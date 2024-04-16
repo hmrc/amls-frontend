@@ -16,22 +16,24 @@
 
 package utils
 
-import org.joda.time.{LocalDate, LocalDateTime}
-import org.joda.time.format.DateTimeFormat
+import java.time.format.DateTimeFormatter
+import java.time.{LocalDate, LocalDateTime}
 
 object DateHelper {
 
+  private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+
   implicit def localDateOrdering: Ordering[LocalDate] = Ordering.fromLessThan(_ isBefore _)
 
-  def isNotFutureDate = {
+  def isNotFutureDate: LocalDate => Boolean = {
     date: LocalDate => !date.isAfter(LocalDate.now())
   }
 
-  def formatDate(date: LocalDate) = {
-    DateTimeFormat.forPattern("d MMMM yyyy").print(date)
+  def formatDate(date: LocalDate): String = {
+    formatter.format(date)
   }
 
-  def formatDate(date: LocalDateTime) = {
-    DateTimeFormat.forPattern("d MMMM yyyy").print(date)
+  def formatDate(date: LocalDateTime): String = {
+    formatter.format(date)
   }
 }

@@ -27,7 +27,6 @@ import models.payments._
 import models.renewal._
 import models.status.{SubmissionReady, SubmissionReadyForReview}
 import models.{Country, FeeResponse, ReadStatusResponse, ReturnLocation}
-import org.joda.time.DateTime
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import play.api.test.Helpers._
@@ -37,6 +36,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import utils.AmlsSpec
 import views.html.payments.WaysToPayView
 
+import java.time.LocalDateTime
 import scala.concurrent.{ExecutionContext, Future}
 
 class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator with PaymentGenerator with Injecting {
@@ -66,7 +66,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
 
-    val fees = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber, 100, None, None, 0, 100, Some(paymentReferenceNumber), None, DateTime.now())
+    val fees = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber, 100, None, None, 0, 100, Some(paymentReferenceNumber), None, LocalDateTime.now())
 
     val submissionStatus = SubmissionReadyForReview
     val readStatusResponse = mock[ReadStatusResponse]

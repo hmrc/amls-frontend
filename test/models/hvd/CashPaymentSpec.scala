@@ -16,18 +16,19 @@
 
 package models.hvd
 
-import org.joda.time.LocalDate
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JodaReads, JodaWrites, JsPath, JsSuccess, Json}
+import play.api.libs.json.{JsPath, JsSuccess, Json}
 
-class CashPaymentSpec extends PlaySpec with MockitoSugar with JodaReads with JodaWrites {
+import java.time.LocalDate
+
+class CashPaymentSpec extends PlaySpec with MockitoSugar {
 
   "CashPayment" should {
 
     val cashPaymentYes = CashPayment(
       CashPaymentOverTenThousandEuros(true),
-      Some(CashPaymentFirstDate(new LocalDate(1990, 2, 24))))
+      Some(CashPaymentFirstDate(LocalDate.of(1990, 2, 24))))
     val cashPaymentYesJson = Json.obj("acceptedAnyPayment" -> true, "paymentDate" ->"1990-02-24")
 
     val cashPaymentNo = CashPayment(
@@ -37,7 +38,7 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar with JodaReads with Jod
 
     "have isCashPaymentsComplete function which" must {
       "return true if CashPayments is complete" in {
-        val completeCashPayment = CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(new LocalDate(1999, 1, 1))))
+        val completeCashPayment = CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(1999, 1, 1))))
 
         completeCashPayment.isCashPaymentsComplete mustBe(true)
       }
@@ -77,11 +78,11 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar with JodaReads with Jod
       }
 
       "return CashPayment with acceptedPayment:true and paymentDate:Some when passed paymentDate" in {
-        CashPayment.update(cashPaymentYes, CashPaymentFirstDate(new LocalDate(1980, 2, 24)))
-          .mustBe(CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(new LocalDate(1980, 2, 24)))))
+        CashPayment.update(cashPaymentYes, CashPaymentFirstDate(LocalDate.of(1980, 2, 24)))
+          .mustBe(CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(1980, 2, 24)))))
 
-        CashPayment.update(cashPaymentNo, CashPaymentFirstDate(new LocalDate(1980, 2, 24)))
-          .mustBe(CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(new LocalDate(1980, 2, 24)))))
+        CashPayment.update(cashPaymentNo, CashPaymentFirstDate(LocalDate.of(1980, 2, 24)))
+          .mustBe(CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(1980, 2, 24)))))
       }
     }
 
@@ -112,7 +113,7 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar with JodaReads with Jod
         Json.toJson(cashPaymentYes) must
           be(Json.obj(
             "acceptedAnyPayment" -> true,
-            "paymentDate" -> new LocalDate(1990, 2, 24)
+            "paymentDate" -> LocalDate.of(1990, 2, 24)
           ))
       }
     }

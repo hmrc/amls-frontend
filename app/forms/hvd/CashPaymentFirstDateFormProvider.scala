@@ -18,7 +18,7 @@ package forms.hvd
 
 import forms.mappings.Mappings
 import models.hvd.CashPaymentFirstDate
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import play.api.data.Form
 
 import javax.inject.Inject
@@ -26,14 +26,14 @@ import javax.inject.Inject
 class CashPaymentFirstDateFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[CashPaymentFirstDate] = Form[CashPaymentFirstDate](
-    "paymentDate" -> jodaLocalDate(
+    "paymentDate" -> localDate(
       invalidKey = "error.date.hvd.real",
       allRequiredKey = "error.date.hvd.all",
       twoRequiredKey = "error.date.hvd.two",
       requiredKey = "error.date.hvd.one"
     ).verifying(
-      jodaMinDate(CashPaymentFirstDateFormProvider.minDate, "error.date.hvd.past"),
-      jodaMaxDate(CashPaymentFirstDateFormProvider.maxDate, "error.date.hvd.future")
+      minDate(CashPaymentFirstDateFormProvider.minDate, "error.date.hvd.past"),
+      maxDate(CashPaymentFirstDateFormProvider.maxDate, "error.date.hvd.future")
     ).transform[CashPaymentFirstDate](
       CashPaymentFirstDate(_), _.paymentDate
     )
@@ -43,7 +43,7 @@ class CashPaymentFirstDateFormProvider @Inject()() extends Mappings {
 
 object CashPaymentFirstDateFormProvider {
 
-  val minDate: LocalDate = new LocalDate(1900, 1, 1)
+  val minDate: LocalDate = LocalDate.of(1900, 1, 1)
 
   def maxDate: LocalDate = LocalDate.now()
 }

@@ -21,7 +21,6 @@ import models.ReadStatusResponse
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, NotStarted, TaskRow, Updated}
 import models.status._
-import org.joda.time.{DateTimeUtils, LocalDate, LocalDateTime}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -29,10 +28,12 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.{Application, Environment}
 import play.api.test.Helpers
+import play.api.{Application, Environment}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.ZoneOffset.UTC
+import java.time.{Clock, Instant, LocalDate, LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 import scala.concurrent.{ExecutionContext, Future}
 
 class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with GuiceOneAppPerSuite {
@@ -45,12 +46,15 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       .build()
   }
 
+  val mockClock: Clock = mock[Clock]
+
    val service = new StatusService(
     amlsConnector = mock[AmlsConnector],
     dataCacheConnector = mock[DataCacheConnector],
     enrolmentsService = mock[AuthEnrolmentsService],
     sectionsProvider = mock[SectionsProvider],
-    environment = mock[Environment]
+    environment = mock[Environment],
+    clock = mockClock
   )
 
   val amlsRegNo = Some("X0123456789")
@@ -61,8 +65,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   implicit val ec = app.injector.instanceOf[ExecutionContext]
   implicit val messages = Helpers.stubMessages()
 
-  val readStatusResponse: ReadStatusResponse = ReadStatusResponse(new LocalDateTime(), "Pending", None, None, None,
-    None, false)
+  val readStatusResponse: ReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
 
   "Status Service" must {
     "return NotCompleted" in {
@@ -211,6 +214,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
     "return ReadyForRenewal" in {
       val renewalDate = LocalDate.now().plusDays(15)
+      when(mockClock.withZone(UTC)).thenReturn(Clock.fixed(Instant.from(ZonedDateTime.now(UTC)), UTC))
 
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
@@ -223,12 +227,11 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual ReadyForRenewal(Some(renewalDate))
       }
-
     }
 
     "return ReadyForRenewal when on first day of window" in {
-      val renewalDate = new LocalDate(2017,3,31)
-      DateTimeUtils.setCurrentMillisFixed((new LocalDate(2017,3,2)).toDateTimeAtStartOfDay.getMillis)
+      val renewalDate = LocalDate.of(2017,3,31)
+      when(mockClock.withZone(UTC)).thenReturn(Clock.fixed(Instant.from(ZonedDateTime.of(2017, 3, 2, 0, 0, 0, 0, UTC)), UTC))
 
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
@@ -242,14 +245,12 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual ReadyForRenewal(Some(renewalDate))
       }
-
-      DateTimeUtils.setCurrentMillisSystem()
-
     }
 
     "return Approved when one day before window" in {
-      val renewalDate = new LocalDate(2017,3,31)
-      DateTimeUtils.setCurrentMillisFixed((new LocalDate(2017,3,1)).toDateTimeAtStartOfDay.getMillis)
+      val renewalDate = LocalDate.of(2017,3,31)
+      when(mockClock.withZone(UTC)).thenReturn(Clock.fixed(Instant.from(ZonedDateTime.of(2017, 3, 1, 0, 0, 0, 0, UTC)), UTC))
+
 
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
@@ -263,9 +264,6 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual SubmissionDecisionApproved
       }
-
-      DateTimeUtils.setCurrentMillisSystem()
-
     }
 
     "not return ReadyForRenewal" in {

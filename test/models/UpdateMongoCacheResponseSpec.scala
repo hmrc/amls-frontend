@@ -17,14 +17,15 @@
 package models
 
 import models.businesscustomer.{Address, ReviewDetails}
-import models.businessdetails.{ActivityStartDate, BusinessDetails, ContactingYou, CorporationTaxRegisteredYes, CorrespondenceAddress, CorrespondenceAddressUk, PreviouslyRegisteredYes, RegisteredOfficeUK, VATRegisteredYes}
-import models.businessmatching.{BusinessActivities, BusinessAppliedForPSRNumberYes, BusinessMatching, BusinessMatchingMsbServices, CompanyRegistrationNumber, TypeOfBusiness}
+import models.businessdetails._
 import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
 import models.businessmatching.BusinessMatchingMsbService.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, TransmittingMoney}
 import models.businessmatching.BusinessType.SoleProprietor
-import org.joda.time.LocalDate
+import models.businessmatching._
 import play.api.libs.json.{JsNull, JsSuccess, Json}
 import utils.AmlsSpec
+
+import java.time.LocalDate
 
 class UpdateMongoCacheResponseSpec extends AmlsSpec {
 
@@ -42,7 +43,7 @@ class UpdateMongoCacheResponseSpec extends AmlsSpec {
     tradingPremises = None,
     businessDetails = Some(BusinessDetails(
       Some(PreviouslyRegisteredYes(Some("12345678"))),
-      Some(ActivityStartDate(new LocalDate("1990-02-24"))),
+      Some(ActivityStartDate(LocalDate.of(1990,2,24))),
       Some(VATRegisteredYes("123456789")),
       Some(CorporationTaxRegisteredYes("1234567890")),
       Some(ContactingYou(Some("1234567890"), Some("test@test.com"))),

@@ -17,24 +17,19 @@
 package models.tradingpremises
 
 import models.DateOfChange
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import play.api.libs.json._
 import typeclasses.MongoKey
-import play.api.libs.json.JodaWrites._
-import play.api.libs.json.JodaReads._
 
-case class AgentName(agentName: String,
-                     dateOfChange: Option[DateOfChange] = None,
-                     agentDateOfBirth: Option[LocalDate] = None
-                    )
+case class AgentName(agentName: String, dateOfChange: Option[DateOfChange] = None, agentDateOfBirth: Option[LocalDate] = None)
 
 object AgentName {
 
-  implicit val mongoKey = new MongoKey[AgentName] {
+  implicit val mongoKey: MongoKey[AgentName] = new MongoKey[AgentName] {
     override def apply(): String = "agent-name"
   }
 
-  implicit val format = Json.format[AgentName]
+  implicit val format: OFormat[AgentName] = Json.format[AgentName]
 
   implicit def convert(data: AgentName): Option[TradingPremises] = {
     Some(TradingPremises(agentName = Some(data)))

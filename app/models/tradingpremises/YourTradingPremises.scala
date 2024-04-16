@@ -17,8 +17,10 @@
 package models.tradingpremises
 
 import models.DateOfChange
-import org.joda.time.LocalDate
-import play.api.libs.json.{Reads, Writes}
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
+
+import java.time.LocalDate
 
 case class YourTradingPremises(
                                 tradingName: String,
@@ -29,13 +31,8 @@ case class YourTradingPremises(
                               )
 
 object YourTradingPremises {
-  
-  import play.api.libs.json.JodaReads._
-  import play.api.libs.json.JodaWrites._
 
   implicit val reads: Reads[YourTradingPremises] = {
-    import play.api.libs.functional.syntax._
-    import play.api.libs.json._
     (
       (__ \ "tradingName").read[String] and
         __.read[Address] and
@@ -46,8 +43,6 @@ object YourTradingPremises {
   }
 
   implicit val writes: Writes[YourTradingPremises] = {
-    import play.api.libs.functional.syntax._
-    import play.api.libs.json._
     (
       (__ \ "tradingName").write[String] and
         __.write[Address] and

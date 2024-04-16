@@ -27,7 +27,6 @@ import models.businessmatching.{BusinessActivities => BusinessMatchingActivities
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady}
 import models.tradingpremises._
 import models.{DateOfChange, TradingPremisesSection}
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
@@ -46,6 +45,7 @@ import utils.{AmlsSpec, AuthorisedRequest, DateHelper}
 import views.html.DateOfChangeView
 import views.html.tradingpremises.WhatDoesYourBusinessDoView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter with Injecting {
@@ -473,7 +473,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
             "dateOfChange.day" -> "01"
           )
 
-        val date = new LocalDate(2011, 10, 1)
+        val date = LocalDate.of(2011, 10, 1)
 
         val authorisedRequest = AuthorisedRequest(postRequest, Some("REF"), "CREDID", Individual, Enrolments(Set()), ("TYPE", "ID"), Some("GROUPID"), Some(User))
 
@@ -508,10 +508,10 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
         val authorisedRequest = AuthorisedRequest(postRequest, Some("REF"), "CREDID", Individual, Enrolments(Set()), ("TYPE", "ID"), Some("GROUPID"), Some(User))
 
         val data = WhatDoesYourBusinessDo(Set(AccountancyServices))
-        val expectedData = WhatDoesYourBusinessDo(data.activities, dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
+        val expectedData = WhatDoesYourBusinessDo(data.activities, dateOfChange = Some(DateOfChange(LocalDate.of(2010, 10, 1))))
 
         val yourPremises = mock[YourTradingPremises]
-        when(yourPremises.startDate) thenReturn Some(new LocalDate(2005, 1, 1))
+        when(yourPremises.startDate) thenReturn Some(LocalDate.of(2005, 1, 1))
 
         val premises = TradingPremises(yourTradingPremises = Some(yourPremises), whatDoesYourBusinessDoAtThisAddress = Some(data))
 

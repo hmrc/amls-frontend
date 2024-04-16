@@ -19,7 +19,6 @@ package views.hvd
 import models.hvd.PercentageOfCashPaymentOver15000.Third
 import models.hvd.Products._
 import models.hvd._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.test.{FakeRequest, Injecting}
@@ -28,6 +27,7 @@ import utils.hvd.CheckYourAnswersHelper
 import views.Fixture
 import views.html.hvd.CheckYourAnswersView
 
+import java.time.LocalDate
 import scala.jdk.CollectionConverters._
 
 class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks with Injecting {
@@ -59,7 +59,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
       Hvd(
         cashPayment = Some(CashPayment(
           CashPaymentOverTenThousandEuros(true),
-          Some(CashPaymentFirstDate(LocalDate.parse("2012-6-20"))))),
+          Some(CashPaymentFirstDate(LocalDate.of(2012,6,20))))),
         products = Some(Products(Set(Alcohol, Tobacco, Antiques, Cars, OtherMotorVehicles,
           Caravans, Jewellery, Gold, ScrapMetals, MobilePhones, Clothing,
           Other("Other Product")

@@ -18,22 +18,22 @@ package forms.supervision
 
 import forms.mappings.Mappings
 import models.supervision.SupervisionEnd
-import org.joda.time.LocalDate
 import play.api.data.Form
 
+import java.time.LocalDate
 import javax.inject.Inject
 
 class SupervisionEndFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[SupervisionEnd] = Form[SupervisionEnd](
-    "endDate" -> jodaLocalDate(
+    "endDate" -> localDate(
       invalidKey = "error.supervision.end.invalid.date.not.real",
       allRequiredKey = "error.supervision.end.required.date.all",
       twoRequiredKey = "error.supervision.end.required.date.two",
       requiredKey = "error.supervision.end.required.date.one"
     ).verifying(
-      jodaMinDate(SupervisionEndFormProvider.minDate, "error.supervision.end.invalid.date.after.1900"),
-      jodaMaxDate(SupervisionEndFormProvider.maxDate, "error.supervision.end.invalid.date.future")
+      minDate(SupervisionEndFormProvider.minDate, "error.supervision.end.invalid.date.after.1900"),
+      maxDate(SupervisionEndFormProvider.maxDate, "error.supervision.end.invalid.date.future")
     ).transform[SupervisionEnd](
       SupervisionEnd(_), _.endDate
     )
@@ -43,7 +43,7 @@ class SupervisionEndFormProvider @Inject()() extends Mappings {
 
 object SupervisionEndFormProvider {
 
-  val minDate: LocalDate = new LocalDate(1900, 1, 1)
+  val minDate: LocalDate = LocalDate.of(1900, 1, 1)
 
   def maxDate: LocalDate = LocalDate.now()
 }

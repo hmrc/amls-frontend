@@ -20,16 +20,17 @@ import models.DateOfChange
 import models.hvd.Products.Cars
 import models.hvd.SalesChannel._
 import models.registrationprogress._
-import org.joda.time.LocalDate
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JodaReads, JodaWrites, JsUndefined, Json}
+import play.api.libs.json.{JsUndefined, Json}
 import play.api.test.Helpers
 import uk.gov.hmrc.http.cache.client.CacheMap
 
+import java.time.LocalDate
+
 sealed trait HvdTestFixture {
-  val DefaultCashPayment = CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(new LocalDate(1956, 2, 15))))
+  val DefaultCashPayment = CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(1956, 2, 15))))
   private val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
 
   val NewCashPayment = CashPayment(CashPaymentOverTenThousandEuros(false), None)
@@ -43,17 +44,17 @@ sealed trait HvdTestFixture {
     Some(true),
     Some(paymentMethods),
     Some(LinkedCashPayments(false)),
-    Some(DateOfChange(new LocalDate("2016-02-24"))))
+    Some(DateOfChange(LocalDate.of(2016,2,24))))
 }
 
-class HvdSpec extends PlaySpec with MockitoSugar with JodaReads with JodaWrites {
+class HvdSpec extends PlaySpec with MockitoSugar {
 
   "hvd" must {
 
     val completeJson = Json.obj(
       "cashPayment" -> Json.obj(
         "acceptedAnyPayment" -> true,
-        "paymentDate" -> new LocalDate(1956, 2, 15)
+        "paymentDate" -> LocalDate.of(1956, 2, 15)
       ),
       "products" -> Json.obj(
         "products" -> Seq("04")
@@ -91,7 +92,7 @@ class HvdSpec extends PlaySpec with MockitoSugar with JodaReads with JodaWrites 
           val completeJson = Json.obj(
             "cashPayment" -> Json.obj(
               "acceptedAnyPayment" -> true,
-              "paymentDate" -> new LocalDate(1956, 2, 15)
+              "paymentDate" -> LocalDate.of(1956, 2, 15)
             ),
             "products" -> Json.obj(
               "products" -> Seq("04")

@@ -39,7 +39,7 @@ trait TradingPremisesGenerator extends BaseGenerator with BusinessActivitiesGene
     name <- stringOfLengthGen(nameLength)
     address <- tradingPremisesAddressGen
     residential <- Gen.oneOf(Some(true), Some(false), None)
-    startDate <- jodaLocalDateGen
+    startDate <- localDateGen
   } yield YourTradingPremises(name, address, residential, Some(startDate), None)
 
   val whatBusinessActivitiesGen: Gen[WhatDoesYourBusinessDo] = for {

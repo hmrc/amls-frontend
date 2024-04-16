@@ -20,12 +20,13 @@ import controllers.actions.SuccessfulAuthAction
 import forms.DateOfChangeFormProvider
 import models.DateOfChange
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatDateRemovedPageId}
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.DateOfChangeView
+
+import java.time.LocalDate
 
 class WhatDateRemovedControllerSpec extends AmlsSpec with Injecting {
 
@@ -74,7 +75,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec with Injecting {
         val result = controller.get()(request)
         status(result) must be(OK)
         Jsoup.parse(contentAsString(result)).getElementById("dateOfChange.day").attr("value") mustBe today.getDayOfMonth.toString
-        Jsoup.parse(contentAsString(result)).getElementById("dateOfChange.month").attr("value") mustBe today.getMonthOfYear.toString
+        Jsoup.parse(contentAsString(result)).getElementById("dateOfChange.month").attr("value") mustBe today.getMonthValue.toString
         Jsoup.parse(contentAsString(result)).getElementById("dateOfChange.year").attr("value") mustBe today.getYear.toString
       }
     }
@@ -87,7 +88,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec with Injecting {
 
         val result = controller.post()(FakeRequest(POST, routes.WhatDateRemovedController.post().url).withFormUrlEncodedBody(
           "dateOfChange.day" -> today.getDayOfMonth.toString,
-          "dateOfChange.month" -> today.getMonthOfYear.toString,
+          "dateOfChange.month" -> today.getMonthValue.toString,
           "dateOfChange.year" -> today.getYear.toString
         ))
 
@@ -101,7 +102,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec with Injecting {
         await {
           controller.post()(FakeRequest(POST, routes.WhatDateRemovedController.post().url).withFormUrlEncodedBody(
             "dateOfChange.day" -> today.getDayOfMonth.toString,
-            "dateOfChange.month" -> today.getMonthOfYear.toString,
+            "dateOfChange.month" -> today.getMonthValue.toString,
             "dateOfChange.year" -> today.getYear.toString
           ))
         }

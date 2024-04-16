@@ -18,11 +18,12 @@ package utils.supervision
 
 import models.supervision.ProfessionalBodies.{AccountingTechnicians, Other}
 import models.supervision._
-import org.joda.time.LocalDate
 import org.scalatest.Assertion
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import utils.{AmlsSpec, DateHelper}
+
+import java.time.LocalDate
 
 class CheckYourAnswersHelperSpec extends AmlsSpec {
 

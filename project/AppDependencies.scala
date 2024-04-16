@@ -28,7 +28,6 @@ private object AppDependencies {
     "commons-codec"          % "commons-codec"                 % "1.15",
     // PLAY
     "com.typesafe.play"     %% "play-json"                     % "2.8.1",
-    "com.typesafe.play"     %% "play-json-joda"                % "2.8.1"
   )
 
   trait ScopeDependencies {

@@ -27,6 +27,8 @@ import services.StatusService
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.responsiblepeople.RemoveResponsiblePersonView
 
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ofPattern
 import scala.concurrent.Future
 
 class RemoveResponsiblePersonController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -87,7 +89,7 @@ class RemoveResponsiblePersonController @Inject()(val dataCacheConnector: DataCa
                     case Right(value) if startDate.exists(_.isAfter(value.endDate)) =>
                       val formWithFutureError =
                         formProvider().withError(
-                          "endDate", messages("error.expected.rp.date.after.start", name, startDate.fold("")(_.toString("dd-MM-yyyy")))
+                          "endDate", messages("error.expected.rp.date.after.start", name, startDate.fold("")(strtDte => strtDte.format(ofPattern("dd-MM-yyyy"))))
                         )
                       Future.successful(BadRequest(view(formWithFutureError, index, name, true, flow)))
                     case Right(value) => updateDataStrict[ResponsiblePerson](request.credId, index) {

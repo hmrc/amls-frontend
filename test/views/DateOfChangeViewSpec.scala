@@ -18,11 +18,12 @@ package views
 
 import forms.DateOfChangeFormProvider
 import models.DateOfChange
-import org.joda.time.LocalDate
 import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.html.DateOfChangeView
+
+import java.time.LocalDate
 
 class DateOfChangeViewSpec extends AmlsViewSpec with Matchers {
 

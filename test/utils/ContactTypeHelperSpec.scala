@@ -18,8 +18,10 @@ package utils
 
 import models.notifications.ContactType.NoSubject
 import models.notifications._
-import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatestplus.play.PlaySpec
+
+import java.time.ZoneOffset.UTC
+import java.time.{Instant, LocalDateTime}
 
 class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
 
@@ -36,7 +38,7 @@ class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
           Some(ContactType.MindedToRevoke),
           None,
           false,
-          new DateTime(1479730062573L, DateTimeZone.UTC),
+          LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC),
           false,
           "XJML00000200000",
           "1",
@@ -56,7 +58,7 @@ class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
           None,
           None,
           false,
-          new DateTime(1479730062573L, DateTimeZone.UTC),
+          LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC),
           false,
           "XJML00000200000",
           "1",
@@ -75,7 +77,7 @@ class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
           None,
           None,
           true,
-          new DateTime(1479730062573L, DateTimeZone.UTC),
+          LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC),
           false,
           "XJML00000200000",
           "1",
@@ -94,7 +96,7 @@ class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
           None,
           None,
           true,
-          new DateTime(1479730062573L, DateTimeZone.UTC),
+          LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC),
           false,
           "XJML00000200000",
           "1",
@@ -113,7 +115,7 @@ class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
           contactType = None,
           contactNumber = None,
           variation = false,
-          receivedAt = new DateTime(1479730062573L, DateTimeZone.UTC),
+          receivedAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC),
           isRead = false,
           amlsRegistrationNumber = "XJML00000200000",
           templatePackageVersion = "v1m0",

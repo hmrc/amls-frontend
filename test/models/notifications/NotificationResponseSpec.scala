@@ -16,13 +16,14 @@
 
 package models.notifications
 
-import org.joda.time.LocalDateTime
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 
+import java.time.LocalDateTime
+
 class NotificationResponseSpec extends AnyWordSpec with Matchers {
-  private val testProcessingDate = new LocalDateTime(2001, 12, 17, 9, 30, 47)
+  private val testProcessingDate = LocalDateTime.of(2001, 12, 17, 9, 30, 47)
 
   val notificationJson = Json.obj(
     "processingDate" -> "2001-12-17T09:30:47Z",

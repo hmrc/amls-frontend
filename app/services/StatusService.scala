@@ -22,18 +22,21 @@ import models.ReadStatusResponse
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, TaskRow, Updated}
 import models.status._
-import org.joda.time.LocalDate
+
+import java.time.{Clock, LocalDate, ZoneOffset}
 import play.api.i18n.Messages
 import play.api.{Environment, Logging, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.ZoneOffset.UTC
 import scala.concurrent.{ExecutionContext, Future}
 
 class StatusService @Inject() (val amlsConnector: AmlsConnector,
                                val dataCacheConnector: DataCacheConnector,
                                val enrolmentsService: AuthEnrolmentsService,
                                val sectionsProvider: SectionsProvider,
-                               val environment: Environment) extends Logging {
+                               val environment: Environment,
+                               clock: Clock) extends Logging {
   private val renewalPeriod = 30
 
   val Pending = "Pending"
@@ -47,7 +50,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
 
   private def getApprovedStatus(response: ReadStatusResponse) = {
     (response.currentRegYearEndDate, response.renewalConFlag) match {
-      case (Some(endDate), false) if LocalDate.now().isAfter(endDate.minusDays(renewalPeriod)) =>
+      case (Some(endDate), false) if LocalDate.now(clock.withZone(UTC)).isAfter(endDate.minusDays(renewalPeriod)) =>
         ReadyForRenewal(response.currentRegYearEndDate)
       case (_, true) => RenewalSubmitted(response.currentRegYearEndDate)
       case _ => SubmissionDecisionApproved

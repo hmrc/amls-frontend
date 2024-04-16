@@ -23,7 +23,6 @@ import forms.tradingpremises.TradingAddressFormProvider
 import models._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
@@ -41,6 +40,7 @@ import utils.{AmlsSpec, DateHelper}
 import views.html.DateOfChangeView
 import views.html.tradingpremises.WhereAreTradingPremisesView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter with Injecting {
@@ -136,7 +136,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           "AA11 1AA"
         ),
         Some(true),
-        Some(new LocalDate(1990, 2, 24))
+        Some(LocalDate.of(1990, 2, 24))
       )
 
       "respond with SEE_OTHER" when {
@@ -433,7 +433,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       )
 
       val address = Address("Address 1", Some("Address 2"), None, None, "AA1 1AA")
-      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name", address, Some(true), Some(new LocalDate(2007, 2, 1)))
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name", address, Some(true), Some(LocalDate.of(2007, 2, 1)))
 
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
@@ -464,7 +464,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       )
 
       val address = Address("Address 1", Some("Address 2"), None, None, "AA1 1AA")
-      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = Some(true), Some(new LocalDate(2007, 2, 1)))
+      val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = Some(true), Some(LocalDate.of(2007, 2, 1)))
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises), lineId = None)))))
@@ -497,13 +497,13 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         "dateOfChange.day" -> "01"
       )
 
-      val address = Address("addressLine1", Some("addressLine2"), None, None, "AA1 1AA", Some(DateOfChange(new LocalDate(2010, 10, 1))))
+      val address = Address("addressLine1", Some("addressLine2"), None, None, "AA1 1AA", Some(DateOfChange(LocalDate.of(2010, 10, 1))))
 
-      val yourPremises = YourTradingPremises("Some name", address.copy(dateOfChange = None), isResidential = Some(true), Some(new LocalDate(2001, 1, 1)), None)
+      val yourPremises = YourTradingPremises("Some name", address.copy(dateOfChange = None), isResidential = Some(true), Some(LocalDate.of(2001, 1, 1)), None)
       val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
 
       val expectedResult = yourPremises.copy(
-        tradingNameChangeDate = Some(DateOfChange(new LocalDate(2010, 10, 1))),
+        tradingNameChangeDate = Some(DateOfChange(LocalDate.of(2010, 10, 1))),
         tradingPremisesAddress = address
       )
 
@@ -533,7 +533,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       val ytp = mock[YourTradingPremises]
 
       when(tp.yourTradingPremises) thenReturn Some(ytp)
-      when(ytp.startDate) thenReturn Some(new LocalDate(2011,1,1))
+      when(ytp.startDate) thenReturn Some(LocalDate.of(2011,1,1))
 
       val postRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.dateOfChange(1).url)
         .withFormUrlEncodedBody(
@@ -556,7 +556,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       val ytp = mock[YourTradingPremises]
 
       when(tp.yourTradingPremises) thenReturn Some(ytp)
-      when(ytp.startDate) thenReturn Some(new LocalDate(2011,1,1))
+      when(ytp.startDate) thenReturn Some(LocalDate.of(2011,1,1))
 
       val postRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.dateOfChange(1).url)
         .withFormUrlEncodedBody(
@@ -583,7 +583,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       "dateOfChange.day" -> "01"
     )
 
-    val date = new LocalDate(2008, 1, 1)
+    val date = LocalDate.of(2008, 1, 1)
 
     val yourPremises = YourTradingPremises("Some name", mock[Address], isResidential = Some(true), Some(date), None)
     val premises = TradingPremises(yourTradingPremises = Some(yourPremises))

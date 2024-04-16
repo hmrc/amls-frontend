@@ -29,14 +29,13 @@ import models.payments.PaymentStatuses.{Cancelled, Created, Failed}
 import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.renewal.{InvolvedInOtherNo, Renewal}
-import models.status.{SubmissionDecisionApproved, _}
+import models.status._
 import models.{status => _, _}
-import org.joda.time.{DateTime, LocalDate}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import play.api.test.{FakeRequest, Injecting}
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -44,6 +43,7 @@ import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AmlsSpec, FeeHelper}
 import views.html.confirmation._
 
+import java.time.{LocalDate, LocalDateTime}
 import scala.concurrent.Future
 
 // scalastyle:off magic.number
@@ -123,7 +123,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
       totalFees = 200,
       paymentReference = Some(paymentReferenceNumber),
       difference = Some(115),
-      createdAt = DateTime.now
+      createdAt = LocalDateTime.now
     )
 
     when {
@@ -280,7 +280,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
       "the application status is 'ready for renewal'" in new Fixture {
 
-        setupStatus(ReadyForRenewal(Some(new LocalDate())))
+        setupStatus(ReadyForRenewal(Some(LocalDate.now())))
 
         when {
           controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
@@ -301,7 +301,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
       "the application status is 'ready for renewal' and user has done only variation" in new Fixture {
 
-        setupStatus(ReadyForRenewal(Some(new LocalDate())))
+        setupStatus(ReadyForRenewal(Some(LocalDate.now())))
 
         when {
           controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())

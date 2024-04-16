@@ -20,7 +20,6 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.responsiblepeople.address.NewHomeAddressDateOfChangeFormProvider
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
@@ -29,6 +28,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import views.html.responsiblepeople.address.NewHomeDateOfChangeView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec with Injecting {
@@ -55,7 +55,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec with Injecting {
 
     val responsiblePeople = ResponsiblePerson(personName = Some(PersonName("FirstName",
       None, "lastName")),
-      positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2009,1,1))))))
+      positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(LocalDate.of(2009,1,1))))))
 
     "Get:" must {
       "successfully load when the person moved to new address page" when {

@@ -20,11 +20,12 @@ import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching.BusinessActivities
 import models.tradingpremises.BusinessStructure._
 import models.tradingpremises._
-import org.joda.time.LocalDate
 import org.scalatest.Assertion
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import utils.{AmlsSpec, DateHelper}
+
+import java.time.LocalDate
 
 class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator {
 
@@ -37,7 +38,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
     "foo",
     Address("123 Test Road", Some("Some Village"), Some("A Town"), Some("Big City"), "AA1 1BB", None),
     Some(true),
-    Some(new LocalDate(2010, 10, 10)),
+    Some(LocalDate.of(2010, 10, 10)),
     None
   )
 
@@ -53,7 +54,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
   val agentCompanyName = "Agent Company Name"
   val agentCompanyRegNumber = "98765432"
   val agentPartnershipName = "Agent Partner"
-  val agentDob = LocalDate.parse("1995-12-12")
+  val agentDob = LocalDate.of(1995,12,12)
 
   val nonAgent: TradingPremises = tp.copy(
     registeringAgentPremises = Some(RegisteringAgentPremises(false)),

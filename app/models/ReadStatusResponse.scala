@@ -16,11 +16,10 @@
 
 package models
 
-import org.joda.time.format.ISODateTimeFormat
-import org.joda.time.{DateTimeZone, LocalDate, LocalDateTime}
 import play.api.libs.json._
-import play.api.libs.json.JodaWrites._
-import play.api.libs.json.JodaReads._
+
+import java.time.format.DateTimeFormatter
+import java.time.{LocalDate, LocalDateTime, ZoneId}
 
 case class ReadStatusResponse(
                                processingDate: LocalDateTime,
@@ -38,17 +37,13 @@ case class ReadStatusResponse(
 
 object ReadStatusResponse {
 
-  val dateTimeFormat = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC
+  val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
 
-  implicit val readsJodaLocalDateTime: Reads[LocalDateTime] = Reads[LocalDateTime](js =>
-    js.validate[String].map[LocalDateTime](dtString =>
-      LocalDateTime.parse(dtString, dateTimeFormat)
-    )
-  )
-
-  implicit val localDateTimeWrite: Writes[LocalDateTime] = new Writes[LocalDateTime] {
-    def writes(dateTime: LocalDateTime): JsValue = JsString(dateTimeFormat.print(dateTime.toDateTime(DateTimeZone.UTC)))
+  implicit val readsLocalDateTime: Reads[LocalDateTime] = Reads[LocalDateTime] { js =>
+    js.validate[String].map[LocalDateTime](dtString => LocalDateTime.parse(dtString, dateTimeFormatter))
   }
+
+  implicit val localDateTimeWrite: Writes[LocalDateTime] = (dateTime: LocalDateTime) => JsString(dateTimeFormatter.format(dateTime))
 
   implicit val format: OFormat[ReadStatusResponse] = Json.format[ReadStatusResponse]
 }

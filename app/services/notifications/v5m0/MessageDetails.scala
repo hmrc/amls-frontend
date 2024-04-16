@@ -18,15 +18,16 @@ package services.notifications.v5m0
 
 import models.notifications.ContactType
 import models.notifications.ContactType._
-import org.joda.time.format.DateTimeFormat
+
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class MessageDetails
 
 object MessageDetails {
-  val format = DateTimeFormat.forPattern("yyyy-MM-dd")
-  val Pattern = "dd-MM-yyyy"
+  val f: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 
-  def formatDate(date:String) = format.parseLocalDate(date).toString(Pattern)
+  def formatDate(date: String): String = LocalDate.parse(date).format(f)
 
   def static(contactType: ContactType, url: String): String = {
     contactType match {

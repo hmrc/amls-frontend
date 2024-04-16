@@ -20,13 +20,13 @@ import cats.implicits._
 import connectors.FeeConnector
 import models.FeeResponse
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
-import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.AmlsSpec
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {
@@ -52,7 +52,7 @@ class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {
       BigDecimal(100),
       None,
       None,
-      new DateTime(2018, 1, 1, 0, 0)
+      LocalDateTime.of(2018, 1, 1, 0, 0)
     )
 
     val testFeeResponseAmendVariation = FeeResponse(
@@ -65,7 +65,7 @@ class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {
       BigDecimal(100),
       None,
       Some(BigDecimal(100)),
-      new DateTime(2018, 1, 1, 0, 0)
+      LocalDateTime.of(2018, 1, 1, 0, 0)
     )
 
     def setupMockFeeConnector(amlsReference: String, feeResponse: Option[FeeResponse] = None, exception: Option[Throwable] = None) =

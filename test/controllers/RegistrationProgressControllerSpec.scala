@@ -28,7 +28,6 @@ import models.registrationprogress._
 import models.renewal.{Renewal, _}
 import models.responsiblepeople.{ResponsiblePeopleValues, ResponsiblePerson}
 import models.status._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
@@ -42,6 +41,7 @@ import utils.{AmlsSpec, DependencyMocks}
 import views.html.registrationamendment.RegistrationAmendmentView
 import views.html.registrationprogress.RegistrationProgressView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class RegistrationProgressControllerSpec extends AmlsSpec
@@ -636,7 +636,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         "redirect to the renew registration controller" in new Fixture {
           when {
             controller.statusService.getStatus(any(), any(), any())(any(), any(), any())
-          } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
+          } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
 
           when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
             .thenReturn(Future.successful(false))

@@ -17,11 +17,12 @@
 package models.asp
 
 import models.DateOfChange
-import org.joda.time.LocalDate
+import models.asp.Service._
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import models.asp.Service._
 import play.api.libs.json._
+
+import java.time.LocalDate
 
 class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
 
@@ -35,7 +36,7 @@ class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
         "dateOfChange" -> "2016-02-24")
 
       Json.fromJson[ServicesOfBusiness](json) must
-        be(JsSuccess(ServicesOfBusiness(businessServices, Some(DateOfChange(new LocalDate("2016-02-24")))), JsPath))
+        be(JsSuccess(ServicesOfBusiness(businessServices, Some(DateOfChange(LocalDate.of(2016,2,24)))), JsPath))
     }
 
     "successfully validate selected services value" in {

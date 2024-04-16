@@ -22,12 +22,13 @@ import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.{Country, DateOfChange}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.scalatest.Assertion
 import play.api.i18n.Messages
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import utils.{AmlsSpec, DateHelper}
+
+import java.time.LocalDate
 
 class CheckYourAnswersHelperSpec extends AmlsSpec {
 
@@ -1139,7 +1140,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
 
   val otherName: String = "James Mark Jones"
 
-  val dateOfBirth: LocalDate = LocalDate.parse("1990-03-14")
+  val dateOfBirth: LocalDate = LocalDate.of(1990,3,14)
 
   val passportNumber: String = "123456789"
 
@@ -1211,7 +1212,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val currentAddress: ResponsiblePersonCurrentAddress = ResponsiblePersonCurrentAddress(
     personAddress = personAddress1,
     timeAtAddress = Some(ZeroToFiveMonths),
-    dateOfChange = Some(DateOfChange(new LocalDate(1990, 2, 24)))
+    dateOfChange = Some(DateOfChange(LocalDate.of(1990, 2, 24)))
   )
 
   val additionalAddress: ResponsiblePersonAddress = ResponsiblePersonAddress(
@@ -1233,7 +1234,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val currentAddressNonUK: ResponsiblePersonCurrentAddress = ResponsiblePersonCurrentAddress(
     personAddress = nonUKAddress1,
     timeAtAddress = Some(ZeroToFiveMonths),
-    dateOfChange = Some(DateOfChange(new LocalDate(1990, 2, 24)))
+    dateOfChange = Some(DateOfChange(LocalDate.of(1990, 2, 24)))
   )
 
   val additionalAddressNonUK: ResponsiblePersonAddress = ResponsiblePersonAddress(
@@ -1252,7 +1253,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     additionalExtraAddress = Some(additionalExtraAddressNonUK)
   )
 
-  val positionStartDate: LocalDate = new LocalDate(1990, 2, 24)
+  val positionStartDate: LocalDate = LocalDate.of(1990, 2, 24)
 
   val positions: Positions = Positions(
     positions = Set(BeneficialOwner, NominatedOfficer),

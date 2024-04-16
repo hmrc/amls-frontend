@@ -27,7 +27,6 @@ import models.registrationprogress.{Completed, Started, TaskRow}
 import models.renewal.Renewal
 import models.responsiblepeople._
 import models.status._
-import org.joda.time.LocalDateTime
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -39,6 +38,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import views.html.declaration.{WhoIsRegisteringThisRegistrationView, WhoIsRegisteringThisRenewalView, WhoIsRegisteringThisUpdateView}
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with Injecting {

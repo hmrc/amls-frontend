@@ -21,30 +21,31 @@ import models.registrationprogress.{Completed, Started, TaskRow, Updated}
 import models.renewal._
 import models.responsiblepeople._
 import models.status._
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.i18n.Messages
 import play.api.test.Helpers
 import play.api.test.Helpers._
 import services.{RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.DeclarationHelper._
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
 class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
-  implicit val statusService = mock[StatusService]
-  implicit val renewalService = mock[RenewalService]
-  implicit val headerCarrier = mock[HeaderCarrier]
+  implicit val statusService: StatusService = mock[StatusService]
+  implicit val renewalService: RenewalService = mock[RenewalService]
+  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
-  val amlsRegNo = Some("regNo")
-  val accountTypeId = ("accountType", "accountId")
+  val amlsRegNo: Option[String] = Some("regNo")
+  val accountTypeId: (String, String) = ("accountType", "accountId")
   val credId = "12341234"
 
   private val completeRenewal = Renewal(
@@ -69,7 +70,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
     businessTurnover = None
   )
 
-  implicit val messages = Helpers.stubMessages()
+  implicit val messages: Messages = Helpers.stubMessages()
 
   "currentPartnersNames" must {
     "return a sequence of full names of only undeleted partners" in {
@@ -201,7 +202,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
         "return true" in {
           when {
             statusService.getStatus(any(),any(), any())(any(),any(), any())
-          } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
+          } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
 
           when(renewalService.isRenewalComplete(any(), any())(any(), any()))
             .thenReturn(Future.successful(false))
@@ -217,7 +218,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
         "return true" in {
           when {
             statusService.getStatus(any(),any(), any())(any(),any(), any())
-          } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
+          } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
 
           when(renewalService.isRenewalComplete(any(), any())(any(), any()))
             .thenReturn(Future.successful(false))
@@ -233,7 +234,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
         "return false" in {
           when {
             statusService.getStatus(any(),any(), any())(any(),any(), any())
-          } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
+          } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
 
           when(renewalService.isRenewalComplete(any(), any())(any(), any()))
             .thenReturn(Future.successful(true))
@@ -278,7 +279,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
   "statusEndDate" must {
     "return the end date where there is a date" in {
-      val date = new LocalDate()
+      val date = LocalDate.now()
       when {
         statusService.getStatus(any(),any(), any())(any(),any(), any())
       } thenReturn Future.successful(ReadyForRenewal(Some(date)))
@@ -299,7 +300,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
     "return renewal subheading if application is in renewal window and renewal is complete" in {
       when {
         statusService.getStatus(any(),any(), any())(any(),any(), any())
-      } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
+      } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
 
       when(renewalService.isRenewalComplete(any(), any())(any(), any()))
         .thenReturn(Future.successful(true))
@@ -369,19 +370,19 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
     }
   }
 
-  val partnerWithName = ResponsiblePerson(
+  val partnerWithName: ResponsiblePerson = ResponsiblePerson(
     personName = Some(PersonName("FirstName1", None, "LastName1")),
     positions = Some(Positions(Set(Partner), None)),
     status = None
   )
 
-  val deletedPartner = ResponsiblePerson(
+  val deletedPartner: ResponsiblePerson = ResponsiblePerson(
     personName = Some(PersonName("FirstName2", None, "LastName2")),
     positions = Some(Positions(Set(Partner), None)),
     status = Some(StatusConstants.Deleted)
   )
 
-  val nonPartnerWithName = ResponsiblePerson(
+  val nonPartnerWithName: ResponsiblePerson = ResponsiblePerson(
     personName = Some(PersonName("FirstName1", None, "LastName1")),
     positions = Some(Positions(Set(Director), None)),
     status = None

@@ -16,10 +16,12 @@
 
 package models.notifications
 
-import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import utils.AmlsSpec
+
+import java.time.{Instant, LocalDateTime}
+import java.time.ZoneOffset.UTC
 
 class NotificationRowSpec extends PlaySpec with AmlsSpec {
 
@@ -32,7 +34,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
     None,
     None,
     false,
-    DateTime.now(),
+    LocalDateTime.now(),
     false,
     "XJML00000200000",
     "v1m0",
@@ -63,7 +65,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
     }
 
     "format the date for the table of messages" in {
-      testNotifications.copy(receivedAt = new DateTime(2017, 12, 1, 3, 3, DateTimeZone.UTC)).dateReceived mustBe "1 December 2017"
+      testNotifications.copy(receivedAt = LocalDateTime.of(2017, 12, 1, 3, 3)).dateReceived mustBe "1 December 2017"
     }
 
     "read and write json successfully" ignore {
@@ -76,7 +78,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
         Some(ContactType.MindedToRevoke),
         None,
         false,
-        new DateTime(1479730062573L, DateTimeZone.UTC),
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC),
         false,
         "XJML00000200000",
         "1",
@@ -109,7 +111,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
         Some(ContactType.RejectionReasons),
         None,
         false,
-        new DateTime(1479730062573L, DateTimeZone.UTC),
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC),
         false,
         "XJML00000200000",
         "1",
@@ -172,7 +174,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
         Some(ContactType.RejectionReasons),
         None,
         false,
-        new DateTime(1479730062573L, DateTimeZone.UTC),
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC),
         false,
         "XJML00000200000",
         "1",

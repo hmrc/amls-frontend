@@ -72,10 +72,10 @@ class RemoveTradingPremisesViewSpec extends AmlsViewSpec with Matchers with Inje
 
     behave like pageWithErrors(
       remove_trading_premises(
-        fp().withError("endDate.day", "error.expected.jodadate.format"), 1, true, "trading address",true
+        fp().withError("endDate.day", "error.expected.date.format"), 1, true, "trading address",true
       ),
       "endDate",
-      "error.expected.jodadate.format"
+      "error.expected.date.format"
     )
 
     behave like pageWithBackLink(remove_trading_premises(fp(), 1, false, "trading Address", true))

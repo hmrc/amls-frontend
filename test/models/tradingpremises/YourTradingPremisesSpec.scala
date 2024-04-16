@@ -17,12 +17,13 @@
 package models.tradingpremises
 
 import models.DateOfChange
-import org.joda.time.LocalDate
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json._
 
-class YourTradingPremisesSpec extends AnyWordSpec with Matchers with JodaWrites with JodaReads {
+import java.time.LocalDate
+
+class YourTradingPremisesSpec extends AnyWordSpec with Matchers {
 
   val model = YourTradingPremises(
     "foo",
@@ -34,7 +35,7 @@ class YourTradingPremisesSpec extends AnyWordSpec with Matchers with JodaWrites 
       "AA11 1AA"
     ),
     Some(true),
-    Some(new LocalDate(1990, 2, 24))
+    Some(LocalDate.of(1990, 2, 24))
   )
 
   "YourTradingPremises" must {
@@ -43,16 +44,16 @@ class YourTradingPremisesSpec extends AnyWordSpec with Matchers with JodaWrites 
       "tradingName" -> "foo",
       "addressLine1" -> "1",
       "addressLine2" -> "2",
-      "addressDateOfChange" -> new LocalDate(1997, 7, 1),
+      "addressDateOfChange" -> LocalDate.of(1997, 7, 1),
       "postcode" -> "AA11 1AA",
       "isResidential" -> true,
-      "startDate" -> new LocalDate(1990, 2, 24),
-      "tradingNameChangeDate" -> new LocalDate(2016,1,12)
+      "startDate" -> LocalDate.of(1990, 2, 24),
+      "tradingNameChangeDate" -> LocalDate.of(2016,1,12)
     )
 
     val jsonModel = model.copy(
-      tradingNameChangeDate = Some(DateOfChange(new LocalDate(2016, 1, 12))),
-      tradingPremisesAddress = model.tradingPremisesAddress.copy(dateOfChange = Some(DateOfChange(new LocalDate(1997, 7, 1))))
+      tradingNameChangeDate = Some(DateOfChange(LocalDate.of(2016, 1, 12))),
+      tradingPremisesAddress = model.tradingPremisesAddress.copy(dateOfChange = Some(DateOfChange(LocalDate.of(1997, 7, 1))))
     )
 
     "Correctly serialise from json" in {

@@ -20,15 +20,16 @@ import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal}
-import models.tradingpremises.TradingPremisesMsbServices._
 import models.businessmatching.{BusinessMatchingMsbServices => BMMsbServices}
+import models.tradingpremises.TradingPremisesMsbServices._
 import models.tradingpremises.{WhatDoesYourBusinessDo, TradingPremisesMsbServices => TPMsbServices}
-import org.joda.time.LocalDate
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import services.TradingPremisesService
 import utils.{AmlsSpec, DependencyMocks, FutureAssertions, StatusConstants}
+
+import java.time.LocalDate
 
 class TradingPremisesServiceSpec extends PlaySpec
   with AmlsSpec
@@ -50,7 +51,7 @@ class TradingPremisesServiceSpec extends PlaySpec
 
           val models = Seq(
             tradingPremisesGen.sample.get.copy(
-              whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(BillPaymentServices), Some(DateOfChange(new LocalDate(2001,10,31)))))
+              whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(BillPaymentServices), Some(DateOfChange(LocalDate.of(2001,10,31)))))
             ),
             tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get.copy(status = Some(StatusConstants.Deleted)),
             tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get,

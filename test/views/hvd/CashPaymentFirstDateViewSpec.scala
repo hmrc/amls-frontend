@@ -18,13 +18,14 @@ package views.hvd
 
 import forms.hvd.CashPaymentFirstDateFormProvider
 import models.hvd.CashPaymentFirstDate
-import org.joda.time.LocalDate
 import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.hvd.CashPaymentFirstDateView
+
+import java.time.LocalDate
 
 class CashPaymentFirstDateViewSpec extends AmlsViewSpec with Matchers  {
 
@@ -41,14 +42,14 @@ class CashPaymentFirstDateViewSpec extends AmlsViewSpec with Matchers  {
 
     "have correct title" in new ViewFixture {
 
-      def view = dateView(fp().fill(CashPaymentFirstDate(LocalDate.parse("2016-3-20"))), true)
+      def view = dateView(fp().fill(CashPaymentFirstDate(LocalDate.of(2016,3,20))), true)
 
       doc.title must startWith(Messages("hvd.cash.payment.date.title") + " - " + Messages("summary.hvd"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = dateView(fp().fill(CashPaymentFirstDate(LocalDate.parse("2016-3-24"))), true)
+      def view = dateView(fp().fill(CashPaymentFirstDate(LocalDate.of(2016,3,24))), true)
 
       heading.html must be(Messages("hvd.cash.payment.date.title"))
       subHeading.html must include(Messages("summary.hvd"))

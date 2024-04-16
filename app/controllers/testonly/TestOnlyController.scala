@@ -16,7 +16,7 @@
 
 package controllers.testonly
 
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import config.BusinessCustomerSessionCache
 import connectors.cache.MongoCacheConnector
 import connectors.{AmlsConnector, DataCacheConnector, TestOnlyStubConnector}
@@ -29,7 +29,7 @@ import models.tradingpremises._
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.UpdateMongoCacheService
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import utils.AuthAction
 import views.html.confirmation._
 import views.html.ErrorView
@@ -58,20 +58,20 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
                                   ) extends AmlsBaseController(ds, cc) {
 
 
-  def dropMongoCache = authAction.async {
+  def dropMongoCache: Action[AnyContent] = authAction.async {
       implicit request =>
         removeCacheData(request.credId) map { _ =>
           Ok("Cache successfully cleared")
         }
   }
 
-  def removeCacheData(credId: String)(implicit hc: HeaderCarrier) = for {
+  def removeCacheData(credId: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = for {
     _ <- customerCache.remove()
     _ <- mongoCacheConnector.remove(credId)
     response <- testOnlyStubConnector.clearState()
   } yield response
 
-  def updateMongo(fileName:String)  = authAction.async {
+  def updateMongo(fileName:String): Action[AnyContent] = authAction.async {
       implicit request =>
         stubsService.getMongoCacheData(fileName) flatMap {
           case Some(data) =>

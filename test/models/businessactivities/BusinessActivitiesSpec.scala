@@ -21,60 +21,61 @@ import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessActivities => ba, _}
 import models.registrationprogress._
 import models.{Country, DateOfChange}
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
+
+import java.time.LocalDate
 
 class BusinessActivitiesSpec extends AmlsSpec {
 
   val DefaultFranchiseName = "DEFAULT FRANCHISE NAME"
   val DefaultSoftwareName = "DEFAULT SOFTWARE"
-  val DefaultBusinessTurnover = ExpectedBusinessTurnover.First
-  val DefaultAMLSTurnover = ExpectedAMLSTurnover.First
+  val DefaultBusinessTurnover: ExpectedBusinessTurnover = ExpectedBusinessTurnover.First
+  val DefaultAMLSTurnover: ExpectedAMLSTurnover = ExpectedAMLSTurnover.First
   val DefaultInvolvedInOtherDetails = "DEFAULT INVOLVED"
-  val DefaultInvolvedInOther = InvolvedInOtherYes(DefaultInvolvedInOtherDetails)
-  val DefaultBusinessFranchise = BusinessFranchiseYes(DefaultFranchiseName)
+  val DefaultInvolvedInOther: InvolvedInOtherYes = InvolvedInOtherYes(DefaultInvolvedInOtherDetails)
+  val DefaultBusinessFranchise: BusinessFranchiseYes = BusinessFranchiseYes(DefaultFranchiseName)
   val DefaultTransactionRecord = true
-  val DefaultTransactionRecordTypes = TransactionTypes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
-  val DefaultCustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
-  val DefaultNCARegistered = NCARegistered(true)
-  val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
-  val DefaultRiskAssessments = RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))
-  val DefaultHowManyEmployees = HowManyEmployees(Some("5"),Some("4"))
-  val DefaultWhoIsYourAccountant = WhoIsYourAccountant(
+  val DefaultTransactionRecordTypes: TransactionTypes = TransactionTypes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
+  val DefaultCustomersOutsideUK: CustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
+  val DefaultNCARegistered: NCARegistered = NCARegistered(true)
+  val DefaultAccountantForAMLSRegulations: AccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
+  val DefaultRiskAssessments: RiskAssessmentPolicy = RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))
+  val DefaultHowManyEmployees: HowManyEmployees = HowManyEmployees(Some("5"),Some("4"))
+  val DefaultWhoIsYourAccountant: WhoIsYourAccountant = WhoIsYourAccountant(
     Some(WhoIsYourAccountantName("Accountant's name", Some("Accountant's trading name"))),
     Some(WhoIsYourAccountantIsUk(true)),
     Some(UkAccountantsAddress("address1", Some("address2"), Some("address3"), Some("address4"), "POSTCODE"))
   )
-  val DefaultIdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
-  val DefaultTaxMatters = TaxMatters(false)
+  val DefaultIdentifySuspiciousActivity: IdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
+  val DefaultTaxMatters: TaxMatters = TaxMatters(false)
 
   val NewFranchiseName = "NEW FRANCHISE NAME"
-  val NewBusinessFranchise = BusinessFranchiseYes(NewFranchiseName)
-  val NewInvolvedInOtherDetails = "NEW INVOLVED"
-  val NewInvolvedInOther = InvolvedInOtherYes(NewInvolvedInOtherDetails)
-  val NewBusinessTurnover = ExpectedBusinessTurnover.Second
-  val NewAMLSTurnover = ExpectedAMLSTurnover.Second
+  val NewBusinessFranchise: BusinessFranchiseYes = BusinessFranchiseYes(NewFranchiseName)
+  val NewInvolvedInOtherDetails: String = "NEW INVOLVED"
+  val NewInvolvedInOther: InvolvedInOtherYes = InvolvedInOtherYes(NewInvolvedInOtherDetails)
+  val NewBusinessTurnover: ExpectedBusinessTurnover = ExpectedBusinessTurnover.Second
+  val NewAMLSTurnover: ExpectedAMLSTurnover = ExpectedAMLSTurnover.Second
   val NewTransactionRecord = false
-  val NewCustomersOutsideUK = CustomersOutsideUK(None)
-  val NewNCARegistered = NCARegistered(false)
-  val NewAccountantForAMLSRegulations = AccountantForAMLSRegulations(false)
-  val NewRiskAssessment = RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set()))
-  val NewHowManyEmployees = HowManyEmployees(Some("2"),Some("3"))
-  val NewIdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
-  val NewWhoIsYourAccountant = WhoIsYourAccountant(
+  val NewCustomersOutsideUK: CustomersOutsideUK = CustomersOutsideUK(None)
+  val NewNCARegistered: NCARegistered = NCARegistered(false)
+  val NewAccountantForAMLSRegulations: AccountantForAMLSRegulations = AccountantForAMLSRegulations(false)
+  val NewRiskAssessment: RiskAssessmentPolicy = RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set()))
+  val NewHowManyEmployees: HowManyEmployees = HowManyEmployees(Some("2"),Some("3"))
+  val NewIdentifySuspiciousActivity: IdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
+  val NewWhoIsYourAccountant: WhoIsYourAccountant = WhoIsYourAccountant(
     Some(WhoIsYourAccountantName("newName", Some("newTradingName"))),
     Some(WhoIsYourAccountantIsUk(true)),
     Some(UkAccountantsAddress("98E", Some("Building1"), Some("street1"), Some("road1"), "AA11 1AA"))
   )
-  val NewTaxMatters = TaxMatters(true)
+  val NewTaxMatters: TaxMatters = TaxMatters(true)
 
-  val bmBusinessActivitiesWithoutASP = ba(Set(EstateAgentBusinessService))
+  val bmBusinessActivitiesWithoutASP: ba = ba(Set(EstateAgentBusinessService))
 
-  val completeModel = BusinessActivities(
+  val completeModel: BusinessActivities = BusinessActivities(
     involvedInOther = Some(DefaultInvolvedInOther),
     expectedBusinessTurnover = Some(DefaultBusinessTurnover),
     expectedAMLSTurnover = Some(DefaultAMLSTurnover),
@@ -93,13 +94,13 @@ class BusinessActivitiesSpec extends AmlsSpec {
     hasAccepted = true
   )
 
-  val completeModelOtherYesNoExpectedTurnover = completeModel.copy(
+  val completeModelOtherYesNoExpectedTurnover: BusinessActivities = completeModel.copy(
     expectedBusinessTurnover = None,
     hasChanged = false,
     hasAccepted = true
   )
 
-  val completeModelWithoutCustUK = BusinessActivities(
+  val completeModelWithoutCustUK: BusinessActivities = BusinessActivities(
     involvedInOther = Some(DefaultInvolvedInOther),
     expectedBusinessTurnover = Some(DefaultBusinessTurnover),
     expectedAMLSTurnover = Some(DefaultAMLSTurnover),
@@ -118,7 +119,7 @@ class BusinessActivitiesSpec extends AmlsSpec {
     hasAccepted = true
   )
 
-  val completeModelWithoutAccountantAdvice = BusinessActivities(
+  val completeModelWithoutAccountantAdvice: BusinessActivities = BusinessActivities(
     involvedInOther = Some(DefaultInvolvedInOther),
     expectedBusinessTurnover = Some(DefaultBusinessTurnover),
     expectedAMLSTurnover = Some(DefaultAMLSTurnover),
@@ -137,7 +138,7 @@ class BusinessActivitiesSpec extends AmlsSpec {
     hasAccepted = true
   )
 
-  val completeJson = Json.obj(
+  val completeJson: JsObject = Json.obj(
     "involvedInOther" -> true,
     "details" -> DefaultInvolvedInOtherDetails,
     "expectedBusinessTurnover" -> "01",
@@ -172,7 +173,7 @@ class BusinessActivitiesSpec extends AmlsSpec {
     "hasAccepted" -> true
   )
 
-  val oldFormatJson = Json.obj(
+  val oldFormatJson: JsObject = Json.obj(
     "involvedInOther" -> true,
     "details" -> DefaultInvolvedInOtherDetails,
     "expectedBusinessTurnover" -> "01",
@@ -204,7 +205,7 @@ class BusinessActivitiesSpec extends AmlsSpec {
     "hasAccepted" -> true
   )
 
-  val partialModel = BusinessActivities(businessFranchise = Some(DefaultBusinessFranchise))
+  val partialModel: BusinessActivities = BusinessActivities(businessFranchise = Some(DefaultBusinessFranchise))
 
   "BusinessActivities Serialisation" must {
     "serialise as expected" in {

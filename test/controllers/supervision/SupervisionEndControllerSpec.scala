@@ -19,7 +19,6 @@ package controllers.supervision
 import controllers.actions.SuccessfulAuthAction
 import forms.supervision.SupervisionEndFormProvider
 import models.supervision._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
@@ -27,6 +26,8 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.supervision.SupervisionEndView
+
+import java.time.LocalDate
 
 class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
@@ -61,8 +62,8 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
 
     "on get display the SupervisionEnd page with pre populated data" in new Fixture {
-      val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
-      val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
+      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) //scalastyle:off magic.number
+      val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) //scalastyle:off magic.number
 
       mockCacheFetch[Supervision](Some(Supervision(
         Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))),
@@ -99,8 +100,8 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
     }
 
     "on post with valid data" in new Fixture {
-      val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
-      val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
+      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) //scalastyle:off magic.number
+      val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) //scalastyle:off magic.number
 
       val newRequest = FakeRequest(POST, routes.SupervisionEndController.post().url)
       .withFormUrlEncodedBody(
@@ -122,8 +123,8 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
     }
 
     "on post with valid data in edit mode" in new Fixture {
-      val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
-      val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
+      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) //scalastyle:off magic.number
+      val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) //scalastyle:off magic.number
 
       val newRequest = FakeRequest(POST, routes.SupervisionEndController.post().url)
       .withFormUrlEncodedBody(
@@ -147,7 +148,7 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
     "on post with invalid data" in new Fixture {
 
       mockCacheFetch[Supervision](Some(Supervision(
-        Some(AnotherBodyYes("Name", Some(SupervisionStart(new LocalDate(2005, 2, 24))))),
+        Some(AnotherBodyYes("Name", Some(SupervisionStart(LocalDate.of(2005, 2, 24))))),
         None,
         None,
         Some(ProfessionalBodyYes("details"))

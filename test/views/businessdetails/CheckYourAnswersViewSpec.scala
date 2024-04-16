@@ -17,17 +17,16 @@
 package views.businessdetails
 
 import models.businessdetails._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import play.api.test.{FakeRequest, Injecting}
+import play.api.test.Injecting
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.AmlsSummaryViewSpec
 import utils.businessdetails.CheckYourAnswersHelper
 import views.Fixture
 import views.html.businessdetails.CheckYourAnswersView
 
+import java.time.LocalDate
 import scala.jdk.CollectionConverters._
 
 class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks with Injecting {
@@ -61,7 +60,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
       val list = cyaHelper.createSummaryList(
         BusinessDetails(
           Some(PreviouslyRegisteredYes(Some("1234"))),
-          Some(ActivityStartDate(new LocalDate(2016, 1, 2))),
+          Some(ActivityStartDate(LocalDate.of(2016, 1, 2))),
           Some(VATRegisteredYes("2345")),
           Some(CorporationTaxRegisteredYes("3456")),
           Some(ContactingYou(Some("01234567890"), Some("test@test.com"))),

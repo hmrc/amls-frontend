@@ -18,7 +18,7 @@ package forms.responsiblepeople
 
 import forms.mappings.Mappings
 import models.responsiblepeople.PositionStartDate
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import play.api.data.Form
 
 import javax.inject.Inject
@@ -26,14 +26,14 @@ import javax.inject.Inject
 class PositionWithinBusinessStartDateFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[PositionStartDate] = Form[PositionStartDate](
-    "startDate" -> jodaLocalDate(
+    "startDate" -> localDate(
       invalidKey = "error.rp.position.invalid.date.not.real",
       allRequiredKey = "error.rp.position.required.date.all",
       twoRequiredKey = "error.rp.position.required.date.two",
       requiredKey = "error.rp.position.required.date.one"
     ).verifying(
-      jodaMinDate(PositionWithinBusinessStartDateFormProvider.minDate, "error.rp.position.invalid.date.after.1900"),
-      jodaMaxDate(PositionWithinBusinessStartDateFormProvider.maxDate, "error.rp.position.invalid.date.future")
+      minDate(PositionWithinBusinessStartDateFormProvider.minDate, "error.rp.position.invalid.date.after.1900"),
+      maxDate(PositionWithinBusinessStartDateFormProvider.maxDate, "error.rp.position.invalid.date.future")
     ).transform[PositionStartDate](
       PositionStartDate(_), _.startDate
     )
@@ -43,7 +43,7 @@ class PositionWithinBusinessStartDateFormProvider @Inject()() extends Mappings {
 
 object PositionWithinBusinessStartDateFormProvider {
 
-  val minDate: LocalDate = new LocalDate(1900, 1, 1)
+  val minDate: LocalDate = LocalDate.of(1900, 1, 1)
 
   def maxDate: LocalDate = LocalDate.now()
 }

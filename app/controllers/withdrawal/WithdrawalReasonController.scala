@@ -22,7 +22,7 @@ import connectors.AmlsConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.withdrawal.WithdrawalReasonFormProvider
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawalReason}
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AuthEnrolmentsService
 import utils.{AckRefGenerator, AuthAction}

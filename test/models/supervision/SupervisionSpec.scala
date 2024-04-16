@@ -18,11 +18,12 @@ package models.supervision
 
 import models.registrationprogress._
 import models.supervision.ProfessionalBodies._
-import org.joda.time.LocalDate
 import org.mockito.Mockito._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
+
+import java.time.LocalDate
 
 class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
@@ -297,9 +298,9 @@ trait SupervisionValues {
   object DefaultValues {
 
     private val supervisor = "Company A"
-    private val start = Some(SupervisionStart(new LocalDate(1993, 8, 25)))
+    private val start = Some(SupervisionStart(LocalDate.of(1993, 8, 25)))
     //scalastyle:off magic.number
-    private val end = Some(SupervisionEnd(new LocalDate(1999, 8, 25)))
+    private val end = Some(SupervisionEnd(LocalDate.of(1999, 8, 25)))
     //scalastyle:off magic.number
     private val reason = Some(SupervisionEndReasons("Ending reason"))
 

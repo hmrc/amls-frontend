@@ -18,14 +18,16 @@ package models.notifications
 
 import models.notifications.RejectedReason.FailedToPayCharges
 import models.notifications.StatusType.DeRegistered
-import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
+import java.time.ZoneOffset._
+import java.time.{Instant, LocalDate, LocalDateTime, ZoneOffset}
+
 class NotificationDetailsSpec extends PlaySpec with Matchers {
 
-  val dateTime = new DateTime(1479730062573L, DateTimeZone.UTC)
+  val dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC)
 
   "NotificationDetails" must {
 
@@ -114,7 +116,7 @@ class NotificationDetailsSpec extends PlaySpec with Matchers {
       val inputString = "parameter 1-31/07/2018|parameter 2- ABC1234"
 
       //noinspection ScalaStyle
-      NotificationDetails.convertEndDateWithRefMessageText(inputString) mustBe Some(EndDateDetails(new LocalDate(2018, 7, 31), Some("ABC1234")))
+      NotificationDetails.convertEndDateWithRefMessageText(inputString) mustBe Some(EndDateDetails(LocalDate.of(2018, 7, 31), Some("ABC1234")))
 
     }
 
@@ -122,7 +124,7 @@ class NotificationDetailsSpec extends PlaySpec with Matchers {
       val inputString = "<![CDATA[<P>parameter 1- 31/07/2018|parameter 2-ABC1234</P>]]>"
 
       //noinspection ScalaStyle
-      NotificationDetails.convertEndDateWithRefMessageText(inputString) mustBe Some(EndDateDetails(new LocalDate(2018, 7, 31), Some("ABC1234")))
+      NotificationDetails.convertEndDateWithRefMessageText(inputString) mustBe Some(EndDateDetails(LocalDate.of(2018, 7, 31), Some("ABC1234")))
 
     }
 
@@ -139,14 +141,14 @@ class NotificationDetailsSpec extends PlaySpec with Matchers {
       val inputString = "parameter 1-31/07/2018"
 
       //noinspection ScalaStyle
-      NotificationDetails.convertEndDateMessageText(inputString) mustBe Some(EndDateDetails(new LocalDate(2018, 7, 31), None))
+      NotificationDetails.convertEndDateMessageText(inputString) mustBe Some(EndDateDetails(LocalDate.of(2018, 7, 31), None))
     }
 
     "convert the input message text into the model when there are special characters in the input string" in {
       val inputString = "<![CDATA[<P>parameter 1-20/05/2009</P>]]>"
 
       //noinspection ScalaStyle
-      NotificationDetails.convertEndDateMessageText(inputString) mustBe Some(EndDateDetails(new LocalDate(2009, 5, 20), None))
+      NotificationDetails.convertEndDateMessageText(inputString) mustBe Some(EndDateDetails(LocalDate.of(2009, 5, 20), None))
     }
 
     "return none when supplied with an invalid string" in {

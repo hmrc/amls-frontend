@@ -19,10 +19,14 @@ package utils
 import controllers.hvd.routes
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionStatus}
 import models.tradingpremises.TradingPremises
-import org.joda.time.LocalDate
+
+import java.time.LocalDate
 import play.api.Logging
 import play.api.i18n.Messages
 import play.api.mvc.Call
+
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ofPattern
 
 trait DateOfChangeHelper extends Logging {
 
@@ -61,22 +65,22 @@ trait DateOfChangeHelper extends Logging {
     status.contains("Approved")
   }
 
-  def redirectToDateOfChange[A](status: SubmissionStatus, a: Option[A], b: A) =
+  def redirectToDateOfChange[A](status: SubmissionStatus, a: Option[A], b: A): Boolean =
     !a.contains(b) && isEligibleForDateOfChange(status)
 
-  def dateOfChangApplicable[A](status: String, a: Option[A], b: A) =
+  def dateOfChangApplicable[A](status: String, a: Option[A], b: A): Boolean =
     !a.contains(b) && isEligibleApplicationStatus(status)
 
-  def startDateFormFields(startDate: Option[LocalDate], fieldName: String = "activityStartDate") = {
+  def startDateFormFields(startDate: Option[LocalDate], fieldName: String = "activityStartDate"): Map[String, Seq[String]] = {
     startDate match {
-      case Some(date) => Map(fieldName -> Seq(date.toString("yyyy-MM-dd")))
+      case Some(date) => Map(fieldName -> Seq(date.format(ofPattern("yyyy-MM-dd"))))
       case _ => Map.empty[String, Seq[String]]
     }
   }
 
   implicit class TradingPremisesExtensions(tradingPremises: Option[TradingPremises])(implicit messages: Messages) extends DateOfChangeHelper {
 
-    def startDate = tradingPremises.yourTradingPremises.fold[Option[LocalDate]](None)(ytp => ytp.startDate)
+    def startDate: Option[LocalDate] = tradingPremises.yourTradingPremises.fold[Option[LocalDate]](None)(ytp => ytp.startDate)
   }
 
 }

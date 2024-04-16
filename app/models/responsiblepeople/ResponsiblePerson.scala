@@ -18,11 +18,12 @@ package models.responsiblepeople
 
 import models.registrationprogress._
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
-import org.joda.time.LocalDate
 import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
+
+import java.time.LocalDate
 
 case class ResponsiblePerson(personName: Option[PersonName] = None,
                              legalName: Option[PreviousName] = None,
@@ -330,8 +331,6 @@ object ResponsiblePerson {
   }
 
   import play.api.libs.functional.syntax._
-  import play.api.libs.json.JodaReads._
-  import play.api.libs.json.JodaWrites._
   import play.api.libs.json._
   import utils.MappingUtils._
 
@@ -339,7 +338,7 @@ object ResponsiblePerson {
 
   val key = "responsible-people"
 
-  implicit val mongoKey = new MongoKey[ResponsiblePerson] {
+  implicit val mongoKey: MongoKey[ResponsiblePerson] = new MongoKey[ResponsiblePerson] {
     override def apply(): String = key
   }
 

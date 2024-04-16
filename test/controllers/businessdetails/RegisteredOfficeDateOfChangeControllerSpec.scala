@@ -21,7 +21,6 @@ import controllers.actions.SuccessfulAuthAction
 import forms.DateOfChangeFormProvider
 import models.businessdetails._
 import models.{Country, DateOfChange}
-import org.joda.time.LocalDate
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -33,6 +32,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import views.html.DateOfChangeView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
@@ -67,7 +67,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
         "dateOfChange.day" -> "01"
       )
 
-      val date = new LocalDate(2010, 10, 1)
+      val date = LocalDate.of(2010, 10, 1)
       val office = RegisteredOfficeUK("305", Some("address line"), Some("address line2"), Some("address line3"), "AA1 1AA")
       val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(date)))
 
@@ -102,7 +102,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
         "dateOfChange.day" -> "26"
       )
 
-      val date = new LocalDate(2005, 4, 26)
+      val date = LocalDate.of(2005, 4, 26)
 
       val office = RegisteredOfficeNonUK("305", Some("address line"), Some("address line2"), Some("address line3"), Country("Finland", "FIN"))
 
@@ -156,7 +156,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
       val office = RegisteredOfficeUK("305", Some("address line"), Some("address line2"), Some("address line3"), "AA1 1AA")
 
       val business = BusinessDetails(
-        activityStartDate = Some(ActivityStartDate(new LocalDate(2015, 10, 1))),
+        activityStartDate = Some(ActivityStartDate(LocalDate.of(2015, 10, 1))),
         registeredOffice = Some(office)
       )
 

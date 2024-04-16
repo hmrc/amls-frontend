@@ -19,7 +19,6 @@ package controllers.hvd
 import controllers.actions.SuccessfulAuthAction
 import forms.hvd.CashPaymentFormProvider
 import models.hvd._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -30,6 +29,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.hvd.CashPaymentView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
@@ -66,7 +66,7 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
 
       "load Yes when Cash payment from mongoCache returns True" in new Fixture {
         // scalastyle:off magic.number
-        val firstDate = Some(CashPaymentFirstDate(new LocalDate(1990, 2, 24)))
+        val firstDate = Some(CashPaymentFirstDate(LocalDate.of(1990, 2, 24)))
         val activities = Hvd(cashPayment = Some(CashPayment(CashPaymentOverTenThousandEuros(true), firstDate)))
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))

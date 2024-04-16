@@ -24,7 +24,6 @@ import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMa
 import models.businessmatching.BusinessActivity.AccountancyServices
 import models.deregister.DeRegisterSubscriptionResponse
 import models.registrationdetails.RegistrationDetails
-import org.joda.time.LocalDateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
@@ -32,6 +31,7 @@ import services.{AuthEnrolmentsService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.deregister.DeregisterApplicationView
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class DeRegisterApplicationControllerSpec extends AmlsSpec {

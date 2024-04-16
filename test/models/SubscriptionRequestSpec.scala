@@ -21,10 +21,11 @@ import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import models.tradingpremises.BusinessStructure.SoleProprietor
 import models.tradingpremises.TradingPremisesMsbService._
 import models.tradingpremises._
-import org.joda.time.LocalDate
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+
+import java.time.LocalDate
 
 class SubscriptionRequestSpec extends PlaySpec with MockitoSugar {
 
@@ -38,7 +39,7 @@ class SubscriptionRequestSpec extends PlaySpec with MockitoSugar {
       "asdfasdf"
     ),
     Some(true),
-    Some(new LocalDate(1990, 2, 24))
+    Some(LocalDate.of(1990, 2, 24))
   )
 
   val businessStructure = SoleProprietor
@@ -64,7 +65,7 @@ class SubscriptionRequestSpec extends PlaySpec with MockitoSugar {
     false,
     Some(123456),
     Some("Added"),
-    Some(ActivityEndDate(new LocalDate(1999, 1, 1)))
+    Some(ActivityEndDate(LocalDate.of(1999, 1, 1)))
 
   )
 

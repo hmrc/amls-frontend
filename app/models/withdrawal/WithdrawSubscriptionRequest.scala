@@ -16,8 +16,7 @@
 
 package models.withdrawal
 
-import org.joda.time.LocalDate
-import play.api.libs.json.JodaReads._
+import java.time.LocalDate
 
 case class WithdrawSubscriptionRequest(acknowledgementReference: String,
                                        withdrawalDate: LocalDate,
@@ -29,13 +28,12 @@ object WithdrawSubscriptionRequest {
 
   import play.api.libs.json._
 
-  val DefaultAckReference = "A" * 32
+  val DefaultAckReference: String = "A" * 32
 
-  implicit val format = Json.reads[WithdrawSubscriptionRequest]
+  implicit val format: Reads[WithdrawSubscriptionRequest] = Json.reads[WithdrawSubscriptionRequest]
 
   implicit val jsonWrites: Writes[WithdrawSubscriptionRequest] = {
     import play.api.libs.functional.syntax._
-    import play.api.libs.json.JodaWrites._
     import play.api.libs.json._
     Writes[WithdrawSubscriptionRequest] { ep =>
       (

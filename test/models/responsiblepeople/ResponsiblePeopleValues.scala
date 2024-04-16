@@ -19,14 +19,17 @@ package models.responsiblepeople
 import controllers.responsiblepeople.NinoUtil
 import models.Country
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ZeroToFiveMonths}
-import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import uk.gov.hmrc.domain.Nino
 import utils.StatusConstants
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 trait ResponsiblePeopleValues extends NinoUtil {
 
-  private val startDate = Some(PositionStartDate(new LocalDate()))
+  private val startDate = Some(PositionStartDate(LocalDate.now()))
+  private val formattedStartDate = startDate.get.startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
   private val nino = nextNino
 
   object DefaultValues {
@@ -59,7 +62,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     val ukPassportNo = UKPassportNo
     val nonUKPassportYes = NonUKPassportYes("87654321")
     val nonUKPassportNo = NoPassport
-    val dateOfBirth = DateOfBirth(new LocalDate(1990, 10, 2))
+    val dateOfBirth = DateOfBirth(LocalDate.of(1990, 10, 2))
   }
 
   object NewValues {
@@ -87,7 +90,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val completeModelUkResidentFPtrue = ResponsiblePerson(
     personName = Some(DefaultValues.personName),
     legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    legalNameChangeDate = Some(LocalDate.of(1990, 2, 24)),
     knownBy = None,
     personResidenceType = Some(DefaultValues.personResidenceTypeUk),
     ukPassport = None,
@@ -112,7 +115,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val incompleteModelUkResidentNoDOB = ResponsiblePerson(
     personName = Some(DefaultValues.personName),
     legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    legalNameChangeDate = Some(LocalDate.of(1990, 2, 24)),
     knownBy = None,
     personResidenceType = Some(DefaultValues.personResidenceTypeUk),
     ukPassport = None,
@@ -137,7 +140,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val completeModelUkResident = ResponsiblePerson(
     personName = Some(DefaultValues.personName),
     legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    legalNameChangeDate = Some(LocalDate.of(1990, 2, 24)),
     knownBy = Some(DefaultValues.noKnownBy),
     personResidenceType = Some(DefaultValues.personResidenceTypeUk),
     ukPassport = None,
@@ -162,7 +165,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val completeModelUkResidentForOldData = ResponsiblePerson(
     personName = Some(DefaultValues.personName),
     legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    legalNameChangeDate = Some(LocalDate.of(1990, 2, 24)),
     knownBy = None,
     personResidenceType = Some(DefaultValues.personResidenceTypeUk),
     ukPassport = None,
@@ -212,7 +215,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val completeModelUkResidentNoPreviousName = ResponsiblePerson(
     personName = Some(DefaultValues.personName),
     legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    legalNameChangeDate = Some(LocalDate.of(1990, 2, 24)),
     knownBy = Some(DefaultValues.knownBy),
     personResidenceType = Some(DefaultValues.personResidenceTypeUk),
     ukPassport = Some(DefaultValues.ukPassportYes),
@@ -237,7 +240,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val incompleteResponsiblePeople = ResponsiblePerson(
     personName = Some(DefaultValues.personName),
     legalName = Some(DefaultValues.legalName),
-    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    legalNameChangeDate = Some(LocalDate.of(1990, 2, 24)),
     knownBy = Some(DefaultValues.knownBy),
     personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
     ukPassport = None,
@@ -421,7 +424,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     ),
     "positions" -> Json.obj(
       "positions" -> Seq("01", "03"),
-      "startDate" -> startDate.get.startDate.toString("yyyy-MM-dd")
+      "startDate" -> startDate.get.startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
     ),
     "saRegistered" -> Json.obj(
       "saRegistered" -> true,
@@ -494,7 +497,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     ),
     "positions" -> Json.obj(
       "positions" -> Seq("01", "03"),
-      "startDate" -> startDate.get.startDate.toString("yyyy-MM-dd")
+      "startDate" -> formattedStartDate
     ),
     "saRegistered" -> Json.obj(
       "saRegistered" -> true,
@@ -574,7 +577,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     ),
     "positions" -> Json.obj(
       "positions" -> Seq("01", "03"),
-      "startDate" -> startDate.get.startDate.toString("yyyy-MM-dd")
+      "startDate" -> formattedStartDate
     ),
     "saRegistered" -> Json.obj(
       "saRegistered" -> true,
@@ -660,7 +663,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     ),
     "positions" -> Json.obj(
       "positions" -> Seq("01", "03"),
-      "startDate" -> startDate.get.startDate.toString("yyyy-MM-dd")
+      "startDate" -> formattedStartDate
     ),
     "saRegistered" -> Json.obj(
       "saRegistered" -> true,
@@ -743,7 +746,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     ),
     "positions" -> Json.obj(
       "positions" -> Seq("01", "03"),
-      "startDate" -> startDate.get.startDate.toString("yyyy-MM-dd")
+      "startDate" -> formattedStartDate
     ),
     "saRegistered" -> Json.obj(
       "saRegistered" -> true,
@@ -821,7 +824,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     ),
     "positions" -> Json.obj(
       "positions" -> Seq("01", "03"),
-      "startDate" -> startDate.get.startDate.toString("yyyy-MM-dd")
+      "startDate" -> formattedStartDate
     ),
     "saRegistered" -> Json.obj(
       "saRegistered" -> true,
@@ -898,7 +901,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     ),
     "positions" -> Json.obj(
       "positions" -> Seq("01", "03"),
-      "startDate" -> startDate.get.startDate.toString("yyyy-MM-dd")
+      "startDate" -> formattedStartDate
     ),
     "saRegistered" -> Json.obj(
       "saRegistered" -> true,
@@ -975,7 +978,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     ),
     "positions" -> Json.obj(
       "positions" -> Seq("01", "03"),
-      "startDate" -> startDate.get.startDate.toString("yyyy-MM-dd")
+      "startDate" -> formattedStartDate
     ),
     "saRegistered" -> Json.obj(
       "saRegistered" -> true,
@@ -1048,7 +1051,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     ),
     "positions" -> Json.obj(
       "positions" -> Seq("01", "03"),
-      "startDate" -> startDate.get.startDate.toString("yyyy-MM-dd")
+      "startDate" -> formattedStartDate
     ),
     "saRegistered" -> Json.obj(
       "saRegistered" -> true,
@@ -1114,7 +1117,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     ),
     "positions" -> Json.obj(
       "positions" -> Seq("01", "03"),
-      "startDate" -> startDate.get.startDate.toString("yyyy-MM-dd")
+      "startDate" -> formattedStartDate
     ),
     "saRegistered" -> Json.obj(
       "saRegistered" -> true,
@@ -1148,10 +1151,10 @@ trait ResponsiblePeopleValues extends NinoUtil {
     personResidenceType = Some(PersonResidenceType(NonUKResidence, Some(Country("Antigua and Barbuda", "bb")), Some(Country("United Kingdom", "GB")))),
     ukPassport = Some(UKPassportNo),
     nonUKPassport = Some(NoPassport),
-    dateOfBirth = Some(DateOfBirth(new LocalDate(1990, 2, 24))),
+    dateOfBirth = Some(DateOfBirth(LocalDate.of(1990, 2, 24))),
     contactDetails = Some(ContactDetails("0912345678", "TEST@EMAIL.COM")),
     addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", Some("add2"), Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
-    positions = Some(Positions(Set(NominatedOfficer, SoleProprietor), Some(PositionStartDate(new LocalDate(2002, 2, 2))))),
+    positions = Some(Positions(Set(NominatedOfficer, SoleProprietor), Some(PositionStartDate(LocalDate.of(2002, 2, 2))))),
     saRegistered = Some(SaRegisteredNo),
     vatRegistered = Some(VATRegisteredNo),
     experienceTraining = Some(ExperienceTrainingNo),

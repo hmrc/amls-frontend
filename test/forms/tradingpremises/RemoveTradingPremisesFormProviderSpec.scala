@@ -16,16 +16,16 @@
 
 package forms.tradingpremises
 
-import forms.behaviours.JodaDateBehaviours
+import forms.behaviours.DateBehaviours
 import models.tradingpremises.ActivityEndDate
-import org.joda.time.LocalDate
 import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import play.api.test.{FakeRequest, Helpers}
 
+import java.time.LocalDate
 import scala.collection.mutable
 
-class RemoveTradingPremisesFormProviderSpec extends JodaDateBehaviours {
+class RemoveTradingPremisesFormProviderSpec extends DateBehaviours {
 
   val formProvider: RemoveTradingPremisesFormProvider = new RemoveTradingPremisesFormProvider
   val form: Form[ActivityEndDate] = formProvider()
@@ -41,11 +41,11 @@ class RemoveTradingPremisesFormProviderSpec extends JodaDateBehaviours {
 
     "bind valid data" in {
 
-      forAll(jodaDatesBetween(minDate, maxDate)) { date =>
+      forAll(datesBetween(minDate, maxDate)) { date =>
 
         val data = Map(
           s"$formField.day" -> date.getDayOfMonth.toString,
-          s"$formField.month" -> date.getMonthOfYear.toString,
+          s"$formField.month" -> date.getMonthValue.toString,
           s"$formField.year" -> date.getYear.toString
         )
 
@@ -68,11 +68,11 @@ class RemoveTradingPremisesFormProviderSpec extends JodaDateBehaviours {
 
         s"$field is blank" in {
 
-          forAll(jodaDatesBetween(minDate, maxDate)) { date =>
+          forAll(datesBetween(minDate, maxDate)) { date =>
 
             val data = mutable.Map(
               s"$formField.day" -> date.getDayOfMonth.toString,
-              s"$formField.month" -> date.getMonthOfYear.toString,
+              s"$formField.month" -> date.getMonthValue.toString,
               s"$formField.year" -> date.getYear.toString
             )
 
@@ -81,7 +81,7 @@ class RemoveTradingPremisesFormProviderSpec extends JodaDateBehaviours {
             val result = form.bind(data.toMap)
 
             result.errors.headOption shouldEqual Some(
-              FormError(formField, messages("error.expected.jodadate.format"), Seq(field))
+              FormError(formField, messages("error.expected.date.format"), Seq(field))
             )
           }
         }
@@ -91,11 +91,11 @@ class RemoveTradingPremisesFormProviderSpec extends JodaDateBehaviours {
 
         s"${fields._1} and ${fields._2} are blank" in {
 
-          forAll(jodaDatesBetween(minDate, maxDate)) { date =>
+          forAll(datesBetween(minDate, maxDate)) { date =>
 
             val data = mutable.Map(
               s"$formField.day" -> date.getDayOfMonth.toString,
-              s"$formField.month" -> date.getMonthOfYear.toString,
+              s"$formField.month" -> date.getMonthValue.toString,
               s"$formField.year" -> date.getYear.toString
             )
 
@@ -105,14 +105,14 @@ class RemoveTradingPremisesFormProviderSpec extends JodaDateBehaviours {
             val result = form.bind(data.toMap)
 
             result.errors.headOption shouldEqual Some(
-              FormError(formField, messages("error.expected.jodadate.format"), Seq(fields._1, fields._2))
+              FormError(formField, messages("error.expected.date.format"), Seq(fields._1, fields._2))
             )
           }
         }
       }
     }
 
-    behave like mandatoryDateField(form, formField, "error.expected.jodadate.format")
+    behave like mandatoryDateField(form, formField, "error.expected.date.format")
 
     behave like dateFieldWithMin(form, formField, minDate, FormError(formField, "error.invalid.year.post1900"))
 

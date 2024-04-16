@@ -18,7 +18,7 @@ package forms
 
 import forms.mappings.Mappings
 import models.DateOfChange
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import play.api.data.Form
 
 import javax.inject.Inject
@@ -26,14 +26,14 @@ import javax.inject.Inject
 class DateOfChangeFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[DateOfChange] = Form[DateOfChange](
-    "dateOfChange" -> jodaLocalDate(
+    "dateOfChange" -> localDate(
       invalidKey = "error.invalid.tp.date.not.real",
       allRequiredKey = "error.required.tp.all",
       twoRequiredKey = "error.required.tp.two",
       requiredKey = "error.required.tp.one"
     ).verifying(
-      jodaMinDate(DateOfChangeFormProvider.minDate, "error.allowed.start.date"),
-      jodaMaxDate(DateOfChangeFormProvider.maxDate, "error.future.date")
+      minDate(DateOfChangeFormProvider.minDate, "error.allowed.start.date"),
+      maxDate(DateOfChangeFormProvider.maxDate, "error.future.date")
     ).transform[DateOfChange](
       DateOfChange(_), _.dateOfChange
     )
@@ -43,7 +43,7 @@ class DateOfChangeFormProvider @Inject()() extends Mappings {
 
 object DateOfChangeFormProvider {
 
-  val minDate: LocalDate = new LocalDate(1900, 1, 1)
+  val minDate: LocalDate = LocalDate.of(1900, 1, 1)
 
   def maxDate: LocalDate = LocalDate.now()
 }

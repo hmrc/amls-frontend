@@ -28,10 +28,9 @@ import models.businessmatching._
 import models.notifications.{IDType, NotificationRow}
 import models.registrationdetails.RegistrationDetails
 import models.renewal._
-import models.responsiblepeople.{PersonName, _}
+import models.responsiblepeople._
 import models.status._
 import models.{status => _, _}
-import org.joda.time.{DateTime, DateTimeZone, LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -40,7 +39,6 @@ import play.api.http.Status.OK
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import play.api.test.Injecting
-import play.twirl.api.Html
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -48,6 +46,7 @@ import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
 import views.html.status.YourRegistrationView
 import views.html.status.components._
 
+import java.time.{LocalDate, LocalDateTime}
 import scala.concurrent.Future
 
 class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting {
@@ -130,7 +129,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       inject[TradeInformationFindOut],
       view = view)
 
-    val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
+    val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(LocalDate.now())))
     val rp1 = ResponsiblePerson(
       personName = Some(PersonName("first1", Some("middle"), "last1")),
       legalName = None,
@@ -189,7 +188,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
     550.0,
     Some("XA353523452345"),
     None,
-    new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC)
+    LocalDateTime.of(2017, 12, 1, 1, 3)
   )
 
   val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
@@ -821,7 +820,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       "return 1 if there is amls ref number available and 1 unread notification" in new Fixture with FutureAssertions {
 
         when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
-          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), false, amlsRegistrationNumber, "", IDType("")))))
+          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, LocalDateTime.now(), false, amlsRegistrationNumber, "", IDType("")))))
 
         val result = controller.countUnreadNotifications(Some(amlsRegistrationNumber), None, ("", ""))
 
@@ -831,8 +830,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       "return 1 if there is amls ref number available and 1 unread notification and 1 read notification" in new Fixture with FutureAssertions {
 
         when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
-          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), false, amlsRegistrationNumber, "", IDType("")),
-            NotificationRow(None, None, None, false, DateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
+          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, LocalDateTime.now(), false, amlsRegistrationNumber, "", IDType("")),
+            NotificationRow(None, None, None, false, LocalDateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
 
         val result = controller.countUnreadNotifications(Some(amlsRegistrationNumber), None, ("", ""))
 
@@ -842,7 +841,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       "return 0 if there is amls ref number available and 1 read notification" in new Fixture with FutureAssertions {
 
         when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
-          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
+          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, LocalDateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
 
         val result = controller.countUnreadNotifications(Some(amlsRegistrationNumber), None, ("", ""))
 
@@ -862,7 +861,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       "return 1 if there is safe id available and 1 unread notification" in new Fixture with FutureAssertions {
 
         when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any()))
-          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), false, amlsRegistrationNumber, "", IDType("")))))
+          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, LocalDateTime.now(), false, amlsRegistrationNumber, "", IDType("")))))
 
         val result = controller.countUnreadNotifications(None, Some("internalId"), ("", ""))
 
@@ -872,8 +871,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       "return 1 if there is safe id available and 1 unread notification and 1 read notification" in new Fixture with FutureAssertions {
 
         when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any()))
-          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), false, amlsRegistrationNumber, "", IDType("")),
-            NotificationRow(None, None, None, false, DateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
+          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, LocalDateTime.now(), false, amlsRegistrationNumber, "", IDType("")),
+            NotificationRow(None, None, None, false, LocalDateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
 
         val result = controller.countUnreadNotifications(None, Some("internalId"), ("", ""))
 
@@ -883,7 +882,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       "return 0 if there is safe id available and 1 read notification" in new Fixture with FutureAssertions {
 
         when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any()))
-          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
+          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, LocalDateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
 
         val result = controller.countUnreadNotifications(None, Some("internalId"), ("", ""))
 

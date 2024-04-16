@@ -22,7 +22,6 @@ import controllers.actions.SuccessfulAuthAction
 import forms.responsiblepeople.PersonNonUKPassportFormProvider
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{DateOfBirth, NonUKPassportYes, PersonName, ResponsiblePerson}
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -34,6 +33,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import views.html.responsiblepeople.PersonNonUKPassportView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
@@ -133,7 +133,7 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with 
             "nonUKPassportNumber" -> passportNumber
           )
 
-          val responsiblePeople = ResponsiblePerson(personName = Some(personName), dateOfBirth = Some(DateOfBirth(new LocalDate())))
+          val responsiblePeople = ResponsiblePerson(personName = Some(personName), dateOfBirth = Some(DateOfBirth(LocalDate.now())))
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
@@ -189,7 +189,7 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with 
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(ResponsiblePerson(personName = Some(personName),
-              dateOfBirth = Some(DateOfBirth(new LocalDate(1990, 1,22)))))))
+              dateOfBirth = Some(DateOfBirth(LocalDate.of(1990, 1,22)))))))
 
           when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
             .thenReturn(Future.successful(Some(mockCacheMap)))

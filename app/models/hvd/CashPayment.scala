@@ -16,9 +16,9 @@
 
 package models.hvd
 
-import org.joda.time.LocalDate
-import play.api.libs.json.{Reads, Writes, _}
-import play.api.libs.json.JodaReads._
+import play.api.libs.json._
+
+import java.time.LocalDate
 
 case class CashPayment(acceptedPayment: CashPaymentOverTenThousandEuros, firstDate: Option[CashPaymentFirstDate]) {
 

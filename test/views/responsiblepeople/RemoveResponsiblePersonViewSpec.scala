@@ -18,12 +18,13 @@ package views.responsiblepeople
 
 import forms.responsiblepeople.RemoveResponsiblePersonFormProvider
 import models.responsiblepeople.ResponsiblePersonEndDate
-import org.joda.time.LocalDate
 import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.RemoveResponsiblePersonView
+
+import java.time.LocalDate
 
 class RemoveResponsiblePersonViewSpec extends AmlsViewSpec with Matchers {
 

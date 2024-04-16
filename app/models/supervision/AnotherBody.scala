@@ -16,12 +16,13 @@
 
 package models.supervision
 
-import org.joda.time.LocalDate
 import play.api.i18n.Messages
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 import utils.MappingUtils.constant
+
+import java.time.LocalDate
 
 sealed trait AnotherBody
 
@@ -66,9 +67,8 @@ object AnotherBody {
     }
   }
 
-  import utils.MappingUtils.Implicits._
-  import play.api.libs.json.JodaReads._
   import play.api.libs.json._
+  import utils.MappingUtils.Implicits._
 
   def oldStartDateReader: Reads[Option[SupervisionStart]] =
     (__ \ "startDate").readNullable[LocalDate] map { sd =>

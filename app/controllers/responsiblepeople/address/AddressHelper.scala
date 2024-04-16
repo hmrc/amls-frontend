@@ -25,7 +25,8 @@ import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonth
 import models.responsiblepeople._
 import models.status.SubmissionStatus
 import models.{Country, DateOfChange, ViewResponse}
-import org.joda.time.{LocalDate, Months}
+
+import java.time.LocalDate
 import play.api.data.Form
 import play.api.i18n.{Lang, Messages}
 import play.api.mvc.{AnyContent, Request}
@@ -34,6 +35,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{ControllerHelper, DateOfChangeHelper, RepeatingSection}
 
+import java.time.temporal.ChronoUnit
 import scala.concurrent.{ExecutionContext, Future}
 
 trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
@@ -196,7 +198,7 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
     dateOfMove flatMap {
       dateOp =>
         dateOp.dateOfChange map { date =>
-          Months.monthsBetween(date, LocalDate.now()).getMonths match {
+          ChronoUnit.MONTHS.between(date, LocalDate.now()).toInt match {
             case m if 0 until 6 contains m => ZeroToFiveMonths
             case m if 6 until 12 contains m => SixToElevenMonths
             case m if 12 until 36 contains m => OneToThreeYears

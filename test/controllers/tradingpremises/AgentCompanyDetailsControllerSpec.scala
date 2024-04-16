@@ -24,7 +24,6 @@ import models.businessmatching.BusinessActivity.{BillPaymentServices, EstateAgen
 import models.tradingpremises.BusinessStructure.SoleProprietor
 import models.tradingpremises.TradingPremisesMsbService._
 import models.tradingpremises._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -35,6 +34,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import views.html.tradingpremises.AgentCompanyDetailsView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGenerator with Injecting {
@@ -221,7 +221,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
   val year =1990
   val month = 2
   val day = 24
-  val date = new LocalDate(year, month, day)
+  val date = LocalDate.of(year, month, day)
 
   val ytp = YourTradingPremises("tradingName1", address, Some(true), Some(date))
   val ytp1 = YourTradingPremises("tradingName2", address, Some(true), Some(date))

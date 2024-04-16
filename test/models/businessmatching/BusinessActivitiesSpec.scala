@@ -18,11 +18,12 @@ package models.businessmatching
 
 import models.DateOfChange
 import models.businessmatching.BusinessActivity._
-import org.joda.time.LocalDate
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.libs.json._
 import utils.AmlsSpec
+
+import java.time.LocalDate
 
 
 class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
@@ -166,7 +167,7 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
               Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService),
               None,
               None,
-              Some(DateOfChange(new LocalDate(1990, 2,24)))
+              Some(DateOfChange(LocalDate.of(1990, 2,24)))
             )))
 
         }
@@ -196,7 +197,7 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
           Set(HighValueDealing, EstateAgentBusinessService),
           None,
           None,
-          Some(DateOfChange(new LocalDate(1990, 2,24)))
+          Some(DateOfChange(LocalDate.of(1990, 2,24)))
         )) must be(Json.obj(
           "businessActivities" -> Seq("04", "03"),
           "dateOfChange" -> "1990-02-24"

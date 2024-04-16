@@ -20,7 +20,6 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.tradingpremises.ActivityStartDateFormProvider
 import models.tradingpremises._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.{any, eq => meq}
@@ -33,6 +32,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction}
 import views.html.tradingpremises.ActivityStartDateView
 
+import java.time.LocalDate
 import scala.jdk.CollectionConverters._
 import scala.concurrent.Future
 
@@ -59,7 +59,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
   }
 
   "ActivityStartDateController" must {
-    val ytpModel = YourTradingPremises("foo", address, None, Some(new LocalDate(2010, 10, 10)), None)
+    val ytpModel = YourTradingPremises("foo", address, None, Some(LocalDate.of(2010, 10, 10)), None)
     val ytp = Some(ytpModel)
 
     val emptyCache = CacheMap("", Map.empty)
@@ -124,7 +124,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
           "startDate.year" -> "2014"
         )
         val updatedYtp = Some(YourTradingPremises("foo",
-          Address("1",None,None,None,"AA1 1BB",None), None, Some(new LocalDate(2014, 5, 20)), None))
+          Address("1",None,None,None,"AA1 1BB",None), None, Some(LocalDate.of(2014, 5, 20)), None))
 
         val updatedTp = TradingPremises(yourTradingPremises = updatedYtp, hasChanged = true)
 

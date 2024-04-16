@@ -16,10 +16,12 @@
 
 package models.withdrawal
 
-import org.joda.time.LocalDate
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class WithdrawSubscriptionRequestSpec extends PlaySpec with Matchers {
 
@@ -29,7 +31,7 @@ class WithdrawSubscriptionRequestSpec extends PlaySpec with Matchers {
         val date = LocalDate.now()
         val expectedJson = Json.obj(
           "acknowledgementReference" -> "SomeRef",
-          "withdrawalDate" -> date.toString("yyyy-MM-dd"),
+          "withdrawalDate" -> date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
           "withdrawalReason" -> "Other, please specify",
           "specifyOtherReason" -> "reason"
         )

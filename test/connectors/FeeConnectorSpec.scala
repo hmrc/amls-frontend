@@ -20,15 +20,15 @@ import config.ApplicationConfig
 import generators.AmlsReferenceNumberGenerator
 import models.ResponseType.SubscriptionResponseType
 import models._
-import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
+import java.time.LocalDateTime
+import java.time.ZoneOffset.UTC
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -62,7 +62,7 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with
       totalFees = 550.0,
       paymentReference = Some("XA000000000000"),
       difference = None,
-      createdAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
+      createdAt = LocalDateTime.of(2017, 12, 1, 1, 3))
 
     "successfully receive feeResponse" in new Fixture {
 

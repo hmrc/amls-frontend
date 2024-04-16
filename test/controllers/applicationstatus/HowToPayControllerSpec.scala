@@ -18,9 +18,8 @@ package controllers.applicationstatus
 
 import controllers.actions.SuccessfulAuthAction
 import generators.submission.SubscriptionResponseGenerator
-import models.{FeeResponse, ResponseType}
 import models.ResponseType.SubscriptionResponseType
-import org.joda.time.DateTime
+import models.{FeeResponse, ResponseType}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -28,6 +27,7 @@ import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, FeeHelper}
 import views.html.applicationstatus.HowToPayView
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator {
@@ -61,7 +61,7 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
           totalFees = 200,
           paymentReference = Some(paymentReferenceNumber),
           difference = Some(115),
-          createdAt = DateTime.now
+          createdAt = LocalDateTime.now
         )
 
         "There is a payment reference number" in new Fixture {

@@ -27,7 +27,6 @@ import models.businessmatching._
 import models.registrationprogress._
 import models.responsiblepeople.{ResponsiblePeopleValues, ResponsiblePerson}
 import models.status.{ReadyForRenewal, RenewalSubmitted}
-import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -41,6 +40,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction}
 
+import java.time.{LocalDate, LocalDateTime}
 import scala.concurrent.Future
 
 class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenerator with ResponsiblePeopleValues {

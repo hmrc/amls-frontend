@@ -18,13 +18,14 @@ package views.businessdetails
 
 import forms.businessdetails.ActivityStartDateFormProvider
 import models.businessdetails.ActivityStartDate
-import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
 import play.api.data.Form
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.ActivityStartDateView
+
+import java.time.LocalDate
 
 
 class ActivityStartDateViewSpec extends AmlsViewSpec with Matchers {

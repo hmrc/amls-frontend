@@ -24,7 +24,6 @@ import models.registrationprogress.{Completed, Started, TaskRow}
 import models.renewal._
 import models.status.{NotCompleted, ReadyForRenewal, SubmissionReadyForReview}
 import models.{Country, ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
-import org.joda.time.{LocalDate, LocalDateTime}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -35,6 +34,7 @@ import services.{RenewalService, SectionsProvider}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.declaration.DeclareView
 
+import java.time.{LocalDate, LocalDateTime}
 import scala.concurrent.Future
 import scala.language.postfixOps
 
@@ -150,7 +150,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
           (any())).thenReturn(Future.successful(Some(addPerson)))
 
-        mockApplicationStatus(ReadyForRenewal(Some(new LocalDate())))
+        mockApplicationStatus(ReadyForRenewal(Some(LocalDate.now())))
 
         val result = declarationController.get()(request)
         status(result) must be(OK)

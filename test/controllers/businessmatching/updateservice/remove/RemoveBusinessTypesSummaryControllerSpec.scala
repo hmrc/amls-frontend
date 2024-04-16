@@ -25,7 +25,6 @@ import models.businessmatching.BusinessMatching
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, RemoveBusinessTypesSummaryPageId}
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
@@ -35,6 +34,7 @@ import utils._
 import views.TitleValidator
 import views.html.businessmatching.updateservice.remove.RemoveActivitiesSummaryView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValidator {
@@ -61,7 +61,7 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
     "the user visits the page" which {
       "contains the correct content" in new Fixture {
         // scalastyle:off magic.number
-        val now = new LocalDate(2014, 1, 1)
+        val now = LocalDate.of(2014, 1, 1)
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel(Some(Set(MoneyServiceBusiness)), Some(DateOfChange(now)))))
 
         val result = controller.get()(request)

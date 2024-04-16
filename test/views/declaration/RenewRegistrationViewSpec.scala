@@ -17,13 +17,13 @@
 package views.declaration
 
 import forms.declaration.RenewRegistrationFormProvider
-import org.joda.time.LocalDate
 import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
-import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.declaration.RenewRegistrationView
+
+import java.time.LocalDate
 
 class RenewRegistrationViewSpec extends AmlsViewSpec with Matchers {
 

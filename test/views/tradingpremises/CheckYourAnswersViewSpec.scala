@@ -20,7 +20,6 @@ import models.businessmatching.BusinessActivity.{BillPaymentServices, EstateAgen
 import models.tradingpremises.BusinessStructure.SoleProprietor
 import models.tradingpremises.TradingPremisesMsbService._
 import models.tradingpremises._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.test.FakeRequest
@@ -29,6 +28,7 @@ import utils.tradingpremises.CheckYourAnswersHelper
 import views.Fixture
 import views.html.tradingpremises.CheckYourAnswersView
 
+import java.time.LocalDate
 import scala.jdk.CollectionConverters._
 
 sealed trait TestHelper extends AmlsSummaryViewSpec {
@@ -43,10 +43,10 @@ sealed trait TestHelper extends AmlsSummaryViewSpec {
       "asdfasdf"
     ),
     Some(true),
-    Some(new LocalDate(1990, 2, 24))
+    Some(LocalDate.of(1990, 2, 24))
   )
   val businessStructure = SoleProprietor
-  val agentName = AgentName(agentName = "Agent Name", agentDateOfBirth = Some(new LocalDate(1990, 2, 24)))
+  val agentName = AgentName(agentName = "Agent Name", agentDateOfBirth = Some(LocalDate.of(1990, 2, 24)))
   val agentCompanyName = AgentCompanyDetails("Company Name", Some("12345678"))
   val agentPartnership = AgentPartnership("Partner Name")
   val wdbd = WhatDoesYourBusinessDo(
@@ -68,7 +68,7 @@ sealed trait TestHelper extends AmlsSummaryViewSpec {
     false,
     Some(123456),
     Some("Added"),
-    Some(ActivityEndDate(new LocalDate(1999, 1, 1)))
+    Some(ActivityEndDate(LocalDate.of(1999, 1, 1)))
   )
 
   lazy val cyaView = inject[CheckYourAnswersView]

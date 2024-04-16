@@ -24,7 +24,6 @@ import models.DateOfChange
 import models.businessmatching.BusinessActivity._
 import models.businessmatching._
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRemovePageId}
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.any
@@ -35,6 +34,7 @@ import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.remove.RemoveActivitiesView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 

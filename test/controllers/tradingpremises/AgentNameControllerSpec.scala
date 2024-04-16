@@ -26,7 +26,6 @@ import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises.BusinessStructure.SoleProprietor
 import models.tradingpremises._
 import models.tradingpremises.TradingPremisesMsbService._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
@@ -39,6 +38,7 @@ import utils.{AmlsSpec, DependencyMocks}
 import views.html.DateOfChangeView
 import views.html.tradingpremises.AgentNameView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with TradingPremisesGenerator with Injecting {
@@ -218,7 +218,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           any(),
           meq(Seq(tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
-            agentName = Some(AgentName("text",None,Some(new LocalDate(1956,2,15)))),
+            agentName = Some(AgentName("text",None,Some(LocalDate.of(1956,2,15)))),
             agentCompanyDetails = None,
             agentPartnership = None
           ), TradingPremises())))(any())
@@ -306,10 +306,10 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           )
 
           val name = AgentName("someName")
-          val updatedName= name.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
+          val updatedName= name.copy(dateOfChange = Some(DateOfChange(LocalDate.of(2010, 10, 1))))
 
           val yourPremises = mock[YourTradingPremises]
-          when(yourPremises.startDate) thenReturn new Some(new LocalDate(2005, 1, 1))
+          when(yourPremises.startDate) thenReturn new Some(LocalDate.of(2005, 1, 1))
 
           val premises = TradingPremises(agentName = Some(name), yourTradingPremises = Some(yourPremises))
 
@@ -339,7 +339,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           )
 
           val yourPremises = mock[YourTradingPremises]
-          when(yourPremises.startDate) thenReturn Some(new LocalDate(2005, 1, 1))
+          when(yourPremises.startDate) thenReturn Some(LocalDate.of(2005, 1, 1))
 
           val premises = TradingPremises(agentName = Some(AgentName("Trading Name")), yourTradingPremises = Some(yourPremises))
 
@@ -358,7 +358,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
   val year =1990
   val month = 2
   val day = 24
-  val date = new LocalDate(year, month, day)
+  val date = LocalDate.of(year, month, day)
 
   val ytp = YourTradingPremises("tradingName1", address, Some(true), Some(date))
   val ytp1 = YourTradingPremises("tradingName2", address, Some(true), Some(date))

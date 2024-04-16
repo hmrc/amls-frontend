@@ -24,7 +24,6 @@ import models.ResponseType.SubscriptionResponseType
 import models.confirmation.Currency
 import models.renewal.{AMLSTurnover, AMPTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
 import models.status.SubmissionReady
-import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.play.PlaySpec
@@ -36,6 +35,7 @@ import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.AmlsSpec
 import views.html.payments.TypeOfBankView
 
+import java.time.LocalDateTime
 import scala.concurrent.{ExecutionContext, Future}
 
 class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenerator with Injecting {
@@ -78,7 +78,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
       100,
       Some(paymentReferenceNumber),
       None,
-      DateTime.now()
+      LocalDateTime.now()
     )))
 
     when {

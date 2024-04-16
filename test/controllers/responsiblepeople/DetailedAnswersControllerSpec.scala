@@ -26,7 +26,6 @@ import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople._
 import models.status._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -42,6 +41,7 @@ import utils.responsiblepeople.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.responsiblepeople.CheckYourAnswersView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePeopleValues
@@ -214,7 +214,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
         "respond with OK and show the detailed answers page with a correctly formatted responsiblePerson startDate" in new Fixture {
 
-          private val testStartDate = new LocalDate(1999,1,1)
+          private val testStartDate = LocalDate.of(1999,1,1)
 
           val model = completeResponsiblePerson.copy(personName = Some(personName),
             legalName = Some(PreviousName(Some(false), None, None, None)),

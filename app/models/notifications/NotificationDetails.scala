@@ -18,34 +18,32 @@ package models.notifications
 
 import cats.implicits._
 import models.confirmation.Currency
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
-import org.joda.time.{DateTime, LocalDate}
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import utils.ContactTypeHelper
+
+import java.time.format.DateTimeFormatter
+import java.time.{LocalDate, LocalDateTime}
 
 case class NotificationDetails(contactType: Option[ContactType],
                                status: Option[Status],
                                messageText: Option[String],
                                variation: Boolean,
-                               receivedAt: DateTime) {
+                               receivedAt: LocalDateTime) {
 
-  val cType = ContactTypeHelper.getContactType(status, contactType, variation)
+  val cType: ContactType = ContactTypeHelper.getContactType(status, contactType, variation)
 
-  def subject(templateVersion: String) =
+  def subject(templateVersion: String): String =
     templateVersion match {
       case "v1m0" | "v2m0" | "v3m0" | "v4m0" => s"notifications.subject.$cType"
       case "v5m0" => s"notifications.subject.v5.$cType"
       case _ => throw new Exception(s"Unknown template version $templateVersion")
     }
 
-
-  def dateReceived = {
-    val fmt: DateTimeFormatter = DateTimeFormat.forPattern("d MMMM Y")
-    receivedAt.toString(fmt)
+  def dateReceived: String = {
+    receivedAt.format(DateTimeFormatter.ofPattern("d MMMM Y"))
   }
-
 }
 
 object NotificationDetails {
@@ -55,7 +53,7 @@ object NotificationDetails {
         (JsPath \ "status").readNullable[Status] and
         (JsPath \ "messageText").readNullable[String] and
         (JsPath \ "variation").read[Boolean] and
-        (JsPath \ "receivedAt").read[DateTime]((MongoJodaFormats.dateTimeFormat))
+        (JsPath \ "receivedAt").read[LocalDateTime]((MongoJavatimeFormats.localDateTimeFormat))
       )(NotificationDetails.apply _)
 
   val writes : OWrites[NotificationDetails ] =
@@ -64,13 +62,13 @@ object NotificationDetails {
         (JsPath \ "status").writeNullable[Status] and
         (JsPath \ "messageText").writeNullable[String] and
         (JsPath \ "variation").write[Boolean] and
-        (JsPath \ "receivedAt").write[DateTime]((MongoJodaFormats.dateTimeFormat))
+        (JsPath \ "receivedAt").write[LocalDateTime]((MongoJavatimeFormats.localDateTimeFormat))
       )(unlift(NotificationDetails.unapply))
 
   implicit val format: OFormat[NotificationDetails] = OFormat(reads, writes)
 
   private val parseDate: String => LocalDate =
-    input => LocalDate.parse(input, DateTimeFormat.forPattern("dd/MM/yyyy"))
+    input => LocalDate.parse(input, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 
   private val extractEndDate: String => Option[LocalDate] = input => {
     val pattern = """(?i)[\w\s]+\s*-\s*(\d{1,2}/\d{1,2}/\d{4})""".r.unanchored

@@ -25,7 +25,6 @@ import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -38,6 +37,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, StatusConstants}
 import views.html.responsiblepeople.PositionWithinBusinessStartDateView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with Injecting {
@@ -73,7 +73,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
   val RecordId = 1
 
-  private val startDate: Option[PositionStartDate] = Some(PositionStartDate(new LocalDate()))
+  private val startDate: Option[PositionStartDate] = Some(PositionStartDate(LocalDate.now()))
 
   val pageTitle = "When did this person start their role in the business? - " +
     messages("summary.responsiblepeople") + " - " +
@@ -168,8 +168,8 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
         val document: Document = Jsoup.parse(contentAsString(result))
         document.title must include(pageTitle)
-        document.select("input[id=startDate.day]").`val`() must be(startDate.get.startDate.dayOfMonth().get.toString)
-        document.select("input[id=startDate.month]").`val`() must be(startDate.get.startDate.monthOfYear().get.toString)
+        document.select("input[id=startDate.day]").`val`() must be(startDate.get.startDate.getDayOfMonth().toString)
+        document.select("input[id=startDate.month]").`val`() must be(startDate.get.startDate.getMonthValue().toString)
         document.select("input[id=startDate.year]").`val`() must be(startDate.get.startDate.getYear.toString)
       }
     }

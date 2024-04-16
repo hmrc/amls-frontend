@@ -24,12 +24,12 @@ import forms.deregister.DeregistrationReasonFormProvider
 import models.businessmatching.BusinessActivity.HighValueDealing
 import models.businessmatching.BusinessMatching
 import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
-import org.joda.time.LocalDate
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AuthEnrolmentsService
 import utils.{AckRefGenerator, AuthAction}
 import views.html.deregister.DeregistrationReasonView
 
+import java.time.LocalDate
 import javax.inject.Inject
 
 class DeregistrationReasonController @Inject()(authAction: AuthAction,

@@ -16,7 +16,7 @@
 
 package utils
 
-import org.joda.time.LocalDate
+import java.time.LocalDate
 
 class DateHelperSpec extends AmlsSpec  {
   "DateHelper" should {

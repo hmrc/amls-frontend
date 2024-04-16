@@ -22,7 +22,6 @@ import controllers.actions.SuccessfulAuthAction
 import forms.responsiblepeople.PersonUKPassportFormProvider
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito.{verify, when}
@@ -33,6 +32,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import views.html.responsiblepeople.PersonUKPassportView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
@@ -252,7 +252,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with Inj
 
             val responsiblePeople = ResponsiblePerson(
               ukPassport = Some(UKPassportNo),
-              dateOfBirth = Some(DateOfBirth(new LocalDate(2001,12,1)))
+              dateOfBirth = Some(DateOfBirth(LocalDate.of(2001,12,1)))
             )
 
             when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -369,7 +369,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with Inj
     "remove non uk passport data excluding date of birth" when {
       "data is changed to uk passport" in new Fixture {
 
-        val dateOfBirth = DateOfBirth(LocalDate.parse("2000-01-01"))
+        val dateOfBirth = DateOfBirth(LocalDate.of(2000,1,1))
 
         val newRequest = FakeRequest(POST, routes.PersonUKPassportController.post(1).url)
         .withFormUrlEncodedBody(
