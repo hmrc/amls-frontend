@@ -37,7 +37,6 @@ trait CacheOps {
     val sensitiveDecrypter: Reads[SensitiveT[T]] = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
 
     cache.data.get(key) flatMap { encryptedJson =>
-      println(s"\n\n == decrypting the following encrypted json:$encryptedJson \n\n with key:$key")
       val decryptionResult: JsResult[SensitiveT[T]] = sensitiveDecrypter.reads(encryptedJson)
 
       if (decryptionResult.isSuccess) {

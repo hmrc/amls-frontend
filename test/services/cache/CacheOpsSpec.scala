@@ -20,7 +20,6 @@ import models.amp.Amp
 import models.tradingpremises.TradingPremises
 import org.scalatest.OptionValues
 import play.api.libs.json.{JsArray, JsBoolean, JsObject, JsString}
-import uk.gov.hmrc.crypto.json.JsonDecryptor
 import utils.AmlsSpec
 
 class CacheOpsSpec extends AmlsSpec with OptionValues {
@@ -51,7 +50,7 @@ class CacheOpsSpec extends AmlsSpec with OptionValues {
       )
 
       // When
-      val optAmp = TestCacheClient.catchDoubleEncryption(cache, "amp")(Amp.reads, compositeSymmetricCrypto, new JsonDecryptor[Amp]())
+      val optAmp = TestCacheClient.catchDoubleEncryption(cache, "amp")(Amp.reads, compositeSymmetricCrypto)
 
       // Then
       optAmp.value mustEqual expectedAmp
@@ -63,7 +62,7 @@ class CacheOpsSpec extends AmlsSpec with OptionValues {
 
       // When
       val optTradingPremises = TestCacheClient
-        .catchDoubleEncryption(cache, "trading-premises")(TradingPremises.reads, compositeSymmetricCrypto, new JsonDecryptor[TradingPremises]())
+        .catchDoubleEncryption(cache, "trading-premises")(TradingPremises.reads, compositeSymmetricCrypto)
 
       // Then
       optTradingPremises.value mustEqual TradingPremises()
@@ -76,7 +75,7 @@ class CacheOpsSpec extends AmlsSpec with OptionValues {
       // when
       val expectedEx = intercept[SecurityException] {
         TestCacheClient
-          .catchDoubleEncryption(cache, "trading-premises")(TradingPremises.reads, compositeSymmetricCrypto, new JsonDecryptor[TradingPremises]())
+          .catchDoubleEncryption(cache, "trading-premises")(TradingPremises.reads, compositeSymmetricCrypto)
       }
 
       // Then

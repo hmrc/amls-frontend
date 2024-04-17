@@ -107,7 +107,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       config = config,
       parser = mock[BodyParsers.Default],
       start = view,
-      headerCarrierForPartialsConverter = headerCarrierForPartialsConverter)
+      headerCarrierForPartialsConverter = headerCarrierForPartialsConverter,
+      applicationCrypto = applicationCrypto)
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
@@ -273,7 +274,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       config = config,
       parser = mock[BodyParsers.Default],
       start = view,
-      headerCarrierForPartialsConverter = headerCarrierForPartialsConverter)
+      headerCarrierForPartialsConverter = headerCarrierForPartialsConverter,
+      applicationCrypto = applicationCrypto)
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
