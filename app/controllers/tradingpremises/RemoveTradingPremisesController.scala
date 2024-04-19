@@ -92,7 +92,7 @@ class RemoveTradingPremisesController @Inject () (
                   }
                 } yield Redirect(routes.YourTradingPremisesController.get(complete))
               }
-              case _ => removeWithoutDate
+              case _ => removeWithoutDate()
             }
           }
         }
@@ -149,7 +149,7 @@ class RemoveTradingPremisesController @Inject () (
                       }
                     )
                 }.getOrElse(throw new RuntimeException("Could not access trading premises"))
-              case _ => removeWithoutDate
+              case _ => removeWithoutDate()
             }
           }
         }

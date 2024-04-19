@@ -39,7 +39,7 @@ import models.supervision.Supervision
 import models.tcsp.TcspTypes._
 import models.tcsp._
 import models.tradingpremises.TradingPremises
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.{Json, Writes}

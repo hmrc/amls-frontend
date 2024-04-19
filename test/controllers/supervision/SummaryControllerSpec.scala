@@ -20,7 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.asp.Asp
 import models.supervision.{Supervision, SupervisionValues}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._

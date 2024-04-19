@@ -21,7 +21,7 @@ import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.{BusinessDetails, ConfirmRegisteredOffice, RegisteredOfficeUK}
 import models.businessmatching.BusinessMatching
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.http.cache.client.CacheMap

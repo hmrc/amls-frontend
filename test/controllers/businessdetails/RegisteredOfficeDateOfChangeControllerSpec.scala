@@ -22,7 +22,7 @@ import forms.DateOfChangeFormProvider
 import models.businessdetails._
 import models.{Country, DateOfChange}
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._

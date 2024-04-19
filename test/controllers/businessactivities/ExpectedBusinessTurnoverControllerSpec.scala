@@ -22,7 +22,7 @@ import forms.businessactivities.ExpectedBusinessTurnoverFormProvider
 import models.businessactivities.{BusinessActivities, ExpectedBusinessTurnover}
 import models.status.NotCompleted
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar

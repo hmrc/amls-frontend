@@ -44,11 +44,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockApplicationConfig = mock[ApplicationConfig]
 
-    val removeBusinessTypeHelper = new RemoveBusinessTypeHelper(
-      SuccessfulAuthAction,
-      mockApplicationConfig,
-      mockCacheConnector
-    )
+    val removeBusinessTypeHelper = new RemoveBusinessTypeHelper()(mockCacheConnector)
 
     val router = new RemoveBusinessTypeRouter(
       businessMatchingService = mockBusinessMatchingService,

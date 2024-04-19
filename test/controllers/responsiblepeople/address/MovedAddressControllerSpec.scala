@@ -21,7 +21,7 @@ import controllers.actions.SuccessfulAuthAction
 import controllers.responsiblepeople.address
 import forms.responsiblepeople.address.MovedAddressFormProvider
 import models.responsiblepeople._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._

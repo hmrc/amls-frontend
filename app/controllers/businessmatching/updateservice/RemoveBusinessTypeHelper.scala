@@ -18,14 +18,12 @@ package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
-import config.ApplicationConfig
 import connectors.DataCacheConnector
-import javax.inject.{Inject, Singleton}
 import models.amp.Amp
 import models.asp.Asp
+import models.businessmatching.BusinessActivity._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching}
-import models.businessmatching.BusinessActivity._
 import models.eab.Eab
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.hvd.Hvd
@@ -35,14 +33,12 @@ import models.tcsp.Tcsp
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthAction
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
-                                         appConfig: ApplicationConfig,
-                                         implicit val dataCacheConnector: DataCacheConnector) {
+class RemoveBusinessTypeHelper @Inject()(implicit val dataCacheConnector: DataCacheConnector) {
 
   def removeSectionData(credId: String, model: RemoveBusinessTypeFlowModel)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[CacheMap]] = {
@@ -85,7 +81,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
   }
 
   def removeBusinessMatchingBusinessTypes(credId: String, model: RemoveBusinessTypeFlowModel)
-                                         (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BMBusinessMatching] = {
+                                         (implicit ec: ExecutionContext): OptionT[Future, BMBusinessMatching] = {
 
     val emptyActivities = BMBusinessActivities(Set.empty[BMBusinessActivity])
     val setAccepted = (bm: BMBusinessMatching) => bm.copy(hasAccepted = true)
@@ -115,7 +111,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
   }
 
   def removeTradingPremisesBusinessTypes(credId: String, model: RemoveBusinessTypeFlowModel)
-                                        (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[TradingPremises]] = {
+                                        (implicit ec: ExecutionContext): OptionT[Future, Seq[TradingPremises]] = {
 
     val setAccepted = (tp: TradingPremises) => tp.copy(hasAccepted = true)
 
@@ -155,7 +151,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
   }
 
   def removeFitAndProper(credId: String, model: RemoveBusinessTypeFlowModel)
-                        (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[ResponsiblePerson]] = {
+                        (implicit ec: ExecutionContext): OptionT[Future, Seq[ResponsiblePerson]] = {
 
     val emptyActivities = BMBusinessActivities(Set.empty[BMBusinessActivity])
 
@@ -183,16 +179,15 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
   }
 
   def dateOfChangeApplicable(credId: String, activitiesToRemove: Set[BMBusinessActivity])
-                            (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Boolean] = {
+                            (implicit ec: ExecutionContext): OptionT[Future, Boolean] =
     for {
       recentlyAdded <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](credId, ServiceChangeRegister.key)) orElse OptionT.some(ServiceChangeRegister())
       addedActivities <- OptionT.fromOption[Future](recentlyAdded.addedActivities) orElse OptionT.some(Set.empty)
     } yield {
       (activitiesToRemove -- addedActivities).nonEmpty
     }
-  }
 
-  def removeFlowData(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, RemoveBusinessTypeFlowModel] = {
+  def removeFlowData(credId: String)(implicit ec: ExecutionContext): OptionT[Future, RemoveBusinessTypeFlowModel] = {
     val emptyModel = RemoveBusinessTypeFlowModel()
     OptionT.liftF(dataCacheConnector.save(credId, RemoveBusinessTypeFlowModel.key, RemoveBusinessTypeFlowModel())) map { _ => emptyModel }
   }

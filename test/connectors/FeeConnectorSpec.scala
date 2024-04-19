@@ -20,7 +20,7 @@ import config.ApplicationConfig
 import generators.AmlsReferenceNumberGenerator
 import models.ResponseType.SubscriptionResponseType
 import models._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar

@@ -18,7 +18,7 @@ package connectors
 
 import config.AmlsSessionCache
 import models.status.ConfirmationStatus
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures

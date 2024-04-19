@@ -28,7 +28,7 @@ import models.businessmatching._
 import models.flowmanagement.{AddBusinessTypeFlowModel, SubSectorsPageId}
 import models.moneyservicebusiness.MoneyServiceBusinessTestData
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.test.FakeRequest

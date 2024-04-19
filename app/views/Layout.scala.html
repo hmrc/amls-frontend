@@ -73,9 +73,12 @@
 }
 
 @scripts = {
-    <script @CSPNonce.attr src='@controllers.routes.Assets.versioned("lib/govuk-frontend/govuk/all.js")'></script>
     <script @CSPNonce.attr src='@controllers.routes.Assets.versioned("lib/hmrc-frontend/hmrc/all.js")'></script>
-    <script @CSPNonce.attr>window.GOVUKFrontend.initAll();window.HMRCFrontend.initAll()</script>
+    <script @CSPNonce.attr type="module">
+        import { initAll } from '@routes.Assets.versioned("lib/govuk-frontend/dist/govuk/govuk-frontend.min.js")'
+        initAll()
+    </script>
+    <script @CSPNonce.attr>window.HMRCFrontend.initAll()</script>
     @autocompleteJavascript()
     <script @CSPNonce.attr src='@controllers.routes.Assets.versioned("submitButtonDisable.js")'></script>
 }

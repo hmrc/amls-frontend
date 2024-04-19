@@ -17,7 +17,7 @@
 package models.eab
 
 import models.registrationprogress._
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import play.api.libs.json._
 import uk.gov.hmrc.http.cache.client.CacheMap

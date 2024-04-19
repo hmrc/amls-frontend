@@ -23,7 +23,7 @@ import models.businessmatching.BusinessActivity._
 import models.businessmatching._
 import models.businessmatching.updateservice.{Add, Remove}
 import models.flowmanagement.ChangeBusinessTypesPageId
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._

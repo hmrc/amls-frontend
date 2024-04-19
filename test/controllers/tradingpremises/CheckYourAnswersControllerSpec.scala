@@ -23,7 +23,7 @@ import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, Tra
 import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities, _}
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers.{OK, contentAsString, status, _}

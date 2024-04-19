@@ -38,7 +38,7 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{status => _, _}
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.matchers.must.Matchers

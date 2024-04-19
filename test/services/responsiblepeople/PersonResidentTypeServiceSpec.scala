@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import models.Country
 import models.responsiblepeople._
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import play.api.mvc.AnyContentAsEmpty
@@ -134,7 +134,7 @@ class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValue
 
           when(mockDataCacheConnector.fetchAll(any())(any())).thenReturn(Future.successful(None))
 
-          verifyZeroInteractions(mockCacheMap)
+          verifyNoInteractions(mockCacheMap)
 
           verify(mockDataCacheConnector, times(0))
             .save[Seq[ResponsiblePerson]](any(), any(), any())(any())

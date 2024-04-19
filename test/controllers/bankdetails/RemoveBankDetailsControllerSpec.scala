@@ -20,7 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.bankdetails.BankAccountType.PersonalAccount
 import models.bankdetails._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}

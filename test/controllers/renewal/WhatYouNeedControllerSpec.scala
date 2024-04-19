@@ -21,7 +21,7 @@ import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, Telephone
 import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.registrationprogress.{Completed, NotStarted, TaskRow}
 import models.renewal.Renewal
-import org.mockito.Matchers.{any, eq => meq}
+import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import play.api.mvc.MessagesControllerComponents

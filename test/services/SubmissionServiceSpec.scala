@@ -36,7 +36,7 @@ import models.renewal._
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalacheck.Gen
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}

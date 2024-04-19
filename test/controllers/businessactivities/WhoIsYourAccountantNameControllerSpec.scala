@@ -21,7 +21,7 @@ import controllers.actions.SuccessfulAuthAction
 import forms.businessactivities.WhoIsYourAccountantNameFormProvider
 import models.businessactivities.{BusinessActivities, WhoIsYourAccountant, WhoIsYourAccountantName}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures

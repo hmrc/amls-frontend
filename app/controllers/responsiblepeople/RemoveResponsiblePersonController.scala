@@ -27,7 +27,6 @@ import services.StatusService
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.responsiblepeople.RemoveResponsiblePersonView
 
-import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ofPattern
 import scala.concurrent.Future
 

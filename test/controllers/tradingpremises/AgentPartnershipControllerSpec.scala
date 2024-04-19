@@ -22,7 +22,7 @@ import generators.tradingpremises.TradingPremisesGenerator
 import models.TradingPremisesSection
 import models.tradingpremises.{AgentPartnership, TradingPremises}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar

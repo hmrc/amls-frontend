@@ -20,7 +20,7 @@ import cats.implicits._
 import connectors.FeeConnector
 import models.FeeResponse
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.http.UpstreamErrorResponse

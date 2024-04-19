@@ -29,7 +29,7 @@ import models.responsiblepeople.TimeAtAddress.OneToThreeYears
 import models.responsiblepeople._
 import models.status._
 import models.{status => _, _}
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import play.api.mvc.{BodyParsers, Result}
 import play.api.test.Helpers._

@@ -23,14 +23,14 @@ import models.businessdetails.{BusinessDetails, CorporationTaxRegisteredYes}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.businessmatching.BusinessType.{LimitedCompany, UnincorporatedBody}
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.DependencyMocks
 import utils.AmlsSpec
-import org.mockito.Matchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.{eq => eqTo}
 
 class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with DependencyMocks {
 

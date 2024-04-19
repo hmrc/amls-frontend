@@ -26,7 +26,7 @@ import models.moneyservicebusiness._
 import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
 import org.scalatest.matchers.must.Matchers

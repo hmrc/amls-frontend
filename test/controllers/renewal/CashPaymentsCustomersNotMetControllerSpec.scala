@@ -21,7 +21,7 @@ import controllers.actions.SuccessfulAuthAction
 import forms.renewal.CashPaymentsCustomersNotMetFormProvider
 import models.renewal._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}

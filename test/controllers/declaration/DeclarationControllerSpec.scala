@@ -24,7 +24,7 @@ import models.registrationprogress.{Completed, Started, TaskRow}
 import models.renewal._
 import models.status.{NotCompleted, ReadyForRenewal, SubmissionReadyForReview}
 import models.{Country, ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar

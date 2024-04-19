@@ -21,7 +21,7 @@ import controllers.actions.SuccessfulAuthAction
 import forms.businessdetails.LettersAddressFormProvider
 import models.businessdetails._
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures

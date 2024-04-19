@@ -32,8 +32,7 @@ import models.responsiblepeople._
 import models.status._
 import models.{status => _, _}
 import org.jsoup.Jsoup
-import org.mockito.Matchers
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.http.Status.OK
 import play.api.i18n.Messages
@@ -275,7 +274,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+        when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
@@ -336,7 +335,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
           .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+        when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
@@ -359,10 +358,10 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+        when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+        when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
@@ -384,10 +383,10 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+        when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+        when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
@@ -410,10 +409,10 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+        when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+        when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
@@ -432,10 +431,10 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+        when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+        when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
@@ -458,10 +457,10 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+        when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+        when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
@@ -484,10 +483,10 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+        when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+        when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
@@ -507,10 +506,10 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+        when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+        when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
         when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -538,10 +537,10 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+        when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+        when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
         when(controller.renewalService.isRenewalComplete(any(), any[String]())(any(), any()))
@@ -582,7 +581,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
             reviewDetails = Some(ReviewDetails("BusinessName", None, mock[Address], "safeId", None))
           )))
 
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+        when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
         val dataCache = mock[DataCacheConnector]

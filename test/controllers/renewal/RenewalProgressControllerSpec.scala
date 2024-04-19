@@ -28,7 +28,7 @@ import models.registrationprogress._
 import models.responsiblepeople.{ResponsiblePeopleValues, ResponsiblePerson}
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder

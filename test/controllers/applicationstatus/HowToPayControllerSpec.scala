@@ -21,7 +21,7 @@ import generators.submission.SubscriptionResponseGenerator
 import models.ResponseType.SubscriptionResponseType
 import models.{FeeResponse, ResponseType}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, FeeHelper}

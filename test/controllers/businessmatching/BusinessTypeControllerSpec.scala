@@ -19,8 +19,7 @@ package controllers.businessmatching
 import controllers.actions.SuccessfulAuthAction
 import forms.businessmatching.BusinessTypeFormProvider
 import models.businessmatching.BusinessType
-import org.mockito.Matchers
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers.{eq => eqTo, any}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
@@ -117,7 +116,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
       val newRequest = FakeRequest(POST, routes.BusinessTypeController.post().url)
         .withFormUrlEncodedBody("businessType" -> BusinessType.LimitedCompany.toString)
 
-      when(mockService.updateBusinessType(any(), Matchers.eq(BusinessType.LimitedCompany))(any(), any()))
+      when(mockService.updateBusinessType(any(), eqTo(BusinessType.LimitedCompany))(any(), any()))
         .thenReturn(Future.successful(Some(BusinessType.LimitedCompany)))
 
       val result = controller.post()(newRequest)
@@ -130,7 +129,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
       val newRequest = test.FakeRequest(POST, routes.BusinessTypeController.post().url)
         .withFormUrlEncodedBody("businessType" -> BusinessType.LimitedCompany.toString)
 
-      when(mockService.updateBusinessType(any(), Matchers.eq(BusinessType.LimitedCompany))(any(), any()))
+      when(mockService.updateBusinessType(any(), eqTo(BusinessType.LimitedCompany))(any(), any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)

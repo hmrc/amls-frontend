@@ -22,7 +22,7 @@ import models.businessactivities._
 import models.businessmatching.BusinessActivity.{AccountancyServices, MoneyServiceBusiness}
 import models.businessmatching.{BusinessMatching, BusinessActivities => BMBusinessActivities}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
@@ -136,7 +136,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
             val result = controller.post()(newRequest)
             status(result) must be(BAD_REQUEST)
 
-            verifyZeroInteractions(mockService)
+            verifyNoInteractions(mockService)
           }
 
           "riskassessments fields are missing, represented by an empty string" in new Fixture {
@@ -150,7 +150,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
             val result = controller.post()(newRequest)
             status(result) must be(BAD_REQUEST)
 
-            verifyZeroInteractions(mockService)
+            verifyNoInteractions(mockService)
           }
         }
       }

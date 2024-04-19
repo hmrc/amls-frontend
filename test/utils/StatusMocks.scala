@@ -17,7 +17,7 @@
 package utils
 
 import models.status.SubmissionStatus
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import services.StatusService

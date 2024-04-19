@@ -18,7 +18,7 @@ package services.businessactivities
 
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, EmployeeCountAMLSSupervision, HowManyEmployees}
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.IntegrationPatience

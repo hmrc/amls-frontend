@@ -32,7 +32,7 @@ import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.status.SubmissionDecisionApproved
 import models.tcsp.Tcsp
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar

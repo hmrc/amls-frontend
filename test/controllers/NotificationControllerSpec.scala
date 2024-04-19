@@ -28,7 +28,7 @@ import models.notifications.{ContactType, IDType, NotificationDetails, Notificat
 import models.registrationdetails.RegistrationDetails
 import models.status.{SubmissionDecisionRejected, SubmissionReadyForReview}
 import models.{Country, ReadStatusResponse}
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar

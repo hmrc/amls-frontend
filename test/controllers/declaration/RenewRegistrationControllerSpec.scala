@@ -21,7 +21,7 @@ import forms.declaration.RenewRegistrationFormProvider
 import models.declaration.{RenewRegistration, RenewRegistrationNo, RenewRegistrationYes}
 import models.status.ReadyForRenewal
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar

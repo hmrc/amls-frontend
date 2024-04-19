@@ -22,7 +22,7 @@ import forms.businessactivities.AccountantIsUKAddressFormProvider
 import models.Country
 import models.businessactivities._
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}

@@ -21,8 +21,8 @@ import forms.bankdetails.BankAccountHasIBANFormProvider
 import models.bankdetails.BankAccountType.PersonalAccount
 import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import org.mockito.Matchers
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -133,7 +133,7 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec with Injecting {
             "hasIBAN" -> "true"
           )
 
-          when(controller.auditConnector.sendEvent(Matchers.any())(Matchers.any(), Matchers.any()))
+          when(controller.auditConnector.sendEvent(any())(any(), any()))
             .thenReturn(Future.successful(AuditResult.Success))
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))

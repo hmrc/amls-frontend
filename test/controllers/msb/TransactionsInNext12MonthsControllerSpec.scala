@@ -22,7 +22,7 @@ import models.businessmatching.BusinessActivity.{MoneyServiceBusiness => MoneySe
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry, TransactionsInNext12Months}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._

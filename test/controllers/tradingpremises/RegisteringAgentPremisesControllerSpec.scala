@@ -24,7 +24,7 @@ import models.businessmatching.{BusinessActivities => BusinessMatchingActivities
 import models.businessmatching.BusinessActivity._
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._

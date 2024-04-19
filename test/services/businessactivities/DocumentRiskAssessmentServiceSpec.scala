@@ -19,7 +19,7 @@ package services.businessactivities
 import connectors.DataCacheConnector
 import models.businessactivities._
 import models.businessmatching.BusinessMatching
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.http.cache.client.CacheMap

@@ -19,7 +19,7 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
-import org.mockito.Matchers.{any, eq => meq}
+import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import play.api.mvc.Call

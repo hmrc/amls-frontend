@@ -23,7 +23,7 @@ import models.ReadStatusResponse
 import models.businesscustomer.ReviewDetails
 import models.registrationdetails.RegistrationDetails
 import models.status.SubmissionReadyForReview
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}

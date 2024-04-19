@@ -17,7 +17,7 @@
 package controllers
 
 import models.autocomplete.LocationGraphTransformer
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec

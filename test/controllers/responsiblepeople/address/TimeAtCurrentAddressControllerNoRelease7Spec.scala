@@ -22,7 +22,7 @@ import forms.responsiblepeople.address.TimeAtAddressFormProvider
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.status.SubmissionDecisionApproved
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}

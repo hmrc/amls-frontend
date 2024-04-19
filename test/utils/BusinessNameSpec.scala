@@ -23,7 +23,7 @@ import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
 import models.registrationdetails.RegistrationDetails
 import models.status.SubmissionReady
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import services.StatusService

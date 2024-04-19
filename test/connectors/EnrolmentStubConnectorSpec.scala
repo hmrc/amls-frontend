@@ -19,7 +19,7 @@ package connectors
 import config.ApplicationConfig
 import generators.BaseGenerator
 import models.enrolment.{EnrolmentIdentifier, GovernmentGatewayEnrolment}
-import org.mockito.Matchers.{any}
+import org.mockito.ArgumentMatchers.{any}
 import org.mockito.Mockito.{verify, when}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpClient

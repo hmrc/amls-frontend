@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import models.businessactivities.BusinessActivities
 import models.businessactivities.ExpectedAMLSTurnover.First
 import models.businessmatching.BusinessMatching
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.IntegrationPatience

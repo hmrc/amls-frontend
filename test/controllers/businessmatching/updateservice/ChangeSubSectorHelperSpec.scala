@@ -24,7 +24,7 @@ import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.ChangeSubSectorFlowModel
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSB, _}
 import org.mockito.Mockito.{never, verify}
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo}
 import models.tradingpremises.TradingPremisesMsbService.{
   ChequeCashingScrapMetal => TPChequeCashingScrapMetal,
@@ -40,9 +40,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture extends DependencyMocks {
     self =>
-    val helper = new ChangeSubSectorHelper(
-      SuccessfulAuthAction,
-      mockCacheConnector)
+    val helper = new ChangeSubSectorHelper()(mockCacheConnector)
   }
 
   "requires a PSR Number" when {

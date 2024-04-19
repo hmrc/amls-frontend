@@ -27,7 +27,7 @@ import models.businessmatching.BusinessActivity.{AccountancyServices, BillPaymen
 import models.flowmanagement.AddBusinessTypeFlowModel
 import models.responsiblepeople.ResponsiblePerson
 import org.jsoup.Jsoup
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}

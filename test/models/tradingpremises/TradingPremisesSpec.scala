@@ -20,7 +20,7 @@ import models.businessmatching.BusinessActivity._
 import models.registrationprogress._
 import models.tradingpremises.BusinessStructure._
 import models.tradingpremises.TradingPremisesMsbService._
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap

@@ -24,7 +24,7 @@ import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMa
 import models.businessmatching.BusinessActivity.AccountancyServices
 import models.deregister.DeRegisterSubscriptionResponse
 import models.registrationdetails.RegistrationDetails
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}

@@ -20,7 +20,7 @@ import config.ApplicationConfig
 import connectors.{EnrolmentStubConnector, TaxEnrolmentsConnector}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentIdentifier, GovernmentGatewayEnrolment, TaxEnrolment}
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import play.api.test.Helpers._

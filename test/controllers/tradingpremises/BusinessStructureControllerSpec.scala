@@ -23,7 +23,7 @@ import models.TradingPremisesSection
 import models.tradingpremises.BusinessStructure._
 import models.tradingpremises._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar

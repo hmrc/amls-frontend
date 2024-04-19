@@ -25,8 +25,7 @@ import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.withdrawal._
 import models.{AmendVariationRenewalResponse, _}
-import org.mockito.Matchers
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar
@@ -39,7 +38,8 @@ import java.time.{LocalDate, LocalDateTime}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with AmlsReferenceNumberGenerator with PaymentGenerator {
+class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with
+  AmlsReferenceNumberGenerator with PaymentGenerator {
 
   val amlsConnector = new AmlsConnector(http = mock[HttpClient],
                                         appConfig = mock[ApplicationConfig])
@@ -262,7 +262,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       val id = "fcguhio"
 
       when {
-        amlsConnector.http.POSTString[HttpResponse](Matchers.any(), eqTo(id), Matchers.any())(Matchers.any(), Matchers.any(), Matchers.any())
+        amlsConnector.http.POSTString[HttpResponse](any(), eqTo(id), any())(any(), any(), any())
       } thenReturn Future.successful(HttpResponse(CREATED, ""))
 
       whenReady(amlsConnector.savePayment(id, amlsRegistrationNumber, safeId, accountTypeId)) {

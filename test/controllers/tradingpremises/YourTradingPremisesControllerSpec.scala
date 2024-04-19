@@ -22,7 +22,7 @@ import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities}
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises._
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages

@@ -25,7 +25,7 @@ import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDec
 import models.tradingpremises._
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatestplus.mockito.MockitoSugar

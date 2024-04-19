@@ -1,5 +1,5 @@
-$govuk-assets-path: "/agent/assets/lib/govuk-frontend/govuk/assets/";
-@import "lib/govuk-frontend/govuk/base";
+$govuk-assets-path: "/agent/assets/lib/govuk-frontend/dist/govuk/assets/";
+@import "lib/govuk-frontend/dist/govuk/base";
 
 .registration-status-tag {
   float: right;

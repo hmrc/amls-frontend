@@ -21,7 +21,7 @@ import forms.renewal.FXTransactionsInLast12MonthsFormProvider
 import models.businessmatching.BusinessActivity._
 import models.businessmatching._
 import models.renewal.{FXTransactionsInLast12Months, Renewal}
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
