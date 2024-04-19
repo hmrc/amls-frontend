@@ -20,7 +20,7 @@ import models.businessmatching.BusinessActivity
 import org.scalatestplus.mockito.MockitoSugar
 import services.businessmatching.ServiceFlow
 import org.mockito.Mockito.when
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 
 import scala.concurrent.Future
 

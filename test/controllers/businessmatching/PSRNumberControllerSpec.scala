@@ -30,7 +30,7 @@ import models.moneyservicebusiness.MoneyServiceBusiness
 import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
@@ -128,11 +128,11 @@ class PSRNumberControllerSpec extends AmlsSpec
         val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
         when {
-          controller.helper.getOrCreateFlowModel(any())(any(), any())
+          controller.helper.getOrCreateFlowModel(any())(any())
         } thenReturn Future.successful(flowModel)
 
         when {
-          controller.helper.updateSubSectors(any(), any())(any(), any())
+          controller.helper.updateSubSectors(any(), any())(any())
         } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
         val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
@@ -156,7 +156,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
         when {
-          controller.helper.getOrCreateFlowModel(any())(any(), any())
+          controller.helper.getOrCreateFlowModel(any())(any())
         } thenReturn Future.successful(flowModel)
 
         mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)

@@ -25,7 +25,7 @@ import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessMatching, BusinessActivities => BMActivities}
 import models.status.NotCompleted
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import play.api.mvc.Result

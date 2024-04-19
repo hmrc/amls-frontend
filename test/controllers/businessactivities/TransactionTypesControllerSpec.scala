@@ -26,7 +26,7 @@ import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.{never, verify}
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.scalatest.matchers.must.Matchers
 import play.api.test.{FakeRequest, Injecting}
 import views.html.businessactivities.TransactionTypesView

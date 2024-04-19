@@ -24,7 +24,7 @@ import models.businessmatching._
 import models.businessmatching.BusinessActivity.{BillPaymentServices, HighValueDealing, TelephonePaymentService}
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddMoreBusinessTypesPageId}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}

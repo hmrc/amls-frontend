@@ -25,7 +25,7 @@ import models.businessmatching.updateservice.Remove
 import models.businessmatching.updateservice.{Add, ChangeBusinessType}
 import models.flowmanagement.{ChangeBusinessTypesPageId, RemoveBusinessTypeFlowModel}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
@@ -64,14 +64,12 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with I
     val businessMatching = BusinessMatching(activities = Some(businessActivitiesModel))
     val emptyBusinessMatching = BusinessMatching()
 
-    mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
-
     when {
       bmService.getRemainingBusinessActivities(any())(any(), any())
     } thenReturn OptionT.liftF[Future, Set[BusinessActivity]](Future.successful(Set(HighValueDealing)))
 
     when {
-      controller.helper.removeFlowData(any())(any(), any())
+      controller.helper.removeFlowData(any())(any())
     } thenReturn OptionT.liftF[Future, RemoveBusinessTypeFlowModel](Future.successful(RemoveBusinessTypeFlowModel()))
   }
 
@@ -143,18 +141,6 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with I
           val result = controller.post()(request)
           status(result) must be(BAD_REQUEST)
         }
-      }
-
-      "return Internal Server Error if the business matching model can't be obtained" in new Fixture {
-
-        val postRequest = FakeRequest(POST, routes.ChangeBusinessTypesController.post().url)
-        .withFormUrlEncodedBody("" -> "")
-
-        mockCacheGetEntry[BusinessMatching](None, BusinessMatching.key)
-
-        val result = controller.post()(postRequest)
-
-        status(result) mustBe INTERNAL_SERVER_ERROR
       }
     }
   }

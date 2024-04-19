@@ -26,7 +26,7 @@ import models.flowmanagement.{RemoveBusinessTypeFlowModel, RemoveBusinessTypesSu
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -84,19 +84,19 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
 
         mockCacheFetch(Some(flowModel), Some(RemoveBusinessTypeFlowModel.key))
 
-        when(removeServiceHelper.removeBusinessMatchingBusinessTypes(any(), eqTo(flowModel))(any(), any()))
+        when(removeServiceHelper.removeBusinessMatchingBusinessTypes(any(), eqTo(flowModel))(any()))
           .thenReturn(OptionT.liftF(Future.successful(mock[BusinessMatching])))
 
-        when(removeServiceHelper.removeFitAndProper(any(), eqTo(flowModel))(any(), any()))
+        when(removeServiceHelper.removeFitAndProper(any(), eqTo(flowModel))(any()))
           .thenReturn(OptionT.liftF[Future, Seq[ResponsiblePerson]](Future.successful(Seq.empty)))
 
-        when(removeServiceHelper.removeTradingPremisesBusinessTypes(any(), eqTo(flowModel))(any(), any()))
+        when(removeServiceHelper.removeTradingPremisesBusinessTypes(any(), eqTo(flowModel))(any()))
           .thenReturn(OptionT.liftF[Future, Seq[TradingPremises]](Future.successful(Seq.empty)))
 
         when(removeServiceHelper.removeSectionData(any(), eqTo(flowModel))(any(), any()))
           .thenReturn(OptionT.liftF[Future, Seq[CacheMap]](Future.successful(Seq.empty)))
 
-        when(removeServiceHelper.removeFlowData(any())(any(), any()))
+        when(removeServiceHelper.removeFlowData(any())(any()))
           .thenReturn(OptionT.liftF[Future, RemoveBusinessTypeFlowModel](Future.successful(RemoveBusinessTypeFlowModel())))
 
         val result = controller.post()(requestWithUrlEncodedBody("" -> ""))

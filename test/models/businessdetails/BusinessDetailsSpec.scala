@@ -17,7 +17,7 @@
 package models.businessdetails
 
 import models.registrationprogress._
-import org.mockito.Matchers.{any, eq => meq}
+import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito._
 import play.api.libs.json.{JsNull, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap

@@ -242,7 +242,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
 
         val updatedTaskRow = TaskRow(
           "bankdetails",
-          controllers.bankdetails.routes.YourBankAccountsController.get.url,
+          controllers.bankdetails.routes.YourBankAccountsController.get().url,
           true,
           Updated,
           TaskRow.updatedTag
@@ -257,7 +257,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
         val deleted = Seq(completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true))
         val updatedTaskRow = TaskRow(
           "bankdetails",
-          controllers.bankdetails.routes.YourBankAccountsController.get.url,
+          controllers.bankdetails.routes.YourBankAccountsController.get().url,
           true,
           Updated,
           TaskRow.updatedTag
@@ -272,7 +272,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
       val incomplete = Seq(accountTypePartialModel)
       val startedTaskRow = TaskRow(
         "bankdetails",
-        controllers.bankdetails.routes.YourBankAccountsController.get.url,
+        controllers.bankdetails.routes.YourBankAccountsController.get().url,
         false,
         Started,
         TaskRow.incompleteTag

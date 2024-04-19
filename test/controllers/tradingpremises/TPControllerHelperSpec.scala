@@ -20,7 +20,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.http.cache.client.CacheMap
 import org.mockito.Mockito._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import cats.implicits._
 import config.ApplicationConfig
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}

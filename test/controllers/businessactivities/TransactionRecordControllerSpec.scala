@@ -21,7 +21,7 @@ import forms.businessactivities.TransactionRecordFormProvider
 import models.businessactivities.TransactionTypes.Paper
 import models.businessactivities._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._

@@ -22,7 +22,7 @@ import forms.tcsp.OnlyOffTheShelfCompsSoldFormProvider
 import models.tcsp.ProvidedServices._
 import models.tcsp.TcspTypes._
 import models.tcsp._
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar

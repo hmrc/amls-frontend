@@ -45,11 +45,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
     val mockApplicationConfig = mock[ApplicationConfig]
 
-    val helper = new RemoveBusinessTypeHelper(
-      SuccessfulAuthAction,
-      mockApplicationConfig,
-      mockCacheConnector
-    )
+    val helper = new RemoveBusinessTypeHelper()(mockCacheConnector)
   }
 
   "RemoveBusinessTypeHelper" must {

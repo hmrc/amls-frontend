@@ -43,7 +43,7 @@ import models.tcsp.TcspTypes._
 import models.tcsp.ProvidedServices.{PhonecallHandling, Other => PSOther}
 import models.tradingpremises.TradingPremises
 import models.{DataImport, _}
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.verify
 import play.api.libs.json.{JsObject, Json}
 import play.api.test.Helpers._

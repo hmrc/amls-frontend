@@ -22,7 +22,7 @@ import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService._
 import models.registrationprogress._
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec

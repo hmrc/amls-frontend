@@ -91,7 +91,7 @@ class DetailedAnswersController @Inject () (
       case Some(x) if x.copy(hasAccepted = true).isComplete => showHideAddressMove(amlsRegistrationNo, accountTypeId, credId, x.lineId) flatMap { showHide =>
         isMsbOrTcsp(credId).map {
           msbOrTcsp: Option[Boolean] =>
-            val shouldShowApprovalSection = !(msbOrTcsp.contains(true)) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
+            val shouldShowApprovalSection = !msbOrTcsp.contains(true) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
             val personName = ControllerHelper.rpTitleName(Some(x))
             val summaryList = cyaHelper.getSummaryList(x, businessMatching, personName, index, flow, showHide, shouldShowApprovalSection)
             Ok(view(summaryList, index, showHide, personName, flow))
@@ -113,11 +113,10 @@ class DetailedAnswersController @Inject () (
       }
   }
 
-  private def isMsbOrTcsp(credId: String)(implicit hc: HeaderCarrier): Future[Option[Boolean]] = {
+  private def isMsbOrTcsp(credId: String): Future[Option[Boolean]] =
     for {
       businessmatching <- dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key)
     } yield businessmatching.map(_.msbOrTcsp)
-  }
 
   private def redirectFromDeclarationFlow(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)(implicit hc: HeaderCarrier) =
     (for {
@@ -135,7 +134,7 @@ class DetailedAnswersController @Inject () (
         Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
     }) getOrElse InternalServerError("Cannot determine redirect")
 
-  private def fetchModel(credId: String)(implicit hc: HeaderCarrier) =
+  private def fetchModel(credId: String) =
     dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key)
 
 }

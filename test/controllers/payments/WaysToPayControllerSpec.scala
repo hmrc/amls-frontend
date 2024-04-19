@@ -27,7 +27,7 @@ import models.payments._
 import models.renewal._
 import models.status.{SubmissionReady, SubmissionReadyForReview}
 import models.{Country, FeeResponse, ReadStatusResponse, ReturnLocation}
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}

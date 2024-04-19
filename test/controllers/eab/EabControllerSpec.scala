@@ -19,7 +19,7 @@ package controllers.eab
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.eab.Eab
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder

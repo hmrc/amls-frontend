@@ -23,7 +23,7 @@ import forms.renewal.SendLargestAmountsOfMoneyFormProvider
 import models.Country
 import models.renewal.{CustomersOutsideUK, Renewal, SendTheLargestAmountsOfMoney}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
 import org.scalatestplus.mockito.MockitoSugar

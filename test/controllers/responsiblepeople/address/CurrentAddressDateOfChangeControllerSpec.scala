@@ -22,7 +22,7 @@ import controllers.responsiblepeople.address
 import forms.DateOfChangeFormProvider
 import models.responsiblepeople.TimeAtAddress.{ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._

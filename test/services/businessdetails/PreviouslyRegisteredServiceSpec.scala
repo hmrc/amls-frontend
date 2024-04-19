@@ -18,7 +18,7 @@ package services.businessdetails
 
 import connectors.DataCacheConnector
 import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.http.cache.client.CacheMap

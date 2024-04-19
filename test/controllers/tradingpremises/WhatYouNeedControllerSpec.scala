@@ -21,7 +21,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService.{ChequeCashingNotScrapMetal, TransmittingMoney}
 import models.businessmatching._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar

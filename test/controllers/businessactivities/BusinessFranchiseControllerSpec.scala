@@ -20,7 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import forms.businessactivities.BusinessFranchiseFormProvider
 import models.businessactivities.BusinessFranchiseYes
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
@@ -132,7 +132,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
 
-          verifyZeroInteractions(mockService)
+          verifyNoInteractions(mockService)
         }
       }
     }

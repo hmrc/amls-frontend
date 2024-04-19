@@ -19,7 +19,7 @@ package models
 import play.api.libs.json._
 
 import java.time.format.DateTimeFormatter
-import java.time.{LocalDate, LocalDateTime, ZoneId}
+import java.time.{LocalDate, LocalDateTime}
 
 case class ReadStatusResponse(
                                processingDate: LocalDateTime,

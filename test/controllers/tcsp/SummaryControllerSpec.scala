@@ -20,7 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.tcsp._
 import models.tcsp.ProvidedServices._
 import models.tcsp.TcspTypes._
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.OptionValues
 import play.api.test.Helpers._

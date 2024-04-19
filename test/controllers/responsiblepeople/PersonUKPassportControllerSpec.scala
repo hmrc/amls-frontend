@@ -23,7 +23,7 @@ import forms.responsiblepeople.PersonUKPassportFormProvider
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._

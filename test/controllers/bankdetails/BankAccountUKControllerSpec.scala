@@ -23,9 +23,9 @@ import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
-import org.mockito.{ArgumentCaptor, Matchers}
+import org.mockito.ArgumentCaptor
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -170,7 +170,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
             "sortCode" -> "123456"
           )
 
-          when(controller.auditConnector.sendEvent(Matchers.any())(Matchers.any(), Matchers.any()))
+          when(controller.auditConnector.sendEvent(any())(any(), any()))
             .thenReturn(Future.successful(AuditResult.Success))
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))

@@ -20,7 +20,7 @@ import cats.implicits._
 import models.confirmation.Currency
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import play.custom.JsPathSupport.{localDateTimeReads, localDateTimeWrites}
 import utils.ContactTypeHelper
 
 import java.time.format.DateTimeFormatter
@@ -53,7 +53,7 @@ object NotificationDetails {
         (JsPath \ "status").readNullable[Status] and
         (JsPath \ "messageText").readNullable[String] and
         (JsPath \ "variation").read[Boolean] and
-        (JsPath \ "receivedAt").read[LocalDateTime]((MongoJavatimeFormats.localDateTimeFormat))
+        (JsPath \ "receivedAt").read[LocalDateTime](localDateTimeReads)
       )(NotificationDetails.apply _)
 
   val writes : OWrites[NotificationDetails ] =
@@ -62,7 +62,7 @@ object NotificationDetails {
         (JsPath \ "status").writeNullable[Status] and
         (JsPath \ "messageText").writeNullable[String] and
         (JsPath \ "variation").write[Boolean] and
-        (JsPath \ "receivedAt").write[LocalDateTime]((MongoJavatimeFormats.localDateTimeFormat))
+        (JsPath \ "receivedAt").write[LocalDateTime](localDateTimeWrites)
       )(unlift(NotificationDetails.unapply))
 
   implicit val format: OFormat[NotificationDetails] = OFormat(reads, writes)

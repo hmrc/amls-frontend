@@ -26,7 +26,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture, CacheMocks}
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import play.api.test.FakeRequest
 import services.ProxyCacheService
 

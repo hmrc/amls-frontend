@@ -25,7 +25,7 @@ import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, Telephone
 import models.businessmatching.{BusinessMatching, BusinessActivities => BMBusinessActivities}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages

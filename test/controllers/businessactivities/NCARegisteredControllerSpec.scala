@@ -21,7 +21,7 @@ import controllers.actions.SuccessfulAuthAction
 import forms.businessactivities.NCARegisteredFormProvider
 import models.businessactivities.{BusinessActivities, NCARegistered}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test

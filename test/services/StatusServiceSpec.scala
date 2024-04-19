@@ -21,19 +21,20 @@ import models.ReadStatusResponse
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, NotStarted, TaskRow, Updated}
 import models.status._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers
 import play.api.{Application, Environment}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.ZoneOffset.UTC
-import java.time.{Clock, Instant, LocalDate, LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time._
 import scala.concurrent.{ExecutionContext, Future}
 
 class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with GuiceOneAppPerSuite {
@@ -61,9 +62,9 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   val accountTypeId = ("accountType", "accountId")
   val credId = "123412345"
   
-  implicit val hc = mock[HeaderCarrier]
-  implicit val ec = app.injector.instanceOf[ExecutionContext]
-  implicit val messages = Helpers.stubMessages()
+  implicit val hc: HeaderCarrier = mock[HeaderCarrier]
+  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+  implicit val messages: Messages = Helpers.stubMessages()
 
   val readStatusResponse: ReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
 

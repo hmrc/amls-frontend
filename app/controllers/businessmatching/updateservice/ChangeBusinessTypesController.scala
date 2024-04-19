@@ -21,10 +21,8 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.businessmatching.updateservice.ChangeBusinessTypesFormProvider
-import models.businessmatching._
 import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.ChangeBusinessTypesPageId
-import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -34,7 +32,6 @@ import views.html.businessmatching.updateservice.ChangeServicesView
 
 import javax.inject.Inject
 import scala.collection.immutable.SortedSet
-import scala.concurrent.Future
 
 class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
                                               val ds: CommonPlayDependencies,
@@ -71,18 +68,11 @@ class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
       )
   }
 
-  private def getFormData(credId: String)(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, messages: Messages) = for {
-    cache <- OptionT(dataCacheConnector.fetchAll(credId))
-    businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+  private def getFormData(credId: String)(implicit hc: HeaderCarrier) = for {
     activities <- businessMatchingService.getRemainingBusinessActivities(credId)
     remainingActivities = activities.map(_.toString)
   } yield {
-    val existing = addHelper.prefixedActivities(businessMatching)
-
-    val existingSorted = SortedSet[String]() ++ existing
     val remainingActivitiesSorted = SortedSet[String]() ++ remainingActivities
-
     remainingActivitiesSorted
   }
-
 }

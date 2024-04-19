@@ -28,7 +28,7 @@ import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MoneyServiceBusinessTestData}
 import models.status.NotCompleted
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.FakeRequest
@@ -68,7 +68,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
     } thenReturn cacheMapT
 
     when {
-      controller.helper.updateSubSectors(any(), any())(any(), any())
+      controller.helper.updateSubSectors(any(), any())(any())
     } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
     def setupModel(model: Option[BusinessMatching]): Unit = when {

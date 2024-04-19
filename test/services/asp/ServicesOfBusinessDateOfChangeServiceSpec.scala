@@ -20,8 +20,8 @@ import connectors.DataCacheConnector
 import models.DateOfChange
 import models.asp.{Asp, Service, ServicesOfBusiness}
 import models.businessdetails.{ActivityStartDate, BusinessDetails}
-import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{reset, verifyZeroInteractions, when}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{reset, verifyNoInteractions, when}
 import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
@@ -124,7 +124,7 @@ class ServicesOfBusinessDateOfChangeServiceSpec extends AmlsSpec with BeforeAndA
 
           service.updateAsp(emptyAsp, DateOfChange(date), cacheId).futureValue mustBe Some(emptyAsp)
 
-          verifyZeroInteractions(mockCacheConnector, mockCacheMap)
+          verifyNoInteractions(mockCacheConnector, mockCacheMap)
         }
       }
     }

@@ -30,29 +30,28 @@ trait RepeatingSection {
   def dataCacheConnector: DataCacheConnector
 
   def getData[T](cache: CacheMap, index: Int)
-  (implicit hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Option[T] =
+                (implicit formats: Format[T], key: MongoKey[T]): Option[T] =
     getData[T](cache) match {
       case data if index > 0 && index <= data.length + 1 => data lift (index - 1)
       case _ => None
     }
 
   def getData[T](credId: String, index: Int)
-                (implicit hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Option[T]] = {
+                (implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Option[T]] =
     getData[T](credId) map {
       case data if index > 0 && index <= data.length + 1 => data lift (index - 1)
       case _ => None
     }
-  }
 
   def getData[T](cache: CacheMap)
-                (implicit  hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Seq[T] =
+                (implicit formats: Format[T], key: MongoKey[T]): Seq[T] =
     cache.getEntry[Seq[T]](key()).fold(Seq.empty[T])(identity)
 
-  def getData[T](credId: String)(implicit hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Seq[T]] = {
+  def getData[T](credId: String)(implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Seq[T]] =
     dataCacheConnector.fetch[Seq[T]](credId, key()) map { _.fold(Seq.empty[T])(identity) }
-  }
 
-  def addData[T](credId:String, data: T)(implicit hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Int] = {
+  def addData[T](credId:String, data: T)
+                (implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Int] =
     getData[T](credId).flatMap { d =>
       if (!d.lastOption.contains(data)) {
         putData(credId, d :+ data) map {
@@ -62,7 +61,6 @@ trait RepeatingSection {
         Future.successful(d.size)
       }
     }
-  }
 
   def fetchAllAndUpdateStrict[T](credId: String, index: Int)(fn: (CacheMap, T) => T)
                                 (implicit hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Option[CacheMap]] = {
@@ -79,7 +77,7 @@ trait RepeatingSection {
   }
 
   protected def updateDataStrict[T](credId: String, index: Int)(fn: T => T)
-                                   (implicit hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[CacheMap] =
+                                   (implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[CacheMap] =
     getData[T](credId) flatMap {
       data => {
         putData(credId, data.patch(index - 1, Seq(fn(data(index - 1))), 1))
@@ -87,7 +85,7 @@ trait RepeatingSection {
     }
 
   protected def removeDataStrict[T](credId: String, index: Int)
-                                   (implicit hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[CacheMap] =
+                                   (implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[CacheMap] =
     getData(credId) flatMap {
       data => {
         putData(credId, data.patch(index - 1, Nil, 1))
@@ -95,7 +93,7 @@ trait RepeatingSection {
     }
 
   protected def putData[T](credId: String, data: Seq[T])
-                          (implicit hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[CacheMap] =
+                          (implicit formats: Format[T], key: MongoKey[T]): Future[CacheMap] =
     dataCacheConnector.save[Seq[T]](credId, key(), data)
 
 }

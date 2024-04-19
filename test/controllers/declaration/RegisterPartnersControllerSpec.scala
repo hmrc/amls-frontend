@@ -22,7 +22,7 @@ import forms.declaration.BusinessPartnersFormProvider
 import models.registrationprogress.{Completed, Started, TaskRow}
 import models.responsiblepeople._
 import models.status._
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._

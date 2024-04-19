@@ -21,10 +21,10 @@ import models.notifications.RejectedReason._
 import play.api.i18n.Messages
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import play.custom.JsPathSupport.{localDateTimeReads, localDateTimeWrites}
 import uk.gov.hmrc.govukfrontend.views.Aliases.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import utils.ContactTypeHelper
 
 import java.time.LocalDateTime
@@ -129,7 +129,7 @@ case class NotificationRow(
 }
 
 object NotificationRow {
-  implicit val dateTimeFormat: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
+  implicit val dateTimeFormat: Format[LocalDateTime] = Format(localDateTimeReads, localDateTimeWrites)
 
   val reads: Reads[NotificationRow] =
     (
@@ -137,7 +137,7 @@ object NotificationRow {
         (JsPath \ "contactType").readNullable[ContactType] and
         (JsPath \ "contactNumber").readNullable[String] and
         (JsPath \ "variation").read[Boolean] and
-        (JsPath \ "receivedAt").read[LocalDateTime](MongoJavatimeFormats.localDateTimeReads) and
+        (JsPath \ "receivedAt").read[LocalDateTime](localDateTimeReads) and
         (JsPath \ "isRead").read[Boolean] and
         (JsPath \ "amlsRegistrationNumber").read[String] and
         (JsPath \ "templatePackageVersion").read[String] and
@@ -150,7 +150,7 @@ object NotificationRow {
         (JsPath \ "contactType").writeNullable[ContactType] and
         (JsPath \ "contactNumber").writeNullable[String] and
         (JsPath \ "variation").write[Boolean] and
-        (JsPath \ "receivedAt").write[LocalDateTime](MongoJavatimeFormats.localDateTimeWrites) and
+        (JsPath \ "receivedAt").write[LocalDateTime](localDateTimeWrites) and
         (JsPath \ "isRead").write[Boolean] and
         (JsPath \ "amlsRegistrationNumber").write[String] and
         (JsPath \ "templatePackageVersion").write[String] and

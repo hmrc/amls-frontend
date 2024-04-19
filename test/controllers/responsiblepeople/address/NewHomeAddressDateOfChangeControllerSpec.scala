@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.responsiblepeople.address.NewHomeAddressDateOfChangeFormProvider
 import models.responsiblepeople._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}

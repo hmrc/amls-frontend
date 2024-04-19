@@ -32,7 +32,7 @@ import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.status._
 import models.{status => _, _}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}

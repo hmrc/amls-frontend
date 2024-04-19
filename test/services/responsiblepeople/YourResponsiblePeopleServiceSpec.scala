@@ -18,7 +18,7 @@ package services.responsiblepeople
 
 import connectors.DataCacheConnector
 import models.responsiblepeople.{PersonName, ResponsiblePeopleValues, ResponsiblePerson}
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import utils.{AmlsSpec, StatusConstants}
 

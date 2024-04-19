@@ -19,31 +19,29 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import config.ApplicationConfig
 import connectors.DataCacheConnector
-import javax.inject.{Inject, Singleton}
 import models.businessactivities.BusinessActivities
-import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching._
-import models.businessmatching.{BusinessActivities => BMBusinessActivities}
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.updateservice.ServiceChangeRegister
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.flowmanagement.AddBusinessTypeFlowModel
 import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tradingpremises.TradingPremises
 import play.api.i18n.Messages
 import services.{ResponsiblePeopleService, TradingPremisesService}
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AuthAction, RepeatingSection, StatusConstants}
+import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.{RepeatingSection, StatusConstants}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
-                                      implicit val dataCacheConnector: DataCacheConnector,
+class AddBusinessTypeHelper @Inject()(implicit val dataCacheConnector: DataCacheConnector,
                                       val tradingPremisesService: TradingPremisesService,
                                       val responsiblePeopleService: ResponsiblePeopleService,
                                       val appConfig:ApplicationConfig) extends RepeatingSection {
 
-  def updateBusinessActivities(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier): OptionT[Future, BusinessActivities] = {
+  def updateBusinessActivities(credId: String, model: AddBusinessTypeFlowModel): OptionT[Future, BusinessActivities] =
     OptionT(dataCacheConnector.update[BusinessActivities](credId, BusinessActivities.key) {
       case Some(dcModel) if model.activity.contains(AccountancyServices) =>
         dcModel.accountantForAMLSRegulations(None)
@@ -53,9 +51,8 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
 
       case Some(dcModel) => dcModel
     })
-  }
 
-  def updateSupervision(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext) = {
+  def updateSupervision(credId: String)(implicit ec: ExecutionContext): OptionT[Future, Supervision] = {
     val emptyModel = Supervision(hasAccepted = true)
 
     for {
@@ -70,10 +67,12 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     } yield newSupervision
   }
 
-  def updateHasAcceptedFlag(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier ,ec: ExecutionContext) =
+  def updateHasAcceptedFlag(credId: String, model: AddBusinessTypeFlowModel)
+                           (implicit ec: ExecutionContext): OptionT[Future, CacheMap] =
     OptionT.liftF(dataCacheConnector.save[AddBusinessTypeFlowModel](credId, AddBusinessTypeFlowModel.key, model.copy(hasAccepted = true)))
 
-  def updateServicesRegister(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier ,ec: ExecutionContext):  OptionT[Future, ServiceChangeRegister] = {
+  def updateServicesRegister(credId: String, model: AddBusinessTypeFlowModel)
+                            (implicit ec: ExecutionContext): OptionT[Future, ServiceChangeRegister] =
     for {
       activity <- OptionT.fromOption[Future](model.activity)
       updatedModel <- OptionT(dataCacheConnector.update[ServiceChangeRegister](credId, ServiceChangeRegister.key) {
@@ -82,14 +81,9 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
         case _ => ServiceChangeRegister(Some(Set(activity)))
       })
     } yield updatedModel
-  }
 
-  def tradingPremisesData(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Seq[TradingPremises]] =
-    getData[TradingPremises](credId).map {
-      _.filterNot(tp => tp.status.contains(StatusConstants.Deleted))
-    }
-
-  def updateBusinessMatching(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier ,ec: ExecutionContext): OptionT[Future, BusinessMatching] = {
+  def updateBusinessMatching(credId: String, model: AddBusinessTypeFlowModel)
+                            (implicit ec: ExecutionContext): OptionT[Future, BusinessMatching] =
     for {
       newActivity <- OptionT.fromOption[Future](model.activity)
       newMsbServices <- OptionT.fromOption[Future](model.subSectors) orElse OptionT.some(BusinessMatchingMsbServices(Set.empty[BusinessMatchingMsbService]))
@@ -106,43 +100,37 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
               .msbServices(Some(currentMsbServices.copy(msbServices = currentMsbServices.msbServices ++ newMsbServices.msbServices)))
               .businessAppliedForPSRNumber(newPsrNumber)
               .copy(hasAccepted = true)
-          case Some(bm) => {
+          case Some(bm) =>
             bm.activities(currentActivities.copy(businessActivities = currentActivities.businessActivities + newActivity))
               .copy(hasAccepted = true)
-          }
-
         })
       }
     } yield newBusinessMatching
-  }
 
-  def isMsbOrTcsp(model: AddBusinessTypeFlowModel) = {
+  def isMsbOrTcsp(model: AddBusinessTypeFlowModel): Boolean =
     model.activity.contains(TrustAndCompanyServices) || model.activity.contains(MoneyServiceBusiness)
-  }
 
-  def clearFlowModel(credId: String)(implicit hc: HeaderCarrier): OptionT[Future, AddBusinessTypeFlowModel] =
+  def clearFlowModel(credId: String): OptionT[Future, AddBusinessTypeFlowModel] =
     OptionT(dataCacheConnector.update[AddBusinessTypeFlowModel](credId, AddBusinessTypeFlowModel.key)(_ => AddBusinessTypeFlowModel()))
 
-  def prefixedActivities(businessMatching: BusinessMatching)(implicit messages: Messages) =
-    businessMatching.prefixedAlphabeticalBusinessTypes(true) match {
+  def prefixedActivities(businessMatching: BusinessMatching)(implicit messages: Messages): Set[String] =
+    businessMatching.prefixedAlphabeticalBusinessTypes(estateAgent = true) match {
     case Some(activities) if activities.size == 1 => Set(activities.head)
     case Some(_) => businessMatching.alphabeticalBusinessActivitiesLowerCase().getOrElse(Set.empty[String]).toSet
     case _ => Set.empty[String]
   }
 
-  def tradingPremises(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Seq[(TradingPremises, Int)]] = {
+  def tradingPremises(credId: String)(implicit ec: ExecutionContext): Future[Seq[(TradingPremises, Int)]] =
     getData[TradingPremises](credId).map {
       _.zipWithIndex.filterNot { case (tp, _) =>
         tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
       }
     }
-  }
 
-  def responsiblePeople(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Seq[(ResponsiblePerson, Int)]] = {
+  def responsiblePeople(credId: String)(implicit ec: ExecutionContext): Future[Seq[(ResponsiblePerson, Int)]] =
     getData[ResponsiblePerson](credId).map {
       _.zipWithIndex.filterNot { case (rp, _) =>
         rp.status.contains(StatusConstants.Deleted) | !rp.isComplete
       }
     }
-  }
 }

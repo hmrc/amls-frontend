@@ -20,7 +20,7 @@ import cats.data.OptionT
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import models.flowmanagement.{AddBusinessTypeFlowModel, NoPSRPageId}
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
@@ -66,7 +66,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
 
     "clear the flow model" in new Fixture {
       when {
-        mockUpdateServiceHelper.clearFlowModel(any())(any())
+        mockUpdateServiceHelper.clearFlowModel(any())
       } thenReturn OptionT[Future, AddBusinessTypeFlowModel](Future.successful(Some(AddBusinessTypeFlowModel())))
 
       val result = controller.post()(requestWithUrlEncodedBody("" -> ""))

@@ -29,7 +29,7 @@ import models.renewal.{Renewal, _}
 import models.responsiblepeople.{ResponsiblePeopleValues, ResponsiblePerson}
 import models.status._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{any, eq => meq}
+import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito._
 import play.api.http.Status.OK
 import play.api.test.Helpers._

@@ -21,7 +21,7 @@ import controllers.actions.SuccessfulAuthAction
 import forms.renewal.BusinessTurnoverFormProvider
 import models.renewal.{BusinessTurnover, Renewal}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
@@ -100,7 +100,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
             "businessTurnover" -> ""
           )
 
-          verifyZeroInteractions(mockDataCacheConnector, mockRenewalService)
+          verifyNoInteractions(mockDataCacheConnector, mockRenewalService)
 
           status(controller.post()(newRequest)) must be(BAD_REQUEST)
         }
@@ -111,7 +111,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
             "businessTurnover" -> "foo"
           )
 
-          verifyZeroInteractions(mockDataCacheConnector, mockRenewalService)
+          verifyNoInteractions(mockDataCacheConnector, mockRenewalService)
 
           status(controller.post()(newRequest)) must be(BAD_REQUEST)
         }

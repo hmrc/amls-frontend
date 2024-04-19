@@ -21,7 +21,7 @@ import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessActivities => ba, _}
 import models.registrationprogress._
 import models.{Country, DateOfChange}
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap

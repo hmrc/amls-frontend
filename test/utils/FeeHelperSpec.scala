@@ -20,7 +20,7 @@ import generators.AmlsReferenceNumberGenerator
 import generators.submission.SubscriptionResponseGenerator
 import models.ResponseType.SubscriptionResponseType
 import models.{FeeResponse, ResponseType}
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar

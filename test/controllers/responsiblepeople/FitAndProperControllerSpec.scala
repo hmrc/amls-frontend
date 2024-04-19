@@ -23,7 +23,7 @@ import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.businessmatching._
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
-import org.mockito.Matchers.{any, eq => meq}
+import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar

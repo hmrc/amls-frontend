@@ -22,17 +22,17 @@ import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model._
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json._
+import play.custom.JsPathSupport.{localDateTimeReads, localDateTimeWrites}
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.mongo.MongoComponent
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
 import java.time.{LocalDateTime, ZoneOffset}
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.SECONDS
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 // $COVERAGE-OFF$
@@ -60,12 +60,12 @@ case class Cache(id: String, data: Map[String, JsValue], lastUpdated: LocalDateT
 }
 
 object Cache {
-  implicit val dateFormat = MongoJavatimeFormats.localDateTimeFormat
-  implicit val format = Json.format[Cache]
+  implicit val dateFormat: Format[LocalDateTime] = Format(localDateTimeReads, localDateTimeWrites)
+  implicit val format: OFormat[Cache] = Json.format[Cache]
 
   def apply(cacheMap: CacheMap): Cache = Cache(cacheMap.id, cacheMap.data)
 
-  val empty = Cache("", Map())
+  val empty: Cache = Cache("", Map())
 }
 
 /**

@@ -21,7 +21,7 @@ import models.registrationprogress.{Completed, Started, TaskRow, Updated}
 import models.renewal._
 import models.responsiblepeople._
 import models.status._
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar

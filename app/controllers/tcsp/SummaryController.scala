@@ -20,17 +20,16 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import javax.inject.Inject
 import models.tcsp._
-import services.StatusService
-import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.http.HeaderCarrier
-import views.html.tcsp.CheckYourAnswersView
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.StatusService
+import services.businessmatching.ServiceFlow
 import utils.AuthAction
 import utils.tcsp.CheckYourAnswersHelper
+import views.html.tcsp.CheckYourAnswersView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class SummaryController @Inject()(
@@ -61,5 +60,5 @@ class SummaryController @Inject()(
         } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Cannot update Tcsp")
   }
 
-  private def fetchModel(credId: String)(implicit hc: HeaderCarrier): Future[Option[Tcsp]] = dataCache.fetch[Tcsp](credId, Tcsp.key)
+  private def fetchModel(credId: String): Future[Option[Tcsp]] = dataCache.fetch[Tcsp](credId, Tcsp.key)
 }

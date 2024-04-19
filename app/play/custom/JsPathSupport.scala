@@ -16,16 +16,24 @@
 
 package play.custom
 
-import play.api.libs.json.{JsPath, Reads}
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import play.api.libs.json.{JsPath, Reads, Writes, __}
 
-import java.time.LocalDateTime
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
 object JsPathSupport {
+
+  val localDateTimeReads: Reads[LocalDateTime] =
+    Reads.at[String](__ \ "$date" \ "$numberLong")
+      .map(dateTime => Instant.ofEpochMilli(dateTime.toLong).atZone(ZoneOffset.UTC).toLocalDateTime)
+
+  val localDateTimeWrites: Writes[LocalDateTime] =
+    Writes.at[String](__ \ "$date" \ "$numberLong").contramap(_.toInstant(ZoneOffset.UTC).toEpochMilli.toString)
+
   implicit class RichJsPath(path: JsPath) {
+
     val readLocalDateTime: Reads[LocalDateTime] = {
-      Reads.at[LocalDateTime](path)(MongoJavatimeFormats.localDateTimeReads)
+      Reads.at[LocalDateTime](path)(localDateTimeReads)
         .orElse(Reads.at[String](path).map(dateTimeStr => LocalDateTime.parse(dateTimeStr, ISO_LOCAL_DATE_TIME)))
     }
   }
