@@ -38,15 +38,24 @@
 }
 
 @supportingContent = {
-    @if(isPreSubmission) {
-        @messages(title)
+    <div class="govuk-inset-text govuk-!-margin-top-0">
+        <p>@messages("businessmatching.registerservices.existing")</p>
+        @{existing map { activity =>
+            messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}")
+        } mkString(", ")}
+    </div>
+}
+
+@optionalLegend = @{
+    if(isPreSubmission) {
+        None
     } else {
-        <div class="govuk-inset-text">
-            <p>@messages("businessmatching.registerservices.existing")</p>
-            @{existing map{ activity =>
-                messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}")
-            } mkString(", ")}
-        </div>
+        Some(
+            Legend(
+                content = HtmlContent(supportingContent),
+                classes = if(!isPreSubmission) "govuk-body" else ""
+            )
+        )
     }
 }
 
@@ -64,19 +73,11 @@
 
         @subtitle("summary.businessmatching")
 
-        @if(!isPreSubmission) { @heading(title) }
+        @heading(title)
 
         @inputCheckbox(
             Checkboxes(
-                fieldset = Some(Fieldset(
-                    legend = Some(
-                        Legend(
-                            content = HtmlContent(supportingContent),
-                            classes = if(isPreSubmission) "govuk-label--xl" else "govuk-body",
-                            isPageHeading = isPreSubmission
-                        )
-                    )
-                )),
+                fieldset = Some(Fieldset(legend = optionalLegend)),
                 hint = Some(
                     Hint(
                         content = Text(messages("lbl.select.all"))
