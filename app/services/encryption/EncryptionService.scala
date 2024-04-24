@@ -45,7 +45,11 @@ class EncryptionService @Inject()(applicationConfig: ApplicationConfig, applicat
     * @return the decrypted string
     */
   def decrypt(encryptedValue: String): Try[String] = {
-    decryptAsBytes(encryptedValue).map(new String(_))
+    decryptAsBytes(encryptedValue) match {
+      case Success(decryptedBytes) => Success(new String(decryptedBytes))
+      case Failure(exception) if exception.isInstanceOf[SecurityException] => Success(encryptedValue)
+      case Failure(exception) => throw exception
+    }
   }
 
   /**
@@ -59,9 +63,13 @@ class EncryptionService @Inject()(applicationConfig: ApplicationConfig, applicat
       case Success(value) => {
         value.startsWith("{") | value.startsWith("[") match {
           case true => PlainText(value)
-          case false => doubleDecryptJsonString(value)
+          case false => decrypt(value) match {
+            case Success(decryptedValue) => PlainText(decryptedValue)
+            case Failure(exception) => throw exception
+          }
         }
       }
+      case Failure(exception) if (exception.isInstanceOf[SecurityException]) => PlainText(doublyEncryptedValue)
       case Failure(exception) => throw exception
     }
   }
@@ -86,6 +94,9 @@ class EncryptionService @Inject()(applicationConfig: ApplicationConfig, applicat
       val cipher: Cipher = Cipher.getInstance(secretKeySpec.getAlgorithm)
       cipher.init(DECRYPT_MODE, secretKeySpec, cipher.getParameters)
       cipher.doFinal(Base64.decodeBase64(encryptedValue.getBytes(UTF_8)))
+    } match {
+      case Success(value) => Success(value)
+      case Failure(exception) => Failure(new SecurityException(exception))
     }
   }
 }

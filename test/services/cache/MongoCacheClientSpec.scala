@@ -42,7 +42,7 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
   val encryptedRepository =
     new MongoCacheClient(appConfigWithEncryption, app.injector.instanceOf[ApplicationCrypto], mongoComponent, app.injector.instanceOf[EncryptionService])
   val testCache: Cache = Cache("123", Map("fieldName" -> JsString("valueName")))
-  val encryptedCacheData: Map[String, JsString] = Map("fieldName" -> JsString("ySHCexnallxRdjjI5bBnqwWHwr0HhFdaJWy4spxPytU="))
+  val encryptedCacheData: Map[String, JsString] = Map("fieldName" -> JsString("Q2NYiC4W49rMPxfI+soQ2g=="))
 
   ".saveAll" must {
 
