@@ -19,7 +19,6 @@ package services.cache
 import crypto.Crypto.SensitiveT
 import play.api.libs.json.Reads._
 import play.api.libs.json._
-import uk.gov.hmrc.crypto.Sensitive.SensitiveString
 import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
