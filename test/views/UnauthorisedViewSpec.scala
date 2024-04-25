@@ -17,17 +17,20 @@
 package views
 
 import config.ApplicationConfig
+import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
+import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.html.UnauthorisedView
 
 class UnauthorisedViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val unauthorisedView = app.injector.instanceOf[UnauthorisedView]
-    implicit val requestWithToken = addTokenForView()
-    implicit val config = app.injector.instanceOf[ApplicationConfig]
-    def view = unauthorisedView()(requestWithToken, config, messages)
+    lazy val unauthorisedView: UnauthorisedView = app.injector.instanceOf[UnauthorisedView]
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
+    implicit val config: ApplicationConfig = app.injector.instanceOf[ApplicationConfig]
+    def view: HtmlFormat.Appendable = unauthorisedView()(requestWithToken, config, messages)
   }
 
   "UnauthorisedView" must {
@@ -37,20 +40,20 @@ class UnauthorisedViewSpec extends AmlsViewSpec with Matchers {
     }
 
     "display the correct body content" in new ViewFixture {
-      val paragraphs = doc.getElementsByClass("govuk-body").text()
+      val paragraphs: String = doc.getElementsByClass("govuk-body").text()
       paragraphs must include(messages("unauthorised.text1"))
       paragraphs must include(messages("unauthorised.text2"))
     }
 
     "display the correct link" in new ViewFixture {
-      val link = doc.getElementById("register-link")
+      val link: Element = doc.getElementById("register-link")
 
       link.text() mustBe messages("unauthorised.register.link.text")
       link.attr("href") mustBe config.registerNewOrgLink
     }
 
     "display the correct button with link" in new ViewFixture {
-      val button = doc.getElementById("button")
+      val button: Element = doc.getElementById("button")
 
       button.text() mustBe messages("button.backtosignin")
       button.attr("href") mustBe s"${config.logoutUrl}?continue=${config.loginContinue}"
