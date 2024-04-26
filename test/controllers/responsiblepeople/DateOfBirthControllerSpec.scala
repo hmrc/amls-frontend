@@ -28,7 +28,7 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.responsiblepeople.DateOfBirthView
 
@@ -55,8 +55,8 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injectin
       errorView
     )
 
-    val emptyCache = CacheMap("", Map.empty)
-    val mockCacheMap = mock[CacheMap]
+    val emptyCache = Cache.empty
+    val mockCacheMap = mock[Cache]
 
     val personName = PersonName("firstname", None, "lastname")
 
@@ -175,7 +175,7 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injectin
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
 
-          when(controller.dataCacheConnector.fetchAll(any())(any()))
+          when(controller.dataCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))

@@ -27,7 +27,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.businessdetails.BusinessTelephoneView
 
@@ -52,7 +52,7 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
       view = view)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "ContactingYouPhoneController" must {
 

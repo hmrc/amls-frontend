@@ -25,7 +25,7 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.hvd.CashPaymentFirstDateView
 
@@ -45,7 +45,7 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar with
       view = view)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "CashPaymentFirstDateController" must {
 

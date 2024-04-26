@@ -27,7 +27,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.responsiblepeople.address.MovedAddressView
 
@@ -62,12 +62,12 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecti
     "Get is called" must {
 
       "Load Moved address page successfully when address is supplied" in new Fixture {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(responsiblePerson))
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get(1)(request)
@@ -76,12 +76,12 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecti
       }
 
       "Load registration progress page successfully when no ResponsiblePeople model is supplied" in new Fixture {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(None)
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get(1)(request)
@@ -100,12 +100,12 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecti
         )
 
         val responsiblePerson = Seq(rp)
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(responsiblePerson))
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get(1)(request)
@@ -127,13 +127,13 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecti
             "movedAddress" -> "true"
           )
 
-          val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[Cache]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(ResponsiblePerson())))
 
 
-          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+          when(controller.dataCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1)(newRequest)
@@ -168,12 +168,12 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecti
         )
 
         val responsiblePerson = Seq(rp)
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(responsiblePerson))
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post(1)(newRequest)
@@ -187,12 +187,12 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecti
         .withFormUrlEncodedBody(
         )
 
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(None)
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post(1)(newRequest)
@@ -207,12 +207,12 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecti
           "movedAddress" -> ""
         )
 
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(responsiblePerson))
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post(1)(newRequest)

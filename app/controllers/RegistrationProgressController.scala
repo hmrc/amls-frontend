@@ -29,7 +29,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import services._
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AuthAction, ControllerHelper, DeclarationHelper}
 import views.html.registrationamendment.RegistrationAmendmentView
 import views.html.registrationprogress.RegistrationProgressView
@@ -59,18 +59,18 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
           case _ =>
             (for {
               status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
-              cacheMap <- OptionT(dataCache.fetchAll(request.credId))
-              completePreApp <- OptionT(preApplicationComplete(cacheMap, status, request.amlsRefNumber))
-              responsiblePeople <- OptionT.fromOption[Future](cacheMap.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
-              businessMatching <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              cache <- OptionT(dataCache.fetchAll(request.credId))
+              completePreApp <- OptionT(preApplicationComplete(cache, status, request.amlsRefNumber))
+              responsiblePeople <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
+              businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
               newActivities <- getNewActivities(request.credId) orElse OptionT.some(Set.empty[BusinessActivity])
             } yield {
               businessMatching.reviewDetails map { reviewDetails =>
 
                 val newTaskRows = sectionsProvider.taskRowsFromBusinessActivities(
-                  newActivities, businessMatching.msbServices)(cacheMap, messages.preferred(request)
+                  newActivities, businessMatching.msbServices)(cache, messages.preferred(request)
                 )
-                val taskRows = sectionsProvider.taskRows(cacheMap)
+                val taskRows = sectionsProvider.taskRows(cache)
                 val taskListToDisplay = TaskList(taskRows.filter(tr => tr.msgKey != BusinessMatching.messageKey) diff newTaskRows)
                 val canEditPreapplication = Set(NotCompleted, SubmissionReady, SubmissionDecisionApproved).contains(status)
                 val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage()).toSeq)
@@ -137,7 +137,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
     }
   }
 
-  private def preApplicationComplete(cache: CacheMap, status: SubmissionStatus, amlsRegistrationNumber: Option[String])
+  private def preApplicationComplete(cache: Cache, status: SubmissionStatus, amlsRegistrationNumber: Option[String])
                                     (implicit hc: HeaderCarrier): Future[Option[Boolean]] = {
 
     val preAppStatus: SubmissionStatus => Boolean = s => Set(NotCompleted, SubmissionReady).contains(s)

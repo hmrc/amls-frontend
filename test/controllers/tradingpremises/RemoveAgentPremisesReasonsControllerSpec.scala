@@ -28,7 +28,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.JsValue
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.tradingpremises.RemoveAgentPremisesReasonsView
 
@@ -52,7 +52,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
       error = errorView)
 
     val tradingPremises = TradingPremises()
-    val cache = CacheMap("", Map.empty[String, JsValue])
+    val cache = Cache.empty
 
     def mockFetch(model: Option[Seq[TradingPremises]]) =
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())

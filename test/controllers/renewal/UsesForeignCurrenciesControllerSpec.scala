@@ -32,7 +32,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.renewal.UsesForeignCurrenciesView
 
@@ -45,7 +45,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
     val renewalService = mock[RenewalService]
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
-    val cacheMap = mock[CacheMap]
+    val cacheMap = mock[Cache]
     lazy val view = inject[UsesForeignCurrenciesView]
     lazy val controller = new UsesForeignCurrenciesController(
       SuccessfulAuthAction,
@@ -60,7 +60,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
       renewalService.getRenewal(any())(any())
     } thenReturn Future.successful(Renewal().some)
 
-    when(dataCacheConnector.fetchAll(any())(any()))
+    when(dataCacheConnector.fetchAll(any()))
       .thenReturn(Future.successful(Some(cacheMap)))
   }
 
@@ -70,7 +70,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
 
     when {
       renewalService.updateRenewal(any(),any())(any())
-    } thenReturn Future.successful(mock[CacheMap])
+    } thenReturn Future.successful(mock[Cache])
   }
 
   trait RoutingFixture extends FormSubmissionFixture {
@@ -107,7 +107,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
       .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
 
     when(dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), eqTo(expectedRenewal))(any()))
-      .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      .thenReturn(Future.successful(Cache.empty))
 
     def setupBusinessMatching(activities: Set[BusinessActivity], msbServices: Set[BusinessMatchingMsbService]) = when {
       cacheMap.getEntry[BusinessMatching](BusinessMatching.key)

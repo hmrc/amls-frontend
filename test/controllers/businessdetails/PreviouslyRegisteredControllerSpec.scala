@@ -31,7 +31,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessdetails.PreviouslyRegisteredService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.businessdetails.PreviouslyRegisteredView
 
@@ -40,7 +40,7 @@ import scala.concurrent.Future
 class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val mockService = mock[PreviouslyRegisteredService]
-  val mockCacheMap = mock[CacheMap]
+  val mockCacheMap = mock[Cache]
 
   trait Fixture {
     self => val request = addToken(authRequest)
@@ -54,7 +54,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
       view = view)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   override def beforeEach(): Unit = reset(mockService, mockCacheMap)
 

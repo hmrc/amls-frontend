@@ -28,7 +28,7 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.html.businessdetails.RegisteredOfficeIsUKView
 
@@ -40,7 +40,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
     self => val request = addToken(authRequest)
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
-    val mockCacheMap = mock[CacheMap]
+    val mockCacheMap = mock[Cache]
     lazy val view = app.injector.instanceOf[RegisteredOfficeIsUKView]
     val controller = new RegisteredOfficeIsUKController(
       dataCacheConnector = mockDataCacheConnector,

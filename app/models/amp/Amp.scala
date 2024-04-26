@@ -23,7 +23,7 @@ import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 final case class Amp(data: JsObject = Json.obj(),
                      hasChanged: Boolean = false,
@@ -83,7 +83,7 @@ object Amp {
     Call(redirectCallType, destinationUrl)
   }
 
-  def taskRow(appConfig: ApplicationConfig)(implicit cache: CacheMap, messages: Messages): TaskRow = {
+  def taskRow(appConfig: ApplicationConfig)(implicit cache: Cache, messages: Messages): TaskRow = {
     val notStarted = TaskRow(
       key,
       generateRedirect(appConfig.ampWhatYouNeedUrl).url,

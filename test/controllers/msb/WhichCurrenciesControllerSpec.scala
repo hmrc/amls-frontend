@@ -33,7 +33,7 @@ import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.CurrencyAutocompleteService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.msb.WhichCurrenciesView
 
@@ -55,7 +55,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
       .thenReturn(Future.successful(None))
 
     when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
-      .thenReturn(Future.successful(CacheMap("TESTID", Map())))
+      .thenReturn(Future.successful(Cache("TESTID", Map())))
     lazy val view = inject[WhichCurrenciesView]
     val controller = new WhichCurrenciesController(dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
@@ -69,9 +69,9 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
 
-    val cacheMap = mock[CacheMap]
+    val cacheMap = mock[Cache]
 
-    when(controller.dataCacheConnector.fetchAll(any())(any()))
+    when(controller.dataCacheConnector.fetchAll(any()))
       .thenReturn(Future.successful(Some(cacheMap)))
     val msbServices = Some(BusinessMatchingMsbServices(Set()))
     when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key))

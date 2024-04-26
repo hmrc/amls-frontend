@@ -33,7 +33,6 @@ import scala.concurrent.Future
 @Singleton
 class ConfirmationController @Inject()(authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
-                                       private[controllers] val keystoreConnector: KeystoreConnector,
                                        private[controllers] implicit val dataCacheConnector: DataCacheConnector,
                                        private[controllers] implicit val amlsConnector: AmlsConnector,
                                        private[controllers] implicit val statusService: StatusService,
@@ -59,7 +58,6 @@ class ConfirmationController @Inject()(authAction: AuthAction,
         status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
         submissionRequestStatus <- dataCacheConnector.fetch[SubmissionRequestStatus](request.credId, SubmissionRequestStatus.key)
         result <- resultFromStatus(status, submissionRequestStatus, request.amlsRefNumber, request.accountTypeId, request.credId, request.groupIdentifier)
-        _ <- keystoreConnector.setConfirmationStatus
       } yield result
   }
 

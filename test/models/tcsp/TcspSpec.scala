@@ -21,7 +21,7 @@ import models.tcsp.ProvidedServices._
 import models.tcsp.TcspTypes._
 import org.mockito.Mockito._
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 trait TcspValues {
@@ -110,7 +110,7 @@ class TcspSpec extends AmlsSpec with TcspValues {
 
     "have a task row function that" must {
 
-      implicit val cache = mock[CacheMap]
+      implicit val cache = mock[Cache]
 
       "returns a Not Started task row when model is empty" in {
 

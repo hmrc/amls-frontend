@@ -13,7 +13,6 @@ private object AppDependencies {
     // GOV UK
     "uk.gov.hmrc"           %% "domain"                        % s"8.3.0-$playV",
     "uk.gov.hmrc"           %% "play-partials"                 % s"8.3.0-$playV",
-    "uk.gov.hmrc"           %% "http-caching-client"           % s"10.0.0-$playV",
     "uk.gov.hmrc"           %% "json-encryption"               % s"5.3.0-$playV",
     "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-$playV"            % hmrcMongoV,
     "uk.gov.hmrc"           %% s"bootstrap-frontend-$playV"    % bootstrapV,

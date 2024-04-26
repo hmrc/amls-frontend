@@ -74,7 +74,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+      when(service.sectionsProvider.taskRows(any[String])(any(), any()))
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, NotStarted, TaskRow.notStartedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
@@ -92,7 +92,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+        when(service.sectionsProvider.taskRows(any[String])(any(), any()))
           .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
         when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse))
@@ -106,7 +106,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+        when(service.sectionsProvider.taskRows(any[String])(any(), any()))
           .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", true, Updated, TaskRow.updatedTag))))
 
         when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse))
@@ -120,7 +120,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+        when(service.sectionsProvider.taskRows(any[String])(any(), any()))
           .thenReturn(Future.successful(Seq(
             TaskRow("test", "/foo", false, Completed, TaskRow.completedTag),
             TaskRow("test2", "/bar", true, Updated, TaskRow.updatedTag),
@@ -138,7 +138,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+      when(service.sectionsProvider.taskRows(any[String])(any(), any()))
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
@@ -154,7 +154,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+      when(service.sectionsProvider.taskRows(any[String])(any(), any()))
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
@@ -170,7 +170,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+      when(service.sectionsProvider.taskRows(any[String])(any(), any()))
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
@@ -186,7 +186,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+      when(service.sectionsProvider.taskRows(any[String])(any(), any()))
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
@@ -202,7 +202,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+      when(service.sectionsProvider.taskRows(any[String])(any(), any()))
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
@@ -220,7 +220,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+      when(service.sectionsProvider.taskRows(any[String])(any(), any()))
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
@@ -237,7 +237,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+      when(service.sectionsProvider.taskRows(any[String])(any(), any()))
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
@@ -256,7 +256,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+      when(service.sectionsProvider.taskRows(any[String])(any(), any()))
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
@@ -273,7 +273,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+      when(service.sectionsProvider.taskRows(any[String])(any(), any()))
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
@@ -289,7 +289,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+      when(service.sectionsProvider.taskRows(any[String])(any(), any()))
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
@@ -304,7 +304,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+      when(service.sectionsProvider.taskRows(any[String])(any(), any()))
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
@@ -319,7 +319,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+      when(service.sectionsProvider.taskRows(any[String])(any(), any()))
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
@@ -335,7 +335,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+      when(service.sectionsProvider.taskRows(any[String])(any(), any()))
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
@@ -367,7 +367,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+        when(service.sectionsProvider.taskRows(any[String])(any(), any()))
           .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
         val result = service.getDetailedStatus(None, ("", ""), "credId")
@@ -382,7 +382,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+        when(service.sectionsProvider.taskRows(any[String])(any(), any()))
           .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", true, Updated, TaskRow.updatedTag))))
 
         val result = service.getDetailedStatus(None, ("", ""), "credId")
@@ -397,7 +397,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+        when(service.sectionsProvider.taskRows(any[String])(any(), any()))
           .thenReturn(Future.successful(Seq(
             TaskRow("test", "/foo", false, Completed, TaskRow.completedTag),
             TaskRow("test2", "/bar", true, Updated, TaskRow.updatedTag)

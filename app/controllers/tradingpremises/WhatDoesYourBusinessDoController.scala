@@ -33,7 +33,7 @@ import play.twirl.api.Html
 import services.StatusService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AuthAction, DateHelper, DateOfChangeHelper, RepeatingSection}
 import views.html.DateOfChangeView
 import views.html.tradingpremises.WhatDoesYourBusinessDoView
@@ -53,11 +53,11 @@ class WhatDoesYourBusinessDoController @Inject () (
                                                     implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with Logging {
 
   private def data(credId: String, index: Int, edit: Boolean)(implicit hc: HeaderCarrier)
-  : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {
+  : Future[Either[Result, (Cache, Set[BusinessActivity])]] = {
     dataCacheConnector.fetchAll(credId).map {
       cache =>
         (for {
-          c: CacheMap <- cache
+          c: Cache <- cache
           bm <- c.getEntry[BusinessMatching](BusinessMatching.key)
           activities <- bm.activities flatMap {
             _.businessActivities match {
@@ -66,7 +66,7 @@ class WhatDoesYourBusinessDoController @Inject () (
             }
           }
         } yield (c, activities))
-          .fold[Either[Result, (CacheMap, Set[BusinessActivity])]] {
+          .fold[Either[Result, (Cache, Set[BusinessActivity])]] {
           Left(Redirect(routes.WhereAreTradingPremisesController.get(index, edit)))
         } {
           t => Right(t)

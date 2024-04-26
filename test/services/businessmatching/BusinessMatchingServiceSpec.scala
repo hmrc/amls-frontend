@@ -16,15 +16,14 @@
 
 package services.businessmatching
 
-import config.ApplicationConfig
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.ViewResponse
 import models.asp.Asp
 import models.businessactivities.BusinessActivities
 import models.businessdetails.BusinessDetails
-import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.eab.Eab
@@ -49,8 +48,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
   with BusinessMatchingGenerator {
 
   trait Fixture extends DependencyMocks {
-    val mockApplicationConfig = mock[ApplicationConfig]
-    val service = new BusinessMatchingService(mockStatusService, mockCacheConnector, mockApplicationConfig)
+    val service = new BusinessMatchingService(mockCacheConnector)
 
     val businessMatchingModel = businessMatchingGen.sample.get
 
@@ -281,9 +279,9 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       await(result)
 
-      verify(mockCacheConnector).removeByKey[Asp](
+      verify(mockCacheConnector).removeByKey(
         eqTo("internalId"), eqTo(Asp.key)
-      )(any())
+      )
 
     }
     "clear data of Hvd given HighValueDealing" in new Fixture {
@@ -292,9 +290,9 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       await(result)
 
-      verify(mockCacheConnector).removeByKey[Hvd](
+      verify(mockCacheConnector).removeByKey(
         eqTo("internalId"), eqTo(Hvd.key)
-      )(any())
+      )
 
     }
     "clear data of Msb given MoneyServiceBusiness" in new Fixture {
@@ -303,9 +301,9 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       await(result)
 
-      verify(mockCacheConnector).removeByKey[Msb](
+      verify(mockCacheConnector).removeByKey(
         eqTo("internalId"), eqTo(Msb.key)
-      )(any())
+      )
 
     }
     "clear data of Tcsp given TrustAndCompanyServices" in new Fixture {
@@ -314,9 +312,9 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       await(result)
 
-      verify(mockCacheConnector).removeByKey[Tcsp](
+      verify(mockCacheConnector).removeByKey(
         eqTo("internalId"), eqTo(Tcsp.key)
-      )(any())
+      )
 
     }
     "clear data of Eab given EstateAgentBusinessService" in new Fixture {
@@ -325,9 +323,9 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       await(result)
 
-      verify(mockCacheConnector).removeByKey[Eab](
+      verify(mockCacheConnector).removeByKey(
         eqTo("internalId"), eqTo(Eab.key)
-      )(any())
+      )
 
     }
 

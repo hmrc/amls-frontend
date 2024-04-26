@@ -26,7 +26,7 @@ import models.registrationprogress._
 import models.renewal._
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -80,7 +80,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     dataCache.fetch[Renewal](cacheId, Renewal.key)
 
   // TODO make private and update usages to new update function
-  def updateRenewal(credId: String, renewal: Renewal)(implicit headerCarrier: HeaderCarrier): Future[CacheMap] =
+  def updateRenewal(credId: String, renewal: Renewal)(implicit headerCarrier: HeaderCarrier): Future[Cache] =
     dataCache.save[Renewal](credId, Renewal.key, renewal)
 
   def isRenewalComplete(renewal: Renewal, credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
@@ -169,7 +169,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     - Update controllers usages of updateRenewal with this
     - Make old method private
    */
-  def fetchAndUpdateRenewal(credId: String, updateAction: Renewal => Renewal)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[CacheMap]] = {
+  def fetchAndUpdateRenewal(credId: String, updateAction: Renewal => Renewal)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[Cache]] = {
     for {
       renewal <- OptionT(getRenewal(credId))
       updatedCache <- OptionT.liftF(updateRenewal(credId, updateAction(renewal)))

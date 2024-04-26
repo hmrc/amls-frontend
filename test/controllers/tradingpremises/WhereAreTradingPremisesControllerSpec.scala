@@ -32,7 +32,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers.{status => hstatus, _}
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
@@ -76,7 +76,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
     reset(mockDataCacheConnector)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
   val fields = Array[String]("tradingName", "addressLine1", "addressLine2", "postcode")
   val recordId1 = 1
 
@@ -511,7 +511,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         .thenReturn(Future.successful(Some(Seq(premises))))
 
       when(controller.dataCacheConnector.save[TradingPremises](any(), meq(TradingPremises.key), any[TradingPremises])(any())).
-        thenReturn(Future.successful(mock[CacheMap]))
+        thenReturn(Future.successful(mock[Cache]))
 
       val result = controller.saveDateOfChange(1)(postRequest)
 

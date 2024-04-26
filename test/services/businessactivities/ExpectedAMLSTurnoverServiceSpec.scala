@@ -24,7 +24,7 @@ import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.IntegrationPatience
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import scala.concurrent.Future
@@ -32,7 +32,7 @@ import scala.concurrent.Future
 class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach with IntegrationPatience {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[CacheMap]
+  val mockCacheMap = mock[Cache]
 
   val service = new ExpectedAMLSTurnoverService(mockCacheConnector)
 
@@ -51,7 +51,7 @@ class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach w
           val bm = BusinessMatching()
           val ba = BusinessActivities().expectedAMLSTurnover(First)
 
-          when(mockCacheConnector.fetchAll(any())(any()))
+          when(mockCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -71,7 +71,7 @@ class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach w
           val bm = BusinessMatching()
           val ba = BusinessActivities()
 
-          when(mockCacheConnector.fetchAll(any())(any()))
+          when(mockCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -87,7 +87,7 @@ class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach w
 
           val bm = BusinessMatching()
 
-          when(mockCacheConnector.fetchAll(any())(any()))
+          when(mockCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -104,7 +104,7 @@ class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach w
 
         "neither matching or activities are present in the cache" in {
 
-          when(mockCacheConnector.fetchAll(any())(any()))
+          when(mockCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -118,7 +118,7 @@ class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach w
 
         "cache cannot be retrieved" in {
 
-          when(mockCacheConnector.fetchAll(any())(any()))
+          when(mockCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(None))
 
           service.getBusinessMatchingExpectedTurnover(credId).futureValue mustBe None

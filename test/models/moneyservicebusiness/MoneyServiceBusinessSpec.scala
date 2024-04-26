@@ -22,7 +22,7 @@ import models.businessmatching._
 import models.registrationprogress._
 import org.mockito.Mockito._
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestData {
@@ -49,7 +49,7 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
     }
 
     "return the correct TaskRow" when {
-      implicit val cacheMap = mock[CacheMap]
+      implicit val cacheMap = mock[Cache]
 
       "model has been updated" should {
         "return an Updated TaskRow" in {

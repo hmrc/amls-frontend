@@ -25,7 +25,7 @@ import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import play.api.data.Form
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AuthAction, ControllerHelper}
 import views.html.businessdetails.VATRegisteredView
 
@@ -77,7 +77,7 @@ class VATRegisteredController @Inject () (
     }
   }
 
-  private def getBusinessType(maybeCache: Option[CacheMap]): Option[BusinessType] = for {
+  private def getBusinessType(maybeCache: Option[Cache]): Option[BusinessType] = for {
     cache <- maybeCache
     businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
   } yield businessType

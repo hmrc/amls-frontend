@@ -28,7 +28,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.DateOfChangeView
 
@@ -53,8 +53,8 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
     )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
-  val cache = mock[CacheMap]
+  val emptyCache = Cache.empty
+  val cache = mock[Cache]
 
   "CurrentAddressDateOfChangeController" must {
     "when get is called" must {

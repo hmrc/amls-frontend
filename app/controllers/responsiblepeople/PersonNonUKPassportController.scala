@@ -22,7 +22,7 @@ import forms.responsiblepeople.PersonNonUKPassportFormProvider
 import models.responsiblepeople.ResponsiblePerson
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.PersonNonUKPassportView
 
@@ -71,7 +71,7 @@ class PersonNonUKPassportController @Inject()(override val messagesApi: Messages
       )
   }
 
-  private def redirectToNextPage(result: Option[CacheMap], index: Int, edit: Boolean, flow: Option[String])
+  private def redirectToNextPage(result: Option[Cache], index: Int, edit: Boolean, flow: Option[String])
                                 (implicit request: Request[AnyContent]) = {
     (for {
       cache <- result

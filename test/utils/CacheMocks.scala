@@ -21,21 +21,21 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
+import org.mockito.stubbing.{Answer, OngoingStubbing}
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 import scala.concurrent.Future
 
 trait CacheMocks extends MockitoSugar {
 
-  implicit val mockCacheConnector = mock[DataCacheConnector]
-  implicit val mockCacheMap = mock[CacheMap]
+  implicit val mockCacheConnector: DataCacheConnector = mock[DataCacheConnector]
+  implicit val mockCacheMap: Cache = mock[Cache]
 
   mockCacheFetchAll
 
-  def mockCacheFetch[T](item: Option[T], key: Option[String] = None)(implicit cache: DataCacheConnector) = key match {
+  def mockCacheFetch[T](item: Option[T], key: Option[String] = None)
+                       (implicit cache: DataCacheConnector): OngoingStubbing[Future[Option[T]]] = key match {
     case Some(k) => when {
       cache.fetch[T](any(), eqTo(k))(any())
     } thenReturn Future.successful(item)
@@ -45,23 +45,24 @@ trait CacheMocks extends MockitoSugar {
     } thenReturn Future.successful(item)
   }
 
-  def mockCacheGetEntry[T](item: Option[T], key: String)(implicit cache: CacheMap) = when {
+  def mockCacheGetEntry[T](item: Option[T], key: String): OngoingStubbing[Option[T]] = when {
     mockCacheMap.getEntry[T](eqTo(key))(any())
   } thenReturn item
 
-  def mockCacheFetchAll(implicit cache: DataCacheConnector) = when {
-    cache.fetchAll(any())(any[HeaderCarrier])
+  def mockCacheFetchAll(implicit cache: DataCacheConnector): Any = when {
+    cache.fetchAll(any())
   } thenReturn Future.successful(Some(mockCacheMap))
 
-  def mockCacheSave[T](implicit cache: DataCacheConnector) = when {
+  def mockCacheSave[T](implicit cache: DataCacheConnector): OngoingStubbing[Future[Cache]] = when {
     cache.save[T](any(), any(), any())(any())
   } thenReturn Future.successful(mockCacheMap)
 
   def mockCacheRemoveByKey[T](implicit cache: DataCacheConnector) = when {
-    cache.removeByKey[T](any(), any())(any())
+    cache.removeByKey(any(), any())
   } thenReturn Future.successful(mockCacheMap)
 
-  def mockCacheSave[T](item: T, key: Option[String] = None)(implicit cache: DataCacheConnector) = key match {
+  def mockCacheSave[T](item: T, key: Option[String] = None)
+                      (implicit cache: DataCacheConnector): OngoingStubbing[Future[Cache]] = key match {
     case Some(k) => when {
       cache.save[T](any(), eqTo(k), eqTo(item))(any())
     } thenReturn Future.successful(mockCacheMap)
@@ -70,16 +71,8 @@ trait CacheMocks extends MockitoSugar {
     } thenReturn Future.successful(mockCacheMap)
   }
 
-  def mockCacheRemoveByKey[T](item: T, key: Option[String] = None)(implicit cache: DataCacheConnector) = key match {
-    case Some(k) => when {
-      cache.removeByKey[T](any(), eqTo(k))(any())
-    } thenReturn Future.successful(mockCacheMap)
-    case _ => when {
-      cache.removeByKey[T](any(), any())(any())
-    } thenReturn Future.successful(mockCacheMap)
-  }
-
-  def mockCacheUpdate[T](key: Option[String] = None, dbModel: T)(implicit cache: DataCacheConnector) = key match {
+  def mockCacheUpdate[T](key: Option[String] = None, dbModel: T)
+                        (implicit cache: DataCacheConnector): OngoingStubbing[Future[Option[T]]] = key match {
     case Some(k) =>
       val funcCaptor = ArgumentCaptor.forClass(classOf[Option[T] => T])
 

@@ -27,7 +27,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.renewal.FXTransactionsInLast12MonthsView
 
@@ -47,7 +47,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       view = view
     )
 
-    val cacheMap = mock[CacheMap]
+    val cacheMap = mock[Cache]
 
     when(mockRenewalService.fetchAndUpdateRenewal(any(), any())(any(), any()))
       .thenReturn(Future.successful(Some(cacheMap)))
@@ -60,7 +60,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
     } thenReturn Future.successful(Some(BusinessMatching(activities = Some(BusinessActivities(activities)))))
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "RenewalForeignExchangeTransactionsController" must {
 

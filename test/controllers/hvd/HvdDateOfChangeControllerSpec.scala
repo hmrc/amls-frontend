@@ -28,7 +28,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DateHelper, DateOfChangeHelper}
 import views.html.DateOfChangeView
 
@@ -52,7 +52,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Inje
 
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "HvdDateOfChangeController" must {
 
@@ -71,14 +71,14 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Inje
         "dateOfChange.year" -> "1990"
       )
       val hvd = Hvd(dateOfChange = Some(DateOfChange(LocalDate.of(1990,2,24))))
-      val mockCacheMap = mock[CacheMap]
+      val mockCacheMap = mock[Cache]
       when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
         .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(LocalDate.of(1990, 2, 24))))))
 
       when(mockCacheMap.getEntry[Hvd](Hvd.key))
         .thenReturn(Some(Hvd()))
 
-      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
@@ -102,7 +102,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Inje
           "dateOfChange.year" -> "1990"
         )
 
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
         val hvd = Hvd(dateOfChange = Some(DateOfChange(LocalDate.of(1999,1,28))))
 
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
@@ -111,7 +111,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Inje
         when(mockCacheMap.getEntry[Hvd](Hvd.key))
           .thenReturn(Some(hvd))
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
@@ -134,7 +134,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Inje
           "dateOfChange.year" -> "2001"
         )
 
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
         val hvd = Hvd(dateOfChange = Some(DateOfChange(LocalDate.of(1990,1,20))))
 
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
@@ -143,7 +143,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Inje
         when(mockCacheMap.getEntry[Hvd](Hvd.key))
           .thenReturn(Some(hvd))
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
@@ -171,14 +171,14 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Inje
           "dateOfChange.year" -> "199000"
         )
 
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
           .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(LocalDate.of(1990, 2, 24))))))
 
         when(mockCacheMap.getEntry[Hvd](Hvd.key))
           .thenReturn(None)
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
@@ -199,14 +199,14 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Inje
 
         val date = LocalDate.of(1990, 2, 24)
 
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
           .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(date)))))
 
         when(mockCacheMap.getEntry[Hvd](Hvd.key))
           .thenReturn(Some(Hvd()))
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(controller.dataCacheConnector.save[Hvd](any(), any(), any())

@@ -24,7 +24,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with GuiceOneAppPerSuite {
 
@@ -195,7 +195,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
       "called" must {
         "return NotStarted task row if model is empty" in {
-          val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[Cache]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(Seq(ResponsiblePerson())))
@@ -204,7 +204,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
         }
 
         "return Started task row if model is not empty" in {
-          val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[Cache]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(Seq(incompleteResponsiblePeople)))
@@ -213,7 +213,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
         }
 
         "return Completed task row if model is not empty and has complete rp" in {
-          val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[Cache]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(Seq(completeResponsiblePerson)))
@@ -222,7 +222,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
         }
 
         "return Completed task row if model is not empty and has complete rp that has changed" in {
-          val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[Cache]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(Seq(completeResponsiblePerson.copy(hasChanged = true))))
@@ -231,7 +231,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
         }
 
         "return Started task row if model is not empty and has complete and incomplete rps" in {
-          val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[Cache]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(Seq(completeResponsiblePerson, incompleteResponsiblePeople)))

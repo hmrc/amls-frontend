@@ -18,7 +18,7 @@ package controllers.tradingpremises
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import org.mockito.Mockito._
 import org.mockito.ArgumentMatchers._
 import cats.implicits._
@@ -34,7 +34,7 @@ class TPControllerHelperSpec extends PlaySpec with MockitoSugar {
 
   trait TestFixture {
     implicit val request = FakeRequest()
-    val cache = mock[CacheMap]
+    val cache = mock[Cache]
     implicit val lang = mock[Lang]
     implicit val messages = mock[Messages]
     implicit val appConfig = mock[ApplicationConfig]

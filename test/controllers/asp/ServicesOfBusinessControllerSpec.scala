@@ -28,13 +28,13 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.asp.ServicesOfBusinessView
 
 class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   trait Fixture extends DependencyMocks {
     self =>

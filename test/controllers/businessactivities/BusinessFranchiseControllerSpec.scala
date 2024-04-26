@@ -28,7 +28,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.businessactivities.BusinessFranchiseService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.businessactivities.BusinessFranchiseNameView
 
@@ -52,7 +52,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
       view = view)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   override protected def beforeEach(): Unit = reset(mockService)
 

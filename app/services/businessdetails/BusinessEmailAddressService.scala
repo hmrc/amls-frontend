@@ -19,8 +19,8 @@ package services.businessdetails
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessdetails.{BusinessDetails, ContactingYou, ContactingYouEmail}
+import services.cache.Cache
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,7 +31,7 @@ class BusinessEmailAddressService @Inject()(val dataCache: DataCacheConnector)(i
     dataCache.fetch[BusinessDetails](credId, BusinessDetails.key).map(_.flatMap(_.contactingYou.flatMap(_.email)))
   }
 
-  def updateEmailAddress(credId: String, data: ContactingYouEmail)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
+  def updateEmailAddress(credId: String, data: ContactingYouEmail)(implicit hc: HeaderCarrier): Future[Option[Cache]] = {
     dataCache.fetch[BusinessDetails](credId, BusinessDetails.key).map {
       _ map { businessDetails =>
         val updatedBusinessDetails = businessDetails.contactingYou(

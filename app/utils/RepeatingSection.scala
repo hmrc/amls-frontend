@@ -18,9 +18,9 @@ package utils
 
 import connectors.DataCacheConnector
 import play.api.libs.json.Format
+import services.cache.Cache
 import typeclasses.MongoKey
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+
 import scala.concurrent.{ExecutionContext, Future}
 
 // $COVERAGE-OFF$
@@ -29,7 +29,7 @@ trait RepeatingSection {
 
   def dataCacheConnector: DataCacheConnector
 
-  def getData[T](cache: CacheMap, index: Int)
+  def getData[T](cache: Cache, index: Int)
                 (implicit formats: Format[T], key: MongoKey[T]): Option[T] =
     getData[T](cache) match {
       case data if index > 0 && index <= data.length + 1 => data lift (index - 1)
@@ -43,7 +43,7 @@ trait RepeatingSection {
       case _ => None
     }
 
-  def getData[T](cache: CacheMap)
+  def getData[T](cache: Cache)
                 (implicit formats: Format[T], key: MongoKey[T]): Seq[T] =
     cache.getEntry[Seq[T]](key()).fold(Seq.empty[T])(identity)
 
@@ -62,8 +62,8 @@ trait RepeatingSection {
       }
     }
 
-  def fetchAllAndUpdateStrict[T](credId: String, index: Int)(fn: (CacheMap, T) => T)
-                                (implicit hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Option[CacheMap]] = {
+  def fetchAllAndUpdateStrict[T](credId: String, index: Int)(fn: (Cache, T) => T)
+                                (implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Option[Cache]] =
     dataCacheConnector.fetchAll(credId).flatMap {
       _.map {
         cacheMap =>
@@ -74,10 +74,9 @@ trait RepeatingSection {
           }.getOrElse(Future.successful(Some(cacheMap)))
       }.getOrElse(Future.successful(None))
     }
-  }
 
   protected def updateDataStrict[T](credId: String, index: Int)(fn: T => T)
-                                   (implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[CacheMap] =
+                                   (implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Cache] =
     getData[T](credId) flatMap {
       data => {
         putData(credId, data.patch(index - 1, Seq(fn(data(index - 1))), 1))
@@ -85,7 +84,7 @@ trait RepeatingSection {
     }
 
   protected def removeDataStrict[T](credId: String, index: Int)
-                                   (implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[CacheMap] =
+                                   (implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Cache] =
     getData(credId) flatMap {
       data => {
         putData(credId, data.patch(index - 1, Nil, 1))
@@ -93,7 +92,7 @@ trait RepeatingSection {
     }
 
   protected def putData[T](credId: String, data: Seq[T])
-                          (implicit formats: Format[T], key: MongoKey[T]): Future[CacheMap] =
+                          (implicit formats: Format[T], key: MongoKey[T]): Future[Cache] =
     dataCacheConnector.save[Seq[T]](credId, key(), data)
 
 }

@@ -30,7 +30,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.renewal.AMPTurnoverView
 
@@ -42,7 +42,7 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     self =>
     val request = addToken(authRequest)
 
-    val emptyCache = CacheMap("", Map.empty)
+    val emptyCache = Cache.empty
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
@@ -61,7 +61,7 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     def testRenewal: Option[Renewal] = None
 
-    when(controller.dataCacheConnector.fetchAll(any())(any()))
+    when(controller.dataCacheConnector.fetchAll(any()))
       .thenReturn(Future.successful(Some(mockCacheMap)))
 
     when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -71,7 +71,7 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       .thenReturn(testRenewal)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "AMPTurnoverController" when {
 

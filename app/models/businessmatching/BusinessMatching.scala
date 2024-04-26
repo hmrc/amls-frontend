@@ -22,7 +22,7 @@ import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, UnincorporatedBody}
 import models.registrationprogress._
 import play.api.i18n.Messages
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 case class BusinessMatching(
                              reviewDetails: Option[ReviewDetails] = None,
@@ -170,7 +170,7 @@ object BusinessMatching {
 
   val messageKey = "businessmatching"
 
-  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+  def taskRow(implicit cache: Cache, messages: Messages): TaskRow = {
     val notStartedRow = TaskRow(
       messageKey,
       controllers.businessmatching.routes.RegisterServicesController.get().url,

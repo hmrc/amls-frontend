@@ -29,7 +29,7 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.responsiblepeople.address.TimeAtAdditionalAddressView
 
@@ -53,7 +53,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar w
       error = errorView)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
   val outOfBounds = 99
 
   "TimeAtAdditionalAddressController" when {
@@ -151,7 +151,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar w
             "timeAtAddress" -> ""
           )
 
-          val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[Cache]
 
           val responsiblePeople = ResponsiblePerson()
 

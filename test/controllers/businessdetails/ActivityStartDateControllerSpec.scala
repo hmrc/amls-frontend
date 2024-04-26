@@ -30,7 +30,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessdetails.ActivityStartDateView
 
@@ -58,7 +58,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
   private val startDate = ActivityStartDate(LocalDate.of(2010, 2, 22))
   private val businessDetails = BusinessDetails(None, Some(startDate), None, None)
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "ActivityStartDateController" must {
 
@@ -98,14 +98,14 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
           Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
-        override val mockCacheMap = mock[CacheMap]
+        override val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
           .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
 
-        when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCache.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
         when(controller.dataCache.save(any(), any(), any())(any())).thenReturn(Future.successful(emptyCache))
 
@@ -127,14 +127,14 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         when(controller.dataCache.save(any(), any(), any())(any())).thenReturn(Future.successful(emptyCache))
 
-        override val mockCacheMap = mock[CacheMap]
+        override val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
           .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
 
-        when(controller.dataCache.fetchAll(any[String])(any[HeaderCarrier]))
+        when(controller.dataCache.fetchAll(any[String]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post()(newRequest)
@@ -230,14 +230,14 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
           Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
-        override val mockCacheMap = mock[CacheMap]
+        override val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
           .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
 
-        when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCache.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
         when(controller.dataCache.save(any(), any(), any())(any()))
           .thenThrow(new IndexOutOfBoundsException("error"))
@@ -258,14 +258,14 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
           Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
-        override val mockCacheMap = mock[CacheMap]
+        override val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
           .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
 
-        when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCache.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
         when(controller.dataCache.save(any(), any(), any())(any())).thenReturn(Future.successful(emptyCache))
 

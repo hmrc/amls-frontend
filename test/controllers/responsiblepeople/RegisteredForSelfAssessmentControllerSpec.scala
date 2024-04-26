@@ -30,7 +30,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import views.html.responsiblepeople.SelfAssessmentRegisteredView
 
 import scala.concurrent.Future
@@ -50,7 +50,7 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
       error = errorView)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
   val personName = Some(PersonName("firstname", None, "lastname"))
 
   "RegisteredForSelfAssessmentController" when {

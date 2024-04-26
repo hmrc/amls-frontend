@@ -60,7 +60,7 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
     mockCacheGetEntry[BusinessMatching](Some(bm), BusinessMatching.key)
 
     when {
-      mockBusinessMatchingService.preApplicationComplete(any())(any(), any())
+      mockBusinessMatchingService.preApplicationComplete(any())(any())
     } thenReturn Future.successful(false)
 
   }

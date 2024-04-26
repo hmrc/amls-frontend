@@ -24,7 +24,7 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.responsiblepeople.address.NewHomeDateOfChangeView
 
@@ -48,7 +48,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec with Injecting {
       error = errorView
     )
 
-    val cacheMap = mock[CacheMap]
+    val cacheMap = mock[Cache]
   }
 
   "NewHomeAddressDateOfChangeController" must {
@@ -64,7 +64,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec with Injecting {
           when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
           when(cacheMap.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key)).thenReturn(Some(NewHomeDateOfChange(Some(LocalDate.now()))))
-          when(controller.dataCacheConnector.fetchAll(any())(any())).thenReturn(Future.successful(Some(cacheMap)))
+          when(controller.dataCacheConnector.fetchAll(any())).thenReturn(Future.successful(Some(cacheMap)))
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -76,7 +76,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec with Injecting {
           when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
           when(cacheMap.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key)).thenReturn(None)
-          when(controller.dataCacheConnector.fetchAll(any())(any())).thenReturn(Future.successful(Some(cacheMap)))
+          when(controller.dataCacheConnector.fetchAll(any())).thenReturn(Future.successful(Some(cacheMap)))
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -86,7 +86,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec with Injecting {
           when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(None)
           when(cacheMap.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key)).thenReturn(None)
-          when(controller.dataCacheConnector.fetchAll(any())(any())).thenReturn(Future.successful(Some(cacheMap)))
+          when(controller.dataCacheConnector.fetchAll(any())).thenReturn(Future.successful(Some(cacheMap)))
 
           val result = controller.get(1)(request)
           status(result) must be(NOT_FOUND)

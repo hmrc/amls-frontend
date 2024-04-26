@@ -77,7 +77,7 @@ class ServiceFlowSpec extends PlaySpec with Matchers with MockitoSugar with Scal
     mockCacheGetEntry[Asp](Some(aspModel), Asp.key)
 
     def setUpActivities(activities: Set[BusinessActivity]) = when {
-      businessMatchingService.getAdditionalBusinessActivities(any())(any(), any())
+      businessMatchingService.getAdditionalBusinessActivities(any())(any())
     } thenReturn OptionT.liftF[Future, Set[BusinessActivity]](Future.successful(activities))
 
     mockCacheFetch(Some(UpdateService(inNewServiceFlow = true)), Some(UpdateService.key))

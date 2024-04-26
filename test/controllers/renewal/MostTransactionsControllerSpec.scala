@@ -34,7 +34,7 @@ import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.html.renewal.MostTransactionsView
 
@@ -47,8 +47,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
     val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
-    val cacheMap = mock[CacheMap]
-    val emptyCache = CacheMap("", Map.empty)
+    val cacheMap = mock[Cache]
+    val emptyCache = Cache.empty
     val mockRenewalService = mock[RenewalService]
     lazy val view = inject[MostTransactionsView]
     val controller = new MostTransactionsController(
@@ -92,14 +92,14 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
       "mostTransactionsCountries[]" -> "GB"
     )
 
-    when(cache.fetchAll(any())(any()))
+    when(cache.fetchAll(any()))
             .thenReturn(Future.successful(Some(cacheMap)))
 
     when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
             .thenReturn(Some(incomingModel))
 
     when(cache.save[Renewal](any(), eqTo(Renewal.key), eqTo(outgoingModel))(any()))
-            .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+            .thenReturn(Future.successful(Cache.empty))
 
     def setupBusinessMatching(activities: Set[BusinessActivity] = Set(), msbServices: Set[BusinessMatchingMsbService] = Set()) = when {
       cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
@@ -263,7 +263,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
 
       val incomingModel = Renewal()
 
-      when(cache.fetchAll(any())(any()))
+      when(cache.fetchAll(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -273,7 +273,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
         .thenReturn(Some(incomingModel))
 
       when(cache.save[Renewal](any(), eqTo(Renewal.key), any())
-        (any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        (any())).thenReturn(Future.successful(Cache.empty))
 
 
       a[Exception] must be thrownBy {

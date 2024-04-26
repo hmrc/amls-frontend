@@ -34,7 +34,7 @@ import play.api.test.{FakeRequest, Injecting}
 import services.businessmatching.RecoverActivitiesService
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.renewal.InvolvedInOtherView
 
@@ -46,9 +46,9 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
     self =>
     val request = addToken(authRequest)
 
-    val mockCacheMap = mock[CacheMap]
+    val mockCacheMap = mock[Cache]
 
-    val emptyCache = CacheMap("", Map.empty)
+    val emptyCache = Cache.empty
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockStatusService = mock[StatusService]
@@ -79,7 +79,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
           )))
         )
 
-        when(mockDataCacheConnector.fetchAll(any())(any()))
+        when(mockDataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[Renewal](Renewal.key))
@@ -112,7 +112,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(None)
 
-        when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(mockDataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -128,7 +128,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(BusinessMatching()))
 
-        when(mockDataCacheConnector.fetchAll(any())(any()))
+        when(mockDataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -144,7 +144,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(businessMatching))
 
-        when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(mockDataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(controller.recoverActivitiesService.recover(any())(any(), any(), any()))
@@ -162,7 +162,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(businessMatching))
 
-        when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(mockDataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(controller.recoverActivitiesService.recover(any())(any(), any(), any()))

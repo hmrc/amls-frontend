@@ -21,7 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.supervision.SupervisionEndReasonsFormProvider
 import models.supervision._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AuthAction
 import utils.CharacterCountParser.cleanData
 import views.html.supervision.SupervisionEndReasonsView
@@ -82,7 +82,7 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
     supervision.anotherBody(updatedAnotherBody).copy(hasAccepted = true)
   }
 
-  private def redirectTo(edit: Boolean, cache: CacheMap): Result = {
+  private def redirectTo(edit: Boolean, cache: Cache): Result = {
     import utils.ControllerHelper.supervisionComplete
 
       if (supervisionComplete(cache)) {

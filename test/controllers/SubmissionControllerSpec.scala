@@ -101,7 +101,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       "redirect to the RegistrationProgressController when incomplete" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(incompleteSections))
 
         when {
@@ -119,7 +119,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       "return to the confirmation page on first submission" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when {
@@ -137,7 +137,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       "return to the landing controller when recovers from duplicate response" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when {
@@ -161,7 +161,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
     "post must return the response from the service correctly when Submission Ready for review" in new Fixture {
       when {
-        mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+        mockSectionsProvider.taskRows(any[String])(any(), any())
       }.thenReturn(Future.successful(completedSections))
 
       when {
@@ -180,7 +180,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     "redirect to the correct help page when a duplicate enrolment error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
       val msg = "HMRC-MLR-ORG duplicate enrolment"
       when {
-        mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+        mockSectionsProvider.taskRows(any[String])(any(), any())
       }.thenReturn(Future.successful(completedSections))
 
       when {
@@ -200,7 +200,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     "redirect to the correct help page when a duplicate subscription error is encountered" in new Fixture with ParagraphHelpers {
       val msg = "HMRC-MLR-ORG duplicate subscription"
       when {
-        mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+        mockSectionsProvider.taskRows(any[String])(any(), any())
       }.thenReturn(Future.successful(completedSections))
 
       when {
@@ -220,7 +220,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     "redirect to the correct help page when an error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
       val msg = "invalid credentials"
       when {
-        mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+        mockSectionsProvider.taskRows(any[String])(any(), any())
       }.thenReturn(Future.successful(completedSections))
 
       when {
@@ -239,7 +239,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
     "redirect to the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
       when {
-        mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+        mockSectionsProvider.taskRows(any[String])(any(), any())
       }.thenReturn(Future.successful(completedSections))
 
       when {
@@ -261,7 +261,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     "Submission is approved" must {
       "call the variation method on the service" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when {
@@ -281,7 +281,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       "Redirect to the correct confirmation page" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when {
@@ -299,7 +299,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       "redirect to the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when {
@@ -320,7 +320,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     "Submission is in renewal status" must {
       "call the renewal method on the service" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when {
@@ -345,7 +345,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       "do a variation if user is in renewal period but has no renewal object" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when {
@@ -367,7 +367,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       "redirect to the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when {
@@ -392,7 +392,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     "Submission is in renewal amendment status" must {
       "call the renewal amendment method on the service" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when {
@@ -415,7 +415,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       "redirect to the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when {

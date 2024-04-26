@@ -16,9 +16,7 @@
 
 package connectors.cache
 
-import play.api.libs.json.{JsObject, JsValue, Reads}
-import services.cache.{Cache, CryptoCache}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import play.api.libs.json.{JsObject, JsValue}
 // $COVERAGE-OFF$
 trait Conversions {
 
@@ -31,25 +29,5 @@ trait Conversions {
     case JsObject(fields) => fields.toMap
     case _ => Map.empty[String, JsValue]
   }
-
-  /**
-    * Converts a new Cache object to an old CacheMap type, for compatibility reasons
-    * @param cache The cache object to convert
-    * @return The CacheMap instance
-    */
-  def toCacheMap(cache: Cache): CacheMap = new DelegateCacheMap(cache)
-
-  /**
-    * A new implementation of CacheMap, which delegates calls to getEntry() to the given cache instance if that
-    * cache instance is a CryptoCache. Otherwise, the default implementation of CacheMap is used.
-    * @param cache The cache to delegate to
-    */
-  private class DelegateCacheMap(cache: Cache) extends CacheMap(cache.id, cache.data) {
-    override def getEntry[T](key: String)(implicit fjs: Reads[T]): Option[T] = cache match {
-      case c: CryptoCache => c.getEncryptedEntry(key)
-      case _ => super.getEntry(key)
-    }
-  }
-
 }
 // $COVERAGE-ON$

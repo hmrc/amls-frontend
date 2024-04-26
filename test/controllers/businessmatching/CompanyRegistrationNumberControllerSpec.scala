@@ -31,7 +31,7 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, CacheMocks, StatusMocks}
 import views.html.businessmatching.CompanyRegistrationNumberView
 
@@ -64,17 +64,17 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
     mockApplicationStatus(NotCompleted)
 
     when {
-      controller.businessMatchingService.getModel(any())(any())
+      controller.businessMatchingService.getModel(any())
     } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(businessMatching))
 
-    val emptyCache = CacheMap("", Map.empty)
+    val emptyCache = Cache.empty
   }
 
   "CompanyRegistrationNumberController" must {
 
     "on get() display company registration number page" in new Fixture {
       when {
-        controller.businessMatchingService.getModel(any())(any())
+        controller.businessMatchingService.getModel(any())
       } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(None))
 
 

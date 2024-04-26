@@ -34,7 +34,7 @@ import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.renewal.TransactionsInLast12MonthsView
 
@@ -70,14 +70,14 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
     def formRequest(valid: Boolean) = FakeRequest(POST, routes.TransactionsInLast12MonthsController.post().url)
     .withFormUrlEncodedBody(formData(valid))
 
-    val cache = mock[CacheMap]
+    val cache = mock[Cache]
 
     when {
       renewalService.updateRenewal(any(),any())(any())
     } thenReturn Future.successful(cache)
 
     when {
-      mockDataCacheConnector.fetchAll(any())(any())
+      mockDataCacheConnector.fetchAll(any())
     } thenReturn Future.successful(Some(cache))
 
     def post(edit: Boolean = false, valid: Boolean = true)(block: Future[Result] => Unit) =

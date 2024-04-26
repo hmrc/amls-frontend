@@ -36,7 +36,7 @@ import play.api.test.Helpers.{status, _}
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, StatusConstants}
 import views.html.responsiblepeople.RemoveResponsiblePersonView
 
@@ -252,7 +252,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
       "respond with SEE_OTHER" when {
         "removing a responsible person from an application with status NotCompleted" in new Fixture {
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
@@ -273,7 +273,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
         "removing a responsible person from an application with status SubmissionReady" in new Fixture {
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
@@ -294,7 +294,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
         "removing a responsible person from an application with status SubmissionReady and redirect to your answers page" in new Fixture {
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
@@ -315,7 +315,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
         "removing a responsible person with lineId from an application with status SubmissionReadyForReview" in new Fixture {
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
                   .thenReturn(Future.successful(Some(Seq(CompleteResponsiblePeople1, CompleteResponsiblePeople2, CompleteResponsiblePeople3))))
@@ -338,7 +338,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
         "removing a responsible person without lineId from an application with status SubmissionReadyForReview" in new Fixture {
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
                   .thenReturn(Future.successful(Some(Seq(CompleteResponsiblePeople1.copy(lineId = None), CompleteResponsiblePeople2, CompleteResponsiblePeople3))))
@@ -360,7 +360,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
         "removing a responsible person from an application with status SubmissionDecisionApproved" in new Fixture {
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
           val newRequest = FakeRequest(POST, routes.RemoveResponsiblePersonController.remove(1).url)
           .withFormUrlEncodedBody(
             "dateRequired" -> "true",
@@ -390,7 +390,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
         "removing a new incomplete responsible person from an application with status SubmissionDecisionApproved" in new Fixture {
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
           val newRequest = FakeRequest(POST, routes.RemoveResponsiblePersonController.remove(1).url)
           .withFormUrlEncodedBody("dateRequired" -> "false")
 
@@ -419,7 +419,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         }
 
         "removing a responsible person from an application with no date" in new Fixture {
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           val newRequest = FakeRequest(POST, routes.RemoveResponsiblePersonController.remove(1).url)
           .withFormUrlEncodedBody(
@@ -442,7 +442,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
       "respond with BAD_REQUEST" when {
         "removing a responsible person from an application with no date" in new Fixture {
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           val newRequest = FakeRequest(POST, routes.RemoveResponsiblePersonController.remove(1).url)
           .withFormUrlEncodedBody(
@@ -466,7 +466,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         }
 
         s"removing a responsible person from an application given a year which is below ${RemoveResponsiblePersonFormProvider.minDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))}" in new Fixture {
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           val belowMinDate = RemoveResponsiblePersonFormProvider.minDate.minusDays(1)
 
@@ -491,7 +491,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         }
 
         "removing a rp from an application with future date" in new Fixture {
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           val futureDate = LocalDate.now().plusDays(1)
 
@@ -518,7 +518,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
         "removing a responsible person from an application with end date before position start date" in new Fixture {
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           val startDate = LocalDate.of(1999, 5, 1)
 

@@ -23,7 +23,7 @@ import models.tradingpremises.BusinessStructure._
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
 import play.api.mvc._
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AuthAction, RepeatingSection}
 import views.html.tradingpremises.BusinessStructureView
 
@@ -57,7 +57,7 @@ class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheCon
                               data: BusinessStructure,
                               edit: Boolean,
                               index: Int,
-                              result: Option[CacheMap]
+                              result: Option[Cache]
                             )(implicit request: Request[AnyContent]): Result = {
     data match {
       case SoleProprietor => Redirect(routes.AgentNameController.get(index, edit))

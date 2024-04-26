@@ -35,9 +35,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
+import services.cache.Cache
 import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction}
 
 import java.time.{LocalDate, LocalDateTime}
@@ -48,8 +47,6 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
   trait Fixture {
     self =>
     val request = addToken(authRequest)
-
-    implicit val headerCarrier = HeaderCarrier()
 
     val dataCacheConnector = mock[DataCacheConnector]
     val progressService = mock[ProgressService]
@@ -75,14 +72,14 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
     val controller = app.injector.instanceOf[RenewalProgressController]
 
-    val cacheMap = mock[CacheMap]
+    val cacheMap = mock[Cache]
 
     val defaultTaskRow = TaskRow("A new section", "/foo", false, NotStarted, TaskRow.notStartedTag)
 
     val renewalTaskRow = defaultTaskRow.copy(msgKey = "renewal")
 
     when {
-      dataCacheConnector.fetchAll(any())(any())
+      dataCacheConnector.fetchAll(any())
     } thenReturn Future.successful(Some(cacheMap))
 
     when {
@@ -105,7 +102,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
       Some(renewalDate), false)
 
-    when(businessMatchingService.getAdditionalBusinessActivities(any())(any(), any()))
+    when(businessMatchingService.getAdditionalBusinessActivities(any())(any()))
       .thenReturn(OptionT.none[Future, Set[BusinessActivity]])
 
     when {
@@ -201,7 +198,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
       when {
-        dataCacheConnector.fetchAll(any())(any())
+        dataCacheConnector.fetchAll(any())
       } thenReturn Future.successful(None)
 
       val result = controller.get()(request)

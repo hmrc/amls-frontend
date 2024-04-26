@@ -26,7 +26,7 @@ import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview, S
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.tradingpremises.YourTradingPremisesView
 
@@ -60,7 +60,7 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
         tp <- dataCacheConnector.fetchAll(request.credId) map {
           cache =>
             for {
-              c: CacheMap <- cache
+              c: Cache <- cache
               tp <- c.getEntry[Seq[TradingPremises]](TradingPremises.key)
             } yield tp
         }

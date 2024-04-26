@@ -33,7 +33,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, StatusConstants}
 import views.html.responsiblepeople.PositionWithinBusinessView
 
@@ -70,7 +70,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   val RecordId = 1
 
@@ -86,11 +86,11 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
     "get is called" must {
 
       "display 'What is this person's role?' page" in new Fixture {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
           Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(Seq(ResponsiblePerson(personName))))
@@ -110,11 +110,11 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
           Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
 
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any())).thenReturn(Some(Seq(responsiblePeople)))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get(RecordId)(request)
@@ -138,11 +138,11 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
           Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
 
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any())).thenReturn(Some(Seq(responsiblePeople)))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get(RecordId)(request)
@@ -168,12 +168,12 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
           val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
 
-          val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[Cache]
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(ResponsiblePerson(personName))))
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(mockBusinessMatching))
-          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+          when(controller.dataCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(RecordId)(newRequest)
@@ -189,12 +189,12 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
             Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
           val businessMatching = BusinessMatching(Some(reviewDtls))
 
-          val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[Cache]
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(ResponsiblePerson(personName))))
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(businessMatching))
-          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+          when(controller.dataCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(RecordId)(newRequest)
@@ -217,7 +217,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
             when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
 
-            val mockCacheMap = mock[CacheMap]
+            val mockCacheMap = mock[Cache]
 
             when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
 
@@ -240,7 +240,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
             when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
               (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-            val mockCacheMap = mock[CacheMap]
+            val mockCacheMap = mock[Cache]
             when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(RecordId)(newRequest)
@@ -261,7 +261,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
             (any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-          val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[Cache]
           when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(RecordId, true, Some(flowFromDeclaration))(newRequest)

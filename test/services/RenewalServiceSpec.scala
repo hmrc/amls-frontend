@@ -29,7 +29,7 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import scala.concurrent.Future
@@ -47,9 +47,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
     val credId = "12345678"
     
-    val mockCacheMap = mock[CacheMap]
+    val mockCacheMap = mock[Cache]
 
-    when(dataCache.fetchAll(any())(any()))
+    when(dataCache.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
     when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
             .thenReturn(Some(BusinessMatching()))

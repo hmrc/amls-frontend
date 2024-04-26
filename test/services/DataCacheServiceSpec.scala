@@ -22,8 +22,8 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
+import services.cache.Cache
+import uk.gov.hmrc.http.NotFoundException
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
@@ -34,17 +34,15 @@ class DataCacheServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures 
     override private[services] val cacheConnector = mock[DataCacheConnector]
   }
 
-  val cacheMap = CacheMap("", Map.empty)
+  val cacheMap: Cache = Cache.empty
   val credID = "12345678"
-
-  implicit val hc = HeaderCarrier()
 
   "getCache" must {
 
     "Return a successful future when a cache exists" in {
 
       when {
-        DataCacheService.cacheConnector.fetchAll(any())(any())
+        DataCacheService.cacheConnector.fetchAll(any())
       } thenReturn Future.successful(Some(cacheMap))
 
       whenReady (DataCacheService.getCache(credID)) {
@@ -56,7 +54,7 @@ class DataCacheServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures 
     "Return a failed future when no cache exists" in {
 
       when {
-        DataCacheService.cacheConnector.fetchAll(any())(any())
+        DataCacheService.cacheConnector.fetchAll(any())
       } thenReturn Future.successful(None)
 
       whenReady (DataCacheService.getCache(credID).failed) {

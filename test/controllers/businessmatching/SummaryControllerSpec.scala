@@ -30,7 +30,7 @@ import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.businessmatching.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.CheckYourAnswersView
@@ -65,7 +65,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
     mockApplicationStatus(NotCompleted)
 
     def mockGetModel(model: Option[BusinessMatching]) = when {
-      controller.businessMatchingService.getModel(any())(any())
+      controller.businessMatchingService.getModel(any())
     } thenReturn {
       if (model.isDefined) {
         OptionT.liftF[Future, BusinessMatching](Future.successful(model))
@@ -75,8 +75,8 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
     }
 
     def mockUpdateModel = when {
-      controller.businessMatchingService.updateModel(any(), any())(any(), any())
-    } thenReturn OptionT.liftF[Future, CacheMap](Future.successful(mockCacheMap))
+      controller.businessMatchingService.updateModel(any(), any())(any())
+    } thenReturn OptionT.liftF[Future, Cache](Future.successful(mockCacheMap))
   }
 
   "Get" must {
@@ -135,7 +135,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
           redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
 
           val captor = ArgumentCaptor.forClass(classOf[BusinessMatching])
-          verify(mockBusinessMatchingService).updateModel(any(), captor.capture())(any(), any())
+          verify(mockBusinessMatchingService).updateModel(any(), captor.capture())(any())
           captor.getValue.hasAccepted mustBe true
           captor.getValue.preAppComplete mustBe true
         }

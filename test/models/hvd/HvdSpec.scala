@@ -25,7 +25,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsUndefined, Json}
 import play.api.test.Helpers
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 import java.time.LocalDate
 
@@ -155,7 +155,7 @@ class HvdSpec extends PlaySpec with MockitoSugar {
     "have a section function that" must {
 
       implicit val messages = Helpers.stubMessages()
-      implicit val cache = mock[CacheMap]
+      implicit val cache = mock[Cache]
 
       "return a Not Started Task Row when model is empty" in new HvdTestFixture {
 

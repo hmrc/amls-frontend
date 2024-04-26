@@ -29,7 +29,7 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
@@ -68,9 +68,9 @@ class AdditionalExtraAddressUKControllerSpec extends AmlsSpec with MockitoSugar 
 
   val personName = Some(PersonName("firstname", None, "lastname"))
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
-  val mockCacheMap = mock[CacheMap]
+  val mockCacheMap = mock[Cache]
 
   "AdditionalExtraAddressController" when {
 

@@ -20,7 +20,7 @@ import models.asp.Service._
 import models.registrationprogress._
 import org.mockito.Mockito._
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 trait AspValues {
@@ -112,7 +112,7 @@ class AspSpec extends AmlsSpec with AspValues {
 
     "have a task row function that" must {
 
-      implicit val cache = mock[CacheMap]
+      implicit val cache = mock[Cache]
 
       "return a NotStarted Task Row when model is empty" in {
 

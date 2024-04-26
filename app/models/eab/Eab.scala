@@ -22,7 +22,7 @@ import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 case class Eab(data: JsObject = Json.obj(),
                hasChanged: Boolean = false,
@@ -124,7 +124,7 @@ object Eab {
     Call(redirectCallType, destinationUrl)
   }
 
-  def section(appConfig: ApplicationConfig)(implicit cache: CacheMap): Section = {
+  def section(appConfig: ApplicationConfig)(implicit cache: Cache): Section = {
     val messageKey = "eab"
     val notStarted = Section(messageKey, NotStarted, false, generateRedirect(appConfig.eabWhatYouNeedUrl))
     cache.getEntry[Eab](key).fold(notStarted) {
@@ -137,7 +137,7 @@ object Eab {
     }
   }
 
-  def taskRow(appConfig: ApplicationConfig)(implicit cache: CacheMap, messages: Messages): TaskRow = {
+  def taskRow(appConfig: ApplicationConfig)(implicit cache: Cache, messages: Messages): TaskRow = {
     val messageKey = "eab"
     val notStarted = TaskRow(
       messageKey,

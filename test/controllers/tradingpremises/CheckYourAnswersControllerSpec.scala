@@ -30,7 +30,7 @@ import play.api.test.Helpers.{OK, contentAsString, status, _}
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import utils.tradingpremises.CheckYourAnswersHelper
 import views.html.tradingpremises.CheckYourAnswersView
@@ -44,7 +44,7 @@ class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Inj
   implicit val request = FakeRequest
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[CacheMap]
+  val mockCacheMap = mock[Cache]
   val statusService = mock[StatusService]
 
   trait Fixture  {
@@ -69,7 +69,7 @@ class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Inj
 
     "get is called" must {
       "respond with OK and show the detailed answers page" in new Fixture {
-        when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(mockDataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val businessMatchingActivitiesAll = BusinessMatchingActivities(
@@ -98,7 +98,7 @@ class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Inj
 
           val ytpModel = YourTradingPremises("foo", Address("1",None,None,None,"AA1 1BB",None), None, Some(LocalDate.of(2010, 10, 10)), None)
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           val newRequest = FakeRequest(POST, routes.CheckYourAnswersController.post(1).url)
             .withFormUrlEncodedBody("hasAccepted" -> "true")

@@ -28,7 +28,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.businessactivities.IdentifySuspiciousActivityView
 
@@ -95,7 +95,7 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
           .thenReturn(Future.successful(None))
 
         when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
-          .thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
+          .thenReturn(Future.successful(Cache(BusinessActivities.key, Map("" -> Json.obj()))))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -133,7 +133,7 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
           .thenReturn(Future.successful(None))
 
         when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
-          .thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
+          .thenReturn(Future.successful(Cache(BusinessActivities.key, Map("" -> Json.obj()))))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)

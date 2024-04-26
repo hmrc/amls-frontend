@@ -23,7 +23,7 @@ import models.tradingpremises.TradingPremisesMsbService._
 import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, StatusConstants}
 
 import java.time.LocalDate
@@ -203,7 +203,7 @@ class TradingPremisesSpec extends AmlsSpec {
   "Amendment and Variation flow" when {
     "the taskRow is complete with all the trading premises being removed" must {
       "successfully redirect to what you need page" in {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(
@@ -222,7 +222,7 @@ class TradingPremisesSpec extends AmlsSpec {
 
     "the taskRow is complete with all the trading premises being removed and has one incomplete model" must {
       "successfully redirect to your trading premises page" in {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(
@@ -242,7 +242,7 @@ class TradingPremisesSpec extends AmlsSpec {
 
     "the taskRow is complete with one of the trading premises object being removed" must {
       "successfully redirect to your trading premises page" in {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(
@@ -260,7 +260,7 @@ class TradingPremisesSpec extends AmlsSpec {
 
     "the taskRow is complete with all the trading premises unchanged" must {
       "successfully redirect to your trading premises page" in {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(completeModel, completeModel)))
@@ -275,7 +275,7 @@ class TradingPremisesSpec extends AmlsSpec {
 
     "the taskRow is complete with all the trading premises being modified" must {
       "successfully redirect to your trading premises page" in {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(
@@ -297,7 +297,7 @@ class TradingPremisesSpec extends AmlsSpec {
 
     "the taskRow consists of just 1 empty Trading premises" must {
       "return a result indicating NotStarted" in {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(TradingPremises())))
@@ -308,7 +308,7 @@ class TradingPremisesSpec extends AmlsSpec {
 
     "the taskRow consists of a partially complete model followed by a completely empty one" must {
       "return a result indicating partial completeness" in {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(incompleteModel, TradingPremises())))
@@ -319,7 +319,7 @@ class TradingPremisesSpec extends AmlsSpec {
 
     "the taskRow consists of a complete model followed by an empty one" must {
       "return a result indicating partial completeness" in {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(completeModel, TradingPremises(hasAccepted = true))))
@@ -330,7 +330,7 @@ class TradingPremisesSpec extends AmlsSpec {
 
     "the taskRow consists of a complete model followed by a totally empty one with no changes or acceptance" must {
       "return a result indicating completeness" in {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(completeModel, TradingPremises())))
@@ -341,7 +341,7 @@ class TradingPremisesSpec extends AmlsSpec {
 
     "has a completed model, an empty one and an incomplete one" when {
       "return the correct index" in {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(

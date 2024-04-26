@@ -20,7 +20,7 @@ import models.registrationprogress._
 import models.supervision.ProfessionalBodies._
 import org.mockito.Mockito._
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import java.time.LocalDate
@@ -49,7 +49,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
     "have a task row function that" must {
 
-      implicit val cache = mock[CacheMap]
+      implicit val cache = mock[Cache]
 
       "returns a Not Started task row when there is no model in the cache" in {
 

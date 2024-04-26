@@ -34,7 +34,7 @@ import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import services.businessmatching.RecoverActivitiesService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.businessactivities.InvolvedInOtherNameView
 
@@ -58,9 +58,9 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
     )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
-  val mockCacheMap = mock[CacheMap]
+  val mockCacheMap = mock[Cache]
 
   "InvolvedInOtherController" when {
 
@@ -81,7 +81,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -109,7 +109,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
         when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -128,7 +128,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(BusinessMatching()))
 
-        when(controller.dataCacheConnector.fetchAll(any())(any()))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
@@ -144,7 +144,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
       "redirect to itself after performing a successful recovery of missing business types" in new Fixture {
         val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BMActivities(Set())))
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -164,7 +164,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
       "return an internal server error after failing to recover missing business types" in new Fixture {
         val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BMActivities(Set())))
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))

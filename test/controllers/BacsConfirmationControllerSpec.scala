@@ -34,7 +34,7 @@ import org.mockito.Mockito._
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.confirmation.ConfirmationBacsView
 
@@ -70,7 +70,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
 
-    protected val mockCacheMap = mock[CacheMap]
+    protected val mockCacheMap = mock[Cache]
     val companyNameFromCache = "My Test Company Name From Cache"
     val companyNameFromRegistration = "My Test Company Name From Registration"
 

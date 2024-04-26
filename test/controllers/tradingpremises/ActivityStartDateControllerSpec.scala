@@ -28,7 +28,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AuthAction}
 import views.html.tradingpremises.ActivityStartDateView
 
@@ -62,7 +62,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
     val ytpModel = YourTradingPremises("foo", address, None, Some(LocalDate.of(2010, 10, 10)), None)
     val ytp = Some(ytpModel)
 
-    val emptyCache = CacheMap("", Map.empty)
+    val emptyCache = Cache.empty
     "GET:" must {
 
       "successfully load activity start page with empty form" in new Fixture {

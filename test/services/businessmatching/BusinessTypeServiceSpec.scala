@@ -27,7 +27,7 @@ import org.scalacheck.Gen
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.IntegrationPatience
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import scala.concurrent.Future
@@ -122,7 +122,7 @@ class BusinessTypeServiceSpec extends AmlsSpec
           .thenReturn(Future.successful(Some(oldModel)))
 
         when(mockCacheConnector.save[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key), eqTo(newModel))(any()))
-          .thenReturn(Future.successful(mock[CacheMap]))
+          .thenReturn(Future.successful(mock[Cache]))
 
         service.updateBusinessType(credId, LPrLLP).futureValue mustBe Some(LPrLLP)
 

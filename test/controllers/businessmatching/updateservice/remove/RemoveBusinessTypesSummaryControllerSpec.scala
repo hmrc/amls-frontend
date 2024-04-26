@@ -29,7 +29,7 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils._
 import views.TitleValidator
 import views.html.businessmatching.updateservice.remove.RemoveActivitiesSummaryView
@@ -93,8 +93,8 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
         when(removeServiceHelper.removeTradingPremisesBusinessTypes(any(), eqTo(flowModel))(any()))
           .thenReturn(OptionT.liftF[Future, Seq[TradingPremises]](Future.successful(Seq.empty)))
 
-        when(removeServiceHelper.removeSectionData(any(), eqTo(flowModel))(any(), any()))
-          .thenReturn(OptionT.liftF[Future, Seq[CacheMap]](Future.successful(Seq.empty)))
+        when(removeServiceHelper.removeSectionData(any(), eqTo(flowModel))(any()))
+          .thenReturn(OptionT.liftF[Future, Seq[Cache]](Future.successful(Seq.empty)))
 
         when(removeServiceHelper.removeFlowData(any())(any()))
           .thenReturn(OptionT.liftF[Future, RemoveBusinessTypeFlowModel](Future.successful(RemoveBusinessTypeFlowModel())))

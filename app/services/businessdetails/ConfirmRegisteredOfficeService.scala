@@ -22,7 +22,7 @@ import models.businesscustomer.Address
 import models.businessdetails._
 import models.businessmatching.BusinessMatching
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,7 +43,7 @@ class ConfirmRegisteredOfficeService @Inject() (val dataCache: DataCacheConnecto
 
   def updateRegisteredOfficeAddress(credId: String, data: ConfirmRegisteredOffice)(implicit hc: HeaderCarrier): Future[Option[RegisteredOffice]] = {
 
-    def updateFromCacheMap(optCache: Option[CacheMap]): Option[Future[RegisteredOffice]] = optCache.flatMap { cache =>
+    def updateFromCacheMap(optCache: Option[Cache]): Option[Future[RegisteredOffice]] = optCache.flatMap { cache =>
       cache.getEntry[BusinessMatching](BusinessMatching.key).flatMap { bm =>
         cache.getEntry[BusinessDetails](BusinessDetails.key).flatMap { bd =>
           if (data.isRegOfficeOrMainPlaceOfBusiness) {

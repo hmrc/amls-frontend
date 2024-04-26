@@ -36,7 +36,7 @@ import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import services.msb.MoneySourcesService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils._
 import views.html.msb.MoneySourcesView
 
@@ -58,7 +58,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
       .thenReturn(Future.successful(None))
 
     when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
-      .thenReturn(Future.successful(CacheMap("TESTID", Map())))
+      .thenReturn(Future.successful(Cache("TESTID", Map())))
     lazy val view = inject[MoneySourcesView]
     val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
@@ -73,9 +73,9 @@ class MoneySourcesControllerSpec extends AmlsSpec
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
 
-    val cacheMap = mock[CacheMap]
+    val cacheMap = mock[Cache]
 
-    when(controller.dataCacheConnector.fetchAll(any())(any()))
+    when(controller.dataCacheConnector.fetchAll(any()))
       .thenReturn(Future.successful(Some(cacheMap)))
     val msbServices = Some(BusinessMatchingMsbServices(Set()))
     when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key))
@@ -96,7 +96,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
       "wholesalerNames" -> "wholesaler names",
       "moneySources[3]" -> "customers")
 
-    val cacheMap = mock[CacheMap]
+    val cacheMap = mock[Cache]
     lazy val view = inject[MoneySourcesView]
     when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
       .thenReturn(Future.successful(Some(completeMsb.copy(whichCurrencies = Some(WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, None))))))))

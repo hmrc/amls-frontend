@@ -21,7 +21,6 @@ import config.ApplicationConfig
 import play.api.Configuration
 import play.api.libs.json.{JsString, Reads}
 import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.AmlsSpec
@@ -152,11 +151,11 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
 
     "create and return a cache when one does not exist" in {
       repository.upsert(
-        CacheMap("123", testCache.data), JsString("valueName"), "fieldName"
+        Cache("123", testCache.data), JsString("valueName"), "fieldName"
       ).data mustBe testCache.data
 
       encryptedRepository.upsert(
-        CacheMap("123", testCache.data), JsString("valueName"), "fieldName"
+        Cache("123", testCache.data), JsString("valueName"), "fieldName"
       ).data mustBe encryptedCacheData
     }
 
@@ -164,13 +163,13 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
       repository.saveAll(testCache, "123").futureValue
       val newData = Map("fieldName" -> JsString("newValueName"))
       repository.upsert(
-        CacheMap("123", testCache.data), JsString("newValueName"), "fieldName"
+        Cache("123", testCache.data), JsString("newValueName"), "fieldName"
       ).data mustBe newData
 
       encryptedRepository.saveAll(testCache, "123").futureValue
       val newEncryptedData = Map("fieldName" -> JsString("lb6PR82vFARAM8u3kHMtKA=="))
       encryptedRepository.upsert(
-        CacheMap("123", testCache.data), JsString("newValueName"), "fieldName"
+        Cache("123", testCache.data), JsString("newValueName"), "fieldName"
       ).data mustBe newEncryptedData
     }
   }

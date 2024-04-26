@@ -35,7 +35,7 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import services.businessactivities.ExpectedAMLSTurnoverService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.businessactivities.ExpectedAMLSTurnoverView
 
@@ -60,12 +60,12 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
       view = view
     )
 
-    val mockCache = mock[CacheMap]
+    val mockCache = mock[Cache]
 
     def model: Option[BusinessActivities] = None
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   override def beforeEach(): Unit = reset(mockService)
 

@@ -32,7 +32,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.{RenewalService, StatusService}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.renewal.SendMoneyToOtherCountryView
 
@@ -43,7 +43,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
   trait Fixture {
     self =>
     val request = addToken(authRequest)
-    val cacheMap = mock[CacheMap]
+    val cacheMap = mock[Cache]
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockStatusService = mock[StatusService]
@@ -68,7 +68,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
     } thenReturn Future.successful(cacheMap)
 
     when {
-      mockDataCacheConnector.fetchAll(any())(any())
+      mockDataCacheConnector.fetchAll(any())
     } thenReturn Future.successful(Some(cacheMap))
 
     when {
@@ -80,7 +80,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
     } thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(msbServices)), activities = Some(BusinessActivities(activities))))
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "SendMoneyToOtherCountryController" must {
 

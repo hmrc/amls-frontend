@@ -26,7 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessdetails.BusinessEmailAddressService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.businessdetails.BusinessEmailAddressView
 
@@ -52,7 +52,7 @@ class BusinessEmailAddressControllerSpec extends AmlsSpec with MockitoSugar with
       view = view)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "BusinessHasEmailController" must {
 

@@ -26,7 +26,7 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
 import views.html.businessactivities.AccountantIsUKAddressView
 
@@ -50,9 +50,9 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with Injecting {
     )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
-  val mockCacheMap = mock[CacheMap]
+  val mockCacheMap = mock[Cache]
 
   "InvolvedInOtherController" when {
 

@@ -19,8 +19,8 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.Country
-import models.businessmatching._
 import models.businessmatching.BusinessActivity._
+import models.businessmatching._
 import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers._
@@ -32,8 +32,7 @@ import play.api.mvc.{AnyContentAsFormUrlEncoded, Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.RenewalService
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AuthAction}
 
 import scala.concurrent.Future
@@ -44,14 +43,12 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
     self =>
     val request = addToken(authRequest)
 
-    implicit val headerCarrier = HeaderCarrier()
-
     val dataCacheConnector = mock[DataCacheConnector]
     val renewalService = mock[RenewalService]
     val authAction = SuccessfulAuthAction
 
-    val emptyCache = CacheMap("", Map.empty)
-    val mockCacheMap = mock[CacheMap]
+    val emptyCache = Cache.empty
+    val mockCacheMap = mock[Cache]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -77,7 +74,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
     def formRequest(data: Option[Request[AnyContentAsFormUrlEncoded]]) = formData(data)
 
-    val cache = mock[CacheMap]
+    val cache = mock[Cache]
 
     val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Seq(Country("GB","GB")))
     val mostTransactions = MostTransactions(Seq(Country("GB","GB")))
@@ -89,7 +86,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
     } thenReturn Future.successful(cache)
 
     when {
-      dataCacheConnector.fetchAll(any())(any())
+      dataCacheConnector.fetchAll(any())
     } thenReturn Future.successful(Some(cache))
 
     when {

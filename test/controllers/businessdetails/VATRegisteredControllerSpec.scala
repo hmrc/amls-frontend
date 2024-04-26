@@ -172,7 +172,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             "registeredForVATYes" -> "1234567890"
           )
 
-          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+          when(controller.dataCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post()(newRequest)

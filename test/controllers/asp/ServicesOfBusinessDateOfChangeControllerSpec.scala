@@ -26,7 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.asp.ServicesOfBusinessDateOfChangeService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DateHelper, DependencyMocks}
 import views.html.DateOfChangeView
 
@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   val mockService = mock[ServicesOfBusinessDateOfChangeService]
 

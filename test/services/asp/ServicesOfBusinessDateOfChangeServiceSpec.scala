@@ -23,7 +23,7 @@ import models.businessdetails.{ActivityStartDate, BusinessDetails}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{reset, verifyNoInteractions, when}
 import org.scalatest.BeforeAndAfterEach
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import java.time.LocalDate
@@ -32,7 +32,7 @@ import scala.concurrent.Future
 class ServicesOfBusinessDateOfChangeServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[CacheMap]
+  val mockCacheMap = mock[Cache]
 
   val service = new ServicesOfBusinessDateOfChangeService(mockCacheConnector)
 
@@ -53,7 +53,7 @@ class ServicesOfBusinessDateOfChangeServiceSpec extends AmlsSpec with BeforeAndA
 
         "business details contains start date and model is present in cache" in {
 
-          when(mockCacheConnector.fetchAll(eqTo(cacheId))(any()))
+          when(mockCacheConnector.fetchAll(eqTo(cacheId)))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))
@@ -70,7 +70,7 @@ class ServicesOfBusinessDateOfChangeServiceSpec extends AmlsSpec with BeforeAndA
 
         "model is present in cache but business details do not contain start date" in {
 
-          when(mockCacheConnector.fetchAll(eqTo(cacheId))(any()))
+          when(mockCacheConnector.fetchAll(eqTo(cacheId)))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))
@@ -87,7 +87,7 @@ class ServicesOfBusinessDateOfChangeServiceSpec extends AmlsSpec with BeforeAndA
 
         "model is not present and business details do not contain start date" in {
 
-          when(mockCacheConnector.fetchAll(eqTo(cacheId))(any()))
+          when(mockCacheConnector.fetchAll(eqTo(cacheId)))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))

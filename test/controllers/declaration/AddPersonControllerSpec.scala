@@ -33,7 +33,7 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.declaration.AddPersonView
 
@@ -57,7 +57,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
       view = view
     )
 
-    val emptyCache = CacheMap("", Map.empty)
+    val emptyCache = Cache.empty
 
     val defaultReviewDetails = ReviewDetails(
           businessName = "",
@@ -342,7 +342,7 @@ class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar
     )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "AddPersonController" when {
     "get is called" must {

@@ -30,7 +30,7 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.AutoCompleteService
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.responsiblepeople.CountryOfBirthView
 
@@ -57,7 +57,7 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
     )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
   val outOfBounds = 99
   val personName = Some(PersonName("firstname", None, "lastname"))
   val nino = Nino(nextNino)

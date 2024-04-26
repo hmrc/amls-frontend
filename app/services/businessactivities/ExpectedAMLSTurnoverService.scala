@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
 import models.businessmatching.BusinessMatching
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -46,7 +46,7 @@ class ExpectedAMLSTurnoverService @Inject()(val dataCacheConnector: DataCacheCon
   }
 
   def updateBusinessActivities(credId: String, expectedAMLSTurnover: ExpectedAMLSTurnover)
-                              (implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
+                              (implicit hc: HeaderCarrier): Future[Option[Cache]] = {
 
     dataCacheConnector.fetch[BusinessActivities](credId, BusinessActivities.key) map { baOpt =>
       baOpt map { ba =>

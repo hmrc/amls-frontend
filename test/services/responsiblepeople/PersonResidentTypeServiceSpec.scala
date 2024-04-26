@@ -28,7 +28,7 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.{Enrolments, User}
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AuthorisedRequest}
 
 import scala.concurrent.Future
@@ -36,7 +36,7 @@ import scala.concurrent.Future
 class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValues with BeforeAndAfterEach {
 
   lazy val mockDataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-  lazy val mockCacheMap: CacheMap = mock[CacheMap]
+  lazy val mockCacheMap: Cache = mock[Cache]
   lazy val service = new PersonResidentTypeService(mockDataCacheConnector)
 
   implicit val authorisedRequest: AuthorisedRequest[AnyContentAsEmpty.type] = AuthorisedRequest(
@@ -58,7 +58,7 @@ class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValue
 
           val answer = PersonResidenceType(UKResidence(Nino(nextNino)), None, None)
 
-          when(mockDataCacheConnector.fetchAll(any())(any()))
+          when(mockDataCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any())) thenReturn Some(Seq(ResponsiblePerson()))
@@ -88,7 +88,7 @@ class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValue
             Some(Country("Spain", "ES"))
           )
 
-          when(mockDataCacheConnector.fetchAll(any())(any()))
+          when(mockDataCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any())) thenReturn Some(Seq(ResponsiblePerson()))
@@ -114,7 +114,7 @@ class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValue
 
           val answer = PersonResidenceType(NonUKResidence, None, None)
 
-          when(mockDataCacheConnector.fetchAll(any())(any()))
+          when(mockDataCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any())) thenReturn None
@@ -132,7 +132,7 @@ class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValue
 
           val answer = PersonResidenceType(NonUKResidence, None, None)
 
-          when(mockDataCacheConnector.fetchAll(any())(any())).thenReturn(Future.successful(None))
+          when(mockDataCacheConnector.fetchAll(any())).thenReturn(Future.successful(None))
 
           verifyNoInteractions(mockCacheMap)
 

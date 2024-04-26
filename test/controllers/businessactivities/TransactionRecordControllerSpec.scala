@@ -26,7 +26,7 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessactivities.CustomerTransactionRecordsView
 
@@ -46,7 +46,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar with In
     mockCacheSave[BusinessActivities]
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "TransactionRecordController" when {
 

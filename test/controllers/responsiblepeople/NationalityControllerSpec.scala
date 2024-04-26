@@ -32,7 +32,7 @@ import play.api.test.{FakeRequest, Injecting}
 import services.AutoCompleteService
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.responsiblepeople.NationalityView
 
@@ -67,7 +67,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
     val personName = Some(PersonName("firstname", None, "lastname"))
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "NationalityController" must {
 

@@ -20,8 +20,7 @@ import cats.data.OptionT
 import connectors.DataCacheConnector
 import models.Country
 import models.responsiblepeople.{NonUKResidence, PersonResidenceType, ResponsiblePerson, UKResidence}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.RepeatingSection
 
 import javax.inject.{Inject, Singleton}
@@ -30,10 +29,10 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class PersonResidentTypeService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) extends RepeatingSection {
 
-  def getResponsiblePerson(credId: String, index: Int)(implicit hc: HeaderCarrier): Future[Option[ResponsiblePerson]] =
+  def getResponsiblePerson(credId: String, index: Int): Future[Option[ResponsiblePerson]] =
     getData[ResponsiblePerson](credId, index)
 
-  def getCache(data: PersonResidenceType, credId: String, index: Int)(implicit hc: HeaderCarrier): OptionT[Future, CacheMap] = {
+  def getCache(data: PersonResidenceType, credId: String, index: Int): OptionT[Future, Cache] =
     OptionT(
       fetchAllAndUpdateStrict[ResponsiblePerson](credId, index) { (_, rp) =>
         val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
@@ -45,5 +44,4 @@ class PersonResidentTypeService @Inject()(val dataCacheConnector: DataCacheConne
         }
       }
     )
-  }
 }

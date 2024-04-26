@@ -22,7 +22,7 @@ import models.businessmatching.BusinessMatching
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import scala.concurrent.Future
@@ -30,7 +30,7 @@ import scala.concurrent.Future
 class DocumentRiskAssessmentServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
   val mockCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap: CacheMap = mock[CacheMap]
+  val mockCacheMap: Cache = mock[Cache]
 
   val service = new DocumentRiskAssessmentService(mockCacheConnector)
 
@@ -85,7 +85,7 @@ class DocumentRiskAssessmentServiceSpec extends AmlsSpec with BeforeAndAfterEach
 
       "save Business Activities model and return Business Matching object" in {
 
-        when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+        when(mockCacheConnector.fetchAll(eqTo(credId)))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -109,7 +109,7 @@ class DocumentRiskAssessmentServiceSpec extends AmlsSpec with BeforeAndAfterEach
 
         "Business Activities is not present in cache" in {
 
-          when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+          when(mockCacheConnector.fetchAll(eqTo(credId)))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -126,7 +126,7 @@ class DocumentRiskAssessmentServiceSpec extends AmlsSpec with BeforeAndAfterEach
 
         "Business Matching is not present in cache" in {
 
-          when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+          when(mockCacheConnector.fetchAll(eqTo(credId)))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))

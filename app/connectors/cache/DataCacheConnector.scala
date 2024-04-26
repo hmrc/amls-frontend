@@ -18,41 +18,37 @@ package connectors
 
 import connectors.cache.MongoCacheConnector
 import play.api.libs.json.Format
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 import javax.inject.Inject
 import scala.concurrent.Future
 
-// $COVERAGE-OFF$
-// Coverage has been turned off for these types until we remove the deprecated methods
 class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
 
   def fetch[T](credId: String, key: String)(implicit formats: Format[T]): Future[Option[T]] =
     cacheConnector.fetch(credId, key)
 
-  def save[T](credId: String, key: String, data: T)(implicit format: Format[T]): Future[CacheMap] =
+  def save[T](credId: String, key: String, data: T)(implicit format: Format[T]): Future[Cache] =
     cacheConnector.save(credId, key, data)
 
-  def upsertNewAuth[T](targetCache: CacheMap, cacheId: String, data: T)(implicit format: Format[T]): CacheMap =
+  def upsertNewAuth[T](targetCache: Cache, cacheId: String, data: T)(implicit format: Format[T]): Cache =
     cacheConnector.upsertNewAuth(targetCache, cacheId, data)
 
-  def fetchAll(credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] =
+  def fetchAll(credId: String): Future[Option[Cache]] =
     cacheConnector.fetchAll(credId)
 
-  def fetchAllWithDefault(credId: String)(implicit hc: HeaderCarrier): Future[CacheMap] =
+  def fetchAllWithDefault(credId: String): Future[Cache] =
     cacheConnector.fetchAllWithDefault(credId)
 
-  def remove(credId: String)(implicit hc: HeaderCarrier): Future[Boolean] =
+  def remove(credId: String): Future[Boolean] =
     cacheConnector.remove(credId)
 
-  def removeByKey[T](credId: String, key: String)(implicit format: Format[T]): Future[CacheMap] = {
+  def removeByKey(credId: String, key: String): Future[Cache] =
     cacheConnector.removeByKey(credId, key)
-  }
 
   def update[T](credId: String, key: String)(f: Option[T] => T)(implicit fmt: Format[T]): Future[Option[T]] =
     cacheConnector.update(credId, key)(f)
 
-  def saveAll(credId: String, cacheMap: Future[CacheMap]): Future[CacheMap] =
-    cacheConnector.saveAll(credId, cacheMap)
+  def saveAll(credId: String, cache: Future[Cache]): Future[Cache] =
+    cacheConnector.saveAll(credId, cache)
 }

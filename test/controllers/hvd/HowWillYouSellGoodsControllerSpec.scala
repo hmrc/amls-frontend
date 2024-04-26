@@ -25,7 +25,7 @@ import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDec
 import org.jsoup.Jsoup
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DateOfChangeHelper, DependencyMocks}
 import views.html.hvd.HowWillYouSellGoodsView
 
@@ -52,7 +52,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec with Injecting {
     mockIsNewActivityNewAuth(false)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "load UI for the first time" in new Fixture {
     val result = controller.get()(request)

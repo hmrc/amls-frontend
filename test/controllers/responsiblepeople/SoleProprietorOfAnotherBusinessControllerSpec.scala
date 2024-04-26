@@ -30,7 +30,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.responsiblepeople.SoleProprietorView
 
@@ -56,7 +56,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
       error = errorView)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   val personName = Some(PersonName("firstname", None, "lastname"))
   val soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true))
@@ -86,7 +86,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
         "updating existing Responsible Person if there is some VAT data" must {
           "redirect to VATRegisteredController" in new Fixture {
 
-            val mockCacheMap = mock[CacheMap]
+            val mockCacheMap = mock[Cache]
 
             when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, vatRegistered = Some(VATRegisteredNo), lineId = Some(44444))))))
@@ -108,7 +108,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
         "updating existing Responsible Person if there is no any VAT data" must {
           "redirect to SelfAssessmentController" in new Fixture {
 
-            val mockCacheMap = mock[CacheMap]
+            val mockCacheMap = mock[Cache]
 
             when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName, soleProprietorOfAnotherBusiness = None, vatRegistered = None, lineId = Some(4444))))))
@@ -233,7 +233,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
       "soleProprietorOfAnotherBusiness is set to true" must {
         "go to VATRegisteredController" in new Fixture {
 
-          val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[Cache]
           val newRequest = FakeRequest(POST, routes.SoleProprietorOfAnotherBusinessController.post(1).url)
           .withFormUrlEncodedBody(
             "soleProprietorOfAnotherBusiness" -> "true",
@@ -263,7 +263,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
       "soleProprietorOfAnotherBusiness is set to false" when {
         "edit is true" must {
           "go to DetailedAnswersController" in new Fixture {
-            val mockCacheMap = mock[CacheMap]
+            val mockCacheMap = mock[Cache]
             val newRequest = FakeRequest(POST, routes.SoleProprietorOfAnotherBusinessController.post(1).url)
             .withFormUrlEncodedBody(
               "soleProprietorOfAnotherBusiness" -> "false",
@@ -283,7 +283,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
 
         "edit is false" must {
           "go to RegisteredForSelfAssessmentController" in new Fixture {
-            val mockCacheMap = mock[CacheMap]
+            val mockCacheMap = mock[Cache]
             val newRequest = FakeRequest(POST, routes.SoleProprietorOfAnotherBusinessController.post(1).url)
             .withFormUrlEncodedBody(
               "soleProprietorOfAnotherBusiness" -> "false",

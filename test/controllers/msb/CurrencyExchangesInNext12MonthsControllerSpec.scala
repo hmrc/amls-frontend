@@ -27,7 +27,7 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.msb.CurrencyExchangesInNext12MonthsView
 
@@ -52,7 +52,7 @@ class CurrencyExchangesInNext12MonthsControllerSpec extends AmlsSpec with Mockit
     mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   val fullModel = WhichCurrencies(
     Seq("USD", "CHF", "EUR"),

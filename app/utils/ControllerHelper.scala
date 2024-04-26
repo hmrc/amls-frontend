@@ -33,7 +33,7 @@ import play.api.mvc.Request
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -208,7 +208,7 @@ object ControllerHelper {
     names <- whoIsYourAccountant.names
   } yield names.accountantsName).getOrElse("")
 
-  def supervisionComplete(cache: CacheMap) = cache.getEntry[Supervision](Supervision.key) match {
+  def supervisionComplete(cache: Cache) = cache.getEntry[Supervision](Supervision.key) match {
     case Some(supervision) => supervision.isComplete
     case _ => false
   }

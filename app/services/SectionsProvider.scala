@@ -35,7 +35,7 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector,
                                  val config: ApplicationConfig) {
 
-  def taskRows(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Seq[TaskRow]] =
+  def taskRows(cacheId: String)(implicit ec: ExecutionContext, messages: Messages): Future[Seq[TaskRow]] =
     cacheConnector.fetchAll(cacheId) map {
       optionCache =>
         optionCache map {
@@ -52,13 +52,12 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
         } getOrElse Seq.empty
     }
 
-  def taskRows(cache: CacheMap)(implicit messages: Messages): Seq[TaskRow] = {
+  def taskRows(cache: Cache)(implicit messages: Messages): Seq[TaskRow] =
     mandatoryTaskRows(cache, messages) ++ dependentTaskRows(cache, messages)
-  }
 
   def taskRowsFromBusinessActivities(activities: Set[BusinessActivity],
                                      msbServices: Option[BusinessMatchingMsbServices])
-                                    (implicit cache: CacheMap, messages: Messages): Seq[TaskRow] = {
+                                    (implicit cache: Cache, messages: Messages): Seq[TaskRow] = {
 
     val asp = if (activities.contains(AccountancyServices)) Seq(Asp.taskRow) else Seq.empty
     val tcsp = if (activities.contains(TrustAndCompanyServices)) Seq(Tcsp.taskRow) else Seq.empty
@@ -71,13 +70,13 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
     asp ++ tcsp ++ supervision ++ amp ++ eab ++ hvd ++ msb
   }
 
-  private def dependentTaskRows(implicit cache: CacheMap, messages: Messages): Seq[TaskRow] =
+  private def dependentTaskRows(implicit cache: Cache, messages: Messages): Seq[TaskRow] =
     (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
       ba <- bm.activities
     } yield taskRowsFromBusinessActivities(ba.businessActivities, bm.msbServices)) getOrElse Seq.empty
 
-  private def mandatoryTaskRows(implicit cache: CacheMap, messages: Messages): Seq[TaskRow] =
+  private def mandatoryTaskRows(implicit cache: Cache, messages: Messages): Seq[TaskRow] =
     Seq(
       BusinessMatching.taskRow,
       BusinessDetails.taskRow,

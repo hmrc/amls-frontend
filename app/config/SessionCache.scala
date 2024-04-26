@@ -18,17 +18,42 @@ package config
 
 import com.google.inject.Inject
 import play.api.Configuration
-import uk.gov.hmrc.http.cache.client.SessionCache
+import uk.gov.hmrc.http.HttpReadsInstances.throwOnFailure
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.mongo.cache.CacheIdType.SessionCacheId.NoSessionException
 
-class AmlsSessionCache @Inject()(val configuration: Configuration,
-                                 val httpClient: HttpClient) extends ServicesConfig(configuration) with SessionCache {
+import scala.concurrent.{ExecutionContext, Future}
 
-  override def http = httpClient
-  override def defaultSource = getConfString("amls-frontend.cache", "amls-frontend")
-  override def baseUri = baseUrl("cachable.session-cache")
-  override def domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
+// The code in this trait was migrated verbatim from http-caching-client.
+// This supports access to keystore to clear the business-customer-frontend keystore cache, which
+// is currently required for acceptance testing purposes.
+trait SessionCache {
+  def http: HttpClient
+  def defaultSource: String
+  def baseUri: String
+  def domain: String
+
+  private val noSession = Future.failed[String](NoSessionException)
+
+  val legacyRawReads: HttpReads[HttpResponse] =
+    throwOnFailure(readEitherOf(readRaw))
+
+  private def cacheId(implicit hc: HeaderCarrier): Future[String] =
+    hc.sessionId.fold(noSession)(c => Future.successful(c.value))
+
+  protected def buildUri(source: String, id: String): String =
+    s"$baseUri/$domain/$source/$id"
+
+  def delete(uri: String)(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[HttpResponse] =
+    http.DELETE[HttpResponse](uri)(legacyRawReads, hc, executionContext)
+
+  def remove()(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[HttpResponse] =
+    for {
+      c <- cacheId
+      result <- delete(buildUri(defaultSource, c))
+    } yield result
 }
 
 class BusinessCustomerSessionCache @Inject()(val configuration: Configuration,

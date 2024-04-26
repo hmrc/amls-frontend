@@ -31,7 +31,7 @@ import org.scalatest.{BeforeAndAfter, OptionValues}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.responsiblepeople.address.AdditionalAddressView
@@ -63,7 +63,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
     )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
   val outOfBounds = 99
 
   "AdditionalAddressController" when {

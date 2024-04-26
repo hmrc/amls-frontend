@@ -28,7 +28,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.AnyContentAsEmpty
 import uk.gov.hmrc.auth.core.AffinityGroup.Individual
 import uk.gov.hmrc.auth.core.{Enrolments, User}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AuthorisedRequest}
 
 import scala.concurrent.Future
@@ -37,7 +37,7 @@ class RecoverActivitiesServiceSpec extends AmlsSpec with MockitoSugar {
 
   val mockAmlsConnector: AmlsConnector = mock[AmlsConnector]
   val mockDataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap: CacheMap = mock[CacheMap]
+  val mockCacheMap: Cache = mock[Cache]
   val service = new RecoverActivitiesService(mockAmlsConnector, mockDataCacheConnector)
   val emptyBusinessMatching: BusinessMatching = BusinessMatching()
   val emptyBusinessActivities: BusinessActivities = BusinessActivities(Set())

@@ -36,7 +36,7 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.libs.json.Format
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
 
@@ -70,9 +70,9 @@ class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: Da
     } yield true
   }
 
-  def fn[T](credId: String, key: String, m: Option[T])(implicit hc: HeaderCarrier, fmt: Format[T]): Future[CacheMap] = m match {
+  def fn[T](credId: String, key: String, m: Option[T])(implicit fmt: Format[T]): Future[Cache] = m match {
     case Some(model) => cacheConnector.save[T](credId, key, model)
-    case _ => Future.successful(CacheMap("", Map.empty))
+    case _ => Future.successful(Cache.empty)
   }
 
   def getMongoCacheData(fileName: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Option[UpdateMongoCacheResponse]] = {

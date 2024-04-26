@@ -29,7 +29,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessdetails.ConfirmRegisteredOfficeService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.businessdetails.ConfirmRegisteredOfficeOrMainPlaceView
 
@@ -58,7 +58,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
   val reviewDtlsNonUk = reviewDtls.copy(
     businessAddress = Address("line1", Some("line2"), Some("line3"), Some("line4"), None, Country("United States of America", "US")))
   val bm = BusinessMatching(Some(reviewDtls))
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   override def beforeEach(): Unit = reset(mockService)
 

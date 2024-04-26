@@ -28,7 +28,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import views.html.responsiblepeople.PersonNameView
 
 import scala.concurrent.Future
@@ -51,7 +51,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
     )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "PersonNameController" when {
 

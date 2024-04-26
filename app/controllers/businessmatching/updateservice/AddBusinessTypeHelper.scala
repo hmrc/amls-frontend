@@ -29,7 +29,7 @@ import models.supervision.Supervision
 import models.tradingpremises.TradingPremises
 import play.api.i18n.Messages
 import services.{ResponsiblePeopleService, TradingPremisesService}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{RepeatingSection, StatusConstants}
 
 import javax.inject.{Inject, Singleton}
@@ -68,7 +68,7 @@ class AddBusinessTypeHelper @Inject()(implicit val dataCacheConnector: DataCache
   }
 
   def updateHasAcceptedFlag(credId: String, model: AddBusinessTypeFlowModel)
-                           (implicit ec: ExecutionContext): OptionT[Future, CacheMap] =
+                           (implicit ec: ExecutionContext): OptionT[Future, Cache] =
     OptionT.liftF(dataCacheConnector.save[AddBusinessTypeFlowModel](credId, AddBusinessTypeFlowModel.key, model.copy(hasAccepted = true)))
 
   def updateServicesRegister(credId: String, model: AddBusinessTypeFlowModel)

@@ -33,7 +33,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, StatusConstants}
 import views.html.responsiblepeople.PositionWithinBusinessStartDateView
 
@@ -69,7 +69,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
       val hasNominatedOfficerButDeleted = responsiblePerson.copy(positions = Some(DefaultValues.hasNominatedOfficerPositions), status = Some(StatusConstants.Deleted))
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   val RecordId = 1
 
@@ -88,11 +88,11 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
     "get is called" must {
 
       "display the 'When did this person start their role in the business?' page" in new Fixture {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
           Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(Seq(hasNominatedOfficer)))
@@ -109,9 +109,9 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
       }
 
       "display the 'When did this person start their role in the business?' page when no business matching available" in new Fixture {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(Seq(hasNominatedOfficer)))
@@ -129,9 +129,9 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
       }
 
       "display the 'When did this person start their role in the business?' page when no start date" in new Fixture {
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(Seq(hasNominatedOfficer.copy(positions = Some(hasNominatedOfficer.positions.get.copy(startDate = None))))))
@@ -156,11 +156,11 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
           Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
 
-        val mockCacheMap = mock[CacheMap]
+        val mockCacheMap = mock[Cache]
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any())).thenReturn(Some(Seq(responsiblePeople)))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get(RecordId)(request)
@@ -185,12 +185,12 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
             val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
 
-            val mockCacheMap = mock[CacheMap]
+            val mockCacheMap = mock[Cache]
             when (mockCacheMap.getEntry[Seq[ResponsiblePerson]] (any () ) (any () ) )
               .thenReturn (Some (Seq ( hasNominatedOfficer ) ) )
             when (mockCacheMap.getEntry[BusinessMatching] (BusinessMatching.key) )
               .thenReturn (Some (mockBusinessMatching) )
-            when (controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+            when (controller.dataCacheConnector.fetchAll(any()))
              .thenReturn (Future.successful (Some (mockCacheMap) ) )
             when (controller.dataCacheConnector.save[Seq[ResponsiblePerson]] (any(), any(), any()) (any()))
               .thenReturn (Future.successful (mockCacheMap) )
@@ -212,12 +212,12 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
             val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
 
-            val mockCacheMap = mock[CacheMap]
+            val mockCacheMap = mock[Cache]
             when (mockCacheMap.getEntry[Seq[ResponsiblePerson]] (any () ) (any () ) )
             .thenReturn (Some (Seq ( hasNominatedOfficer ) ) )
             when (mockCacheMap.getEntry[BusinessMatching] (BusinessMatching.key) )
             .thenReturn (Some (mockBusinessMatching) )
-            when (controller.dataCacheConnector.fetchAll(any()) (any[HeaderCarrier] ) )
+            when (controller.dataCacheConnector.fetchAll(any()))
             .thenReturn (Future.successful (Some (mockCacheMap) ) )
 
             val result = controller.post (RecordId) (newRequest)
@@ -232,12 +232,12 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
             val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
 
-            val mockCacheMap = mock[CacheMap]
+            val mockCacheMap = mock[Cache]
             when (mockCacheMap.getEntry[Seq[ResponsiblePerson]] (any () ) (any () ) )
             .thenReturn (Some (Seq ( hasNominatedOfficer ) ) )
             when (mockCacheMap.getEntry[BusinessMatching] (BusinessMatching.key) )
             .thenReturn (Some (mockBusinessMatching) )
-            when (controller.dataCacheConnector.fetchAll(any()) (any[HeaderCarrier] ) )
+            when (controller.dataCacheConnector.fetchAll(any()))
             .thenReturn (Future.successful (Some (mockCacheMap) ) )
             val result = controller.post (RecordId) (newRequest)
             status (result) must be (BAD_REQUEST)
@@ -255,7 +255,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
 
-          val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[Cache]
 
           when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
 
@@ -275,7 +275,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
             (any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-          val mockCacheMap = mock[CacheMap]
+          val mockCacheMap = mock[Cache]
           when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(RecordId, true, Some(flowFromDeclaration))(newRequest)

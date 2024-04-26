@@ -32,7 +32,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.responsiblepeople.address.CurrentAddressView
 
@@ -43,7 +43,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
   implicit val hc = HeaderCarrier()
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
   val outOfBounds = 99
 
   before {
@@ -258,7 +258,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           when(currentAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
-            .thenReturn(Future.successful(mock[CacheMap]))
+            .thenReturn(Future.successful(mock[Cache]))
 
           val result = currentAddressController.post(RecordId)(line1MissingRequest)
           status(result) must be(BAD_REQUEST)

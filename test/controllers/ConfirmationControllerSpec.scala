@@ -37,7 +37,7 @@ import play.api.test.Helpers._
 import play.api.test.Injecting
 import services._
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, FeeHelper}
 import views.html.confirmation.{ConfirmationAmendmentView, ConfirmationNewView, ConfirmationNoFeeView, ConfirmationRenewalView}
 
@@ -56,7 +56,6 @@ class ConfirmationControllerSpec extends AmlsSpec
     val baseUrl = "http://localhost"
     val request = addToken(authRequest(uri = baseUrl))
     val controller = new ConfirmationController(
-      keystoreConnector = mock[KeystoreConnector],
       authAction = SuccessfulAuthAction,
       statusService = mock[StatusService],
       dataCacheConnector = mock[DataCacheConnector],
@@ -75,7 +74,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
 
-    protected val mockCacheMap = mock[CacheMap]
+    protected val mockCacheMap = mock[Cache]
     val companyNameFromCache = "My Test Company Name From Cache"
     val companyNameFromRegistration = "My Test Company Name From Registration"
 
@@ -84,10 +83,6 @@ class ConfirmationControllerSpec extends AmlsSpec
     when {
       controller.authenticator.refreshProfile(any(), any())
     } thenReturn Future.successful(HttpResponse(OK, ""))
-
-    when {
-      controller.keystoreConnector.setConfirmationStatus(any(), any())
-    } thenReturn Future.successful(())
 
     when {
       controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
@@ -164,20 +159,6 @@ class ConfirmationControllerSpec extends AmlsSpec
   }
 
   "ConfirmationController" must {
-
-    "write a confirmation value to Keystore" in new Fixture {
-
-      val submissionStatus = SubmissionReady
-
-      setupStatus(submissionStatus)
-
-      val result = controller.get()(request)
-
-      status(result) mustBe OK
-
-      verify(controller.keystoreConnector).setConfirmationStatus(any(), any())
-
-    }
 
     "notify user of progress if application has not already been submitted" in new Fixture {
 
