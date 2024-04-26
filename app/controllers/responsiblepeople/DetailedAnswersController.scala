@@ -32,7 +32,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, 
 import services.StatusService
 import services.businessmatching.RecoverActivitiesService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.responsiblepeople.CheckYourAnswersHelper
 import utils.{AuthAction, ControllerHelper, DeclarationHelper, RepeatingSection}
 import views.html.responsiblepeople.CheckYourAnswersView
@@ -66,7 +66,7 @@ class DetailedAnswersController @Inject () (
       dataCacheConnector.fetchAll(request.credId) flatMap {
         optionalCache =>
           (for {
-            cache: CacheMap <- optionalCache
+            cache: Cache <- optionalCache
             businessMatching: BusinessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
           } yield {
             redirect(request.amlsRefNumber, request.accountTypeId, request.credId, cache, index, flow, businessMatching)
@@ -83,7 +83,7 @@ class DetailedAnswersController @Inject () (
       }
   }
 
-  private def redirect(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, cache: CacheMap, index: Int, flow: Option[String], businessMatching: BusinessMatching)
+  private def redirect(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, cache: Cache, index: Int, flow: Option[String], businessMatching: BusinessMatching)
                       (implicit request: Request[_]): Future[Result] =
     (for {
       responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)

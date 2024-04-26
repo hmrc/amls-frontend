@@ -40,7 +40,7 @@ import services.StatusService
 import uk.gov.hmrc.auth.core.AffinityGroup.Individual
 import uk.gov.hmrc.auth.core.{Enrolments, User}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AuthorisedRequest, DateHelper}
 import views.html.DateOfChangeView
 import views.html.tradingpremises.WhatDoesYourBusinessDoView
@@ -51,7 +51,7 @@ import scala.concurrent.Future
 class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter with Injecting {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[CacheMap]
+  val mockCacheMap = mock[Cache]
   val fieldElements = Array("report-name", "report-email", "report-action", "report-error")
   val recordId1 = 1
 
@@ -79,11 +79,11 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
     val businessMatchingActivitiesAll = BusinessMatchingActivities(
       Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
 
-    val emptyCache = CacheMap("", Map.empty)
+    val emptyCache = Cache.empty
     when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any()))
       .thenReturn(Future.successful(emptyCache))
 
-    when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+    when(mockDataCacheConnector.fetchAll(any()))
       .thenReturn(Future.successful(Some(mockCacheMap)))
 
     when(whatDoesYourBusinessDoController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())).
@@ -522,7 +522,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           (any())).thenReturn(Future.successful(Some(Seq(premises))))
 
         when(whatDoesYourBusinessDoController.dataCacheConnector.save[TradingPremises](any(), meq(TradingPremises.key), any[TradingPremises])(any())).
-          thenReturn(Future.successful(mock[CacheMap]))
+          thenReturn(Future.successful(mock[Cache]))
 
         val result = whatDoesYourBusinessDoController.saveDateOfChange(1)(authorisedRequest)
 

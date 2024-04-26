@@ -20,7 +20,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, EmployeeCount, HowManyEmployees}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,7 +33,7 @@ class HowManyEmployeesService @Inject() (val dataCacheConnector: DataCacheConnec
         .flatMap(ba => ba.howManyEmployees.flatMap(_.employeeCount)))
   }
 
-  def updateEmployeeCount(credId: String, data: EmployeeCount)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
+  def updateEmployeeCount(credId: String, data: EmployeeCount)(implicit hc: HeaderCarrier): Future[Option[Cache]] = {
     dataCacheConnector.fetch[BusinessActivities](credId, BusinessActivities.key) map { _ map { ba =>
       dataCacheConnector.save[BusinessActivities](
         credId, BusinessActivities.key, ba.howManyEmployees(updateData(ba.howManyEmployees, data))

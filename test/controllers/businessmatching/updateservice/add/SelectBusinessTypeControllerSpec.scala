@@ -58,13 +58,13 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec with Injecting {
     )
 
     when {
-      controller.businessMatchingService.getModel(any())(any())
+      controller.businessMatchingService.getModel(any())
     } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
       activities = Some(BusinessActivities(Set(BillPaymentServices)))
     )))
 
     when {
-      controller.businessMatchingService.getSubmittedBusinessActivities(any())(any(), any())
+      controller.businessMatchingService.getSubmittedBusinessActivities(any())(any())
     } thenReturn OptionT.liftF[Future, Set[BusinessActivity]](Future.successful(Set(BillPaymentServices)))
 
     mockCacheFetch[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel(Some(BillPaymentServices), Some(true))), Some(AddBusinessTypeFlowModel.key))
@@ -121,7 +121,7 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec with Injecting {
       "return a 500" when {
         "invalid form is posted and business matching returns None" in new Fixture {
 
-          when(controller.businessMatchingService.getModel(any())(any()))
+          when(controller.businessMatchingService.getModel(any()))
             .thenReturn(OptionT.none[Future, BusinessMatching])
 
           val result = controller.post()(FakeRequest(POST, routes.SelectBusinessTypeController.post().url)

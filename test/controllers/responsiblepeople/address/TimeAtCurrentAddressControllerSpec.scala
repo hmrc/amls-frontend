@@ -31,7 +31,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.responsiblepeople.address.TimeAtAddressView
 
@@ -62,8 +62,8 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with
       .thenReturn(Future.successful(SubmissionReadyForReview))
   }
 
-  val mockCacheMap = mock[CacheMap]
-  val emptyCache = CacheMap("", Map.empty)
+  val mockCacheMap = mock[Cache]
+  val emptyCache = Cache.empty
   val outOfBounds = 99
 
   "TimeAtCurrentAddressController" when {

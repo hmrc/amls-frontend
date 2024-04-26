@@ -21,7 +21,7 @@ import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, Previous
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import scala.concurrent.Future
@@ -29,7 +29,7 @@ import scala.concurrent.Future
 class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[CacheMap]
+  val mockCacheMap = mock[Cache]
 
   val service = new PreviouslyRegisteredService(mockCacheConnector)
 
@@ -77,7 +77,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
           val bd = BusinessDetails()
 
-          when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+          when(mockCacheConnector.fetchAll(eqTo(credId)))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))
@@ -101,7 +101,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
         "business details is not yet saved in the cache" in {
 
-          when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+          when(mockCacheConnector.fetchAll(eqTo(credId)))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))
@@ -128,7 +128,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
         "cache is empty" in {
 
-          when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+          when(mockCacheConnector.fetchAll(eqTo(credId)))
             .thenReturn(Future.successful(None))
 
           service.updatePreviouslyRegistered(credId, PreviouslyRegisteredNo).futureValue mustBe None
@@ -144,7 +144,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
           val bd = BusinessDetails()
 
-          when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+          when(mockCacheConnector.fetchAll(eqTo(credId)))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))

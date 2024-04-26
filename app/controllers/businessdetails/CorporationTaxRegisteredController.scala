@@ -24,27 +24,23 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessdetails.{BusinessDetails, CorporationTaxRegistered, CorporationTaxRegisteredYes}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
-import play.api.mvc.{MessagesControllerComponents, Request, Result}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthAction
-import utils.ControllerHelper
+import play.api.mvc._
+import services.cache.Cache
+import utils.{AuthAction, ControllerHelper}
 
 import scala.concurrent.Future
 
 // This controller no longer has a vew or POST method. The UTR is acquired in BM and should be copied
 // to Business Details only once pre-submission. API5 then populates this field from ETMP. The user
 // should have no requirement to update it.
-class CorporationTaxRegisteredController @Inject () (val dataCacheConnector: DataCacheConnector,
-                                                     val businessMatchingConnector: BusinessMatchingConnector,
-                                                     val authAction: AuthAction,
-                                                     val ds: CommonPlayDependencies,
-                                                     val cc: MessagesControllerComponents,
-                                                     implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
+class CorporationTaxRegisteredController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                   val businessMatchingConnector: BusinessMatchingConnector,
+                                                   val authAction: AuthAction,
+                                                   val ds: CommonPlayDependencies,
+                                                   val cc: MessagesControllerComponents,
+                                                   implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
-  val failedResult = InternalServerError("Failed to update the business corporation tax number")
-
-  def get() = authAction.async {
+  def get(): Action[AnyContent] = authAction.async {
     implicit request =>
       filterByBusinessType ( request.credId, cache =>
         cache.getEntry[BusinessDetails](BusinessDetails.key) match {
@@ -66,16 +62,16 @@ class CorporationTaxRegisteredController @Inject () (val dataCacheConnector: Dat
       )
   }
 
-  private def filterByBusinessType(cacheId: String, fn: CacheMap => Future[Result])(implicit hc:HeaderCarrier, request: Request[_]): Future[Result] = {
+  private def filterByBusinessType(cacheId: String, fn: Cache => Future[Result])
+                                  (implicit request: Request[_]): Future[Result] =
     OptionT(dataCacheConnector.fetchAll(cacheId)) flatMap { cache =>
       ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key)) match {
-        case Some((LPrLLP | LimitedCompany)) => OptionT.liftF(fn(cache))
+        case Some(LPrLLP | LimitedCompany) => OptionT.liftF(fn(cache))
         case _ => OptionT.pure(NotFound(notFoundView))
       }
     } getOrElse InternalServerError("Could not retrieve business type")
-  }
 
-  private def updateCache(cacheId: String, cache: CacheMap, data: CorporationTaxRegistered)(implicit hc: HeaderCarrier) = for {
+  private def updateCache(cacheId: String, cache: Cache, data: CorporationTaxRegistered) = for {
     businessDetails <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
     cacheMap <- OptionT.liftF(dataCacheConnector.save[BusinessDetails](cacheId, BusinessDetails.key, businessDetails.corporationTaxRegistered(data)))
   } yield cacheMap

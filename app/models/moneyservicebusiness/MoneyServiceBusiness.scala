@@ -21,7 +21,7 @@ import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, For
 import models.registrationprogress._
 import play.api.i18n.Messages
 import play.api.libs.json._
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.ControllerHelper
 
 case class MoneyServiceBusiness(
@@ -129,7 +129,7 @@ object MoneyServiceBusiness {
 
   val key = "msb"
 
-  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+  def taskRow(implicit cache: Cache, messages: Messages): TaskRow = {
     val notStarted = TaskRow(
       key,
       controllers.msb.routes.WhatYouNeedController.get.url,

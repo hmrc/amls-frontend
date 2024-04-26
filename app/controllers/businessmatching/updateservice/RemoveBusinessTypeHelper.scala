@@ -31,8 +31,7 @@ import models.moneyservicebusiness.{MoneyServiceBusiness => MSBSection}
 import models.responsiblepeople.ResponsiblePerson
 import models.tcsp.Tcsp
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,9 +40,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class RemoveBusinessTypeHelper @Inject()(implicit val dataCacheConnector: DataCacheConnector) {
 
   def removeSectionData(credId: String, model: RemoveBusinessTypeFlowModel)
-                       (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[CacheMap]] = {
+                       (implicit ec: ExecutionContext): OptionT[Future, Seq[Cache]] = {
 
-    def removeActivities(activities: List[BMBusinessActivity]): Future[Seq[CacheMap]] = {
+    def removeActivities(activities: List[BMBusinessActivity]): Future[Seq[Cache]] = {
       activities match {
         case Nil =>
           Future.successful(Seq.empty)
@@ -55,26 +54,26 @@ class RemoveBusinessTypeHelper @Inject()(implicit val dataCacheConnector: DataCa
       }
     }
 
-    def removeActivity(activity: BMBusinessActivity): Future[CacheMap] = {
+    def removeActivity(activity: BMBusinessActivity): Future[Cache] = {
       activity match {
         case ArtMarketParticipant =>
-          dataCacheConnector.removeByKey[Amp](credId, Amp.key)
+          dataCacheConnector.removeByKey(credId, Amp.key)
         case MoneyServiceBusiness =>
-          dataCacheConnector.removeByKey[MSBSection](credId, MSBSection.key)
+          dataCacheConnector.removeByKey(credId, MSBSection.key)
         case HighValueDealing =>
-          dataCacheConnector.removeByKey[Hvd](credId, Hvd.key)
+          dataCacheConnector.removeByKey(credId, Hvd.key)
         case TrustAndCompanyServices =>
-          dataCacheConnector.removeByKey[Tcsp](credId, Tcsp.key)
+          dataCacheConnector.removeByKey(credId, Tcsp.key)
         case AccountancyServices =>
-          dataCacheConnector.removeByKey[Asp](credId, Asp.key)
+          dataCacheConnector.removeByKey(credId, Asp.key)
         case EstateAgentBusinessService =>
-          dataCacheConnector.removeByKey[Eab](credId, Eab.key)
+          dataCacheConnector.removeByKey(credId, Eab.key)
         case _ =>
           dataCacheConnector.fetchAllWithDefault(credId)
       }
     }
 
-    OptionT.liftF(model.activitiesToRemove.fold(Future.successful(Seq.empty[CacheMap])) {
+    OptionT.liftF(model.activitiesToRemove.fold(Future.successful(Seq.empty[Cache])) {
       activities =>
         removeActivities(activities.toList)
     })

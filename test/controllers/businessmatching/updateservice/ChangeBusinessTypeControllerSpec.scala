@@ -65,7 +65,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with I
     val emptyBusinessMatching = BusinessMatching()
 
     when {
-      bmService.getRemainingBusinessActivities(any())(any(), any())
+      bmService.getRemainingBusinessActivities(any())(any())
     } thenReturn OptionT.liftF[Future, Set[BusinessActivity]](Future.successful(Set(HighValueDealing)))
 
     when {
@@ -95,7 +95,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with I
         } thenReturn Set.empty[String]
 
         when {
-          bmService.getRemainingBusinessActivities(any())(any(), any())
+          bmService.getRemainingBusinessActivities(any())(any())
         } thenReturn OptionT.liftF[Future, Set[BusinessActivity]](Future.successful(Set.empty))
 
         val result = controller.get()(request)

@@ -68,7 +68,7 @@ class NeedMoreInformationController @Inject()(authAction: AuthAction,
     implicit request =>
       (for {
         route <- OptionT.liftF(router.getRoute(request.credId, NeedMoreInformationPageId, new AddBusinessTypeFlowModel))
-        _ <- OptionT.liftF(dataCacheConnector.removeByKey[ServiceChangeRegister](request.credId, ServiceChangeRegister.key))
+        _ <- OptionT.liftF(dataCacheConnector.removeByKey(request.credId, ServiceChangeRegister.key))
       } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: Add : NewServiceInformationController")
   }
 }

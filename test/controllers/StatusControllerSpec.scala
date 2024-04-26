@@ -40,7 +40,7 @@ import play.api.test.Helpers._
 import play.api.test.Injecting
 import services._
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
 import views.html.status.YourRegistrationView
 import views.html.status.components._
@@ -50,7 +50,7 @@ import scala.concurrent.Future
 
 class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting {
 
-  val cacheMap = mock[CacheMap]
+  val cacheMap = mock[Cache]
 
   trait Fixture extends DependencyMocks {
     self =>
@@ -214,7 +214,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.authenticator.refreshProfile(any(), any()))
           .thenReturn(Future.successful(HttpResponse(OK, "")))
 
-        when(controller.dataCache.remove(any())(any()))
+        when(controller.dataCache.remove(any()))
           .thenReturn(Future.successful(true))
 
         val result = controller.newSubmission()(request)
@@ -234,7 +234,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.authenticator.refreshProfile(any(), any()))
           .thenReturn(Future.successful(HttpResponse(OK, "")))
 
-        when(controller.dataCache.remove(any[String]())(any()))
+        when(controller.dataCache.remove(any[String]()))
           .thenReturn(Future.successful(true))
 
         val result = controller.newSubmission()(request)
@@ -249,7 +249,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         controller.amlsConnector.registrationDetails(any(), any())(any(), any())
       } thenReturn Future.successful(RegistrationDetails("Test Company", isIndividual = false))
 
-      when(controller.landingService.cacheMap(any[String])(any(), any()))
+      when(controller.landingService.cacheMap(any[String]))
         .thenReturn(Future.successful(Some(cacheMap)))
 
       val statusResponse = mock[ReadStatusResponse]
@@ -271,7 +271,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
       "application status is NotCompleted" in new Fixture {
 
-        when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
+        when(controllerNoAmlsNumber.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
@@ -291,7 +291,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       "application status is SubmissionReadyForReview" when {
         "there is a fee response available" in new Fixture {
 
-          when(controller.landingService.cacheMap(any[String])(any(), any()))
+          when(controller.landingService.cacheMap(any[String]))
             .thenReturn(Future.successful(Some(cacheMap)))
 
           when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
@@ -309,7 +309,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         }
 
         "there is no ReadStatusResponse" in new Fixture {
-          when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]))
             .thenReturn(Future.successful(Some(cacheMap)))
 
           when(controllerNoAmlsNumber.dataCache.fetch[BusinessMatching](any(), any())(any()))
@@ -329,7 +329,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
       "application status is SubmissionDecisionApproved" in new Fixture {
 
-        when(controller.landingService.cacheMap(any[String])(any(), any()))
+        when(controller.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
@@ -355,7 +355,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
       "application status is SubmissionDecisionRejected" in new Fixture {
 
-        when(controller.landingService.cacheMap(any[String])(any(), any()))
+        when(controller.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
@@ -380,7 +380,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
       "application status is SubmissionDecisionRevoked and the submit button is allowed" in new Fixture {
 
-        when(controller.landingService.cacheMap(any[String])(any(), any()))
+        when(controller.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
@@ -406,7 +406,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
       "application status is SubmissionDecisionExpired" in new Fixture {
 
-        when(controller.landingService.cacheMap(any[String])(any(), any()))
+        when(controller.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
@@ -428,7 +428,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
       "application status is SubmissionWithdrawn" in new Fixture {
 
-        when(controller.landingService.cacheMap(any[String])(any(), any()))
+        when(controller.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
@@ -454,7 +454,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
       "application status is DeRegistered" in new Fixture {
 
-        when(controller.landingService.cacheMap(any[String])(any(), any()))
+        when(controller.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
@@ -480,7 +480,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
       "application status is RenewalSubmitted" in new Fixture {
 
-        when(controller.landingService.cacheMap(any[String])(any(), any()))
+        when(controller.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
@@ -503,7 +503,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
       "application status is ReadyForRenewal, and the renewal has not been started" in new Fixture {
 
-        when(controller.landingService.cacheMap(any[String])(any(), any()))
+        when(controller.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
@@ -534,7 +534,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
       "application status is ReadyForRenewal, and the renewal has been started but is incomplete" in new Fixture {
 
-        when(controller.landingService.cacheMap(any[String])(any(), any()))
+        when(controller.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
@@ -568,7 +568,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
       "application status is ReadyForRenewal, and the renewal is complete but not submitted" in new Fixture {
 
-        when(controller.landingService.cacheMap(any[String])(any(), any()))
+        when(controller.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](any())(any()))
@@ -586,7 +586,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
         val dataCache = mock[DataCacheConnector]
 
-        when(dataCache.fetchAll(any[String]())(any()))
+        when(dataCache.fetchAll(any[String]()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(controller.renewalService.isRenewalComplete(any(), any[String]())(any(), any()))
@@ -641,7 +641,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
           .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
-        when(controller.landingService.cacheMap(any[String])(any(), any()))
+        when(controller.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
@@ -669,7 +669,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
           .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
-        when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
+        when(controllerNoAmlsNumber.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
@@ -696,7 +696,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
           .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
-        when(controller.landingService.cacheMap(any[String])(any(), any()))
+        when(controller.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))

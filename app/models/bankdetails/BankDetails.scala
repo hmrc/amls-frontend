@@ -20,7 +20,7 @@ import models.bankdetails.BankAccountType.NoBankAccountUsed
 import models.registrationprogress._
 import play.api.i18n.Messages
 import typeclasses.MongoKey
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.StatusConstants
 
 case class BankDetails(
@@ -82,7 +82,7 @@ object BankDetails {
     }
   }
 
-  def taskRow(implicit cache: CacheMap, messages: Messages) = {
+  def taskRow(implicit cache: Cache, messages: Messages) = {
 
     val messageKey = "bankdetails"
     val notStarted = TaskRow(

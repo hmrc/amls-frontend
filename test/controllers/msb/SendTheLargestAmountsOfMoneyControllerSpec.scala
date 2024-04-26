@@ -28,7 +28,7 @@ import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.msb.SendLargestAmountsOfMoneyView
 
@@ -52,7 +52,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
     mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "SendTheLargestAmountsOfMoneyController" must {
     "load the 'Where to Send The Largest Amounts Of Money' page" in new Fixture  {

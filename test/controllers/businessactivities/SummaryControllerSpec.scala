@@ -32,7 +32,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import utils.businessactivities.CheckYourAnswersHelper
 import views.html.businessactivities.CheckYourAnswersView
@@ -56,7 +56,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       view = view
     )
 
-    val mockCacheMap = mock[CacheMap]
+    val mockCacheMap = mock[Cache]
 
     val completeModel = BusinessActivities(
       involvedInOther = Some(BusinessActivitiesValues.DefaultInvolvedInOther),
@@ -87,7 +87,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
-      when(controller.dataCache.fetchAll(any())(any()))
+      when(controller.dataCache.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -105,7 +105,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
-      when(controller.dataCache.fetchAll(any())(any()))
+      when(controller.dataCache.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -120,7 +120,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
     "show edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
       "application in variation mode" in new Fixture {
-        when(controller.dataCache.fetchAll(any())(any()))
+        when(controller.dataCache.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -145,7 +145,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
     "show edit link" when {
       "application not in variation mode" in new Fixture {
-        when(controller.dataCache.fetchAll(any())(any()))
+        when(controller.dataCache.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -173,7 +173,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
       "all questions are complete" in new Fixture {
 
-        val emptyCache = CacheMap("", Map.empty)
+        val emptyCache = Cache.empty
 
         val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
 

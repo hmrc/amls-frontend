@@ -31,7 +31,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import utils.AmlsSpec
@@ -114,7 +114,7 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
     "respond to a post request correctly" when {
 
-      val emptyCache = CacheMap("", Map.empty)
+      val emptyCache = Cache.empty
 
       "when isUk is true" in new Fixture {
 

@@ -42,7 +42,7 @@ import play.api.mvc._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AuthAction, ControllerHelper}
@@ -146,10 +146,10 @@ class LandingController @Inject()(val landingService: LandingService,
     }
   }
 
-  private def refreshAndRedirect(amlsRegistrationNumber: String, maybeCacheMap: Option[CacheMap], credId: String, accountTypeId: (String, String))
+  private def refreshAndRedirect(amlsRegistrationNumber: String, maybeCache: Option[Cache], credId: String, accountTypeId: (String, String))
                                 (implicit headerCarrier: HeaderCarrier): Future[Result] = {
 
-    maybeCacheMap match {
+    maybeCache match {
       case Some(c) if c.getEntry[DataImport](DataImport.key).isDefined =>
         // $COVERAGE-OFF$
         logger.debug("[AMLSLandingController][refreshAndRedirect]: dataImport is defined")
@@ -238,7 +238,7 @@ class LandingController @Inject()(val landingService: LandingService,
     }
   }
 
-  private def preApplicationComplete(cache: CacheMap, amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
+  private def preApplicationComplete(cache: Cache, amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
                                     (implicit headerCarrier: HeaderCarrier): Future[Result] = {
 
     val deleteAndRedirect = () => cacheConnector.remove(cacheId) map { _ =>
@@ -327,55 +327,55 @@ class LandingController @Inject()(val landingService: LandingService,
     }
   }
 
-  private def dataHasChanged(cacheMap: CacheMap) = {
+  private def dataHasChanged(cache: Cache) = {
     Seq(
-      cacheMap.getEntry[Asp](Asp.key).fold(false) {
+      cache.getEntry[Asp](Asp.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Amp](Amp.key).fold(false) {
+      cache.getEntry[Amp](Amp.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[BusinessDetails](BusinessDetails.key).fold(false) {
+      cache.getEntry[BusinessDetails](BusinessDetails.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Seq[BankDetails]](BankDetails.key).fold(false) {
+      cache.getEntry[Seq[BankDetails]](BankDetails.key).fold(false) {
         _.exists(_.hasChanged)
       },
-      cacheMap.getEntry[BusinessActivities](BusinessActivities.key).fold(false) {
+      cache.getEntry[BusinessActivities](BusinessActivities.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[BusinessMatching](BusinessMatching.key).fold(false) {
+      cache.getEntry[BusinessMatching](BusinessMatching.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Eab](Eab.key).fold(false) {
+      cache.getEntry[Eab](Eab.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false) {
+      cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).fold(false) {
+      cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).fold(false) {
         _.exists(_.hasChanged)
       },
-      cacheMap.getEntry[Supervision](Supervision.key).fold(false) {
+      cache.getEntry[Supervision](Supervision.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Tcsp](Tcsp.key).fold(false) {
+      cache.getEntry[Tcsp](Tcsp.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Seq[TradingPremises]](TradingPremises.key).fold(false) {
+      cache.getEntry[Seq[TradingPremises]](TradingPremises.key).fold(false) {
         _.exists(_.hasChanged)
       },
-      cacheMap.getEntry[Hvd](Hvd.key).fold(false) {
+      cache.getEntry[Hvd](Hvd.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Renewal](Renewal.key).fold(false) {
+      cache.getEntry[Renewal](Renewal.key).fold(false) {
         _.hasChanged
       }
     ).exists(identity)
   }
 
 
-  private def fixEmptyRecords[T](credId: String, cache: CacheMap, key: String)
+  private def fixEmptyRecords[T](credId: String, cache: Cache, key: String)
                                 (implicit hc: HeaderCarrier, f: play.api.libs.json.Format[T]) = {
 
     import play.api.libs.json._

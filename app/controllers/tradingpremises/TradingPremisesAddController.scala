@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.tradingpremises.TradingPremises
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
@@ -34,7 +34,7 @@ class TradingPremisesAddController @Inject()(val dataCacheConnector: DataCacheCo
                                              val cc: MessagesControllerComponents,
                                              implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  private def isMSBSelected(cacheMap: Option[CacheMap]): Boolean = {
+  private def isMSBSelected(cacheMap: Option[Cache]): Boolean = {
     val test = for {
       c <- cacheMap
       businessMatching <- c.getEntry[BusinessMatching](BusinessMatching.key)

@@ -19,7 +19,7 @@ package models.supervision
 import models.registrationprogress._
 import play.api.i18n.Messages
 import typeclasses.MongoKey
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 case class Supervision(
                         anotherBody: Option[AnotherBody] = None,
@@ -67,7 +67,7 @@ case class Supervision(
 
 object Supervision {
 
-  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+  def taskRow(implicit cache: Cache, messages: Messages): TaskRow = {
     val notStarted = TaskRow(
       key,
       controllers.supervision.routes.WhatYouNeedController.get.url,

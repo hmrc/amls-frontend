@@ -26,7 +26,7 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.msb.BranchesOrAgentsView
 
@@ -100,7 +100,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         .thenReturn(Future.successful(Some(model)))
 
       when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        .thenReturn(Future.successful(Cache.empty))
 
       val result = controller.post(edit = false)(newRequest)
 
@@ -119,7 +119,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         .thenReturn(Future.successful(None))
 
       when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        .thenReturn(Future.successful(Cache.empty))
 
       val result = controller.post(edit = false)(newRequest)
 
@@ -143,7 +143,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         .thenReturn(Future.successful(Some(model)))
 
       when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key),any())(any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        .thenReturn(Future.successful(Cache.empty))
 
       val result = controller.post(edit = true)(newRequest)
 
@@ -167,7 +167,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         .thenReturn(Future.successful(Some(model)))
 
       when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key),any())(any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        .thenReturn(Future.successful(Cache.empty))
 
       val result = controller.post(edit = true)(newRequest)
 

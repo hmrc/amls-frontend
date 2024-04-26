@@ -26,7 +26,7 @@ import play.api.mvc.Call
 import utils.AmlsSpec
 import play.api.test.Helpers._
 import org.scalacheck.Gen
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import org.scalactic.anyvals.PosInt
 import org.scalatest.matchers.must.Matchers
@@ -72,7 +72,7 @@ class ResponsiblePersonAddControllerSpec extends AmlsSpec
         val requiredSuccess =10
 
 
-        val emptyCache = CacheMap("", Map.empty)
+        val emptyCache = Cache.empty
         val reasonableCounts = for (n <- Gen.choose(min, max)) yield n
 
         forAll(reasonableCounts, minSuccessful(PosInt.from(requiredSuccess).get)) { currentCount: Int =>

@@ -36,7 +36,7 @@ import play.api.test.Helpers._
 import play.api.test.Injecting
 import services.StatusService
 import services.businessmatching.RecoverActivitiesService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.responsiblepeople.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.responsiblepeople.CheckYourAnswersView
@@ -70,7 +70,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
     def setupMocksFor(model: ResponsiblePerson, status: SubmissionStatus = SubmissionReady) = {
 
       when {
-        controller.dataCacheConnector.fetchAll(any())(any())
+        controller.dataCacheConnector.fetchAll(any())
       } thenReturn Future.successful(Some(mockCacheMap))
 
       when {
@@ -246,7 +246,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       "respond with SEE_OTHER and show the registration progress page" when {
         "section data is unavailable" in new Fixture {
           when {
-            controller.dataCacheConnector.fetchAll(any())(any())
+            controller.dataCacheConnector.fetchAll(any())
           } thenReturn Future.successful(None)
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
@@ -269,7 +269,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
             when {
               controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
-            } thenReturn Future.successful(CacheMap("", Map.empty))
+            } thenReturn Future.successful(Cache.empty)
 
             val result = controller.post(1, None)(request)
 
@@ -289,7 +289,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
             when {
               controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
-            } thenReturn Future.successful(CacheMap("", Map.empty))
+            } thenReturn Future.successful(Cache.empty)
 
 
             val result = controller.post(1, flow)(request)
@@ -316,7 +316,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
           when {
             controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
-          } thenReturn Future.successful(CacheMap("", Map.empty))
+          } thenReturn Future.successful(Cache.empty)
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
@@ -346,7 +346,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
           when {
             controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
-          } thenReturn Future.successful(CacheMap("", Map.empty))
+          } thenReturn Future.successful(Cache.empty)
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
@@ -376,7 +376,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
           when {
             controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
-          } thenReturn Future.successful(CacheMap("", Map.empty))
+          } thenReturn Future.successful(Cache.empty)
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson.copy(positions = Some(Positions(Set(SoleProprietor), Some(PositionStartDate(LocalDate.now().minusMonths(5))))))))))
@@ -406,7 +406,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
           when {
             controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
-          } thenReturn Future.successful(CacheMap("", Map.empty))
+          } thenReturn Future.successful(Cache.empty)
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson.copy(positions = Some(Positions(Set(SoleProprietor), Some(PositionStartDate(LocalDate.now().minusMonths(5))))))))))

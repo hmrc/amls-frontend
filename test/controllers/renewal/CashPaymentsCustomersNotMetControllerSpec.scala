@@ -26,7 +26,7 @@ import org.mockito.Mockito.when
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.renewal.CashPaymentsCustomersNotMetView
 
@@ -56,7 +56,7 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec with Injecting 
       .thenReturn(Future.successful(None))
 
     when(mockRenewalService.updateRenewal(any(), any())(any()))
-      .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      .thenReturn(Future.successful(Cache.empty))
   }
 
   "CashPaymentsCustomersNotMet controller" when {

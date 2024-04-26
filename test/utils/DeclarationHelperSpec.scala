@@ -347,7 +347,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
     "return false where one or more sections are incomplete" in {
       when{
-        sectionsProvider.taskRows(eqTo(credId))(any(), any(), any())
+        sectionsProvider.taskRows(eqTo(credId))(any(), any())
       }.thenReturn(Future.successful(incompleteSections))
 
       await(sectionsComplete(credId, sectionsProvider)) mustBe(false)
@@ -355,7 +355,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
     "return true where all sections are complete" in {
       when{
-        sectionsProvider.taskRows(eqTo(credId))(any(), any(), any())
+        sectionsProvider.taskRows(eqTo(credId))(any(), any())
       }.thenReturn(Future.successful(completedSections))
 
       await(sectionsComplete(credId, sectionsProvider)) mustBe(true)
@@ -363,7 +363,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
     "return true where sections are either complete or updated" in {
 
-      when(sectionsProvider.taskRows(eqTo(credId))(any(), any(), any()))
+      when(sectionsProvider.taskRows(eqTo(credId))(any(), any()))
         .thenReturn(Future.successful(completedAndUpdatedSections))
 
       await(sectionsComplete(credId, sectionsProvider)) mustBe true

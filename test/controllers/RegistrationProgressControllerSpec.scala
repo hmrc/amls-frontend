@@ -36,7 +36,7 @@ import play.api.test.Helpers._
 import play.api.test.Injecting
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, ProgressService, RenewalService, SectionsProvider}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.registrationamendment.RegistrationAmendmentView
 import views.html.registrationprogress.RegistrationProgressView
@@ -80,13 +80,13 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
     when(mockBusinessMatching.isComplete) thenReturn true
     when(mockBusinessMatching.reviewDetails) thenReturn Some(reviewDetailsGen.sample.get)
-    when(mockBusinessMatchingService.getAdditionalBusinessActivities(any[String]())(any(), any())) thenReturn OptionT.none[Future, Set[BusinessActivity]]
+    when(mockBusinessMatchingService.getAdditionalBusinessActivities(any[String]())(any())) thenReturn OptionT.none[Future, Set[BusinessActivity]]
 
     when {
       mockSectionsProvider.taskRowsFromBusinessActivities(any(), any())(any(), any())
     } thenReturn Seq.empty[TaskRow]
 
-    when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+    when(mockSectionsProvider.taskRows(any[Cache])(any()))
       .thenReturn(Seq.empty[TaskRow])
 
     when {
@@ -135,7 +135,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       "status is renewal submitted and renewal data exists in mongoCache" must {
         "show the registration amendment page" in new Fixture {
 
-          when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+          when(mockSectionsProvider.taskRows(any[Cache])(any()))
             .thenReturn(Seq(
               TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
               TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
@@ -165,7 +165,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
             mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-            when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+            when(mockSectionsProvider.taskRows(any[Cache])(any()))
               .thenReturn(Seq.empty[TaskRow])
 
             when(controller.sectionsProvider.taskRows(meq(mockCacheMap))(any()))
@@ -190,7 +190,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             "enable the submission button" when {
               "all tasks have the status 'Completed'" in new Fixture {
 
-                when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+                when(mockSectionsProvider.taskRows(any[Cache])(any()))
                   .thenReturn(Seq(
                     TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
                     TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
@@ -207,7 +207,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               "all tasks have the status 'Updated'" in new Fixture {
 
-                when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+                when(mockSectionsProvider.taskRows(any[Cache])(any()))
                   .thenReturn(Seq(
                     TaskRow("TESTSECTION1", "/foo", false, Updated, TaskRow.completedTag),
                     TaskRow("TESTSECTION2", "/bar", true, Updated, TaskRow.completedTag)
@@ -224,7 +224,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               "all tasks have the status 'Completed' or 'Updated'" in new Fixture {
 
-                when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+                when(mockSectionsProvider.taskRows(any[Cache])(any()))
                   .thenReturn(Seq(
                     TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
                     TaskRow("TESTSECTION2", "/bar", true, Updated, TaskRow.completedTag)
@@ -249,7 +249,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
                 mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-                when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+                when(mockSectionsProvider.taskRows(any[Cache])(any()))
                   .thenReturn(Seq(
                     TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
                     TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
@@ -273,7 +273,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
                 mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-                when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+                when(mockSectionsProvider.taskRows(any[Cache])(any()))
                   .thenReturn(Seq(
                     TaskRow("TESTSECTION1", "/foo", true, Updated, TaskRow.updatedTag),
                     TaskRow("TESTSECTION2", "/bar", true, Updated, TaskRow.updatedTag)
@@ -297,7 +297,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
                 mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-                when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+                when(mockSectionsProvider.taskRows(any[Cache])(any()))
                   .thenReturn(Seq(
                     TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
                     TaskRow("TESTSECTION2", "/bar", true, Updated, TaskRow.updatedTag)
@@ -324,7 +324,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             "enable the submission button" when {
               "all tasks have the status 'Completed'" in new Fixture {
 
-                when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+                when(mockSectionsProvider.taskRows(any[Cache])(any()))
                   .thenReturn(Seq(
                     TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
                     TaskRow("TESTSECTION2", "/bar", false, Completed, TaskRow.completedTag)
@@ -347,7 +347,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-              when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+              when(mockSectionsProvider.taskRows(any[Cache])(any()))
                 .thenReturn(Seq(
                   TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
                   TaskRow("TESTSECTION2", "/bar", false, Completed, TaskRow.completedTag)
@@ -372,7 +372,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           "application is pre-submission" must {
             "disable the submission button" in new Fixture {
 
-              when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+              when(mockSectionsProvider.taskRows(any[Cache])(any()))
                 .thenReturn(Seq(
                   TaskRow("TESTSECTION1", "/foo", false, NotStarted, TaskRow.notStartedTag),
                   TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
@@ -395,7 +395,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-              when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+              when(mockSectionsProvider.taskRows(any[Cache])(any()))
                 .thenReturn(Seq(
                   TaskRow("TESTSECTION1", "/foo", false, NotStarted, TaskRow.notStartedTag),
                   TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
@@ -417,7 +417,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         "no section has changed" must {
           "disable the submission button" in new Fixture {
 
-            when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+            when(mockSectionsProvider.taskRows(any[Cache])(any()))
               .thenReturn(Seq(
                 TaskRow("TESTSECTION1", "/foo", false, NotStarted, TaskRow.notStartedTag),
                 TaskRow("TESTSECTION2", "/bar", false, Completed, TaskRow.completedTag)
@@ -442,7 +442,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
             mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-            when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+            when(mockSectionsProvider.taskRows(any[Cache])(any()))
               .thenReturn(
                 Seq(
                   TaskRow(BusinessMatching.messageKey, "/foo", false, Completed, TaskRow.completedTag),
@@ -478,7 +478,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             TaskRow("TESTSECTION2", "/bar", false, Completed, TaskRow.completedTag)
           )
 
-          when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+          when(mockSectionsProvider.taskRows(any[Cache])(any()))
             .thenReturn(sections)
 
           val responseF = controller.get()(request)
@@ -536,7 +536,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
           val completeTaskRow = TaskRow(BusinessMatching.messageKey, controllers.routes.LandingController.get.url, true, Started, TaskRow.incompleteTag)
-          when(mockSectionsProvider.taskRows(any[CacheMap])(any())) thenReturn Seq(completeTaskRow)
+          when(mockSectionsProvider.taskRows(any[Cache])(any())) thenReturn Seq(completeTaskRow)
 
           val result = controller.get()(request)
           status(result) mustBe OK
@@ -559,7 +559,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           val taskRow = Seq(models.moneyservicebusiness.MoneyServiceBusiness.taskRow)
 
-          when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+          when(mockSectionsProvider.taskRows(any[Cache])(any()))
             .thenReturn(taskRow)
 
           val newTaskRows = Seq(

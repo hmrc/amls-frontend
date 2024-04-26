@@ -30,7 +30,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import services.{ProgressService, RenewalService}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import utils.renewal.CheckYourAnswersHelper
 import views.html.renewal.CheckYourAnswersView
@@ -43,9 +43,9 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
     self =>
     val request = addToken(authRequest)
 
-    val mockCacheMap = mock[CacheMap]
+    val mockCacheMap = mock[Cache]
 
-    val emptyCache = CacheMap("", Map.empty)
+    val emptyCache = Cache.empty
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
@@ -85,7 +85,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   }
 
-    val mockCacheMap = mock[CacheMap]
+    val mockCacheMap = mock[Cache]
 
     val bmBusinessActivities = Some(BMBusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
 
@@ -93,7 +93,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
     "load the summary page when there is data in the renewal" in new Fixture {
 
-      when(mockDataCacheConnector.fetchAll(any())(any()))
+      when(mockDataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       when(mockCacheMap.getEntry[Renewal](Renewal.key))
         .thenReturn(Some(Renewal(Some(models.renewal.InvolvedInOtherYes("test")))))
@@ -105,7 +105,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
     }
 
     "redirect to the renewal progress page when section data is unavailable" in new Fixture {
-      when(mockDataCacheConnector.fetchAll(any())(any()))
+      when(mockDataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(emptyCache)))
 
       val result = controller.get()(request)
@@ -115,7 +115,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   "POST" must {
     "update the hasAccepted flag on the model" in new Fixture {
-      val cache = mock[CacheMap]
+      val cache = mock[Cache]
 
       when {
         controller.dataCacheConnector.fetch[Renewal](any(), any())(any())

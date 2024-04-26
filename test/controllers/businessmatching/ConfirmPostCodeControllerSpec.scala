@@ -29,7 +29,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AuthAction}
 
 import scala.concurrent.Future
@@ -53,7 +53,7 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
     val controller = app.injector.instanceOf[ConfirmPostCodeController]
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
   val businessAddress = BusinessCustomerAddress("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB"))
   val reviewDtls = ReviewDetails(
     "BusinessName",

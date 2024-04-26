@@ -86,7 +86,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "status is pre-submission" in new Fixture {
           when {
-            mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+            mockSectionsProvider.taskRows(any[String])(any(), any())
           }.thenReturn(Future.successful(completedSections))
 
           mockApplicationStatus(SubmissionReady)
@@ -101,7 +101,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "status is pending" in new Fixture {
           when {
-            mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+            mockSectionsProvider.taskRows(any[String])(any(), any())
           }.thenReturn(Future.successful(completedSections))
 
           mockApplicationStatus(SubmissionReadyForReview)
@@ -116,7 +116,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "status is approved" in new Fixture {
           when {
-            mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+            mockSectionsProvider.taskRows(any[String])(any(), any())
           }.thenReturn(Future.successful(completedSections))
 
           mockApplicationStatus(SubmissionDecisionApproved)
@@ -131,7 +131,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "status is ready for renewal" in new Fixture {
           when {
-            mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+            mockSectionsProvider.taskRows(any[String])(any(), any())
           }.thenReturn(Future.successful(completedSections))
 
           mockApplicationStatus(ReadyForRenewal(Some(LocalDate.now())))
@@ -153,7 +153,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "redirect to the RegistrationProgressController" in new Fixture {
           when {
-            mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+            mockSectionsProvider.taskRows(any[String])(any(), any())
           }.thenReturn(Future.successful(incompleteSections))
 
           mockApplicationStatus(SubmissionReady)

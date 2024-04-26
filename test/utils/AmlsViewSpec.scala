@@ -18,7 +18,6 @@ package utils
 
 import akka.stream.Materializer
 import config.ApplicationConfig
-import connectors.KeystoreConnector
 import controllers.CommonPlayDependencies
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
@@ -27,25 +26,21 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
 import play.api.i18n.{Lang, MessagesApi}
-import play.api.inject.bind
-import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.{FakeRequest, Injecting}
-import play.api.{Application, Mode}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.HeaderCarrier
 
 trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with Matchers with AuthorisedFixture with Injecting {
-
-  protected val bindModules: Seq[GuiceableModule] = Seq(bind[KeystoreConnector].to(mock[KeystoreConnector]))
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .disable[com.kenshoo.play.metrics.PlayModule]
     .configure(
       "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
     )
-    .bindings(bindModules:_*).in(Mode.Test)
     .build()
 
   val commonDependencies = app.injector.instanceOf(classOf[CommonPlayDependencies])

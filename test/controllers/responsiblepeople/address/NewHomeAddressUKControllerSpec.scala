@@ -26,7 +26,7 @@ import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.responsiblepeople.address.NewHomeAddressUKView
 
@@ -53,7 +53,7 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec with Injecting {
     )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
   val outOfBounds = 99
   val personName = Some(PersonName("firstname", None, "lastname"))
 
@@ -109,8 +109,8 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec with Injecting {
           when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key), any())
             (any())).thenReturn(Future.successful(emptyCache))
 
-          when(controller.dataCacheConnector.removeByKey[NewHomeAddress](any(), meq(NewHomeAddress.key))
-            (any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.removeByKey(any(), meq(NewHomeAddress.key)))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(RecordId)(requestWithParams)
 
@@ -161,8 +161,8 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec with Injecting {
           when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key), any())
             (any())).thenReturn(Future.successful(emptyCache))
 
-          when(controller.dataCacheConnector.removeByKey[NewHomeAddress](any(), meq(NewHomeAddress.key))
-            (any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.removeByKey(any(), meq(NewHomeAddress.key)))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(RecordId)(requestWithParams)
 
@@ -202,8 +202,8 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec with Injecting {
           when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key), any())
             (any())).thenReturn(Future.successful(emptyCache))
 
-          when(controller.dataCacheConnector.removeByKey[NewHomeAddress](any(), meq(NewHomeAddress.key))
-            (any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.removeByKey(any(), meq(NewHomeAddress.key)))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(RecordId)(requestWithParams)
 

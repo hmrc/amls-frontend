@@ -27,7 +27,7 @@ import models.responsiblepeople.ResponsiblePerson
 import play.api.data.Form
 import play.api.mvc._
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import views.html.DateOfChangeView
 
@@ -83,7 +83,7 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
 
   private def validFormView(credId: String, index: Int, date: DateOfChange, edit: Boolean)
                            (implicit request: Request[AnyContent]): Future[Result] = {
-    doUpdate(credId, index, date).map { cache: CacheMap =>
+    doUpdate(credId, index, date).map { cache: Cache =>
       if (cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)) {
         Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
       } else {

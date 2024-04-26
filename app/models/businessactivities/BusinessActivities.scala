@@ -22,7 +22,7 @@ import models.businessmatching.{BusinessMatching, BusinessActivities => Business
 import models.registrationprogress._
 import play.api.Logging
 import play.api.i18n.Messages
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.ControllerHelper
 
 case class BusinessActivities(
@@ -162,7 +162,7 @@ case class BusinessActivities(
 
 object BusinessActivities extends Logging {
 
-  def section(implicit cache: CacheMap): Section = {
+  def section(implicit cache: Cache): Section = {
     val messageKey = "businessactivities"
     val notStarted = Section(messageKey, NotStarted, false, controllers.businessactivities.routes.WhatYouNeedController.get)
     val bmBusinessActivities = ControllerHelper.getBusinessActivity(cache.getEntry[BusinessMatching](BusinessMatching.key))
@@ -176,7 +176,7 @@ object BusinessActivities extends Logging {
     }
   }
 
-  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+  def taskRow(implicit cache: Cache, messages: Messages): TaskRow = {
     val messageKey = "businessactivities"
     val notStarted = TaskRow(
       messageKey,

@@ -29,7 +29,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils._
 import views.html.responsiblepeople.TrainingView
 
@@ -57,8 +57,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
   }
 
-  val emptyCache = CacheMap("", Map.empty)
-  val mockCacheMap = mock[CacheMap]
+  val emptyCache = Cache.empty
+  val mockCacheMap = mock[Cache]
 
   "TrainingController" when {
 
@@ -121,7 +121,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
           "information" -> "test"
         )
 
-        when(controller.dataCacheConnector.fetchAll(any())(any()))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
@@ -140,7 +140,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
               "information" -> "I do not remember when I did the training"
             )
 
-            when(controller.dataCacheConnector.fetchAll(any())(any()))
+            when(controller.dataCacheConnector.fetchAll(any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
@@ -163,7 +163,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
               "information" -> "I do not remember when I did the training"
             )
 
-            when(controller.dataCacheConnector.fetchAll(any())(any()))
+            when(controller.dataCacheConnector.fetchAll(any()))
               .thenReturn(Future.successful(Some(emptyCache)))
 
             val result = controller.post(recordId, true, Some(flowFromDeclaration))(newRequest)

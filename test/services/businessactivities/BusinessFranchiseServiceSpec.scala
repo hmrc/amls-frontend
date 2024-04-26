@@ -21,7 +21,7 @@ import models.businessactivities.{BusinessActivities, BusinessFranchiseYes}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import scala.concurrent.Future
@@ -29,7 +29,7 @@ import scala.concurrent.Future
 class BusinessFranchiseServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[CacheMap]
+  val mockCacheMap = mock[Cache]
 
   val service = new BusinessFranchiseService(mockCacheConnector)
 

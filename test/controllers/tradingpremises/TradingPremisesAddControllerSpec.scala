@@ -26,7 +26,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import scala.concurrent.Future
@@ -45,17 +45,17 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
   }
 
   "TradingPremisesAddController" should {
-    val emptyCache = CacheMap("", Map.empty)
+    val emptyCache = Cache.empty
 
     "load What You Need successfully when displayGuidance is true" in new Fixture {
 
       val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-      val mockCacheMap = mock[CacheMap]
+      val mockCacheMap = mock[Cache]
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
 
-      when(controller.dataCacheConnector.fetchAll(any())(any()))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
@@ -72,7 +72,7 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
     "load Where Are Trading Premises page successfully when user selects option other then MSB in business matching page" in new Fixture {
 
       val BusinessActivitiesModel = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-      val mockCacheMap = mock[CacheMap]
+      val mockCacheMap = mock[Cache]
 
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -81,7 +81,7 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
 
-      when(controller.dataCacheConnector.fetchAll(any())(any()))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(controller.dataCacheConnector.fetch[TradingPremises](any(), any())(any()))
@@ -98,7 +98,7 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
     "load confirm trading premises address page successfully when user selects option other then MSB in business matching page" in new Fixture {
 
       val BusinessActivitiesModel = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-      val mockCacheMap = mock[CacheMap]
+      val mockCacheMap = mock[Cache]
 
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -107,7 +107,7 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
 
-      when(controller.dataCacheConnector.fetchAll(any())(any()))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(controller.dataCacheConnector.fetch[TradingPremises](any(), any())(any()))
@@ -124,12 +124,12 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
     "load Registering Agent Premises page successfully when user selects MSB in business matching page" in new Fixture {
 
       val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-      val mockCacheMap = mock[CacheMap]
+      val mockCacheMap = mock[Cache]
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
 
-      when(controller.dataCacheConnector.fetchAll(any())(any()))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(controller.dataCacheConnector.fetch[TradingPremises](any(), any())(any()))

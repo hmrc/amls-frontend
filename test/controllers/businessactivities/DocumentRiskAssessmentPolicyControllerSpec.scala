@@ -29,7 +29,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.businessactivities.DocumentRiskAssessmentService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.businessactivities.DocumentRiskAssessmentPolicyView
 
@@ -53,7 +53,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
       error = errorView)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   override def beforeEach(): Unit = reset(mockService)
 

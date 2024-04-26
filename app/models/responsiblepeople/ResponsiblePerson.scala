@@ -20,7 +20,7 @@ import models.registrationprogress._
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import play.api.i18n.Messages
 import typeclasses.MongoKey
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.StatusConstants
 
 import java.time.LocalDate
@@ -240,7 +240,7 @@ object ResponsiblePerson {
   def filter(rp: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
     rp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == ResponsiblePerson())
 
-  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+  def taskRow(implicit cache: Cache, messages: Messages): TaskRow = {
 
     val messageKey = "responsiblepeople"
     val notStarted = TaskRow(
@@ -320,14 +320,6 @@ object ResponsiblePerson {
   def getResponsiblePersonFromData(data: Option[Seq[ResponsiblePerson]], index: Int) = data.flatMap{
     case sq if index > 0 && index <= sq.length + 1 => sq.lift(index - 1)
     case _ => None
-  }
-
-  def findResponsiblePersonByName(name: String, responsiblePeople: Seq[ResponsiblePerson]): Option[(ResponsiblePerson, Int)] = {
-    responsiblePeople.zipWithIndex.filter {
-      case (p, _) => p.personName.isDefined & !p.status.contains(StatusConstants.Deleted)
-    } find {
-      case (p, _) => p.personName.fold(false)(_.fullNameWithoutSpace equals name)
-    }
   }
 
   import play.api.libs.functional.syntax._

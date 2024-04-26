@@ -33,7 +33,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.hvd.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.hvd.CheckYourAnswersView
@@ -172,7 +172,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
 
   "POST" must {
     "update the hasAccepted flag on the model" in new Fixture {
-      val cache = mock[CacheMap]
+      val cache = mock[Cache]
 
       when {
         (controller.dataCache.fetch[Hvd](any(), any())(any()))

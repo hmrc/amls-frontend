@@ -29,7 +29,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.businessdetails.LettersAddressView
 
@@ -54,9 +54,9 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
       formProvider = inject[LettersAddressFormProvider],
       view = view)
 
-    val emptyCache = CacheMap("", Map.empty)
+    val emptyCache = Cache.empty
 
-    val mockCacheMap = mock[CacheMap]
+    val mockCacheMap = mock[Cache]
   }
 
   private val ukAddress = RegisteredOfficeUK("line_1", Some("line_2"), Some(""), Some(""), "AA1 1AA")
@@ -103,7 +103,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
           hasAccepted = false
         )
 
-        when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCache.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
@@ -129,7 +129,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
           "lettersAddress" -> "false"
         )
 
-        when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCache.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))

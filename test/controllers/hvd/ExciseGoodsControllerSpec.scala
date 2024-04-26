@@ -24,7 +24,7 @@ import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDec
 import org.jsoup.Jsoup
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DateOfChangeHelper, DependencyMocks}
 import views.html.hvd.ExciseGoodsView
 
@@ -48,7 +48,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec with Injecting {
     mockIsNewActivityNewAuth(false)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "ExciseGoodsController" must {
 

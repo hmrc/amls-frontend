@@ -78,7 +78,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
         )))
 
-      when(controller.dataCacheConnector.fetchAll(any())(any()))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(controller.dataCacheConnector.save(any(), any(), any())(any()))

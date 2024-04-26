@@ -31,7 +31,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, StatusConstants}
 import views.html.tradingpremises.RemoveTradingPremisesView
 
@@ -171,7 +171,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
       "respond with SEE_OTHER" when {
         "removing a trading premises from an application with status NotCompleted" in new Fixture {
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(tradingPremisesList)))
@@ -191,7 +191,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
         }
         "removing a trading premises from an application with status SubmissionReady" in new Fixture {
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(tradingPremisesList)))
@@ -212,7 +212,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
 
         "removing a trading premises (with line id) from an application with status SubmissionReadyForReview" in new Fixture {
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
           val newRequest = FakeRequest(POST, routes.RemoveTradingPremisesController.remove(1).url)
           .withFormUrlEncodedBody(
             "endDate.day" -> "1",
@@ -243,7 +243,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
 
         "removing a trading premises (no line id) from an application with status SubmissionReadyForReview" in new Fixture {
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(lineId = None)))))
@@ -262,7 +262,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
 
         "removing a trading premises from an application with status SubmissionDecisionApproved" in new Fixture {
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
           val newRequest = FakeRequest(POST, routes.RemoveTradingPremisesController.remove(1).url)
           .withFormUrlEncodedBody(
             "endDate.day" -> "1",
@@ -293,7 +293,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
         }
 
         "removing a new trading premises (no line id) in an amendment or variation" in new Fixture {
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(lineId = None)))))
@@ -313,7 +313,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
 
       "respond with BAD_REQUEST" when {
         "removing a trading premises from an application with no date" in new Fixture {
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           val newRequest = FakeRequest(POST, routes.RemoveTradingPremisesController.remove(1, true).url)
           .withFormUrlEncodedBody(
@@ -334,7 +334,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
 
         }
         "removing a trading premises from an application a year too great in length" in new Fixture {
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           val newRequest = FakeRequest(POST, routes.RemoveTradingPremisesController.remove(1, true).url)
           .withFormUrlEncodedBody(
@@ -356,7 +356,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
         }
 
         "removing a trading premises from an application with future date" in new Fixture {
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           val newRequest = FakeRequest(POST, routes.RemoveTradingPremisesController.remove(1, true).url)
           .withFormUrlEncodedBody(
@@ -379,7 +379,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
 
         "removing a trading premises from an application with end date before premises start date" in new Fixture {
 
-          val emptyCache = CacheMap("", Map.empty)
+          val emptyCache = Cache.empty
 
           val tradingPremisesEndDateList = Seq(completeTradingPremises1)
 

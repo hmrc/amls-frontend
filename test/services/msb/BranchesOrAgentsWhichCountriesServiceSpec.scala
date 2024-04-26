@@ -23,7 +23,7 @@ import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import play.api.mvc.Results.Redirect
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import scala.concurrent.Future
@@ -101,7 +101,7 @@ class BranchesOrAgentsWhichCountriesServiceSpec extends AmlsSpec with BeforeAndA
         ) thenReturn Future.successful(Some(MoneyServiceBusiness()))
 
         when(mockCacheConnector.save[MoneyServiceBusiness](meq(credId), any(), meq(updatedMsb))(any())
-        ) thenReturn Future.successful(CacheMap("id", Map.empty))
+        ) thenReturn Future.successful(Cache("id", Map.empty))
 
         val redirect = Redirect("/foo")
         service.fetchAndSaveBranchesOrAgents(credId, data, redirect).futureValue mustBe(redirect)

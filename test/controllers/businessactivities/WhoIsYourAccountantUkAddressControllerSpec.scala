@@ -27,7 +27,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.html.businessactivities.AccountantUKAddressView
 
@@ -52,9 +52,9 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
     )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
-  val mockCacheMap = mock[CacheMap]
+  val mockCacheMap = mock[Cache]
 
   "InvolvedInOtherController" when {
 

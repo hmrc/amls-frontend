@@ -27,7 +27,7 @@ import play.api.test
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.businessactivities.HowManyEmployeesService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.businessactivities.BusinessEmployeesCountView
 
@@ -50,7 +50,7 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
       view = view)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "HowManyEmployeesController" when {
 

@@ -34,7 +34,7 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.AutoCompleteService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
@@ -79,7 +79,7 @@ class AdditionalAddressNonUKControllerSpec extends AmlsSpec with MockitoSugar wi
     )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
   val outOfBounds = 99
 
   "AdditionalAddressNonUKController" when {

@@ -34,7 +34,7 @@ import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.renewal.TotalThroughputView
 
@@ -48,7 +48,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
     val renewalService = mock[RenewalService]
     val dataCacheConnector = mock[DataCacheConnector]
     val renewal = Renewal()
-    val cacheMap = mock[CacheMap]
+    val cacheMap = mock[Cache]
     lazy val view = inject[TotalThroughputView]
     lazy val controller = new TotalThroughputController(
       SuccessfulAuthAction, ds = commonDependencies,
@@ -65,14 +65,14 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
 
     val formData = "throughput" -> ExpectedThroughput.First.toString
     val formRequest = FakeRequest(POST, routes.TotalThroughputController.post().url).withFormUrlEncodedBody(formData)
-    val cache = mock[CacheMap]
+    val cache = mock[Cache]
 
     when {
       renewalService.updateRenewal(any(),any())(any())
     } thenReturn Future.successful(cache)
 
     when {
-      dataCacheConnector.fetchAll(any())(any())
+      dataCacheConnector.fetchAll(any())
     } thenReturn Future.successful(Some(cache))
 
     setupBusinessMatching(Set(HighValueDealing, MoneyServiceBusiness))
@@ -140,14 +140,14 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
           "throughput" -> ExpectedThroughput.First.toString
       )
 
-      when(dataCacheConnector.fetchAll(any())(any()))
+      when(dataCacheConnector.fetchAll(any()))
               .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
               .thenReturn(Some(incomingModel))
 
       when(dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), eqTo(outgoingModel))(any()))
-              .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+              .thenReturn(Future.successful(Cache.empty))
   }
 
   "A valid form post to the MSB throughput controller" when {

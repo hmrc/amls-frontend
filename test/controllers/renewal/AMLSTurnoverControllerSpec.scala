@@ -30,7 +30,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.renewal.AMLSTurnoverView
 
@@ -69,7 +69,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       .thenReturn(Future.successful(testRenewal))
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "AMLSTurnoverController" must {
 

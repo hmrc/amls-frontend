@@ -30,7 +30,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.tradingpremises.YourTradingPremisesView
 
@@ -70,7 +70,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
       val businessMatchingActivitiesAll = BusinessMatchingActivities(
         Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
 
-      when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+      when(mockDataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(model)))
@@ -86,7 +86,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
       val businessMatchingActivitiesAll = BusinessMatchingActivities(
         Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
 
-      when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+      when(mockDataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(None)
@@ -100,7 +100,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
 
     "for a complete individual display the trading premises check your answers page" in new Fixture {
 
-      when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+      when(mockDataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val businessMatchingActivities = BusinessMatchingActivities(
@@ -123,7 +123,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
 
     "for an individual redirect to the trading premises summary summary if data is not present" in new Fixture {
 
-      when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+      when(mockDataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))
@@ -147,7 +147,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
       val businessMatchingActivitiesAll = BusinessMatchingActivities(
         Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
 
-      when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+      when(mockDataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(model)))
@@ -168,7 +168,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
 
         val ytpModel = YourTradingPremises("foo", Address("1",None,None,None,"AA1 1BB",None), None, Some(LocalDate.of(2010, 10, 10)), None)
 
-        val emptyCache = CacheMap("", Map.empty)
+        val emptyCache = Cache.empty
 
         val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
 

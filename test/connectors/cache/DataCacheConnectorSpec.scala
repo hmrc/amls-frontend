@@ -77,7 +77,7 @@ class DataCacheConnectorSpec
       } thenReturn Future.successful(newCache)
 
       whenReady(dataCacheConnector.save(credId, key, model)) { result =>
-        result mustBe toCacheMap(newCache)
+        result mustBe newCache
         result.id mustBe credId
       }
     }
@@ -98,7 +98,7 @@ class DataCacheConnectorSpec
         dataCacheConnector.mongoCache.fetchAll(Some(credId))
       } thenReturn Future.successful(Some(newCache))
 
-      whenReady(dataCacheConnector.fetchAll(credId)) { _ mustBe Some(toCacheMap(newCache)) }
+      whenReady(dataCacheConnector.fetchAll(credId)) { _ mustBe Some(newCache) }
     }
 
     "remove data from Mongo for CredId" in new Fixture {

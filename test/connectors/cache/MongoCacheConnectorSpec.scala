@@ -27,7 +27,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -55,7 +55,7 @@ class MongoCacheConnectorSpec extends AnyFreeSpec
     val credId = "12345678"
     val key = arbitrary[String].sample.get
 
-    val cacheMap = CacheMap("12345678", Map("id" -> Json.toJson("12345678")))
+    val cacheMap = Cache("12345678", Map("id" -> Json.toJson("12345678")))
 
     when(factory.createClient) thenReturn client
 
@@ -89,7 +89,7 @@ class MongoCacheConnectorSpec extends AnyFreeSpec
         client.fetchAll(Some(credId))
       } thenReturn Future.successful(Some(cache))
 
-      whenReady(connector.fetchAll(credId)) { _ mustBe Some(toCacheMap(cache)) }
+      whenReady(connector.fetchAll(credId)) { _ mustBe Some(cache) }
     }
 
   }
@@ -102,7 +102,7 @@ class MongoCacheConnectorSpec extends AnyFreeSpec
       when(client.createOrUpdate(any(), any(), meq(key))(any())) thenReturn Future.successful(cache)
 
       whenReady(connector.save(credId, key, model)) { result =>
-        result mustBe toCacheMap(cache)
+        result mustBe cache
         result.id mustBe credId
       }
     }
@@ -114,7 +114,7 @@ class MongoCacheConnectorSpec extends AnyFreeSpec
       when(client.saveAll(any(), any())) thenReturn Future.successful(true)
 
       forAll(arbitrary[String], arbitrary[String]) { (str1, str2) =>
-        val cacheMap = CacheMap("test", referenceMap(str1, str2))
+        val cacheMap = Cache("test", referenceMap(str1, str2))
 
         whenReady(connector.saveAll(credId, Future.successful(cacheMap))) { cache =>
           cache.data mustBe referenceMap(str1, str2)

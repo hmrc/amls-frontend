@@ -34,7 +34,7 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.MsbServicesView
 
@@ -61,10 +61,10 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       services = view
     )
 
-    val cacheMapT = OptionT.liftF[Future, CacheMap](Future.successful(mockCacheMap))
+    val cacheMapT = OptionT.liftF[Future, Cache](Future.successful(mockCacheMap))
 
     when {
-      controller.businessMatchingService.updateModel(any(), any())(any(), any())
+      controller.businessMatchingService.updateModel(any(), any())(any())
     } thenReturn cacheMapT
 
     when {
@@ -72,7 +72,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
     } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
     def setupModel(model: Option[BusinessMatching]): Unit = when {
-      controller.businessMatchingService.getModel(any())(any())
+      controller.businessMatchingService.getModel(any())
     } thenReturn (model match {
       case Some(bm) => OptionT.liftF[Future, BusinessMatching](Future.successful(bm))
       case _ => OptionT.none[Future, BusinessMatching]

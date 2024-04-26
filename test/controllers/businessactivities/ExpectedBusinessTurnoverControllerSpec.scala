@@ -29,7 +29,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.businessactivities.ExpectedBusinessTurnoverView
 
@@ -52,7 +52,7 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
     )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "ExpectedBusinessTurnoverControllerSpec" when {
 

@@ -27,7 +27,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.businessmatching.TypeOfBusinessView
 
@@ -51,7 +51,7 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
   "TypeOfBusinessController" must {
 
-    val emptyCache = CacheMap("", Map.empty)
+    val emptyCache = Cache.empty
 
     "display business Types Page" in new Fixture {
 

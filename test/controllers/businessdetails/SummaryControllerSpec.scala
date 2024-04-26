@@ -29,7 +29,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import utils.businessdetails.CheckYourAnswersHelper
 import views.html.businessdetails.CheckYourAnswersView
@@ -105,7 +105,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
       "all questions are complete" in new Fixture {
 
-        val emptyCache = CacheMap("", Map.empty)
+        val emptyCache = Cache.empty
 
         val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
 

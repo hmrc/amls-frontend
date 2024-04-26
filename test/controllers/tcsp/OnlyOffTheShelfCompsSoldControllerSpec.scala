@@ -28,7 +28,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.tcsp.OnlyOffTheShelfCompsSoldView
 
@@ -65,7 +65,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
       .thenReturn(Future.successful(Some(tcsp)))
 
     when(cache.save[Tcsp](any(), any(), any())(any()))
-      .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      .thenReturn(Future.successful(Cache.empty))
   }
 
   "The OnlyOffTheShelfCompsSoldController" when {

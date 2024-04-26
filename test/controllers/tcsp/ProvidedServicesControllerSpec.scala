@@ -27,7 +27,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.tcsp.ProvidedServicesView
 
@@ -76,7 +76,7 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
     "post" must {
 
-      val cacheMap = mock[CacheMap]
+      val cacheMap = mock[Cache]
 
       "successfully navigate to next page when valid data is sent" in new Fixture {
 

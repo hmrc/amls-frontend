@@ -19,7 +19,7 @@ package services
 import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
-import connectors.{AmlsConnector, BusinessMatchingConnector, DataCacheConnector, KeystoreConnector}
+import connectors.{AmlsConnector, BusinessMatchingConnector, DataCacheConnector}
 import models._
 import models.amp.Amp
 import models.asp.Asp
@@ -40,23 +40,22 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.i18n.Messages
 import play.api.mvc.Request
+import services.cache.Cache
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LandingService @Inject() (val cacheConnector: DataCacheConnector,
-                                val keyStore: KeystoreConnector,
-                                val desConnector: AmlsConnector,
-                                val statusService: StatusService,
-                                val businessMatchingConnector: BusinessMatchingConnector){
+class LandingService @Inject()(val cacheConnector: DataCacheConnector,
+                               val desConnector: AmlsConnector,
+                               val statusService: StatusService,
+                               val businessMatchingConnector: BusinessMatchingConnector){
 
-  def cacheMap(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CacheMap]] = cacheConnector.fetchAll(credId)
+  def cacheMap(credId: String): Future[Option[Cache]] = cacheConnector.fetchAll(credId)
 
-  def setAltCorrespondenceAddress(amlsRefNumber: String, maybeCacheMap: Option[CacheMap], accountTypeId: (String, String), credId: String)
-                                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+  def setAltCorrespondenceAddress(amlsRefNumber: String, maybeCache: Option[Cache], accountTypeId: (String, String), credId: String)
+                                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Cache] = {
     val cachedModel = for {
-      cache <- OptionT.fromOption[Future](maybeCacheMap)
+      cache <- OptionT.fromOption[Future](maybeCache)
       entry <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
     } yield entry
 
@@ -68,13 +67,11 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
     } yield cacheMap) getOrElse (throw new Exception("Unable to update alt correspondence address"))
   }
 
-  def setAltCorrespondenceAddress(businessDetails: BusinessDetails, credId: String)
-                                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+  def setAltCorrespondenceAddress(businessDetails: BusinessDetails, credId: String): Future[Cache] =
     cacheConnector.save[BusinessDetails](credId, BusinessDetails.key, fixAddress(businessDetails))
-  }
 
   def refreshCache(amlsRefNumber: String, credId: String, accountTypeId: (String, String))
-                  (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[CacheMap] = {
+                  (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Cache] =
     for {
       viewResponse           <- desConnector.view(amlsRefNumber, accountTypeId)
       subscriptionResponse   <- cacheConnector.fetch[SubscriptionResponse](credId, SubscriptionResponse.key).recover { case _ => None }
@@ -85,7 +82,6 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
         upsertCacheEntries(appCache, viewResponse, subscriptionResponse, amendVariationResponse, amlsRefNumber, accountTypeId, credId)
       }
     } yield refreshedCache
-  }
 
   def writeEmptyBankDetails(bankDetailsSeq: Seq[BankDetails]): Seq[BankDetails] = {
     val empty = Seq.empty[BankDetails]
@@ -98,20 +94,18 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
     }
   }
 
-  def reviewDetails(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[Option[ReviewDetails]] = {
+  def reviewDetails(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[Option[ReviewDetails]] =
     businessMatchingConnector.getReviewDetails map {
       case Some(details) => Some(ReviewDetails.convert(details))
       case _ => None
     }
-  }
 
   /* Consider if there's a good way to stop
    * this from just overwriting whatever is in Business Matching,
    * shouldn't be a problem as this should only happen when someone
    * first comes into the Application from Business Customer FE
    */
-  def updateReviewDetails(reviewDetails: ReviewDetails, credId: String)
-                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+  def updateReviewDetails(reviewDetails: ReviewDetails, credId: String): Future[Cache] = {
     val bm = BusinessMatching(reviewDetails = Some(reviewDetails))
     cacheConnector.save[BusinessMatching](credId, BusinessMatching.key, bm)
   }
@@ -119,10 +113,10 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
   /* **********
    * Privates *
    ************/
-  private def upsertCacheEntries(appCache: CacheMap, viewResponse: ViewResponse, subscriptionResponse: Option[SubscriptionResponse],
+  private def upsertCacheEntries(appCache: Cache, viewResponse: ViewResponse, subscriptionResponse: Option[SubscriptionResponse],
                                  amendVariationResponse: Option[AmendVariationRenewalResponse], amlsRegistrationNo: String,
                                  accountTypeId: (String, String), cacheId: String)
-                                (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[CacheMap] = {
+                                (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Cache] = {
 
     val cachedViewResponse = cacheConnector.upsertNewAuth[Option[ViewResponse]](appCache, ViewResponse.key, Some(viewResponse))
 
@@ -251,8 +245,8 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
   private def tradingPremisesSection(viewResponse: Option[Seq[TradingPremises]]): Option[Seq[TradingPremises]] =
     Some(viewResponse.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))
 
-  private def saveRenewalData(viewResponse: ViewResponse, cacheMap: CacheMap, amlsRegistrationNo: String, accountTypeId: (String, String), cacheId: String)
-                             (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[CacheMap] = {
+  private def saveRenewalData(viewResponse: ViewResponse, cache: Cache, amlsRegistrationNo: String, accountTypeId: (String, String), cacheId: String)
+                             (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Cache] = {
 
     import models.businessactivities.{InvolvedInOther => BAInvolvedInOther}
     import models.hvd.{PercentageOfCashPaymentOver15000 => HvdRPercentageOfCashPaymentOver15000}
@@ -261,7 +255,7 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
     for {
       renewalStatus <- statusService.getStatus(Option(amlsRegistrationNo), accountTypeId, cacheId)
     } yield renewalStatus match {
-      case RenewalSubmitted(_) => {
+      case RenewalSubmitted(_) =>
         val renewal = Some(Renewal(
           involvedInOtherActivities = viewResponse.businessActivitiesSection.involvedInOther.map(i => BAInvolvedInOther.convert(i)),
           businessTurnover = viewResponse.businessActivitiesSection.expectedBusinessTurnover.map(data => ExpectedBusinessTurnover.convert(data)),
@@ -292,9 +286,8 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
           ceTransactionsInLast12Months = viewResponse.msbSection.fold[Option[CETransactionsInLast12Months]](None)
             (_.ceTransactionsInNext12Months.map(t => CETransactionsInLast12Months(t.ceTransaction)))
         ))
-        cacheConnector.upsertNewAuth[Renewal](cacheMap, Renewal.key, renewal)
-      }
-      case _ => cacheMap
+        cacheConnector.upsertNewAuth[Renewal](cache, Renewal.key, renewal)
+      case _ => cache
     }
   }
 

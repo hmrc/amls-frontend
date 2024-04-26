@@ -26,7 +26,7 @@ import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito.{verify, when}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.responsiblepeople.address.NewHomeAddressView
 
@@ -52,7 +52,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec with Injecting {
     )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
   val personName = Some(PersonName("firstname", None, "lastname"))
 
   "NewHomeAddressController" when {

@@ -27,7 +27,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.asp.OtherBusinessTaxMattersView
 
@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   trait Fixture extends DependencyMocks {
     self =>

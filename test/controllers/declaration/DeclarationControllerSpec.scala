@@ -109,7 +109,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -125,7 +125,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "load the declaration page for pre-submissions if name and business matching is found" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -144,7 +144,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "load the declaration page for pre-submissions if name and business matching is found (renewal)" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -163,7 +163,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "load the declaration page for pre-submissions if name and business matching is found (amendment)" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -182,7 +182,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "report error if retrieval of amlsRegNo fails" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -209,7 +209,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "redirect to the RegistrationProgressController" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(incompleteSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -234,7 +234,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "load the declaration for amendments page for submissions if name and business matching is found" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -252,7 +252,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -268,7 +268,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "redirect to the declaration-persons for amendments page if name and/or business matching not found and submission is ready for review" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -291,7 +291,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "redirect to the RegistrationProgressController" in new Fixture {
         when {
-          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(incompleteSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())

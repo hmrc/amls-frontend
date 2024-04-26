@@ -20,7 +20,7 @@ import models.registrationprogress._
 import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito._
 import play.api.libs.json.{JsNull, Json}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import java.time.LocalDate
@@ -29,7 +29,7 @@ class BusinessDetailsSpec extends AmlsSpec {
 
   val previouslyRegistered = PreviouslyRegisteredYes(Some("12345678"))
 
-  val cache = mock[CacheMap]
+  val cache = mock[Cache]
 
   val regForVAT = VATRegisteredYes("123456789")
 

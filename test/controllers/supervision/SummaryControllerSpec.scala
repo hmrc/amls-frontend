@@ -25,7 +25,7 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.Injecting
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.supervision.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.supervision.CheckYourAnswersView
@@ -78,7 +78,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   "POST" must {
     "update the hasAccepted flag on the model" in new Fixture {
-      val cache = mock[CacheMap]
+      val cache = mock[Cache]
 
       when {
         controller.dataCacheConnector.fetch[Supervision](any(), any())(any())

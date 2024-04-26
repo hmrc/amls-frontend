@@ -36,7 +36,7 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.businessmatching.RecoverActivitiesService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.responsiblepeople.ExperienceTrainingView
 
@@ -66,8 +66,8 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       amlsErrorHandler = inject[AmlsErrorHandler])
   }
 
-  val emptyCache: CacheMap = CacheMap("", Map.empty)
-  val mockCacheMap: CacheMap = mock[CacheMap]
+  val emptyCache: Cache = Cache.empty
+  val mockCacheMap: Cache = mock[Cache]
 
   "ExperienceTrainingController" must {
 
@@ -79,7 +79,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on get load the page with the business activities" in new Fixture {
 
-        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
@@ -109,7 +109,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on get display the page with pre populated data for the Yes Option" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
@@ -127,7 +127,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on get display the page with pre populated data with No Data for the information" in new Fixture {
 
-      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
@@ -147,7 +147,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
     "on get redirect to itself after performing a successful recovery of missing business types" in new Fixture {
       val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessMatchingActivities(Set())))
 
-      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(businessMatching))
@@ -170,7 +170,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
     "on get return an internal server error after failing to recover missing business types" in new Fixture {
       val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessMatchingActivities(Set())))
 
-      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(businessMatching))
@@ -196,9 +196,9 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
         "experienceInformation" -> "I do not remember when I did the training"
       )
 
-      val mockCacheMap = mock[CacheMap]
+      val mockCacheMap = mock[Cache]
 
-      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
@@ -221,9 +221,9 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
         "experienceTraining" -> "false"
       )
 
-      val mockCacheMap = mock[CacheMap]
+      val mockCacheMap = mock[Cache]
 
-      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
@@ -245,9 +245,9 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       .withFormUrlEncodedBody(
         "experienceTraining" -> "not a boolean value"
       )
-      val mockCacheMap = mock[CacheMap]
+      val mockCacheMap = mock[Cache]
 
-      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
@@ -266,9 +266,9 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on post with valid data in edit mode" in new Fixture {
 
-      val mockCacheMap = mock[CacheMap]
+      val mockCacheMap = mock[Cache]
 
-      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))

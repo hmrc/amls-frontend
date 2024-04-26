@@ -33,7 +33,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.msb.UsesForeignCurrenciesView
 
@@ -57,7 +57,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
       .thenReturn(Future.successful(None))
 
     when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
-      .thenReturn(Future.successful(CacheMap("TESTID", Map())))
+      .thenReturn(Future.successful(Cache("TESTID", Map())))
 
     val controller = new UsesForeignCurrenciesController(dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
@@ -70,9 +70,9 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
 
-    val cacheMap = mock[CacheMap]
+    val cacheMap = mock[Cache]
 
-    when(controller.dataCacheConnector.fetchAll(any())(any()))
+    when(controller.dataCacheConnector.fetchAll(any()))
       .thenReturn(Future.successful(Some(cacheMap)))
     val msbServices = Some(BusinessMatchingMsbServices(Set()))
     when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key))
@@ -101,7 +101,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
       mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(true)
 
-    val emptyCache = CacheMap("", Map.empty)
+    val emptyCache = Cache.empty
 
     val outgoingModel = completeMsb.copy(
       whichCurrencies = Some(WhichCurrencies(
@@ -124,7 +124,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
         msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
       )))
 
-      when(controller.dataCacheConnector.fetchAll(any())(any()))
+      when(controller.dataCacheConnector.fetchAll(any()))
       .thenReturn(Future.successful(Some(mockCacheMap)))
 
     when(controller.dataCacheConnector.save(any(), eqTo(MoneyServiceBusiness.key), any())(any()))

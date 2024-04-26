@@ -25,7 +25,6 @@ import play.api.libs.json._
 import play.custom.JsPathSupport.{localDateTimeReads, localDateTimeWrites}
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, _}
-import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
@@ -44,12 +43,12 @@ case class Cache(id: String, data: Map[String, JsValue], lastUpdated: LocalDateT
     * Upsert a value into the cache given its key.
     * If the data to be inserted is null then remove the entry by key
     */
-  def upsert[T](key: String, data: JsValue, hasValue: Boolean) = {
+  def upsert(key: String, data: JsValue, hasValue: Boolean): Cache = {
     val updated = if (hasValue) {
       this.data + (key -> data)
     }
     else {
-      this.data - (key)
+      this.data - key
     }
 
     this.copy(
@@ -57,13 +56,23 @@ case class Cache(id: String, data: Map[String, JsValue], lastUpdated: LocalDateT
       lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
     )
   }
+
+  def getEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] =
+    data
+      .get(key)
+      .map(json =>
+        json
+          .validate[T]
+          .fold(
+            errors => throw new Exception(s"Entry for key '$key'. Attempt to convert to Cache gave errors: $errors"),
+            valid => valid
+          )
+      )
 }
 
 object Cache {
   implicit val dateFormat: Format[LocalDateTime] = Format(localDateTimeReads, localDateTimeWrites)
   implicit val format: OFormat[Cache] = Json.format[Cache]
-
-  def apply(cacheMap: CacheMap): Cache = Cache(cacheMap.id, cacheMap.data)
 
   val empty: Cache = Cache("", Map())
 }
@@ -76,9 +85,8 @@ object Cache {
   * @param crypto The cryptography instance to use to decrypt values
   */
 class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(cache.id, cache.data) with CacheOps {
-  def getEncryptedEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] = {
+  override def getEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] =
     catchDoubleEncryption(cache, key)(fmt, crypto, new JsonDecryptor[T]()(crypto, fmt))
-  }
 }
 
 /**
@@ -142,7 +150,7 @@ class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto
   /**
     * Removes the item with the specified key from the cache
     */
-  def removeByKey[T](credId: String, key: String): Future[Cache] = {
+  def removeByKey(credId: String, key: String): Future[Cache] =
     fetchAll(Some(credId)) flatMap { maybeNewCache =>
       val cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
 
@@ -150,17 +158,16 @@ class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto
         filter = bsonIdQuery(credId),
         update = Updates.combine(
           Updates.set("id", credId),
-          Updates.set("data", Codecs.toBson(cache.data - (key))),
+          Updates.set("data", Codecs.toBson(cache.data - key)),
           Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))),
         options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       ).toFuture()
     }
-  }
 
   /**
     * Inserts data into the existing cache object in memory given the specified key. If the data does not exist, it will be created.
     */
-  def upsert[T](targetCache: CacheMap, data: T, key: String)(implicit writes: Writes[T]): CacheMap = {
+  def upsert[T](targetCache: Cache, data: T, key: String)(implicit writes: Writes[T]): Cache = {
     val jsonData = if (appConfig.mongoEncryptionEnabled) {
       val jsonEncryptor = new JsonEncryptor[T]()
       Json.toJson(Protected(data))(jsonEncryptor)
@@ -168,7 +175,7 @@ class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto
       Json.toJson(data)
     }
 
-    toCacheMap(Cache(targetCache).upsert[T](key, jsonData, data != None))
+    targetCache.upsert(key, jsonData, data != None)
   }
 
   /**
@@ -208,21 +215,18 @@ class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto
   /**
     * Fetches the whole cache and returns default where not exists
     */
-  def fetchAllWithDefault(credId: String): Future[Cache] = {
+  def fetchAllWithDefault(credId: String): Future[Cache] =
     fetchAll(Some(credId)).map {
       _.getOrElse(Cache(credId, Map.empty))
     }
-  }
 
   /**
     * Removes the item with the specified id from the cache
     */
-  def removeById(credId: String): Future[Boolean] = {
+  def removeById(credId: String): Future[Boolean] =
     collection.findOneAndDelete(key(credId)).toFuture()
-      .map { result => true
-      }
+      .map { _ => true }
       .recover { case _ => false }
-  }
 
 
 

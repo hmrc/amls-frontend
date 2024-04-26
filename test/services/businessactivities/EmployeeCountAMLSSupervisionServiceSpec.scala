@@ -22,7 +22,7 @@ import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.IntegrationPatience
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import scala.concurrent.Future
@@ -30,7 +30,7 @@ import scala.concurrent.Future
 class EmployeeCountAMLSSupervisionServiceSpec extends AmlsSpec with BeforeAndAfterEach with IntegrationPatience {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[CacheMap]
+  val mockCacheMap = mock[Cache]
 
   val service = new EmployeeCountAMLSSupervisionService(mockCacheConnector)
 

@@ -31,7 +31,7 @@ import play.twirl.api.Html
 import services.StatusService
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AuthAction, DateHelper, DateOfChangeHelper, RepeatingSection}
 import views.html.DateOfChangeView
 import views.html.tradingpremises.AgentNameView
@@ -109,7 +109,7 @@ class AgentNameController @Inject()(
 
   }
 
-  def getTradingPremises(result: Option[CacheMap], index: Int)(implicit hc: HeaderCarrier,
+  def getTradingPremises(result: Option[Cache], index: Int)(implicit hc: HeaderCarrier,
                                                                formats: Format[TradingPremises],
                                                                key: MongoKey[TradingPremises]): Option[TradingPremises] =
     result flatMap { cache => getData(cache, index) }

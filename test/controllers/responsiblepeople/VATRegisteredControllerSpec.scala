@@ -29,7 +29,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.responsiblepeople.VATRegisteredView
 
@@ -49,7 +49,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
       error = errorView)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   val personName = Some(PersonName("firstname", None, "lastname"))
 

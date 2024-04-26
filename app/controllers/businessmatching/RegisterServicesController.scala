@@ -30,7 +30,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AuthAction, RepeatingSection}
 import views.html.businessmatching.RegisterServicesView
 
@@ -143,8 +143,7 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
 
   private def clearRemovedSections(credId: String,
                                    previousBusinessActivities: Set[BusinessActivity],
-                                   currentBusinessActivities: Set[BusinessActivity]
-                                  )(implicit hc: HeaderCarrier) = {
+                                   currentBusinessActivities: Set[BusinessActivity]) =
     for {
       _ <- clearSectionIfRemoved(credId, previousBusinessActivities, currentBusinessActivities, AccountancyServices)
       _ <- clearSectionIfRemoved(credId, previousBusinessActivities, currentBusinessActivities, EstateAgentBusinessService)
@@ -153,33 +152,27 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
       _ <- clearSectionIfRemoved(credId, previousBusinessActivities, currentBusinessActivities, TrustAndCompanyServices)
       _ <- clearSupervisionIfNoLongerRequired(credId, previousBusinessActivities, currentBusinessActivities)
     } yield true
-  }
 
   private def clearSectionIfRemoved(credId: String,
                                     previousBusinessActivities: Set[BusinessActivity],
                                     currentBusinessActivities: Set[BusinessActivity],
-                                    businessActivity: BusinessActivity
-                                   )(implicit hc: HeaderCarrier) = {
+                                    businessActivity: BusinessActivity) =
     if (previousBusinessActivities.contains(businessActivity) && !currentBusinessActivities.contains(businessActivity)) {
       businessMatchingService.clearSection(credId: String, businessActivity)
     } else {
-      Future.successful(CacheMap)
+      Future.successful(Cache)
     }
-  }
 
   private def clearSupervisionIfNoLongerRequired(credId: String,
                                                  previousBusinessActivities: Set[BusinessActivity],
-                                                 currentBusinessActivities: Set[BusinessActivity]
-                                                )(implicit hc: HeaderCarrier) = {
+                                                 currentBusinessActivities: Set[BusinessActivity]) =
     if (hasASPorTCSP(previousBusinessActivities) && !hasASPorTCSP(currentBusinessActivities)) {
       dataCacheConnector.save[Supervision](credId, Supervision.key, Supervision())
     } else {
-      Future.successful(CacheMap)
+      Future.successful(Cache)
     }
-  }
 
-  private def maybeRemoveAccountantForAMLSRegulations(credId: String, bmActivities: BusinessMatchingActivities)
-                                                     (implicit hc: HeaderCarrier) = {
+  private def maybeRemoveAccountantForAMLSRegulations(credId: String, bmActivities: BusinessMatchingActivities) =
     for {
       activities <- dataCacheConnector.fetch[BusinessActivities](credId, BusinessActivities.key)
       strippedActivities <- Future.successful(withoutAccountantForAMLSRegulations(activities))
@@ -190,7 +183,6 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
         Future.successful(activities)
       }
     }
-  }
 
   private def redirectTo(businessActivities: Set[BusinessActivity], includeCompanyNotRegistered: Boolean): Result =
     if (businessActivities.contains(MoneyServiceBusiness)) {
@@ -260,11 +252,11 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
       case _ => rp
     }
 
-  private def updateResponsiblePeople(credId: String, responsiblePeople: Seq[ResponsiblePerson])(implicit hc: HeaderCarrier): Future[_] =
+  private def updateResponsiblePeople(credId: String, responsiblePeople: Seq[ResponsiblePerson]): Future[_] =
     dataCacheConnector.save[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key, responsiblePeople)
 
   val shouldPromptForFitAndProper: (ResponsiblePerson, BusinessMatchingActivities) => ResponsiblePerson =
-    (rp, activities) => {
+    (rp, _) => {
         if(promptFitAndProper(rp)) {
           resetHasAccepted(rp)
         } else {

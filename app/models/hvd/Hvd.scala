@@ -22,7 +22,7 @@ import models.registrationprogress.{Completed, NotStarted, Section, Started, Tas
 import play.api.Logging
 import play.api.i18n.Messages
 import play.api.libs.json._
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 case class Hvd (cashPayment: Option[CashPayment] = None,
                 products: Option[Products] = None,
@@ -109,7 +109,7 @@ object Hvd {
 
   val key = "hvd"
 
-  def section(implicit cache: CacheMap): Section = {
+  def section(implicit cache: Cache): Section = {
     val notStarted = Section(key, NotStarted, false, controllers.hvd.routes.WhatYouNeedController.get)
     cache.getEntry[Hvd](key).fold(notStarted)  {
       model =>
@@ -121,7 +121,7 @@ object Hvd {
     }
   }
 
-  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+  def taskRow(implicit cache: Cache, messages: Messages): TaskRow = {
     val notStarted = TaskRow(
       key,
       controllers.hvd.routes.WhatYouNeedController.get.url,

@@ -28,7 +28,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.{ProgressService, SectionsProvider}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils._
 import views.html.declaration.RegisterPartnersView
 
@@ -58,7 +58,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
       view = inject[RegisterPartnersView]
     )
 
-    val emptyCache = CacheMap("", Map.empty)
+    val emptyCache = Cache.empty
 
     val personName = PersonName("firstName", Some("middleName"), "lastName")
     val personName1 = PersonName("firstName1", Some("middleName1"), "lastName1")
@@ -91,7 +91,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
         )
         "respond with OK" in new Fixture {
           when {
-            mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+            mockSectionsProvider.taskRows(any[String])(any(), any())
           }.thenReturn(Future.successful(taskRows))
 
           when {
@@ -115,7 +115,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
 
         "redirect to the RegistrationProgressController" in new Fixture {
           when {
-            mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+            mockSectionsProvider.taskRows(any[String])(any(), any())
           }.thenReturn(Future.successful(taskRows))
 
           when {

@@ -27,7 +27,7 @@ import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.tcsp.ServiceProviderTypesView
 
@@ -64,13 +64,13 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
       Some(defaultServicesOfAnotherTCSP)
     )
 
-    val cacheMap = CacheMap("", Map.empty)
+    val cacheMap = Cache.empty
 
     when(cache.fetch[Tcsp](any(), any())(any()))
       .thenReturn(Future.successful(Some(model)))
 
     when(cache.save[Tcsp](any(), any(), any())(any()))
-      .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      .thenReturn(Future.successful(Cache.empty))
   }
 
   "TcspTypesController" must {

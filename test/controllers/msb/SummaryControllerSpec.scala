@@ -104,7 +104,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
-      when(controller.dataCache.fetchAll(any())(any()))
+      when(controller.dataCache.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       val msbServices = Some(
         BusinessMatchingMsbServices(

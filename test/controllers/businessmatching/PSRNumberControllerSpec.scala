@@ -37,7 +37,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.PsrNumberView
 
@@ -83,7 +83,7 @@ class PSRNumberControllerSpec extends AmlsSpec
 
     mockCacheFetch[ServiceChangeRegister](None, None)
 
-    val emptyCache = CacheMap("", Map.empty)
+    val emptyCache = Cache.empty
   }
 
   "BusinessAppliedForPSRNumberController" when {
@@ -95,7 +95,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         )
 
         when {
-          controller.businessMatchingService.getModel(any())(any())
+          controller.businessMatchingService.getModel(any())
         } thenReturn OptionT.liftF(Future.successful(model))
 
         val result = controller.get()(request)
@@ -111,7 +111,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         }
 
         when {
-          controller.businessMatchingService.getModel(any())(any())
+          controller.businessMatchingService.getModel(any())
         } thenReturn OptionT.liftF(Future.successful(businessMatching))
 
         val result = controller.get()(request)
@@ -178,7 +178,7 @@ class PSRNumberControllerSpec extends AmlsSpec
           )
 
         when {
-          controller.businessMatchingService.getModel(any())(any())
+          controller.businessMatchingService.getModel(any())
         } thenReturn OptionT.liftF(Future.successful(businessMatching))
 
         val result = controller.post()(newRequest)

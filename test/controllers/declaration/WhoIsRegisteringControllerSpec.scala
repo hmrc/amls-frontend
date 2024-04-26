@@ -34,7 +34,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.{RenewalService, SectionsProvider, StatusService}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import views.html.declaration.{WhoIsRegisteringThisRegistrationView, WhoIsRegisteringThisRenewalView, WhoIsRegisteringThisUpdateView}
 
@@ -71,7 +71,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
     val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None,
       None, false)
 
-    val cacheMap = mock[CacheMap]
+    val cacheMap = mock[Cache]
 
     val responsiblePeople = (for {
       p1 <- responsiblePersonGen
@@ -85,7 +85,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
         controller.renewalService.getRenewal(any())(any())
       } thenReturn Future.successful(renewal)
 
-      when(controller.dataCacheConnector.fetchAll(any())(any()))
+      when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
       when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
@@ -107,7 +107,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
     }
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "WhoIsRegisteringController" must {
     "Get" must {
@@ -120,7 +120,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
         "load the who is registering page" when {
           "status is pending" in new Fixture {
             when {
-              mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+              mockSectionsProvider.taskRows(any[String])(any(), any())
             }.thenReturn(Future.successful(completedSections))
 
             run(SubmissionReadyForReview) { _ =>
@@ -137,7 +137,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 
           "status is approved" in new Fixture {
             when {
-              mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+              mockSectionsProvider.taskRows(any[String])(any(), any())
             }.thenReturn(Future.successful(completedSections))
 
             run(SubmissionDecisionApproved) { _ =>
@@ -154,7 +154,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 
           "status is pre-submission" in new Fixture {
             when {
-              mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+              mockSectionsProvider.taskRows(any[String])(any(), any())
             }.thenReturn(Future.successful(completedSections))
 
             run(SubmissionReady) { _ =>
@@ -171,7 +171,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 
           "status is renewal amendment" in new Fixture {
             when {
-              mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+              mockSectionsProvider.taskRows(any[String])(any(), any())
             }.thenReturn(Future.successful(completedSections))
 
             run(RenewalSubmitted(None)) { _ =>
@@ -185,7 +185,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 
           "status is renewal" in new Fixture {
             when {
-              mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+              mockSectionsProvider.taskRows(any[String])(any(), any())
             }.thenReturn(Future.successful(completedSections))
 
             run(ReadyForRenewal(None), Some(mock[Renewal])) { _ =>
@@ -206,7 +206,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 
         "redirect to the RegistrationProgressController" in new Fixture {
           when {
-            mockSectionsProvider.taskRows(any[String])(any(), any(), any())
+            mockSectionsProvider.taskRows(any[String])(any(), any())
           }.thenReturn(Future.successful(incompleteSections))
 
           run(SubmissionReadyForReview) { _ =>

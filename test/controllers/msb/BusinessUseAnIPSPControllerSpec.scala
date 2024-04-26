@@ -24,7 +24,7 @@ import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.msb.BusinessUseAnIPSPView
 
@@ -45,7 +45,7 @@ class BusinessUseAnIPSPControllerSpec extends AmlsSpec with Injecting {
       view = view)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "BusinessUseAnIPSPController" must {
 

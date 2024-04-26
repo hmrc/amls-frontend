@@ -34,7 +34,7 @@ import org.mockito.Mockito._
 import play.api.mvc.{BodyParsers, Result}
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
@@ -87,8 +87,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       headerCarrierForPartialsConverter = mock[HeaderCarrierForPartialsConverter])
 
     when {
-      controllerNoAmlsNumber.landingService.setAltCorrespondenceAddress(any(), any[String])(any(), any())
-    } thenReturn Future.successful(mock[CacheMap])
+      controllerNoAmlsNumber.landingService.setAltCorrespondenceAddress(any(), any[String])
+    } thenReturn Future.successful(mock[Cache])
 
     val completeATB = mock[BusinessDetails]
     val completeResponsiblePerson: ResponsiblePerson = ResponsiblePerson(
@@ -124,7 +124,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
         val inCompleteResponsiblePeople: ResponsiblePerson = completeResponsiblePerson.copy(
           dateOfBirth = None
         )
-        val cacheMap: CacheMap = mock[CacheMap]
+        val cacheMap: Cache = mock[Cache]
         val complete: BusinessMatching = mock[BusinessMatching]
 
         when(complete.isCompleteLanding) thenReturn true
@@ -134,7 +134,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
         when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
 
-        when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
+        when(controllerNoAmlsNumber.landingService.cacheMap(any[String])) thenReturn Future.successful(Some(cacheMap))
         when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
           .thenReturn(Future.successful((rejectedStatusGen.sample.get, None)))
 
@@ -153,9 +153,9 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
             .thenReturn(Future.successful((NotCompleted, None)))
 
           val complete = mock[BusinessMatching]
-          val emptyCacheMap = mock[CacheMap]
+          val emptyCacheMap = mock[Cache]
 
-          when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(emptyCacheMap))
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String])) thenReturn Future.successful(Some(emptyCacheMap))
           when(complete.isCompleteLanding) thenReturn true
           when(emptyCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
           when(emptyCacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
@@ -167,7 +167,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
         }
 
         "the form has been submitted" in new Fixture {
-          val cacheMap = mock[CacheMap]
+          val cacheMap = mock[Cache]
 
           val complete = mock[BusinessMatching]
 
@@ -177,7 +177,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           when(cacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(None)
           when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
             .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
-          when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String])) thenReturn Future.successful(Some(cacheMap))
           when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
             .thenReturn(Future.successful((SubmissionReady, None)))
 
@@ -206,9 +206,9 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
             businessAddress = Address("Line 1", Some("Line 2"), None, None, Some("AA11AA"), Country("United Kingdom", "GB")),
             safeId = ""))
 
-          when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(None)
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String])) thenReturn Future.successful(None)
           when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
-          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())).thenReturn(Future.successful(mock[Cache]))
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
@@ -224,9 +224,9 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
             businessAddress = Address("Line 1", Some("Line 2"), None, None, Some("aa1 $ aa156"), Country("United Kingdom", "GB")),
             safeId = ""))
 
-          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())) thenReturn Future.successful(None)
           when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
-          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())).thenReturn(Future.successful(mock[Cache]))
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
@@ -240,9 +240,9 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
             businessAddress = Address("Line 1", Some("Line 2"), None, None, None, Country("United Kingdom", "GB")),
             safeId = ""))
 
-          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())) thenReturn Future.successful(None)
           when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
-          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())).thenReturn(Future.successful(mock[Cache]))
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
@@ -256,9 +256,9 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
             businessAddress = Address("Line 1", Some("Line 2"), None, None, None, Country("USA", "US")),
             safeId = ""))
 
-          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())) thenReturn Future.successful(None)
           when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
-          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())).thenReturn(Future.successful(mock[Cache]))
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
@@ -272,9 +272,9 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
             businessAddress = Address("Line 1", Some("Line 2"), None, None, None, Country("", "")),
             safeId = ""))
 
-          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())) thenReturn Future.successful(None)
           when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
-          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())).thenReturn(Future.successful(mock[Cache]))
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
@@ -283,7 +283,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
 
         "the landing service has no valid review details" in new Fixture {
-          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())) thenReturn Future.successful(None)
           when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(None))
 
           val result = controllerNoAmlsNumber.get()(request)
@@ -294,13 +294,13 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
       "pre application must throw an exception" when {
         "the business matching is incomplete" in new Fixture {
-          val cachmap = mock[CacheMap]
+          val cachmap = mock[Cache]
           val httpResponse = mock[HttpResponse]
 
           val complete = mock[BusinessMatching]
 
           when(httpResponse.status) thenReturn (BAD_REQUEST)
-          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(Some(cachmap))
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())) thenReturn Future.successful(Some(cachmap))
           when(complete.isCompleteLanding) thenReturn false
           when(cachmap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
 

@@ -27,7 +27,7 @@ import org.mockito.Mockito._
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.responsiblepeople.address.TimeAtAddressView
 
@@ -52,7 +52,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Injecti
     )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "CurrentAddressController" must {
     "when the service status is Approved and the address is changed" when {

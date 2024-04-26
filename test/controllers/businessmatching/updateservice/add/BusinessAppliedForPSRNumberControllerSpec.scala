@@ -32,7 +32,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.{FakeRequest, Injecting}
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.add.BusinessAppliedForPSRNumberView
 
@@ -42,7 +42,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
   with BusinessMatchingGenerator
   with Injecting {
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   trait Fixture extends DependencyMocks {
     self =>

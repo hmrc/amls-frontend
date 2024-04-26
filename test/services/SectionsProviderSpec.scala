@@ -35,7 +35,7 @@ import models.tradingpremises.TradingPremises
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.IntegrationPatience
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import scala.concurrent.Future
@@ -43,7 +43,7 @@ import scala.concurrent.Future
 class SectionsProviderSpec extends AmlsSpec with IntegrationPatience {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  implicit val mockCache = mock[CacheMap]
+  implicit val mockCache = mock[Cache]
 
   lazy val sectionsProvider = new SectionsProvider(mockCacheConnector, appConfig)
 
@@ -94,7 +94,7 @@ class SectionsProviderSpec extends AmlsSpec with IntegrationPatience {
 
       "return an empty sequence when cache connector cannot retrieve cache" in {
 
-        when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+        when(mockCacheConnector.fetchAll(eqTo(credId)))
           .thenReturn(Future.successful(None))
 
         sectionsProvider.taskRows(credId).futureValue mustBe Seq.empty[TaskRow]
@@ -102,7 +102,7 @@ class SectionsProviderSpec extends AmlsSpec with IntegrationPatience {
 
       "return all mandatory rows even if there are no extra activities in cache " in {
 
-        when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+        when(mockCacheConnector.fetchAll(eqTo(credId)))
           .thenReturn(Future.successful(Some(mockCache)))
 
         sectionsProvider.taskRows(credId).futureValue mustBe Seq(

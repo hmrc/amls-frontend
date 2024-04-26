@@ -20,7 +20,7 @@ import models.registrationprogress._
 import models.tcsp.TcspTypes._
 import play.api.i18n.Messages
 import typeclasses.MongoKey
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 case class Tcsp (tcspTypes: Option[TcspTypes] = None,
                  onlyOffTheShelfCompsSold: Option[OnlyOffTheShelfCompsSold] = None,
@@ -90,7 +90,7 @@ object Tcsp {
   import play.api.libs.json._
   import utils.MappingUtils._
 
-  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+  def taskRow(implicit cache: Cache, messages: Messages): TaskRow = {
     val notStarted = TaskRow(
       key,
       controllers.tcsp.routes.WhatYouNeedController.get.url,

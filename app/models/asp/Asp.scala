@@ -19,7 +19,7 @@ package models.asp
 import models.registrationprogress._
 import play.api.i18n.Messages
 import typeclasses.MongoKey
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 case class Asp(
                 services: Option[ServicesOfBusiness] = None,
@@ -45,7 +45,7 @@ object Asp {
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
-  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+  def taskRow(implicit cache: Cache, messages: Messages): TaskRow = {
     val messageKey = "asp"
     val notStarted = TaskRow(
       messageKey,

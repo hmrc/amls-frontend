@@ -19,7 +19,7 @@ package models.businessdetails
 import models.registrationprogress._
 import play.api.i18n.Messages
 import play.api.libs.json.{Json, OWrites, Reads}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 
 case class BusinessDetails(
                              previouslyRegistered: Option[PreviouslyRegistered] = None,
@@ -88,7 +88,7 @@ case class BusinessDetails(
 
 object BusinessDetails {
 
-  def taskRow(implicit cache: CacheMap, messages: Messages) = {
+  def taskRow(implicit cache: Cache, messages: Messages) = {
 
     val messageKey = "businessdetails"
     val notStarted = TaskRow(

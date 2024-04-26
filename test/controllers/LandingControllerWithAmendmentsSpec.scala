@@ -49,7 +49,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AmlsSpec, AuthorisedFixture}
@@ -110,18 +110,18 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       headerCarrierForPartialsConverter = headerCarrierForPartialsConverter)
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any(), any()))
-      .thenReturn(Future.successful(mock[CacheMap]))
+      .thenReturn(Future.successful(mock[Cache]))
 
     when {
-      controller.landingService.setAltCorrespondenceAddress(any(), any[String])(any(), any())
-    } thenReturn Future.successful(mock[CacheMap])
+      controller.landingService.setAltCorrespondenceAddress(any(), any[String])
+    } thenReturn Future.successful(mock[Cache])
 
     val completeATB = mock[BusinessDetails]
 
-    val emptyCacheMap = CacheMap("test", Map.empty)
+    val emptyCacheMap = Cache("test", Map.empty)
 
     def setUpMocksForNoDataInSaveForLater(controller: LandingController) = {
-      when(controller.landingService.cacheMap(any[String])(any(), any()))
+      when(controller.landingService.cacheMap(any[String]))
         .thenReturn(Future.successful(None))
     }
 
@@ -143,19 +143,19 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         .thenReturn(Future.successful(None))
     }
 
-    def setUpMocksForDataExistsInSaveForLater(controller: LandingController, testData: CacheMap = mock[CacheMap]) = {
-      when(controller.landingService.cacheMap(any[String])(any(), any()))
+    def setUpMocksForDataExistsInSaveForLater(controller: LandingController, testData: Cache = mock[Cache]) = {
+      when(controller.landingService.cacheMap(any[String]))
         .thenReturn(Future.successful(Some(testData)))
     }
 
     //noinspection ScalaStyle
-    def buildTestCacheMap(hasChanged: Boolean,
+    def buildTestCache(hasChanged: Boolean,
                           includesResponse: Boolean,
                           noTP: Boolean = false,
                           noRP: Boolean = false,
                           includeSubmissionStatus: Boolean = false,
                           includeDataImport: Boolean = false,
-                          cacheMap: CacheMap = mock[CacheMap]): CacheMap = {
+                          cacheMap: Cache = mock[Cache]): Cache = {
 
       val testASP = Asp(hasChanged = hasChanged)
       val testAMP = Amp(hasChanged = hasChanged)
@@ -276,18 +276,18 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       headerCarrierForPartialsConverter = headerCarrierForPartialsConverter)
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any(), any()))
-      .thenReturn(Future.successful(mock[CacheMap]))
+      .thenReturn(Future.successful(mock[Cache]))
 
     when {
-      controller.landingService.setAltCorrespondenceAddress(any(), any[String])(any(), any())
-    } thenReturn Future.successful(mock[CacheMap])
+      controller.landingService.setAltCorrespondenceAddress(any(), any[String])
+    } thenReturn Future.successful(mock[Cache])
 
     val completeATB = mock[BusinessDetails]
 
-    val emptyCacheMap = CacheMap("test", Map.empty)
+    val emptyCacheMap = Cache("test", Map.empty)
 
     def setUpMocksForNoDataInSaveForLater(controller: LandingController) = {
-      when(controller.landingService.cacheMap(any[String])(any(), any()))
+      when(controller.landingService.cacheMap(any[String]))
         .thenReturn(Future.successful(None))
     }
 
@@ -309,19 +309,19 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         .thenReturn(Future.successful(None))
     }
 
-    def setUpMocksForDataExistsInSaveForLater(controller: LandingController, testData: CacheMap = mock[CacheMap]) = {
-      when(controller.landingService.cacheMap(any[String])(any(), any()))
+    def setUpMocksForDataExistsInSaveForLater(controller: LandingController, testData: Cache = mock[Cache]) = {
+      when(controller.landingService.cacheMap(any[String]))
         .thenReturn(Future.successful(Some(testData)))
     }
 
     //noinspection ScalaStyle
-    def buildTestCacheMap(hasChanged: Boolean,
+    def buildTestCache(hasChanged: Boolean,
                           includesResponse: Boolean,
                           noTP: Boolean = false,
                           noRP: Boolean = false,
                           includeSubmissionStatus: Boolean = false,
                           includeDataImport: Boolean = false,
-                          cacheMap: CacheMap = mock[CacheMap]): CacheMap = {
+                          cacheMap: Cache = mock[Cache]): Cache = {
 
       val testASP = Asp(hasChanged = hasChanged)
       val testBusinessDetails = BusinessDetails(hasChanged = hasChanged)
@@ -416,7 +416,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         val inCompleteResponsiblePeople: ResponsiblePerson = completeResponsiblePerson.copy(
           dateOfBirth = None)
 
-        val cacheMap: CacheMap = mock[CacheMap]
+        val cacheMap: Cache = mock[Cache]
         val complete: BusinessMatching = mock[BusinessMatching]
 
         when(complete.isCompleteLanding) thenReturn true
@@ -426,7 +426,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
 
-        when(controller.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
+        when(controller.landingService.cacheMap(any[String])) thenReturn Future.successful(Some(cacheMap))
         when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
           .thenReturn(Future.successful((rejectedStatusGen.sample.get, None)))
 
@@ -449,7 +449,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
         val eabOmbudsmanServices = Eab(completeData)
 
-        val cacheMap: CacheMap = mock[CacheMap]
+        val cacheMap: Cache = mock[Cache]
         val complete: BusinessMatching = mock[BusinessMatching]
 
         when(complete.isCompleteLanding) thenReturn true
@@ -459,7 +459,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
 
-        when(controller.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
+        when(controller.landingService.cacheMap(any[String])) thenReturn Future.successful(Some(cacheMap))
         when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
           .thenReturn(Future.successful((activeStatusGen.sample.get, None)))
 
@@ -495,7 +495,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         "data has just been imported" should {
 
           def runImportTest(hasChanged: Boolean): Unit = new Fixture {
-            val testCacheMap = buildTestCacheMap(
+            val testCacheMap = buildTestCache(
               hasChanged = hasChanged,
               includesResponse = false,
               includeSubmissionStatus = true,
@@ -531,7 +531,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           "the user has just submitted" when {
             "there are no incomplete responsible people" should {
               "refresh from API5 and redirect to status controller" in new Fixture {
-                val testCacheMap = buildTestCacheMap(
+                val testCacheMap = buildTestCache(
                   hasChanged = true,
                   includesResponse = false,
                   includeSubmissionStatus = true)
@@ -564,7 +564,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 )
                 val eabOther = Eab(completeRedressSchemeOther,  hasAccepted = true)
 
-                val testCacheMap = buildTestCacheMap(
+                val testCacheMap = buildTestCache(
                   hasChanged = true,
                   includesResponse = false,
                   includeSubmissionStatus = true)
@@ -592,7 +592,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           "the user has not just submitted" when {
             "there are no incomplete responsible people" should {
               "redirect to status controller without refreshing API5" in new Fixture {
-                val testCacheMap = buildTestCacheMap(
+                val testCacheMap = buildTestCache(
                   hasChanged = true,
                   includesResponse = false)
 
@@ -632,7 +632,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
                 val eabOmbudsmanServices = Eab(completeData)
 
-                val testCacheMap = buildTestCacheMap(
+                val testCacheMap = buildTestCache(
                   hasChanged = true,
                   includesResponse = false)
 
@@ -663,7 +663,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
         "data has not changed" should {
           "refresh from API5 and redirect to status controller" in new Fixture {
-            setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(hasChanged = false, includesResponse = false))
+            setUpMocksForDataExistsInSaveForLater(controller, buildTestCache(hasChanged = false, includesResponse = false))
 
             when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
@@ -682,7 +682,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", None, Some(true)))))
 
-            val testCacheMap = buildTestCacheMap(hasChanged = false, includesResponse = false)
+            val testCacheMap = buildTestCache(hasChanged = false, includesResponse = false)
             setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
             when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
             when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
@@ -696,11 +696,11 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           }
 
           "refresh from API5 and redirect to status controller when there is no TP or RP data" in new Fixture {
-            val testCacheMap = buildTestCacheMap(hasChanged = false, includesResponse = false, noTP = true, noRP = true)
+            val testCacheMap = buildTestCache(hasChanged = false, includesResponse = false, noTP = true, noRP = true)
 
             setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
 
-            val fixedCacheMap = buildTestCacheMap(hasChanged = false, includesResponse = false)
+            val fixedCacheMap = buildTestCache(hasChanged = false, includesResponse = false)
 
             when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", None))))
@@ -753,9 +753,9 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         "not refresh API5 and redirect to status controller" in new FixtureNoAmlsNumber {
 
           val businessMatching = mock[BusinessMatching]
-          val cacheMap = mock[CacheMap]
+          val cacheMap = mock[Cache]
 
-          when(controller.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
+          when(controller.landingService.cacheMap(any[String])) thenReturn Future.successful(Some(cacheMap))
           when(businessMatching.isCompleteLanding) thenReturn true
           when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(businessMatching))
           when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
@@ -777,8 +777,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             setUpMocksForNoDataInSaveForLater(controller)
             setUpMocksForDataExistsInKeystore(controller)
 
-            when(controller.landingService.updateReviewDetails(any(), any())(any(), any()))
-              .thenReturn(Future.successful(mock[CacheMap]))
+            when(controller.landingService.updateReviewDetails(any(), any()))
+              .thenReturn(Future.successful(mock[Cache]))
 
             val result = controller.get()(request)
 
@@ -786,7 +786,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             redirectLocation(result) must be(Some(controllers.businessmatching.routes.BusinessTypeController.get.url))
 
             Mockito.verify(controller.landingService, times(1))
-              .updateReviewDetails(any[ReviewDetails], any[String])(any[HeaderCarrier], any[ExecutionContext])
+              .updateReviewDetails(any[ReviewDetails], any[String])
           }
         }
 

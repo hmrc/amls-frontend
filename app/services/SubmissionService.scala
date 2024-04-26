@@ -42,7 +42,7 @@ import models.tradingpremises.TradingPremises.FilterUtils
 import play.api.http.Status.UNPROCESSABLE_ENTITY
 import play.api.libs.json.Format
 import play.api.mvc.Request
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import utils.StatusConstants
 
@@ -82,7 +82,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     }
   }
 
-  private def createSubscriptionRequest(cache: CacheMap): SubscriptionRequest = {
+  private def createSubscriptionRequest(cache: Cache): SubscriptionRequest = {
 
     def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
     def filteredTradingPremises     = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
@@ -163,22 +163,22 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     } yield c
   }
 
-  private def safeId(cache: CacheMap)(implicit ec: ExecutionContext, request: Request[_], headerCarrier: HeaderCarrier): Future[String] = {
+  private def safeId(cache: Cache)(implicit ec: ExecutionContext, request: Request[_], headerCarrier: HeaderCarrier): Future[String] =
     (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
       rd <- bm.reviewDetails
     } yield rd.safeId) match {
       case Some(a) =>
-        if(a.trim.isEmpty)
+        if(a.trim.isEmpty) {
           businessMatchingConnector.getReviewDetails map {
             case Some(details) => details.safeId
             case _ => throw new Exception("No safe id from business customer service")
           }
-        else
+        } else {
           Future.successful(a)
+        }
       case _ => Future.failed(new Exception("No SafeID value available"))
     }
-  }
 
   def bankDetailsExceptDeleted(bankDetails: Option[Seq[BankDetails]]): Option[Seq[BankDetails]] = {
     bankDetails match {

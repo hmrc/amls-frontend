@@ -32,7 +32,7 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.responsiblepeople.PersonResidentTypeService
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.responsiblepeople.PersonResidenceTypeView
 
@@ -62,8 +62,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
     )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
-  val mockCacheMap = mock[CacheMap]
+  val emptyCache = Cache.empty
+  val mockCacheMap = mock[Cache]
 
   "PersonResidentTypeController" when {
 
@@ -80,7 +80,7 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
           val responsiblePeople = ResponsiblePerson(Some(personName))
 
-          when(mockService.getResponsiblePerson(any(), any())(any()))
+          when(mockService.getResponsiblePerson(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeople)))
 
           val result = controller.get(1)(request)
@@ -102,7 +102,7 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               nationality = Some(Country("United Kingdom", "GB"))))
           )
 
-          when(mockService.getResponsiblePerson(any(), any())(any()))
+          when(mockService.getResponsiblePerson(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeople)))
 
           val result = controller.get(1)(request)
@@ -123,7 +123,7 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               nationality = Some(Country("United Kingdom", "GB"))))
           )
 
-          when(mockService.getResponsiblePerson(any(), any())(any()))
+          when(mockService.getResponsiblePerson(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeople)))
 
           val result = controller.get(1)(request)
@@ -140,7 +140,7 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
         "neither RP personName nor residenceType is found" in new Fixture {
           val responsiblePeople = ResponsiblePerson()
 
-          when(mockService.getResponsiblePerson(any(), any())(any()))
+          when(mockService.getResponsiblePerson(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeople)))
 
           val result = controller.get(0)(request)
@@ -174,8 +174,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
                 )
               )
             )
-            when(mockService.getCache(any(), any(), any())(any()))
-              .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
+            when(mockService.getCache(any(), any(), any()))
+              .thenReturn(OptionT[Future, Cache](Future.successful(Some(mockCacheMap))))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
               .thenReturn(Some(Seq(responsiblePeople)))
@@ -207,8 +207,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               )
             )
 
-            when(mockService.getCache(any(), any(), any())(any()))
-              .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
+            when(mockService.getCache(any(), any(), any()))
+              .thenReturn(OptionT[Future, Cache](Future.successful(Some(mockCacheMap))))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
               .thenReturn(Some(Seq(responsiblePeople)))
@@ -236,8 +236,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
                 )
               )
 
-              when(mockService.getCache(any(), any(), any())(any()))
-                .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
+              when(mockService.getCache(any(), any(), any()))
+                .thenReturn(OptionT[Future, Cache](Future.successful(Some(mockCacheMap))))
 
               when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
                 .thenReturn(Some(Seq(responsiblePeople)))
@@ -271,8 +271,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
                 )
               )
 
-              when(mockService.getCache(any(), any(), any())(any()))
-                .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
+              when(mockService.getCache(any(), any(), any()))
+                .thenReturn(OptionT[Future, Cache](Future.successful(Some(mockCacheMap))))
 
               when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
                 .thenReturn(Some(Seq(responsiblePeople)))
@@ -298,8 +298,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
           val responsiblePeople = ResponsiblePerson()
 
-          when(mockService.getCache(any(), any(), any())(any()))
-            .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
+          when(mockService.getCache(any(), any(), any()))
+            .thenReturn(OptionT[Future, Cache](Future.successful(Some(mockCacheMap))))
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
@@ -324,8 +324,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
           val responsiblePeople = ResponsiblePerson()
 
-          when(mockService.getCache(any(), any(), any())(any()))
-            .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
+          when(mockService.getCache(any(), any(), any()))
+            .thenReturn(OptionT[Future, Cache](Future.successful(Some(mockCacheMap))))
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
@@ -364,8 +364,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               "nationality" -> countryCode
             )
 
-            when(mockService.getCache(any(), any(), any())(any()))
-              .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
+            when(mockService.getCache(any(), any(), any()))
+              .thenReturn(OptionT[Future, Cache](Future.successful(Some(mockCacheMap))))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
               .thenReturn(Some(Seq(responsiblePeople)))
@@ -385,7 +385,7 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
           )
           val responsiblePeople = ResponsiblePerson(Some(PersonName("firstname", None, "lastname")))
 
-          when(mockService.getResponsiblePerson(any(), any())(any()))
+          when(mockService.getResponsiblePerson(any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeople)))
 
           val result = controller.post(1)(newRequest)
@@ -410,8 +410,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
 
-          when(mockService.getCache(any(), any(), any())(any()))
-            .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
+          when(mockService.getCache(any(), any(), any()))
+            .thenReturn(OptionT[Future, Cache](Future.successful(Some(mockCacheMap))))
 
           val result = controller.post(10, false)(newRequest)
           status(result) must be(NOT_FOUND)

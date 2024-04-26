@@ -24,7 +24,7 @@ import models.businessmatching.BusinessMatching
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.BeforeAndAfterEach
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import scala.concurrent.Future
@@ -32,7 +32,7 @@ import scala.concurrent.Future
 class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[CacheMap]
+  val mockCacheMap = mock[Cache]
 
   val service = new ConfirmRegisteredOfficeService(mockCacheConnector)
 
@@ -109,7 +109,7 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
 
       "update and save the model correctly" in {
 
-        when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+        when(mockCacheConnector.fetchAll(eqTo(credId)))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -140,7 +140,7 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
 
         "user has answered false" in {
 
-          when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+          when(mockCacheConnector.fetchAll(eqTo(credId)))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -156,7 +156,7 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
 
         "business details is empty" in {
 
-          when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+          when(mockCacheConnector.fetchAll(eqTo(credId)))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -172,7 +172,7 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
 
         "business matching is empty" in {
 
-          when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+          when(mockCacheConnector.fetchAll(eqTo(credId)))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -183,7 +183,7 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
 
         "cache cannot be retrieved" in {
 
-          when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+          when(mockCacheConnector.fetchAll(eqTo(credId)))
             .thenReturn(Future.successful(None))
 
           service.updateRegisteredOfficeAddress(credId, ConfirmRegisteredOffice(true)).futureValue mustBe None

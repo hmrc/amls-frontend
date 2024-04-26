@@ -20,7 +20,7 @@ import models.registrationprogress._
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import play.api.libs.json._
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 class EabSpec extends AmlsSpec {
@@ -349,7 +349,7 @@ class EabSpec extends AmlsSpec {
 
     "taskRow is called" must {
 
-      val mockCache = mock[CacheMap]
+      val mockCache = mock[Cache]
       val msgKey = "eab"
 
       val completeData = completeServices ++

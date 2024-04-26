@@ -24,7 +24,7 @@ import models.{Country, DateOfChange}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import java.time.LocalDate
@@ -562,7 +562,7 @@ class BusinessActivitiesSpec extends AmlsSpec {
 
   "taskRow is called" must {
 
-    val mockCacheMap = mock[CacheMap]
+    val mockCacheMap = mock[Cache]
 
     "return a not started task row" when {
 

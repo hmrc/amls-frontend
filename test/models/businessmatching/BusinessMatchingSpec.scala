@@ -24,7 +24,7 @@ import models.businessmatching.BusinessMatchingMsbService._
 import models.registrationprogress._
 import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
@@ -354,7 +354,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
     "taskRow" must {
 
       "return `NotStarted` task row when there is no task row in mongoCache" in {
-        implicit val cache = CacheMap("", Map.empty)
+        implicit val cache = Cache.empty
         BusinessMatching.taskRow mustBe TaskRow(
           "businessmatching",
           controllers.businessmatching.routes.RegisterServicesController.get().url,
@@ -365,7 +365,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       }
 
       "return `Started` task row when there is a task row which isn't completed" in {
-        implicit val cache = mock[CacheMap]
+        implicit val cache = mock[Cache]
         when {
           cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
         } thenReturn Some(BusinessMatching())
@@ -379,7 +379,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       }
 
       "return `Completed` task row when there is a task row which is completed" in {
-        implicit val cache = mock[CacheMap]
+        implicit val cache = mock[Cache]
 
         when {
           cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
@@ -395,7 +395,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       }
 
       "return `Updated` task row when there is a task row which is completed and has changed" in {
-        implicit val cache = mock[CacheMap]
+        implicit val cache = mock[Cache]
 
         when {
           cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())

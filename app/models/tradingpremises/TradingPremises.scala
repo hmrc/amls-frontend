@@ -21,7 +21,7 @@ import models.registrationprogress._
 import models.tradingpremises.BusinessStructure._
 import play.api.i18n.Messages
 import typeclasses.MongoKey
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.StatusConstants
 
 case class TradingPremises(
@@ -141,7 +141,7 @@ object TradingPremises {
   def filterWithIndex(rp: Seq[TradingPremises]): Seq[(TradingPremises, Int)] =
     rp.zipWithIndex.reverse.filterNot(_._1.status.contains(StatusConstants.Deleted)).filterNot(_._1 == TradingPremises())
 
-  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+  def taskRow(implicit cache: Cache, messages: Messages): TaskRow = {
 
     val messageKey = "tradingpremises"
     val notStarted = TaskRow(

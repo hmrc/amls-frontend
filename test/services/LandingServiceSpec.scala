@@ -44,8 +44,8 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.{Json, Writes}
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
+import services.cache.Cache
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 
 import java.time.LocalDate
@@ -55,7 +55,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
   val service = new LandingService (
     cacheConnector = mock[DataCacheConnector],
-    keyStore = mock[KeystoreConnector],
     desConnector = mock[AmlsConnector],
     statusService = mock[StatusService],
     businessMatchingConnector = mock[BusinessMatchingConnector]
@@ -136,7 +135,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     hasChanged = false
   )
 
-  def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section: T) = {
+  def setUpMockView[T](mock: DataCacheConnector, result: Cache, key: String, section: T) = {
     when {
       mock.save[T](any(), eqTo(key), eqTo(section))(any())
     } thenReturn Future.successful(result)
@@ -144,7 +143,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
   "setAltCorrespondenceAddress" must {
 
-    val cacheMap = CacheMap("", Map.empty)
+    val cacheMap = Cache.empty
 
     "return a cachmap with the saved alternative correspondence address - true" in {
       val correspondenceAddress = CorrespondenceAddressNonUk("Name Test", "Test", "Test", Some("Test"), Some("test"), None, Country("Albania", "AL"))
@@ -176,7 +175,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
   "setAlCorrespondenceAddressWithRegNo" must {
 
-    val cacheMap = CacheMap("", Map.empty)
+    val cacheMap = Cache.empty
 
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
@@ -198,7 +197,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
     "return a cachmap of the saved alternative correspondence address" in {
 
-      val cache = mock[CacheMap]
+      val cache = mock[Cache]
 
       when(service.cacheConnector.save[BusinessDetails](any(), any(), any())(any()))
         .thenReturn(Future.successful(cache))
@@ -220,7 +219,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
     "only call API 5 data" when {
       "the cache doesn't contain a ViewResponse entry" in {
-        val cache = mock[CacheMap]
+        val cache = mock[Cache]
 
         reset(service.cacheConnector)
         reset(service.desConnector)
@@ -245,7 +244,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
   }
 
   "refreshCache" must {
-    val cacheMap = CacheMap("", Map.empty)
+    val cacheMap = Cache.empty
 
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
@@ -275,10 +274,10 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
       } thenReturn Future.successful(viewResponse)
 
-      when(service.cacheConnector.remove(any[String])(any())).thenReturn(Future.successful(true))
+      when(service.cacheConnector.remove(any[String])).thenReturn(Future.successful(true))
 
       when {
-        service.cacheConnector.fetchAllWithDefault(any())(any())
+        service.cacheConnector.fetchAllWithDefault(any())
       } thenReturn Future.successful(cacheMap)
 
       val subscriptionResponse = mock[SubscriptionResponse]
@@ -334,7 +333,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
   }
 
   "refreshCache with null sectors" must {
-    val cacheMap = CacheMap("", Map.empty)
+    val cacheMap = Cache.empty
 
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
@@ -364,10 +363,10 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
       } thenReturn Future.successful(viewResponse)
 
-      when(service.cacheConnector.remove(any())(any())).thenReturn(Future.successful(true))
+      when(service.cacheConnector.remove(any())).thenReturn(Future.successful(true))
 
       when {
-        service.cacheConnector.fetchAllWithDefault(any())(any())
+        service.cacheConnector.fetchAllWithDefault(any())
       } thenReturn Future.successful(cacheMap)
 
       val subscriptionResponse = mock[SubscriptionResponse]
@@ -451,7 +450,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       hasAccepted = true
     )
 
-    val cacheMap = CacheMap("", Map.empty)
+    val cacheMap = Cache.empty
 
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
@@ -477,7 +476,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
 
       when {
-        service.cacheConnector.fetchAllWithDefault(any())(any())
+        service.cacheConnector.fetchAllWithDefault(any())
       } thenReturn Future.successful(cacheMap)
 
       when {
@@ -492,7 +491,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.cacheConnector.fetch[AmendVariationRenewalResponse](any(), eqTo(AmendVariationRenewalResponse.key))(any())
       } thenReturn Future.successful(None)
 
-      when(service.cacheConnector.remove(any())(any())).thenReturn(Future.successful(true))
+      when(service.cacheConnector.remove(any())).thenReturn(Future.successful(true))
 
       when {
         service.cacheConnector.saveAll(any(), any())
@@ -560,7 +559,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
   "updateReviewDetails" must {
 
-    val cacheMap = CacheMap("", Map.empty)
+    val cacheMap = Cache.empty
     val reviewDetails = ReviewDetails(
       businessName = "",
       businessType = None,

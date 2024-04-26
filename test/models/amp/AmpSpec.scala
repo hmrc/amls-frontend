@@ -20,7 +20,7 @@ import models.registrationprogress._
 import models.renewal.AMPTurnover
 import org.mockito.Mockito._
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 
 import java.time.{LocalDate, LocalDateTime}
@@ -128,7 +128,7 @@ class AmpSpec extends AmlsSpec with AmpValues {
     }
 
     "have a task row function that" must {
-      implicit val cache         = mock[CacheMap]
+      implicit val cache         = mock[Cache]
       val ampWhatYouNeedUrl = "http://localhost:9223/anti-money-laundering/art-market-participant/what-you-need"
       val ampSummaryUrl     = "http://localhost:9223/anti-money-laundering/art-market-participant/check-your-answers"
 

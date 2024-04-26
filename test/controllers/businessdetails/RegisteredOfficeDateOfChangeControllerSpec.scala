@@ -28,7 +28,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import services.cache.Cache
 import utils.AmlsSpec
 import views.html.DateOfChangeView
 
@@ -50,7 +50,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
       view = view)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache = Cache.empty
 
   "return view for Date of Change" in new Fixture {
     val result = controller.get()(request)
@@ -77,7 +77,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
         thenReturn(Future.successful(Some(business)))
 
       when(controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(any())).
-        thenReturn(Future.successful(mock[CacheMap]))
+        thenReturn(Future.successful(mock[Cache]))
 
       val result = controller.post()(postRequest)
 
@@ -114,7 +114,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
         thenReturn(Future.successful(Some(business)))
 
       when(controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(any())).
-        thenReturn(Future.successful(mock[CacheMap]))
+        thenReturn(Future.successful(mock[Cache]))
 
       val result = controller.post()(postRequest)
 
@@ -164,7 +164,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
         thenReturn(Future.successful(Some(business)))
 
       when(controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(any())).
-        thenReturn(Future.successful(mock[CacheMap]))
+        thenReturn(Future.successful(mock[Cache]))
 
       val result = controller.post()(postRequest)
       status(result) must be(BAD_REQUEST)
