@@ -70,7 +70,7 @@ trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar w
 
     "have a back link" in {
       def doc: Document = Jsoup.parse(html.body)
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
+      assert(doc.getElementsByClass("govuk-back-link") != null, "\n\nElement " + "govuk-back-link" + " was not rendered on the page.\n")
     }
   }
 

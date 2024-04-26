@@ -26,11 +26,10 @@ import views.html.applicationstatus.HowToPayView
 class HowToPayViewSpec extends AmlsViewSpec with Matchers {
 
   implicit lazy val config: ApplicationConfig = inject[ApplicationConfig]
+  lazy val howToPay = app.injector.instanceOf[HowToPayView]
+  implicit val requestWithToken = addTokenForView()
 
-  trait ViewFixture extends Fixture {
-    lazy val howToPay = app.injector.instanceOf[HowToPayView]
-    implicit val requestWithToken = addTokenForView()
-  }
+  trait ViewFixture extends Fixture
 
   "HowToPayView" must {
     "Have the correct title" in new ViewFixture {
@@ -126,11 +125,6 @@ class HowToPayViewSpec extends AmlsViewSpec with Matchers {
       )
     }
 
-    "have a back link" in new ViewFixture {
-
-      def view = howToPay(None)
-
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
-    }
+    behave like pageWithBackLink(howToPay(None))
   }
 }

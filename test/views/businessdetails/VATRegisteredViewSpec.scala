@@ -29,11 +29,11 @@ import views.html.businessdetails.VATRegisteredView
 
 class VATRegisteredViewSpec extends AmlsViewSpec with Matchers  {
 
-  trait ViewFixture extends Fixture {
-    lazy val vat_registered = app.injector.instanceOf[VATRegisteredView]
-    lazy val formProvider = app.injector.instanceOf[VATRegisteredFormProvider]
-    implicit val requestWithToken = addTokenForView()
-  }
+  lazy val vat_registered = app.injector.instanceOf[VATRegisteredView]
+  lazy val formProvider = app.injector.instanceOf[VATRegisteredFormProvider]
+  implicit val requestWithToken = addTokenForView()
+
+  trait ViewFixture extends Fixture
 
   "vat_registered view" must {
     "have correct title" in new ViewFixture {
@@ -85,11 +85,7 @@ class VATRegisteredViewSpec extends AmlsViewSpec with Matchers  {
       doc.getElementById("vrnNumber-error").text() mustBe (s"Error: ${messages(messageKey)}")
     }
 
-    "have a back link" in new ViewFixture {
+    behave like pageWithBackLink(vat_registered(formProvider(), true))
 
-      def view = vat_registered(formProvider(), true)
-
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
-    }
   }
 }

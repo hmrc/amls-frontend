@@ -25,14 +25,13 @@ import play.api.data.{Form, FormError}
 import views.Fixture
 import views.html.businessmatching.TypeOfBusinessView
 
-
 class TypeOfBusinessViewSpec extends AmlsViewSpec with Matchers  {
 
-  trait ViewFixture extends Fixture {
-    lazy val type_of_business = app.injector.instanceOf[TypeOfBusinessView]
-    lazy val formProvider = app.injector.instanceOf[TypeOfBusinessFormProvider]
-    implicit val requestWithToken = addTokenForView()
-  }
+  lazy val type_of_business = app.injector.instanceOf[TypeOfBusinessView]
+  lazy val formProvider = app.injector.instanceOf[TypeOfBusinessFormProvider]
+  implicit val requestWithToken = addTokenForView()
+
+  trait ViewFixture extends Fixture
 
   "type_of_business view" must {
     "have correct title" in new ViewFixture {
@@ -69,10 +68,7 @@ class TypeOfBusinessViewSpec extends AmlsViewSpec with Matchers  {
 
     }
 
-    "have a back link" in new ViewFixture {
-      def view = type_of_business(formProvider(), edit = true)
+    behave like pageWithBackLink(type_of_business(formProvider(), true))
 
-      doc.getElementById("back-link").isInstanceOf[Element] mustBe true
-    }
   }
 }

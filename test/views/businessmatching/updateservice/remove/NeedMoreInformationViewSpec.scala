@@ -25,9 +25,11 @@ import views.html.businessmatching.updateservice.remove.NeedMoreInformationView
 
 class NeedMoreInformationViewSpec extends AmlsViewSpec with Matchers {
 
+  lazy val informationView = app.injector.instanceOf[NeedMoreInformationView]
+  implicit val requestWithToken = addTokenForView()
+
   trait ViewFixture extends Fixture {
-    lazy val informationView = app.injector.instanceOf[NeedMoreInformationView]
-    implicit val requestWithToken = addTokenForView()
+
     def view = informationView(Set(AccountancyServices))
   }
 
@@ -43,10 +45,6 @@ class NeedMoreInformationViewSpec extends AmlsViewSpec with Matchers {
 
     "have correct subHeading" in new ViewFixture {
       subHeading.html must include(messages("summary.updateservice"))
-    }
-
-    "have the back link button" in new ViewFixture {
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
     }
 
     "show the correct content when asp is selected" in new ViewFixture {
@@ -65,5 +63,8 @@ class NeedMoreInformationViewSpec extends AmlsViewSpec with Matchers {
     "have the correct button" in new ViewFixture {
       doc.getElementById("removeserviceinfo-submit").text() mustBe messages("Continue")
     }
+
+    behave like pageWithBackLink(informationView(Set(AccountancyServices)))
+
   }
 }

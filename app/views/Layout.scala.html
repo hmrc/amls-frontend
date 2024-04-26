@@ -20,6 +20,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcReportTechnicalIssueHelper
 @import views.html.helper.CSPNonce
 @import config.ApplicationConfig
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
 
 @this(
     appConfig: ApplicationConfig,
@@ -44,7 +45,7 @@
     showBackLink: Boolean = true,
     fullWidthLayout: Boolean = false,
     showDeskproLink: Boolean = true
-)(mainContent: Html)(implicit request: Request[_], messages: Messages)
+)(mainContent: Html)(implicit request: RequestHeader, messages: Messages)
 
 @headScripts = {
     @if(timeoutEnabled) {
@@ -61,14 +62,7 @@
 
 @beforeContentBlock = {
     @if(showBackLink) {
-        @govukBackLink(
-            BackLink(
-                attributes = Map("id" -> "back-link"),
-                classes="js-enabled",
-                href="javascript:history.back()",
-                content = HtmlContent(messages("site.back"))
-            )
-        )
+        @govukBackLink(BackLink.mimicsBrowserBackButtonViaJavaScript)
     }
 }
 
