@@ -115,7 +115,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   val applicationWhoNeedsToRegisterLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#businesses-already-supervised-for-money-laundering-purposes"
 
-  val tradeInformationLink = "https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019"
+  val tradeInformationLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register"
 
   val legislationLink = "http://www.legislation.gov.uk/search"
 
