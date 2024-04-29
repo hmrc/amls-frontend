@@ -783,8 +783,6 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
                   .thenReturn(Future.successful((NotCompleted, None)))
 
-//                when(testCacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(Some(eabOmbudsmanServices))
-
                 val updatedTestCacheMap = testCacheMap.data + (Eab.key -> Json.toJson(eabOmbudsmanServices))
                 val delegateCacheMap = new DelegateCacheMap(Cache(testCacheMap.id, updatedTestCacheMap))
                 when(mockCacheConverter.toCacheMap(any())).thenReturn(delegateCacheMap)
