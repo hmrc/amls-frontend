@@ -770,7 +770,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         val result = controller.canOrCannotTradeInformation(msbAndOther)(request)
 
         result.body must include("There are some services you cannot provide while your application is pending")
-        result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
+        result.body must include("https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register")
         result.body must include("Find out if you can trade")
       }
 
@@ -778,7 +778,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         val result = controller.canOrCannotTradeInformation(tcspAndOther)(request)
 
         result.body must include("There are some services you cannot provide while your application is pending")
-        result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
+        result.body must include("https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register")
         result.body must include("Find out if you can trade")
       }
 
@@ -786,14 +786,14 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         val result = controller.canOrCannotTradeInformation(msbAndTcsp)(request)
 
         result.body must include("There are some services you cannot provide while your application is pending")
-        result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
+        result.body must include("https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register")
         result.body must include("Find out if you can trade")
       }
 
       "return default content if BA is empty" in new Fixture {
         val result = controller.canOrCannotTradeInformation(None)(request)
 
-        result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
+        result.body must include("https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register")
         result.body must include("Find out if you can trade")
       }
     }
