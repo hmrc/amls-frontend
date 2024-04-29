@@ -19,7 +19,7 @@ package services.cache
 import models.amp.Amp
 import models.businessmatching.BusinessMatching
 import org.scalatest.OptionValues
-import play.api.libs.json.{JsArray, JsBoolean, JsString, Json}
+import play.api.libs.json.{JsArray, JsBoolean, JsString, JsValue, Json}
 import services.cache.CacheMapOps.RichCacheMap
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
@@ -74,6 +74,17 @@ class CacheMapOpsSpec extends AmlsSpec with OptionValues {
 
       // Then
       unencryptedAmp.value mustEqual expectedAmp
+    }
+
+    "double decrypt nothing" in {
+      // Given
+      val emptyCacheMap = CacheMap("test-cache-map-1", Map.empty[String, JsValue])
+
+      // When
+      val unencryptedAmp = emptyCacheMap.sanitiseDoubleDecrypt(Amp.key)(Amp.reads, compositeSymmetricCrypto)
+
+      // Then
+      unencryptedAmp mustBe None
     }
   }
 }

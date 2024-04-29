@@ -19,6 +19,7 @@ package controllers
 import java.net.URLEncoder
 import config.ApplicationConfig
 import connectors.DataCacheConnector
+import connectors.cache.CacheConverter
 import controllers.actions.{SuccessfulAuthActionNoAmlsRefNo, SuccessfulAuthActionNoUserRole}
 import generators.StatusGenerator
 import models.businesscustomer.{Address, ReviewDetails}
@@ -54,6 +55,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
     val request = addToken(authRequest)
     val config = mock[ApplicationConfig]
+    val mockCacheConverter = mock[CacheConverter]
     lazy val view = app.injector.instanceOf[Start]
     lazy val headerCarrierForPartialsConverter = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
     val controllerNoAmlsNumber = new LandingController(
@@ -70,7 +72,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       parser = mock[BodyParsers.Default],
       start = view,
       headerCarrierForPartialsConverter = headerCarrierForPartialsConverter,
-      applicationCrypto = applicationCrypto)
+      applicationCrypto = applicationCrypto,
+      cacheConverter = mockCacheConverter)
 
     val controllerNoUserRole = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -86,7 +89,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       parser = mock[BodyParsers.Default],
       start = view,
       headerCarrierForPartialsConverter = mock[HeaderCarrierForPartialsConverter],
-      applicationCrypto = applicationCrypto)
+      applicationCrypto = applicationCrypto,
+      cacheConverter = mockCacheConverter)
 
     when {
       controllerNoAmlsNumber.landingService.setAltCorrespondenceAddress(any(), any[String])(any(), any())

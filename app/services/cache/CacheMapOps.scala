@@ -17,7 +17,7 @@
 package services.cache
 
 import crypto.Crypto.SensitiveT
-import play.api.libs.json.{JsError, JsResult, JsResultException, JsString, JsSuccess, Reads}
+import play.api.libs.json.{JsError, JsObject, JsResult, JsResultException, JsString, JsSuccess, Json, Reads}
 import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.http.cache.client.{CacheMap, KeyStoreEntryValidationException}
@@ -41,27 +41,45 @@ object CacheMapOps {
         }
     }
 
-    def sanitiseDoubleDecrypt[T](key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Option[T] = {
-      val sensitiveDecrypter: Reads[SensitiveT[T]] = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
-      val sensitiveStringDecrypter: Reads[SensitiveT[String]] = JsonEncryption.sensitiveDecrypter[String, SensitiveT[String]](SensitiveT.apply)
-
-      cacheMap.data.get(key)
-        .map {
-          case JsString(doubleEncStr) => {
-            val sanitisedDoubleEncryptedStr = doubleEncStr.stripPrefix("'").stripSuffix("'")
-            Try(sensitiveDecrypter.reads(JsString(sanitisedDoubleEncryptedStr))) match {
-              case Success(jsResult) => jsResult.get.decryptedValue
-              case Failure(ex) => throw ex
-              case Failure(jsResultException: JsResultException) => {
-                sensitiveStringDecrypter.reads(JsString(sanitisedDoubleEncryptedStr))
-                  .flatMap(decryptedStr => sensitiveDecrypter.reads(JsString(decryptedStr.decryptedValue)))
-                  .map(_.decryptedValue)
-                  .getOrElse(throw new Exception("unable to double decrypt value"))
-              }
-            }
+    def tryDecrypt[T](key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Try[Option[T]] = {
+      Try {
+        val optJsValue = cacheMap.data.get(key)
+          optJsValue.map { jsValue =>
+            jsValue.validate[T]
+              .fold(
+                errors => throw new KeyStoreEntryValidationException(key, jsValue, CacheMap.getClass, errors),
+                valid => (valid)
+              )
           }
-        }
+      }
     }
 
+    def sanitiseDoubleDecrypt[T](key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Option[T] = {
+      tryDecrypt(key)(reads, c) match {
+        case Success(value) => value
+        case Failure(_: KeyStoreEntryValidationException) => {
+          val sensitiveDecrypter: Reads[SensitiveT[T]] = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
+          val sensitiveStringDecrypter: Reads[SensitiveT[String]] = JsonEncryption.sensitiveDecrypter[String, SensitiveT[String]](SensitiveT.apply)
+
+          cacheMap.data.get(key)
+            .map {
+              case jsStr@JsString(str) if str.startsWith("{") | str.startsWith("[") => reads.reads(jsStr).asOpt.getOrElse(throw new Exception("error reading"))
+              case JsString(doubleEncStr) => {
+                val sanitisedDoubleEncryptedStr = doubleEncStr.stripPrefix("'").stripSuffix("'")
+                Try(sensitiveDecrypter.reads(JsString(sanitisedDoubleEncryptedStr))) match {
+                  case Success(jsResult) => jsResult.get.decryptedValue
+                  case Failure(ex) => throw ex
+                  case Failure(_: JsResultException) => {
+                    sensitiveStringDecrypter.reads(JsString(sanitisedDoubleEncryptedStr))
+                      .flatMap(decryptedStr => sensitiveDecrypter.reads(JsString(decryptedStr.decryptedValue)))
+                      .map(_.decryptedValue)
+                      .getOrElse(throw new Exception("unable to double decrypt value"))
+                  }
+                }
+              }
+            }
+        }
+      }
+    }
   }
 }

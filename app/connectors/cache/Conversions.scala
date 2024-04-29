@@ -16,6 +16,7 @@
 
 package connectors.cache
 
+import connectors.cache.Conversions.DelegateCacheMap
 import play.api.libs.json.{JsObject, JsValue, Reads}
 import services.cache.{Cache, CryptoCache}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -38,18 +39,21 @@ trait Conversions {
     * @return The CacheMap instance
     */
   def toCacheMap(cache: Cache): CacheMap = new DelegateCacheMap(cache)
+}
 
+
+object Conversions {
   /**
     * A new implementation of CacheMap, which delegates calls to getEntry() to the given cache instance if that
     * cache instance is a CryptoCache. Otherwise, the default implementation of CacheMap is used.
+    *
     * @param cache The cache to delegate to
     */
-  private class DelegateCacheMap(cache: Cache) extends CacheMap(cache.id, cache.data) {
+  class DelegateCacheMap(cache: Cache) extends CacheMap(cache.id, cache.data) {
     override def getEntry[T](key: String)(implicit fjs: Reads[T]): Option[T] = cache match {
       case c: CryptoCache => c.getEncryptedEntry(key)
       case _ => super.getEntry(key)
     }
   }
-
 }
 // $COVERAGE-ON$

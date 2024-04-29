@@ -19,7 +19,7 @@ package controllers
 import audit.ServiceEntrantEvent
 import config.ApplicationConfig
 import connectors.DataCacheConnector
-import connectors.cache.Conversions
+import connectors.cache.CacheConverter
 import forms.mappings.Constraints
 import models._
 import models.amp.Amp
@@ -71,7 +71,8 @@ class LandingController @Inject()(val landingService: LandingService,
                                   parser: BodyParsers.Default,
                                   start: Start,
                                   headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter,
-                                  applicationCrypto: ApplicationCrypto) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper with Logging with Constraints with Conversions {
+                                  applicationCrypto: ApplicationCrypto,
+                                  cacheConverter: CacheConverter) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper with Logging with Constraints {
 
   implicit val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
 
@@ -386,7 +387,7 @@ class LandingController @Inject()(val landingService: LandingService,
   private def insertEmptyRecords[T](credId: String, cache: CacheMap, key: String)
                                    (implicit hc: HeaderCarrier, f: play.api.libs.json.Format[T]): Future[CacheMap] = {
     try {
-      val delegateCacheMap = toCacheMap(Cache(cache.id, cache.data))
+      val delegateCacheMap = cacheConverter.toCacheMap(Cache(cache.id, cache.data))
       delegateCacheMap.getEntry[Seq[T]](key)
       Future.successful(delegateCacheMap)
     } catch {
