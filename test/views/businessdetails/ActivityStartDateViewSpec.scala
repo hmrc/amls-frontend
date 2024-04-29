@@ -27,13 +27,13 @@ import views.html.businessdetails.ActivityStartDateView
 
 import java.time.LocalDate
 
-
 class ActivityStartDateViewSpec extends AmlsViewSpec with Matchers {
-  trait ViewFixture extends Fixture {
-    lazy val date = inject[ActivityStartDateView]
-    lazy val formProvider = inject[ActivityStartDateFormProvider]
-    implicit val requestWithToken = addTokenForView()
-  }
+
+  lazy val date = inject[ActivityStartDateView]
+  lazy val formProvider = inject[ActivityStartDateFormProvider]
+  implicit val requestWithToken = addTokenForView()
+
+  trait ViewFixture extends Fixture
 
   "ActivityStartDateView" must {
     "have correct title" in new ViewFixture {
@@ -74,10 +74,7 @@ class ActivityStartDateViewSpec extends AmlsViewSpec with Matchers {
 
     }
 
-    "have a back link" in new ViewFixture {
-      def view = date(formProvider(), true)
+    behave like pageWithBackLink(date(formProvider(), true))
 
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
-    }
   }
 }

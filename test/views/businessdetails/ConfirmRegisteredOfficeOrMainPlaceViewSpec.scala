@@ -24,14 +24,13 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.ConfirmRegisteredOfficeOrMainPlaceView
 
-
 class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with Matchers {
 
-  trait ViewFixture extends Fixture {
-    lazy val place = app.injector.instanceOf[ConfirmRegisteredOfficeOrMainPlaceView]
-    lazy val formProvider = app.injector.instanceOf[ConfirmRegisteredOfficeFormProvider]
-    implicit val requestWithToken = addTokenForView()
-  }
+  lazy val place = app.injector.instanceOf[ConfirmRegisteredOfficeOrMainPlaceView]
+  lazy val formProvider = app.injector.instanceOf[ConfirmRegisteredOfficeFormProvider]
+  implicit val requestWithToken = addTokenForView()
+
+  trait ViewFixture extends Fixture
 
   "ConfirmRegisteredOfficeOrMainPlaceView" must {
     "have correct title" in new ViewFixture {
@@ -78,11 +77,9 @@ class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with Match
       doc.getElementById("isRegOfficeOrMainPlaceOfBusiness-error").text() must include(messages(errorKey))
     }
 
-    "have a back link" in new ViewFixture {
-      val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
-      def view = place(formProvider(), address, true)
+    val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
 
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
-    }
+    behave like pageWithBackLink(place(formProvider(), address, true))
+
   }
 }

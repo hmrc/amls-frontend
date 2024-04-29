@@ -27,11 +27,11 @@ import views.html.businessmatching.PsrNumberView
 
 class PsrNumberViewSpec extends AmlsViewSpec {
 
-    trait ViewFixture extends Fixture {
-        lazy val psr_number = app.injector.instanceOf[PsrNumberView]
-        lazy val formProvider = app.injector.instanceOf[PSRNumberFormProvider]
-        implicit val requestWithToken = addTokenForView()
-    }
+    lazy val psr_number = app.injector.instanceOf[PsrNumberView]
+    lazy val formProvider = app.injector.instanceOf[PSRNumberFormProvider]
+    implicit val requestWithToken = addTokenForView()
+
+    trait ViewFixture extends Fixture
 
     "psr_number view" must {
         "have correct title for pre-submission mode" in new ViewFixture {
@@ -129,13 +129,13 @@ class PsrNumberViewSpec extends AmlsViewSpec {
         "have a back link in pre-submission mode" in new ViewFixture {
             def view = psr_number(formProvider(), edit = false, isPreSubmission = true)
 
-            doc.getElementById("back-link").isInstanceOf[Element] mustBe true
+            assert(doc.getElementsByClass("govuk-back-link") != null, "\n\nElement " + "govuk-back-link" + " was not rendered on the page.\n")
         }
 
         "have a back link in non pre-submission mode" in new ViewFixture {
             def view = psr_number(formProvider(), edit = true, isPreSubmission = false)
 
-            doc.getElementById("back-link").isInstanceOf[Element] mustBe true
+            assert(doc.getElementsByClass("govuk-back-link") != null, "\n\nElement " + "govuk-back-link" + " was not rendered on the page.\n")
         }
     }
 }

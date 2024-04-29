@@ -95,13 +95,14 @@ class RegisterServicesViewSpec extends AmlsViewSpec with Matchers  {
     "have a back link in pre-submission mode" in new ViewFixture {
       def view = register_services(formProvider(), edit = true, Seq.empty, isPreSubmission = true)
 
-      doc.getElementById("back-link").text() must be("Back")
+      doc.getElementsByClass("govuk-back-link").text() must be("Back")
     }
 
     "have a back link in non pre-submission mode" in new ViewFixture {
       def view = register_services(formProvider(), edit = true, Seq.empty, isPreSubmission = false)
 
-      doc.getElementById("back-link").text() must be("Back")
+      doc.getElementsByClass("govuk-back-link").text() must be("Back")
+
     }
 
     "have correct hint content" in new ViewFixture {

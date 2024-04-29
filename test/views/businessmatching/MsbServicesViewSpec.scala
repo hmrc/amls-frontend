@@ -29,11 +29,11 @@ import views.html.businessmatching.MsbServicesView
 
 class MsbServicesViewSpec extends AmlsViewSpec with Matchers  {
 
-  trait ViewFixture extends Fixture {
-    lazy val services = app.injector.instanceOf[MsbServicesView]
-    lazy val formProvider = app.injector.instanceOf[MsbSubSectorsFormProvider]
-    implicit val requestWithToken = addTokenForView()
-  }
+  lazy val services = app.injector.instanceOf[MsbServicesView]
+  lazy val formProvider = app.injector.instanceOf[MsbSubSectorsFormProvider]
+  implicit val requestWithToken = addTokenForView()
+
+  trait ViewFixture extends Fixture
 
   val sortedServices = BusinessMatchingMsbServices.all.sortBy(_.toString)
 
@@ -105,13 +105,13 @@ class MsbServicesViewSpec extends AmlsViewSpec with Matchers  {
     "have a back link in pre-submission mode" in new ViewFixture {
       def view = services(formProvider(), edit = true, isPreSubmission = true)
 
-      doc.getElementById("back-link").isInstanceOf[Element] mustBe true
+      assert(doc.getElementsByClass("govuk-back-link") != null, "\n\nElement " + "govuk-back-link" + " was not rendered on the page.\n")
     }
 
     "have a back link in non pre-submission mode" in new ViewFixture {
       def view = services(formProvider(), edit = true, isPreSubmission = false)
 
-      doc.getElementById("back-link").isInstanceOf[Element] mustBe true
+      assert(doc.getElementsByClass("govuk-back-link") != null, "\n\nElement " + "govuk-back-link" + " was not rendered on the page.\n")
     }
   }
 

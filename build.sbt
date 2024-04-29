@@ -6,7 +6,7 @@ import sbt.*
 import com.typesafe.sbt.digest.Import.digest
 import com.typesafe.sbt.web.Import.{Assets, pipelineStages}
 import uk.gov.hmrc.*
-import DefaultBuildSettings.{addTestReportOption, defaultSettings, scalaSettings}
+import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings, scalaSettings}
 import play.twirl.sbt.Import.TwirlKeys
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion

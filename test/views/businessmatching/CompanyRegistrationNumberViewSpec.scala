@@ -81,13 +81,13 @@ class CompanyRegistrationNumberViewSpec extends AmlsViewSpec with Matchers  {
     "have a back link in pre-submission mode" in new ViewFixture {
       def view = viewUnderTest(formProvider, edit = false, isPreSubmission = true)
 
-      doc.getElementById("back-link").attr("href") mustBe "javascript:history.back()"
+      doc.getElementsByClass("govuk-back-link").attr("href") mustBe "#"
     }
 
     "have a back link in non pre-submission mode" in new ViewFixture {
       def view = viewUnderTest(formProvider, edit = false, isPreSubmission = false)
 
-      doc.getElementById("back-link").attr("href") mustBe "javascript:history.back()"
+      doc.getElementsByClass("govuk-back-link").attr("href") mustBe "#"
     }
 
   }

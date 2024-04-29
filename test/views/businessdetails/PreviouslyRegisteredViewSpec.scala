@@ -29,11 +29,11 @@ import views.html.businessdetails.PreviouslyRegisteredView
 
 class PreviouslyRegisteredViewSpec extends AmlsViewSpec with Matchers  {
 
-  trait ViewFixture extends Fixture {
-    lazy val previously_registered = app.injector.instanceOf[PreviouslyRegisteredView]
-    lazy val formProvider = app.injector.instanceOf[PreviouslyRegisteredFormProvider]
-    implicit val requestWithToken = addTokenForView()
-  }
+  lazy val previously_registered = app.injector.instanceOf[PreviouslyRegisteredView]
+  lazy val formProvider = app.injector.instanceOf[PreviouslyRegisteredFormProvider]
+  implicit val requestWithToken = addTokenForView()
+
+  trait ViewFixture extends Fixture
 
   "previously_registered view" must {
     "have correct title" in new ViewFixture {
@@ -70,10 +70,7 @@ class PreviouslyRegisteredViewSpec extends AmlsViewSpec with Matchers  {
 
     }
 
-    "have a back link" in new ViewFixture {
-      def view = previously_registered(formProvider(), true)
+    behave like pageWithBackLink(previously_registered(formProvider(), true))
 
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
-    }
   }
 }

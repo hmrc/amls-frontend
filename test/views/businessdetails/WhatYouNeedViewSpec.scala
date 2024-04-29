@@ -22,13 +22,12 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.WhatYouNeedView
 
-
 class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
-  trait ViewFixture extends Fixture {
-    lazy val what_you_need = app.injector.instanceOf[WhatYouNeedView]
-    implicit val requestWithToken = addTokenForView()
-  }
+  lazy val what_you_need = app.injector.instanceOf[WhatYouNeedView]
+  implicit val requestWithToken = addTokenForView()
+
+  trait ViewFixture extends Fixture
 
   "What you need View" must {
     "Have the correct title" in new ViewFixture {
@@ -54,10 +53,7 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       html must include(messages("a contact email address, telephone number, and postal address"))
     }
 
-    "have a back link" in new ViewFixture {
-      def view = what_you_need()
+    behave like pageWithBackLink(what_you_need())
 
-      doc.getElementById("back-link").isInstanceOf[Element] mustBe true
-    }
   }
 }
