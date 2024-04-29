@@ -16,7 +16,6 @@
 
 package controllers
 
-import connectors.AuthenticatorConnector
 import exceptions.{DuplicateEnrolmentException, DuplicateSubscriptionException, InvalidEnrolmentCredentialsException}
 import models.status._
 import models.{SubmissionResponse, SubscriptionResponse}
@@ -33,7 +32,6 @@ import scala.concurrent.Future
 class SubmissionController @Inject()(val subscriptionService: SubmissionService,
                                      val statusService: StatusService,
                                      val renewalService: RenewalService,
-                                     val authenticator: AuthenticatorConnector,
                                      authAction: AuthAction,
                                      val ds: CommonPlayDependencies,
                                      val cc: MessagesControllerComponents,
@@ -62,9 +60,7 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
             // $COVERAGE-OFF$
             logger.info("[SubmissionController][post]:SubscriptionResponse(previouslySubmitted=true)")
             // $COVERAGE-ON$
-            authenticator.refreshProfile map { _ =>
-              Redirect(controllers.routes.LandingController.get)
-            }
+              Future.successful(Redirect(controllers.routes.LandingController.get))
           case _ =>
             // $COVERAGE-OFF$
             logger.info("[SubmissionController][post]:SubmissionResponse or SubscriptionResponse(previouslySubmitted=false)")

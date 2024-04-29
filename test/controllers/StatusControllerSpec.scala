@@ -65,7 +65,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       mock[ProgressService],
       mock[AmlsConnector],
       mockCacheConnector,
-      mock[AuthenticatorConnector],
       SuccessfulAuthAction,
       commonDependencies,
       mock[FeeResponseService],
@@ -101,7 +100,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       mock[ProgressService],
       mock[AmlsConnector],
       mockCacheConnector,
-      mock[AuthenticatorConnector],
       SuccessfulAuthActionNoAmlsRefNo,
       commonDependencies,
       mock[FeeResponseService],
@@ -211,10 +209,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.enrolmentsService.deEnrol(any(), any())(any(), any()))
           .thenReturn(Future.successful(true))
 
-        when(controller.authenticator.refreshProfile(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(OK, "")))
-
-        when(controller.dataCache.remove(any()))
+        when(controller.dataCache.remove(any[String])).thenReturn(Future.successful(true))
           .thenReturn(Future.successful(true))
 
         val result = controller.newSubmission()(request)
@@ -231,10 +226,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.enrolmentsService.deEnrol(any(), any())(any(), any()))
           .thenReturn(Future.successful(true))
 
-        when(controller.authenticator.refreshProfile(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(OK, "")))
-
-        when(controller.dataCache.remove(any[String]()))
+        when(controller.dataCache.remove(any[String])).thenReturn(Future.successful(true))
           .thenReturn(Future.successful(true))
 
         val result = controller.newSubmission()(request)

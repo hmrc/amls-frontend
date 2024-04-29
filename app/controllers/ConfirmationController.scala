@@ -36,7 +36,6 @@ class ConfirmationController @Inject()(authAction: AuthAction,
                                        private[controllers] implicit val dataCacheConnector: DataCacheConnector,
                                        private[controllers] implicit val amlsConnector: AmlsConnector,
                                        private[controllers] implicit val statusService: StatusService,
-                                       private[controllers] val authenticator: AuthenticatorConnector,
                                        private[controllers] val confirmationService: ConfirmationService,
                                        val cc: MessagesControllerComponents,
                                        val feeHelper: FeeHelper,
@@ -54,7 +53,6 @@ class ConfirmationController @Inject()(authAction: AuthAction,
       logger.debug(s"[$prefix] - begin get()...")
       // $COVERAGE-ON$
       for {
-        _ <- authenticator.refreshProfile
         status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
         submissionRequestStatus <- dataCacheConnector.fetch[SubmissionRequestStatus](request.credId, SubmissionRequestStatus.key)
         result <- resultFromStatus(status, submissionRequestStatus, request.amlsRefNumber, request.accountTypeId, request.credId, request.groupIdentifier)

@@ -57,7 +57,6 @@ class BacsConfirmationControllerSpec extends AmlsSpec
       statusService = mock[StatusService],
       dataCacheConnector = mock[DataCacheConnector],
       amlsConnector = mock[AmlsConnector],
-      authenticator = mock[AuthenticatorConnector],
       enrolmentService = mock[AuthEnrolmentsService],
       ds = commonDependencies,
       cc = mockMcc,
@@ -75,10 +74,6 @@ class BacsConfirmationControllerSpec extends AmlsSpec
     val companyNameFromRegistration = "My Test Company Name From Registration"
 
     setupBusinessMatching(companyNameFromCache)
-
-    when {
-      controller.authenticator.refreshProfile(any(), any())
-    } thenReturn Future.successful(HttpResponse(OK, ""))
 
     when {
       controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())

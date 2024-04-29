@@ -32,7 +32,6 @@ class BacsConfirmationController @Inject()(authAction: AuthAction,
                                            private[controllers] implicit val dataCacheConnector: DataCacheConnector,
                                            private[controllers] implicit val amlsConnector: AmlsConnector,
                                            private[controllers] implicit val statusService: StatusService,
-                                           private[controllers] val authenticator: AuthenticatorConnector,
                                            private[controllers] val enrolmentService: AuthEnrolmentsService,
                                            val cc: MessagesControllerComponents,
                                            view: ConfirmationBacsView) extends AmlsBaseController(ds, cc) {
@@ -40,7 +39,6 @@ class BacsConfirmationController @Inject()(authAction: AuthAction,
   def bacsConfirmation(): Action[AnyContent] = authAction.async {
       implicit request =>
         val okResult = for {
-          _ <- OptionT.liftF(authenticator.refreshProfile)
           refNo <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
           status <- OptionT.liftF(statusService.getReadStatus(refNo, request.accountTypeId))
           name <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)

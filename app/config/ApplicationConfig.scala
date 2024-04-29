@@ -91,8 +91,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
   val mongoEncryptionEnabled = configuration.getOptional[Boolean]("appCache.mongo.encryptionEnabled").getOrElse(true)
   val cacheExpiryInSeconds = configuration.getOptional[Int]("appCache.expiryInSeconds").getOrElse(60)
 
-  def refreshProfileToggle: Boolean = configuration.getOptional[Boolean]("feature-toggle.refresh-profile").getOrElse(false)
-
   def frontendBaseUrl = {
     val secure = servicesConfig.getConfBool("amls-frontend.public.secure", false)
     val scheme = if (secure) "https" else "http"

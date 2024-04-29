@@ -44,7 +44,6 @@ class StatusController @Inject()(val landingService: LandingService,
                                  val progressService: ProgressService,
                                  val amlsConnector: AmlsConnector,
                                  val dataCache: DataCacheConnector,
-                                 val authenticator: AuthenticatorConnector,
                                  authAction: AuthAction,
                                  val ds: CommonPlayDependencies,
                                  val feeResponseService: FeeResponseService,
@@ -100,7 +99,6 @@ class StatusController @Inject()(val landingService: LandingService,
       val redirect = for {
         amlsRegNumber <- OptionT.fromOption[Future](request.amlsRefNumber)
         _ <- OptionT.liftF(enrolmentsService.deEnrol(amlsRegNumber, request.groupIdentifier))
-        _ <- OptionT.liftF(authenticator.refreshProfile)
         _ <- OptionT.liftF(dataCache.remove(request.credId))
       } yield Redirect(controllers.routes.LandingController.start(true))
 
