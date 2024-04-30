@@ -99,6 +99,8 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
     s"$scheme://$host"
   }
 
+  def encryptionKey = servicesConfig.getString("json.encryption.key")
+
   val testOnlyStubsUrl = baseUrl("test-only") + getConfigString("test-only.get-base-url")
 
   lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
