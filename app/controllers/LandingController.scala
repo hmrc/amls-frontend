@@ -40,19 +40,16 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json._
-import play.api.mvc.Results.Redirect
 import play.api.mvc._
-import services.cache.Cache
 import services.cache.CacheMapOps.RichCacheMap
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.{CacheMap, KeyStoreEntryValidationException}
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
-import utils.{AuthAction, ControllerHelper}
+import utils.AuthAction
 import views.html.Start
 
 import java.net.URLEncoder
@@ -113,26 +110,22 @@ class LandingController @Inject()(val landingService: LandingService,
       getWithoutAmendments(amlsRegistrationNumber, credId, accountTypeId)
     } else {
       val mlrNumber: String = amlsRegistrationNumber.head
-      val prefilledEnrolmentIntoCacheFromDatabase: Future[Option[CacheMap]] = landingService.cacheMap(credId)
+      val prefilledEnrolmentIntoCacheFromDatabase: Future[Option[CacheMap]] = landingService.initialiseGetWithAmendments(credId)
       prefilledEnrolmentIntoCacheFromDatabase.flatMap { optPrefilledCache =>
         if (optPrefilledCache.isEmpty) {
           refreshAndRedirect(mlrNumber, None, credId, accountTypeId)
         } else {
-          val cache: CacheMap = optPrefilledCache.head
+          val cacheMap: CacheMap = optPrefilledCache.head
           logger.debug("getWithAmendments:AMLSReference:" + amlsRegistrationNumber)
-          insertEmptyRecords[TradingPremises](credId, cache, TradingPremises.key)
-            .flatMap(_ => insertEmptyRecords[ResponsiblePerson](credId, cache, ResponsiblePerson.key))
-            .flatMap { cacheMap =>
-              if (dataHasChanged(cacheMap)) {
-                cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
-                  case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
-                } getOrElse landingService.setAltCorrespondenceAddress(mlrNumber, Some(cacheMap), accountTypeId, credId) flatMap { _ =>
-                  preFlightChecksAndRedirect(amlsRegistrationNumber, accountTypeId, credId)
-                }
-              } else {
-                refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
-              }
+          if (dataHasChanged(cacheMap)) {
+            cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
+              case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
+            } getOrElse landingService.setAltCorrespondenceAddress(mlrNumber, Some(cacheMap), accountTypeId, credId) flatMap { _ =>
+              preFlightChecksAndRedirect(amlsRegistrationNumber, accountTypeId, credId)
             }
+          } else {
+            refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
+          }
         }
       }
     }
@@ -319,23 +312,5 @@ class LandingController @Inject()(val landingService: LandingService,
       cacheMap.sanitiseDoubleDecrypt[Hvd](Hvd.key).fold(false)(_.hasChanged),
       cacheMap.sanitiseDoubleDecrypt[Renewal](Renewal.key).fold(false)(_.hasChanged)
     ).exists(identity)
-  }
-
-  /**
-    * Try to deserialise a sequence of data from the cache & if unsuccessful then populate the database
-    * with an empty sequence of records for that type, we don't really care about the returned value from getEntry
-    *
-    * @return The unchanged CacheMap
-    */
-  private def insertEmptyRecords[T](credId: String, cache: CacheMap, key: String)
-                                   (implicit hc: HeaderCarrier, f: play.api.libs.json.Format[T]): Future[CacheMap] = {
-    try {
-      val delegateCacheMap = cacheConverter.toCacheMap(Cache(cache.id, cache.data))
-      delegateCacheMap.getEntry[Seq[T]](key)
-      Future.successful(delegateCacheMap)
-    } catch {
-      case _: JsResultException | _: KeyStoreEntryValidationException =>
-        cacheConnector.save[Seq[T]](credId, key, Seq.empty[T])
-    }
   }
 }
