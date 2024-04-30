@@ -18,14 +18,17 @@ package forms.responsiblepeople
 
 import forms.behaviours.StringFieldBehaviours
 import forms.mappings.Constraints
-import models.responsiblepeople.{ExperienceTraining, ExperienceTrainingYes, ExperienceTrainingNo}
+import models.responsiblepeople.{ExperienceTraining, ExperienceTrainingNo, ExperienceTrainingYes}
 import play.api.data.{Form, FormError}
+import play.api.i18n.{Messages, MessagesImplicits}
+import play.api.test.{FakeRequest, Helpers}
 
-class ExperienceTrainingFormProviderSpec extends StringFieldBehaviours with Constraints {
+class ExperienceTrainingFormProviderSpec extends StringFieldBehaviours with Constraints with MessagesImplicits {
 
+  implicit val messages: Messages = Helpers.stubMessagesApi().preferred(FakeRequest())
   val formProvider = new ExperienceTrainingFormProvider()
-
-  val form: Form[ExperienceTraining] = formProvider()
+  val name = "John Smith"
+  val form: Form[ExperienceTraining] = formProvider(name, None)
   val booleanFieldName: String = "experienceTraining"
   val stringFieldName: String = "experienceInformation"
 
@@ -73,14 +76,30 @@ class ExperienceTrainingFormProviderSpec extends StringFieldBehaviours with Cons
         }
       }
 
-      s"$booleanFieldName is empty" in {
+      s"$booleanFieldName is empty with single service" in {
+
+        val service = "high value dealer"
+        val result = formProvider(name, Some(service)).bind(Map(
+          booleanFieldName -> ""
+        ))
+
+        result.value shouldBe None
+        result.errors shouldBe Seq(
+          FormError(
+            booleanFieldName,
+            messages("error.required.rp.experiencetraining.one", name, service)
+          )
+        )
+      }
+
+      s"$booleanFieldName is empty with multiple services" in {
 
         val result = form.bind(Map(
           booleanFieldName -> ""
         ))
 
         result.value shouldBe None
-        result.errors shouldBe Seq(FormError(booleanFieldName, "error.required.rp.experiencetraining"))
+        result.errors shouldBe Seq(FormError(booleanFieldName, messages("error.required.rp.experiencetraining", name)))
       }
 
       s"$stringFieldName is empty when $booleanFieldName is true" in {
