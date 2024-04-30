@@ -32,6 +32,8 @@ case class Country(name: String, code: String) {
 
 object Country {
 
+  val unitedKingdom = Country("United Kingdom", "GB")
+
   implicit val writes = Writes[Country] {
     case Country(_, c) => JsString(c)
   }

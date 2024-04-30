@@ -26,6 +26,7 @@ import models.amp.Amp
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
+import models.businesscustomer.ReviewDetails
 import models.businessdetails.BusinessDetails
 import models.businessmatching.BusinessMatching
 import models.eab.Eab
@@ -40,6 +41,7 @@ import models.tradingpremises.TradingPremises
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json._
+import play.api.mvc.Results.Redirect
 import play.api.mvc._
 import services.cache.Cache
 import services.cache.CacheMapOps.RichCacheMap
@@ -107,46 +109,32 @@ class LandingController @Inject()(val landingService: LandingService,
   def getWithAmendments(amlsRegistrationNumber: Option[String], credId: String, accountTypeId: (String, String))
                        (implicit request: Request[_]): Future[Result] = {
 
-    amlsRegistrationNumber match {
-      case Some(mlrNumber) => landingService.cacheMap(credId) flatMap {
-        //enrolment exists
-        case Some(c) =>
-          // $COVERAGE-OFF$
+    if (amlsRegistrationNumber.isEmpty) {
+      getWithoutAmendments(amlsRegistrationNumber, credId, accountTypeId)
+    } else {
+      val mlrNumber: String = amlsRegistrationNumber.head
+      val prefilledEnrolmentIntoCacheFromDatabase: Future[Option[CacheMap]] = landingService.cacheMap(credId)
+      prefilledEnrolmentIntoCacheFromDatabase.flatMap { optPrefilledCache =>
+        if (optPrefilledCache.isEmpty) {
+          refreshAndRedirect(mlrNumber, None, credId, accountTypeId)
+        } else {
+          val cache: CacheMap = optPrefilledCache.head
           logger.debug("getWithAmendments:AMLSReference:" + amlsRegistrationNumber)
-          // $COVERAGE-ON$
-          insertEmptyRecords[TradingPremises](credId, c, TradingPremises.key)
-            .flatMap(_ => insertEmptyRecords[ResponsiblePerson](credId, c, ResponsiblePerson.key))
+          insertEmptyRecords[TradingPremises](credId, cache, TradingPremises.key)
+            .flatMap(_ => insertEmptyRecords[ResponsiblePerson](credId, cache, ResponsiblePerson.key))
             .flatMap { cacheMap =>
               if (dataHasChanged(cacheMap)) {
-                // $COVERAGE-OFF$
-                logger.debug("Data has changed in getWithAmendments()")
-                // $COVERAGE-ON$
                 cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
                   case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
                 } getOrElse landingService.setAltCorrespondenceAddress(mlrNumber, Some(cacheMap), accountTypeId, credId) flatMap { _ =>
                   preFlightChecksAndRedirect(amlsRegistrationNumber, accountTypeId, credId)
                 }
               } else {
-                // $COVERAGE-OFF$
-                logger.debug("Data has not changed route in getWithAmendments()")
-                // $COVERAGE-ON$
                 refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
               }
             }
-        case _ => {
-          // $COVERAGE-OFF$
-          logger.debug("Data with amlsRegistration number route in getWithAmendments()" + amlsRegistrationNumber)
-          // $COVERAGE-ON$
-          refreshAndRedirect(mlrNumber, None, credId, accountTypeId)
         }
       }
-
-      case _ => {
-        // $COVERAGE-OFF$
-        logger.debug("No Enrolement exists getWithAmendments()")
-        // $COVERAGE-ON$
-        getWithoutAmendments(amlsRegistrationNumber, credId, accountTypeId)
-      } //no enrolment exists
     }
   }
 
@@ -192,7 +180,7 @@ class LandingController @Inject()(val landingService: LandingService,
   }
 
   def getWithoutAmendments(amlsRegistrationNumber: Option[String], credId: String, accountTypeId: (String, String))
-                          (implicit request: Request[_]) = {
+                          (implicit request: Request[_]): Future[Result] = {
 
     // $COVERAGE-OFF$
     logger.debug("getWithoutAmendments:AMLSReference:" + amlsRegistrationNumber.getOrElse("Amls registration number not available"))
@@ -201,44 +189,36 @@ class LandingController @Inject()(val landingService: LandingService,
     implicit val hc = headerCarrierForPartialsConverter.fromRequestWithEncryptedCookie(request)
 
     landingService.cacheMap(credId) flatMap {
-      case Some(cache) =>
-        preApplicationComplete(cache, amlsRegistrationNumber, accountTypeId, credId)
+      case Some(cache) => preApplicationComplete(cache, amlsRegistrationNumber, accountTypeId, credId)
       case None => {
-        for {
-          reviewDetails <- landingService.reviewDetails
-        } yield (reviewDetails, amlsRegistrationNumber) match {
-          case (Some(rd), None) =>
-            // $COVERAGE-OFF$
-            logger.debug("LandingController:getWithoutAmendments: " + rd)
-            // $COVERAGE-ON$
-            landingService.updateReviewDetails(rd, credId) map { _ => {
-              auditConnector.sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse(""), rd.safeId))
-
-              (rd.businessAddress.postcode, rd.businessAddress.country) match {
-                case (Some(postcode), Country("United Kingdom", "GB")) =>
-                  if (postcode.matches(postcodeRegex)) {
-                    Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
-                  } else {
-                    Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
-                  }
-                case (_, Country("United Kingdom", "GB")) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
-                case (_, country) if !country.isUK && !country.isEmpty => Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
-                case (_, _) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
+        landingService.reviewDetails.map { reviewDetails =>
+          (reviewDetails, amlsRegistrationNumber) match {
+            case (Some(rd), None) =>
+              logger.debug("LandingController:getWithoutAmendments: " + rd)
+              landingService.updateReviewDetails(rd, credId).map { _ =>
+                auditConnector.sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse(""), rd.safeId))
+                businessTypePostcodeRedirectLogic(rd)
               }
-            }
-            }
-          case (None, None) =>
-            // $COVERAGE-OFF$
-            logger.debug("LandingController:getWithoutAmendments - (None, None)")
-            // $COVERAGE-ON$
-            Future.successful(Redirect(Call("GET", appConfig.businessCustomerUrl)))
-          case (_, Some(amlsRef)) =>
-            // $COVERAGE-OFF$
-            logger.debug("LandingController:getWithoutAmendments: " + amlsRef)
-            // $COVERAGE-ON$
-            Future.successful(Redirect(controllers.routes.StatusController.get()))
+            case (None, None) => Future.successful(Redirect(Call("GET", appConfig.businessCustomerUrl)))
+            case (_, Some(amlsRef)) =>
+              logger.debug("LandingController:getWithoutAmendments: " + amlsRef)
+              Future.successful(Redirect(controllers.routes.StatusController.get()))
+          }
         }
       }.flatMap(identity)
+    }
+  }
+
+  private def businessTypePostcodeRedirectLogic(rd: ReviewDetails): Result = {
+    (rd.businessAddress.postcode, rd.businessAddress.country) match {
+      case (Some(postcode), Country.unitedKingdom) =>
+        postcode.matches(postcodeRegex) match {
+          case true => Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
+          case false => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
+        }
+      case (_, Country.unitedKingdom) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
+      case (_, country) if !country.isUK && !country.isEmpty => Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
+      case (_, _) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
     }
   }
 
@@ -300,11 +280,7 @@ class LandingController @Inject()(val landingService: LandingService,
     logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: calling statusService.getDetailedStatus")
     // $COVERAGE-ON$
     statusService.getDetailedStatus(amlsRegistrationNumber, accountTypeId, cacheId).flatMap {
-      case (SubmissionDecisionRejected |
-            SubmissionDecisionRevoked |
-            DeRegistered |
-            SubmissionDecisionExpired |
-            SubmissionWithdrawn, _) =>
+      case (SubmissionDecisionRejected | SubmissionDecisionRevoked | DeRegistered | SubmissionDecisionExpired | SubmissionWithdrawn, _) =>
         // $COVERAGE-OFF$
         logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: status is negative, returning false")
         // $COVERAGE-ON$
@@ -313,68 +289,35 @@ class LandingController @Inject()(val landingService: LandingService,
         // $COVERAGE-OFF$
         logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: status is positive, will call the landingService.cachMap")
         // $COVERAGE-ON$
-        landingService.cacheMap(cacheId).map {
-          cache =>
-            // $COVERAGE-OFF$
-            logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: checking cacheMap for incomplete redress scheme")
-            // $COVERAGE-ON$
-
-            val hasInvalidRedressScheme = for {
-              eab <- cache.map(_.getEntry[Eab](Eab.key))
-            } yield ControllerHelper.hasInvalidRedressScheme(eab)
-
-            // $COVERAGE-OFF$
-            logger.debug(s"[AMLSLandingController][hasIncompleteRedressScheme]: eab.isRedressInvalid = ${hasInvalidRedressScheme.contains(true)}")
-            // $COVERAGE-ON$
-            hasInvalidRedressScheme.contains(true)
+        landingService.cacheMap(cacheId).map { cache =>
+          // $COVERAGE-OFF$
+          logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: checking cacheMap for incomplete redress scheme")
+          // $COVERAGE-ON$
+          val hasInvalidRedressScheme = cache.map(_.getEntry[Eab](Eab.key)).map(_.exists(_.isInvalidRedressScheme))
+          // $COVERAGE-OFF$
+          logger.debug(s"[AMLSLandingController][hasIncompleteRedressScheme]: eab.isRedressInvalid = ${hasInvalidRedressScheme.contains(true)}")
+          // $COVERAGE-ON$
+          hasInvalidRedressScheme.contains(true)
         }
     }
   }
 
-  private def dataHasChanged(cacheMap: CacheMap) = {
+  private def dataHasChanged(cacheMap: CacheMap): Boolean = {
     Seq(
-      cacheMap.sanitiseDoubleDecrypt[Asp](Asp.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.sanitiseDoubleDecrypt[Amp](Amp.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.sanitiseDoubleDecrypt[BusinessDetails](BusinessDetails.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.sanitiseDoubleDecrypt[Seq[BankDetails]](BankDetails.key).fold(false) {
-        _.exists(_.hasChanged)
-      },
-      cacheMap.sanitiseDoubleDecrypt[BusinessActivities](BusinessActivities.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.sanitiseDoubleDecrypt[BusinessMatching](BusinessMatching.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.sanitiseDoubleDecrypt[Eab](Eab.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.sanitiseDoubleDecrypt[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.sanitiseDoubleDecrypt[Seq[ResponsiblePerson]](ResponsiblePerson.key).fold(false) {
-        _.exists(_.hasChanged)
-      },
-      cacheMap.sanitiseDoubleDecrypt[Supervision](Supervision.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.sanitiseDoubleDecrypt[Tcsp](Tcsp.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.sanitiseDoubleDecrypt[Seq[TradingPremises]](TradingPremises.key).fold(false) {
-        _.exists(_.hasChanged)
-      },
-      cacheMap.sanitiseDoubleDecrypt[Hvd](Hvd.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.sanitiseDoubleDecrypt[Renewal](Renewal.key).fold(false) {
-        _.hasChanged
-      }
+      cacheMap.sanitiseDoubleDecrypt[Asp](Asp.key).fold(false)(_.hasChanged),
+      cacheMap.sanitiseDoubleDecrypt[Amp](Amp.key).fold(false)(_.hasChanged),
+      cacheMap.sanitiseDoubleDecrypt[BusinessDetails](BusinessDetails.key).fold(false)(_.hasChanged),
+      cacheMap.sanitiseDoubleDecrypt[Seq[BankDetails]](BankDetails.key).fold(false)(_.exists(_.hasChanged)),
+      cacheMap.sanitiseDoubleDecrypt[BusinessActivities](BusinessActivities.key).fold(false)(_.hasChanged),
+      cacheMap.sanitiseDoubleDecrypt[BusinessMatching](BusinessMatching.key).fold(false)(_.hasChanged),
+      cacheMap.sanitiseDoubleDecrypt[Eab](Eab.key).fold(false)(_.hasChanged),
+      cacheMap.sanitiseDoubleDecrypt[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false)(_.hasChanged),
+      cacheMap.sanitiseDoubleDecrypt[Seq[ResponsiblePerson]](ResponsiblePerson.key).fold(false)(_.exists(_.hasChanged)),
+      cacheMap.sanitiseDoubleDecrypt[Supervision](Supervision.key).fold(false)(_.hasChanged),
+      cacheMap.sanitiseDoubleDecrypt[Tcsp](Tcsp.key).fold(false)(_.hasChanged),
+      cacheMap.sanitiseDoubleDecrypt[Seq[TradingPremises]](TradingPremises.key).fold(false)(_.exists(_.hasChanged)),
+      cacheMap.sanitiseDoubleDecrypt[Hvd](Hvd.key).fold(false)(_.hasChanged),
+      cacheMap.sanitiseDoubleDecrypt[Renewal](Renewal.key).fold(false)(_.hasChanged)
     ).exists(identity)
   }
 

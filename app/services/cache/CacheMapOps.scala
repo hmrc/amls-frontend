@@ -17,7 +17,7 @@
 package services.cache
 
 import crypto.Crypto.SensitiveT
-import play.api.libs.json.{JsError, JsObject, JsResult, JsResultException, JsString, JsSuccess, Json, Reads}
+import play.api.libs.json.{JsResultException, JsString, Reads}
 import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.http.cache.client.{CacheMap, KeyStoreEntryValidationException}
@@ -26,31 +26,16 @@ import scala.util.{Failure, Success, Try}
 
 object CacheMapOps {
   implicit class RichCacheMap(cacheMap: CacheMap) {
-    def getSanitisedEntry[T](key: String)(implicit reads: Reads[T]): Option[T] = {
-      cacheMap.data.get(key)
-        .flatMap {
-          case jsv@JsString(value) => {
-            JsString(value.stripPrefix("'").stripSuffix("'"))
-              .validate[T]
-              .fold(
-                errors => throw new KeyStoreEntryValidationException(key, jsv, CacheMap.getClass, errors),
-                valid => Some(valid)
-              )
-          }
-          case _ => cacheMap.getEntry(key)
-        }
-    }
-
     def tryDecrypt[T](key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Try[Option[T]] = {
       Try {
         val optJsValue = cacheMap.data.get(key)
-          optJsValue.map { jsValue =>
-            jsValue.validate[T]
-              .fold(
-                errors => throw new KeyStoreEntryValidationException(key, jsValue, CacheMap.getClass, errors),
-                valid => (valid)
-              )
-          }
+        optJsValue.map { jsValue =>
+          jsValue.validate[T]
+            .fold(
+              errors => throw new KeyStoreEntryValidationException(key, jsValue, CacheMap.getClass, errors),
+              valid => (valid)
+            )
+        }
       }
     }
 
