@@ -20,6 +20,7 @@ import forms.mappings.Mappings
 import models.responsiblepeople.{ExperienceTraining, ExperienceTrainingNo, ExperienceTrainingYes}
 import play.api.data.Form
 import play.api.data.Forms.mapping
+import play.api.i18n.Messages
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
@@ -29,21 +30,27 @@ class ExperienceTrainingFormProvider @Inject()() extends Mappings {
   val length = 255
 
   private val booleanFieldName = "experienceTraining"
-  private val booleanError = "error.required.rp.experiencetraining"
-  def apply(): Form[ExperienceTraining] = Form[ExperienceTraining](
-    mapping(
-      booleanFieldName -> boolean(booleanError, booleanError),
-      "experienceInformation" -> mandatoryIfTrue(
-        booleanFieldName,
-        text("error.required.rp.experiencetraining.information").verifying(
-          firstError(
-            maxLength(length, "error.rp.invalid.experiencetraining.information.maxlength.255"),
-            regexp(basicPunctuationRegex, "error.rp.invalid.experiencetraining.information")
+  def apply(name: String, serviceOpt: Option[String] = None)(implicit messages: Messages): Form[ExperienceTraining] = {
+
+    val booleanError = serviceOpt.fold(messages("error.required.rp.experiencetraining", name)) {
+      service => messages("error.required.rp.experiencetraining.one", name, service)
+    }
+
+    Form[ExperienceTraining](
+      mapping(
+        booleanFieldName -> boolean(booleanError, booleanError),
+        "experienceInformation" -> mandatoryIfTrue(
+          booleanFieldName,
+          text("error.required.rp.experiencetraining.information").verifying(
+            firstError(
+              maxLength(length, "error.rp.invalid.experiencetraining.information.maxlength.255"),
+              regexp(basicPunctuationRegex, "error.rp.invalid.experiencetraining.information")
+            )
           )
         )
-      )
-    )(apply)(unapply)
-  )
+      )(apply)(unapply)
+    )
+  }
 
   def apply(hasTraining: Boolean, information: Option[String]): ExperienceTraining = {
     (hasTraining, information) match {

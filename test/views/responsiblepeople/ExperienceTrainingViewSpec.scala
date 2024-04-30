@@ -44,9 +44,7 @@ class ExperienceTrainingViewSpec extends AmlsViewSpec with Matchers  {
 
     "have correct title" in new ViewFixture {
 
-      val businessTypes = Some(List("AccountancyServices"))
-
-      def view = trainingView(fp().fill(ExperienceTrainingYes("info")), businessMatching, false, 0, None, name)
+      def view = trainingView(fp(name).fill(ExperienceTrainingYes("info")), businessMatching, false, 0, None, name)
 
       doc.title must be(messages("responsiblepeople.experiencetraining.title") +
         " - " + messages("summary.responsiblepeople") +
@@ -56,14 +54,14 @@ class ExperienceTrainingViewSpec extends AmlsViewSpec with Matchers  {
 
     "have correct heading" in new ViewFixture {
 
-      def view = trainingView(fp().fill(ExperienceTrainingNo), businessMatching, false, 0, None, name)
+      def view = trainingView(fp(name).fill(ExperienceTrainingNo), businessMatching, false, 0, None, name)
 
       heading.html() must be(messages("responsiblepeople.experiencetraining.heading", name, "an accountancy service provider"))
     }
 
     behave like pageWithErrors(
       trainingView(
-        fp().withError("experienceTraining", "error.required.rp.experiencetraining"),
+        fp(name).withError("experienceTraining", "error.required.rp.experiencetraining"),
         businessMatching, false, 0, None, name
       ),
       "experienceTraining", "error.required.rp.experiencetraining"
@@ -71,7 +69,7 @@ class ExperienceTrainingViewSpec extends AmlsViewSpec with Matchers  {
 
     behave like pageWithErrors(
       trainingView(
-        fp().withError("experienceInformation", "error.rp.invalid.experiencetraining.information"),
+        fp(name).withError("experienceInformation", messages("error.rp.invalid.experiencetraining.information", name)),
         businessMatching, false, 0, None, name
       ),
       "experienceInformation", "error.rp.invalid.experiencetraining.information"
