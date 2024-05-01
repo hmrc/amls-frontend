@@ -44,11 +44,10 @@ class CryptoService @Inject()(applicationConfig: ApplicationConfig, applicationC
     * @param encryptedValue the value to decrypt
     * @return the decrypted string
     */
-  def decrypt(encryptedValue: String): Try[String] = {
+  def decrypt(encryptedValue: String): String = {
     decryptAsBytes(encryptedValue) match {
-      case Success(decryptedBytes) => Success(new String(decryptedBytes))
-      case Failure(exception) if exception.isInstanceOf[SecurityException] => Success(encryptedValue)
-      case Failure(exception) => throw exception
+      case Success(decryptedBytes) => new String(decryptedBytes)
+      case Failure(_) => encryptedValue
     }
   }
 
@@ -59,18 +58,10 @@ class CryptoService @Inject()(applicationConfig: ApplicationConfig, applicationC
     * @return The decrypted value
     */
   def doubleDecryptJsonString(doublyEncryptedValue: String): PlainText = {
-    decrypt(doublyEncryptedValue) match {
-      case Success(value) => {
-        value.startsWith("{") | value.startsWith("[") match {
-          case true => PlainText(value)
-          case false => decrypt(value) match {
-            case Success(decryptedValue) => PlainText(decryptedValue)
-            case Failure(exception) => throw exception
-          }
-        }
-      }
-      case Failure(exception) if (exception.isInstanceOf[SecurityException]) => PlainText(doublyEncryptedValue)
-      case Failure(exception) => throw exception
+    val value = decrypt(doublyEncryptedValue)
+    value.startsWith("{") | value.startsWith("[") match {
+      case true => PlainText(value)
+      case false => PlainText(decrypt(value))
     }
   }
 

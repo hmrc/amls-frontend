@@ -16,6 +16,7 @@
 
 package services.encryption
 
+import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import utils.AmlsSpec
 
 class CryptoServiceSpec extends AmlsSpec {
@@ -32,7 +33,18 @@ class CryptoServiceSpec extends AmlsSpec {
       val decryptedString = cryptoService.decrypt(encryptedString)
 
       // Then
-      decryptedString.get mustEqual expectedDecryptedString
+      decryptedString mustEqual expectedDecryptedString
+    }
+
+    "handle an unencrypted value" in {
+      // Given
+      val unencryptedString = "TradingPremises"
+
+      // When
+      val decryptedString = cryptoService.decrypt(unencryptedString)
+
+      // Then
+      decryptedString mustEqual unencryptedString
     }
   }
 
@@ -73,6 +85,21 @@ class CryptoServiceSpec extends AmlsSpec {
         // Then
         decryptedString.value mustEqual expectedDecryptedJsonString
       }
+    }
+
+    "decrypt an encrypted string at most twice" in {
+      // Given
+      val responsiblePerson = ResponsiblePerson(personName = Some(PersonName("David", Some("Dolores"), "Smith")))
+      val jsonString = ResponsiblePerson.writes.writes(responsiblePerson).toString()
+      val singlyEncryptedString = cryptoService.encryptJsonString(jsonString)
+      val doubleEncryptedString = cryptoService.encryptJsonString(singlyEncryptedString.toString())
+      val tripleEncryptedString = cryptoService.encryptJsonString(doubleEncryptedString.toString())
+
+      // When
+      val decryptedString = cryptoService.doubleDecryptJsonString(tripleEncryptedString.toString())
+
+      // Then
+      decryptedString.value mustEqual singlyEncryptedString.toString()
     }
   }
 }
