@@ -30,7 +30,7 @@ import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Success, Try}
 
 @Singleton
-class EncryptionService @Inject()(applicationConfig: ApplicationConfig, applicationCrypto: ApplicationCrypto) {
+class CryptoService @Inject()(applicationConfig: ApplicationConfig, applicationCrypto: ApplicationCrypto) {
 
   private val encryptionKey = applicationConfig.encryptionKey
   private val keyBytes: Array[Byte] = Base64.decodeBase64(encryptionKey.getBytes(UTF_8))

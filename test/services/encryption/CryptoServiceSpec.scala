@@ -18,9 +18,9 @@ package services.encryption
 
 import utils.AmlsSpec
 
-class EncryptionServiceSpec extends AmlsSpec {
+class CryptoServiceSpec extends AmlsSpec {
 
-  val encryptionService = new EncryptionService(appConfig, applicationCrypto)
+  val cryptoService = new CryptoService(appConfig, applicationCrypto)
 
   ".decrypt" must {
     "decrypt an encrypted value" in {
@@ -29,7 +29,7 @@ class EncryptionServiceSpec extends AmlsSpec {
       val expectedDecryptedString = "{\"involvedInOther\":false,\"expectedAMLSTurnover\":\"04\",\"businessFranchise\":true,\"franchiseName\":\"FranchiserName1\",\"isRecorded\":true,\"transactionTypes\":{\"types\":[\"01\",\"02\",\"03\"],\"software\":\"Test package\"},\"isOutside\":true,\"countries\":[\"AD\",\"GB\"],\"ncaRegistered\":true,\"hasWrittenGuidance\":true,\"hasPolicy\":true,\"riskassessments\":[\"02\",\"01\"],\"employeeCount\":\"12345678901\",\"employeeCountAMLSSupervision\":\"11223344556\",\"hasChanged\":false,\"hasAccepted\":true}"
 
       // When
-      val decryptedString = encryptionService.decrypt(encryptedString)
+      val decryptedString = cryptoService.decrypt(encryptedString)
 
       // Then
       decryptedString.get mustEqual expectedDecryptedString
@@ -43,7 +43,7 @@ class EncryptionServiceSpec extends AmlsSpec {
       val expectedDecryptedJsonString = "{\"involvedInOther\":false,\"expectedAMLSTurnover\":\"04\",\"businessFranchise\":true,\"franchiseName\":\"FranchiserName1\",\"isRecorded\":true,\"transactionTypes\":{\"types\":[\"01\",\"02\",\"03\"],\"software\":\"Test package\"},\"isOutside\":true,\"countries\":[\"AD\",\"GB\"],\"ncaRegistered\":true,\"hasWrittenGuidance\":true,\"hasPolicy\":true,\"riskassessments\":[\"02\",\"01\"],\"employeeCount\":\"12345678901\",\"employeeCountAMLSSupervision\":\"11223344556\",\"hasChanged\":false,\"hasAccepted\":true}"
 
       // When
-      val decryptedJsonString = encryptionService.doubleDecryptJsonString(doubleEncryptedJsonString)
+      val decryptedJsonString = cryptoService.doubleDecryptJsonString(doubleEncryptedJsonString)
 
       // Then
       decryptedJsonString.value mustEqual expectedDecryptedJsonString
@@ -56,7 +56,7 @@ class EncryptionServiceSpec extends AmlsSpec {
         val expectedDecryptedJsonString = "{\"tcspTypes\":{\"serviceProviders\":[\"03\",\"02\",\"01\",\"05\",\"04\"]},\"onlyOffTheShelfCompsSold\":{\"onlyOffTheShelfCompsSold\":true},\"complexCorpStructureCreation\":{\"complexCorpStructureCreation\":true},\"providedServices\":{\"services\":[\"08\",\"03\",\"06\",\"02\",\"07\",\"01\",\"05\",\"04\"],\"details\":\"SpecifyOther\"},\"doesServicesOfAnotherTCSP\":true,\"servicesOfAnotherTCSP\":{\"servicesOfAnotherTCSP\":true,\"mlrRefNumber\":\"111111111111111\"},\"hasChanged\":false,\"hasAccepted\":true}"
 
         // When
-        val decryptedString = encryptionService.doubleDecryptJsonString(encryptedJsonString)
+        val decryptedString = cryptoService.doubleDecryptJsonString(encryptedJsonString)
 
         // Then
         decryptedString.value mustEqual expectedDecryptedJsonString
@@ -68,7 +68,7 @@ class EncryptionServiceSpec extends AmlsSpec {
         val expectedDecryptedJsonString = "[{\"registeringAgentPremises\":{\"agentPremises\":true},\"yourTradingPremises\":{\"tradingName\":\"TradingName\",\"postcode\":\"NE99 1ZZ\",\"addressLine1\":\"AddressLine1\",\"addressLine2\":\"AddressLine2\",\"addressLine3\":\"AddressLine3\",\"addressLine4\":\"AddressLine4\",\"isResidential\":true,\"startDate\":\"2001-01-01\"},\"businessStructure\":{\"agentsBusinessStructure\":\"01\"},\"agentName\":{\"agentName\":\"AgentLegalEntityName\"},\"whatDoesYourBusinessDoAtThisAddress\":{\"activities\":[\"04\",\"01\",\"03\",\"02\",\"07\",\"08\",\"05\",\"06\"]},\"msbServices\":{\"msbServices\":[\"02\",\"03\",\"05\",\"01\",\"04\"]},\"hasChanged\":false,\"lineId\":333333,\"hasAccepted\":true},{\"registeringAgentPremises\":{\"agentPremises\":true},\"yourTradingPremises\":{\"tradingName\":\"Trade\",\"postcode\":\"NE99 1ZZ\",\"addressLine1\":\"a\",\"addressLine2\":\"a\",\"addressLine3\":\"a\",\"addressLine4\":\"a\",\"isResidential\":true,\"startDate\":\"1967-08-13\"},\"businessStructure\":{\"agentsBusinessStructure\":\"01\"},\"agentName\":{\"agentName\":\"Legal Agent\"},\"whatDoesYourBusinessDoAtThisAddress\":{\"activities\":[\"04\",\"01\",\"03\",\"02\",\"07\",\"08\",\"05\",\"06\"]},\"msbServices\":{\"msbServices\":[\"02\",\"03\",\"05\",\"01\",\"04\"]},\"hasChanged\":false,\"lineId\":444444,\"hasAccepted\":true},{\"registeringAgentPremises\":{\"agentPremises\":true},\"yourTradingPremises\":{\"tradingName\":\"TradingName\",\"postcode\":\"NE99 1ZZ\",\"addressLine1\":\"AgentAddressLine1\",\"addressLine2\":\"AgentAddressLine2\",\"addressLine3\":\"AgentAddressLine3\",\"addressLine4\":\"AgentAddressLine4\",\"isResidential\":true,\"startDate\":\"2001-01-01\"},\"businessStructure\":{\"agentsBusinessStructure\":\"01\"},\"agentName\":{\"agentName\":\"AgentLegalEntityName2\"},\"whatDoesYourBusinessDoAtThisAddress\":{\"activities\":[\"04\",\"01\",\"03\",\"02\",\"07\",\"08\",\"05\",\"06\"]},\"msbServices\":{\"msbServices\":[\"02\",\"03\",\"05\",\"01\",\"04\"]},\"hasChanged\":false,\"lineId\":555555,\"hasAccepted\":true},{\"registeringAgentPremises\":{\"agentPremises\":true},\"yourTradingPremises\":{\"tradingName\":\"TName\",\"postcode\":\"NE99 1ZZ\",\"addressLine1\":\"AgentAddressLine1\",\"addressLine2\":\"AgentAddressLine2\",\"addressLine3\":\"AgentAddressLine3\",\"addressLine4\":\"AgentAddressLine4\",\"isResidential\":true,\"startDate\":\"2001-01-01\"},\"businessStructure\":{\"agentsBusinessStructure\":\"02\"},\"agentCompanyDetails\":{\"agentCompanyName\":\"AnotherAgentLegalEntityName2\",\"companyRegistrationNumber\":\"12345678\"},\"whatDoesYourBusinessDoAtThisAddress\":{\"activities\":[\"04\",\"01\",\"03\",\"02\",\"07\",\"08\",\"05\",\"06\"]},\"msbServices\":{\"msbServices\":[\"02\",\"03\",\"05\",\"01\",\"04\"]},\"hasChanged\":false,\"lineId\":666666,\"hasAccepted\":true},{\"registeringAgentPremises\":{\"agentPremises\":false},\"yourTradingPremises\":{\"tradingName\":\"OwnBusinessTradingName\",\"postcode\":\"NE99 1ZZ\",\"addressLine1\":\"OwnBusinessAddressLine1\",\"addressLine2\":\"OwnBusinessAddressLine2\",\"addressLine3\":\"OwnBusinessAddressLine3\",\"addressLine4\":\"OwnBusinessAddressLine4\",\"isResidential\":false,\"startDate\":\"2001-01-01\"},\"whatDoesYourBusinessDoAtThisAddress\":{\"activities\":[\"04\",\"01\",\"03\",\"02\",\"07\",\"08\",\"05\",\"06\"]},\"msbServices\":{\"msbServices\":[\"02\",\"03\",\"05\",\"01\",\"04\"]},\"hasChanged\":false,\"lineId\":111111,\"hasAccepted\":true},{\"registeringAgentPremises\":{\"agentPremises\":false},\"yourTradingPremises\":{\"tradingName\":\"OwnBusinessTradingName1\",\"postcode\":\"NE99 1ZZ\",\"addressLine1\":\"OB11AddressLine1\",\"addressLine2\":\"OB1AddressLine2\",\"addressLine3\":\"OB1AddressLine3\",\"addressLine4\":\"OB1AddressLine4\",\"isResidential\":false,\"startDate\":\"2001-01-01\"},\"whatDoesYourBusinessDoAtThisAddress\":{\"activities\":[\"04\",\"01\",\"03\",\"02\",\"07\",\"08\",\"05\",\"06\"]},\"msbServices\":{\"msbServices\":[\"02\",\"03\",\"05\",\"01\",\"04\"]},\"hasChanged\":false,\"lineId\":222222,\"hasAccepted\":true}]"
 
         // When
-        val decryptedString = encryptionService.doubleDecryptJsonString(encryptedJsonString)
+        val decryptedString = cryptoService.doubleDecryptJsonString(encryptedJsonString)
 
         // Then
         decryptedString.value mustEqual expectedDecryptedJsonString

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package crypto
+package models.crypto
 
 import uk.gov.hmrc.crypto.Sensitive
 

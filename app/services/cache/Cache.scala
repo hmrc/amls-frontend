@@ -16,7 +16,7 @@
 
 package services.cache
 
-import crypto.Crypto.SensitiveT
+import models.crypto.Crypto.SensitiveT
 import play.api.libs.json.{Format, JsResultException, JsString, JsValue, Json, OFormat, Reads}
 import play.custom.JsPathSupport.{localDateTimeReads, localDateTimeWrites}
 import uk.gov.hmrc.crypto.json.JsonEncryption
@@ -80,17 +80,7 @@ case class Cache(id: String, data: Map[String, JsValue], lastUpdated: LocalDateT
   }
 
   def tryDecrypt[T](key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Try[Option[T]] = {
-    Try {
-      val optJsValue = data.get(key)
-      optJsValue.map { jsValue =>
-        jsValue
-          .validate[T]
-          .fold(
-            errors => throw new Exception(s"Entry for key '$key'. Attempt to convert to Cache gave errors: $errors"),
-            valid => valid
-          )
-      }
-    }
+    Try(getEntry(key))
   }
 
   def sanitiseDoubleDecrypt[T](key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Option[T] = {

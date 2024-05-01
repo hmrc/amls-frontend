@@ -22,9 +22,9 @@ import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model._
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json._
-import services.encryption.EncryptionService
+import services.encryption.CryptoService
 import uk.gov.hmrc.crypto.json.JsonEncryption
-import uk.gov.hmrc.crypto.{ApplicationCrypto, _}
+import uk.gov.hmrc.crypto._
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
@@ -38,8 +38,8 @@ import scala.util.{Failure, Success, Try}
   * An injectible factory for creating new MongoCacheClients
   */
 class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCrypto: ApplicationCrypto, mongo: MongoComponent,
-                                        encryptionService: EncryptionService)(implicit val ec: ExecutionContext) {
-  def createClient: MongoCacheClient = new MongoCacheClient(config, applicationCrypto, mongo: MongoComponent, encryptionService)
+                                        cryptoService: CryptoService)(implicit val ec: ExecutionContext) {
+  def createClient: MongoCacheClient = new MongoCacheClient(config, applicationCrypto, mongo: MongoComponent, cryptoService)
 }
 
 /**
@@ -50,7 +50,7 @@ class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCr
 
 @Singleton
 class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto: ApplicationCrypto, mongo: MongoComponent,
-                                 encryptionService: EncryptionService)(implicit val ec: ExecutionContext)
+                                 cryptoService: CryptoService)(implicit val ec: ExecutionContext)
   extends PlayMongoRepository[Cache](
     mongoComponent = mongo,
     collectionName = "app-cache",
@@ -71,7 +71,7 @@ class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto
   def createOrUpdate[T](credId: String, data: T, key: String)(implicit writes: Writes[T]): Future[Cache] = {
     val jsonData =
       if (appConfig.mongoEncryptionEnabled) {
-        encryptionService.encryptJsonString(Json.toJson(data).toString())
+        cryptoService.encryptJsonString(Json.toJson(data).toString())
       } else {
         Json.toJson(data)
       }
@@ -116,7 +116,7 @@ class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto
     */
   def upsert[T](targetCache: Cache, data: T, key: String)(implicit writes: Writes[T]): Cache = {
     val jsonData = if (appConfig.mongoEncryptionEnabled) {
-      encryptionService.encryptJsonString(Json.toJson(data).toString())
+      cryptoService.encryptJsonString(Json.toJson(data).toString())
     } else {
       Json.toJson(data)
     }
@@ -188,7 +188,7 @@ class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto
     * @return whether the operation was successful or not
     */
   def saveAll(cache: Cache): Future[Boolean] = {
-    val rebuiltCache = cache.decryptReEncrypt(appConfig.mongoEncryptionEnabled, encryptionService.doubleDecryptJsonString, compositeSymmetricCrypto.encrypt)
+    val rebuiltCache = cache.decryptReEncrypt(appConfig.mongoEncryptionEnabled, cryptoService.doubleDecryptJsonString, compositeSymmetricCrypto.encrypt)
     collection.findOneAndUpdate(
       filter = bsonIdQuery(cache.id),
       update = Updates.combine(
@@ -207,7 +207,7 @@ class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto
     * @return whether the operation was successful or not
     */
   def saveAll(cache: Cache, credId: String): Future[Boolean] = {
-    val rebuiltCache = cache.decryptReEncrypt(appConfig.mongoEncryptionEnabled, encryptionService.doubleDecryptJsonString, compositeSymmetricCrypto.encrypt)
+    val rebuiltCache = cache.decryptReEncrypt(appConfig.mongoEncryptionEnabled, cryptoService.doubleDecryptJsonString, compositeSymmetricCrypto.encrypt)
     collection.findOneAndUpdate(
       filter = bsonIdQuery(rebuiltCache.id),
       update = Updates.combine(
