@@ -80,7 +80,7 @@ class CryptoService @Inject()(applicationConfig: ApplicationConfig, applicationC
     * @param encryptedValue the value to decrypt
     * @return the decrypted raw array of bytes
     */
-  private def decryptAsBytes(encryptedValue: String): Try[Array[Byte]] = {
+  def decryptAsBytes(encryptedValue: String): Try[Array[Byte]] = {
     Try {
       val cipher: Cipher = Cipher.getInstance(secretKeySpec.getAlgorithm)
       cipher.init(DECRYPT_MODE, secretKeySpec, cipher.getParameters)
