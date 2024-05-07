@@ -38,10 +38,6 @@
 
     @subtitle("summary.businessactivities")
 
-    @heading("businessactivities.employees.title")
-
-    <p class="govuk-body">@messages("businessactivities.employees.line1.label")</p>
-
     @formHelper(action = controllers.businessactivities.routes.HowManyEmployeesController.post(edit)) {
 
         @inputText(
@@ -56,9 +52,9 @@
                 inputmode = Some("numeric"),
                 classes = "govuk-!-width-one-quarter",
                 label = Label(
-                    isPageHeading = false,
                     content = Text(messages("businessactivities.employees.title")),
-                    classes = "govuk-visually-hidden"
+                    classes = "govuk-label--xl",
+                    isPageHeading = true
                 )
             ),
             field = form("employeeCount")
