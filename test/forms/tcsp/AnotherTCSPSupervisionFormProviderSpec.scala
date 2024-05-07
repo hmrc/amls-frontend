@@ -49,7 +49,7 @@ class AnotherTCSPSupervisionFormProviderSpec extends BooleanFieldBehaviours[Serv
 
           val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> details))
 
-          boundForm.value shouldBe Some(ServicesOfAnotherTCSPYes(details))
+          boundForm.value shouldBe Some(ServicesOfAnotherTCSPYes(Some(details)))
           boundForm.errors shouldBe Nil
         }
       }
@@ -71,13 +71,6 @@ class AnotherTCSPSupervisionFormProviderSpec extends BooleanFieldBehaviours[Serv
 
           boundForm.errors.headOption shouldBe Some(FormError(fieldName, errorMessage))
         }
-      }
-
-      "'Yes' is submitted without details" in {
-
-        val boundForm = form.bind(Map(fieldName -> "true"))
-
-        boundForm.errors.headOption shouldBe Some(FormError(inputFieldName, "error.required.tcsp.services.another.tcsp.number"))
       }
 
       "'Yes' is submitted with details" which {

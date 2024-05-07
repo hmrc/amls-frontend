@@ -35,7 +35,7 @@ trait TcspValues {
       TrusteeProvider,
       CompanyDirectorEtc,
       CompanyFormationAgent))
-    val DefaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
+    val DefaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes(Some("12345678"))
 
     val DefaultCompanyServiceProvidersNoFormationAgent = TcspTypes(Set(
       NomineeShareholdersProvider,

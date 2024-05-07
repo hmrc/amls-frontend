@@ -67,7 +67,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
             PhonecallHandling, EmailHandling, EmailServer, SelfCollectMailboxes, MailForwarding, Receptionist, ConferenceRooms, Other("sfasfasef")
           ))),
           Some(true),
-          Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber))
+          Some(ServicesOfAnotherTCSPYes(Some(amlsRegistrationNumber)))
         )
       )
 

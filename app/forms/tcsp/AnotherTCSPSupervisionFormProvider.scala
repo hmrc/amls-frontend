@@ -19,8 +19,7 @@ package forms.tcsp
 import forms.mappings.Mappings
 import models.tcsp.{ServicesOfAnotherTCSP, ServicesOfAnotherTCSPNo, ServicesOfAnotherTCSPYes}
 import play.api.data.Form
-import play.api.data.Forms.mapping
-import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
+import play.api.data.Forms.{mapping, optional}
 
 import javax.inject.Inject
 
@@ -36,7 +35,7 @@ class AnotherTCSPSupervisionFormProvider @Inject()() extends Mappings {
   def apply(): Form[ServicesOfAnotherTCSP] = Form[ServicesOfAnotherTCSP](
     mapping(
       radioFieldName -> boolean(radioError, radioError),
-      "mlrRefNumber" -> mandatoryIfTrue(radioFieldName, text("error.required.tcsp.services.another.tcsp.number")
+      "mlrRefNumber" -> optional(text("error.required.tcsp.services.another.tcsp.number")
         .verifying(
           firstError(
             minLength(minLength, lengthError),
@@ -50,13 +49,12 @@ class AnotherTCSPSupervisionFormProvider @Inject()() extends Mappings {
 
   private def apply(b: Boolean, s: Option[String]): ServicesOfAnotherTCSP = (b, s) match {
     case (false, _) => ServicesOfAnotherTCSPNo
-    case (true, Some(refNo)) => ServicesOfAnotherTCSPYes(refNo)
-    case _ => throw new IllegalArgumentException("No MLR Ref Number available to bind from form")
+    case (true, refNo) => ServicesOfAnotherTCSPYes(refNo)
   }
 
   private def unapply(obj: ServicesOfAnotherTCSP): Option[(Boolean, Option[String])] = obj match {
     case ServicesOfAnotherTCSPNo => Some((false, None))
-    case ServicesOfAnotherTCSPYes(refNo) => Some((true, Some(refNo)))
+    case ServicesOfAnotherTCSPYes(refNo) => Some((true, refNo))
     case _ => None
   }
 }

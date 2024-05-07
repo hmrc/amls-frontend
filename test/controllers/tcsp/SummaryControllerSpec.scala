@@ -41,7 +41,7 @@ class SummaryControllerSpec extends AmlsSpec with Injecting {
     implicit val ec = inject[ExecutionContext]
 
     val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
-    val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
+    val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes(Some("12345678"))
     val mockTcsp = mock[Tcsp]
 
     val defaultCompanyServiceProviders = TcspTypes(Set(RegisteredOfficeEtc,

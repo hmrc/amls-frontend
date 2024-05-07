@@ -36,15 +36,7 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
       "successfully validate given an `Yes` value" in {
 
         Json.fromJson[ServicesOfAnotherTCSP](Json.obj("servicesOfAnotherTCSP" -> true, "mlrRefNumber" -> "12345678")) must
-          be(JsSuccess(ServicesOfAnotherTCSPYes("12345678"), JsPath \ "mlrRefNumber"))
-      }
-
-      "fail to validate when given an empty `Yes` value" in {
-
-        val json = Json.obj("servicesOfAnotherTCSP" -> true)
-
-        Json.fromJson[ServicesOfAnotherTCSP](json) must
-          be(JsError((JsPath \ "mlrRefNumber") -> JsonValidationError("error.path.missing")))
+          be(JsSuccess(ServicesOfAnotherTCSPYes(Some("12345678")), JsPath \ "mlrRefNumber"))
       }
 
       "write the correct value" in {
@@ -52,7 +44,7 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
         Json.toJson(ServicesOfAnotherTCSPNo.asInstanceOf[ServicesOfAnotherTCSP]) must
           be(Json.obj("servicesOfAnotherTCSP" -> false))
 
-        Json.toJson(ServicesOfAnotherTCSPYes("12345678").asInstanceOf[ServicesOfAnotherTCSP]) must
+        Json.toJson(ServicesOfAnotherTCSPYes(Some("12345678")).asInstanceOf[ServicesOfAnotherTCSP]) must
           be(Json.obj(
             "servicesOfAnotherTCSP" -> true,
             "mlrRefNumber" -> "12345678"
