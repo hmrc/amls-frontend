@@ -52,6 +52,24 @@ class LandingService @Inject()(val cacheConnector: DataCacheConnector,
 
   def cacheMap(credId: String): Future[Option[Cache]] = cacheConnector.fetchAll(credId)
 
+  def initialiseGetWithAmendments(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Cache]] = {
+    cacheConnector.fetchAll(credId).map { optCacheMap =>
+      if (optCacheMap.isDefined) {
+        val cacheMap = optCacheMap.head
+
+        if (!cacheMap.data.contains(TradingPremises.key)) {
+          cacheConnector.save[Seq[TradingPremises]](credId, TradingPremises.key, Seq.empty[TradingPremises])
+        }
+
+        if (!cacheMap.data.contains(ResponsiblePerson.key)) {
+          cacheConnector.save[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key, Seq.empty[ResponsiblePerson])
+        }
+      }
+
+      optCacheMap
+    }
+  }
+
   def setAltCorrespondenceAddress(amlsRefNumber: String, maybeCache: Option[Cache], accountTypeId: (String, String), credId: String)
                                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Cache] = {
     val cachedModel = for {

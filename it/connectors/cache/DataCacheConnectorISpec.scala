@@ -22,13 +22,14 @@ import models.businessmatching.BusinessActivity.BillPaymentServices
 import models.businessmatching.{BusinessActivities, BusinessMatching}
 import play.api.libs.json.Json
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
+import services.encryption.CryptoService
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 class DataCacheConnectorISpec extends IntegrationBaseSpec with DefaultPlayMongoRepositorySupport[Cache] {
 
   val cacheClientFactory =
-    new MongoCacheClientFactory(appConfig, app.injector.instanceOf[ApplicationCrypto], mongoComponent)
+    new MongoCacheClientFactory(appConfig, app.injector.instanceOf[ApplicationCrypto], mongoComponent, app.injector.instanceOf[CryptoService])
   override val repository: MongoCacheClient = cacheClientFactory.createClient
   val cacheConnector = new MongoCacheConnector(cacheClientFactory)
   val dataCacheConnector: DataCacheConnector = new DataCacheConnector(cacheConnector)

@@ -69,7 +69,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       config = config,
       parser = mock[BodyParsers.Default],
       start = view,
-      headerCarrierForPartialsConverter = headerCarrierForPartialsConverter)
+      headerCarrierForPartialsConverter = headerCarrierForPartialsConverter,
+      applicationCrypto = applicationCrypto)
 
     val controllerNoUserRole = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -84,7 +85,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       config = config,
       parser = mock[BodyParsers.Default],
       start = view,
-      headerCarrierForPartialsConverter = mock[HeaderCarrierForPartialsConverter])
+      headerCarrierForPartialsConverter = mock[HeaderCarrierForPartialsConverter],
+      applicationCrypto = applicationCrypto)
 
     when {
       controllerNoAmlsNumber.landingService.setAltCorrespondenceAddress(any(), any[String])

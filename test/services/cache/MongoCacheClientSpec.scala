@@ -20,6 +20,7 @@ import com.typesafe.config.{ConfigFactory, ConfigValueFactory}
 import config.ApplicationConfig
 import play.api.Configuration
 import play.api.libs.json.{JsString, Reads}
+import services.encryption.CryptoService
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -35,9 +36,10 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
   )
   val appConfigNoEncryption = new ApplicationConfig(configNoEncryption, app.injector.instanceOf[ServicesConfig])
   val appConfigWithEncryption = new ApplicationConfig(configWithEncryption, app.injector.instanceOf[ServicesConfig])
-  override val repository = new MongoCacheClient(appConfigNoEncryption, app.injector.instanceOf[ApplicationCrypto], mongoComponent)
+  override val repository = new MongoCacheClient(appConfigNoEncryption, app.injector.instanceOf[ApplicationCrypto],
+    mongoComponent, app.injector.instanceOf[CryptoService])
   val encryptedRepository =
-    new MongoCacheClient(appConfigWithEncryption, app.injector.instanceOf[ApplicationCrypto], mongoComponent)
+    new MongoCacheClient(appConfigWithEncryption, app.injector.instanceOf[ApplicationCrypto], mongoComponent, app.injector.instanceOf[CryptoService])
   val testCache: Cache = Cache("123", Map("fieldName" -> JsString("valueName")))
   val encryptedCacheData: Map[String, JsString] = Map("fieldName" -> JsString("Q2NYiC4W49rMPxfI+soQ2g=="))
 

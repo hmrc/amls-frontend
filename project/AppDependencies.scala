@@ -5,7 +5,7 @@ private object AppDependencies {
 
   private val playV = "play-28"
   private val flexmarkVersion = "0.64.8"
-  private val bootstrapV = "6.0.0"
+  private val bootstrapV = "7.3.0"
   private val hmrcMongoV = "1.8.0"
 
   val compile: Seq[ModuleID] = Seq(
@@ -13,7 +13,7 @@ private object AppDependencies {
     // GOV UK
     "uk.gov.hmrc"           %% "domain"                        % s"8.3.0-$playV",
     "uk.gov.hmrc"           %% "play-partials"                 % s"8.3.0-$playV",
-    "uk.gov.hmrc"           %% "json-encryption"               % s"5.3.0-$playV",
+    "uk.gov.hmrc"           %% s"crypto-json-$playV"           % "7.6.0",
     "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-$playV"            % hmrcMongoV,
     "uk.gov.hmrc"           %% s"bootstrap-frontend-$playV"    % bootstrapV,
     "uk.gov.hmrc"           %% s"play-frontend-hmrc-$playV"    % "9.7.0",

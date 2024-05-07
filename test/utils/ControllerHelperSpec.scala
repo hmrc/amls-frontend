@@ -111,39 +111,6 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
 
   "ControllerHelper" must {
 
-    "hasInvalidRedressScheme" must {
-
-      "return false" when {
-
-        "eab is None" in {
-          ControllerHelper.hasInvalidRedressScheme(None) mustEqual false
-        }
-
-        "when no redress scheme" in {
-          ControllerHelper.hasInvalidRedressScheme(Some(eabNoRedress)) mustEqual false
-        }
-
-        "when 'PropertyOmbudsman' is selected" in {
-          ControllerHelper.hasInvalidRedressScheme(Some(eabPropertyOmbudsman)) mustEqual false
-        }
-
-        "when 'PropertyRedressScheme' is selected" in {
-          ControllerHelper.hasInvalidRedressScheme(Some(eabPropertyRedress)) mustEqual false
-        }
-      }
-
-      "return true" when {
-
-        "when 'OmbudsmanServices' is selected" in {
-          ControllerHelper.hasInvalidRedressScheme(Some(eabOmbudsmanServices)) mustEqual true
-        }
-
-        "when 'Other' is selected" in {
-          ControllerHelper.hasInvalidRedressScheme(Some(eabOther)) mustEqual true
-        }
-      }
-    }
-
     "hasIncompleteResponsiblePerson" must {
 
       "return false" when {

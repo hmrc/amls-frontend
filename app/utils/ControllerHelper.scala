@@ -22,7 +22,6 @@ import models.businessactivities.{BusinessActivities => BA}
 import models.businessmatching.BusinessActivity._
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.eab.Eab
 import models.renewal.CustomersOutsideUK
 import models.responsiblepeople.ResponsiblePerson.filter
 import models.responsiblepeople.{NonUKResidence, ResponsiblePerson}
@@ -32,8 +31,8 @@ import play.api.i18n.{Lang, Messages}
 import play.api.mvc.Request
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,13 +40,6 @@ object ControllerHelper {
 
   def hasIncompleteResponsiblePerson(rps: Option[Seq[ResponsiblePerson]]): Boolean =
     rps.exists((data: Seq[ResponsiblePerson]) => filter(data).exists(_.isComplete equals false))
-
-  def hasInvalidRedressScheme(eabOpt: Option[Eab]): Boolean = {
-    eabOpt match {
-      case Some(eab) => eab.isInvalidRedressScheme
-      case None => false
-    }
-  }
 
   def getBusinessType(matching: Option[BusinessMatching]): Option[BusinessType] = {
     matching flatMap { bm =>
