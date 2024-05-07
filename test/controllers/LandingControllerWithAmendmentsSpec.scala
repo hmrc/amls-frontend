@@ -284,8 +284,6 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
                   .thenReturn(Future.successful((NotCompleted, None)))
 
-                val updatedTestCacheMap = testCache.data + (ResponsiblePerson.key -> Json.toJson(Seq.empty[ResponsiblePerson]))
-
                 val result = controller.get()(requestWithHeaders("test-context" -> "ESCS"))
 
                 status(result) must be(SEE_OTHER)
@@ -318,8 +316,6 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
                   .thenReturn(Future.successful((NotCompleted, None)))
 
-                val updatedTestCache = testCache.data + (Eab.key -> Json.toJson(eabOther))
-
                 val result = controller.get()(requestWithHeaders(("test-context" -> "ESCS")))
 
                 status(result) must be(SEE_OTHER)
@@ -346,8 +342,6 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
                   .thenReturn(Future.successful((NotCompleted, None)))
-
-                val updatedTestCacheMap = testCache.data + (ResponsiblePerson.key -> Json.toJson(Seq.empty[ResponsiblePerson]))
 
                 val result = controller.get()(request)
 
@@ -386,8 +380,6 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
                   .thenReturn(Future.successful((NotCompleted, None)))
 
-                val updatedTestCache = testCache.data + (Eab.key -> Json.toJson(eabOmbudsmanServices))
-
                 val result = controller.get()(request)
 
                 status(result) must be(SEE_OTHER)
@@ -424,8 +416,6 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             setUpMocksForDataExistsInSaveForLater(controller, testCache)
             when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
               .thenReturn(Future.successful((NotCompleted, None)))
-
-            val updatedCacheMapData: Map[String, JsValue] = testCache.data.-(ResponsiblePerson.key)
 
             val result = controller.get()(request)
 
