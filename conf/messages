@@ -84,7 +84,7 @@ error.invalid.middlename.validation = Middle name must only include letters a to
 error.invalid.lastname.validation = Last name must only include letters a to z, hyphens, spaces, and apostrophes
 error.invalid.position.validation = Select all roles that apply
 
-error.required.vat.number = Enter this person’s VAT registration number
+error.required.vat.number = Enter your business’ VAT registration number
 error.invalid.vat.number.length = VAT registration number must be 9 numbers
 error.invalid.vat.number = VAT registration number must only include numbers
 
