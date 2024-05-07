@@ -17,6 +17,7 @@
 package services.cache
 
 import models.crypto.Crypto.SensitiveT
+import play.api.Logging
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 import uk.gov.hmrc.crypto.json.JsonEncryption
@@ -24,7 +25,7 @@ import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
 import scala.util.{Failure, Success, Try}
 
-trait CacheOps {
+trait CacheOps extends Logging {
 
   /**
     * Retrieves an encrypted value from the cache
@@ -49,6 +50,7 @@ trait CacheOps {
   def catchDoubleEncryption[T](cache: Cache, key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Option[T] = {
     Try(decryptValue[T](cache, key)(reads, c)) match {
       case Failure(_: JsResultException) =>
+        logger.warn(s"performing double decryption")
         decryptValue[String](cache, key)(StringReads, c)
           .map(hashedStr => JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply).reads(JsString(hashedStr)))
           .map(result => result.map(protectedObj => protectedObj.decryptedValue))
