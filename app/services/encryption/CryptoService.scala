@@ -18,6 +18,7 @@ package services.encryption
 
 import config.ApplicationConfig
 import org.apache.commons.codec.binary.Base64
+import play.api.Logger
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter, PlainText}
@@ -32,6 +33,7 @@ import scala.util.{Failure, Success, Try}
 @Singleton
 class CryptoService @Inject()(applicationConfig: ApplicationConfig, applicationCrypto: ApplicationCrypto) {
 
+  private val logger = Logger(getClass)
   private val encryptionKey = applicationConfig.encryptionKey
   private val keyBytes: Array[Byte] = Base64.decodeBase64(encryptionKey.getBytes(UTF_8))
   private val secretKeySpec = new SecretKeySpec(keyBytes, "AES")
@@ -61,7 +63,10 @@ class CryptoService @Inject()(applicationConfig: ApplicationConfig, applicationC
     val value = decrypt(doublyEncryptedValue)
     value.startsWith("{") | value.startsWith("[") match {
       case true => PlainText(value)
-      case false => PlainText(decrypt(value))
+      case false => {
+        logger.warn(s"performing double decryption")
+        PlainText(decrypt(value))
+      }
     }
   }
 
