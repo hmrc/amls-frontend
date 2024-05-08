@@ -36,7 +36,6 @@ class LoginEventControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
     val request = addToken(authRequest)
 
     lazy val defaultBuilder: GuiceApplicationBuilder = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .configure(
         "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
