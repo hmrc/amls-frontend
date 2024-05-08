@@ -16,7 +16,7 @@
 
 package utils
 
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 import config.ApplicationConfig
 import controllers.CommonPlayDependencies
 import org.jsoup.Jsoup
@@ -37,7 +37,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with Matchers with AuthorisedFixture with Injecting {
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
-    .disable[com.kenshoo.play.metrics.PlayModule]
     .configure(
       "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
     )

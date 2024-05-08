@@ -5,8 +5,8 @@ import sbt.Tests.{Group, SubProcess}
 import sbt.*
 import com.typesafe.sbt.digest.Import.digest
 import com.typesafe.sbt.web.Import.{Assets, pipelineStages}
-import uk.gov.hmrc.*
 import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings, scalaSettings}
+import uk.gov.hmrc.DefaultBuildSettings
 import play.twirl.sbt.Import.TwirlKeys
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
@@ -28,14 +28,15 @@ lazy val scoverageSettings = {
   )
 }
 
+ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / majorVersion := 5
+
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(Seq(play.sbt.PlayScala, SbtDistributablesPlugin) *)
-  .settings(libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always))
-  .settings(majorVersion := 4)
+  .settings(libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-java8-compat" % VersionScheme.Always))
   .settings(scoverageSettings)
   .settings(scalaSettings *)
   .settings(defaultSettings() *)
-  .settings(scalaVersion := "2.13.12")
   .settings(routesImport += "models.notifications.ContactType._")
   .settings(routesImport += "utils.Binders._")
   .settings(Global / lintUnusedKeysOnLoad := false)
@@ -55,14 +56,6 @@ lazy val microservice = Project(appName, file("."))
       "controllers.routes._"
     )
   )
-  .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(Defaults.itSettings) *)
-  .settings(
-    IntegrationTest / Keys.fork := false,
-    IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "it")).value,
-    addTestReportOption(IntegrationTest, "int-test-reports"),
-    IntegrationTest / testGrouping := oneForkedJvmPerTest((IntegrationTest / definedTests).value),
-    IntegrationTest / parallelExecution := false)
  .settings(
     scalacOptions ++= List(
       "-Yrangepos",
@@ -74,6 +67,17 @@ lazy val microservice = Project(appName, file("."))
     )
   )
   .disablePlugins(JUnitXmlReportPlugin)
+
+lazy val it = project
+  .enablePlugins(play.sbt.PlayScala)
+  .dependsOn(microservice % "test->test")
+  .settings(
+    DefaultBuildSettings.itSettings(),
+    Test / Keys.fork := false,
+    addTestReportOption(Test, "int-test-reports"),
+    Test / testGrouping := oneForkedJvmPerTest((Test / definedTests).value),
+    Test / parallelExecution := false
+  )
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]) = {
   tests.map {

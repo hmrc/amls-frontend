@@ -37,7 +37,6 @@ class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar
     val statusService = mockStatusService
 
     lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[StatusService].to(self.statusService))

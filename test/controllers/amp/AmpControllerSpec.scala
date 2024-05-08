@@ -59,7 +59,6 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
     val credId          = "someId"
 
     lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[ProxyCacheService].to(proxyCacheService))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
