@@ -58,7 +58,7 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar wi
 
         val mlrRefNumber = "12345678"
 
-        mockCacheFetch[Tcsp](Some(Tcsp(servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(mlrRefNumber)))))
+        mockCacheFetch[Tcsp](Some(Tcsp(servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(Some(mlrRefNumber))))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -107,22 +107,6 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar wi
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.SummaryController.get.url))
           }
-
-        }
-
-      }
-
-      "respond with BAD_REQUEST" when {
-        "invalid data" in new Fixture {
-
-          val newRequestInvalid = FakeRequest(POST, routes.AnotherTCSPSupervisionController.post().url)
-              .withFormUrlEncodedBody(
-            "servicesOfAnotherTCSP" -> "true",
-            "mlrRefNumber" -> ""
-          )
-
-          val result = controller.post()(newRequestInvalid)
-          status(result) must be(BAD_REQUEST)
         }
       }
 

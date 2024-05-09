@@ -180,7 +180,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
     )
 
     model.servicesOfAnotherTCSP.map {
-      case ServicesOfAnotherTCSPYes(mlrRefNumber) => Seq(
+      case ServicesOfAnotherTCSPYes(Some(mlrRefNumber)) => Seq(
         yesNoRow(true),
         row(
           "tcsp.anothertcspsupervision.cya.additional.header",
@@ -191,6 +191,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
           )
         )
       )
+      case ServicesOfAnotherTCSPYes(None) => Seq(yesNoRow(true))
       case ServicesOfAnotherTCSPNo => Seq(yesNoRow(false))
     }
   }

@@ -76,7 +76,7 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
           "edit is true" when {
             "further action is not required in AnotherTCSPSupervisionController" in new Fixture {
 
-              mockCacheFetch[Tcsp](Some(Tcsp(servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber)))))
+              mockCacheFetch[Tcsp](Some(Tcsp(servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(Some(amlsRegistrationNumber))))))
               mockCacheSave[Tcsp]
 
               val newRequest = FakeRequest(POST, routes.ServicesOfAnotherTCSPController.post(true).url)
@@ -173,7 +173,7 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
     "remove data from ServicesOfAnotherTCSP" when {
       "request is edit from true to false" in new Fixture {
 
-        mockCacheFetch[Tcsp](Some(Tcsp(doesServicesOfAnotherTCSP = Some(true), servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber)))))
+        mockCacheFetch[Tcsp](Some(Tcsp(doesServicesOfAnotherTCSP = Some(true), servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(Some(amlsRegistrationNumber))))))
         mockCacheSave[Tcsp]
 
         val newRequest = FakeRequest(POST, routes.ServicesOfAnotherTCSPController.post(true).url)

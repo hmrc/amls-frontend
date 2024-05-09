@@ -24,7 +24,7 @@ import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 
 sealed trait ServicesOfAnotherTCSP
 
-case class ServicesOfAnotherTCSPYes(mlrRefNumber: String) extends ServicesOfAnotherTCSP
+case class ServicesOfAnotherTCSPYes(mlrRefNumber: Option[String]) extends ServicesOfAnotherTCSP
 
 case object ServicesOfAnotherTCSPNo extends ServicesOfAnotherTCSP
 
@@ -46,7 +46,7 @@ object ServicesOfAnotherTCSP {
 
   implicit val jsonReads: Reads[ServicesOfAnotherTCSP] =
     (__ \ "servicesOfAnotherTCSP").read[Boolean] flatMap {
-      case true => (__ \ "mlrRefNumber").read[String] map ServicesOfAnotherTCSPYes.apply
+      case true => (__ \ "mlrRefNumber").readNullable[String] map ServicesOfAnotherTCSPYes.apply
       case false => Reads(__ => JsSuccess(ServicesOfAnotherTCSPNo))
     }
 

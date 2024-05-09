@@ -50,7 +50,7 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
       view = view)
 
     val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
-    val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
+    val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes(Some("12345678"))
 
     val defaultCompanyServiceProviders = TcspTypes(Set(RegisteredOfficeEtc,
       CompanyFormationAgent, NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc))
@@ -146,7 +146,7 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
           )
 
           val expectedModel = Tcsp(Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc))),
-            None, None, None, Some(true), Some(ServicesOfAnotherTCSPYes("12345678")), true, false)
+            None, None, None, Some(true), Some(ServicesOfAnotherTCSPYes(Some("12345678"))), true, false)
 
           val result = controller.post()(newRequest)
           status(result) mustBe SEE_OTHER

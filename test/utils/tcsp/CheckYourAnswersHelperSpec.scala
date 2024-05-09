@@ -56,7 +56,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     Some(ComplexCorpStructureCreationYes),
     Some(providedServices),
     Some(true),
-    Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber))
+    Some(ServicesOfAnotherTCSPYes(Some(amlsRegistrationNumber)))
   )
 
   trait RowFixture {
