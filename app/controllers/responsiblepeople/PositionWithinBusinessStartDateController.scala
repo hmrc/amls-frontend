@@ -91,12 +91,12 @@ class PositionWithinBusinessStartDateController @Inject ()(val dataCacheConnecto
           for {
             _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp => rp.positions match {
                 case Some(x) => rp.positions(Positions.update(x, data))
-                case _ => {
+                case _ =>
+                  val message = "Positions does not exist, cannot update start date"
                   // $COVERAGE-OFF$
-                  logger.warn(s"Positions does not exist for ${rp.personName.getOrElse("[NAME MISSING]")}")
+                  logger.warn(message)
                   // $COVERAGE-ON$
-                  throw new IllegalStateException("Positions does not exist, cannot update start date")
-                }
+                  throw new IllegalStateException(message)
               }
             }
             rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
