@@ -26,7 +26,7 @@
     button: Button
 )
 
-@(summaryList: SummaryList,
+@(headingsAndSummaryLists: Seq[(String, SummaryList)],
   index: Int,
   showHide: Boolean = false,
   personName: String = "",
@@ -52,7 +52,10 @@
         </div>
     }
 
-    @govukSummaryList(summaryList)
+    @headingsAndSummaryLists.map { case (subheading, summaryList) =>
+      <h2 class="govuk-heading-m">@subheading</h2>
+      @govukSummaryList(summaryList)
+    }
 
     @formHelper(action = controllers.responsiblepeople.routes.DetailedAnswersController.post(index, flow)) {
         @button("responsiblepeople.check_your_answers.button")

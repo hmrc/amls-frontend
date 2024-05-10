@@ -24,16 +24,18 @@ import models.responsiblepeople._
 import models.{Country, DateOfChange}
 import org.jsoup.Jsoup
 import org.scalatest.prop.TableDrivenPropertyChecks
+import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.AmlsSummaryViewSpec
 import utils.responsiblepeople.CheckYourAnswersHelper
 import views.Fixture
 import views.html.responsiblepeople.CheckYourAnswersView
 
 import java.time.LocalDate
-import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
+import scala.jdk.CollectionConverters._
 
 class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks with ResponsiblePeopleValues {
 
@@ -41,11 +43,13 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
   lazy val cyaHelper = inject[CheckYourAnswersHelper]
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView(FakeRequest())
+    implicit val requestWithToken: Request[_] = addTokenForView(FakeRequest())
 
-    val businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))
+    val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))
 
-    val cyaList = cyaHelper.getSummaryList(responsiblePeopleModel, businessMatching, personName.fullName, 1, None, true, true)
+    val cyaList: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
+      responsiblePeopleModel, businessMatching, personName.fullName, 1, None, true, true
+    )
   }
 
   "CheckYourAnswersView" must {
@@ -61,6 +65,10 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
       heading.html must be(messages("title.cya"))
       subHeading.html must include(messages("summary.responsiblepeople"))
+
+      doc.getElementsByClass("govuk-heading-m").asScala.zipWithIndex.foreach { case (subheading, index) =>
+        subheading.text() mustBe messages(s"responsiblepeople.check_your_answers.subheading.${index + 1}")
+      }
     }
 
     "include the provided data" when {
@@ -69,10 +77,10 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
         override def view: HtmlFormat.Appendable = answersView(cyaList, 1, true, personName.fullName)
 
         (
-          cyaList.rows,
-          doc.getElementsByClass("govuk-summary-list__key").toSeq,
-          doc.getElementsByClass("govuk-summary-list__value").toSeq,
-        ).zipped.foreach { case (row, key, value) =>
+          cyaList.flatMap(_._2.rows) lazyZip
+          doc.getElementsByClass("govuk-summary-list__key").asScala lazyZip
+          doc.getElementsByClass("govuk-summary-list__value").asScala
+        ).foreach { case (row, key, value) =>
 
           row.key.content.asHtml.body must include(key.text())
 
@@ -87,7 +95,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
       "a full non-uk address history" in new ViewFixture {
 
-        val cyaListNonUK = cyaHelper.getSummaryList(
+        val cyaListNonUK = cyaHelper.getHeadingsAndSummaryLists(
           responsiblePeopleModel.copy(addressHistory = Some(addressHistoryNonUK)),
           businessMatching, personName.fullName, 1, None, true, true
         )
@@ -100,10 +108,10 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
         )
 
         (
-          cyaListNonUK.rows,
-          doc.getElementsByClass("govuk-summary-list__key").toSeq,
-          doc.getElementsByClass("govuk-summary-list__value").toSeq,
-        ).zipped.foreach { case (row, key, value) =>
+          cyaListNonUK.flatMap(_._2.rows) lazyZip
+          doc.getElementsByClass("govuk-summary-list__key").asScala lazyZip
+          doc.getElementsByClass("govuk-summary-list__value").asScala
+        ).foreach { case (row, key, value) =>
 
           row.key.content.asHtml.body must include(key.text())
 
@@ -123,7 +131,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
         def view = {
           answersView(
-            cyaHelper.getSummaryList(
+            cyaHelper.getHeadingsAndSummaryLists(
               responsiblePeopleModelWithApprovalCheck, businessMatching, personName.fullName, 1, None, true, false
             ),
             1, true, personName.fullName, None)
@@ -142,7 +150,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
         def view = {
           answersView(
-            cyaHelper.getSummaryList(
+            cyaHelper.getHeadingsAndSummaryLists(
               responsiblePeopleModelWithApprovalCheck, businessMatching, personName.fullName, 1, None, true, true
             ),
             1, true, personName.fullName, None)
@@ -162,7 +170,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
         def view = {
           answersView(
-            cyaHelper.getSummaryList(
+            cyaHelper.getHeadingsAndSummaryLists(
               responsiblePeopleModelWithApprovalCheck, businessMatching, personName.fullName, 1, None, false, true
             ),
             1, true, personName.fullName, None)
