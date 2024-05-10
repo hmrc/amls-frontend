@@ -1805,6 +1805,7 @@ bankdetails.accounttype.nonuk.lbl.04 = The business doesn’t use a bank account
 bankdetails.bankaccount.title = What kind of bank account is this?
 bankdetails.bankaccount.accountname.title = Give this bank account an informal name to help you identify it
 bankdetails.bankaccount.accountname = Give this bank account an informal name to help you identify it
+bankdetails.bankaccount.hint = For example, ‘business account’ or ‘client account’
 
 bankdetails.bankaccount.accounttype.title = Is this a UK bank account?
 bankdetails.bankaccount.accounttype = Is this a UK bank account?
