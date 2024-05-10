@@ -97,7 +97,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           }).asSeq,
           classes = "govuk-!-margin-bottom-9"
         )
-      ),
+      )
     )
   }
 
