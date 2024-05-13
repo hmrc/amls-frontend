@@ -2223,6 +2223,12 @@ responsiblepeople.check_your_answers.complete = Complete
 responsiblepeople.check_your_answers.you.have.registered = You have registered
 responsiblepeople.check_your_answers.visuallyhidden.the.responsible.person = the responsible person
 responsiblepeople.check_your_answers.visuallyhidden.from.your = from your responsible people
+responsiblepeople.check_your_answers.subheading.1 = Personal details
+responsiblepeople.check_your_answers.subheading.2 = Place of birth and nationality
+responsiblepeople.check_your_answers.subheading.3 = Contact details
+responsiblepeople.check_your_answers.subheading.4 = Home addresses
+responsiblepeople.check_your_answers.subheading.5 = Business details
+responsiblepeople.check_your_answers.subheading.6 = Experience
 responsiblepeople.check_your_answers.button = Accept and add this responsible person
 
 responsiblepeople.check_your_answers.hasNonUKresident.1 = Because at least one of the people you’ve registered lives outside of the UK, HMRC will likely need more information about them.

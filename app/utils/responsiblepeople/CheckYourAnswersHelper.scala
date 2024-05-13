@@ -28,40 +28,76 @@ import javax.inject.Inject
 
 class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions {
 
-  def getSummaryList(model: ResponsiblePerson,
-                     businessMatching: BusinessMatching,
-                     personName: String,
-                     idx: Int,
-                     flow: Option[String],
-                     showHide: Boolean = false,
-                     showApprovalSection: Boolean = false
-                    )(implicit messages: Messages): SummaryList = {
+  def getHeadingsAndSummaryLists(model: ResponsiblePerson,
+                                 businessMatching: BusinessMatching,
+                                 personName: String,
+                                 idx: Int,
+                                 flow: Option[String],
+                                 showHide: Boolean = false,
+                                 showApprovalSection: Boolean = false
+                                )(implicit messages: Messages): Seq[(String, SummaryList)] = {
 
-    SummaryList(
-      getPersonNameRow(model, idx, flow).asSeq ++
-      getLegalNameRows(model, personName, idx, flow).asSeq ++
-      getKnownByRows(model, personName, idx, flow).asSeq ++
-      getDateOfBirthRow(model, personName, idx, flow) ++
-      getPersonResidenceRows(model, personName, idx, flow).asSeq ++
-      getUKPassportRows(model, personName, idx, flow).asSeq ++
-      getNonUKPassportRows(model, personName, idx, flow).asSeq ++
-      getCountryAndNationalityRows(model, personName, idx, flow).asSeq ++
-      getContactDetailsRow(model, personName, idx, flow) ++
-      getCurrentAddressRows(model, personName, idx, flow, showHide).asSeq ++
-      getAdditionalAddressRows(model, personName, idx, flow).asSeq ++
-      getExtraAddressRows(model, personName, idx, flow).asSeq ++
-      getPositionsRows(model, personName, idx, flow).asSeq ++
-      getSoleProprietorRow(model, personName, idx, flow).asSeq ++
-      getVATRegisteredRows(model, personName, idx, flow).asSeq ++
-      getSARegisteredRows(model, personName, idx, flow).asSeq ++
-      getExperienceTrainingRows(model, businessMatching, personName, idx, flow).asSeq ++
-      getTrainingRows(model, personName, idx, flow).asSeq ++
-      getApprovalFlagsRow(model, personName, idx, flow).asSeq ++
-      (if(showApprovalSection) {
-        getHasAlreadyPaidRow(model, personName, idx, flow)
-      } else {
-        None
-      }).asSeq
+    Seq(
+      (
+        messages("responsiblepeople.check_your_answers.subheading.1"),
+        SummaryList(
+          getPersonNameRow(model, idx, flow).asSeq ++
+          getLegalNameRows(model, personName, idx, flow).asSeq ++
+          getKnownByRows(model, personName, idx, flow).asSeq ++
+          getDateOfBirthRow(model, personName, idx, flow),
+          classes = "govuk-!-margin-bottom-9"
+        )
+      ),
+      (
+        messages("responsiblepeople.check_your_answers.subheading.2"),
+        SummaryList(
+          getPersonResidenceRows(model, personName, idx, flow).asSeq ++
+          getUKPassportRows(model, personName, idx, flow).asSeq ++
+          getNonUKPassportRows(model, personName, idx, flow).asSeq ++
+          getCountryAndNationalityRows(model, personName, idx, flow).asSeq,
+          classes = "govuk-!-margin-bottom-9"
+        )
+      ),
+      (
+        messages("responsiblepeople.check_your_answers.subheading.3"),
+        SummaryList(
+          getContactDetailsRow(model, personName, idx, flow).asSeq,
+          classes = "govuk-!-margin-bottom-9"
+        )
+      ),
+      (
+        messages("responsiblepeople.check_your_answers.subheading.4"),
+        SummaryList(
+          getCurrentAddressRows(model, personName, idx, flow, showHide).asSeq ++
+          getAdditionalAddressRows(model, personName, idx, flow).asSeq ++
+          getExtraAddressRows(model, personName, idx, flow).asSeq,
+          classes = "govuk-!-margin-bottom-9"
+        )
+      ),
+      (
+        messages("responsiblepeople.check_your_answers.subheading.5"),
+        SummaryList(
+          getPositionsRows(model, personName, idx, flow).asSeq ++
+          getSoleProprietorRow(model, personName, idx, flow).asSeq ++
+          getVATRegisteredRows(model, personName, idx, flow).asSeq ++
+          getSARegisteredRows(model, personName, idx, flow).asSeq,
+          classes = "govuk-!-margin-bottom-9"
+        )
+      ),
+      (
+        messages("responsiblepeople.check_your_answers.subheading.6"),
+        SummaryList(
+          getExperienceTrainingRows(model, businessMatching, personName, idx, flow).asSeq ++
+          getTrainingRows(model, personName, idx, flow).asSeq ++
+          getApprovalFlagsRow(model, personName, idx, flow).asSeq ++
+          (if (showApprovalSection) {
+            getHasAlreadyPaidRow(model, personName, idx, flow)
+          } else {
+            None
+          }).asSeq,
+          classes = "govuk-!-margin-bottom-9"
+        )
+      )
     )
   }
 

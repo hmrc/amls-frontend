@@ -93,7 +93,7 @@ class DetailedAnswersController @Inject () (
           msbOrTcsp: Option[Boolean] =>
             val shouldShowApprovalSection = !msbOrTcsp.contains(true) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
             val personName = ControllerHelper.rpTitleName(Some(x))
-            val summaryList = cyaHelper.getSummaryList(x, businessMatching, personName, index, flow, showHide, shouldShowApprovalSection)
+            val summaryList = cyaHelper.getHeadingsAndSummaryLists(x, businessMatching, personName, index, flow, showHide, shouldShowApprovalSection)
             Ok(view(summaryList, index, showHide, personName, flow))
         }
       }
