@@ -43,7 +43,17 @@
 
     @heading("hvd.cash.payment.title")
 
-    @cashPaymentText()
+    <p class="govuk-body">@messages("hvd.cash.data.payment.summary.details")</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("hvd.cash.payment.data.summary.details.01")</li>
+        <li>@messages("hvd.cash.payment.data.summary.details.02")</li>
+        <li>@messages("hvd.cash.payment.data.summary.details.03")</li>
+    </ul>
+
+    <h2 class = govuk-heading-m>@messages("hvd.cash.accepted.payment")</h2>
+
+    <p class="govuk-body">@messages("hvd.cash.payment.convert.currency.summary")</p>
 
     @formHelper(action = controllers.hvd.routes.CashPaymentController.post(edit)) {
 
