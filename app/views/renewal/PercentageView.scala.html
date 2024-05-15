@@ -50,16 +50,24 @@
 
     @heading("renewal.hvd.percentage.title")
 
-    <p class="govuk-body">@messages("renewal.percentage.info.line1")</p>
-    <p class="govuk-body">@messages("renewal.percentage.info.line2")</p>
-
-    <ul class="govuk-list govuk-list--bullet">
-        <li>@messages("renewal.percentage.list.line1")</li>
-        <li>@messages("renewal.percentage.list.line2")</li>
-        <li>@messages("renewal.percentage.list.line3")</li>
-    </ul>
-
     <p class="govuk-body">@messages("renewal.percentage.turnover.text")</p>
+
+    <details class="govuk-details">
+        <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          @messages("renewal.percentage.details")
+        </span>
+        </summary>
+        <div class="govuk-details__text">
+            <p class="govuk-body">@messages("renewal.percentage.info.line1")</p>
+            <p class="govuk-body">@messages("renewal.percentage.info.line2")</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>@messages("renewal.percentage.list.line1")</li>
+                <li>@messages("renewal.percentage.list.line2")</li>
+                <li>@messages("renewal.percentage.list.line3")</li>
+            </ul>
+        </div>
+    </details>
 
     @formHelper(action = controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.post(edit)) {
 
