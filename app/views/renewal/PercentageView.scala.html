@@ -59,13 +59,12 @@
                         isPageHeading = true
                     ))
                 )),
+                hint = Some(Hint(content = Text(messages("renewal.percentage.turnover.text")))),
                 name = "percentage",
                 items = radioItems,
                 classes = "govuk-radios"
             ).withFormField(form("percentage"))
         )
-
-    <p class="govuk-body">@messages("renewal.percentage.turnover.text")</p>
 
     <details class="govuk-details">
         <summary class="govuk-details__summary">
