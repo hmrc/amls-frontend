@@ -48,15 +48,30 @@
 
     @subtitle("summary.renewal")
 
-    @heading("renewal.hvd.percentage.title")
+    @formHelper(action = controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.post(edit)) {
+
+        @inputRadios(
+            Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("renewal.hvd.percentage.title")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
+                name = "percentage",
+                items = radioItems,
+                classes = "govuk-radios"
+            ).withFormField(form("percentage"))
+        )
 
     <p class="govuk-body">@messages("renewal.percentage.turnover.text")</p>
 
     <details class="govuk-details">
         <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">
-          @messages("renewal.percentage.details")
-        </span>
+            <span class="govuk-details__summary-text">
+              @messages("renewal.percentage.details")
+            </span>
         </summary>
         <div class="govuk-details__text">
             <p class="govuk-body">@messages("renewal.percentage.info.line1")</p>
@@ -68,16 +83,6 @@
             </ul>
         </div>
     </details>
-
-    @formHelper(action = controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.post(edit)) {
-
-        @inputRadios(
-            Radios(
-                name = "percentage",
-                items = radioItems,
-                classes = "govuk-radios"
-            ).withFormField(form("percentage"))
-        )
 
         @button()
 
