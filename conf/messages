@@ -2246,8 +2246,9 @@ responsiblepeople.fit_and_proper.title = Has this person passed the fit and prop
 responsiblepeople.fit_and_proper.details = HMRC carries out the fit and proper test as part of the registration process for money service businesses and trust or company service providers. It is different to the test carried out by the Financial Conduct Authority.
 responsiblepeople.fit_and_proper.details2 = If a responsible person has already passed the test, either in their current role or in a previous role, they do not need to pass it again.
 
-responsiblepeople.approval_check.heading = Has HMRC charged your business or another business to do an approval check about {0}?
-responsiblepeople.approval_check.title = Has this person been charged for the approval check?
+responsiblepeople.approval_check.heading = HMRC approval check
+responsiblepeople.approval_check.legend = Has HMRC charged your business or another business to do an approval check about {0}?
+responsiblepeople.approval_check.title = HMRC approval check
 responsiblepeople.approval_check.text.details = This is separate from HMRC’s fit and proper test. HMRC carries out the approval check as part of the registration process for accountancy service providers, art market participants, estate agency businesses, and high value dealers.
 responsiblepeople.approval_check.text.details2 = If a responsible person has already passed the check, either in their current role or in a previous role, they do not need to pass it again.
 
