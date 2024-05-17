@@ -28,7 +28,7 @@ import views.html.supervision.PenalisedByProfessionalView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class PenalisedByProfessionalController @Inject()(
+class AboutPenaltiesController @Inject()(
                                                    val dataCacheConnector: DataCacheConnector,
                                                    val authAction: AuthAction,
                                                    val ds: CommonPlayDependencies,
@@ -50,16 +50,15 @@ class PenalisedByProfessionalController @Inject()(
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
+      formProvider().bindFromRequest(cleanData(request.body, "professionalBody")).fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, edit))),
-        data => {
+        data =>
           for {
             supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
             _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key,
               supervision.professionalBody(data))
           } yield Redirect(routes.SummaryController.get)
-        }
       )
   }
 }

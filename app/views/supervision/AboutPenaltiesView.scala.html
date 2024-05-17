@@ -50,6 +50,14 @@
     )
 }
 
+@radioItems = @{
+    HmrcYesNoRadioItems().map { x =>
+      if(x.value.contains("true")) {
+          x.copy(conditionalHtml = Some(conditionalHtml))
+      } else x
+    }
+}
+
 @layout(pageTitle = messages("supervision.penalisedbyprofessional.title") + " - " + messages("summary.supervision")) {
 
     @errorSummary(form)
@@ -75,8 +83,8 @@
         @inputYesNo(
             Radios(
                 name = "penalised",
-                items = HmrcYesNoRadioItems(),
-                classes = "govuk-radios govuk-radios--inline"
+                items = radioItems,
+                classes = "govuk-radios"
             ).withFormField(form("penalised"))
         )
 

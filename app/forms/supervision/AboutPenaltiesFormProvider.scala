@@ -16,24 +16,22 @@
 
 package forms.supervision
 
-import forms.generic.BooleanFormProvider
-import models.supervision.{ProfessionalBody, ProfessionalBodyNo, ProfessionalBodyYes}
+import forms.mappings.Mappings
+import models.supervision.ProfessionalBodyYes
 import play.api.data.Form
 
 import javax.inject.Inject
 
-class PenalisedByProfessionalFormProvider @Inject()() extends BooleanFormProvider {
+class AboutPenaltiesFormProvider @Inject()() extends Mappings {
 
-  def apply(): Form[ProfessionalBody] = createForm[ProfessionalBody](
-    "penalised", "error.required.professionalbody.penalised.by.professional.body"
-  )(apply, unapply)
+  val length = 255
 
-  private def apply(boolean: Boolean): ProfessionalBody =
-    if(boolean) ProfessionalBodyYes("") else ProfessionalBodyNo
-
-  private def unapply(obj: ProfessionalBody): Boolean = obj match {
-    case ProfessionalBodyYes(_) => true
-    case ProfessionalBodyNo => false
-  }
-
+  def apply(): Form[ProfessionalBodyYes] = Form[ProfessionalBodyYes](
+    "professionalBody" -> text("error.required.professionalbody.info.about.penalty").verifying(
+      firstError(
+        maxLength(length, "error.invalid.professionalbody.info.about.penalty.length.255"),
+        regexp(basicPunctuationRegex, "error.invalid.professionalbody.info.about.penalty")
+      )
+    ).transform[ProfessionalBodyYes](ProfessionalBodyYes.apply, _.value)
+  )
 }
