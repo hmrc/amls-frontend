@@ -48,10 +48,21 @@
         @messages("tcsp.servicesOfAnotherTcsp.hint.2")
     </p>
 
+    <p class="govuk-body">
+        @messages("tcsp.servicesOfAnotherTcsp.NotLegallyRequired")
+    </p>
+
     @formHelper(action = controllers.tcsp.routes.ServicesOfAnotherTCSPController.post(edit)) {
 
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                        legend = Some(Legend(
+                        content = Text(messages("tcsp.servicesOfAnotherTcsp.legend")),
+                        classes = "govuk-fieldset__legend--m",
+                        isPageHeading = false
+                    ))
+                )),
                 name = "servicesOfAnotherTCSP",
                 items = HmrcYesNoRadioItems(),
                 classes = "govuk-radios govuk-radios--inline"

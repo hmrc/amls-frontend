@@ -473,7 +473,7 @@ error.required.tcsp.provided_services.details.punctuation = Service can include 
 error.required.tcsp.service.providers = Select the type of trust or company service provider you are
 error.required.tcsp.off.the.shelf.companies = Select yes if you sell off-the-shelf companies
 error.required.tcsp.complex.corporate.structures = Select yes if you create or will create complex corporate structures for clients
-error.required.tcsp.services.another.tcsp = Select yes if your business uses the services of another trust or company service provider
+error.required.tcsp.services.another.tcsp = Select yes if you provide services at the address of another business
 error.required.tcsp.services.another.tcsp.registered = Select yes if your trust or company service provider is supervised with HMRC under the Money Laundering Regulations
 error.required.tcsp.services.another.tcsp.number = Enter your trust or company service provider’s Money Laundering Regulations number
 error.tcsp.services.another.tcsp.number.length = Money Laundering Regulations number must be between 8 and 15 characters
@@ -2345,11 +2345,14 @@ tcsp.service.provider.lbl.05 = Trust or company formation agent
 
 tcsp.off-the-shelf.companies.lbl = Do you sell off-the-shelf companies?
 tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
-tcsp.servicesOfAnotherTcsp.title = Do you provide services at the address of another business?
-tcsp.servicesOfAnotherTcsp.hint.1 = You must tell us about
-tcsp.servicesOfAnotherTcsp.hint.1.link.text = every premises (opens in a new tab)
+tcsp.servicesOfAnotherTcsp.title = Providing services at the address of another business
+tcsp.servicesOfAnotherTcsp.legend = Do you provide services at the address of another business?
+tcsp.servicesOfAnotherTcsp.hint.1 = You must
+tcsp.servicesOfAnotherTcsp.hint.1.link.text = tell us about every premises (opens in a new tab)
 tcsp.servicesOfAnotherTcsp.hint.2 = you use, including virtual offices.
+tcsp.servicesOfAnotherTcsp.anotherBusinessAddress = Do you provide services at the address of another business?
 tcsp.servicesOfAnotherTcsp.other.hint = Only include companies which are based in the UK and supervised by HM Revenue and Customs for Money Laundering Regulations.
+tcsp.servicesOfAnotherTcsp.NotLegallyRequired = You’re not legally required to register.
 tcsp.servicesOfAnotherTcsp.mlrregno.lbl = Trust or company service provider’s Money Laundering Regulations number (optional)
 tcsp.cya.mlrregno = Money Laundering Regulation reference number
 
