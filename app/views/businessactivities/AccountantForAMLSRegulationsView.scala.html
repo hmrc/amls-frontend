@@ -48,6 +48,13 @@
 
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                    content = Text(messages("businessactivities.accountantForAMLSRegulations.legend")),
+                    classes = "govuk-fieldset__legend--m",
+                    isPageHeading = false
+                    ))
+                )),
                 name = "accountantForAMLSRegulations",
                 items = HmrcYesNoRadioItems(),
                 classes = "govuk-radios govuk-radios--inline"

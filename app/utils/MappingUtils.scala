@@ -53,20 +53,20 @@ trait MappingUtils {
 
   object MonoidImplicits {
     import cats.Monoid
-    implicit def jsonMonoid = new Monoid[JsValue] {
-      def combine(a1: JsValue, a2: JsValue) = {
+    implicit def jsonMonoid: Monoid[JsValue] = new Monoid[JsValue] {
+      def combine(a1: JsValue, a2: JsValue): JsObject = {
         a1.as[JsObject] deepMerge a2.as[JsObject]
       }
-      def empty = {
+      def empty: JsObject = {
         Json.obj()
       }
     }
 
-    implicit def jsonObjMonoid = new Monoid[JsObject] {
+    implicit def jsonObjMonoid: Monoid[JsObject] = new Monoid[JsObject] {
       def combine(a1: JsObject, a2: JsObject) = {
         a1 deepMerge a2
       }
-      def empty = {
+      def empty: JsObject = {
         Json.obj()
       }
     }
