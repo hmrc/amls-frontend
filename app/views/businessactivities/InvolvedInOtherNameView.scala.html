@@ -17,10 +17,10 @@
 @import config.ApplicationConfig
 @import models.businessactivities.InvolvedInOther
 @import uk.gov.hmrc.govukfrontend.views.Aliases.CharacterCount
-@import uk.gov.hmrc.govukfrontend.views.Implicits.{RichCharacterCount, RichRadios}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCharacterCount
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import views.html.components.forms.{ErrorSummary, InputYesNo}
 @import views.html.components.{Button, Heading, ReturnLink, SectionSubtitle}
-
 
 @this(
     layout: Layout,
@@ -34,7 +34,7 @@
     returnLink: ReturnLink
 )
 
-@(form: Form[_], edit: Boolean, businessTypes: Option[List[String]], maxLength: Int)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
+@(form: Form[_], edit: Boolean, businessTypes: Option[List[String]], maxLength: Int)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
 @hasInvolvedInOtherError = @{
     form.errors match {
@@ -60,9 +60,6 @@
                 isPageHeading = false,
                 content = Text(messages("businessactivities.confirm-activities.lbl.details"))
             ),
-            hint = Some(Hint(
-                content = Text(messages("businessactivities.involved.hint"))
-            )),
             id = "details",
             name = "details",
             rows = 6,
@@ -106,6 +103,12 @@
 
         @inputYesNo(
             Radios(
+                Some(Fieldset(
+                    legend = Some(Legend(
+                        content = messages("businessactivities.involved.other.legend").toText,
+                        classes = "govuk-fieldset__legend--m"
+                    ))
+                )),
                 name = "involvedInOther",
                 items = InvolvedInOther.formValues(conditionalInput)
             ).withFormField(form("involvedInOther"))

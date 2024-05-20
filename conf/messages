@@ -1936,11 +1936,12 @@ businessactivities.employees.line2.text = How many people work on activities cov
 businessactivities.employees.line2.label = Include directors, temporary and seasonal staff.
 businessactivities.employees.line2.hint = Include directors, temporary and seasonal staff. If you are a sole proprietor with no employees, enter 1.
 businessactivities.employees.line2.cya = How many people work on activities covered by the Money Laundering Regulations?
-businessactivities.involved.other.title = Is your business involved in any other activities?
-businessactivities.involved.other.hint = Other activities include things like:
+businessactivities.involved.other.title = Other business activities
+businessactivities.involved.other.hint = We need to know if your business is involved in other activities such as:
 businessactivities.involved.listline1 = running a newsagent’s
 businessactivities.involved.listline2 = recruitment
 businessactivities.involved.listline3 = selling software packages
+businessactivities.involved.other.legend = Is your business involved in any other activities?
 
 businessactivities.whoisyouraccountant.title = What is your adviser’s name?
 businessactivities.whoisyouraccountant.name = Full name
