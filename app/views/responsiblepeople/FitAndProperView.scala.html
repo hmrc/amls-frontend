@@ -39,7 +39,7 @@
 
     @subtitle("summary.responsiblepeople")
 
-    @heading("responsiblepeople.fit_and_proper.heading", personName)
+    @heading("responsiblepeople.fit_and_proper.heading")
 
     <p class="govuk-body">@messages("responsiblepeople.fit_and_proper.details")</p>
     <p class="govuk-body">@messages("responsiblepeople.fit_and_proper.details2", personName)</p>
@@ -48,6 +48,13 @@
 
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                        legend = Some(Legend(
+                        content = Text(messages("responsiblepeople.fit_and_proper.legend", personName)),
+                        classes = "govuk-fieldset__legend--m",
+                        isPageHeading = false
+                    ))
+                )),
                 name = "hasAlreadyPassedFitAndProper",
                 items = HmrcYesNoRadioItems(),
                 classes = "govuk-radios govuk-radios--inline"

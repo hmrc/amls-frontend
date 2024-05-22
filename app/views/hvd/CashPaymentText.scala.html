@@ -18,10 +18,20 @@
 
 @()(implicit messages: Messages)
 
-<p class="govuk-body">@messages("hvd.cash.data.payment.summary.details")</p>
+<p class="govuk-body">@messages("hvd.cash.payment.convert.currency.summary")</p>
+
+<details class="govuk-details">
+ <summary class="govuk-details__summary">
+    <span class="govuk-details__summary-text">
+      @messages("hvd.what.is.cash.payment.detail")
+    </span>
+     </summary>
+    <div class="govuk-details__text">
+     <p class="govuk-body">@messages("hvd.cash.data.payment.summary.details")</p>
 <ul class="govuk-list govuk-list--bullet">
     <li>@messages("hvd.cash.payment.data.summary.details.01")</li>
     <li>@messages("hvd.cash.payment.data.summary.details.02")</li>
     <li>@messages("hvd.cash.payment.data.summary.details.03")</li>
 </ul>
-<p class="govuk-body">@messages("hvd.cash.payment.convert.currency.summary")</p>
+    </div>
+</details>

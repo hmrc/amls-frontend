@@ -33,13 +33,13 @@
 
 @(form: Form[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
-@layout(pageTitle = messages("responsiblepeople.approval_check.title", personName) + " - " + messages("summary.responsiblepeople")) {
+@layout(pageTitle = messages("responsiblepeople.approval_check.title") + " - " + messages("summary.responsiblepeople")) {
 
     @errorSummary(form)
 
     @subtitle("summary.responsiblepeople")
 
-    @heading("responsiblepeople.approval_check.heading", personName)
+    @heading("responsiblepeople.approval_check.heading")
 
     <p class="govuk-body">@messages("responsiblepeople.approval_check.text.details", personName)</p>
     <p class="govuk-body">@messages("responsiblepeople.approval_check.text.details2", personName)</p>
@@ -48,6 +48,13 @@
 
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                        legend = Some(Legend(
+                        content = Text(messages("responsiblepeople.approval_check.legend", personName)),
+                        classes = "govuk-fieldset__legend--m",
+                        isPageHeading = false
+                    ))
+                )),
                 name = "hasAlreadyPaidApprovalCheck",
                 items = HmrcYesNoRadioItems(),
                 classes = "govuk-radios govuk-radios--inline"
