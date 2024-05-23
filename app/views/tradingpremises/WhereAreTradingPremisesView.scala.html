@@ -49,10 +49,12 @@
             Input(
                 id = "tradingName",
                 name = "tradingName",
+                autocomplete = Some("organization"),
                 label = Label(
                     content = Text(messages("tradingpremises.yourtradingpremises.tradingname"))
                 ),
-                classes = "govuk-!-width-two-thirds"
+                classes = "govuk-!-width-two-thirds",
+                spellcheck = Some(false)
             ),
             form("tradingName")
         )

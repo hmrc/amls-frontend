@@ -55,10 +55,12 @@
             Input(
                 id = "yourName",
                 name = "yourName",
+                autocomplete = Some("name"),
                 label = Label(
                     content = Text(messages("businessdetails.correspondenceaddress.yourName"))
                 ),
-                classes = "govuk-!-width-two-thirds"
+                classes = "govuk-!-width-two-thirds",
+                spellcheck = Some(false)
             ),
             form("yourName")
         )
@@ -67,10 +69,12 @@
             Input(
                 id = "businessName",
                 name = "businessName",
+                autocomplete = Some("organization"),
                 label = Label(
                     content = Text(messages("businessdetails.correspondenceaddress.businessName"))
                 ),
-                classes = "govuk-!-width-two-thirds"
+                classes = "govuk-!-width-two-thirds",
+                spellcheck = Some(false)
             ),
             form("businessName")
         )

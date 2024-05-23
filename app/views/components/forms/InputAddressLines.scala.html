@@ -20,11 +20,12 @@
 
 @(form: Form[_])(implicit messages: Messages)
 
-@List(1,2,3,4).map { line =>
+@List(1,2).map { line =>
     @inputText(
         Input(
             id = s"addressLine$line",
             name = s"addressLine$line",
+            autocomplete = Some(s"address-line$line"),
             label = Label(
                 content = Text(messages(s"lbl.address.line$line"))
             ),
@@ -32,4 +33,30 @@
         ),
         form(s"addressLine$line")
     )
+
 }
+    @inputText(
+        Input(
+            id = "addressLine3",
+            name = "addressLine3",
+            autocomplete = Some("address-level2"),
+            label = Label(
+                content = Text(messages("lbl.address.line3"))
+            ),
+            classes = "govuk-!-width-two-thirds"
+        ),
+        form("addressLine3")
+    )
+
+    @inputText(
+        Input(
+            id = "addressLine4",
+            name = "addressLine4",
+            autocomplete = Some("address-level1"),
+            label = Label(
+                content = Text(messages("lbl.address.line4"))
+            ),
+            classes = "govuk-!-width-two-thirds"
+        ),
+        form("addressLine4")
+    )
