@@ -145,13 +145,21 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           )
         )
       )
-      case ProfessionalBodyYes(_) => Seq(
+      case ProfessionalBodyYes(details) => Seq(
         row(
-          "supervision.penalisedbyprofessional.title",
+          "supervision.penalisedbyprofessional.heading1",
           booleanToLabel(true),
           editAction(
             controllers.supervision.routes.PenalisedByProfessionalController.get(true).url,
             "penalisedbyprofessional-edit"
+          )
+        ),
+        row(
+          "supervision.penaltydetails.title",
+          details,
+          editAction(
+            controllers.supervision.routes.PenaltyDetailsController.get(true).url,
+            "penaltydetails-edit"
           )
         )
       )

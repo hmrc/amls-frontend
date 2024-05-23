@@ -15,7 +15,8 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.charactercount.CharacterCount
-@import uk.gov.hmrc.govukfrontend.views.Implicits.{RichCharacterCount, RichRadios}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCharacterCount
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 @import views.html.components.{SectionSubtitle, Heading, ReturnLink, Button}
 @import views.html.components.forms.{ErrorSummary, InputYesNo}
@@ -70,10 +71,14 @@
 
     @formHelper(action = controllers.supervision.routes.PenalisedByProfessionalController.post(edit)) {
 
-    <h2 class="govuk-heading-m">@messages("supervision.penalisedbyprofessional.heading1")</h2>
-
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = messages("supervision.penalisedbyprofessional.heading1").toText,
+                        classes = "govuk-fieldset__legend--m"
+                    ))
+                )),
                 name = "penalised",
                 items = HmrcYesNoRadioItems(),
                 classes = "govuk-radios govuk-radios--inline"

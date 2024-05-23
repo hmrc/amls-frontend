@@ -21,9 +21,9 @@ import forms.mappings.Constraints
 import models.supervision.ProfessionalBodyYes
 import play.api.data.{Form, FormError}
 
-class AboutPenaltiesFormProviderSpec extends FieldBehaviours with Constraints {
+class PenaltyDetailsFormProviderSpec extends FieldBehaviours with Constraints {
 
-  val formProvider: AboutPenaltiesFormProvider = new AboutPenaltiesFormProvider()
+  val formProvider: PenaltyDetailsFormProvider = new PenaltyDetailsFormProvider()
 
   val form: Form[ProfessionalBodyYes] = formProvider()
   val fieldName: String = "professionalBody"
@@ -35,7 +35,7 @@ class AboutPenaltiesFormProviderSpec extends FieldBehaviours with Constraints {
     )
 
     behave like mandatoryField(
-      form, fieldName, FormError(fieldName, "error.required.professionalbody.info.about.penalty")
+      form, fieldName, FormError(fieldName, "error.required.penaltydetails.info.about.penalty")
     )
 
     "details are submitted but max length exceeded" in {
@@ -43,7 +43,7 @@ class AboutPenaltiesFormProviderSpec extends FieldBehaviours with Constraints {
       forAll(stringsLongerThan(formProvider.length + 1)) { longDetails =>
         val boundForm = form.bind(Map(fieldName -> longDetails))
         boundForm.errors.headOption shouldBe Some(
-          FormError(fieldName, "error.invalid.professionalbody.info.about.penalty.length.255", Seq(formProvider.length))
+          FormError(fieldName, "error.invalid.penaltydetails.info.about.penalty.length.255", Seq(formProvider.length))
         )
       }
     }
@@ -52,7 +52,7 @@ class AboutPenaltiesFormProviderSpec extends FieldBehaviours with Constraints {
 
       val boundForm = form.bind(Map(fieldName -> "§"))
       boundForm.errors.headOption shouldBe Some(
-        FormError(fieldName, "error.invalid.professionalbody.info.about.penalty", Seq(basicPunctuationRegex))
+        FormError(fieldName, "error.invalid.penaltydetails.info.about.penalty", Seq(basicPunctuationRegex))
       )
     }
   }

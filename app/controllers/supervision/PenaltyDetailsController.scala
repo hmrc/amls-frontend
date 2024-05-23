@@ -18,33 +18,35 @@ package controllers.supervision
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.supervision.PenalisedByProfessionalFormProvider
-import models.supervision.Supervision
+import forms.supervision.PenaltyDetailsFormProvider
+import models.supervision.{ProfessionalBodyNo, ProfessionalBodyYes, Supervision}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
 import utils.CharacterCountParser.cleanData
-import views.html.supervision.PenalisedByProfessionalView
+import views.html.supervision.PenaltyDetailsView
 
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class AboutPenaltiesController @Inject()(
-                                                   val dataCacheConnector: DataCacheConnector,
-                                                   val authAction: AuthAction,
-                                                   val ds: CommonPlayDependencies,
-                                                   val cc: MessagesControllerComponents,
-                                                   formProvider: PenalisedByProfessionalFormProvider,
-                                                   view: PenalisedByProfessionalView) extends AmlsBaseController(ds, cc) {
+class PenaltyDetailsController @Inject()(
+                                          val dataCacheConnector: DataCacheConnector,
+                                          val authAction: AuthAction,
+                                          val ds: CommonPlayDependencies,
+                                          val cc: MessagesControllerComponents,
+                                          formProvider: PenaltyDetailsFormProvider,
+                                          view: PenaltyDetailsView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
-        response =>
-          val form = (for {
-            supervision <- response
-            professionalBody <- supervision.professionalBody
-          } yield formProvider().fill(professionalBody)).getOrElse(formProvider())
-          Ok(view(form, edit))
+      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map { response =>
+        response.professionalBody match {
+          case Some(value @ ProfessionalBodyYes(_)) =>
+            Ok(view(formProvider().fill(value), edit))
+          case Some(ProfessionalBodyNo) =>
+            Redirect(routes.PenalisedByProfessionalController.get(edit))
+          case None =>
+            Ok(view(formProvider(), edit))
+        }
       }
   }
 
