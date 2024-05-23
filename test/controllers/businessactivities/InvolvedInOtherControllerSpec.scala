@@ -33,7 +33,6 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import services.businessmatching.RecoverActivitiesService
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
 import utils.AmlsSpec
 import views.html.businessactivities.InvolvedInOtherNameView
