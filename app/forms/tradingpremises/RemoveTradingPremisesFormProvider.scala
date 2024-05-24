@@ -27,13 +27,15 @@ class RemoveTradingPremisesFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[ActivityEndDate] = Form[ActivityEndDate](
     "endDate" -> localDate(
-      invalidKey = "error.expected.date.format",
-      allRequiredKey = "error.expected.date.format",
-      twoRequiredKey = "error.expected.date.format",
-      requiredKey = "error.expected.date.format"
+      oneInvalidKey = "error.invalid.tp.one",
+      multipleInvalidKey = "error.invalid.tp.multiple",
+      oneRequiredKey = "error.required.tp.one",
+      twoRequiredKey = "error.required.tp.two",
+      allRequiredKey = "error.required.tp.all",
+      realDateKey = "error.invalid.tp.date.not.real"
     ).verifying(
       minDate(RemoveTradingPremisesFormProvider.minDate, "error.invalid.year.post1900"),
-      maxDate(RemoveTradingPremisesFormProvider.maxDate, "error.future.date")
+      maxDate(RemoveTradingPremisesFormProvider.maxDate, "error.invalid.tp.date.future")
     ).transform[ActivityEndDate](
       ActivityEndDate(_), _.endDate
     )

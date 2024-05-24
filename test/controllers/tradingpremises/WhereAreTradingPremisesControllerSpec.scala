@@ -547,7 +547,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       val result = controller.saveDateOfChange(1)(postRequest)
 
       hstatus(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(messages("error.invalid.year"))
+      contentAsString(result) must include(messages("error.invalid.dateofchange.one", "year"))
     }
 
     "given a date of change in the future" in new Fixture {
@@ -570,7 +570,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       val result = controller.saveDateOfChange(1)(postRequest)
 
       hstatus(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(messages("error.future.date"))
+      contentAsString(result) must include(messages("error.invalid.dateofchange.future"))
     }
 
   }

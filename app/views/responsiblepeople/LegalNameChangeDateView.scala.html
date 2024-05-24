@@ -14,15 +14,15 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichDateInput
-@import components.forms.ErrorSummary
 @import components.{Button, ReturnLink, SectionSubtitle, Heading}
 @import config.ApplicationConfig
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichDateInput
+@import views.html.components.forms.DateErrorSummary
 
 @this(
     layout: Layout,
     formHelper: FormWithCSRF,
-    errorSummary: ErrorSummary,
+    errorSummary: DateErrorSummary,
     subtitle: SectionSubtitle,
     heading: Heading,
     govukDateInput: GovukDateInput,
@@ -36,17 +36,22 @@
     pageTitle = s"${messages("responsiblepeople.legalnamechangedate.title")} - ${messages("summary.responsiblepeople")}",
 ) {
 
-    @errorSummary(form, Some(Map("date" -> "date.day")))
+    @errorSummary(form, "date")
 
     @subtitle("summary.responsiblepeople")
-
-    @heading("responsiblepeople.legalnamechangedate.heading", personName)
 
     @formHelper(action = controllers.responsiblepeople.routes.LegalNameChangeDateController.post(index, edit, flow)) {
 
         @govukDateInput(DateInput(
             id = "date",
-            hint = Some(Hint(content = Text(messages("lbl.date.example"))))
+            hint = Some(Hint(content = Text(messages("lbl.date.example")))),
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(messages("responsiblepeople.legalnamechangedate.heading", personName)),
+                    isPageHeading = true,
+                    classes = "govuk-fieldset__legend--xl"
+                ))
+            ))
         ).withFormField(form("date")))
 
         @button()

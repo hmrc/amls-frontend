@@ -15,14 +15,14 @@
  *@
 
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichDateInput
-@import components.forms.ErrorSummary
+@import components.forms.DateErrorSummary
 @import components.{Button, ReturnLink, SectionSubtitle, Heading}
 @import config.ApplicationConfig
 
 @this(
     layout: Layout,
     formHelper: FormWithCSRF,
-    errorSummary: ErrorSummary,
+    errorSummary: DateErrorSummary,
     subtitle: SectionSubtitle,
     heading: Heading,
     govukDateInput: GovukDateInput,
@@ -40,7 +40,7 @@
     pageTitle = s"${messages("responsiblepeople.remove.responsible.person.title")} - ${messages("summary.responsiblepeople")}",
 ) {
 
-    @errorSummary(form, Some(Map("endDate" -> "endDate.day")))
+    @errorSummary(form, "endDate")
 
     @subtitle("summary.responsiblepeople")
 
@@ -56,7 +56,14 @@
 
             @govukDateInput(DateInput(
                 id = "endDate",
-                hint = Some(Hint(content = Text(messages("lbl.date.example"))))
+                hint = Some(Hint(content = Text(messages("lbl.date.example")))),
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("responsiblepeople.remove.named.responsible.person", personName)),
+                        isPageHeading = false,
+                        classes = "govuk-visually-hidden"
+                    ))
+                ))
             ).withFormField(form("endDate")))
 
         } else {

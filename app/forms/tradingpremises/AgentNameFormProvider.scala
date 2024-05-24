@@ -36,13 +36,15 @@ class AgentNameFormProvider @Inject()() extends Mappings {
         )
       ),
       "agentDateOfBirth" -> localDate(
-        invalidKey = "error.invalid.date.tp.not.real",
-        allRequiredKey = "error.required.tp.agent.date.all",
+        oneInvalidKey = "error.invalid.tp.agent.date.one",
+        multipleInvalidKey = "error.invalid.tp.agent.date.multiple",
+        oneRequiredKey = "error.required.tp.agent.date.one",
         twoRequiredKey = "error.required.tp.agent.date.two",
-        requiredKey = "error.required.tp.agent.date.one"
+        allRequiredKey = "error.required.tp.agent.date.all",
+        realDateKey = "error.invalid.agent.date.not.real"
       ).verifying(
-        minDate(LocalDate.of(1900, 1, 1), "error.allowed.start.date"),
-        maxDate(LocalDate.now(), "error.invalid.date.agent.not.real")
+        minDate(LocalDate.of(1900, 1, 1), "error.invalid.agent.date.1900"),
+        maxDate(LocalDate.now(), "error.invalid.agent.date.future")
       )
     )((name, date) => AgentName(name, agentDateOfBirth = Some(date)))(x => x.agentDateOfBirth.map(y => (x.agentName, y)))
   )

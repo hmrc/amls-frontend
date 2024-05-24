@@ -27,10 +27,12 @@ class CashPaymentFirstDateFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[CashPaymentFirstDate] = Form[CashPaymentFirstDate](
     "paymentDate" -> localDate(
-      invalidKey = "error.date.hvd.real",
-      allRequiredKey = "error.date.hvd.all",
+      oneInvalidKey = "error.date.hvd.invalid.one",
+      multipleInvalidKey = "error.date.hvd.invalid.multiple",
+      oneRequiredKey = "error.date.hvd.one",
       twoRequiredKey = "error.date.hvd.two",
-      requiredKey = "error.date.hvd.one"
+      allRequiredKey = "error.date.hvd.all",
+      realDateKey = "error.date.hvd.real"
     ).verifying(
       minDate(CashPaymentFirstDateFormProvider.minDate, "error.date.hvd.past"),
       maxDate(CashPaymentFirstDateFormProvider.maxDate, "error.date.hvd.future")

@@ -94,7 +94,7 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(messages("error.invalid.year"))
+      contentAsString(result) must include(messages("error.invalid.dateofchange.one", "year"))
     }
 
     "fail submission when input date is before activity start date" in new Fixture {
