@@ -19,6 +19,7 @@ package views.supervision
 import forms.supervision.PenalisedByProfessionalFormProvider
 import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
+import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.supervision.PenalisedByProfessionalView
@@ -66,20 +67,19 @@ class PenalisedByProfessionalViewSpec extends AmlsViewSpec with Matchers  {
       }
     }
 
+    "have the correct legend" in new ViewFixture {
+      override def view: HtmlFormat.Appendable = viewUnderTest(fp(), false)
+
+      doc.getElementsByTag("legend")
+        .first().text() mustBe messages("supervision.penalisedbyprofessional.heading1")
+    }
+
     behave like pageWithErrors(
       viewUnderTest(
         fp().withError("penalised", "error.required.professionalbody.penalised.by.professional.body"), true
       ),
       "penalised",
       "error.required.professionalbody.penalised.by.professional.body"
-    )
-
-    behave like pageWithErrors(
-      viewUnderTest(
-        fp().withError("professionalBody", "error.invalid.professionalbody.info.about.penalty"), true
-      ),
-      "professionalBody",
-      "error.invalid.professionalbody.info.about.penalty"
     )
 
     behave like pageWithBackLink(viewUnderTest(fp(), false))

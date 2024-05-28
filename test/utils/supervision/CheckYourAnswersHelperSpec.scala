@@ -250,7 +250,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           7,
-          "supervision.penalisedbyprofessional.title",
+          "supervision.penalisedbyprofessional.heading1",
           booleanToLabel(true),
           controllers.supervision.routes.PenalisedByProfessionalController.get(true).url,
           "penalisedbyprofessional-edit"
@@ -262,10 +262,10 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           8,
-          "supervision.penalisedbyprofessional.details.lbl",
+          "supervision.penaltydetails.title",
           professionalBody.value,
-          controllers.supervision.routes.PenalisedByProfessionalController.get(true).url,
-          "penalisedbyprofessionaldetails-edit"
+          controllers.supervision.routes.PenaltyDetailsController.get(true).url,
+          "penaltydetails-edit"
         )
       }
     }

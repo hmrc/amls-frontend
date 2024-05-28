@@ -19,7 +19,7 @@ package controllers.supervision
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.supervision.PenalisedByProfessionalFormProvider
-import models.supervision.Supervision
+import models.supervision.{ProfessionalBody, ProfessionalBodyNo, ProfessionalBodyYes, Supervision}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
 import utils.CharacterCountParser.cleanData
@@ -50,15 +50,29 @@ class PenalisedByProfessionalController @Inject()(
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest(cleanData(request.body, "professionalBody")).fold(
+      formProvider().bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, edit))),
-        data =>
+        data => {
           for {
             supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
-            _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key,
-              supervision.professionalBody(data))
-          } yield Redirect(routes.SummaryController.get)
+            existingAnswer = supervision.flatMap(_.professionalBody)
+            answerEqualsExisting = existingAnswer.exists(_.getClass == data.getClass)
+          } yield {
+            if(answerEqualsExisting) {
+              Future.successful(Redirect(routes.SummaryController.get))
+            } else {
+              dataCacheConnector.save[Supervision](
+                request.credId, Supervision.key, supervision.professionalBody(data)
+              ) map { _ =>
+                (data, edit) match {
+                  case (ProfessionalBodyYes(_), _) => Redirect(routes.PenaltyDetailsController.get(edit))
+                  case _ => Redirect(routes.SummaryController.get)
+                }
+              }
+            }
+          }
+        }.flatten
       )
   }
 }
