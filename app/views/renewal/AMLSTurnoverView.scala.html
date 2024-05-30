@@ -49,10 +49,7 @@
     @subtitle("summary.renewal")
 
     @businessTypes.map { types =>
-        @if(types.size == 1) {
-            @heading("renewal.turnover.title.single.service", types.head)
-        } else {
-            @heading("renewal.turnover.title")
+        @heading("renewal.turnover.title")
 
             <p class="govuk-body">@messages("renewal.turnover.text")</p>
 
@@ -61,18 +58,24 @@
                     <li>@businessType</li>
                 }
             </ul>
-        }
     }
 
     @formHelper(action = controllers.renewal.routes.AMLSTurnoverController.post(edit)) {
 
         @inputRadios(
             Radios(
-                name = "turnover",
-                items = radioItems,
-                classes = "govuk-radios"
-            ).withFormField(form("turnover"))
-        )
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                    content = Text(messages("renewal.turnover.net.profit")),
+                    classes = "govuk-fieldset__legend--m",
+                    isPageHeading = false
+                ))
+            )),
+            name = "turnover",
+            items = radioItems,
+            classes = "govuk-radios"
+        ).withFormField(form("turnover"))
+    )
 
         @button()
 

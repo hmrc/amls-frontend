@@ -113,7 +113,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
     model.turnover flatMap { turnover =>
       activities map {
         case activity :: Nil => turnoverRow(
-          messages("renewal.turnover.title.single.service", activity), turnover.value
+          messages("renewal.turnover.title", activity), turnover.value
         )
         case _ => turnoverRow("renewal.turnover.title", turnover.value)
       }
