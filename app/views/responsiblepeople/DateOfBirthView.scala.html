@@ -15,14 +15,14 @@
  *@
 
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichDateInput
-@import components.forms.ErrorSummary
+@import components.forms.DateErrorSummary
 @import components.{Button, ReturnLink, SectionSubtitle, Heading}
 @import config.ApplicationConfig
 
 @this(
     layout: Layout,
     formHelper: FormWithCSRF,
-    errorSummary: ErrorSummary,
+    errorSummary: DateErrorSummary,
     subtitle: SectionSubtitle,
     heading: Heading,
     govukDateInput: GovukDateInput,
@@ -36,18 +36,23 @@
     pageTitle = s"${messages("responsiblepeople.date.of.birth.title")} - ${messages("summary.responsiblepeople")}",
 ) {
 
-    @errorSummary(form, Some(Map("dateOfBirth" -> "dateOfBirth.day")))
+    @errorSummary(form, "dateOfBirth")
 
     @subtitle("summary.responsiblepeople")
-
-    @heading("responsiblepeople.date.of.birth.heading", personName)
 
     @formHelper(action = controllers.responsiblepeople.routes.DateOfBirthController.post(index, edit, flow)) {
 
         @govukDateInput(
             DateInput(
                 id = "dateOfBirth",
-                hint = Some(Hint(content = Text(messages("lbl.date.example"))))
+                hint = Some(Hint(content = Text(messages("lbl.date.example")))),
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("responsiblepeople.date.of.birth.heading", personName)),
+                        isPageHeading = true,
+                        classes = "govuk-fieldset__legend--xl"
+                    ))
+                ))
             ).withFormField(form("dateOfBirth"))
         )
 

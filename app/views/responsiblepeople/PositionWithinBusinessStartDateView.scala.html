@@ -17,14 +17,14 @@
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichDateInput
 @import models.businessmatching.BusinessType
 @import models.responsiblepeople.PositionWithinBusiness
-@import components.forms.ErrorSummary
+@import components.forms.DateErrorSummary
 @import components.{Button, ReturnLink, SectionSubtitle, Heading}
 @import config.ApplicationConfig
 
 @this(
     layout: Layout,
     formHelper: FormWithCSRF,
-    errorSummary: ErrorSummary,
+    errorSummary: DateErrorSummary,
     subtitle: SectionSubtitle,
     heading: Heading,
     govukDateInput: GovukDateInput,
@@ -38,7 +38,7 @@
     pageTitle = s"${messages("responsiblepeople.position_within_business.startDate.title")} - ${messages("summary.responsiblepeople")}",
 ) {
 
-    @errorSummary(form, Some(Map("startDate" -> "startDate.day")))
+    @errorSummary(form, "startDate")
 
     @subtitle("summary.responsiblepeople")
 
@@ -59,7 +59,14 @@
         @govukDateInput(
             DateInput(
                 id = "startDate",
-                hint = Some(Hint(content = Text(messages("lbl.date.example"))))
+                hint = Some(Hint(content = Text(messages("lbl.date.example")))),
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("responsiblepeople.position_within_business.startDate.heading", personName)),
+                        isPageHeading = false,
+                        classes = "govuk-visually-hidden"
+                    ))
+                ))
             ).withFormField(form("startDate"))
         )
 

@@ -96,4 +96,19 @@ class DateBehaviours extends FieldBehaviours {
       result.errors should contain only FormError(key, requiredAllKey, errorArgs)
     }
   }
+
+  def realDateField(form: Form[_], key: String, realDateKey: String): Unit = {
+
+    "fail to bind a date that does not exist" in {
+      val data = Map(
+        s"$key.day" -> "31",
+        s"$key.month" -> "2",
+        s"$key.year" -> "2000"
+      )
+
+      val result = form.bind(data)
+
+      result.errors should contain only FormError(key, realDateKey)
+    }
+  }
 }

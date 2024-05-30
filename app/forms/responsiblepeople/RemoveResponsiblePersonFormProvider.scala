@@ -35,13 +35,15 @@ class RemoveResponsiblePersonFormProvider @Inject()() extends Mappings {
       "endDate" -> mandatoryIfTrue(
         booleanKey,
         localDate(
-        invalidKey = "error.invalid.tp.date.not.real",
-        allRequiredKey = "error.required.tp.all",
-        twoRequiredKey = "error.required.tp.two",
-        requiredKey = "error.required.tp.one"
+          oneInvalidKey = "error.invalid.rp.one",
+          multipleInvalidKey = "error.invalid.rp.multiple",
+          oneRequiredKey = "error.required.rp.one",
+          twoRequiredKey = "error.required.rp.two",
+          allRequiredKey = "error.required.rp.all",
+          realDateKey = "error.invalid.rp.date.not.real"
         ).verifying(
-          minDate(RemoveResponsiblePersonFormProvider.minDate, "error.allowed.start.date"),
-          maxDate(RemoveResponsiblePersonFormProvider.maxDate, "error.future.date")
+          minDate(RemoveResponsiblePersonFormProvider.minDate, "error.invalid.year.post1900"),
+          maxDate(RemoveResponsiblePersonFormProvider.maxDate, "error.invalid.rp.date.future")
         )
       )
     )(apply)(unapply)

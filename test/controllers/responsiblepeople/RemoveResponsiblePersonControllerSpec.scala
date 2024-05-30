@@ -461,7 +461,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(messages("error.required.tp.all"))
+          contentAsString(result) must include(messages("error.required.rp.all"))
 
         }
 
@@ -487,7 +487,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(messages("error.allowed.start.date"))
+          contentAsString(result) must include(messages("error.invalid.year.post1900"))
         }
 
         "removing a rp from an application with future date" in new Fixture {
@@ -512,7 +512,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(messages("error.future.date"))
+          contentAsString(result) must include(messages("error.invalid.rp.date.future"))
 
         }
 

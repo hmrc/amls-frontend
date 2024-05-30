@@ -27,10 +27,12 @@ class PositionWithinBusinessStartDateFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[PositionStartDate] = Form[PositionStartDate](
     "startDate" -> localDate(
-      invalidKey = "error.rp.position.invalid.date.not.real",
-      allRequiredKey = "error.rp.position.required.date.all",
+      oneInvalidKey = "error.rp.position.invalid.date.one",
+      multipleInvalidKey = "error.rp.position.invalid.date.multiple",
+      oneRequiredKey = "error.rp.position.required.date.one",
       twoRequiredKey = "error.rp.position.required.date.two",
-      requiredKey = "error.rp.position.required.date.one"
+      allRequiredKey = "error.rp.position.required.date.all",
+      realDateKey = "error.rp.position.invalid.date.not.real"
     ).verifying(
       minDate(PositionWithinBusinessStartDateFormProvider.minDate, "error.rp.position.invalid.date.after.1900"),
       maxDate(PositionWithinBusinessStartDateFormProvider.maxDate, "error.rp.position.invalid.date.future")

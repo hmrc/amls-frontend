@@ -16,7 +16,7 @@
 
 @import config.ApplicationConfig
 @import views.html.components.{Heading, SectionSubtitle, Button, ReturnLink}
-@import views.html.components.forms.ErrorSummary
+@import views.html.components.forms.DateErrorSummary
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichDateInput
 
 @this(
@@ -24,7 +24,7 @@
     formHelper: FormWithCSRF,
     subtitle: SectionSubtitle,
     heading: Heading,
-    errorSummary: ErrorSummary,
+    errorSummary: DateErrorSummary,
     govukDateInput: GovukDateInput,
     button: Button,
     returnLink: ReturnLink
@@ -34,7 +34,7 @@
 
 @layout(pageTitle = messages("tradingpremises.remove.trading.premises.title") + " - " + messages("summary.tradingpremises")) {
 
-    @errorSummary(form, Some(Map("endDate" -> "endDate.day")))
+    @errorSummary(form, "endDate")
 
     @subtitle("summary.tradingpremises")
 
@@ -50,7 +50,14 @@
 
             @govukDateInput(DateInput(
                 id = "endDate",
-                hint = Some(Hint(content = Text(messages("lbl.date.example"))))
+                hint = Some(Hint(content = Text(messages("lbl.date.example")))),
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("tradingpremises.remove.trading.premises.enddate.lbl")),
+                        isPageHeading = false,
+                        classes = "govuk-visually-hidden"
+                    ))
+                ))
             ).withFormField(form("endDate")))
 
         } else {

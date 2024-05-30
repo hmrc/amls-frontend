@@ -68,9 +68,9 @@ class ActivityStartDateViewSpec extends AmlsViewSpec with Matchers {
 
       def view = date(formWithInvalidData, true)
 
-      doc.getElementsByClass("govuk-error-summary").text() must include(messages("error.invalid.date.not.real"))
+      doc.getElementsByClass("govuk-error-summary").text() must include(messages("error.invalid.date.one", "year"))
 
-      doc.getElementById("startDate-error").text() must include(messages("error.invalid.date.not.real"))
+      doc.getElementById("startDate-error").text() must include(messages("error.invalid.date.one", "year"))
 
     }
 

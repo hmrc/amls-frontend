@@ -27,10 +27,12 @@ class SupervisionStartFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[SupervisionStart] = Form[SupervisionStart](
     "startDate" -> localDate(
-      invalidKey = "error.supervision.start.invalid.date.not.real",
-      allRequiredKey = "error.supervision.start.required.date.all",
+      oneInvalidKey = "error.supervision.start.invalid.date.one",
+      multipleInvalidKey = "error.supervision.start.invalid.date.multiple",
+      oneRequiredKey = "error.supervision.start.required.date.one",
       twoRequiredKey = "error.supervision.start.required.date.two",
-      requiredKey = "error.supervision.start.required.date.one"
+      allRequiredKey = "error.supervision.start.required.date.all",
+      realDateKey = "error.supervision.start.invalid.date.not.real"
     ).verifying(
       minDate(SupervisionStartFormProvider.minDate, "error.supervision.start.invalid.date.after.1900"),
       maxDate(SupervisionStartFormProvider.maxDate, "error.supervision.start.invalid.date.future")

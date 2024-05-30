@@ -29,10 +29,12 @@ class NewHomeAddressDateOfChangeFormProvider @Inject()() extends Mappings {
   def apply(): Form[NewHomeDateOfChange] = Form[NewHomeDateOfChange](
     mapping(
       "dateOfChange" -> localDate(
-        invalidKey = "new.home.error.required.date.fake",
-        allRequiredKey = "new.home.error.required.date.all",
+        oneInvalidKey = "new.home.error.invalid.date.one",
+        multipleInvalidKey = "new.home.error.invalid.date.multiple",
+        oneRequiredKey = "new.home.error.required.date.one",
         twoRequiredKey = "new.home.error.required.date.two",
-        requiredKey = "new.home.error.required.date.one"
+        allRequiredKey = "new.home.error.required.date.all",
+        realDateKey = "new.home.error.required.date.fake"
       ).verifying(
         minDate(NewHomeAddressDateOfChangeFormProvider.minDate, "new.home.error.required.date.1900"),
         maxDate(NewHomeAddressDateOfChangeFormProvider.maxDate, "new.home.error.required.date.future")
