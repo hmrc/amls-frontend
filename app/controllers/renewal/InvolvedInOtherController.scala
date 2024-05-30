@@ -20,10 +20,9 @@ import config.AmlsErrorHandler
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.renewal.InvolvedInOtherFormProvider
-
-import javax.inject.{Inject, Singleton}
 import models.businessmatching._
-import models.renewal.{InvolvedInOther, InvolvedInOtherNo, InvolvedInOtherYes, Renewal}
+import models.renewal.InvolvedInOther.fromBool
+import models.renewal.{InvolvedInOtherNo, InvolvedInOtherYes, Renewal}
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RenewalService
@@ -31,6 +30,8 @@ import services.businessmatching.RecoverActivitiesService
 import utils.AuthAction
 import utils.CharacterCountParser.cleanData
 import views.html.renewal.InvolvedInOtherView
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class InvolvedInOtherController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -43,76 +44,61 @@ class InvolvedInOtherController @Inject()(val dataCacheConnector: DataCacheConne
                                           error: AmlsErrorHandler,
                                           view: InvolvedInOtherView) extends AmlsBaseController(ds, cc) with Logging {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-        dataCacheConnector.fetchAll(request.credId).map {
-          optionalCache =>
-            (for {
-              cache <- optionalCache
-              businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-            } yield {
-              (for {
-                renewal <- cache.getEntry[Renewal](Renewal.key)
-                involvedInOther <- renewal.involvedInOtherActivities
-              } yield {
-                Ok(view(formProvider().fill(involvedInOther), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false)))
-              }) getOrElse Ok(view(formProvider(), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false)))
-            }) getOrElse Ok(view(formProvider(), edit, None))
-        } recoverWith {
-          case _: NoSuchElementException =>
-            logger.warn("[InvolvedInOtherController][get] - Business activities list was empty, attempting to recover")
-            recoverActivitiesService.recover(request).map {
-              case true => Redirect(routes.InvolvedInOtherController.get())
-              case false =>
-                logger.warn("[InvolvedInOtherController][get] - Unable to determine business types")
-                InternalServerError(error.internalServerErrorTemplate)
-            }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetchAll(request.credId).map {
+      optionalCache =>
+        (for {
+          cache <- optionalCache
+          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+        } yield {
+          (for {
+            renewal <- cache.getEntry[Renewal](Renewal.key)
+            involvedInOther <- renewal.involvedInOtherActivities
+          } yield {
+            Ok(view(formProvider().fill(involvedInOther.toBool), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false)))
+          }) getOrElse Ok(view(formProvider(), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false)))
+        }) getOrElse Ok(view(formProvider(), edit, None))
+    } recoverWith {
+      case _: NoSuchElementException =>
+        logger.warn("[InvolvedInOtherController][get] - Business activities list was empty, attempting to recover")
+        recoverActivitiesService.recover(request).map {
+          case true => Redirect(routes.InvolvedInOtherController.get())
+          case false =>
+            logger.warn("[InvolvedInOtherController][get] - Unable to determine business types")
+            InternalServerError(error.internalServerErrorTemplate)
         }
-  }
-
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest(cleanData(request.body, "details")).fold(
-        formWithErrors =>
-          for {
-            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-          } yield businessMatching match {
-            case Some(_) => BadRequest(view(formWithErrors, edit, businessMatching.prefixedAlphabeticalBusinessTypes(false)))
-            case None => BadRequest(view(formWithErrors, edit, None))
-          },
-        data =>
-          for {
-            renewal <- renewalService.getRenewal(request.credId)
-            _ <- renewalService.updateRenewal(request.credId, getUpdatedRenewal(renewal, data))
-          } yield data match {
-            case models.renewal.InvolvedInOtherYes(_) => Redirect(routes.BusinessTurnoverController.get(edit))
-            case models.renewal.InvolvedInOtherNo => redirectDependingOnEdit(edit)
-          }
-    )
-  }
-
-  private def getUpdatedRenewal(renewal: Option[Renewal], data: InvolvedInOther): Renewal = {
-    (renewal, data) match {
-      case (Some(_), InvolvedInOtherYes(_)) => {
-        renewal.involvedInOtherActivities(data)
-      }
-      case (Some(_), InvolvedInOtherNo) => {
-        renewal.involvedInOtherActivities(data).resetBusinessTurnover
-      }
-      case (None, _) => {
-        Renewal(involvedInOtherActivities = Some(data), hasChanged = true)
-      }
     }
   }
 
-  private def redirectDependingOnEdit(edit: Boolean) = if (edit) {
-    Redirect(routes.SummaryController.get)
-  } else {
-    Redirect(routes.AMLSTurnoverController.get(edit))
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider().bindFromRequest(cleanData(request.body, "details")).fold(
+      formWithErrors =>
+        renewalService.getBusinessMatching(request.credId).map {
+          case Some(businessMatching) => BadRequest(view(formWithErrors, edit, businessMatching.prefixedAlphabeticalBusinessTypes(false)))
+          case None => BadRequest(view(formWithErrors, edit, None))
+        },
+      involvedInOther =>
+        renewalService.createOrUpdateRenewal(request.credId, r => updateRenewal(r, involvedInOther), initRenewal(involvedInOther)).map { _ =>
+          if (involvedInOther) {
+            Redirect(routes.InvolvedInOtherDetailsController.get(edit))
+          } else if (edit) {
+            Redirect(routes.SummaryController.get)
+          } else {
+            Redirect(routes.AMLSTurnoverController.get(edit))
+          }
+        }
+    )
   }
 
+  private def initRenewal(involvedInOther: Boolean) = {
+    Renewal(involvedInOtherActivities = Some(fromBool(involvedInOther)), hasChanged = true)
+  }
+
+  private def updateRenewal(renewal: Renewal, involvedInOther: Boolean): Renewal = {
+    if (involvedInOther) {
+      renewal.involvedInOtherActivities(InvolvedInOtherYes(""))
+    } else {
+      renewal.involvedInOtherActivities(InvolvedInOtherNo).resetBusinessTurnover
+    }
+  }
 }
-
-
-
-

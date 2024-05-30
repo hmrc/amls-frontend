@@ -57,7 +57,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
       view = view)
 
     when {
-      renewalService.getRenewal(any())(any())
+      renewalService.getRenewal(any())
     } thenReturn Future.successful(Renewal().some)
 
     when(dataCacheConnector.fetchAll(any()))
@@ -69,7 +69,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
     .withFormUrlEncodedBody("usesForeignCurrencies" -> "true")
 
     when {
-      renewalService.updateRenewal(any(),any())(any())
+      renewalService.updateRenewal(any(),any())
     } thenReturn Future.successful(mock[Cache])
   }
 
@@ -158,7 +158,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
         await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
-        verify(renewalService).updateRenewal(any(), captor.capture())(any())
+        verify(renewalService).updateRenewal(any(), captor.capture())
 
         captor.getValue.whichCurrencies mustBe Some(WhichCurrencies(
           Seq("USD"),
@@ -175,7 +175,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
         val result = controller.post()(request)
 
         status(result) mustBe BAD_REQUEST
-        verify(renewalService, never()).updateRenewal(any(),any())(any())
+        verify(renewalService, never()).updateRenewal(any(),any())
       }
     }
   }

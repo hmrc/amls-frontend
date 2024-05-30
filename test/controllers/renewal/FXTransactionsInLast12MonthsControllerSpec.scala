@@ -49,14 +49,12 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     val cacheMap = mock[Cache]
 
-    when(mockRenewalService.fetchAndUpdateRenewal(any(), any())(any(), any()))
-      .thenReturn(Future.successful(Some(cacheMap)))
+    when(mockRenewalService.fetchAndUpdateRenewal(any(), any())(any())).thenReturn(Future.successful(Some(cacheMap)))
 
-    when(mockRenewalService.getRenewal(any())(any()))
-      .thenReturn(Future.successful(None))
+    when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
     def setupBusinessMatching(activities: Set[BusinessActivity]) = when {
-      mockRenewalService.getBusinessMatching(any())(any())
+      mockRenewalService.getBusinessMatching(any())
     } thenReturn Future.successful(Some(BusinessMatching(activities = Some(BusinessActivities(activities)))))
   }
 
@@ -73,7 +71,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "load the page 'How many foreign exchange transactions' with pre populated data" in new Fixture  {
 
-      when(mockRenewalService.getRenewal(any())(any()))
+      when(mockRenewalService.getRenewal(any()))
         .thenReturn(Future.successful(
           Some(Renewal(fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("12345678963")))))
         )
@@ -105,8 +103,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
     "return 500" when {
 
       "updating mongoCache fails" in new FlowFixture {
-        when(mockRenewalService.fetchAndUpdateRenewal(any(), any())(any(), any()))
-          .thenReturn(Future.successful(None))
+        when(mockRenewalService.fetchAndUpdateRenewal(any(), any())(any())).thenReturn(Future.successful(None))
 
         setupBusinessMatching(activities = Set(MoneyServiceBusiness))
         val result = controller.post()(newRequest)

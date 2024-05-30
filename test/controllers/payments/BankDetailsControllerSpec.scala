@@ -75,8 +75,7 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
       hasChanged = true
     )
 
-    when(controller.renewalService.getRenewal(any())(any()))
-      .thenReturn(Future.successful(Some(completeRenewal)))
+    when(controller.renewalService.getRenewal(any())).thenReturn(Future.successful(Some(completeRenewal)))
 
     when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
       .thenReturn(Future.successful(true))

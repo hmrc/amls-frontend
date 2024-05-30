@@ -14,10 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.Aliases.CharacterCount
-@import uk.gov.hmrc.govukfrontend.views.Implicits.{RichCharacterCount, RichRadios}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
-@import views.html.components.forms.ErrorSummary
+@import views.html.components.forms.{ErrorSummary, InputYesNo}
 @import views.html.components.{Heading, SectionSubtitle, ReturnLink, Button}
 
 @this(
@@ -25,8 +24,8 @@
     errorSummary: ErrorSummary,
     subtitle: SectionSubtitle,
     heading: Heading,
-    inputTextArea: GovukCharacterCount,
     radios: GovukRadios,
+    inputYesNo: InputYesNo,
     formHelper: FormWithCSRF,
     returnLink: ReturnLink,
     button: Button
@@ -34,34 +33,12 @@
 
 @(form: Form[_], edit: Boolean, businessTypes: Option[List[String]])(implicit request: Request[_], messages: Messages)
 
-@conditionalInput = @{
-
-    inputTextArea(
-        CharacterCount(
-            label = Label(
-                isPageHeading = false,
-                content = Text(messages("businessactivities.renewal.confirm-activities.lbl.details"))
-            ),
-            id = "details",
-            name = "details",
-            rows = 6,
-            errorMessage = form("details").error.map(err => ErrorMessage(content = Text(messages(err.message, err.args: _*)))),
-            maxLength = Some(255)
-        ).withFormField(form("details"))
-    )
-}
-
 @radioItems = @{
     HmrcYesNoRadioItems().map { radioItem =>
         if (radioItem.value.contains("true")) {
-            radioItem.copy(
-                id = Some("involvedInOther-true"),
-                conditionalHtml = Some(conditionalInput)
-            )
+            radioItem.copy(id = Some("involvedInOther-true"))
         } else {
-            radioItem.copy(
-                id = Some("involvedInOther-false")
-            )
+            radioItem.copy(id = Some("involvedInOther-false"))
         }
     }
 }
@@ -96,11 +73,18 @@
 
     @formHelper(action = controllers.renewal.routes.InvolvedInOtherController.post(edit)) {
 
-        @radios(
+        @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                        legend = Some(Legend(
+                        content = Text(messages("renewal.involvedinother.legend")),
+                        classes = "govuk-fieldset__legend--m",
+                        isPageHeading = false
+                    ))
+                )),
                 name = "involvedInOther",
                 items = radioItems,
-                classes = "govuk-radios"
+                classes = "govuk-radios govuk-radios--inline"
             ).withFormField(form("involvedInOther"))
         )
 

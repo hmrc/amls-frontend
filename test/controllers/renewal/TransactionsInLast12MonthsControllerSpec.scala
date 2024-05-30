@@ -58,7 +58,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
       view = view)
 
     when {
-      renewalService.getRenewal(any())(any())
+      renewalService.getRenewal(any())
     } thenReturn Future.successful(Renewal().some)
 
     val msbModel = moneyServiceBusiness(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)))
@@ -73,7 +73,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
     val cache = mock[Cache]
 
     when {
-      renewalService.updateRenewal(any(),any())(any())
+      renewalService.updateRenewal(any(),any())
     } thenReturn Future.successful(cache)
 
     when {
@@ -107,7 +107,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
       "reads the current value from the renewals model" in new Fixture {
 
         when {
-          renewalService.getRenewal(any())(any())
+          renewalService.getRenewal(any())
         } thenReturn Future.successful(Renewal(transactionsInLast12Months = TransactionsInLast12Months("2500").some).some)
 
         val result = controller.get(true)(request)
@@ -115,7 +115,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
         doc.select("input[name=txnAmount]").first.attr("value") mustBe "2500"
 
-        verify(renewalService).getRenewal(any())(any())
+        verify(renewalService).getRenewal(any())
       }
     }
   }
@@ -210,7 +210,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
           post(valid = false) { result =>
             status(result) mustBe BAD_REQUEST
-            verify(renewalService, never()).updateRenewal(any(),any())(any())
+            verify(renewalService, never()).updateRenewal(any(),any())
           }
         }
       }
@@ -237,7 +237,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
         post() { result =>
           status(result) mustBe SEE_OTHER
-          verify(renewalService).updateRenewal(any(), eqTo(expected))(any())
+          verify(renewalService).updateRenewal(any(), eqTo(expected))
         }
       }
     }

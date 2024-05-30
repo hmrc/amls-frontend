@@ -60,7 +60,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
         when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any())) thenReturn(Future.successful(bm))
 
         when {
-          renewalService.getTaskRow(any())(any[HeaderCarrier], any(), any())
+          renewalService.getTaskRow(any())(any[HeaderCarrier], any())
         } thenReturn Future.successful(
           TaskRow("renewal", controllers.renewal.routes.SummaryController.get.url, Renewal().hasChanged, NotStarted, TaskRow.notStartedTag))
 
@@ -81,7 +81,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
         when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any())) thenReturn(Future.successful(bm))
 
         when {
-          renewalService.getTaskRow(meq("internalId"))(any(), any(), any())
+          renewalService.getTaskRow(meq("internalId"))(any(), any())
         } thenReturn Future.successful(
           TaskRow("renewal", controllers.renewal.routes.SummaryController.get.url, Renewal().hasChanged, Completed, TaskRow.completedTag))
 
@@ -94,7 +94,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any())) thenReturn (Future.successful(None))
 
           when {
-            renewalService.getTaskRow(meq("internalId"))(any(), any(), any())
+            renewalService.getTaskRow(meq("internalId"))(any(), any())
           } thenReturn Future.successful(
             TaskRow("renewal", controllers.renewal.routes.SummaryController.get.url, Renewal().hasChanged, Completed, TaskRow.completedTag))
 

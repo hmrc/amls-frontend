@@ -58,7 +58,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar with Inje
       view = view)
 
     when {
-      renewalService.getRenewal(any())(any())
+      renewalService.getRenewal(any())
     } thenReturn Future.successful(Renewal().some)
 
     when(dataCacheConnector.fetchAll(any()))
@@ -73,7 +73,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar with Inje
     )
 
     when {
-      renewalService.updateRenewal(any(),any())(any())
+      renewalService.updateRenewal(any(),any())
     } thenReturn Future.successful(mock[Cache])
   }
 
@@ -140,7 +140,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar with Inje
 
       "reads the current value from the renewals model" in new Fixture {
         when {
-          renewalService.getRenewal(any())(any())
+          renewalService.getRenewal(any())
         } thenReturn Future.successful(Renewal(whichCurrencies = WhichCurrencies(Seq("EUR"), None, MoneySources(None, None, None).some).some).some)
 
         val result = controller.get(true)(request)
@@ -148,7 +148,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar with Inje
 
         doc.select("select[name=currencies[0]] option[selected]").attr("value") mustBe "EUR"
 
-        verify(renewalService).getRenewal(any())(any())
+        verify(renewalService).getRenewal(any())
       }
     }
   }
@@ -170,7 +170,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar with Inje
         await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
-        verify(renewalService).updateRenewal(any(), captor.capture())(any())
+        verify(renewalService).updateRenewal(any(), captor.capture())
 
         captor.getValue.whichCurrencies mustBe Some(WhichCurrencies(
           Seq("USD", "GBP", "BOB")))
@@ -186,7 +186,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar with Inje
         val result = controller.post()(newRequest)
 
         status(result) mustBe BAD_REQUEST
-        verify(renewalService, never()).updateRenewal(any(),any())(any())
+        verify(renewalService, never()).updateRenewal(any(),any())
       }
     }
   }

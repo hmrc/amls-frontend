@@ -57,7 +57,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
       view = view
     )
 
-    when(mockRenewalService.getRenewal(any())(any()))
+    when(mockRenewalService.getRenewal(any()))
       .thenReturn(Future.successful(Some(Renewal(businessTurnover = Some(BusinessTurnover.First)))))
   }
 
@@ -126,8 +126,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
         when(controller.dataCacheConnector.fetch[BusinessTurnover](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
-        when(mockRenewalService.updateRenewal(any(), any())(any()))
-          .thenReturn(Future.successful(emptyCache))
+        when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -143,8 +142,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
         when(controller.dataCacheConnector.fetch[BusinessTurnover](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
-        when(mockRenewalService.updateRenewal(any(), any())(any()))
-          .thenReturn(Future.successful(emptyCache))
+        when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)

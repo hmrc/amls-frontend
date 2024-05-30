@@ -77,7 +77,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
     val customersOutsideIsUK = CustomersOutsideIsUK(true)
 
     when {
-      renewalService.fetchAndUpdateRenewal(any(), any())(any(), any())
+      renewalService.fetchAndUpdateRenewal(any(), any())(any())
     } thenReturn Future.successful(Some(cache))
 
     when {
@@ -108,7 +108,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
       })
 
       when {
-        renewalService.getBusinessMatching(any())(any())
+        renewalService.getBusinessMatching(any())
       } thenReturn Future.successful(Some(businessMatching))
 
       await(controller.post(edit)(formRequest(data)))
@@ -120,8 +120,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
     "get is called" must {
       "load the page" in new Fixture {
 
-        when(renewalService.getRenewal(any())(any()))
-          .thenReturn(Future.successful(None))
+        when(renewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
 
@@ -137,7 +136,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
       "pre-populate the Customer outside UK Page" in new Fixture {
 
-        when(renewalService.getRenewal(any())(any()))
+        when(renewalService.getRenewal(any()))
           .thenReturn(Future.successful(Some(Renewal(customersOutsideIsUK = Some(CustomersOutsideIsUK(true))))))
 
         val result = controller.get()(request)
@@ -157,7 +156,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
         "return 500" in new FormSubmissionFixture {
           when {
-            renewalService.fetchAndUpdateRenewal(any(), any())(any(), any())
+            renewalService.fetchAndUpdateRenewal(any(), any())(any())
           } thenReturn Future.successful(None)
           post() { res =>
             status(Future.successful(res)) mustBe INTERNAL_SERVER_ERROR

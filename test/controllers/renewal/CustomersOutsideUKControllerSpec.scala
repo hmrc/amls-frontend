@@ -81,7 +81,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
     val customersOutsideIsUK = CustomersOutsideIsUK(true)
 
     when {
-      renewalService.updateRenewal(any(),any())(any())
+      renewalService.updateRenewal(any(),any())
     } thenReturn Future.successful(cache)
 
     when {
@@ -131,8 +131,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
     "get is called" must {
       "load the page" in new Fixture {
 
-        when(renewalService.getRenewal(any())(any()))
-          .thenReturn(Future.successful(None))
+        when(renewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
 
@@ -148,7 +147,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
       "pre-populate the Customer outside UK Page" in new Fixture {
 
-        when(renewalService.getRenewal(any())(any()))
+        when(renewalService.getRenewal(any()))
           .thenReturn(Future.successful(Some(Renewal(customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))))))
 
         val result = controller.get()(request)
