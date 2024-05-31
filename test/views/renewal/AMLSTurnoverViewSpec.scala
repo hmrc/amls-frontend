@@ -43,7 +43,7 @@ class AMLSTurnoverViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = amls_turnover(fp().fill(AMLSTurnover.Third), true, Some(List("some provider")))
 
-      heading.html must be(messages("renewal.turnover.title.single.service", "some provider"))
+      heading.html must be(messages("renewal.turnover.title", "some provider"))
       subHeading.html must include(messages("summary.renewal"))
     }
 

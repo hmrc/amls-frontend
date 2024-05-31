@@ -71,15 +71,8 @@ lazy val it = project
   .enablePlugins(play.sbt.PlayScala)
   .dependsOn(microservice % "test->test")
   .settings(
-    DefaultBuildSettings.itSettings(),
+    DefaultBuildSettings.itSettings(true),
     Test / Keys.fork := false,
     addTestReportOption(Test, "int-test-reports"),
-    Test / testGrouping := oneForkedJvmPerTest((Test / definedTests).value),
     Test / parallelExecution := false
   )
-
-def oneForkedJvmPerTest(tests: Seq[TestDefinition]) = {
-  tests.map {
-    test => new Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
-  }
-}
