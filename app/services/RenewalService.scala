@@ -207,7 +207,5 @@ class RenewalService @Inject()(dataCache: DataCacheConnector)(implicit ec: Execu
 }
 
 object RenewalService {
-  case class BusinessAndOtherActivities(businessActivities: Set[BusinessActivity], involvedInOtherYes: InvolvedInOtherYes) {
-    def containsMSB: Boolean = businessActivities.contains(MoneyServiceBusiness)
-  }
+  case class BusinessAndOtherActivities(businessActivities: Set[BusinessActivity], involvedInOtherYes: InvolvedInOtherYes)
 }

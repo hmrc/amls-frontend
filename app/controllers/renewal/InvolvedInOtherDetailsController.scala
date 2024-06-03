@@ -59,8 +59,7 @@ class InvolvedInOtherDetailsController @Inject()(
   private def redirect(optBusinessAndOtherActivities: Option[BusinessAndOtherActivities], edit: Boolean, credId: String)
                       (implicit request: Request[_]): Result = {
     optBusinessAndOtherActivities match {
-      case Some(businessAndOtherActivities) if businessAndOtherActivities.containsMSB => Redirect(routes.BusinessTurnoverController.get(edit))
-      case Some(_) => Redirect(routes.AMLSTurnoverController.get(edit))
+      case Some(_) => Redirect(routes.BusinessTurnoverController.get(edit))
       case None => {
         logger.error(s"Unable to fetch business activities or other activities for $credId")
         InternalServerError(errorHandler.internalServerErrorTemplate)

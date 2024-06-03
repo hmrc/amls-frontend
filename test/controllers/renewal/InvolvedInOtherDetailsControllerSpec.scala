@@ -84,35 +84,19 @@ class InvolvedInOtherDetailsControllerSpec extends AmlsSpec with MockitoSugar wi
       }
     }
 
-    "redirect to the Business Turnover page" when {
-      "money services business is a business activity" in new Fixture {
-        val postRequest = FakeRequest(POST, routes.InvolvedInOtherDetailsController.post().url)
-          .withFormUrlEncodedBody("details" -> "trading")
+    "redirect to the Business Turnover page" in new Fixture {
+      val postRequest = FakeRequest(POST, routes.InvolvedInOtherDetailsController.post().url)
+        .withFormUrlEncodedBody("details" -> "trading")
 
-        val businessAndOtherActivities: BusinessAndOtherActivities =
-          BusinessAndOtherActivities(Set(AccountancyServices, EstateAgentBusinessService, MoneyServiceBusiness), InvolvedInOtherYes("trading"))
+      val businessAndOtherActivities: BusinessAndOtherActivities =
+        BusinessAndOtherActivities(Set(AccountancyServices, EstateAgentBusinessService, MoneyServiceBusiness), InvolvedInOtherYes("trading"))
 
-        when(mockRenewalService.updateOtherBusinessActivities(any(), any()))
-          .thenReturn(Future.successful(Some(businessAndOtherActivities)))
+      when(mockRenewalService.updateOtherBusinessActivities(any(), any()))
+        .thenReturn(Future.successful(Some(businessAndOtherActivities)))
 
-        val result = controller.post()(postRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.BusinessTurnoverController.get().url))
-      }
-    }
-
-    "redirect to the AMLS Turnover page" when {
-      "money services business is not a business activity" in new Fixture {
-        val postRequest = FakeRequest(POST, routes.InvolvedInOtherDetailsController.post().url)
-          .withFormUrlEncodedBody("details" -> "trading")
-
-        when(mockRenewalService.updateOtherBusinessActivities(any(), any()))
-          .thenReturn(Future.successful(Some(BusinessAndOtherActivities(Set(AccountancyServices, BillPaymentServices), InvolvedInOtherYes("trading")))))
-
-        val result = controller.post()(postRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.AMLSTurnoverController.get().url))
-      }
+      val result = controller.post()(postRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.BusinessTurnoverController.get().url))
     }
 
     "respond with Bad Request" when {

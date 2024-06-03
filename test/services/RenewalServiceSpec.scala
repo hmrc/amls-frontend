@@ -1128,20 +1128,4 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       }
     }
   }
-
-  "BusinessAndOtherActivities.containsMSB" must {
-    "return true" when {
-      "contains money services business" in {
-        BusinessAndOtherActivities(Set(AccountancyServices, MoneyServiceBusiness, EstateAgentBusinessService), InvolvedInOtherYes("trading"))
-          .containsMSB mustBe true
-      }
-    }
-
-    "return false" when {
-      "doesn't contain money services business" in {
-        BusinessAndOtherActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService), InvolvedInOtherYes("trading"))
-          .containsMSB mustBe false
-      }
-    }
-  }
 }
