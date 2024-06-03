@@ -18,57 +18,63 @@ package views.businessactivities
 
 import forms.businessactivities.NCARegisteredFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessactivities.NCARegisteredView
-
 
 class NCARegisteredViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val registered: NCARegisteredView = inject[NCARegisteredView]
   lazy val formProvider: NCARegisteredFormProvider = inject[NCARegisteredFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
-  trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
-  }
+  "The NCA registered view" must {
 
-  "nca_registered view" must {
-    "have correct title" in new ViewFixture {
+    "have the correct title" in new Fixture {
 
-      def view = registered(formProvider(), true)
+      val view: HtmlFormat.Appendable = registered(formProvider(), edit = true)
 
-      doc.title must be(messages("businessactivities.ncaRegistered.title") + " - " +
-        messages("summary.businessactivities") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title mustBe "Reporting suspicious activity to the National Crime Agency (NCA) - Business activities" +
+        " - Manage your anti-money laundering supervision - GOV.UK"
     }
 
-    "have correct headings" in new ViewFixture {
+    "have the correct heading" in new Fixture {
 
-      def view = registered(formProvider(), true)
+      val view: HtmlFormat.Appendable = registered(formProvider(), edit = true)
 
-      heading.html must be(messages("businessactivities.ncaRegistered.title"))
-      subHeading.html must include(messages("summary.businessactivities"))
-
+      heading.text() mustBe "Reporting suspicious activity to the National Crime Agency (NCA)"
     }
 
-    "have correct form fields" in new ViewFixture {
+    "have the correct caption heading" in new Fixture {
 
-      def view = registered(formProvider(), true)
+      val view: HtmlFormat.Appendable = registered(formProvider(), edit = true)
 
+      subHeading.text() mustBe "Business activities"
+    }
+
+    "have the correct legend" in new Fixture {
+
+      val view: HtmlFormat.Appendable = registered(formProvider(), edit = true)
+
+      doc.getElementsByTag("legend").text() mustBe "Has your business registered with the NCA?"
+    }
+
+    "have the correct form field" in new Fixture {
+
+      val view: HtmlFormat.Appendable = registered(formProvider(), edit = true)
       doc.getElementsByAttributeValue("name", "ncaRegistered") must not be empty
-
     }
 
     behave like pageWithErrors(
-      registered(formProvider().bind(Map("ncaRegistered" -> "")), true),
+      registered(formProvider().bind(Map("ncaRegistered" -> "")), edit = true),
       "ncaRegistered",
       "error.required.ba.select.nca"
     )
 
-    behave like pageWithBackLink(registered(formProvider(), false))
+    behave like pageWithBackLink(registered(formProvider(), edit = false))
   }
 }
