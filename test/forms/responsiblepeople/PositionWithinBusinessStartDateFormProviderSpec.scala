@@ -81,9 +81,25 @@ class PositionWithinBusinessStartDateFormProviderSpec extends DateBehaviours {
             val result = form.bind(data.toMap)
 
             result.errors.headOption shouldEqual Some(
-              FormError(formField, messages("error.rp.position.required.date.one"), Seq(field))
+              FormError(s"$formField.$field", messages("error.rp.position.required.date.one"), Seq(field))
             )
           }
+        }
+
+        s"$field is in the incorrect format" in {
+          val data = mutable.Map(
+            s"$formField.day" -> "11",
+            s"$formField.month" -> "11",
+            s"$formField.year" -> "2000"
+          )
+
+          data(s"$formField.$field") = "x"
+
+          val result = form.bind(data.toMap)
+
+          result.errors.headOption shouldEqual Some(
+            FormError(s"$formField.$field", messages("error.rp.position.invalid.date.one"), Seq(field))
+          )
         }
       }
 
@@ -105,9 +121,26 @@ class PositionWithinBusinessStartDateFormProviderSpec extends DateBehaviours {
             val result = form.bind(data.toMap)
 
             result.errors.headOption shouldEqual Some(
-              FormError(formField, messages("error.rp.position.required.date.two"), Seq(fields._1, fields._2))
+              FormError(s"$formField.${fields._1}", messages("error.rp.position.required.date.two"), Seq(fields._1, fields._2))
             )
           }
+        }
+
+        s"${fields._1} and ${fields._2} are in the incorrect format" in {
+          val data = mutable.Map(
+            s"$formField.day" -> "11",
+            s"$formField.month" -> "11",
+            s"$formField.year" -> "2000"
+          )
+
+          data(s"$formField.${fields._1}") = "x"
+          data(s"$formField.${fields._2}") = "x"
+
+          val result = form.bind(data.toMap)
+
+          result.errors.headOption shouldEqual Some(
+            FormError(s"$formField.${fields._1}", messages("error.rp.position.invalid.date.multiple"), Seq(fields._1, fields._2))
+          )
         }
       }
     }
@@ -117,5 +150,7 @@ class PositionWithinBusinessStartDateFormProviderSpec extends DateBehaviours {
     behave like dateFieldWithMin(form, formField, minDate, FormError(formField, "error.rp.position.invalid.date.after.1900"))
 
     behave like dateFieldWithMax(form, formField, maxDate, FormError(formField, "error.rp.position.invalid.date.future"))
+
+    behave like realDateField(form, formField, "error.rp.position.invalid.date.not.real")
   }
 }

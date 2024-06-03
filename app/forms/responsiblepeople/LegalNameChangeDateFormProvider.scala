@@ -27,10 +27,12 @@ class LegalNameChangeDateFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[LegalNameChangeDate] = Form[LegalNameChangeDate](
     "date" -> localDate(
-      invalidKey = "error.rp.name_change.invalid.date.not.real",
-      allRequiredKey = "error.rp.name_change.required.date.all",
+      oneInvalidKey = "error.rp.name_change.invalid.date.one",
+      multipleInvalidKey = "error.rp.name_change.invalid.date.multiple",
+      oneRequiredKey = "error.rp.name_change.required.date.one",
       twoRequiredKey = "error.rp.name_change.required.date.two",
-      requiredKey = "error.rp.name_change.required.date.one"
+      allRequiredKey = "error.rp.name_change.required.date.all",
+      realDateKey = "error.rp.name_change.invalid.date.not.real"
     ).verifying(
       minDate(LegalNameChangeDateFormProvider.minDate, "error.rp.name_change.invalid.date.after.1900"),
       maxDate(LegalNameChangeDateFormProvider.maxDate, "error.rp.name_change.invalid.date.future")

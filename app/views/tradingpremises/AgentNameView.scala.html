@@ -16,13 +16,13 @@
 
 @import config.ApplicationConfig
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichDateInput
-@import views.html.components.forms.{ErrorSummary, InputText}
+@import views.html.components.forms.{DateErrorSummary, InputText}
 @import views.html.components.{Button, Heading, ReturnLink, SectionSubtitle}
 
 @this(
     layout: Layout,
     formHelper: FormWithCSRF,
-    errorSummary: ErrorSummary,
+    errorSummary: DateErrorSummary,
     subtitle: SectionSubtitle,
     heading: Heading,
     inputText: InputText,
@@ -35,7 +35,7 @@
 
 @layout(pageTitle = s"${messages("tradingpremises.agentname.title")} - ${messages("summary.tradingpremises")}") {
 
-    @errorSummary(form, Some(Map("agentDateOfBirth" -> "agentDateOfBirth.day")))
+    @errorSummary(form, "agentDateOfBirth")
 
     @subtitle(messages("summary.tradingpremises"))
 

@@ -81,9 +81,25 @@ class CashPaymentFirstDateFormProviderSpec extends DateBehaviours {
             val result = form.bind(data.toMap)
 
             result.errors.headOption shouldEqual Some(
-              FormError(formField, messages("error.date.hvd.one"), Seq(field))
+              FormError(s"$formField.$field", messages("error.date.hvd.one"), Seq(field))
             )
           }
+        }
+
+        s"$field is in the incorrect format" in {
+          val data = mutable.Map(
+            s"$formField.day" -> "11",
+            s"$formField.month" -> "11",
+            s"$formField.year" -> "2000"
+          )
+
+          data(s"$formField.$field") = "x"
+
+          val result = form.bind(data.toMap)
+
+          result.errors.headOption shouldEqual Some(
+            FormError(s"$formField.$field", messages("error.date.hvd.invalid.one"), Seq(field))
+          )
         }
       }
 
@@ -105,9 +121,26 @@ class CashPaymentFirstDateFormProviderSpec extends DateBehaviours {
             val result = form.bind(data.toMap)
 
             result.errors.headOption shouldEqual Some(
-              FormError(formField, messages("error.date.hvd.two"), Seq(fields._1, fields._2))
+              FormError(s"$formField.${fields._1}", messages("error.date.hvd.two"), Seq(fields._1, fields._2))
             )
           }
+        }
+
+        s"${fields._1} and ${fields._2} are in the incorrect format" in {
+          val data = mutable.Map(
+            s"$formField.day" -> "11",
+            s"$formField.month" -> "11",
+            s"$formField.year" -> "2000"
+          )
+
+          data(s"$formField.${fields._1}") = "x"
+          data(s"$formField.${fields._2}") = "x"
+
+          val result = form.bind(data.toMap)
+
+          result.errors.headOption shouldEqual Some(
+            FormError(s"$formField.${fields._1}", messages("error.date.hvd.invalid.multiple"), Seq(fields._1, fields._2))
+          )
         }
       }
     }
@@ -117,5 +150,7 @@ class CashPaymentFirstDateFormProviderSpec extends DateBehaviours {
     behave like dateFieldWithMin(form, formField, minDate, FormError(formField, "error.date.hvd.past"))
 
     behave like dateFieldWithMax(form, formField, maxDate, FormError(formField, "error.date.hvd.future"))
+
+    behave like realDateField(form, formField, "error.date.hvd.real")
   }
 }

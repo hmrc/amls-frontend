@@ -144,7 +144,7 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar with
         .withFormUrlEncodedBody(
           "paymentDate.day" -> "12",
           "paymentDate.month" -> "5",
-          "paymentDate.year" -> "122"
+          "paymentDate.year" -> "1222"
         )
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))

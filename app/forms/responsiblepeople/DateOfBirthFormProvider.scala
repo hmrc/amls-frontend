@@ -27,10 +27,12 @@ class DateOfBirthFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[DateOfBirth] = Form[DateOfBirth](
     "dateOfBirth" -> localDate(
-      invalidKey = "error.rp.dob.invalid.date.not.real",
-      allRequiredKey = "error.rp.dob.required.date.all",
+      oneInvalidKey = "error.rp.dob.invalid.date.one",
+      multipleInvalidKey = "error.rp.dob.invalid.date.multiple",
+      oneRequiredKey = "error.rp.dob.required.date.one",
       twoRequiredKey = "error.rp.dob.required.date.two",
-      requiredKey = "error.rp.dob.required.date.one"
+      allRequiredKey = "error.rp.dob.required.date.all",
+      realDateKey = "error.rp.dob.invalid.date.not.real"
     ).verifying(
       minDate(LegalNameChangeDateFormProvider.minDate, "error.rp.dob.invalid.date.after.1900"),
       maxDate(LegalNameChangeDateFormProvider.maxDate, "error.rp.dob.invalid.date.future")

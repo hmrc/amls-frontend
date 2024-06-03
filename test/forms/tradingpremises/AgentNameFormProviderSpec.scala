@@ -123,9 +123,26 @@ class AgentNameFormProviderSpec extends DateBehaviours with StringFieldBehaviour
               val result = form.bind(data.toMap)
 
               result.errors.headOption shouldEqual Some(
-                FormError(dateFieldName, messages("error.required.tp.agent.date.one"), Seq(field))
+                FormError(s"$dateFieldName.$field", messages("error.required.tp.agent.date.one"), Seq(field))
               )
             }
+          }
+
+          s"$field is in the incorrect format" in {
+            val data = mutable.Map(
+              nameFieldName -> agentName,
+              s"$dateFieldName.day" -> "11",
+              s"$dateFieldName.month" -> "11",
+              s"$dateFieldName.year" -> "2000"
+            )
+
+            data(s"$dateFieldName.$field") = "x"
+
+            val result = form.bind(data.toMap)
+
+            result.errors.headOption shouldEqual Some(
+              FormError(s"$dateFieldName.$field", messages("error.invalid.tp.agent.date.one"), Seq(field))
+            )
           }
         }
 
@@ -148,9 +165,27 @@ class AgentNameFormProviderSpec extends DateBehaviours with StringFieldBehaviour
               val result = form.bind(data.toMap)
 
               result.errors.headOption shouldEqual Some(
-                FormError(dateFieldName, messages("error.required.tp.agent.date.two"), Seq(fields._1, fields._2))
+                FormError(s"$dateFieldName.${fields._1}", messages("error.required.tp.agent.date.two"), Seq(fields._1, fields._2))
               )
             }
+          }
+
+          s"${fields._1} and ${fields._2} are in the incorrect format" in {
+            val data = mutable.Map(
+              nameFieldName -> agentName,
+              s"$dateFieldName.day" -> "11",
+              s"$dateFieldName.month" -> "11",
+              s"$dateFieldName.year" -> "2000"
+            )
+
+            data(s"$dateFieldName.${fields._1}") = "x"
+            data(s"$dateFieldName.${fields._2}") = "x"
+
+            val result = form.bind(data.toMap)
+
+            result.errors.headOption shouldEqual Some(
+              FormError(s"$dateFieldName.${fields._1}", messages("error.invalid.tp.agent.date.multiple"), Seq(fields._1, fields._2))
+            )
           }
         }
 
@@ -176,7 +211,7 @@ class AgentNameFormProviderSpec extends DateBehaviours with StringFieldBehaviour
 
             val result = form.bind(data)
 
-            result.errors should contain only FormError(dateFieldName, "error.invalid.date.agent.not.real")
+            result.errors should contain only FormError(dateFieldName, "error.invalid.agent.date.future")
           }
         }
       }

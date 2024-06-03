@@ -15,15 +15,14 @@
  *@
 
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichDateInput
-@import components.forms.ErrorSummary
+@import components.forms.DateErrorSummary
 @import components.{Button, ReturnLink, SectionSubtitle, Heading, DisplayAddress}
-@import config.ApplicationConfig
 @import models.tradingpremises.Address
 
 @this(
     layout: Layout,
     formHelper: FormWithCSRF,
-    errorSummary: ErrorSummary,
+    errorSummary: DateErrorSummary,
     subtitle: SectionSubtitle,
     heading: Heading,
     displayAddress: DisplayAddress,
@@ -32,13 +31,13 @@
     returnLink: ReturnLink
 )
 
-@(form: Form[_], index: Int, edit: Boolean, address: Address)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(form: Form[_], index: Int, edit: Boolean, address: Address)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = s"${messages("tradingpremises.startDate.title")} - ${messages("summary.tradingpremises")}",
 ) {
 
-    @errorSummary(form, Some(Map("startDate" -> "startDate.day")))
+    @errorSummary(form, "startDate")
 
     @subtitle("summary.tradingpremises")
 
@@ -50,7 +49,14 @@
 
         @govukDateInput(DateInput(
             id = "startDate",
-            hint = Some(Hint(content = Text(messages("lbl.date.example"))))
+            hint = Some(Hint(content = Text(messages("lbl.date.example")))),
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(messages("tradingpremises.startDate.title")),
+                    isPageHeading = false,
+                    classes = "govuk-visually-hidden"
+                ))
+            ))
         ).withFormField(form("startDate")))
 
         @button()

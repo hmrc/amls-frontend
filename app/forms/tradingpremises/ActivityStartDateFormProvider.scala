@@ -27,10 +27,12 @@ class ActivityStartDateFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[ActivityStartDate] = Form[ActivityStartDate](
     "startDate" -> localDate(
-      invalidKey = "error.invalid.date.tp.not.real",
-      allRequiredKey = "error.required.tp.address.date.all",
+      oneInvalidKey = "error.invalid.date.tp.one",
+      multipleInvalidKey = "error.invalid.date.tp.multiple",
+      oneRequiredKey = "error.required.tp.address.date.one",
       twoRequiredKey = "error.required.tp.address.date.two",
-      requiredKey = "error.required.tp.address.date.one"
+      allRequiredKey = "error.required.tp.address.date.all",
+      realDateKey = "error.invalid.date.tp.not.real"
     ).verifying(
       minDate(ActivityStartDateFormProvider.minDate, "error.invalid.date.tp.after.1700"),
       maxDate(ActivityStartDateFormProvider.maxDate, "error.invalid.date.tp.before.2100")

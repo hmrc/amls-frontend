@@ -16,7 +16,7 @@
 
 package utils.supervision
 
-import models.supervision._
+import models.supervision.{ProfessionalBodyYes, _}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.{SummaryList, SummaryListRow, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
@@ -147,7 +147,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
       )
       case ProfessionalBodyYes(details) => Seq(
         row(
-          "supervision.penalisedbyprofessional.title",
+          "supervision.penalisedbyprofessional.heading1",
           booleanToLabel(true),
           editAction(
             controllers.supervision.routes.PenalisedByProfessionalController.get(true).url,
@@ -155,11 +155,11 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           )
         ),
         row(
-          "supervision.penalisedbyprofessional.details.lbl",
+          "supervision.penaltydetails.title",
           details,
           editAction(
-            controllers.supervision.routes.PenalisedByProfessionalController.get(true).url,
-            "penalisedbyprofessionaldetails-edit"
+            controllers.supervision.routes.PenaltyDetailsController.get(true).url,
+            "penaltydetails-edit"
           )
         )
       )

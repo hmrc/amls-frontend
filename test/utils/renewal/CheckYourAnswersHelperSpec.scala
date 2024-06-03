@@ -220,7 +220,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
             assertRowMatches(
               3,
-              messages("renewal.turnover.title.single.service", singleActivity.get.head),
+              messages("renewal.turnover.title", singleActivity.get.head),
               messages(s"businessactivities.business-turnover.lbl.${turnover.value}"),
               controllers.renewal.routes.AMLSTurnoverController.get(true).url,
               "turnover-edit"

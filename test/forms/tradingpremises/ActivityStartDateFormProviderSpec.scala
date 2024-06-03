@@ -81,9 +81,25 @@ class ActivityStartDateFormProviderSpec extends DateBehaviours {
             val result = form.bind(data.toMap)
 
             result.errors.headOption shouldEqual Some(
-              FormError(formField, messages("error.required.tp.address.date.one"), Seq(field))
+              FormError(s"$formField.$field", messages("error.required.tp.address.date.one"), Seq(field))
             )
           }
+        }
+
+        s"$field is in the incorrect format" in {
+          val data = mutable.Map(
+            s"$formField.day" -> "11",
+            s"$formField.month" -> "11",
+            s"$formField.year" -> "2000"
+          )
+
+          data(s"$formField.$field") = "x"
+
+          val result = form.bind(data.toMap)
+
+          result.errors.headOption shouldEqual Some(
+            FormError(s"$formField.$field", messages("error.invalid.date.tp.one"), Seq(field))
+          )
         }
       }
 
@@ -105,9 +121,26 @@ class ActivityStartDateFormProviderSpec extends DateBehaviours {
             val result = form.bind(data.toMap)
 
             result.errors.headOption shouldEqual Some(
-              FormError(formField, messages("error.required.tp.address.date.two"), Seq(fields._1, fields._2))
+              FormError(s"$formField.${fields._1}", messages("error.required.tp.address.date.two"), Seq(fields._1, fields._2))
             )
           }
+        }
+
+        s"${fields._1} and ${fields._2} are in the incorrect format" in {
+          val data = mutable.Map(
+            s"$formField.day" -> "11",
+            s"$formField.month" -> "11",
+            s"$formField.year" -> "2000"
+          )
+
+          data(s"$formField.${fields._1}") = "x"
+          data(s"$formField.${fields._2}") = "x"
+
+          val result = form.bind(data.toMap)
+
+          result.errors.headOption shouldEqual Some(
+            FormError(s"$formField.${fields._1}", messages("error.invalid.date.tp.multiple"), Seq(fields._1, fields._2))
+          )
         }
       }
     }
@@ -117,5 +150,7 @@ class ActivityStartDateFormProviderSpec extends DateBehaviours {
     behave like dateFieldWithMin(form, formField, minDate, FormError(formField, "error.invalid.date.tp.after.1700"))
 
     behave like dateFieldWithMax(form, formField, maxDate, FormError(formField, "error.invalid.date.tp.before.2100"))
+
+    behave like realDateField(form, formField, "error.invalid.date.tp.not.real")
   }
 }

@@ -194,7 +194,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
         val newRequest = FakeRequest(POST, routes.ActivityStartDateController.post().url).withFormUrlEncodedBody(
           "value.day" -> "1",
           "value.month" -> "3",
-          "value.year" -> "16"
+          "value.year" -> "1666"
         )
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(businessDetails)))
@@ -208,7 +208,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
         val newRequest = FakeRequest(POST, routes.ActivityStartDateController.post().url).withFormUrlEncodedBody(
           "value.day" -> "1",
           "value.month" -> "3",
-          "value.year" -> "19782"
+          "value.year" -> "9782"
         )
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(businessDetails)))

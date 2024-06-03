@@ -14,21 +14,16 @@
  * limitations under the License.
  *@
 
-@import views.html.components.forms.InputText
+@this(errorSummary: GovukErrorSummary)
 
-@this(inputText: InputText)
+@(form: Form[_], formId: String)(implicit messages: Messages)
 
-@(form: Form[_])(implicit messages: Messages)
-
-    @inputText(
-        Input(
-            id = "postCode",
-            name = "postCode",
-            autocomplete = Some("postal-code"),
-            label = Label(
-                content = Text(messages("businessdetails.correspondenceaddress.postCode"))
-            ),
-            classes = "govuk-!-width-one-quarter"
-        ),
-        form("postCode")
-    )
+@form.errors.headOption.map { error =>
+    @errorSummary(ErrorSummary(
+        title = Text(messages("err.summary")),
+        errorList = Seq(ErrorLink(
+            href = if(error.key == formId) Some(s"#${formId}.day") else Some(s"#${error.key}"),
+            content = Text(messages(error.message, error.args:_*))
+        ))
+    ))
+}

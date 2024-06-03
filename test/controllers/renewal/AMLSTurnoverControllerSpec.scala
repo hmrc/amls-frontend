@@ -104,7 +104,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           val result = controller.get()(request)
           status(result) must be(OK)
           contentAsString(result) must include(
-            messages("renewal.turnover.title.single.service", bMatching.alphabeticalBusinessActivitiesLowerCase().head.mkString)
+            messages("renewal.turnover.title", bMatching.alphabeticalBusinessActivitiesLowerCase().head.mkString)
           )
         }
       }

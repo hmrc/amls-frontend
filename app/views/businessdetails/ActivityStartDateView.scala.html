@@ -15,18 +15,18 @@
  *@
 
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichDateInput
-@import components.forms.ErrorSummary
+@import components.forms.DateErrorSummary
 @import components.{Button, ReturnLink, SectionSubtitle}
 @import config.ApplicationConfig
 
 @this(
-        layout: Layout,
-        formHelper: FormWithCSRF,
-        errorSummary: ErrorSummary,
-        subtitle: SectionSubtitle,
-        govukDateInput: GovukDateInput,
-        button: Button,
-        returnLink: ReturnLink
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    errorSummary: DateErrorSummary,
+    subtitle: SectionSubtitle,
+    govukDateInput: GovukDateInput,
+    button: Button,
+    returnLink: ReturnLink
 )
 
 @(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
@@ -35,7 +35,7 @@
     pageTitle = s"${messages("businessdetails.activity.start.date.title")} - ${messages("summary.businessdetails")}",
 ) {
 
-    @errorSummary(form, Some(Map("value" -> "value.day")))
+    @errorSummary(form, "value")
 
     @subtitle("summary.businessdetails")
 

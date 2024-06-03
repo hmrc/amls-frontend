@@ -19,8 +19,7 @@ lazy val scoverageSettings = {
   import scoverage.ScoverageKeys
   Seq(
     // Semicolon-separated list of regexs matching classes to exclude
-    ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;modgiels/.data/..*;view.*;forms.*;config.*;" +
-      ".*BuildInfo.;uk.gov.hmrc.BuildInfo;.*Routes;.*RoutesPrefix*;controllers.ExampleController;controllers.testonly.TestOnlyController",
+    ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;view.*;config.*;.*BuildInfo.;.*Routes;.*RoutesPrefix*",
     ScoverageKeys.coverageMinimumStmtTotal := 90,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
@@ -72,15 +71,8 @@ lazy val it = project
   .enablePlugins(play.sbt.PlayScala)
   .dependsOn(microservice % "test->test")
   .settings(
-    DefaultBuildSettings.itSettings(),
+    DefaultBuildSettings.itSettings(true),
     Test / Keys.fork := false,
     addTestReportOption(Test, "int-test-reports"),
-    Test / testGrouping := oneForkedJvmPerTest((Test / definedTests).value),
     Test / parallelExecution := false
   )
-
-def oneForkedJvmPerTest(tests: Seq[TestDefinition]) = {
-  tests.map {
-    test => new Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
-  }
-}
