@@ -18,9 +18,9 @@ package views.businessdetails
 
 import forms.businessdetails.ActivityStartDateFormProvider
 import models.businessdetails.ActivityStartDate
-import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
 import play.api.data.Form
+import play.api.mvc.Request
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.ActivityStartDateView
@@ -31,7 +31,7 @@ class ActivityStartDateViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val date = inject[ActivityStartDateView]
   lazy val formProvider = inject[ActivityStartDateFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[_] = addTokenForView()
 
   trait ViewFixture extends Fixture
 

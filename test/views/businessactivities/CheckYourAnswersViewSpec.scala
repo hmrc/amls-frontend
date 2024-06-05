@@ -22,6 +22,7 @@ import models.businessmatching.BusinessActivity.MoneyServiceBusiness
 import models.businessmatching.{BusinessMatching, BusinessActivities => BMBusinessActivities}
 import org.jsoup.Jsoup
 import org.scalatest.prop.TableDrivenPropertyChecks
+import play.api.mvc.Request
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.AmlsSummaryViewSpec
@@ -36,7 +37,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
   lazy val summary = app.injector.instanceOf[CheckYourAnswersView]
   lazy val cyaHelper = app.injector.instanceOf[CheckYourAnswersHelper]
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView(FakeRequest())
+    implicit val requestWithToken: Request[_] = addTokenForView(FakeRequest())
   }
 
   "summary view" must {
@@ -57,36 +58,6 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
     }
 
     "include the provided data" in new ViewFixture {
-
-    val sectionChecks: Seq[(String, String)] = Seq(
-      ("title key", "check"),
-      ("businessactivities.confirm-activities.title", "lbl.yes"),
-      ("businessactivities.confirm-activities.lbl.details", "OtherActivities"),
-      ("businessactivities.business-turnover.title", "businessactivities.business-turnover.lbl.01"),
-
-      (messages("businessactivities.turnover.heading", "money service business"), "businessactivities.turnover.lbl.01"),
-
-      ("businessactivities.businessfranchise.title", "lbl.yes"),
-      ("businessactivities.businessfranchise.lbl.franchisename", "FranchiseName"),
-
-      ("businessactivities.employees.line1.cya", "123"),
-      ("businessactivities.employees.line2.cya", "456"),
-      ("businessactivities.keep.customer.records.title", "lbl.yes"),
-      ("businessactivities.do.keep.records",
-        Seq("businessactivities.transactiontype.lbl.01", "businessactivities.transactiontype.lbl.02", "businessactivities.transactiontype.lbl.03").mkString),
-      ("businessactivities.name.software.pkg.lbl", "SoftwareName"),
-      ("businessactivities.identify-suspicious-activity.title", "lbl.yes"),
-      ("businessactivities.ncaRegistered.title", "lbl.yes"),
-      ("businessactivities.riskassessment.policy.title",  "lbl.yes"),
-      ("businessactivities.document.riskassessment.policy.title",
-         Seq("businessactivities.RiskAssessmentType.lbl.01", "businessactivities.RiskAssessmentType.lbl.02").mkString),
-      ("businessactivities.accountantForAMLSRegulations.title", "lbl.yes"),
-      ("businessactivities.whoisyouraccountant.title",
-         Seq("AccountantName","tradingName").mkString),
-      ("businessactivities.whoisyouraccountant.address.header",
-         Seq("line1","line2","line3","line4","AB12CD").mkString),
-      (messages("businessactivities.tax.matters.summary.title", "AccountantName"), "lbl.yes")
-    )
 
       val list: SummaryList = cyaHelper.createSummaryList(
         BusinessActivities(

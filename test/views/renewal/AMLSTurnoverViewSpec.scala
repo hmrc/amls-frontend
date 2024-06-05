@@ -19,6 +19,7 @@ package views.renewal
 import forms.renewal.AMLSTurnoverFormProvider
 import models.renewal.AMLSTurnover
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.Request
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.AMLSTurnoverView
@@ -27,7 +28,7 @@ class AMLSTurnoverViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val amls_turnover = inject[AMLSTurnoverView]
   lazy val fp = inject[AMLSTurnoverFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[_] = addTokenForView()
 
   trait ViewFixture extends Fixture
 

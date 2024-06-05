@@ -330,7 +330,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
       "contains risk assessment types" when {
 
-        "there is one type" in {
+        "there are multiple types" in {
 
           val types = Set[RiskAssessmentType](PaperBased, Digital)
 
@@ -359,18 +359,18 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
           checkChangeLink(
             result,
-            controllers.businessactivities.routes.RiskAssessmentController.get(true).url,
+            controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).url,
             "documentriskassessment-edit"
           )
         }
 
-        "there are multiple types" in {
+        "there is one type" in {
 
-          assertRowMatches(
+            assertRowMatches(
             riskAssessmentTypesIndex,
             messages("businessactivities.document.riskassessment.policy.title"),
             messages(s"businessactivities.RiskAssessmentType.lbl.${PaperBased.value}"),
-            controllers.businessactivities.routes.RiskAssessmentController.get(true).url,
+            controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).url,
             "documentriskassessment-edit"
           )
         }

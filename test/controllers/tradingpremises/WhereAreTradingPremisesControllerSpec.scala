@@ -521,9 +521,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
       verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(TradingPremises.key), captor.capture())(any())
 
-      captor.getValue.head.yourTradingPremises match {
-        case Some(result: YourTradingPremises) => result must be(expectedResult)
-      }
+      captor.getValue.head.yourTradingPremises must be(Some(expectedResult))
 
     }
 
