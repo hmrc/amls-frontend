@@ -29,6 +29,8 @@ import play.twirl.api.Template5
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.govukfrontend.views.Aliases.Table
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.table.HeadCell
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName}
 import views.html.notifications.YourMessagesView
@@ -249,6 +251,20 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
     Table(
       rowsWithIndex.map { case(row, index) =>
         row.asTableRows(id, index)
+      },
+      head = if(rowsWithIndex.nonEmpty) {
+        Some(Seq(
+          HeadCell(
+            content = Text("Subject")
+          ),
+          HeadCell(
+            content = Text("Category")
+          ),
+          HeadCell(
+            content = Text("Date")
+          )
+        ))} else {
+        None
       }
     )
   }
