@@ -99,6 +99,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     lazy val third: V3M0 = app.injector.instanceOf[V3M0]
     lazy val fourth: V4M0 = app.injector.instanceOf[V4M0]
     lazy val fifth: V5M0 = app.injector.instanceOf[V5M0]
+    lazy val sixth: V6M0 = app.injector.instanceOf[V6M0]
     lazy val view: YourMessagesView = app.injector.instanceOf[YourMessagesView]
     val controller = new NotificationController(
       authEnrolmentsService = mockAuthEnrolmentsService,
@@ -116,7 +117,8 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       v2m0 = second,
       v3m0 = third,
       v4m0 = fourth,
-      v5m0 = fifth)
+      v5m0 = fifth,
+      v6m0 = sixth)
 
     val controllerWithFailedAuthAction = new NotificationController(
       authEnrolmentsService = mockAuthEnrolmentsService,
@@ -134,7 +136,8 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       v2m0 = second,
       v3m0 = third,
       v4m0 = fourth,
-      v5m0 = fifth)
+      v5m0 = fifth,
+      v6m0 = sixth)
 
     val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
     val mockReviewDetails: ReviewDetails = mock[ReviewDetails]

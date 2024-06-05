@@ -53,7 +53,8 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
                                        v2m0: V2M0,
                                        v3m0: V3M0,
                                        v4m0: V4M0,
-                                       v5m0: V5M0
+                                       v5m0: V5M0,
+                                       v6m0: V6M0
                                       ) extends AmlsBaseController(ds, cc) {
 
   def notificationsMap(templateVersion: String, templateName: String) = {
@@ -63,6 +64,7 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
       case "v3m0" => version3Notifications(templateName)
       case "v4m0" => version4Notifications(templateName)
       case "v5m0" => version5Notifications(templateName)
+      case "v6m0" => version5Notifications(templateName)
       case _ => throw new RuntimeException(s"Notification version $templateVersion not found")
     }
   }
@@ -128,6 +130,19 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
       case "no_longer_minded_to_revoke" => v5m0.noLongerMindedToRevokeView
       case "rejection_reasons" => v5m0.rejectionReasonsView
       case "revocation_reasons" => v5m0.revocationReasonsView
+      case _ => throw new RuntimeException(s"Message template $templateName not found")
+    }
+  }
+
+  def version6Notifications(templateName: String) = {
+    templateName match {
+      case "message_details" => v6m0.messageDetailsView
+      case "minded_to_reject" => v6m0.mindedToRejectView
+      case "minded_to_revoke" => v6m0.mindedToRevokeView
+      case "no_longer_minded_to_reject" => v6m0.noLongerMindedToRejectView
+      case "no_longer_minded_to_revoke" => v6m0.noLongerMindedToRevokeView
+      case "rejection_reasons" => v6m0.rejectionReasonsView
+      case "revocation_reasons" => v6m0.revocationReasonsView
       case _ => throw new RuntimeException(s"Message template $templateName not found")
     }
   }
