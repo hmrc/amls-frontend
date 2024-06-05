@@ -255,7 +255,7 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
       head = if(rowsWithIndex.nonEmpty) {
         Some(Seq(
           HeadCell(
-            content = Text("Subject")
+            content = Text(messages("site.back"))
           ),
           HeadCell(
             content = Text("Category")
