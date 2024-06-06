@@ -2694,6 +2694,10 @@ notifications.header = Your messages
 notifications.unread = You have unread messages
 notifications.youHaveMessages = Check your messages
 notifications.title = Your business
+notification.heading = Messages for {0}
+notification.subject = Subject
+notification.category = Category
+notification.date = Date
 
 notifications.table.header.subject = Subject
 notifications.table.header.type = Type
@@ -2854,5 +2858,3 @@ site.back = Back
 
 ############################### Footer ###############################
 footer.links.accessibility.text = Accessibility statement
-
-test = Messages for {0}

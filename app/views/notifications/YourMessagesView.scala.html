@@ -27,8 +27,8 @@
 
 @layout(messages("notifications.header"), fullWidthLayout = true) {
 
-    <span class="govuk-caption-xl">@messages("summary.status")</span>
-    <h1 class="govuk-heading-xl">@messages("test", businessName)</h1>
+    <span id="your-registration" class="govuk-caption-xl">@messages("summary.status")</span>
+    <h1 id="notification-heading" class="govuk-heading-xl">@messages("notification.heading", businessName)</h1>
 
     <div id="current-application-notifications" class="message-inbox">
         @table(currentApplicationNotifications)
