@@ -128,4 +128,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
   val waysToPayLink = "https://www.gov.uk/guidance/pay-money-laundering-regulations-fees-and-penalty-charges#ways-to-pay"
 
   val registerNewOrgLink = "/coafe/government-gateway/register?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend"
+
+  val nationalCrimeAgencyUrl = "https://sarsreporting.nationalcrimeagency.gov.uk/"
 }
