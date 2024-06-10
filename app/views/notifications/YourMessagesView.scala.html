@@ -27,14 +27,8 @@
 
 @layout(messages("notifications.header"), fullWidthLayout = true) {
 
-    @subtitle("summary.status")
-
-    @heading("notifications.header")
-
-    <h2 id="your-business" class="govuk-heading-m">@messages("notifications.title")</h2>
-    <p id="business-name" class="govuk-body">@businessName</p>
-
-    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+    <span id="your-registration" class="govuk-caption-xl">@messages("summary.status")</span>
+    <h1 id="notification-heading" class="govuk-heading-xl">@messages("notification.heading", businessName)</h1>
 
     <div id="current-application-notifications" class="message-inbox">
         @table(currentApplicationNotifications)
@@ -43,7 +37,7 @@
     @if(previousApplicationNotifications.isDefined) {
         <div id="previous-application-notifications" class="message-inbox">
             <h2 id="previous-reg-title" class="govuk-heading-m">@messages("notifications.previousReg")</h2>
-            <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible">
+
             @table(previousApplicationNotifications.get)
         </div>
     }
