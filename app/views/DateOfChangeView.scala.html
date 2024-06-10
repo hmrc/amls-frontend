@@ -17,7 +17,6 @@
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichDateInput
 @import components.forms.DateErrorSummary
 @import components.{Button, ReturnLink, SectionSubtitle, Heading}
-@import config.ApplicationConfig
 
 @this(
     layout: Layout,
@@ -30,7 +29,7 @@
     returnLink: ReturnLink
 )
 
-@(form: Form[_], subheadingMessage: String, controllerAction: Call, hasReturnLink: Boolean = true, buttonMsgKey: String = "button.saveandcontinue")(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(form: Form[_], subheadingMessage: String, controllerAction: Call, hasReturnLink: Boolean = true, buttonMsgKey: String = "button.saveandcontinue")(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = s"${messages("dateofchange.title")} - ${messages(subheadingMessage)}",

@@ -16,7 +16,6 @@
 
 @import components.forms.{ErrorSummary, InputAddressLines, InputPostcode, InputText}
 @import components.{Button, Heading, ReturnLink, SectionSubtitle}
-@import config.ApplicationConfig
 
 @this(
         layout: Layout,
@@ -31,7 +30,7 @@
         returnLink: ReturnLink
 )
 
-@(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = messages("businessdetails.correspondenceaddress.title") + " - " + messages("summary.businessdetails")

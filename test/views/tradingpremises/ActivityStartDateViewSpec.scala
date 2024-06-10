@@ -19,6 +19,7 @@ package views.tradingpremises
 import forms.tradingpremises.ActivityStartDateFormProvider
 import models.tradingpremises.Address
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.Request
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -29,19 +30,15 @@ class ActivityStartDateViewSpec extends AmlsViewSpec with Matchers {
   lazy val activity_start_date = inject[ActivityStartDateView]
   lazy val fp = inject[ActivityStartDateFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: Request[_] = FakeRequest()
 
   val addrLine1 = "Line 1"
   val addrLine2 = "Line 2"
   val postcode = "PO5 1CD"
   val address = Address(addrLine1, Some(addrLine2), None, None, postcode)
 
-  trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
-  }
-
   "ActivityStartDateView" must {
-    "have correct title, heading and load UI with empty form" in new ViewFixture {
+    "have correct title, heading and load UI with empty form" in new Fixture {
 
       val pageTitle = messages("tradingpremises.startDate.title") + " - " +
         messages("summary.tradingpremises") + " - " +
