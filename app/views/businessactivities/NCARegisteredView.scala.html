@@ -41,13 +41,23 @@
 
     @heading("businessactivities.ncaRegistered.title")
 
-    <p class="govuk-body">@messages("businessactivities.ncaRegistered.p1")</p>
+    <p class="govuk-body">
+        @messages("businessactivities.ncaRegistered.p1")
+        <a href="@appConfig.nationalCrimeAgencyUrl" target="_blank">@messages("businessactivities.ncaRegistered.link")</a>.
+    </p>
     <p class="govuk-body">@messages("businessactivities.ncaRegistered.p2")</p>
 
     @formHelper(action = controllers.businessactivities.routes.NCARegisteredController.post(edit)) {
 
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("businessactivities.ncaRegistered.legend")),
+                        classes = "govuk-fieldset__legend--m",
+                        isPageHeading = false
+                    ))
+                )),
                 name = "ncaRegistered",
                 items = HmrcYesNoRadioItems(),
                 classes = "govuk-radios govuk-radios--inline"

@@ -33,6 +33,7 @@ class YourMessagesViewSpec extends AmlsViewSpec with Matchers  {
     implicit val requestWithToken = addTokenForView()
 
     val businessName = "Fake Name Ltd."
+    val headingWithBusinessName = "Messages for Fake Name Ltd."
 
     trait ViewFixture extends Fixture {
 
@@ -106,14 +107,13 @@ class YourMessagesViewSpec extends AmlsViewSpec with Matchers  {
         }
 
         "have correct headings" in new ViewFixture {
-            heading.html must be(messages("notifications.header"))
+            heading.html must be(headingWithBusinessName)
         }
 
         behave like pageWithBackLink(your_messages(businessName, Table(), None))
 
-        "have a panel displaying the business name" in new ViewFixture {
-            doc.getElementById("your-business").text mustEqual messages("notifications.title")
-            doc.getElementById("business-name").text mustEqual businessName
+        "have the correct caption" in new ViewFixture {
+            doc.getElementById("your-registration").text() mustEqual messages("summary.status")
         }
 
         "have a first notification table" in new CurrentNotificationsOnlyViewFixture {

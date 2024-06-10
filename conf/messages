@@ -1925,9 +1925,10 @@ businessactivities.transactiontype.lbl.01 = On paper
 businessactivities.transactiontype.lbl.02 = Digitally, on a spreadsheet
 businessactivities.transactiontype.lbl.03 = Digitally, on commercial software packages designed for recording transactions
 businessactivities.name.software.pkg.lbl = Names of the software packages used to record transactions
-businessactivities.ncaRegistered.title = Has your business registered online with the National Crime Agency (NCA)?
-businessactivities.ncaRegistered.subtitle = Before you can report suspicious activity on the National Crime Agency website, you must be registered on the website. You’re not required by law to register.
-businessactivities.ncaRegistered.p1 = To report suspicious activity to the NCA you need to register on the NCA website.
+businessactivities.ncaRegistered.title = Reporting suspicious activity to the National Crime Agency (NCA)
+businessactivities.ncaRegistered.legend = Has your business registered with the NCA?
+businessactivities.ncaRegistered.p1 = To report suspicious activity to the NCA you need to
+businessactivities.ncaRegistered.link = register on the NCA website (opens in a new tab)
 businessactivities.ncaRegistered.p2 = You’re not legally required to register.
 
 businessactivities.customer.outside.uk.title = Do you have customers who live or work outside of the UK?
@@ -2700,6 +2701,10 @@ notifications.header = Your messages
 notifications.unread = You have unread messages
 notifications.youHaveMessages = Check your messages
 notifications.title = Your business
+notification.heading = Messages for {0}
+notification.subject = Subject
+notification.category = Category
+notification.date = Date
 
 notifications.table.header.subject = Subject
 notifications.table.header.type = Type
