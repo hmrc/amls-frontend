@@ -91,7 +91,7 @@ case class NotificationRow(
 
     val link =
       s"""
-         |<a id="hyper-link-$id-$index"
+         |<a id="hyper-link-$id-$index" class="govuk-link"
          |href="${
         controllers.routes.NotificationController.messageDetails(
           _id.id,
@@ -109,12 +109,11 @@ case class NotificationRow(
          |</a>
          |""".stripMargin
 
-    val rowClass = "govuk-!-font-weight-bold govuk-!-width-one-third"
+    val rowClass = "govuk-!-width-one-third"
 
     Seq(
       TableRow(
-        HtmlContent(link),
-        classes = rowClass
+        HtmlContent(link)
       ),
       TableRow(
         Text(messages(notificationType)),

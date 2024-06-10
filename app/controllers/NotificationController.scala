@@ -29,6 +29,8 @@ import play.twirl.api.Template5
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.govukfrontend.views.Aliases.Table
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.table.HeadCell
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName}
 import views.html.notifications.YourMessagesView
@@ -167,10 +169,10 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
       } yield records.zipWithIndex.filter(_._1.amlsRegistrationNumber != amls))
       Ok(view(
         businessName,
-        toTable(currentRecordsWithIndexes, "current-application-notifications"),
+        toTable(currentRecordsWithIndexes, "current-application-notifications", isPreviousRegistrations = false),
         previousRecordsWithIndexes.flatMap(recordsWithIndex =>
           if(recordsWithIndex.nonEmpty) {
-            Some(toTable(recordsWithIndex, "previous-application-notifications"))
+            Some(toTable(recordsWithIndex, "previous-application-notifications", isPreviousRegistrations = true))
           } else {
             None
           }
@@ -245,10 +247,27 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
     Ok(notification)
   }
 
-  private def toTable(rowsWithIndex: Seq[(NotificationRow, Int)], id: String): Table = {
+  private def toTable(rowsWithIndex: Seq[(NotificationRow, Int)], id: String, isPreviousRegistrations: Boolean): Table = {
     Table(
       rowsWithIndex.map { case(row, index) =>
         row.asTableRows(id, index)
+      },
+      head = if(rowsWithIndex.nonEmpty) {
+        Some(Seq(
+          HeadCell(
+            content = Text(messages("notification.subject")),
+            attributes = if (isPreviousRegistrations) Map("id" -> "subject-previousMessages") else Map("id" -> "subject-currentMessages")
+          ),
+          HeadCell(
+            content = Text(messages("notification.category")),
+            attributes = if (isPreviousRegistrations) Map("id" -> "category-previousMessages") else Map("id" -> "category-currentMessages")
+          ),
+          HeadCell(
+            content = Text(messages("notification.date")),
+            attributes = if (isPreviousRegistrations) Map("id" -> "date-previousMessages") else Map("id" -> "date-currentMessages")
+          )
+        ))} else {
+        None
       }
     )
   }
