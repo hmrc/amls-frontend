@@ -42,10 +42,10 @@
 
         @if(showDateField) {
 
-            @heading("tradingpremises.remove.trading.premises.enddate.lbl")
+            @heading("tradingpremises.remove.trading.premises.title")
 
-            <div class="panel-border-wide">
-                <p class="govuk-body">@messages("tradingpremises.remove.trading.premises.text", tradingAddress)</p>
+            <div class="govuk-inset-text">
+                <pre class="govuk-body">@tradingAddress.split(",").map(_.trim).mkString("\n")</pre>
             </div>
 
             @govukDateInput(DateInput(
@@ -55,7 +55,7 @@
                     legend = Some(Legend(
                         content = Text(messages("tradingpremises.remove.trading.premises.enddate.lbl")),
                         isPageHeading = false,
-                        classes = "govuk-visually-hidden"
+                        classes = "govuk-fieldset__legend--m"
                     ))
                 ))
             ).withFormField(form("endDate")))
@@ -64,12 +64,12 @@
 
             @heading("tradingpremises.remove.trading.premises.title")
 
-            <div class="panel-border-wide">
-                <p class="govuk-body govuk-!-margin-bottom-6">@messages("tradingpremises.remove.trading.premises.text", tradingAddress)</p>
+            <div class="govuk-inset-text">
+                <pre class="govuk-body">@tradingAddress.split(",").map(_.trim).mkString("\n")</pre>
             </div>
         }
 
-        @button(messages("tradingpremises.remove.trading.premises.btn"))
+        @button("tradingpremises.remove.trading.premises.btn", classes = "govuk-button--warning")
 
         @returnLink(true)
     }

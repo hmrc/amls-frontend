@@ -47,17 +47,16 @@ class RemoveTradingPremisesViewSpec extends AmlsViewSpec with Matchers with Inje
 
       doc.title must be(pageTitle)
 
-      heading.html must include(messages("tradingpremises.remove.trading.premises.enddate.lbl"))
+      heading.html must include(messages("tradingpremises.remove.trading.premises.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
 
-      doc.getElementsMatchingOwnText(messages("tradingpremises.remove.trading.premises.text", "trading address")).hasText must be(true)
       doc.getElementsMatchingOwnText(messages("tradingpremises.remove.trading.premises.btn")).last().html() must be(
         messages("tradingpremises.remove.trading.premises.btn"))
     }
 
     "shows correct heading for input param showDateField equal false." in new ViewFixture {
 
-      def view: HtmlFormat.Appendable = remove_trading_premises(fp(), 1, false, "trading address", showDateField = false )
+      def view: HtmlFormat.Appendable = remove_trading_premises(fp(), 1, complete = false, "trading address", showDateField = false )
 
       heading.html must be(messages("tradingpremises.remove.trading.premises.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
