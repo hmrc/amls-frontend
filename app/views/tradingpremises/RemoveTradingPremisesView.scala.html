@@ -44,9 +44,11 @@
 
             @heading("tradingpremises.remove.trading.premises.title")
 
-            <div class="govuk-inset-text">
-                <pre class="govuk-body">@tradingAddress.split(",").map(_.trim).mkString("\n")</pre>
-            </div>
+            @if(tradingAddress.nonEmpty) {
+                <div class="govuk-inset-text">
+                    <pre class="govuk-body">@tradingAddress.split(",").map(_.trim).mkString("\n")</pre>
+                </div>
+            }
 
             @govukDateInput(DateInput(
                 id = "endDate",
@@ -64,9 +66,11 @@
 
             @heading("tradingpremises.remove.trading.premises.title")
 
+            @if(tradingAddress.nonEmpty) {
             <div class="govuk-inset-text">
                 <pre class="govuk-body">@tradingAddress.split(",").map(_.trim).mkString("\n")</pre>
             </div>
+            }
         }
 
         @button("tradingpremises.remove.trading.premises.btn", classes = "govuk-button--warning")
