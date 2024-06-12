@@ -37,7 +37,7 @@
 }
 
 @layout(
-    pageTitle = s"${messages("responsiblepeople.remove.responsible.person.title")} - ${messages("summary.responsiblepeople")}",
+    pageTitle = s"${messages("responsiblepeople.remove.named.responsible.person.heading", personName)} - ${messages("summary.responsiblepeople")}",
 ) {
 
     @errorSummary(form, "endDate")
@@ -48,7 +48,7 @@
 
         @if(showDateField){
 
-            @heading("responsiblepeople.remove.named.responsible.person", personName)
+            @heading("responsiblepeople.remove.named.responsible.person.heading", personName)
 
             @content
 
@@ -61,20 +61,20 @@
                     legend = Some(Legend(
                         content = Text(messages("responsiblepeople.remove.named.responsible.person", personName)),
                         isPageHeading = false,
-                        classes = "govuk-visually-hidden"
+                        classes = "govuk-fieldset__legend--m"
                     ))
                 ))
             ).withFormField(form("endDate")))
 
         } else {
-            @heading("responsiblepeople.remove.responsible.person.title", "summary.responsiblepeople")
+            @heading("responsiblepeople.remove.named.responsible.person.heading", personName)
 
             @content
 
             <input type="hidden" name="dateRequired" value="false"/>
         }
 
-        @button("responsiblepeople.remove.responsible.person.btn")
+        @button("responsiblepeople.remove.responsible.person.btn", classes = "govuk-button--warning")
     }
 
     @returnLink(returnLink = true)

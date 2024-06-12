@@ -21,12 +21,14 @@
     id: String = "button",
     hrefOpt: Option[String] = None,
     startButton: Boolean = false,
-    attributes: Map[String, String] = Map.empty
+    attributes: Map[String, String] = Map.empty,
+    classes: String = ""
 )(implicit messages: Messages)
 
 @govukButton(Button(
     href = hrefOpt,
     content = Text(messages(msg)),
     isStartButton = startButton,
-    attributes = attributes + ("id" -> id)
+    attributes = attributes + ("id" -> id),
+    classes = classes
 ))
