@@ -20,13 +20,13 @@ import models.businessactivities.TransactionTypes.DigitalSoftware
 import models.businessactivities._
 import models.businessmatching.BusinessMatching
 import play.api.i18n.Messages
-import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.Aliases._
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, SummaryList}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
+import utils.CheckYourAnswersHelperFunctions
 
 import javax.inject.Inject
 
-class CheckYourAnswersHelper @Inject()() {
+class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions {
 
   def createSummaryList(
                          businessActivities: BusinessActivities,
@@ -210,18 +210,18 @@ class CheckYourAnswersHelper @Inject()() {
     businessActivities.transactionRecordTypes.map { transactionTypes =>
 
       Seq(
-        Some(
+        getValueForRow[TransactionType](
+          transactionTypes.types, x => messages(s"businessactivities.transactiontype.lbl.${x.value}")
+        ).map { value =>
           SummaryListRow(
             Key(Text(messages("businessactivities.do.keep.records"))),
-            toBulletList(
-              transactionTypes.types.map(_.value).toSeq, "businessactivities.transactiontype.lbl"
-            ),
+            value,
             actions = editAction(
               controllers.businessactivities.routes.TransactionTypesController.get(true).url,
               "keeprecordtypes-edit"
             )
           )
-        ),
+        },
         softwareRow(transactionTypes)
       ).flatten
     }
@@ -257,16 +257,6 @@ class CheckYourAnswersHelper @Inject()() {
 
   private def riskAssessmentPolicyRows(businessActivities: BusinessActivities)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
 
-    def getValueForRow(types: Set[RiskAssessmentType]): Option[Value] = types match {
-      case types if types.size > 1 =>
-        Some(
-          toBulletList(types.map(_.value).toSeq, "businessactivities.RiskAssessmentType.lbl")
-        )
-      case types if types.size == 1 =>
-        Some(Value(Text(messages(s"businessactivities.RiskAssessmentType.lbl.${types.head.value}"))))
-      case _ => None
-    }
-
     businessActivities.riskAssessmentPolicy map {
       case RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), _) =>
         Seq(
@@ -291,12 +281,14 @@ class CheckYourAnswersHelper @Inject()() {
               )
             )
           ),
-          getValueForRow(types).map { value =>
+          getValueForRow[RiskAssessmentType](
+            types, x => messages(s"businessactivities.RiskAssessmentType.lbl.${x.value}")
+          ).map { value =>
             SummaryListRow(
               Key(Text(messages("businessactivities.document.riskassessment.policy.title"))),
               value,
               actions = editAction(
-                controllers.businessactivities.routes.RiskAssessmentController.get(true).url,
+                controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).url,
                 "documentriskassessment-edit"
               )
             )
@@ -401,49 +393,13 @@ class CheckYourAnswersHelper @Inject()() {
     }
   }
 
-  private def booleanToLabel(bool: Boolean)(implicit messages: Messages): String = if (bool) {
-    messages("lbl.yes")
-  } else {
-    messages("lbl.no")
-  }
-
-  private def toBulletList[A](coll: Seq[A], messagePrefix: String)(implicit messages: Messages): Value = Value(
-    HtmlContent(
-      Html(
-        "<ul class=\"govuk-list govuk-list--bullet\">" +
-          coll.map { x =>
-            s"<li>${messages(s"$messagePrefix.$x")}</li>"
-          }.mkString +
-        "</ul>"
+  private def getValueForRow[A](types: Set[A], f: A => String)(implicit messages: Messages): Option[Value] = types match {
+    case types if types.size > 1 =>
+      Some(
+        toBulletList(types.map(f).toSeq)
       )
-    )
-  )
-  private def row(title: String, label: String, actions: Option[Actions])(implicit messages: Messages): SummaryListRow = {
-    SummaryListRow(
-      Key(Text(messages(title))),
-      Value(Text(label)),
-      actions = actions
-    )
+    case types if types.size == 1 =>
+      Some(Value(Text(messages(f(types.head)))))
+    case _ => None
   }
-
-  private def editAction(route: String, id: String)(implicit messages: Messages): Option[Actions] = {
-    Some(Actions(
-      items = Seq(ActionItem(
-        route,
-        Text(messages("button.edit")),
-        attributes = Map("id" -> id)
-      ))
-    ))
-  }
-  private def addressToLines(addressLines: Seq[String]): Value = Value(
-    HtmlContent(
-      Html(
-        "<ul class=\"govuk-list\">" +
-          addressLines.map { line =>
-            s"""<li>$line<li>"""
-          }.mkString
-          + "</ul>"
-      )
-    )
-  )
 }

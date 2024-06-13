@@ -49,7 +49,15 @@
         <p class="govuk-body">@messages("payments.waystopay.lead.time")</p>
 
         @inputRadio(
-            Radios(items = WaysToPay.formValues).withFormField(form("waysToPay"))
+            Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                    content = Text(messages("payments.waystopay.legend")),
+                    classes = "govuk-fieldset__legend--m",
+                    isPageHeading = false
+                    ))
+                )),
+                items = WaysToPay.formValues).withFormField(form("waysToPay"))
         )
 
         @button("button.continue")

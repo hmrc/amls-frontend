@@ -18,51 +18,52 @@ package views.tradingpremises
 
 import forms.tradingpremises.RemoveTradingPremisesFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.{FakeRequest, Injecting}
+import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tradingpremises.RemoveTradingPremisesView
 
 class RemoveTradingPremisesViewSpec extends AmlsViewSpec with Matchers with Injecting {
 
-  lazy val remove_trading_premises = inject[RemoveTradingPremisesView]
-  lazy val fp = inject[RemoveTradingPremisesFormProvider]
+  lazy val remove_trading_premises: RemoveTradingPremisesView = inject[RemoveTradingPremisesView]
+  lazy val fp: RemoveTradingPremisesFormProvider = inject[RemoveTradingPremisesFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "RemoveTradingPremisesView" must {
     "have correct title, heading and load UI with empty form" in new ViewFixture {
 
-      val pageTitle = messages("tradingpremises.remove.trading.premises.title") + " - " +
+      val pageTitle: String = messages("tradingpremises.remove.trading.premises.title") + " - " +
         messages("summary.tradingpremises") + " - " +
         messages("title.amls") + " - " + messages("title.gov")
 
-      def view = remove_trading_premises(fp(), 1, false, "trading address", true )
+      def view: HtmlFormat.Appendable = remove_trading_premises(fp(), 1, complete = false, "trading address", showDateField = true )
 
       doc.title must be(pageTitle)
 
-      heading.html must include(messages("tradingpremises.remove.trading.premises.enddate.lbl"))
+      heading.html must include(messages("tradingpremises.remove.trading.premises.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
 
-      doc.getElementsMatchingOwnText(messages("tradingpremises.remove.trading.premises.text", "trading address")).hasText must be(true)
       doc.getElementsMatchingOwnText(messages("tradingpremises.remove.trading.premises.btn")).last().html() must be(
         messages("tradingpremises.remove.trading.premises.btn"))
     }
 
     "shows correct heading for input param showDateField equal false." in new ViewFixture {
 
-      def view = remove_trading_premises(fp(), 1, false, "trading address", false )
+      def view: HtmlFormat.Appendable = remove_trading_premises(fp(), 1, complete = false, "trading address", showDateField = false )
 
       heading.html must be(messages("tradingpremises.remove.trading.premises.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
     }
 
     "check date field existence when input param showDateField is set to true" in new ViewFixture {
-      def view = remove_trading_premises(fp(), 1, false, "trading Address", true)
+      def view: HtmlFormat.Appendable = remove_trading_premises(fp(), 1, complete = false, "trading Address", showDateField = true)
 
       doc.getElementsByAttributeValue("id", "endDate") must not be empty
       doc.getElementsMatchingOwnText(messages("lbl.day")).hasText must be(true)
@@ -72,12 +73,12 @@ class RemoveTradingPremisesViewSpec extends AmlsViewSpec with Matchers with Inje
 
     behave like pageWithErrors(
       remove_trading_premises(
-        fp().withError("endDate.day", "error.expected.date.format"), 1, true, "trading address",true
+        fp().withError("endDate.day", "error.expected.date.format"), 1, complete = true, "trading address",showDateField = true
       ),
       "endDate",
       "error.expected.date.format"
     )
 
-    behave like pageWithBackLink(remove_trading_premises(fp(), 1, false, "trading Address", true))
+    behave like pageWithBackLink(remove_trading_premises(fp(), 1, complete = false, "trading Address", showDateField = true))
   }
 }

@@ -43,7 +43,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    implicit val ec = inject[ExecutionContext]
+    implicit val ec: ExecutionContext = inject[ExecutionContext]
 
     lazy val view = inject[CheckYourAnswersView]
     val controller = new SummaryController (

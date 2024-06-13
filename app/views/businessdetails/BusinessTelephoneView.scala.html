@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import config.ApplicationConfig
 @import views.html.components.forms.{ErrorSummary, InputText}
 @import views.html.components.{Button, Heading, ReturnLink, SectionSubtitle}
 
@@ -29,7 +28,7 @@
     returnLink: ReturnLink
 )
 
-@(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = s"${messages("businessdetails.contactingyou.phone.title")} - ${messages("summary.businessdetails")}") {
 
