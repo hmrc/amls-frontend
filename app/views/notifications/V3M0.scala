@@ -27,5 +27,18 @@ class V3M0 @Inject()(
                       val noLongerMindedToRevokeView: NoLongerMindedToRevokeView,
                       val rejectionReasonsView: RejectionReasonsView,
                       val revocationReasonsView: RevocationReasonsView
-                    )
+                    ) extends VersionedView {
 
+  override def viewFromTemplateFilename(templateName: String): NotificationViewScalaTemplate5 = {
+    templateName match {
+      case "message_details" => messageDetailsView
+      case "minded_to_reject" => mindedToRejectView
+      case "minded_to_revoke" => mindedToRevokeView
+      case "no_longer_minded_to_reject" => noLongerMindedToRejectView
+      case "no_longer_minded_to_revoke" => noLongerMindedToRevokeView
+      case "rejection_reasons" => rejectionReasonsView
+      case "revocation_reasons" => revocationReasonsView
+      case _ => throw new RuntimeException(s"Message template $templateName not found")
+    }
+  }
+}

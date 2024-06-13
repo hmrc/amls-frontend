@@ -37,7 +37,7 @@ import play.api.mvc.{AnyContentAsEmpty, Request, Result}
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService}
-import utils.{AmlsSpec, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks, NotificationTemplateGenerator}
 import views.html.notifications.YourMessagesView
 import views.notifications._
 
@@ -101,6 +101,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     lazy val fifth: V5M0 = app.injector.instanceOf[V5M0]
     lazy val sixth: V6M0 = app.injector.instanceOf[V6M0]
     lazy val view: YourMessagesView = app.injector.instanceOf[YourMessagesView]
+    val templateGenerator = app.injector.instanceOf[NotificationTemplateGenerator]
     val controller = new NotificationController(
       authEnrolmentsService = mockAuthEnrolmentsService,
       statusService = mockStatusService,
@@ -113,12 +114,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       cc = mockMcc,
       view = view,
       error = errorView,
-      v1m0 = first,
-      v2m0 = second,
-      v3m0 = third,
-      v4m0 = fourth,
-      v5m0 = fifth,
-      v6m0 = sixth)
+      templateGenerator)
 
     val controllerWithFailedAuthAction = new NotificationController(
       authEnrolmentsService = mockAuthEnrolmentsService,
@@ -132,12 +128,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       cc = mockMcc,
       view = view,
       error = errorView,
-      v1m0 = first,
-      v2m0 = second,
-      v3m0 = third,
-      v4m0 = fourth,
-      v5m0 = fifth,
-      v6m0 = sixth)
+      notificationTemplateGenerator = templateGenerator)
 
     val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
     val mockReviewDetails: ReviewDetails = mock[ReviewDetails]
