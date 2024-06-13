@@ -26,10 +26,6 @@
 
 @(form: Form[_], model: Seq[ResponsiblePerson])(implicit messages: Messages, request: Request[_], appConfig: ApplicationConfig)
 
-@supportingContent = {
-    <p class="govuk-body">@messages("declaration.who.is.registering.text")</p>
-}
-
 @layout(pageTitle = messages("declaration.who.is.registering.title")) {
 
     @formHelper(action = controllers.declaration.routes.WhoIsRegisteringController.post("registration")) {
@@ -39,7 +35,7 @@
             form,
             model,
             "submit.registration",
-            supportingContent
+            "declaration.who.is.registering.text"
         )
     }
 }

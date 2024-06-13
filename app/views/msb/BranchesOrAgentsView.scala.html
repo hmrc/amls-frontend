@@ -15,7 +15,7 @@
  *@
 
 @import config.ApplicationConfig
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 @import views.html.components.forms.{ErrorSummary, InputYesNo}
 @import views.html.components.{Button, ReturnLink, SectionSubtitle, Heading}
@@ -39,14 +39,18 @@
 
     @subtitle("summary.msb")
 
-    @heading("msb.branchesoragents.title")
-
-    <p class="govuk-body">@messages("msb.branchesoragents.intro")</p>
-
     @formHelper(action = controllers.msb.routes.BranchesOrAgentsController.post(edit)) {
 
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = messages("msb.branchesoragents.title").toText,
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
+                hint = Some(messages("msb.branchesoragents.intro").toHint),
                 name = "hasCountries",
                 items = HmrcYesNoRadioItems(),
                 classes = "govuk-radios govuk-radios--inline"
