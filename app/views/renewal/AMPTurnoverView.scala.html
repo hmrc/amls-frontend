@@ -15,7 +15,7 @@
  *@
 
 @import models.renewal.AMPTurnover
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import views.html.components.forms.ErrorSummary
 @import views.html.components.{Heading, SectionSubtitle, Button, ReturnLink}
 
@@ -48,14 +48,18 @@
 
     @subtitle("summary.renewal")
 
-    @heading("renewal.amp.turnover.title")
-
-    <p class="govuk-body">@messages("renewal.percentage.turnover.text")</p>
-
     @formHelper(action = controllers.renewal.routes.AMPTurnoverController.post(edit)) {
 
         @inputRadios(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = messages("renewal.amp.turnover.title").toText,
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
+                hint = Some(messages("renewal.percentage.turnover.text").toHint),
                 name = "percentageExpectedTurnover",
                 items = radioItems,
                 classes = "govuk-radios"

@@ -15,11 +15,11 @@
  *@
 
 @import models.tradingpremises.AgentRemovalReason
-@import config.{ ApplicationConfig}
+@import config.ApplicationConfig
 @import views.html.components.{SectionSubtitle, ReturnLink, Button, Heading}
 @import views.html.components.forms.{ErrorSummary, InputText}
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
-
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
 @this(
     layout: Layout,
@@ -44,8 +44,7 @@
                 classes = "govuk-label"
             ),
             id = "removalReasonOther",
-            name = "removalReasonOther",
-            classes = ""
+            name = "removalReasonOther"
             ),
         form("removalReasonOther")
     )
@@ -57,12 +56,17 @@
 
     @subtitle("summary.tradingpremises")
 
-    @heading("tradingpremises.remove_reasons.agent.premises.title")
-
     @formHelper(action = controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.post(index, complete)) {
 
         @inputRadios(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = messages("tradingpremises.remove_reasons.agent.premises.title").toText,
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
                 name = "removalReason",
                 items = AgentRemovalReason.formItems(conditionalHtml)
             ).withFormField(form("removalReason"))

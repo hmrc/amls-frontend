@@ -62,8 +62,8 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       cc = mockMcc,
       formProvider = inject[ExperienceTrainingFormProvider],
       view = view,
-      error = errorView,
-      amlsErrorHandler = inject[AmlsErrorHandler])
+      error = errorView
+    )
   }
 
   val emptyCache: Cache = Cache.empty
@@ -142,51 +142,6 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       contentAsString(result) must not include "I do not remember when I did the training"
       document.select("input[name=experienceTraining][value=true]").hasAttr("checked") must be(false)
       document.select("input[name=experienceTraining][value=false]").hasAttr("checked") must be(true)
-    }
-
-    "on get redirect to itself after performing a successful recovery of missing business types" in new Fixture {
-      val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessMatchingActivities(Set())))
-
-      when(controller.dataCacheConnector.fetchAll(any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(businessMatching))
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-        (any())).thenReturn(Future.successful(Some(
-          Seq(ResponsiblePerson(
-            personName = personName,
-            experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training"))
-        )))))
-
-      when(controller.recoverActivitiesService.recover(any())(any(), any(), any()))
-        .thenReturn(Future.successful(true))
-
-      val result: Future[Result] = controller.get(RecordId)(request)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) mustBe Some(routes.ExperienceTrainingController.get(RecordId).url)
-    }
-
-    "on get return an internal server error after failing to recover missing business types" in new Fixture {
-      val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessMatchingActivities(Set())))
-
-      when(controller.dataCacheConnector.fetchAll(any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(businessMatching))
-
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-        (any())).thenReturn(Future.successful(Some(
-          Seq(ResponsiblePerson(
-            personName = personName,
-            experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training"))
-        )))))
-
-      when(controller.recoverActivitiesService.recover(any())(any(), any(), any()))
-        .thenReturn(Future.successful(false))
-
-      val result: Future[Result] = controller.get(RecordId)(request)
-      status(result) must be(INTERNAL_SERVER_ERROR)
     }
 
     "on post with valid data and training selected yes" in new Fixture {
