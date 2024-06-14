@@ -16,6 +16,7 @@
 
 @import models.moneyservicebusiness.ExpectedThroughput
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import views.html.components.forms.ErrorSummary
 @import views.html.components.{Heading, SectionSubtitle, Button, ReturnLink}
 
@@ -42,24 +43,32 @@
     }
 }
 
+@hintText = {
+    <p>
+        @messages("renewal.msb.throughput.info.prefix")
+        <strong>@messages("renewal.msb.throughput.info.bold")</strong>
+        @messages("renewal.msb.throughput.info.suffix")
+    </p>
+}
+
 @layout(messages("renewal.msb.throughput.header") + " - " + messages("summary.renewal")) {
 
     @errorSummary(form, Some(Map("throughput" -> ExpectedThroughput.all.head.toString)))
 
     @subtitle("summary.renewal")
 
-    @heading("renewal.msb.throughput.header")
-
-    <p class="govuk-body">
-        @messages("renewal.msb.throughput.info.prefix")
-        <strong>@messages("renewal.msb.throughput.info.bold")</strong>
-        @messages("renewal.msb.throughput.info.suffix")
-    </p>
-
     @formHelper(action = controllers.renewal.routes.TotalThroughputController.post(edit)) {
 
         @inputRadios(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = messages("renewal.msb.throughput.header").toText,
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
+                hint = Some(Hint(content = HtmlContent(hintText))),
                 name = "throughput",
                 items = radioItems,
                 classes = "govuk-radios"

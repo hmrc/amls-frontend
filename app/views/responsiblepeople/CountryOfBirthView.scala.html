@@ -17,6 +17,7 @@
 @import views.html.components.{Button, Heading, SectionSubtitle, ReturnLink}
 @import views.html.components.forms.{ErrorSummary, InputYesNo, InputCountry}
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 
 @this(
@@ -73,12 +74,17 @@
 
     @subtitle("summary.responsiblepeople")
 
-    @heading("responsiblepeople.country.of.birth.heading", personName)
-
     @formHelper(action = controllers.responsiblepeople.routes.CountryOfBirthController.post(index, edit, flow)) {
 
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = messages("responsiblepeople.country.of.birth.heading", personName).toText,
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
                 name = "bornInUk",
                 items = radioItems,
                 classes = "govuk-radios"
