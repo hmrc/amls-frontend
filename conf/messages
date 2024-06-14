@@ -2714,9 +2714,6 @@ notifications.subject.ReminderToPayForRenewal = Reminder to pay - Renewal
 notifications.subject.v6.ReminderToPayForRenewal = Reminder to pay your annual fee
 notifications.subject.ReminderToPayForManualCharges = Reminder to pay - Manual Charge
 notifications.subject.v6.ReminderToPayForManualCharges = Reminder to pay - Manual Charge
-notifications.subject.RenewalReminder = Reminder to Renew
-notifications.subject.v6.RenewalReminder = Reminder to pay your annual fee
-notifications.subject.v6.NewRenewalReminder = Notification that your annual fee is due
 
 notifications.subject.MindedToReject = Refusal of Application being Considered
 notifications.subject.v6.MindedToReject = Refusal of Application being Considered
@@ -2742,7 +2739,6 @@ notifications.subject.v6.NoSubject = <no subject>
 notifications.previousReg = Messages from your previous registrations
 
 notifications.subject.v6.NewRenewalReminder = Reminder to submit your annual declaration and pay your annual supervision fee.
-notifications.subject.v6.ReminderToPayForRenewal = Reminder to pay your annual fee
 notifications.subject.v6.AutoExpiryOfRegistration = Cancellation of registration
 notifications.subject.v6.RenewalReminder = Notification to submit your annual declaration and pay your annual fee.
 
