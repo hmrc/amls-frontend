@@ -16,10 +16,11 @@
 
 package views.notifications
 
-import javax.inject.Inject
-import views.html.notifications.v4m0._
+import views.html.notifications.v6m0._
 
-class V4M0 @Inject()(
+import javax.inject.Inject
+
+class V6M0 @Inject()(
                       val messageDetailsView: MessageDetailsView,
                       val mindedToRejectView: MindedToRejectView,
                       val mindedToRevokeView: MindedToRevokeView,
