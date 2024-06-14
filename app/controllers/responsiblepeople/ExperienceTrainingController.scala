@@ -39,7 +39,6 @@ class ExperienceTrainingController @Inject()(val dataCacheConnector: DataCacheCo
                                              val ds: CommonPlayDependencies,
                                              val cc: MessagesControllerComponents,
                                              formProvider: ExperienceTrainingFormProvider,
-                                             amlsErrorHandler: AmlsErrorHandler,
                                              view: ExperienceTrainingView,
                                              implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with Logging {
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
@@ -58,15 +57,6 @@ class ExperienceTrainingController @Inject()(val dataCacheConnector: DataCacheCo
                   NotFound(notFoundView)
               }
             }
-          }
-      } recoverWith {
-        case _: NoSuchElementException =>
-          logger.warn("[ExperienceTrainingController][get] - Business activities list was empty, attempting to recover")
-          recoverActivitiesService.recover(request).map {
-            case true => Redirect(routes.ExperienceTrainingController.get(index, edit, flow))
-            case false =>
-              logger.warn("[ExperienceTrainingController][get] - Unable to determine business types")
-              InternalServerError(amlsErrorHandler.internalServerErrorTemplate)
           }
       }
   }

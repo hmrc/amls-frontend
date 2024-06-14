@@ -16,6 +16,7 @@
 
 @import config.ApplicationConfig
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 @import views.html.components.forms.{ErrorSummary, InputYesNo}
 @import views.html.components.{Button, ReturnLink, SectionSubtitle, Heading}
@@ -39,12 +40,17 @@
 
     @subtitle("summary.msb")
 
-    @heading("msb.deal_foreign_currencies.title")
-
     @formHelper(action = controllers.msb.routes.UsesForeignCurrenciesController.post(edit)) {
 
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = messages("msb.deal_foreign_currencies.title").toText,
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
                 name = "usesForeignCurrencies",
                 items = HmrcYesNoRadioItems(),
                 classes = "govuk-radios govuk-radios--inline"

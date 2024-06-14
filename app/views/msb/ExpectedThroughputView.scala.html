@@ -16,7 +16,7 @@
 
 @import config.ApplicationConfig
 @import models.moneyservicebusiness.ExpectedThroughput
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import views.html.components.forms.{ErrorSummary, InputYesNo}
 @import views.html.components.{Button, ReturnLink, SectionSubtitle, Heading}
 
@@ -43,24 +43,32 @@
     }
 }
 
+@hintText = {
+  <p>
+      @messages("msb.throughput.sub.p1") @messages("msb.throughput.sub.p2.prefix")
+      <strong>@messages("msb.throughput.sub.p2.strong")</strong>
+      @messages("msb.throughput.sub.p2.suffix")
+  </p>
+}
+
 @layout(pageTitle = messages("msb.throughput.title") + " - " + messages("summary.msb")) {
 
     @errorSummary(form, Some(Map("throughput" -> ExpectedThroughput.First.toString)))
 
     @subtitle("summary.msb")
 
-    @heading("msb.throughput.title")
-
-    @Html(s"""<p class="govuk-body">""")
-    @Html(s"${messages("msb.throughput.sub.p1")} ")
-    @Html(s"${messages("msb.throughput.sub.p2.prefix")} ")
-    @Html(s"<strong>${messages("msb.throughput.sub.p2.strong")} </strong>")
-    @Html(s"${messages("msb.throughput.sub.p2.suffix")}")
-
     @formHelper(action = controllers.msb.routes.ExpectedThroughputController.post(edit)) {
 
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = messages("msb.throughput.title").toText,
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
+                hint = Some(Hint(content = HtmlContent(hintText))),
                 name = "throughput",
                 items = formItems,
                 classes = "govuk-radios"

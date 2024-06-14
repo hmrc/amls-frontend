@@ -18,7 +18,7 @@
 @import config.ApplicationConfig
 @import views.html.components.{Heading, SectionSubtitle, Button, ReturnLink}
 @import views.html.components.forms.ErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
 @this(
     errorSummary: ErrorSummary,
@@ -34,7 +34,7 @@
   form: Form[_],
   model : Seq[ResponsiblePerson],
   section: String,
-  supportingContent: Html = play.twirl.api.HtmlFormat.empty)(implicit messages: Messages, request: Request[_], appConfig: ApplicationConfig)
+  hintText: String)(implicit messages: Messages, request: Request[_], appConfig: ApplicationConfig)
 
 @formValues = @{
     model.zipWithIndex.flatMap { case (item, index) =>
@@ -52,16 +52,20 @@
     )
 }
 
-@errorSummary(form)
+@errorSummary(form, Some(Map("person" -> "person-0")))
 
 @subtitle(section)
 
-@heading(headingStr)
-
-@supportingContent
-
 @inputRadios(
     Radios(
+        fieldset = Some(Fieldset(
+            legend = Some(Legend(
+                content = messages(headingStr).toText,
+                classes = "govuk-fieldset__legend--xl",
+                isPageHeading = true
+            ))
+        )),
+        hint = Some(messages(hintText).toHint),
         name = "person",
         items = formValues
     ).withFormField(form("person"))

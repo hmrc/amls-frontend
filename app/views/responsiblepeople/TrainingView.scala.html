@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Aliases.CharacterCount
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 @import uk.gov.hmrc.govukfrontend.views.Implicits.{RichCharacterCount, RichRadios}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import views.html.components.forms.{ErrorSummary, InputYesNo}
 @import views.html.components.{Button, Heading, ReturnLink, SectionSubtitle}
 
@@ -47,7 +48,8 @@
             name = "information",
             rows = 8,
             errorMessage = form("information").error.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*)))),
-            maxLength = Some(255)
+            maxLength = Some(255),
+            attributes = Map("aria-describedby" -> "")
         ).withFormField(form("information"))
     )
 }
@@ -73,14 +75,18 @@
 
     @subtitle(messages("summary.responsiblepeople"))
 
-    @heading("responsiblepeople.training.heading", personName)
-
-    <p class="govuk-body">@messages("responsiblepeople.training.hinttext")</p>
-
     @formHelper(action = controllers.responsiblepeople.routes.TrainingController.post(index, edit, flow)) {
 
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = messages("responsiblepeople.training.heading", personName).toText,
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
+                hint = Some(messages("responsiblepeople.training.hinttext").toHint),
                 name = "training",
                 items = radioItems
             ).withFormField(form("training"))

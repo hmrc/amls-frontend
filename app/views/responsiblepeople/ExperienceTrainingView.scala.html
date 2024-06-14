@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Aliases.CharacterCount
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 @import uk.gov.hmrc.govukfrontend.views.Implicits.{RichCharacterCount, RichRadios}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import views.html.components.forms.{ErrorSummary, InputYesNo}
 @import views.html.components.{Button, Heading, ReturnLink, SectionSubtitle}
 
@@ -35,6 +36,15 @@
 )
 
 @(form: Form[_], businessMatching: BusinessMatching, edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@headingKey = @{
+    businessMatching.prefixedAlphabeticalBusinessTypes(true) match {
+        case Some(bType :: Nil) =>
+            messages("responsiblepeople.experiencetraining.heading", personName, bType)
+        case _ =>
+            messages("responsiblepeople.experiencetraining.heading.multiple", personName)
+    }
+}
 
 @conditionalHtml = @{
 
@@ -70,17 +80,11 @@
 
 @layout(pageTitle = s"${messages("responsiblepeople.experiencetraining.title")} - ${messages("summary.responsiblepeople")}") {
 
-    @errorSummary(form, Some(Map("involvedInOther" -> "involvedInOther-true")))
+    @errorSummary(form, Some(Map("experienceTraining" -> "experienceTraining-true")))
 
     @subtitle(messages("summary.responsiblepeople"))
 
-    @businessMatching.prefixedAlphabeticalBusinessTypes(true).map { types =>
-        @if(types.size > 1) {
-            @heading("responsiblepeople.experiencetraining.heading.multiple", personName)
-        } else {
-            @heading("responsiblepeople.experiencetraining.heading", personName, types.head)
-        }
-    }
+    @heading(headingKey)
 
     @businessMatching.alphabeticalBusinessActivitiesLowerCase().map { types =>
         @if(types.size > 1) {
@@ -98,6 +102,13 @@
 
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = headingKey.toText,
+                        classes = "govuk-visually-hidden",
+                        isPageHeading = false
+                    ))
+                )),
                 name = "experienceTraining",
                 items = radioItems
             ).withFormField(form("experienceTraining"))
