@@ -17,8 +17,8 @@
 package views.responsiblepeople
 
 import forms.responsiblepeople.ExperienceTrainingFormProvider
-import models.businessmatching.BusinessActivity.AccountancyServices
-import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing}
+import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
 import models.responsiblepeople.{ExperienceTrainingNo, ExperienceTrainingYes}
 import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
@@ -32,7 +32,8 @@ class ExperienceTrainingViewSpec extends AmlsViewSpec with Matchers  {
   lazy val fp = inject[ExperienceTrainingFormProvider]
 
   val name = "James Jones"
-  val businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices))))
+  def businessMatching(activities: Set[BusinessActivity]): BusinessMatching =
+    BusinessMatching(activities = Some(BusinessActivities(activities)))
 
   implicit val request = FakeRequest()
 
@@ -44,7 +45,14 @@ class ExperienceTrainingViewSpec extends AmlsViewSpec with Matchers  {
 
     "have correct title" in new ViewFixture {
 
-      def view = trainingView(fp(name).fill(ExperienceTrainingYes("info")), businessMatching, false, 0, None, name)
+      def view = trainingView(
+        fp(name).fill(ExperienceTrainingYes("info")),
+        businessMatching(Set(AccountancyServices)),
+        false,
+        0,
+        None,
+        name
+      )
 
       doc.title must be(messages("responsiblepeople.experiencetraining.title") +
         " - " + messages("summary.responsiblepeople") +
@@ -52,17 +60,52 @@ class ExperienceTrainingViewSpec extends AmlsViewSpec with Matchers  {
         " - " + messages("title.gov"))
     }
 
-    "have correct heading" in new ViewFixture {
+    "have correct heading for single activity" in new ViewFixture {
 
-      def view = trainingView(fp(name).fill(ExperienceTrainingNo), businessMatching, false, 0, None, name)
+      def view = trainingView(
+        fp(name).fill(ExperienceTrainingNo),
+        businessMatching(Set(AccountancyServices)),
+        false,
+        0,
+        None,
+        name
+      )
 
       heading.html() must be(messages("responsiblepeople.experiencetraining.heading", name, "an accountancy service provider"))
+    }
+
+    "have correct heading for multiple activities" in new ViewFixture {
+
+      def view = trainingView(
+        fp(name).fill(ExperienceTrainingNo),
+        businessMatching(Set(AccountancyServices, HighValueDealing)),
+        false,
+        0,
+        None,
+        name
+      )
+
+      heading.html() must be(messages("responsiblepeople.experiencetraining.heading.multiple", name))
+    }
+
+    "have correct heading for no activities" in new ViewFixture {
+
+      def view = trainingView(
+        fp(name).fill(ExperienceTrainingNo),
+        businessMatching(Set.empty[BusinessActivity]),
+        false,
+        0,
+        None,
+        name
+      )
+
+      heading.html() must be(messages("responsiblepeople.experiencetraining.heading.multiple", name))
     }
 
     behave like pageWithErrors(
       trainingView(
         fp(name).withError("experienceTraining", "error.required.rp.experiencetraining"),
-        businessMatching, false, 0, None, name
+        businessMatching(Set.empty[BusinessActivity]), false, 0, None, name
       ),
       "experienceTraining", "error.required.rp.experiencetraining"
     )
@@ -70,7 +113,7 @@ class ExperienceTrainingViewSpec extends AmlsViewSpec with Matchers  {
     behave like pageWithErrors(
       trainingView(
         fp(name).withError("experienceInformation", messages("error.rp.invalid.experiencetraining.information", name)),
-        businessMatching, false, 0, None, name
+        businessMatching(Set.empty[BusinessActivity]), false, 0, None, name
       ),
       "experienceInformation", "error.rp.invalid.experiencetraining.information"
     )

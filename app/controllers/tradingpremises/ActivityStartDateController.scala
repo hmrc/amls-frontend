@@ -67,8 +67,7 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
         )
   }
 
-  private def handleValidForm(credId: String, index: Int, edit: Boolean, data: ActivityStartDate)
-                             (implicit hc: HeaderCarrier): Future[Result] = {
+  private def handleValidForm(credId: String, index: Int, edit: Boolean, data: ActivityStartDate): Future[Result] = {
     for {
       _ <- updateDataStrict[TradingPremises](credId, index) { tp =>
         val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None)(x => Some(x.copy(startDate = Some(data.startDate))))
@@ -82,8 +81,7 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
   }
 
   private def handleInvalidForm(credId: String, index: Int, edit: Boolean, f: Form[ActivityStartDate])
-                               (implicit hc: HeaderCarrier,
-                                request: Request[_]): Future[Result] = {
+                               (implicit request: Request[_]): Future[Result] = {
     for {
       tp <- getData[TradingPremises](credId, index)
     } yield tp.flatMap(_.yourTradingPremises) match {

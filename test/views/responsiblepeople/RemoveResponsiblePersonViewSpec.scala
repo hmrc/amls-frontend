@@ -19,7 +19,9 @@ package views.responsiblepeople
 import forms.responsiblepeople.RemoveResponsiblePersonFormProvider
 import models.responsiblepeople.ResponsiblePersonEndDate
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
+import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.RemoveResponsiblePersonView
@@ -28,36 +30,36 @@ import java.time.LocalDate
 
 class RemoveResponsiblePersonViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val personView = inject[RemoveResponsiblePersonView]
-  lazy val fp = inject[RemoveResponsiblePersonFormProvider]
+  lazy val personView: RemoveResponsiblePersonView = inject[RemoveResponsiblePersonView]
+  lazy val fp: RemoveResponsiblePersonFormProvider = inject[RemoveResponsiblePersonFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "RemoveResponsiblePersonView" must {
 
     "have correct title" in new ViewFixture {
 
-      def view = personView(fp().fill(Right(ResponsiblePersonEndDate(LocalDate.now()))), 1, "Gary", false)
+      def view: HtmlFormat.Appendable = personView(fp().fill(Right(ResponsiblePersonEndDate(LocalDate.now()))), 1, "Gary", showDateField = false)
 
-      doc.title() must startWith(messages("responsiblepeople.remove.responsible.person.title") + " - " + messages("summary.responsiblepeople"))
+      doc.title() must startWith(messages("responsiblepeople.remove.named.responsible.person.heading", "Gary") + " - " + messages("summary.responsiblepeople"))
     }
 
     "show none named person heading" in new ViewFixture {
 
-      def view = personView(fp().fill(Left(false)), 1, "Gary", showDateField = false)
+      def view: HtmlFormat.Appendable = personView(fp().fill(Left(false)), 1, "Gary", showDateField = false)
 
-      heading.html() must be(messages("responsiblepeople.remove.responsible.person.title"))
+      heading.html() must be(messages("responsiblepeople.remove.named.responsible.person.heading", "Gary"))
     }
 
     "show named person heading" in new ViewFixture {
 
-      def view = personView(fp(), 1, "Gary", showDateField = true)
+      def view: HtmlFormat.Appendable = personView(fp(), 1, "Gary", showDateField = true)
 
-      heading.html() must be(messages("responsiblepeople.remove.named.responsible.person", "Gary"))
+      heading.html() must be(messages("responsiblepeople.remove.named.responsible.person.heading", "Gary"))
       doc.getElementsByAttributeValue("id", "endDate") must not be empty
     }
 
