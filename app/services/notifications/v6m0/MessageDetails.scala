@@ -81,7 +81,7 @@ object MessageDetails {
        |you must quote when you pay your fee.</p>
        |
        |<p class="govuk-body">HMRCs money laundering registration policy, and details of how to pay your fee can be found on
-       |<a href=$amlsRegistrationFeesGuidanceUrl">Fees you’ll pay for money laundering supervision - GOV.UK (www.gov.uk)</a></p>
+       |<a href="$amlsRegistrationFeesGuidanceUrl">Fees you’ll pay for money laundering supervision - GOV.UK (www.gov.uk)</a></p>
        |
        |<p class="govuk-body">You must pay your annual fee in full by ${formatDate(endDate)}.</p>
        |
@@ -109,7 +109,7 @@ object MessageDetails {
        |continue your registration with HMRC. The amount you must pay was calculated when you submitted your declaration.
        |
        |<p class="govuk-body">HMRCs money laundering registration policy, and details of how to pay your fee can be found on
-       |<a href=$amlsRegistrationFeesGuidanceUrl">Fees you’ll pay for money laundering supervision - GOV.UK (www.gov.uk)</a></p>
+       |<a href="$amlsRegistrationFeesGuidanceUrl">Fees you’ll pay for money laundering supervision - GOV.UK (www.gov.uk)</a></p>
        |
        |<p class="govuk-body">When you pay your fee you must quote your payment reference number which is: $referenceNumber. <strong>Please note</strong> that
        |if you pay your fee without quoting your payment reference number we may not be able to match the payment to your business. This may lead to your fee
