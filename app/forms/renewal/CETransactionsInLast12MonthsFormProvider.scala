@@ -29,6 +29,7 @@ class CETransactionsInLast12MonthsFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[CETransactionsInLast12Months] = Form(
     "ceTransaction" -> text("error.required.renewal.ce.transactions.in.12months")
+      .transform[String](format, format)
       .verifying(
         firstError(
           maxLength(length, lengthAndRegexError),
@@ -37,4 +38,6 @@ class CETransactionsInLast12MonthsFormProvider @Inject()() extends Mappings {
       )
       .transform[CETransactionsInLast12Months](CETransactionsInLast12Months.apply, _.ceTransaction)
   )
+
+  private def format(str: String): String = str.trim.replace(",", "")
 }

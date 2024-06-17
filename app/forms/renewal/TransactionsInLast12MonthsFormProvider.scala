@@ -29,6 +29,7 @@ class TransactionsInLast12MonthsFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[TransactionsInLast12Months] = Form(
     "txnAmount" -> text(error)
+      .transform[String](format, format)
       .verifying(
         firstError(
           maxLength(length, s"$error.length"),
@@ -37,4 +38,5 @@ class TransactionsInLast12MonthsFormProvider @Inject()() extends Mappings {
       )
       .transform[TransactionsInLast12Months](TransactionsInLast12Months.apply, _.transfers)
   )
+  private def format(str: String): String = str.trim.replace(",", "")
 }
