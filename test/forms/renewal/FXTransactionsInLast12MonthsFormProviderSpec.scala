@@ -38,6 +38,15 @@ class FXTransactionsInLast12MonthsFormProviderSpec extends StringFieldBehaviours
 
     behave like fieldWithMaxLength(form, fieldName, fp.length, FormError(fieldName, invalidError, Seq(fp.length)))
 
+    "strip spaces and commas from input" in {
+
+      val input = s" 12,345,678,901 "
+      form.bind(Map(fieldName -> input)).fold(
+        error => fail("Invalid input, cannot bind: " + error.errors.toString),
+        data => assert(data.fxTransaction == input.trim.replace(",", ""))
+      )
+    }
+
     "fail to bind non-numbers" in {
 
       forAll(alphaStringsShorterThan(fp.length).suchThat(_.nonEmpty)) { str =>

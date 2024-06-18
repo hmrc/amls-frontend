@@ -28,7 +28,7 @@ class CETransactionsInLast12MonthsFormProviderSpec extends StringFieldBehaviours
   val fieldName = "ceTransaction"
   val lengthAndRegexError = "error.invalid.renewal.ce.transactions.in.12months"
 
-  "TransactionsInLast12MonthsFormProvider" must {
+  "CETransactionsInLast12MonthsFormProvider" must {
 
     behave like fieldThatBindsValidData(
       form, fieldName, numStringOfLength(fp.length).suchThat(_.nonEmpty)
@@ -37,6 +37,15 @@ class CETransactionsInLast12MonthsFormProviderSpec extends StringFieldBehaviours
     behave like mandatoryField(form, fieldName, FormError(fieldName, "error.required.renewal.ce.transactions.in.12months"))
 
     behave like fieldWithMaxLength(form, fieldName, fp.length, FormError(fieldName, lengthAndRegexError, Seq(fp.length)))
+
+    "strip spaces and commas from input" in {
+
+      val input = s" 12,345,678,901 "
+      form.bind(Map(fieldName -> input)).fold(
+        error => fail("Invalid input, cannot bind: " + error.errors.toString),
+        data => assert(data.ceTransaction == input.trim.replace(",", ""))
+      )
+    }
 
     "fail to bind non-numbers" in {
 
