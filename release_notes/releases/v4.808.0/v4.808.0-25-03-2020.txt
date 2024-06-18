@@ -1,2 +1,0 @@
- + [AMLS-5832] - 'Linked currency label to input'
- + [AMLS-5870] - 'Created banner for covid-19 action'

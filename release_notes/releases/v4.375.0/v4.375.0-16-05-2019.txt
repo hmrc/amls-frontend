@@ -1,6 +1,0 @@
- + [AMLS-4838] - 'Bug fix: Validation error messages not linked to group on MSB 'Where do you send the largest amounts of money' page'
- + [AMLS-4915] - 'Add h1 to legend for Business Activities' + [AMLS-4921] - 'Add h1 to legend for Renewal' + [AMLS-4926] - 'Second Phase content changes - preapp, BA, BD, EAB, BankDetails'
- + [AMLS-4927] - 'Improve error messages EAB Renewal flow'
- + [AMLS-4957] - 'Push users through renewal flow prior to variation when in renewal window'
- + [AMLS-4989] - 'EAB and Renewal markup/accessibility fixes' + [AMLS-4991] - 'Paragraph and hint text adjustments'
- + [AMLS-4997] - 'BUG fix: Renewal Validation error messages not linked to group on 'Which countries did you send the largest amounts of money to in the last 12 months?' page'

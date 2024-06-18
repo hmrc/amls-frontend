@@ -1,15 +1,11 @@
 amls-frontend
 =============
 
-**Anti-Money Laundering Supervision Frontend**
+This is the repository for the Anti-Money Laundering Supervision frontend. This service provides users the ability to register for supervision and update or vary their supervision details.
 
-[![Apache-2.0 license](http://img.shields.io/badge/license-Apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html) [![Build Status](https://travis-ci.org/hmrc/amls-frontend.svg?branch=master)](https://travis-ci.org/hmrc/amls-frontend) [ ![Download](https://api.bintray.com/packages/hmrc/releases/amls-frontend/images/download.svg) ](https://bintray.com/hmrc/releases/amls-frontend/_latestVersion)
+To run the service with test-only routes enabled, run the script `run-local-no-inappconf.sh`.
 
-This is the repository for the Anti-Money Laundering Supervision front end. This service provides users the ability to register for Supervision and update or vary their supervision details.
-
-To run the project clone the repository and in terminal $sbt "run $PORT" 
-
-**Other helpful links**
+**Other helpful documentation**
 
  * [Creating new notification template versions](documentation/template-versions.md)
  

@@ -1,9 +1,0 @@
- + [AMLS-4127] - 'Fixed incorrect visually hidden label on "You need to register as a responsible person" continue button'
- + [AMLS-4156] - 'Added edit functionality on Do you send money to other countries question"
- + [AMLS-4354] - "bug fix - About the Business shows complete when postal address is changed from yes to no"
- + [AMLS-4460] - 'Apply/Remove Gutters from Service'
- + [AMLS-4669] - 'Content changes for bank details section'
- + [AMLS-4697] - 'Added scripts to track and generate release notes'
- + [AMLS-4702] - 'Converted connectors to use dependency injection'
- + [AMLS-4703] - "Dependency Injection to Services in amls-frontend"
- + [AMLS-4856] - 'About the business section content changes'

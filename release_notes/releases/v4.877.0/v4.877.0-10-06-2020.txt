@@ -1,5 +1,0 @@
- + [AMLS-5842] - 'Added accessibility statement link to footer + feature toggle'
- + [AMLS-5917] - 'Remove TODOs from code'
- + [AMLS-5935] - 'Bug fix for supervision end reasons h1'
- + [AMLS-5936] - 'Bug fix: Supervision section should say not started instead of incomplete'
- + [AMLS-cleanup] - 'Removed not necessary config values from ApplicationConfig and non-existing toggle from specs'
