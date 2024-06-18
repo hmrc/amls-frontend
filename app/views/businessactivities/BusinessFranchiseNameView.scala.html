@@ -85,8 +85,17 @@
 
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("businessactivities.businessfranchise.heading")),
+                        classes = "govuk-fieldset__legend--m",
+                        isPageHeading = false
+                    ))
+                )),
                 name = "businessFranchise",
-                items = BusinessFranchise.formValues(conditionalInput)
+                items = BusinessFranchise.formValues(conditionalInput),
+                classes = "govuk-radios govuk-radios--inline"
+
             ).withFormField(form("businessFranchise"))
         )
 

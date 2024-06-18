@@ -1883,7 +1883,8 @@ businessactivities.whatyouneed.line_8 = if you have written guidance on how to i
 businessactivities.whatyouneed.line_9 = if your business has registered with the National Crime Agency (NCA)
 businessactivities.whatyouneed.line_10 = how you document your risk assessment policy and procedure, if your business has one
 businessactivities.whatyouneed.line_11 = about your professional adviser for Money Laundering Regulations, if you have one
-businessactivities.businessfranchise.title = Is your business a franchise?
+businessactivities.businessfranchise.title = Franchises
+businessactivities.businessfranchise.heading = Is your business a franchise?
 businessactivities.businessfranchise.lbl.franchisename = Franchisor’s name
 businessactivities.businessfranchise.lbl.hint = Use their legal name if it is different to their trading name.
 businessactivities.businessfranchise.subtitle = If your business is a franchise, we need to check your registration against the franchisor’s registration.
@@ -2636,11 +2637,8 @@ changeofficer.furtherupdates.validationerror = You must select yes or no. Select
 
 ###############################  Notifications ###############################
 
-notifications.type.statusChange = Status change
-notifications.type.reminder = Reminder
-notifications.type.communication = Communication
+############################### Version 5 ###############################
 
-notifications.subject.ApplicationApproval = Application Approval
 notifications.subject.v5.ApplicationApproval = Application Approval
 notifications.subject.RegistrationVariationApproval = Registration Variation Approval
 notifications.subject.v5.RegistrationVariationApproval = Registration Variation Approval
@@ -2688,7 +2686,63 @@ notifications.subject.v5.DeRegistrationEffectiveDateChange = Your de-registratio
 notifications.subject.NoSubject = <no subject>
 notifications.subject.v5.NoSubject = <no subject>
 
+############################### Version 6 ###############################
+
+notifications.type.statusChange = Status change
+notifications.type.reminder = Reminder
+notifications.type.communication = Communication
+
+notifications.subject.ApplicationApproval = Application Approval
+notifications.subject.v6.ApplicationApproval = Application Approval
+notifications.subject.RegistrationVariationApproval = Registration Variation Approval
+notifications.subject.v6.RegistrationVariationApproval = Registration Variation Approval
+notifications.subject.RenewalApproval = Renewal Approval
+notifications.subject.v6.RenewalApproval = Renewal Approval
+notifications.subject.RejectionReasons = Your application has been refused
+notifications.subject.v6.RejectionReasons = Your application has been refused
+notifications.subject.ApplicationAutorejectionForFailureToPay = Application Auto-Rejection for Failure to Pay
+notifications.subject.v6.ApplicationAutorejectionForFailureToPay = Application Auto-Rejection for Failure to Pay
+notifications.subject.RevocationReasons = Registration Revocation
+notifications.subject.v6.RevocationReasons = Registration Revocation
+notifications.subject.AutoExpiryOfRegistration = Your supervision has expired
+notifications.subject.v6.AutoExpiryOfRegistration = Cancellation of registration
+
+notifications.subject.ReminderToPayForApplication = Reminder to pay - Application
+notifications.subject.v6.ReminderToPayForApplication = Reminder to pay - Application
+notifications.subject.ReminderToPayForVariation = Reminder to pay - Variation
+notifications.subject.v6.ReminderToPayForVariation = Reminder to pay - Variation
+notifications.subject.ReminderToPayForRenewal = Reminder to pay - Renewal
+notifications.subject.v6.ReminderToPayForRenewal = Reminder to pay your annual fee
+notifications.subject.ReminderToPayForManualCharges = Reminder to pay - Manual Charge
+notifications.subject.v6.ReminderToPayForManualCharges = Reminder to pay - Manual Charge
+
+notifications.subject.MindedToReject = Refusal of Application being Considered
+notifications.subject.v6.MindedToReject = Refusal of Application being Considered
+notifications.subject.MindedToRevoke = Revocation of Registration being Considered
+notifications.subject.v6.MindedToRevoke = Revocation of Registration being Considered
+notifications.subject.NoLongerMindedToReject = No longer considering refusal
+notifications.subject.v6.NoLongerMindedToReject = No longer considering refusal
+notifications.subject.NoLongerMindedToRevoke = No longer considering revocation
+notifications.subject.v6.NoLongerMindedToRevoke = No longer considering revocation
+notifications.subject.Others = Message about your supervision
+notifications.subject.v6.Others = Message about your supervision
+
+notifications.subject.RegistrationVariationApproval = Registration Variation Approval
+notifications.subject.v6.RegistrationVariationApproval = Registration Variation Approval
+notifications.subject.ApplicationAutorejectionForFailureToPay = Your application has failed
+notifications.subject.v6.ApplicationAutorejectionForFailureToPay = Your application has failed
+notifications.subject.DeRegistrationEffectiveDateChange = Your de-registration date has been changed
+notifications.subject.v6.DeRegistrationEffectiveDateChange = Your de-registration date has been changed
+
+notifications.subject.NoSubject = <no subject>
+notifications.subject.v6.NoSubject = <no subject>
+
 notifications.previousReg = Messages from your previous registrations
+
+notifications.subject.v6.NewRenewalReminder = Reminder to submit your annual declaration and pay your annual supervision fee.
+notifications.subject.v6.AutoExpiryOfRegistration = Cancellation of registration
+notifications.subject.v6.RenewalReminder = Notification to submit your annual declaration and pay your annual fee.
+
 
 notifications.header = Your messages
 notifications.unread = You have unread messages
