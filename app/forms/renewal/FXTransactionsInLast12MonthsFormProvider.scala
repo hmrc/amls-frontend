@@ -29,6 +29,7 @@ class FXTransactionsInLast12MonthsFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[FXTransactionsInLast12Months] = Form(
     "fxTransaction" -> text("error.required.renewal.fx.transactions.in.12months")
+      .transform[String](format, format)
       .verifying(
         firstError(
           maxLength(length, invalidError),
@@ -37,4 +38,6 @@ class FXTransactionsInLast12MonthsFormProvider @Inject()() extends Mappings {
       )
       .transform[FXTransactionsInLast12Months](FXTransactionsInLast12Months.apply, _.fxTransaction)
   )
+
+  private def format(str: String): String = str.trim.replace(",", "")
 }
