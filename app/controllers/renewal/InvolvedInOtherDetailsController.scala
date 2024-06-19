@@ -41,10 +41,13 @@ class InvolvedInOtherDetailsController @Inject()(
                                                   renewalService: RenewalService,
                                                   errorHandler: AmlsErrorHandler) extends AmlsBaseController(commonPlayDeps, messagesComps) with Logging {
 
+
+
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
     renewalService.getRenewal(request.credId).map {
-      case Some(renewal) => Ok(view(formProvider().fill(renewal.involvedInOtherActivities.head.asInstanceOf[InvolvedInOtherYes]), edit))
-      case None => InternalServerError(errorHandler.internalServerErrorTemplate)
+      case Some(renewal) =>
+        renewal.involvedInOtherActivities.fold(internalServerError)(yes => Ok(view(formProvider().fill(yes.asInstanceOf[InvolvedInOtherYes]), edit)))
+      case None => internalServerError
     }
   }
 
@@ -62,8 +65,12 @@ class InvolvedInOtherDetailsController @Inject()(
       case Some(_) => Redirect(routes.BusinessTurnoverController.get(edit))
       case None => {
         logger.error(s"Unable to fetch business activities or other activities for $credId")
-        InternalServerError(errorHandler.internalServerErrorTemplate)
+        internalServerError
       }
     }
+  }
+
+  private def internalServerError(implicit request: Request[_]): Result = {
+    InternalServerError(errorHandler.internalServerErrorTemplate)
   }
 }
