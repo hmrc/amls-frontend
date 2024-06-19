@@ -1,6 +1,0 @@
- + [AMLS-5096] - 'Bug fix for aria described by whitespace'
- + [AMLS-5724] - 'Update numerc inputs in the service'
- + [AMLS-5728] - 'Changed color background on confirmation page'
- + [AMLS-5844] - 'Removed space from aria-described by field in date component'
- + [AMLS-5840] - 'Removed duplicate screen reader text on button'
- + [AMLS-5880] - 'Personalised error message removal/change'

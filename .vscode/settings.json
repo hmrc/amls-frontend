@@ -1,8 +1,0 @@
-{
-    "search.exclude": {
-        "**/.ensime_cache": true,
-        "./project/project": true,
-        "./project/target": true,
-        "**/target": true
-    }
-}

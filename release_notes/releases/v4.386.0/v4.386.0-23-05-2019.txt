@@ -1,3 +1,0 @@
- + [AMLS-4943] - 'Improve error messages for Payments flow'
- + [AMLS-5003] - 'Change the 'Continue' button to say Start your renewal'
- + [AMLS-5025] - 'Revert - AMLS-4957 - Renewal Fix'

@@ -1,4 +1,0 @@
- + [AMLS-4628] - 'Added visually hidden label to "When did X's name change?" form'
- + [AMLS-4670] - 'Trading premises content changes'
- + [AMLS-4715] - 'EAB Content Changes'
- + [AMLS-4752] - 'Fix for change officer flow bug, removed FurtherUpdates controller, associated view, models and tests. User is now redirected from NewOfficerController to RegistrationProgress page.'

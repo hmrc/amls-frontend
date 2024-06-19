@@ -1,7 +1,0 @@
- + [AMLS-4272] - 'Supervision section page split'
- + [AMLS-4603] - 'Bug fix: Flow does not break on Which professional body are you member of? anymore' + [AMLS-4716] - 'Content updates on Declaration and Submission pages'
- + [AMLS-4733] - 'Removed showFees toggle'
-+ [AMLS-4754] - 'Fixed removal of countries and validation of multiple countries. Removed "Add another country", instead, pages display all country fields by default.' + [AMLS-4757] - 'Change Return to application progress link and button to Return to about your business'
- + [AMLS-4758] - 'Correct error messages for confirm email and remove full stop'
- + [AMLS-4759] - 'Fixed legend on "Where did you send the most transactions in the last 12 months?"' + [AMLS-4770] - 'Fix Voice Over - VO not working as it should on Remove pages'
- + [AMLS-4796] - 'Bug fix: supervision section summary page breaks when user is navigating back through the section'

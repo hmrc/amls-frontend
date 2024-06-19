@@ -1,8 +1,0 @@
- + [AMLS-5808] - 'Business details CYA changes (VAT No)'
- + [AMLS-5809] - 'CYA rework'
- + [AMLS-5810] - 'Fixes for CYA format'
- + [AMLS-5811] - 'Trading premises CYA updates'
- + [AMLS-5815] - 'Supervision CYA changes'
- + [AMLS-5820] - - 'Responsible people CYA changes'
- + [AMLS-5877] - 'WYN content changes'
- + [AMLS-5919] - 'Fix - Renewals HVD Percentage Turnover always sent to DES as 0%-20%'
