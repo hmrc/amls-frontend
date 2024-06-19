@@ -16,91 +16,37 @@
 
 package forms.renewal
 
-import forms.behaviours.BooleanFieldBehaviours
-import forms.mappings.Constraints
-import models.renewal.{InvolvedInOther, InvolvedInOtherNo, InvolvedInOtherYes}
+import forms.behaviours.FieldBehaviours
 import play.api.data.{Form, FormError}
 
-class InvolvedInOtherFormProviderSpec extends BooleanFieldBehaviours[InvolvedInOther] with Constraints {
+class InvolvedInOtherFormProviderSpec extends FieldBehaviours {
 
   val formProvider: InvolvedInOtherFormProvider = new InvolvedInOtherFormProvider()
 
-  override val form: Form[InvolvedInOther] = formProvider()
-  override val fieldName: String = "involvedInOther"
-  override val errorMessage: String = "error.required.renewal.ba.involved.in.other"
-
-  val inputFieldName: String = "details"
+  val form: Form[Boolean] = formProvider()
+  val fieldName: String = "involvedInOther"
+  val errorMessage: String = "error.required.renewal.ba.involved.in.other"
 
   "form" must {
-
     "bind" when {
-
       "'No' is submitted" in {
-
         val boundForm = form.bind(Map(fieldName -> "false"))
-
-        boundForm.value shouldBe Some(InvolvedInOtherNo)
+        boundForm.value shouldBe Some(false)
         boundForm.errors shouldBe Nil
       }
 
-      "'Yes' is submitted and details are given" in {
-
-        forAll(stringsShorterThan(formProvider.length).suchThat(_.nonEmpty)) { details =>
-
-          val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> details))
-
-          boundForm.value shouldBe Some(InvolvedInOtherYes(details))
-          boundForm.errors shouldBe Nil
-        }
+      "'Yes' is submitted" in {
+        val boundForm = form.bind(Map(fieldName -> "true"))
+        boundForm.value shouldBe Some(true)
+        boundForm.errors shouldBe Nil
       }
     }
 
-    "fail to bind and give the correct error" when {
-
-      "an empty value is submitted" in {
-
+    "not bind" when {
+      "nothing is submitted" in {
         val boundForm = form.bind(Map(fieldName -> ""))
-
-        boundForm.errors.headOption shouldBe Some(FormError(fieldName, errorMessage))
-      }
-
-      "an invalid value is submitted" in {
-
-        forAll(stringsLongerThan(1)) { invalidFormValue =>
-          val boundForm = form.bind(Map(fieldName -> invalidFormValue))
-
-          boundForm.errors.headOption shouldBe Some(FormError(fieldName, errorMessage))
-        }
-      }
-
-      "'Yes' is submitted without details" in {
-
-        val boundForm = form.bind(Map(fieldName -> "true"))
-
-        boundForm.errors.headOption shouldBe Some(FormError(inputFieldName, "error.required.renewal.ba.involved.in.other.text"))
-      }
-
-      "'Yes' is submitted with details" which {
-        "is too long" in {
-
-          forAll(stringsLongerThan(formProvider.length + 1)) { longDetails =>
-            val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> longDetails))
-            boundForm.errors.headOption shouldBe Some(
-              FormError(inputFieldName, "error.invalid.maxlength.255.renewal.ba.involved.in.other", Seq(formProvider.length))
-            )
-          }
-        }
-
-        "is invalid" in {
-          forAll(stringsShorterThan(formProvider.length - 1), invalidCharForNames) { (details, char) =>
-            val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> s"${details.dropRight(1)}$char"))
-            boundForm.errors.headOption shouldBe Some(
-              FormError(inputFieldName, "error.text.validation.renewal.ba.involved.in.other", Seq(basicPunctuationRegex))
-            )
-          }
-        }
+        boundForm.errors.head shouldBe FormError(fieldName, "error.required.renewal.ba.involved.in.other")
       }
     }
   }
 }
-

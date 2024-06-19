@@ -6,6 +6,9 @@ GET         /what-you-need                                                    @c
 GET         /other-activities                                                 @controllers.renewal.InvolvedInOtherController.get(edit: Boolean ?= false)
 POST        /other-activities                                                 @controllers.renewal.InvolvedInOtherController.post(edit: Boolean ?= false)
 
+GET         /other-activities-details                                         @controllers.renewal.InvolvedInOtherDetailsController.get(edit: Boolean ?= false)
+POST        /other-activities-details                                         @controllers.renewal.InvolvedInOtherDetailsController.post(edit: Boolean ?= false)
+
 GET         /net-profit-last-12-months                                        @controllers.renewal.BusinessTurnoverController.get(edit: Boolean ?= false)
 POST        /net-profit-last-12-months                                        @controllers.renewal.BusinessTurnoverController.post(edit: Boolean ?= false)
 

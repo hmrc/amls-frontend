@@ -67,11 +67,9 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
     def formRequest(valid: Boolean) =
       FakeRequest(POST, routes.MostTransactionsController.post().url).withFormUrlEncodedBody(formData(valid))
 
-    when(mockRenewalService.getRenewal(any())(any()))
-      .thenReturn(Future.successful(None))
+    when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
-    when(mockRenewalService.updateRenewal(any(), any())(any()))
-      .thenReturn(Future.successful(emptyCache))
+    when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(emptyCache))
 
     def post(edit: Boolean = false, valid: Boolean = true)(block: Future[Result] => Unit) =
       block(controller.post(edit)(formRequest(valid)))

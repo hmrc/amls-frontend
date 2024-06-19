@@ -52,18 +52,15 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec with Injecting 
       view = view
     )
 
-    when(mockRenewalService.getRenewal(any())(any()))
-      .thenReturn(Future.successful(None))
+    when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
-    when(mockRenewalService.updateRenewal(any(), any())(any()))
-      .thenReturn(Future.successful(Cache.empty))
+    when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(Cache.empty))
   }
 
   "CashPaymentsCustomersNotMet controller" when {
     "get is called" must {
       "load the page if business is receiving payments from customers not met in person" in new Fixture {
-          when(mockRenewalService.getRenewal(any())(any()))
-            .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
+          when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
 
           val result = controller.get()(request)
           status(result) mustEqual OK
@@ -74,8 +71,7 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec with Injecting 
         }
 
       "load the page if business is not receiving payments from customers not met in person" in new Fixture {
-        when(mockRenewalService.getRenewal(any())(any()))
-          .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(doNotreceiveCashPayments)))))
+        when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(doNotreceiveCashPayments)))))
 
         val result = controller.get()(request)
         status(result) mustEqual OK

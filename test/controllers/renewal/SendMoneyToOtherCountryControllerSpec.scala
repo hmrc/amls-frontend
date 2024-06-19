@@ -60,11 +60,11 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
     )
 
     when {
-      mockRenewalService.getRenewal(any())(any())
+      mockRenewalService.getRenewal(any())
     } thenReturn Future.successful(Renewal().some)
 
     when {
-      mockRenewalService.updateRenewal(any(),any())(any())
+      mockRenewalService.updateRenewal(any(),any())
     } thenReturn Future.successful(cacheMap)
 
     when {
@@ -92,7 +92,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
 
     "load the page 'Do you send money to other countries?' with pre populated data" in new Fixture {
       when {
-        mockRenewalService.getRenewal(any())(any())
+        mockRenewalService.getRenewal(any())
       } thenReturn Future.successful(Renewal(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))).some)
 
       val result = controller.get()(request)

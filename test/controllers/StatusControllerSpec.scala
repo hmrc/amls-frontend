@@ -514,8 +514,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
-        when(controller.renewalService.getRenewal(any[String]())(any()))
-          .thenReturn(Future.successful(None))
+        when(controller.renewalService.getRenewal(any[String]())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -548,8 +547,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
-        when(controller.renewalService.getRenewal(any[String]())(any()))
-          .thenReturn(Future.successful(Some(Renewal())))
+        when(controller.renewalService.getRenewal(any[String]())).thenReturn(Future.successful(Some(Renewal())))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -612,8 +610,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           hasChanged = true
         )
 
-        when(controller.renewalService.getRenewal(any[String]())(any()))
-          .thenReturn(Future.successful(Some(completeRenewal)))
+        when(controller.renewalService.getRenewal(any[String]())).thenReturn(Future.successful(Some(completeRenewal)))
 
         val result = controller.get()(request)
         status(result) must be(OK)

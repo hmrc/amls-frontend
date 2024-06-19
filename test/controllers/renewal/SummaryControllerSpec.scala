@@ -61,7 +61,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
     )
 
     when {
-      mockRenewalService.getTaskRow(any())(any(), any(), any())
+      mockRenewalService.getTaskRow(any())(any(), any())
     } thenReturn Future.successful(TaskRow("", "/foo", false, Completed, TaskRow.completedTag))
 
     val renewalModel = Renewal(

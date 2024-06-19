@@ -67,11 +67,9 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
     def formRequest(valid: Boolean) =
       FakeRequest(POST, routes.SendTheLargestAmountsOfMoneyController.post().url).withFormUrlEncodedBody(formData(valid))
 
-    when(mockRenewalService.getRenewal(any())(any()))
-      .thenReturn(Future.successful(None))
+    when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
-    when(mockRenewalService.updateRenewal(any(), any())(any()))
-      .thenReturn(Future.successful(emptyCache))
+    when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(emptyCache))
 
     def post(edit: Boolean = false, valid: Boolean = true)(block: Future[Result] => Unit) =
       block(controller.post(edit)(formRequest(valid)))
@@ -130,7 +128,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
           "CustomersOutsideUK is contains countries" when {
             "MostTransactions is None" in new FormSubmissionFixture {
 
-              when(mockRenewalService.getRenewal(any())(any()))
+              when(mockRenewalService.getRenewal(any()))
                 .thenReturn(Future.successful(Some(Renewal(
                   customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB","GB"))))),
                   mostTransactions = None

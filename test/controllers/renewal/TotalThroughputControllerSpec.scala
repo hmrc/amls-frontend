@@ -68,7 +68,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
     val cache = mock[Cache]
 
     when {
-      renewalService.updateRenewal(any(),any())(any())
+      renewalService.updateRenewal(any(),any())
     } thenReturn Future.successful(cache)
 
     when {
@@ -88,8 +88,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
   "The MSB throughput controller" must {
     "return the view with an empty form when no data exists yet" in new Fixture {
 
-      when(renewalService.getRenewal(any())(any()))
-        .thenReturn(Future.successful(None))
+      when(renewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
 
@@ -107,7 +106,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
 
     "return the view with prepopulated data" in new Fixture {
 
-      when(renewalService.getRenewal(any())(any()))
+      when(renewalService.getRenewal(any()))
         .thenReturn(Future.successful(Some(Renewal(totalThroughput = Some(TotalThroughput("01"))))))
 
       val result = controller.get()(request)
@@ -216,7 +215,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
       post() { result =>
         status(result) mustBe SEE_OTHER
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
-        verify(renewalService).updateRenewal(any(), captor.capture())(any())
+        verify(renewalService).updateRenewal(any(), captor.capture())
         captor.getValue.totalThroughput mustBe Some(TotalThroughput("01"))
       }
     }

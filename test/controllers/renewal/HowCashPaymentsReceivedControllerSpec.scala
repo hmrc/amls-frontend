@@ -51,18 +51,15 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec with Injecting {
       view = view
     )
 
-    when(mockRenewalService.getRenewal(any())(any()))
-      .thenReturn(Future.successful(None))
+    when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
-    when(mockRenewalService.updateRenewal(any(), any())(any()))
-      .thenReturn(Future.successful(Cache.empty))
+    when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(Cache.empty))
   }
 
   "HowCashPaymentsReceived controller" when {
     "get is called" must {
       "load the page if renewal data is found" in new Fixture {
-          when(mockRenewalService.getRenewal(any())(any()))
-            .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
+          when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
 
           val result = controller.get()(request)
           status(result) mustEqual OK

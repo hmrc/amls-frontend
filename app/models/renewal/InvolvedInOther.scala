@@ -18,15 +18,29 @@ package models.renewal
 
 import play.api.libs.json._
 
-sealed trait InvolvedInOther
+sealed trait InvolvedInOther {
+  def toBool: Boolean
+}
 
-case class InvolvedInOtherYes(details: String) extends InvolvedInOther
+case class InvolvedInOtherYes(details: String) extends InvolvedInOther {
+  override def toBool: Boolean = true
+}
 
-case object InvolvedInOtherNo extends InvolvedInOther
+case object InvolvedInOtherNo extends InvolvedInOther {
+  override def toBool: Boolean = false
+}
 
 object InvolvedInOther {
 
   val key = "renewal-involved-in-other"
+
+  def fromBool(bool: Boolean): InvolvedInOther = {
+    if (bool) {
+      InvolvedInOtherYes("")
+    } else {
+      InvolvedInOtherNo
+    }
+  }
 
   implicit val jsonReads: Reads[InvolvedInOther] =
     (__ \ "involvedInOther").read[Boolean] flatMap {

@@ -17,7 +17,6 @@
 package views.renewal
 
 import forms.renewal.InvolvedInOtherFormProvider
-import models.renewal.InvolvedInOtherNo
 import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
@@ -34,14 +33,14 @@ class InvolvedInOtherViewSpec extends AmlsViewSpec with Matchers {
   "InvolvedInOtherView" must {
     "have correct title" in new ViewFixture {
 
-      def view = involved_in_other(fp().fill(InvolvedInOtherNo), true, None)
+      def view = involved_in_other(fp().fill(false), true, None)
 
       doc.title must startWith(messages("renewal.involvedinother.title"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = involved_in_other(fp().fill(InvolvedInOtherNo), true, None)
+      def view = involved_in_other(fp().fill(false), true, None)
 
       heading.html must be(messages("renewal.involvedinother.title"))
       subHeading.html must include(messages("summary.renewal"))
@@ -50,7 +49,7 @@ class InvolvedInOtherViewSpec extends AmlsViewSpec with Matchers {
 
     "correctly list business activities" in new ViewFixture {
 
-      def view = involved_in_other(fp().fill(InvolvedInOtherNo), true, Some(List("test activities string")))
+      def view = involved_in_other(fp().fill(false), true, Some(List("test activities string")))
 
       html must include(messages("businessactivities.confirm-activities.subtitle_4"))
       html must include("test activities string")
@@ -62,14 +61,6 @@ class InvolvedInOtherViewSpec extends AmlsViewSpec with Matchers {
       ),
       "involvedInOther",
       "error.required.renewal.ba.involved.in.other"
-    )
-
-    behave like pageWithErrors(
-      involved_in_other(
-        fp().withError("details", "error.text.validation.renewal.ba.involved.in.other"), false, None
-      ),
-      "details",
-      "error.text.validation.renewal.ba.involved.in.other"
     )
 
     behave like pageWithBackLink(involved_in_other(fp(), false, None))

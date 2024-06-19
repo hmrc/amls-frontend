@@ -85,8 +85,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       when(controller.dataCacheConnector.fetch[Renewal](any(), any())
         (any())).thenReturn(Future.successful(None))
 
-      when(mockRenewalService.updateRenewal(any(), any())(any()))
-        .thenReturn(Future.successful(emptyCache))
+      when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -103,8 +102,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       when(controller.dataCacheConnector.fetch[Renewal](any(), any())
         (any())).thenReturn(Future.successful(None))
 
-      when(mockRenewalService.updateRenewal(any(), any())(any()))
-        .thenReturn(Future.successful(emptyCache))
+      when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -124,8 +122,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       when(controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))
         (any())).thenReturn(Future.successful(Some(incomingModel)))
 
-      when(mockRenewalService.updateRenewal(any(), any())(any()))
-        .thenReturn(Future.successful(emptyCache))
+      when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)

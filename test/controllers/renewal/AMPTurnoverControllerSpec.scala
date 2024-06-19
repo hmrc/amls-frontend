@@ -122,11 +122,9 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any())).thenReturn(Future.successful(None))
 
-          when(mockRenewalService.getRenewal(any())(any()))
-            .thenReturn(Future.successful(None))
+          when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
-          when(mockRenewalService.updateRenewal(any(), any())(any()))
-            .thenReturn(Future.successful(mockCacheMap))
+          when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           mockCacheFetch[BusinessMatching](Some(bMatching), Some(BusinessMatching.key))
 
@@ -148,10 +146,8 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any())).thenReturn(Future.successful(Some(bMatching)))
 
-          when(mockRenewalService.getRenewal(any())(any()))
-            .thenReturn(Future.successful(None))
-          when(mockRenewalService.updateRenewal(any(), any())(any()))
-            .thenReturn(Future.successful(mockCacheMap))
+          when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
+          when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
@@ -169,10 +165,8 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any())).thenReturn(Future.successful(Some(bMatching)))
 
-          when(mockRenewalService.getRenewal(any())(any()))
-            .thenReturn(Future.successful(None))
-          when(mockRenewalService.updateRenewal(any(), any())(any()))
-            .thenReturn(Future.successful(mockCacheMap))
+          when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
+          when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
@@ -190,10 +184,8 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any())).thenReturn(Future.successful(Some(bMatching)))
 
-          when(mockRenewalService.getRenewal(any())(any()))
-            .thenReturn(Future.successful(None))
-          when(mockRenewalService.updateRenewal(any(), any())(any()))
-            .thenReturn(Future.successful(mockCacheMap))
+          when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
+          when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)

@@ -17,12 +17,22 @@
 package forms.renewal
 
 import forms.mappings.Mappings
+import models.renewal.InvolvedInOtherYes
 import play.api.data.Form
 
 import javax.inject.Inject
 
-class InvolvedInOtherFormProvider @Inject()() extends Mappings {
+class InvolvedInOtherDetailsFormProvider @Inject()() extends Mappings {
 
-  private val error = "error.required.renewal.ba.involved.in.other"
-  def apply(): Form[Boolean] = Form[Boolean]("involvedInOther" -> boolean(error, error))
+  val detailsMaxLength = 255
+
+  def apply(): Form[InvolvedInOtherYes] = Form[InvolvedInOtherYes](
+    "details" -> text("error.required.renewal.ba.involved.in.other.text")
+      .verifying(
+        firstError(
+          maxLength(detailsMaxLength, "error.invalid.maxlength.255.renewal.ba.involved.in.other"),
+          regexp(basicPunctuationRegex, "error.text.validation.renewal.ba.involved.in.other")
+        )
+      ).transform[InvolvedInOtherYes](InvolvedInOtherYes.apply, _.details)
+  )
 }
