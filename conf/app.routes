@@ -33,7 +33,9 @@ GET         /subscribe/wrong-credential-type                                    
 GET         /subscribe/bad-request                                                    @controllers.SubmissionErrorController.badRequest()
 
 GET         /unauthorised                                                             @controllers.AmlsController.unauthorised
-GET         /unauthorised-role                                                        @controllers.AmlsController.unauthorised_role
+GET         /unauthorised/incorrect-role                                              @controllers.AmlsController.unauthorisedRole
+GET         /unauthorised/incorrect-auth-provider                                     @controllers.AmlsController.unauthorisedAuth
+GET         /unauthorised/incorrect-affinity-group                                    @controllers.AmlsController.unauthorisedAffinityGroup
 GET         /keep-alive                                                               @controllers.AmlsController.keep_alive
 
 GET         /registration-progress                                                    @controllers.RegistrationProgressController.get

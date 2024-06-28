@@ -716,7 +716,8 @@ button.amendment.payfee = Pay amendment fee
 button.logout = Log out
 button.finish = Finish
 button.send.feedback = Send feedback
-button.backtosignin = Back to sign in
+button.backToSignIn = Log in using an organisation account
+button.LogInWithHmrcDetails = Log in using HMRC online login details
 
 visuallyhidden.you.have.registered = You have registered
 visuallyhidden.the.details.for = the details for
@@ -813,12 +814,12 @@ link.print = Print this page
 
 ############################### Login Page ###############################
 amls.Login.title = AMLS
-unauthorised.title = You can’t access this service with this account
+unauthorised.title = Your login attempt was not successful
 unauthorised.text1 = To use this service you should sign in with an ’organisation’ account, but it looks like you’ve tried to use either an ’individual’ or ’agent’ account.
 unauthorised.text2 = If you don’t have an organisation account you can
 unauthorised.register.link.text = register for a new one.
-unauthorised.role.content.line1 = Your account does not have enough access rights to register.
-unauthorised.role.content.line2 = Contact your account administrator to change your access rights, or create a new organisation account.
+unauthorised.role.content.line = You’ve attempted to log in with an [dynamic content: agent/individual] account. To access the Anti-Money Laundering Supervision service, you must log in with an organisation account.
+unauthorised.auth.content.line = You can only access the Anti-Money Laundering Supervision service through your organisational HMRC online login details.
 
 ############################### Start Page ###############################
 start.title = Manage your anti-money laundering supervision

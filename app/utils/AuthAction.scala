@@ -54,10 +54,22 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
   private val ctKey         = "IR-CT"
 
   private lazy val unauthorisedUrl = URLEncoder.encode(
-    ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(applicationConfig).absoluteUrl, "utf-8"
+    ReturnLocation(controllers.routes.AmlsController.unauthorisedRole)(applicationConfig).absoluteUrl, "utf-8"
+  )
+
+  private lazy val unauthorisedAuthUrl = URLEncoder.encode(
+    ReturnLocation(controllers.routes.AmlsController.unauthorisedAuth)(applicationConfig).absoluteUrl, "utf-8"
+  )
+
+  private lazy val unauthorisedAffinityGroupUrl = URLEncoder.encode(
+    ReturnLocation(controllers.routes.AmlsController.unauthorisedAffinityGroup)(applicationConfig).absoluteUrl, "utf-8"
   )
 
   def unauthorised = s"${applicationConfig.logoutUrl}?continue=$unauthorisedUrl"
+
+  def unauthorisedAuth = s"${applicationConfig.logoutUrl}?continue=$unauthorisedAuthUrl"
+
+  def unauthorisedAffinityGroup = s"${applicationConfig.logoutUrl}?continue=$unauthorisedAffinityGroupUrl"
   def signout      = s"${applicationConfig.logoutUrl}"
 
   override final protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
@@ -108,10 +120,10 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
         Left(Redirect(Call("GET", unauthorised)))
       case uap: UnsupportedAuthProvider =>
         logger.debug("DefaultAuthAction:Refine - UnsupportedAuthProvider:" + uap)
-        Left(Redirect(Call("GET", unauthorised)))
+        Left(Redirect(Call("GET", unauthorisedAuth)))
       case uag: UnsupportedAffinityGroup =>
         logger.debug("DefaultAuthAction:Refine - UnsupportedAffinityGroup:" + uag)
-        Left(Redirect(Call("GET", unauthorised)))
+        Left(Redirect(Call("GET", unauthorisedAffinityGroup)))
       case ucr: UnsupportedCredentialRole =>
         logger.debug("DefaultAuthAction:Refine - UnsupportedCredentialRole:" + ucr)
         Left(Redirect(Call("GET", unauthorised)))

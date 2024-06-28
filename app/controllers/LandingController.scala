@@ -70,7 +70,7 @@ class LandingController @Inject()(val landingService: LandingService,
                                   start: Start,
                                   headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper with Logging with Constraints {
 
-  private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(appConfig).absoluteUrl, "utf-8")
+  private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorisedRole)(appConfig).absoluteUrl, "utf-8")
 
   implicit val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
 

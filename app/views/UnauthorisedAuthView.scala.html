@@ -18,19 +18,19 @@
 @import views.html.components.{Heading, Button}
 
 @this(
-    layout: Layout,
-    heading: Heading,
-    button: Button
+layout: Layout,
+heading: Heading,
+button: Button
 )
 
 @()(implicit request: Request[_], appConfig: ApplicationConfig, messages: Messages)
 
 @layout(messages("unauthorised.title"), showBackLink = false) {
 
-    @heading("unauthorised.title")
+@heading("unauthorised.title")
 
-    <p class="govuk-body">@messages("unauthorised.role.content.line")</p>
+<p class="govuk-body">@messages("unauthorised.affinityGroup.content.line")</p>
 
-    <!-- This should log you out and then take you back to the sign in page for Gov Gateway -->
-    @button("button.backToSignIn", hrefOpt = Some(appConfig.logoutUrl))
+<!-- This should log you out and then take you back to the sign in page for Gov Gateway -->
+@button("button.LogInWithHmrcDetails", hrefOpt = Some(appConfig.logoutUrl))
 }
