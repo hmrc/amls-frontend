@@ -64,14 +64,14 @@
                     </dt>
                     <dd id="incomplete-action-panel-@index" class="hmrc-add-to-a-list__change">
                         <a id="detail-edit-@index" class="govuk-link" href="@controllers.responsiblepeople.routes.PersonNameController.get(index + 1, false, None).url">
-                            <span aria-hidden="true">@messages("button.edit")</span>
+                            <span aria-label="Change">@messages("button.edit")</span>
                             <span hidden>@messages("button.edit") @rpDetail(rp)</span>
                         </a>
                     </dd>
 
                     <dd class="hmrc-add-to-a-list__remove">
                         <a id="detail-remove-@index" class="govuk-link" href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1).url">
-                            <span aria-hidden="true">@messages("button.remove")</span>
+                            <span aria-label="Remove">@messages("button.remove")</span>
                             <span hidden>@messages("button.remove") @rpDetail(rp)</span>
                         </a>
                     </dd>
@@ -95,13 +95,13 @@
                     </dt>
                     <dd id="incomplete-action-panel-@index" class="hmrc-add-to-a-list__change">
                         <a id="detail-edit-@index" class="govuk-link" href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1).url">
-                            <span aria-hidden="true">@messages("button.edit")</span>
+                            <span aria-label="Change">@messages("button.edit")</span>
                             <span class=hidden>@messages("button.edit") @rpDetail(rp)</span>
                         </a>
                     </dd>
                     <dd class="hmrc-add-to-a-list__remove">
                         <a id="detail-remove-@index" class="govuk-link" href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1).url">
-                            <span aria-hidden="true">@messages("button.remove")</span>
+                            <span aria-label="Remove">@messages("button.remove")</span>
                             <span hidden>@messages("button.remove") @rpDetail(rp)</span>
                         </a>
                     </dd>
