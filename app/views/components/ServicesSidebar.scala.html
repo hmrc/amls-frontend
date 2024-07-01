@@ -16,7 +16,9 @@
 
 @import config.ApplicationConfig
 
-@this()
+@this(
+govukSummaryList: GovukSummaryList,
+)
 
 @(canEditPreApplication: Boolean,
     displayLink: Boolean,
@@ -25,7 +27,6 @@
     hasCompleteNominatedOfficer: Boolean,
     nominatedOfficerName: Option[String])(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
-
 @gridClass = @{
     if(hasCompleteNominatedOfficer) {
         "govuk-grid-column-one-third"
@@ -33,41 +34,60 @@
         "govuk-grid-column-one-half"
     }
 }
-    <div class="govuk-grid-row">
 
-        <div class="@gridClass" id="your-business">
-            <h2 class="govuk-heading-s">@messages("status.business")</h2>
-            <p class="govuk-body">
-                @Html(businessName)
-            </p>
-        </div>
+@businessNameRow = @{
+    SummaryListRow(
+        Key(Text(messages("status.business"))),
+        Value(Text(businessName))
+    )
+}
 
-        <div class="@gridClass" id="your-services">
-            <h2 class="govuk-heading-s">@messages("status.deregister.services")</h2>
-            @if(serviceNames.length == 1) {
-                <p class="govuk-body">@Html(serviceNames.head)</p>
-            } else {
-                <ul class="govuk-list govuk-list--bullet">
-                    @serviceNames.map(name => Html("<li>" + name + "</li>"))
-                </ul>
-            }
-
+@servicesRowValue = {
+    @if(serviceNames.length == 1) {
+            <p class="govuk-body">@serviceNames.head</p>
+    } else {
+            <ul class="govuk-list govuk-list--bullet">
+                @serviceNames.map { name =>
+                    <li>@name</li>
+                }
+              </ul>
+    }
             @if(displayLink) {
-                <p class="govuk-body sidebar-top-spacing">
-                    <a id="view-details" href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp govuk-link">
-                        @(if(canEditPreApplication) messages("progress.preapplication.canedit") else messages("progress.preapplication.readonly"))
-                    </a>
-                </p>
+              <p class="govuk-body govuk-!-margin-top-4">
+                <a id="view-details" href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp govuk-link">
+                  @(if(canEditPreApplication) messages("progress.preapplication.canedit") else messages("progress.preapplication.readonly"))
+                </a>
+              </p>
             }
-        </div>
+}
 
-        @(hasCompleteNominatedOfficer, nominatedOfficerName) match {
-            case (true, Some(name)) => {
-                <div id="nominated-officer" class="@gridClass">
-                    <h2 class="govuk-heading-s">@messages("changeofficer.changelink.heading")</h2>
-                    <p class="govuk-body">@name</p>
-                </div>
-            }
-            case _ => {}
-        }
-    </div>
+@servicesRow = @{
+  SummaryListRow(
+    Key(Text(messages("status.deregister.services"))),
+        Value(
+            HtmlContent(servicesRowValue)))
+}
+
+@nominatedOfficerRow = @{
+    (hasCompleteNominatedOfficer, nominatedOfficerName) match {
+        case (true, Some(name)) =>
+            Some(SummaryListRow(
+                Key(Text(messages("changeofficer.changelink.heading"))),
+                Value(
+                    HtmlContent(
+                        Html(
+                            s"""<p class="govuk-body">$name</p>"""
+                        )
+                    )
+                )
+            ))
+        case _ => None
+    }
+}
+
+@govukSummaryList(SummaryList(
+    rows = Seq(Some(businessNameRow), nominatedOfficerRow, Some(servicesRow)).flatten,
+    classes = "govuk-summary-list govuk-summary-list--no-border"
+    ))
+
+
