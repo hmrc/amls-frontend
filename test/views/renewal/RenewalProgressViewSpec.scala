@@ -63,7 +63,7 @@ class RenewalProgressViewSpec extends AmlsViewSpec with Matchers {
     "show the business name and services" in new ViewFixture {
       override def view = renewal_progress(TaskList(Seq.empty), businessName, serviceNames, false, true, readyForRenewal)
 
-      val element = doc.getElementById("your-services")
+      val element = doc.getElementsByClass("govuk-summary-list__row").get(1)
       serviceNames.foreach(name => element.text() must include {
         name
       })
@@ -140,7 +140,7 @@ class RenewalProgressViewSpec extends AmlsViewSpec with Matchers {
         hasCompleteNominatedOfficer = true,
         nominatedOfficerName = Some(officerName))
 
-      val element = doc.getElementById("nominated-officer").text()
+      val element = doc.getElementsByClass("govuk-summary-list__row").get(1).text()
 
       element must include("Nominated officer")
       element must include(officerName)

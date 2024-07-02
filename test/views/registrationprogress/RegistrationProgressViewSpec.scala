@@ -54,13 +54,13 @@ class RegistrationProgressViewSpec extends AmlsViewSpec with MockitoSugar with A
         messages("title.amls") + " - " + messages("title.gov"))
       heading.html must be(messages("progress.title"))
 
-      doc.getElementById("your-business").text() must include("Your business")
+      doc.getElementsByClass("govuk-summary-list__key").get(0).text() must include("Your business")
     }
 
     "show the business name and services" in new ViewFixture {
       def view = registration_progress(taskList, true, businessName, serviceNames, true)
 
-      val elementText = doc.getElementById("your-services").text()
+      val elementText = doc.getElementsByClass("govuk-summary-list__row").get(1).text()
       serviceNames.foreach(elementText must include(_))
     }
 
@@ -84,7 +84,7 @@ class RegistrationProgressViewSpec extends AmlsViewSpec with MockitoSugar with A
         hasCompleteNominatedOfficer = true,
         nominatedOfficerName = Some(officerName))
 
-      val element = doc.getElementById("nominated-officer").text()
+      val element = doc.getElementsByClass("govuk-summary-list__row").get(1).text()
 
       element must include("Nominated officer")
       element must include(officerName)
