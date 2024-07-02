@@ -54,24 +54,13 @@ class ExpectedAMLSTurnoverController @Inject()(val authAction: AuthAction,
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       service.getBusinessMatching(request.credId) flatMap { bm =>
-        getFormWithErrorMessage(bm).bindFromRequest().fold(
+        formProvider().bindFromRequest().fold(
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, edit, bm, bm.alphabeticalBusinessActivitiesLowerCase()))),
           data =>
             service.updateBusinessActivities(request.credId, data).map(_ => redirectLogic(edit))
         )
       }
-  }
-
-  private def getFormWithErrorMessage(bm: BusinessMatching)(implicit hc: HeaderCarrier): Form[ExpectedAMLSTurnover] = {
-    bm.activities match {
-      case Some(value) if value.hasOnlyOneBusinessActivity =>
-        formProvider(messages(
-          "error.required.ba.turnover.from.mlr.single",
-          value.businessActivities.head.getMessage(usePhrasedMessage = true)
-        ))
-      case _ => formProvider()
-    }
   }
 
   private def redirectLogic(edit: Boolean): Result = {

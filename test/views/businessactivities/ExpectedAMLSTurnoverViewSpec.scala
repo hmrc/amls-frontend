@@ -35,7 +35,7 @@ class ExpectedAMLSTurnoverViewSpec extends AmlsViewSpec with Matchers {
     implicit val requestWithToken = addTokenForView()
   }
 
-  "expected_amls_turnover view" must {
+  "ExpectedAMLSTurnoverView" must {
     "have correct title" in new ViewFixture {
 
       def view = turnover(formProvider(), true, None, None)
@@ -43,22 +43,12 @@ class ExpectedAMLSTurnoverViewSpec extends AmlsViewSpec with Matchers {
       doc.title must startWith(messages("businessactivities.turnover.title") + " - " + messages("summary.businessactivities"))
     }
 
-    "have correct heading when one service is selected" in new ViewFixture {
+    "have correct heading when one or more services are selected" in new ViewFixture {
 
       def view = turnover(formProvider(), true, None, Some(List("accountancy service provider")))
 
-      heading.html must be(messages("businessactivities.turnover.heading", "accountancy service provider"))
+      heading.html must be(messages("businessactivities.turnover.heading"))
       subHeading.html must include(messages("summary.businessactivities"))
-
-    }
-
-    "have correct heading when multiple services are selected" in new ViewFixture {
-
-      def view = turnover(formProvider(), true, None, Some(List("accountancy service provider", "estate agency business")))
-
-      heading.html must be(messages("businessactivities.turnover.heading.multiple"))
-      subHeading.html must include(messages("summary.businessactivities"))
-
     }
 
     behave like pageWithErrors(

@@ -36,24 +36,13 @@
 
 @supportingContent = {
     @businessMatching.alphabeticalBusinessActivitiesLowerCase(false).map { types =>
-        @if(types.size > 1) {
+
             <p class="govuk-body">@messages("businessactivities.confirm-activities.subtitle")</p>
             <ul class="govuk-list govuk-list--bullet">
                 @types.map { businessType =>
                     <li>@businessType</li>
                 }
             </ul>
-        }
-    }
-}
-
-@headingText = @{
-businessTypes.map { types =>
-    if(types.size > 1) {
-            messages("businessactivities.turnover.heading.multiple")
-        } else {
-            messages("businessactivities.turnover.heading", types.head)
-        }
     }
 }
 
@@ -75,12 +64,22 @@ businessTypes.map { types =>
 
         @subtitle("summary.businessactivities")
 
-        @heading(headingText.getOrElse(messages("businessactivities.turnover.heading.multiple")))
+        @heading(messages("businessactivities.turnover.heading"))
 
         @supportingContent
 
         @inputRadio(
-            Radios(items = radioItems).withFormField(form("expectedAMLSTurnover"))
+            Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                    content = Text(messages("businessactivities.turnover.heading.fieldset")),
+                    classes = "govuk-fieldset__legend--m",
+                    isPageHeading = false
+                    ))
+                )),
+                name = "expectedAMLSTurnover",
+                items = radioItems
+            ).withFormField(form("expectedAMLSTurnover"))
         )
 
         @button()
