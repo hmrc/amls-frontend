@@ -51,10 +51,20 @@
 
         @subtitle("summary.businessactivities")
 
-        @heading(messages("businessactivities.business-turnover.title"))
+
 
         @inputRadio(
-            Radios(items = radioItems).withFormField(form("expectedBusinessTurnover"))
+            Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("businessactivities.business-turnover.title")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
+                name = "expectedBusinessTurnover",
+                items = radioItems
+            ).withFormField(form("expectedBusinessTurnover"))
         )
 
         @button()
