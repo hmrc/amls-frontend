@@ -40,15 +40,18 @@
 
     @subtitle("summary.businessmatching")
 
-    @heading("businessmatching.confirm.postcode.title")
-
     @formHelper(controllers.businessmatching.routes.ConfirmPostCodeController.post()) {
 
         @inputText(
             Input(
                 id = "postCode",
                 name = "postCode",
-                classes = "govuk-!-width-one-quarter"
+                classes = "govuk-!-width-one-quarter",
+                label = Label(
+                    isPageHeading = true,
+                    content = Text(messages("businessmatching.confirm.postcode.title")),
+                    classes = "govuk-label--xl"
+                )
             ),
             form("postCode")
         )
