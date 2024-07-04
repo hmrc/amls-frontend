@@ -45,7 +45,7 @@ class RemoveResponsiblePersonController @Inject()(val dataCacheConnector: DataCa
         rp <- getData[ResponsiblePerson](request.credId, index)
         status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
       } yield rp match {
-        case Some(person) if (person.lineId.isDefined && !person.isComplete) =>
+        case Some(person) if person.lineId.isDefined && !person.isComplete =>
           Redirect(routes.WhatYouNeedController.get(index, flow))
         case Some(person) if person.personName.isDefined =>
           Ok(view(
@@ -63,7 +63,7 @@ class RemoveResponsiblePersonController @Inject()(val dataCacheConnector: DataCa
     implicit request =>
 
       def removeWithoutDate(): Future[Result] = removeDataStrict[ResponsiblePerson](request.credId, index) map { _ =>
-        Redirect(routes.YourResponsiblePeopleController.get)
+        Redirect(routes.YourResponsiblePeopleController.get())
       }
 
       statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap { status =>
@@ -74,13 +74,13 @@ class RemoveResponsiblePersonController @Inject()(val dataCacheConnector: DataCa
             case (SubmissionReadyForReview, None) => removeWithoutDate()
             case (SubmissionReadyForReview, Some(person)) if person.lineId.isDefined =>
               updateDataStrict[ResponsiblePerson](request.credId, index)(_.copy(status = Some(StatusConstants.Deleted), hasChanged = true)).map { _ =>
-                Redirect(routes.YourResponsiblePeopleController.get)
+                Redirect(routes.YourResponsiblePeopleController.get())
               }
             case (_, Some(person)) if person.lineId.isEmpty => removeWithoutDate()
             case (_, Some(person)) =>
               val name = person.personName.fold("")(_.titleName)
               formProvider().bindFromRequest().fold(
-                formWithErrors => Future.successful(BadRequest(view(formWithErrors, index, name, true, flow))),
+                formWithErrors => Future.successful(BadRequest(view(formWithErrors, index, name, showDateField = true, flow))),
                 data => {
                   val startDate = person.positions.flatMap(_.startDate.map(_.startDate))
                   data match {
@@ -90,10 +90,10 @@ class RemoveResponsiblePersonController @Inject()(val dataCacheConnector: DataCa
                         formProvider().withError(
                           "endDate", messages("error.expected.rp.date.after.start", name, startDate.fold("")(strtDte => strtDte.format(ofPattern("dd-MM-yyyy"))))
                         )
-                      Future.successful(BadRequest(view(formWithFutureError, index, name, true, flow)))
+                      Future.successful(BadRequest(view(formWithFutureError, index, name, showDateField = true, flow)))
                     case Right(value) => updateDataStrict[ResponsiblePerson](request.credId, index) {
                       _.copy(status = Some(StatusConstants.Deleted), endDate = Some(value), hasChanged = true)
-                    }.map(_ => Redirect(routes.YourResponsiblePeopleController.get))
+                    }.map(_ => Redirect(routes.YourResponsiblePeopleController.get()))
                   }
                 }
               )

@@ -19,12 +19,12 @@ package controllers.responsiblepeople.address
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.address.NewHomeAddressDateOfChangeFormProvider
-import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.{NewHomeDateOfChange, ResponsiblePerson}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.NewHomeDateOfChangeView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -72,7 +72,7 @@ class NewHomeAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
       }
   }
 
-  private def getPersonName(credId: String, index: Int)(implicit request: Request[AnyContent]): Future[String] = {
+  private def getPersonName(credId: String, index: Int): Future[String] = {
     getData[ResponsiblePerson](credId, index) map { x =>
       val personName = ControllerHelper.rpTitleName(x)
       personName

@@ -60,7 +60,7 @@ class PenaltyDetailsController @Inject()(
             supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
             _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key,
               supervision.professionalBody(data))
-          } yield Redirect(routes.SummaryController.get)
+          } yield Redirect(routes.SummaryController.get())
       )
   }
 }

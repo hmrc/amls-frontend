@@ -71,7 +71,7 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
   }
 
   private def invalidView(f: Form[DateOfChange], index: Integer, edit: Boolean)
-                                             (implicit request: Request[AnyContent]) = {
+                         (implicit request: Request[AnyContent]): Future[Result] = {
     Future.successful(BadRequest(
       view(
         f,
@@ -81,8 +81,7 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
     ))
   }
 
-  private def validFormView(credId: String, index: Int, date: DateOfChange, edit: Boolean)
-                           (implicit request: Request[AnyContent]): Future[Result] = {
+  private def validFormView(credId: String, index: Int, date: DateOfChange, edit: Boolean): Future[Result] = {
     doUpdate(credId, index, date).map { cache: Cache =>
       if (cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)) {
         Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
@@ -92,7 +91,7 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
     }
   }
 
-  private def doUpdate(credId: String, index: Int, date: DateOfChange)(implicit request: Request[AnyContent]) =
+  private def doUpdate(credId: String, index: Int, date: DateOfChange): Future[Cache] =
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
       (for {
         addressHist <- res.addressHistory

@@ -70,7 +70,7 @@ object Supervision {
   def taskRow(implicit cache: Cache, messages: Messages): TaskRow = {
     val notStarted = TaskRow(
       key,
-      controllers.supervision.routes.WhatYouNeedController.get.url,
+      controllers.supervision.routes.WhatYouNeedController.get().url,
       hasChanged = false,
       NotStarted,
       TaskRow.notStartedTag
@@ -79,14 +79,14 @@ object Supervision {
     cache.getEntry[Supervision](key).fold(notStarted) {
       case m if m.isComplete && m.hasChanged => TaskRow(
         key,
-        controllers.supervision.routes.SummaryController.get.url,
+        controllers.supervision.routes.SummaryController.get().url,
         hasChanged = true,
         status = Updated,
         tag = TaskRow.updatedTag
       )
       case model @ m if m.isComplete => TaskRow(
         key,
-        controllers.supervision.routes.SummaryController.get.url,
+        controllers.supervision.routes.SummaryController.get().url,
         model.hasChanged,
         Completed,
         TaskRow.completedTag
@@ -94,7 +94,7 @@ object Supervision {
       case m if m.isEmpty => notStarted
       case model => TaskRow(
         key,
-        controllers.supervision.routes.WhatYouNeedController.get.url,
+        controllers.supervision.routes.WhatYouNeedController.get().url,
         model.hasChanged,
         Started,
         TaskRow.incompleteTag

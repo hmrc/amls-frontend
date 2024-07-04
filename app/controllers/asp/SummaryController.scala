@@ -41,7 +41,7 @@ class SummaryController @Inject()(val dataCache: DataCacheConnector,
         case Some(data) =>
           Ok(view(data))
         case _ =>
-          Redirect(controllers.routes.RegistrationProgressController.get)
+          Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 
@@ -50,6 +50,6 @@ class SummaryController @Inject()(val dataCache: DataCacheConnector,
       for {
         asp <- dataCache.fetch[Asp](request.credId, Asp.key)
         _ <- dataCache.save[Asp](request.credId, Asp.key, asp.copy(hasAccepted = true))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get)
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())
   }
 }

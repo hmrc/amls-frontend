@@ -80,7 +80,7 @@ POST        /remove/:index/                                        @controllers.
 GET         /country-of-birth/:index/                              @controllers.responsiblepeople.CountryOfBirthController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /country-of-birth/:index/                              @controllers.responsiblepeople.CountryOfBirthController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /your-responsible-people                               @controllers.responsiblepeople.YourResponsiblePeopleController.get
+GET         /your-responsible-people                               @controllers.responsiblepeople.YourResponsiblePeopleController.get()
 
 GET         /address-country/:index/                               @controllers.responsiblepeople.address.CurrentAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /address-country/:index/                               @controllers.responsiblepeople.address.CurrentAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)

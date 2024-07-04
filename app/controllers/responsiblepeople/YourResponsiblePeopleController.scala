@@ -33,7 +33,7 @@ class YourResponsiblePeopleController @Inject()(authAction: AuthAction,
     implicit request =>
       yourResponsiblePeopleService.completeAndIncompleteRP(request.credId) map {
         case Some((completeRP, incompleteRP)) => Ok(view(completeRP, incompleteRP))
-        case None => Redirect(controllers.routes.RegistrationProgressController.get)
+        case None => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 }

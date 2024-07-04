@@ -44,7 +44,7 @@ class BankAccountNameController @Inject()(
     implicit request =>
       request.request.session.get("itemIndex") match {
         case Some(idx) => Future.successful(Redirect(controllers.bankdetails.routes.BankAccountNameController.getIndex(idx.toInt)))
-        case _ => handleGet(None, false, request.amlsRefNumber, request.accountTypeId, request.credId)
+        case _ => handleGet(None, edit = false, request.amlsRefNumber, request.accountTypeId, request.credId)
       }
   }
 
@@ -82,7 +82,7 @@ class BankAccountNameController @Inject()(
   }
 
   private def handlePost(credId: String, index: Option[Int] = None, edit: Boolean = false)
-                        (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
+                        (implicit request: Request[AnyContent]): Future[Result] = {
     formProvider().bindFromRequest().fold(
       formWithErrors =>
         Future.successful(BadRequest(view(formWithErrors, edit, index))),

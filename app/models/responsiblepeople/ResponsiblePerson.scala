@@ -267,7 +267,7 @@ object ResponsiblePerson {
             _.isComplete
           } => TaskRow(
             messageKey,
-            controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url,
+            controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url,
             anyChanged(rp),
             Updated,
             TaskRow.updatedTag
@@ -276,7 +276,7 @@ object ResponsiblePerson {
             _.isComplete
           } => TaskRow(
             messageKey,
-            controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url,
+            controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url,
             anyChanged(rp),
             Completed,
             TaskRow.completedTag
@@ -288,7 +288,7 @@ object ResponsiblePerson {
             }
             TaskRow(
               messageKey,
-              controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url,
+              controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url,
               anyChanged(rp),
               Started,
               TaskRow.incompleteTag

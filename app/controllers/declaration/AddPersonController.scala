@@ -47,9 +47,9 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
     }
   }
 
-  def getWithAmendment(): Action[AnyContent] = get() //TODO this can be removed unless there is a GTM need for it
+  def getWithAmendment: Action[AnyContent] = get() //TODO this can be removed unless there is a GTM need for it
 
-  def post() = authAction.async {
+  def post(): Action[AnyContent] = authAction.async {
     implicit request => {
       formProvider().bindFromRequest().fold(
         formWithErrors =>
@@ -61,10 +61,10 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
           dataCacheConnector.save[AddPerson](request.credId, AddPerson.key, data) flatMap { _ =>
             statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
               case _ if isResponsiblePerson(data) => {
-                Redirect(routes.RegisterResponsiblePersonController.get)
+                Redirect(routes.RegisterResponsiblePersonController.get())
               }
               case SubmissionReadyForReview => Redirect(routes.DeclarationController.getWithAmendment())
-              case _ => Redirect(routes.DeclarationController.get)
+              case _ => Redirect(routes.DeclarationController.get())
             }
           }
       )

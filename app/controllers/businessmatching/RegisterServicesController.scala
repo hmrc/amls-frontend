@@ -189,9 +189,9 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
     Redirect(routes.MsbSubSectorsController.get())
     } else {
       if (includeCompanyNotRegistered){
-        Redirect(routes.CheckCompanyController.get)
+        Redirect(routes.CheckCompanyController.get())
       } else {
-        Redirect(routes.SummaryController.get)
+        Redirect(routes.SummaryController.get())
       }
   }
 
@@ -217,13 +217,12 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
   private def updateModel(credId: String,
                           businessMatching: BusinessMatching,
                           updatedBusinessActivities: BusinessMatchingActivities,
-                          isMsb: Boolean)(implicit hc: HeaderCarrier): Future[BusinessMatchingActivities] = {
+                          isMsb: Boolean): Future[BusinessMatchingActivities] = {
 
-    val updatedBusinessMatching = isMsb match {
-      case true =>
-        businessMatching.activities(updatedBusinessActivities)
-      case false =>
-        businessMatching.activities(updatedBusinessActivities).copy(msbServices = None)
+    val updatedBusinessMatching = if (isMsb) {
+      businessMatching.activities(updatedBusinessActivities)
+    } else {
+      businessMatching.activities(updatedBusinessActivities).copy(msbServices = None)
     }
 
     businessMatchingService.updateModel(credId, updatedBusinessMatching).value map { _ =>

@@ -42,7 +42,7 @@
 
     <p class="govuk-body">@messages("start.line.7")</p>
 
-    @button(msg = messages("start.button.text"), hrefOpt = Some(controllers.routes.LandingController.get.url), startButton = true)
+    @button(msg = messages("start.button.text"), hrefOpt = Some(controllers.routes.LandingController.get().url), startButton = true)
 
     <p class="govuk-heading-m">@messages("start.line.8")</p>
 

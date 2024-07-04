@@ -22,7 +22,8 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.address.TimeAtAddressFormProvider
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.cache.Cache
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.TimeAtAdditionalAddressView
 
@@ -52,7 +53,7 @@ class TimeAtAdditionalAddressController @Inject() (val dataCacheConnector: DataC
       }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       formProvider().bindFromRequest().fold(
         formWithErrors =>
@@ -80,7 +81,7 @@ class TimeAtAdditionalAddressController @Inject() (val dataCacheConnector: DataC
       }
   }
 
-  private def redirectTo(index: Int, edit: Boolean, flow: Option[String], data: TimeAtAddress) = {
+  private def redirectTo(index: Int, edit: Boolean, flow: Option[String], data: TimeAtAddress): Result = {
     data match {
       case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(index, edit, flow))
       case ThreeYearsPlus | OneToThreeYears if edit => Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))
@@ -88,7 +89,7 @@ class TimeAtAdditionalAddressController @Inject() (val dataCacheConnector: DataC
     }
   }
 
-  private def doUpdate(credId: String, index: Int, data: ResponsiblePersonAddress)(implicit request: Request[AnyContent]) = {
+  private def doUpdate(credId: String, index: Int, data: ResponsiblePersonAddress): Future[Cache] = {
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
       res.addressHistory(
         res.addressHistory match {

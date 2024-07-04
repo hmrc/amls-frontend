@@ -93,7 +93,7 @@ object Tcsp {
   def taskRow(implicit cache: Cache, messages: Messages): TaskRow = {
     val notStarted = TaskRow(
       key,
-      controllers.tcsp.routes.WhatYouNeedController.get.url,
+      controllers.tcsp.routes.WhatYouNeedController.get().url,
       hasChanged = false,
       NotStarted,
       TaskRow.notStartedTag
@@ -103,7 +103,7 @@ object Tcsp {
         if (model.isComplete && model.hasChanged) {
           TaskRow(
             key,
-            controllers.tcsp.routes.SummaryController.get.url,
+            controllers.tcsp.routes.SummaryController.get().url,
             hasChanged = true,
             status = Updated,
             tag = TaskRow.updatedTag
@@ -111,7 +111,7 @@ object Tcsp {
         } else if (model.isComplete) {
           TaskRow(
             key,
-            controllers.tcsp.routes.SummaryController.get.url,
+            controllers.tcsp.routes.SummaryController.get().url,
             model.hasChanged,
             Completed,
             TaskRow.completedTag
@@ -119,7 +119,7 @@ object Tcsp {
         } else {
           TaskRow(
             key,
-            controllers.tcsp.routes.WhatYouNeedController.get.url,
+            controllers.tcsp.routes.WhatYouNeedController.get().url,
             model.hasChanged,
             Started,
             TaskRow.incompleteTag

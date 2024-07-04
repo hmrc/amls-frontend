@@ -20,10 +20,11 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+
 import javax.inject.Inject
 import models.amp.Amp
 import play.api.libs.json._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ProxyCacheService
 import utils.AuthAction
 
@@ -33,7 +34,7 @@ class AmpController @Inject()(proxyCacheService: ProxyCacheService,
                               val ds: CommonPlayDependencies,
                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
-  def get(credId: String) = Action.async {
+  def get(credId: String): Action[AnyContent] = Action.async {
     implicit request => {
       proxyCacheService.getAmp(credId).map {
         _.map(Ok(_: JsValue)).getOrElse(NotFound)
@@ -41,7 +42,7 @@ class AmpController @Inject()(proxyCacheService: ProxyCacheService,
     }
   }
 
-  def set(credId: String) = Action.async(parse.json) {
+  def set(credId: String): Action[JsValue] = Action.async(parse.json) {
     implicit request => {
       proxyCacheService.setAmp(credId, request.body).map {
         _ => {
@@ -51,11 +52,11 @@ class AmpController @Inject()(proxyCacheService: ProxyCacheService,
     }
   }
 
-  def accept = authAction.async {
+  def accept: Action[AnyContent] = authAction.async {
     implicit request =>
       (for {
         amp <- OptionT(cacheConnector.fetch[Amp](request.credId, Amp.key))
         _ <- OptionT.liftF(cacheConnector.save[Amp](request.credId, Amp.key, amp.copy(hasAccepted = true)))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update AMP")
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update AMP")
   }
 }

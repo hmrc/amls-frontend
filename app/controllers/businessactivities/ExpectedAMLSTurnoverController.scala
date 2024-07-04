@@ -22,7 +22,6 @@ import forms.businessactivities.ExpectedAMLSTurnoverFormProvider
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.StatusService
 import services.businessactivities.ExpectedAMLSTurnoverService
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.businessactivities.ExpectedAMLSTurnoverView
 

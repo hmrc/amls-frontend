@@ -732,31 +732,31 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
     "have canOrCannotTradeInformation method which" must {
       "return correct content if no msb or tcsp in BA" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(noMsbNoTcsp)(request)
+        val result = controller.canOrCannotTradeInformation(noMsbNoTcsp)
 
         result.body must include("You can trade and carry out business activities while your application is pending")
       }
 
       "return correct content if msb only in BA" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(onlyMsb)(request)
+        val result = controller.canOrCannotTradeInformation(onlyMsb)
 
         result.body must include("You cannot trade or carry out business activities while your application is pending")
       }
 
       "return correct content if tcsp only in BA" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(onlyTcsp)(request)
+        val result = controller.canOrCannotTradeInformation(onlyTcsp)
 
         result.body must include("You cannot trade or carry out business activities while your application is pending")
       }
 
       "return correct content if tcsp and msb only in BA" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(msbAndTcspOnly)(request)
+        val result = controller.canOrCannotTradeInformation(msbAndTcspOnly)
 
         result.body must include("You cannot trade or carry out business activities while your application is pending")
       }
 
       "return correct content if msb and other in BA" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(msbAndOther)(request)
+        val result = controller.canOrCannotTradeInformation(msbAndOther)
 
         result.body must include("There are some services you cannot provide while your application is pending")
         result.body must include("https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register")
@@ -764,7 +764,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       }
 
       "return correct content if tcsp and other in BA" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(tcspAndOther)(request)
+        val result = controller.canOrCannotTradeInformation(tcspAndOther)
 
         result.body must include("There are some services you cannot provide while your application is pending")
         result.body must include("https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register")
@@ -772,7 +772,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       }
 
       "return correct content if tcsp, msb and other in BA" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(msbAndTcsp)(request)
+        val result = controller.canOrCannotTradeInformation(msbAndTcsp)
 
         result.body must include("There are some services you cannot provide while your application is pending")
         result.body must include("https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register")
@@ -780,7 +780,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       }
 
       "return default content if BA is empty" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(None)(request)
+        val result = controller.canOrCannotTradeInformation(None)
 
         result.body must include("https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register")
         result.body must include("Find out if you can trade")

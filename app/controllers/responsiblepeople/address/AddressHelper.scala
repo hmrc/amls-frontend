@@ -25,16 +25,15 @@ import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonth
 import models.responsiblepeople._
 import models.status.SubmissionStatus
 import models.{Country, DateOfChange, ViewResponse}
-
-import java.time.LocalDate
 import play.api.data.Form
-import play.api.i18n.{Lang, Messages}
-import play.api.mvc.{AnyContent, Request}
+import play.api.i18n.Messages
+import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{ControllerHelper, DateOfChangeHelper, RepeatingSection}
 
+import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -46,9 +45,8 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
                                                           ec: ExecutionContext,
                                                           auditConnector: AuditConnector,
                                                           messages: Messages,
-                                                          lang: Lang,
                                                           appConfig: ApplicationConfig,
-                                                          error: views.html.ErrorView) = {
+                                                          error: views.html.ErrorView):Future[Result] = {
 
     import play.api.mvc.Results._
 
@@ -76,7 +74,7 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
 
   private[address] def updateAdditionalExtraAddressAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
                                                               (implicit request: Request[AnyContent], hc: HeaderCarrier, ec: ExecutionContext,
-                                                               auditConnector: AuditConnector, messages: Messages, lang: Lang, appConfig: ApplicationConfig, error: views.html.ErrorView) = {
+                                                               auditConnector: AuditConnector, messages: Messages, appConfig: ApplicationConfig, error: views.html.ErrorView):Future[Result] = {
 
     import play.api.mvc.Results._
 
@@ -103,7 +101,7 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
 
   private[address] def updateCurrentAddressAndRedirect(credId: String, data: ResponsiblePersonCurrentAddress, index: Int, edit: Boolean,
                                                        flow: Option[String], originalResponsiblePerson: Option[ResponsiblePerson], status: SubmissionStatus)
-                                                      (implicit request: Request[AnyContent], hc: HeaderCarrier, ec: ExecutionContext, auditConnector: AuditConnector) = {
+                                                      (implicit request: Request[AnyContent], hc: HeaderCarrier, ec: ExecutionContext, auditConnector: AuditConnector):Future[Result] = {
     import play.api.mvc.Results._
 
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
@@ -212,7 +210,7 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
     currentAddress.fold[Option[ResponsiblePersonAddress]](None)(x => Some(ResponsiblePersonAddress(x.personAddress, x.timeAtAddress)))
   }
 
-  private[address] def getUpdatedAddrAndExtraAddr(rp: ResponsiblePerson, currentTimeAtAddress: Option[TimeAtAddress]) = {
+  private[address] def getUpdatedAddrAndExtraAddr(rp: ResponsiblePerson, currentTimeAtAddress: Option[TimeAtAddress]): (Option[ResponsiblePersonAddress], Option[ResponsiblePersonAddress]) = {
     currentTimeAtAddress match {
       case Some(ZeroToFiveMonths) | Some(SixToElevenMonths) => rp.addressHistory.fold[(Option[ResponsiblePersonAddress],
         Option[ResponsiblePersonAddress])]((None, None))(addrHistory => (pushCurrentAddress(addrHistory.currentAddress), addrHistory.additionalAddress))
@@ -220,7 +218,7 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
     }
   }
 
-  private[address] def convertToCurrentAddress(addr: NewHomeAddress, dateOfMove: Option[NewHomeDateOfChange], rp: ResponsiblePerson) = {
+  private[address] def convertToCurrentAddress(addr: NewHomeAddress, dateOfMove: Option[NewHomeDateOfChange], rp: ResponsiblePerson): ResponsiblePersonAddressHistory = {
     val currentTimeAtAddress = getTimeAtAddress(dateOfMove)
     val (additionalAddress, extraAdditionalAddress) = getUpdatedAddrAndExtraAddr(rp, currentTimeAtAddress)
 

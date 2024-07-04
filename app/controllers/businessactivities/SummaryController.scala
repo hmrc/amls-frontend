@@ -51,7 +51,7 @@ class SummaryController @Inject()(val dataCache: DataCacheConnector,
           } yield {
               val summaryList = cyaHelper.createSummaryList(businessActivity, needsAccountancyQuestions)
               Ok(view(summaryList))
-          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
+          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 
@@ -62,6 +62,6 @@ class SummaryController @Inject()(val dataCache: DataCacheConnector,
         _ <- OptionT.liftF(dataCache.save[BusinessActivities](request.credId, BusinessActivities.key,
           businessActivity.copy(hasAccepted = true))
         )
-      } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update HVD")
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update HVD")
   }
 }

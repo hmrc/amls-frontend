@@ -1,4 +1,4 @@
-GET         /what-you-need                             @controllers.tcsp.WhatYouNeedController.get
+GET         /what-you-need                             @controllers.tcsp.WhatYouNeedController.get()
 
 GET         /services                                  @controllers.tcsp.ProvidedServicesController.get(edit: Boolean ?= false)
 POST        /services                                  @controllers.tcsp.ProvidedServicesController.post(edit: Boolean ?= false)
@@ -18,5 +18,5 @@ POST        /another-trust-company-service-provider    @controllers.tcsp.Service
 GET         /provider-hmrc-supervision                 @controllers.tcsp.AnotherTCSPSupervisionController.get(edit: Boolean ?= false)
 POST        /provider-hmrc-supervision                 @controllers.tcsp.AnotherTCSPSupervisionController.post(edit: Boolean ?= false)
 
-GET         /check-your-answers                        @controllers.tcsp.SummaryController.get
+GET         /check-your-answers                        @controllers.tcsp.SummaryController.get()
 POST        /check-your-answers                        @controllers.tcsp.SummaryController.post()

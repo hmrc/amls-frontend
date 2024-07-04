@@ -49,9 +49,9 @@ class MsbSubSectorsPageRouterCompanyNotRegistered extends PageRouterCompanyNotRe
         routes.PSRNumberController.get(edit)
       case _ =>
         if(includeCompanyNotRegistered){
-          routes.CheckCompanyController.get
+          routes.CheckCompanyController.get()
         }else {
-          routes.SummaryController.get
+          routes.SummaryController.get()
         }
     }
 

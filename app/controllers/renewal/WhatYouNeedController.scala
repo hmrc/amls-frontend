@@ -60,7 +60,7 @@ class WhatYouNeedController @Inject()(
                  msbActivities: Option[BusinessMatchingMsbServices])(implicit request: Request[_]): Future[Result] = {
     renewalService.getTaskRow(credId) map {
       case TaskRow(_, _, _, NotStarted | Started, _) => Ok(view(ba, msbActivities))
-      case _ => Redirect(controllers.routes.RegistrationProgressController.get)
+      case _ => Redirect(controllers.routes.RegistrationProgressController.get())
     }
   }
 }

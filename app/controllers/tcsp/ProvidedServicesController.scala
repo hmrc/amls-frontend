@@ -58,7 +58,7 @@ class ProvidedServicesController @Inject() (val dataCacheConnector: DataCacheCon
             _ <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key, tcsp.providedServices(data)
             )
           } yield if (edit) {
-            Redirect(routes.SummaryController.get)
+            Redirect(routes.SummaryController.get())
           } else {
             Redirect(routes.ServicesOfAnotherTCSPController.get())
           }

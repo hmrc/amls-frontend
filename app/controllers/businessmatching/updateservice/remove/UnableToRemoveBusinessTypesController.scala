@@ -20,15 +20,13 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-
-import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.businessmatching.updateservice.remove.UnableToRemoveActivityView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -45,7 +43,7 @@ class UnableToRemoveBusinessTypesController @Inject()(authAction: AuthAction,
       } getOrElse (InternalServerError("Get: Unable to show Unable to Remove Activities page"))
   }
 
-  private def getBusinessActivity(credId: String)(implicit hc: HeaderCarrier, messages: Messages): OptionT[Future, String] = for {
+  private def getBusinessActivity(credId: String)(implicit messages: Messages): OptionT[Future, String] = for {
     model <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
     activities <- OptionT.fromOption[Future](model.alphabeticalBusinessActivitiesLowerCase(false))
   } yield activities.head

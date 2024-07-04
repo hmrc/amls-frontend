@@ -49,7 +49,7 @@ class SummaryController @Inject()(authAction: AuthAction,
             businessMatchingMsb <- businessMatching.msbServices
           } yield {
             Ok(view(cyaHelper.getSummaryList(msb, businessMatchingMsb)))
-          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
+          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 
@@ -59,7 +59,7 @@ class SummaryController @Inject()(authAction: AuthAction,
       for {
         model <- dataCache.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
         _ <- dataCache.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key, model.copy(hasAccepted = true))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get)
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())
   }
 
 }

@@ -70,7 +70,7 @@ class DetailedAnswersController @Inject () (
             businessMatching: BusinessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
           } yield {
             redirect(request.amlsRefNumber, request.accountTypeId, request.credId, cache, index, flow, businessMatching)
-          }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get))
+          }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
       } recoverWith {
         case _: NoSuchElementException =>
           logger.warn("[DetailedAnswersController][get] - Business activities list was empty, attempting to recover")
@@ -97,9 +97,9 @@ class DetailedAnswersController @Inject () (
             Ok(view(summaryList, index, showHide, personName, flow))
         }
       }
-      case Some(_) => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get))
+      case Some(_) => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get()))
       case _ => Future.successful(NotFound(notFoundView))
-    }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get))
+    }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
 
   def post(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction.async{
     implicit request =>
@@ -108,7 +108,7 @@ class DetailedAnswersController @Inject () (
       } flatMap { _ =>
         flow match {
           case Some(`flowFromDeclaration`) => redirectFromDeclarationFlow(request.amlsRefNumber, request.accountTypeId, request.credId)
-          case _ => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get))
+          case _ => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get()))
         }
       }
   }
@@ -118,7 +118,7 @@ class DetailedAnswersController @Inject () (
       businessmatching <- dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key)
     } yield businessmatching.map(_.msbOrTcsp)
 
-  private def redirectFromDeclarationFlow(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)(implicit hc: HeaderCarrier) =
+  private def redirectFromDeclarationFlow(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)(implicit hc: HeaderCarrier): Future[Result] =
     (for {
       model <- OptionT(fetchModel(credId))
       _ <- OptionT.liftF(dataCacheConnector.save(credId, ResponsiblePerson.key, model.filterEmpty.map(_.copy(hasAccepted = true))))
@@ -129,12 +129,12 @@ class DetailedAnswersController @Inject () (
       status <- OptionT.liftF(statusService.getStatus(amlsRegistrationNo, accountTypeId, credId))
     } yield businessType match {
       case Partnership if DeclarationHelper.numberOfPartners(model) < 2 =>
-        Redirect(controllers.declaration.routes.RegisterPartnersController.get)
+        Redirect(controllers.declaration.routes.RegisterPartnersController.get())
       case _ =>
         Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
     }) getOrElse InternalServerError("Cannot determine redirect")
 
-  private def fetchModel(credId: String) =
+  private def fetchModel(credId: String): Future[Option[Seq[ResponsiblePerson]]] =
     dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key)
 
 }

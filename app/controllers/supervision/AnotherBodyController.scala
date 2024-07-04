@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.supervision.AnotherBodyFormProvider
 import models.supervision.{AnotherBody, AnotherBodyNo, AnotherBodyYes, Supervision}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import utils.AuthAction
 import views.html.supervision.AnotherBodyView
 
@@ -75,7 +75,7 @@ class AnotherBodyController @Inject()(val dataCacheConnector: DataCacheConnector
     supervision.anotherBody(updatedAnotherBody).copy(hasAccepted = true)
   }
 
-  private def redirectTo(edit: Boolean, maybeSupervision: Option[Supervision]) = {
+  private def redirectTo(edit: Boolean, maybeSupervision: Option[Supervision]): Result = {
 
     import utils.ControllerHelper.{anotherBodyComplete, isAnotherBodyYes}
 
@@ -86,7 +86,7 @@ class AnotherBodyController @Inject()(val dataCacheConnector: DataCacheConnector
         supervision.isComplete match {
           case false if isAnotherBodyYes(anotherBody) => Redirect(routes.SupervisionStartController.get())
           case false => Redirect(routes.ProfessionalBodyMemberController.get())
-          case true => Redirect(routes.SummaryController.get)
+          case true => Redirect(routes.SummaryController.get())
         }
       }
       case _ => InternalServerError("Could not fetch the data")

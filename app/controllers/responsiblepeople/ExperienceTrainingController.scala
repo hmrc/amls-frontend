@@ -25,7 +25,6 @@ import models.responsiblepeople.ResponsiblePerson
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.businessmatching.RecoverActivitiesService
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.CharacterCountParser.cleanData
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.ExperienceTrainingView
@@ -88,7 +87,7 @@ class ExperienceTrainingController @Inject()(val dataCacheConnector: DataCacheCo
     }
 
 
-  private def businessMatchingData(credId: String)(implicit hc: HeaderCarrier): Future[BusinessMatching] = {
+  private def businessMatchingData(credId: String): Future[BusinessMatching] = {
     dataCacheConnector.fetchAll(credId) map {
       cache =>
         // $COVERAGE-OFF$
@@ -102,7 +101,7 @@ class ExperienceTrainingController @Inject()(val dataCacheConnector: DataCacheCo
   }
 
   private def getSingleService(bm: BusinessMatching): Option[String] = {
-    bm.prefixedAlphabeticalBusinessTypes(true) flatMap { types =>
+    bm.prefixedAlphabeticalBusinessTypes(estateAgent = true) flatMap { types =>
       if (types.size == 1) Some(types.head) else None
     }
   }

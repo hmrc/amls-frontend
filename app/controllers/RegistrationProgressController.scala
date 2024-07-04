@@ -123,7 +123,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
     }
   }
 
-  private def amendmentDeclarationAvailable(sections: Seq[TaskRow]) = {
+  private def amendmentDeclarationAvailable(sections: Seq[TaskRow]): Boolean = {
 
     sections.foldLeft((true, false)) { (acc, section) =>
 
@@ -137,8 +137,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
     }
   }
 
-  private def preApplicationComplete(cache: Cache, status: SubmissionStatus, amlsRegistrationNumber: Option[String])
-                                    (implicit hc: HeaderCarrier): Future[Option[Boolean]] = {
+  private def preApplicationComplete(cache: Cache, status: SubmissionStatus, amlsRegistrationNumber: Option[String]): Future[Option[Boolean]] = {
 
     val preAppStatus: SubmissionStatus => Boolean = s => Set(NotCompleted, SubmissionReady).contains(s)
 
@@ -157,13 +156,13 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
     }).getOrElse(Future.successful(None))
   }
 
-  private def getNewActivities(cacheId: String)(implicit hc: HeaderCarrier): OptionT[Future, Set[BusinessActivity]] =
+  private def getNewActivities(cacheId: String): OptionT[Future, Set[BusinessActivity]] =
     businessMatchingService.getAdditionalBusinessActivities(cacheId)
 
   def post(): Action[AnyContent] = authAction.async {
     implicit request =>
       DeclarationHelper.promptRenewal(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap {
-        case true => Future.successful(Redirect(controllers.declaration.routes.RenewRegistrationController.get))
+        case true => Future.successful(Redirect(controllers.declaration.routes.RenewRegistrationController.get()))
         case false => progressService.getSubmitRedirect(request.amlsRefNumber, request.accountTypeId, request.credId) map {
           case Some(url) => Redirect(url)
           case _ => InternalServerError("Could not get data for redirect")

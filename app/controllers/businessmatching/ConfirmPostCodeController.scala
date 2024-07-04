@@ -60,7 +60,7 @@ class ConfirmPostCodeController @Inject()(authAction: AuthAction,
             _ <- dataCacheConnector.save[BusinessMatching](request.credId, BusinessMatching.key,
               bm.copy(reviewDetails = updateReviewDetails(bm.reviewDetails, data)))
           } yield {
-            Redirect(routes.BusinessTypeController.get)
+            Redirect(routes.BusinessTypeController.get())
           }
       )
     }
