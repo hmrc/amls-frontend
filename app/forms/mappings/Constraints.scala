@@ -30,7 +30,7 @@ trait Constraints {
   protected val numbersOnlyRegex = "^[0-9]*$"
   protected val vrnRegex: String = "^[0-9]{9}$"
   protected val utrRegex: String = "^[0-9]{10}$"
-  protected val transactionsRegex: String = "^\\s*\\d+,*\\d+\\s*$"
+  protected val transactionsRegex: String = "^[0-9]{1,11}$"
   protected val postcodeRegex: String = "^[A-Za-z]{1,2}[0-9][0-9A-Za-z]?\\s?[0-9][A-Za-z]{2}$"
 
   protected def firstError[A](constraints: Constraint[A]*): Constraint[A] =
