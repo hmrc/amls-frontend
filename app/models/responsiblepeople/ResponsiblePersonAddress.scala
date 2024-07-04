@@ -16,12 +16,12 @@
 
 package models.responsiblepeople
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class ResponsiblePersonAddress(personAddress: PersonAddress,
                                     timeAtAddress: Option[TimeAtAddress])
 
 object ResponsiblePersonAddress {
-  implicit val format = Json.format[ResponsiblePersonAddress]
+  implicit val format: OFormat[ResponsiblePersonAddress] = Json.format[ResponsiblePersonAddress]
 }
 

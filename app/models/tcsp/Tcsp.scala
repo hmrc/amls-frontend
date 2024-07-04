@@ -130,25 +130,21 @@ object Tcsp {
 
   val key = "tcsp"
 
-  implicit val mongoKey = new MongoKey[Tcsp] {
-    override def apply(): String = "tcsp"
-  }
+  implicit val mongoKey: MongoKey[Tcsp] = () => "tcsp"
 
-  implicit val jsonWrites = Json.writes[Tcsp]
+  implicit val jsonWrites: OWrites[Tcsp] = Json.writes[Tcsp]
 
   def doesServicesOfAnotherTCSPReader: Reads[Option[Boolean]] = {
 
-    (__ \ "doesServicesOfAnotherTCSP").readNullable[Boolean] flatMap { d =>
-      d match {
-        case None => (__ \ "servicesOfAnotherTCSP").readNullable[ServicesOfAnotherTCSP] map { s =>
+    (__ \ "doesServicesOfAnotherTCSP").readNullable[Boolean] flatMap {
+      case d@None => (__ \ "servicesOfAnotherTCSP").readNullable[ServicesOfAnotherTCSP] map { s =>
 
-          (d, s) match {
-            case (None, None) => None
-            case _ => Some(s.isDefined)
-          }
+        (d, s) match {
+          case (None, None) => None
+          case _ => Some(s.isDefined)
         }
-        case p => constant(p)
       }
+      case p => constant(p)
     }
   }
 
@@ -188,6 +184,6 @@ object Tcsp {
   implicit def default(tcsp: Option[Tcsp]): Tcsp =
     tcsp.getOrElse(Tcsp())
 
-  implicit val formatOption = Reads.optionWithNull[Tcsp]
+  implicit val formatOption: Reads[Option[Tcsp]] = Reads.optionWithNull[Tcsp]
 
 }

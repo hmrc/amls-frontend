@@ -93,7 +93,7 @@ object TradingPremisesMsbService extends Enumerable.Implicits {
     case _ => JsError(play.api.libs.json.JsonValidationError("error.invalid"))
   }
 
-  implicit val writes = Writes[TradingPremisesMsbService] {
+  implicit val writes: Writes[TradingPremisesMsbService] = Writes[TradingPremisesMsbService] {
     case TransmittingMoney => JsString(TransmittingMoney.value)
     case CurrencyExchange => JsString(CurrencyExchange.value)
     case ChequeCashingNotScrapMetal => JsString(ChequeCashingNotScrapMetal.value)
@@ -115,7 +115,7 @@ object TradingPremisesMsbService extends Enumerable.Implicits {
 object TradingPremisesMsbServices {
 
   //TODO - come back to this
-  implicit val jsonWrites = new Writes[TradingPremisesMsbServices] {
+  implicit val jsonWrites: Writes[TradingPremisesMsbServices] = new Writes[TradingPremisesMsbServices] {
     def writes(s: TradingPremisesMsbServices): JsValue = {
       val values = s.services map Json.toJson[TradingPremisesMsbService]
 

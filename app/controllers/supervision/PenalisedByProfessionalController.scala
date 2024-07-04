@@ -19,10 +19,9 @@ package controllers.supervision
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.supervision.PenalisedByProfessionalFormProvider
-import models.supervision.{ProfessionalBody, ProfessionalBodyNo, ProfessionalBodyYes, Supervision}
+import models.supervision.{ProfessionalBodyYes, Supervision}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import utils.CharacterCountParser.cleanData
 import views.html.supervision.PenalisedByProfessionalView
 
 import javax.inject.Inject

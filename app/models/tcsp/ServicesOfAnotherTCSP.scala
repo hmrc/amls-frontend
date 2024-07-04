@@ -50,7 +50,7 @@ object ServicesOfAnotherTCSP {
       case false => Reads(__ => JsSuccess(ServicesOfAnotherTCSPNo))
     }
 
-  implicit val jsonWrites = Writes[ServicesOfAnotherTCSP] {
+  implicit val jsonWrites: Writes[ServicesOfAnotherTCSP] = Writes[ServicesOfAnotherTCSP] {
     case ServicesOfAnotherTCSPYes(value) => Json.obj(
           "servicesOfAnotherTCSP" -> true,
           "mlrRefNumber" -> value

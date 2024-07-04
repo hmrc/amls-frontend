@@ -16,10 +16,10 @@
 
 package models.tradingpremises
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class RegisteringAgentPremises(agentPremises: Boolean)
 
 object RegisteringAgentPremises {
-  implicit val formats = Json.format[RegisteringAgentPremises]
+  implicit val formats: OFormat[RegisteringAgentPremises] = Json.format[RegisteringAgentPremises]
 }

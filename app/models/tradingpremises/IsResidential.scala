@@ -16,10 +16,10 @@
 
 package models.tradingpremises
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class IsResidential (isResidential: Boolean)
 
 object IsResidential {
-  implicit val format =  Json.format[IsResidential]
+  implicit val format: OFormat[IsResidential] =  Json.format[IsResidential]
 }

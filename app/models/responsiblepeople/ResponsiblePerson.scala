@@ -400,7 +400,7 @@ object ResponsiblePerson {
     }
   }
 
-  implicit val formatOption = Reads.optionWithNull[Seq[ResponsiblePerson]]
+  implicit val formatOption: Reads[Option[Seq[ResponsiblePerson]]] = Reads.optionWithNull[Seq[ResponsiblePerson]]
 
   private def hasUkPassportNumber(rp: ResponsiblePerson): Boolean = rp.ukPassport match {
     case Some(UKPassportYes(_)) => true

@@ -16,10 +16,10 @@
 
 package models.responsiblepeople
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class MovedAddress(movedAddress: Boolean)
 
 object MovedAddress {
-  implicit val formats = Json.format[MovedAddress]
+  implicit val formats: OFormat[MovedAddress] = Json.format[MovedAddress]
 }

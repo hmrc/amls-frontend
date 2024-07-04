@@ -22,7 +22,7 @@ import controllers.CommonPlayDependencies
 import models.notifications.ContactType.{DeRegistrationEffectiveDateChange, MindedToReject, MindedToRevoke, NoLongerMindedToReject, NoLongerMindedToRevoke, RejectionReasons, RevocationReasons}
 import models.notifications.{ContactType, NotificationDetails, NotificationParams, NotificationRow}
 import models.status.{SubmissionDecisionRejected, SubmissionStatus}
-import play.api.i18n.{Lang, Messages, MessagesImpl, MessagesProvider}
+import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl, MessagesProvider}
 import play.api.mvc.Request
 import play.twirl.api.{Html, Template5}
 import uk.gov.hmrc.govukfrontend.views.Aliases.Table
@@ -38,12 +38,12 @@ class NotificationTemplateGenerator @Inject()(v1m0: V1M0, v2m0: V2M0, v3m0: V3M0
   type NotificationViewTemplate5 = Template5[NotificationParams, Request[_], Messages, Lang, ApplicationConfig, Html]
 
   implicit val lang: Lang = Lang.defaultLang
-  implicit val msgsApi = cpd.messagesApi
+  implicit val msgsApi: MessagesApi = cpd.messagesApi
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(lang, msgsApi)
   }
-  implicit val messages = messagesProvider.messages
-  implicit val appConfig = cpd.amlsConfig
+  implicit val messages: Messages = messagesProvider.messages
+  implicit val appConfig: ApplicationConfig = cpd.amlsConfig
 
   @VisibleForTesting val templateMsgVersionsToVersionedViews: Map[String, VersionedView] =
     Map("v1m0" -> v1m0, "v2m0" -> v2m0, "v3m0" -> v3m0, "v4m0" -> v4m0, "v5m0" -> v5m0, "v6m0" -> v6m0)

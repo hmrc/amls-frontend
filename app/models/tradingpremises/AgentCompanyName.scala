@@ -23,8 +23,6 @@ case class AgentCompanyName(agentCompanyName: String)
 
 object AgentCompanyName {
 
-  implicit val mongoKey = new MongoKey[AgentCompanyName] {
-    override def apply(): String = "agent-company-name"
-  }
-  implicit val format = Json.format[AgentCompanyName]
+  implicit val mongoKey: MongoKey[AgentCompanyName] = () => "agent-company-name"
+  implicit val format: OFormat[AgentCompanyName] = Json.format[AgentCompanyName]
 }

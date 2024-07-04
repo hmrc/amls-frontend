@@ -39,7 +39,7 @@ object Nationality {
     }
   }
 
-  implicit val jsonWrites = Writes[Nationality] {
+  implicit val jsonWrites: Writes[Nationality] = Writes[Nationality] {
     case British => Json.obj("nationality" -> "01")
     case OtherCountry(value) => Json.obj(
       "nationality" -> "02",

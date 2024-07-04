@@ -68,7 +68,7 @@ object BusinessStructure extends Enumerable.Implicits {
 
   import utils.MappingUtils.Implicits._
 
-  implicit val jsonReadsBusinessStructure = {
+  implicit val jsonReadsBusinessStructure: Reads[BusinessStructure] = {
     (__ \ "agentsBusinessStructure").read[String].flatMap[BusinessStructure] {
       case "01" => SoleProprietor
       case "02" => LimitedLiabilityPartnership
@@ -80,7 +80,7 @@ object BusinessStructure extends Enumerable.Implicits {
     }
   }
 
-  implicit val jsonWritesBusinessStructure = Writes[BusinessStructure] {
+  implicit val jsonWritesBusinessStructure: Writes[BusinessStructure] = Writes[BusinessStructure] {
     case SoleProprietor => Json.obj("agentsBusinessStructure" -> "01")
     case LimitedLiabilityPartnership => Json.obj("agentsBusinessStructure" -> "02")
     case Partnership => Json.obj("agentsBusinessStructure" -> "03")

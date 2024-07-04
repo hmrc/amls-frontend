@@ -16,7 +16,7 @@
 
 package models.responsiblepeople
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class ResponsiblePersonAddressHistory(currentAddress: Option[ResponsiblePersonCurrentAddress] = None,
                                            additionalAddress: Option[ResponsiblePersonAddress] = None,
@@ -38,9 +38,9 @@ case class ResponsiblePersonAddressHistory(currentAddress: Option[ResponsiblePer
 
 object ResponsiblePersonAddressHistory {
 
-  implicit val format = Json.format[ResponsiblePersonAddressHistory]
+  implicit val format: OFormat[ResponsiblePersonAddressHistory] = Json.format[ResponsiblePersonAddressHistory]
 
-  def default() = ResponsiblePersonCurrentAddress(PersonAddressUK("", None, None, None, ""), None)
+  def default(): ResponsiblePersonCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressUK("", None, None, None, ""), None)
 
   def isRPAddressInUK(address: Option[ResponsiblePersonAddress]): Boolean = {
     address match {

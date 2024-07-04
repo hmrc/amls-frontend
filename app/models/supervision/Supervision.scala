@@ -107,9 +107,7 @@ object Supervision {
 
   val key = "supervision"
 
-  implicit val mongoKey = new MongoKey[Supervision] {
-    override def apply(): String = "supervision"
-  }
+  implicit val mongoKey: MongoKey[Supervision] = () => "supervision"
 
   def professionalBodiesReader: Reads[Option[ProfessionalBodies]] =
     (__ \ "professionalBodies").readNullable[ProfessionalBodies] flatMap {
@@ -132,7 +130,7 @@ object Supervision {
 
   implicit val writes: Writes[Supervision] = Json.writes[Supervision]
 
-  implicit val formatOption = Reads.optionWithNull[Supervision]
+  implicit val formatOption: Reads[Option[Supervision]] = Reads.optionWithNull[Supervision]
 
   implicit def default(supervision: Option[Supervision]): Supervision =
     supervision.getOrElse(Supervision())

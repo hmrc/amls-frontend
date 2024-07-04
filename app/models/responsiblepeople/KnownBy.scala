@@ -22,7 +22,7 @@ case class KnownBy(
                     hasOtherNames: Option[Boolean] = None,
                     otherNames: Option[String]) {
 
-  val otherName = Seq(otherNames).flatten[String].mkString(" ")
+  val otherName: String = Seq(otherNames).flatten[String].mkString(" ")
 
 }
 
@@ -36,5 +36,5 @@ object KnownBy {
       (__ \ "otherNames").readNullable[String]
   }.apply(KnownBy.apply _)
 
-  implicit val jsonWrites = Json.writes[KnownBy]
+  implicit val jsonWrites: OWrites[KnownBy] = Json.writes[KnownBy]
 }

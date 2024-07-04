@@ -94,7 +94,7 @@ object ContactType {
       case _ => JsString("")
     }
 
-  implicit def pathBinder(implicit stringBinder:PathBindable[String]) = new PathBindable[ContactType] {
+  implicit def pathBinder(implicit stringBinder:PathBindable[String]): PathBindable[ContactType] = new PathBindable[ContactType] {
 
 
     override def bind(key: String, value: String): Either[String, ContactType] = {

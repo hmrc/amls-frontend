@@ -19,12 +19,12 @@ package utils
 import java.util.UUID
 
 trait AckRefGenerator {
-  def ackRef =
+  def ackRef: String =
     UUID.randomUUID().toString.replaceAll("-", "")
 }
 
 object AckRefGenerator {
-  implicit val instance = new AckRefGenerator {}
+  implicit val instance: AckRefGenerator = new AckRefGenerator {}
 
-  def apply() = instance.ackRef
+  def apply(): String = instance.ackRef
 }

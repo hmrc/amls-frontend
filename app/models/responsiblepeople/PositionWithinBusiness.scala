@@ -154,7 +154,7 @@ object PositionWithinBusiness extends Enumerable.Implicits {
     }
   }
 
-  private[responsiblepeople] implicit val jsonWrites = Writes[PositionWithinBusiness] {
+  private[responsiblepeople] implicit val jsonWrites: Writes[PositionWithinBusiness] = Writes[PositionWithinBusiness] {
     case BeneficialOwner => JsString("01")
     case Director => JsString("02")
     case InternalAccountant => JsString("03")

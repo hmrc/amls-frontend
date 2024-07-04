@@ -23,8 +23,8 @@ case class AgentPartnership(agentPartnership: String)
 
 object AgentPartnership {
 
-  implicit val mongoKey = new MongoKey[AgentPartnership] {
+  implicit val mongoKey: MongoKey[AgentPartnership] = new MongoKey[AgentPartnership] {
     override def apply(): String = "agent-partnership"
   }
-  implicit val format = Json.format[AgentPartnership]
+  implicit val format: OFormat[AgentPartnership] = Json.format[AgentPartnership]
 }

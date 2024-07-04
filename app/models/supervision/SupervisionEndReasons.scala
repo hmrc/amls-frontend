@@ -30,8 +30,8 @@ object SupervisionEndReasons {
     (__ \ "supervisionEndingReason").read[String].map(SupervisionEndReasons.apply) map identity[SupervisionEndReasons]
   }
 
-  implicit val jsonWrites = Writes[SupervisionEndReasons] {
-    case a: SupervisionEndReasons =>
+  implicit val jsonWrites: Writes[SupervisionEndReasons] = Writes[SupervisionEndReasons] {
+    a: SupervisionEndReasons =>
       Json.obj(
         "supervisionEndingReason" -> a.endingReason
       )

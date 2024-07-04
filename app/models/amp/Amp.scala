@@ -50,7 +50,7 @@ final case class Amp(data: JsObject = Json.obj(),
     Reads.optionNoError(Reads.at(path)).reads(data).getOrElse(None)
 
   private def valueAt(path: JsPath): String = {
-    get[JsValue](path).getOrElse(notPresent).toString().toLowerCase()
+    get[JsValue](path).getOrElse(notPresent).toString.toLowerCase()
   }
 
   private def isTypeOfParticipantComplete: Boolean = {

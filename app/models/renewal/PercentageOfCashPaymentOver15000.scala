@@ -56,7 +56,7 @@ object PercentageOfCashPaymentOver15000 extends Enumerable.Implicits {
     }
   }
 
-  implicit val jsonWrites = Writes[PercentageOfCashPaymentOver15000] {
+  implicit val jsonWrites: Writes[PercentageOfCashPaymentOver15000] = Writes[PercentageOfCashPaymentOver15000] {
     case First => Json.obj("percentage" -> "01")
     case Second => Json.obj("percentage" -> "02")
     case Third => Json.obj("percentage" -> "03")

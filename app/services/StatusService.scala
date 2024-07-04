@@ -22,13 +22,12 @@ import models.ReadStatusResponse
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, TaskRow, Updated}
 import models.status._
-
-import java.time.{Clock, LocalDate, ZoneOffset}
 import play.api.i18n.Messages
 import play.api.{Environment, Logging, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.ZoneOffset.UTC
+import java.time.{Clock, LocalDate}
 import scala.concurrent.{ExecutionContext, Future}
 
 class StatusService @Inject() (val amlsConnector: AmlsConnector,

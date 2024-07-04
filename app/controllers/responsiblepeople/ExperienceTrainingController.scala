@@ -17,7 +17,6 @@
 package controllers.responsiblepeople
 
 import com.google.inject.Inject
-import config.AmlsErrorHandler
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.ExperienceTrainingFormProvider
