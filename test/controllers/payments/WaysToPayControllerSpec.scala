@@ -167,7 +167,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
           )
 
           when {
-            controller.paymentsService.requestPaymentsUrl(any(), any(), any(), any(), any())(any(), any(), any())
+            controller.paymentsService.requestPaymentsUrl(any(), any(), any(), any(), any())(any(), any())
           } thenReturn Future.successful(NextUrl("/payments-next-url"))
 
           val result = controller.post()(postRequest)
@@ -179,7 +179,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
             eqTo(amlsRegistrationNumber),
             eqTo(safeId),
             any()
-          )(any(), any(), any())
+          )(any(), any())
 
           redirectLocation(result) mustBe Some("/payments-next-url")
         }

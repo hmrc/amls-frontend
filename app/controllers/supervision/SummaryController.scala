@@ -42,7 +42,7 @@ class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
         case Some(data@Supervision(Some(anotherBody), Some(_), _, Some(_), _, _)) if ControllerHelper.isAbComplete(anotherBody) =>
           Ok(view(cyaHelper.getSummaryList(data)))
         case _ =>
-          Redirect(controllers.routes.RegistrationProgressController.get)
+          Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 
@@ -50,6 +50,6 @@ class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
     implicit request => (for {
       supervision <- OptionT(dataCacheConnector.fetch[Supervision](request.credId, Supervision.key))
       _ <- OptionT.liftF(dataCacheConnector.save[Supervision](request.credId, Supervision.key, supervision.copy(hasAccepted = true)))
-    } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update supervision")
+    } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update supervision")
   }
 }

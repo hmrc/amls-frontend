@@ -71,7 +71,7 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
       rp <- OptionT(getData[ResponsiblePerson](credId, index))
       _ <- OptionT.liftF(auditPreviousAddressChange(data.personAddress, rp, edit)) orElse OptionT.some(Success)
       result <- OptionT.liftF(doUpdate())
-    } yield result) getOrElse NotFound(ControllerHelper.notFoundView(request, messages, lang, appConfig, error))
+    } yield result) getOrElse NotFound(ControllerHelper.notFoundView(request, messages, appConfig, error))
   }
 
   private[address] def updateAdditionalExtraAddressAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
@@ -98,7 +98,7 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
       rp <- OptionT(getData[ResponsiblePerson](credId, index))
       result <- OptionT.liftF(doUpdate())
       _ <- OptionT.liftF(auditPreviousExtraAddressChange(data.personAddress, rp, edit))
-    } yield result).getOrElse(NotFound(ControllerHelper.notFoundView(request, messages, lang, appConfig, error)))
+    } yield result).getOrElse(NotFound(ControllerHelper.notFoundView(request, messages, appConfig, error)))
   }
 
   private[address] def updateCurrentAddressAndRedirect(credId: String, data: ResponsiblePersonCurrentAddress, index: Int, edit: Boolean,

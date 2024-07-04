@@ -65,7 +65,7 @@ object DeclarationHelper {
     }
   }
 
-  private def routeWithoutNominatedOfficer(status: SubmissionStatus) = {
+  private def routeWithoutNominatedOfficer(status: SubmissionStatus): Call = {
     status match {
       case SubmissionReady | NotCompleted | SubmissionReadyForReview | ReadyForRenewal(_) =>
         declaration.routes.WhoIsTheBusinessNominatedOfficerController.get
@@ -108,7 +108,7 @@ object DeclarationHelper {
     }
   }
 
-  private def inRenewalWindow(status: SubmissionStatus)(implicit hc: HeaderCarrier): Future[Boolean] = {
+  private def inRenewalWindow(status: SubmissionStatus): Future[Boolean] = {
     status match {
       case ReadyForRenewal(_) => Future.successful(true)
       case _ => Future.successful(false)
@@ -116,7 +116,7 @@ object DeclarationHelper {
   }
 
   def renewalComplete(renewalService: RenewalService, credId: String)
-                             (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Boolean] = {
+                             (implicit ec: ExecutionContext): Future[Boolean] = {
     renewalService.getRenewal(credId) flatMap {
       case Some(renewal) =>
         renewalService.isRenewalComplete(renewal, credId)
@@ -125,7 +125,7 @@ object DeclarationHelper {
   }
 
   def sectionsComplete(cacheId: String, sectionsProvider: SectionsProvider)
-                      (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Boolean] = {
+                      (implicit ec: ExecutionContext, messages: Messages): Future[Boolean] = {
 
     sectionsProvider.taskRows(cacheId) map {
       _ forall { row =>
@@ -135,7 +135,7 @@ object DeclarationHelper {
   }
 
   def getSubheadingBasedOnStatus(credId: String, amlsRefNumber: Option[String], accountTypeId: (String, String), statusService: StatusService, renewalService: RenewalService)
-                                (implicit hc: HeaderCarrier ,ec: ExecutionContext, messages: Messages)= {
+                                (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): OptionT[Future, String] = {
     for {
       renewalComplete <- OptionT.liftF(DeclarationHelper.renewalComplete(renewalService, credId))
       status <- OptionT.liftF(statusService.getStatus(amlsRefNumber, accountTypeId, credId))

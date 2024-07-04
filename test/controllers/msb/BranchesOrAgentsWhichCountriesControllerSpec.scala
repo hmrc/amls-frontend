@@ -70,7 +70,7 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
 
     "show a prefilled form when store contains data" in new Fixture {
 
-      when(mockService.fetchBranchesOrAgents(any())(any())).thenReturn(Future.successful(Some(branchesOrAgentsAfter)))
+      when(mockService.fetchBranchesOrAgents(any())).thenReturn(Future.successful(Some(branchesOrAgentsAfter)))
 
       val result = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -100,7 +100,7 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
       .withFormUrlEncodedBody(
         "countries[0]" -> "GB"
       )
-      when(mockService.fetchAndSaveBranchesOrAgents(any(), any(), any())(any())).thenReturn(
+      when(mockService.fetchAndSaveBranchesOrAgents(any(), any(), any())).thenReturn(
         Future.successful(Redirect(routes.IdentifyLinkedTransactionsController.get()))
       )
 
@@ -117,7 +117,7 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
         "countries[0]" -> "GB"
       )
 
-      when(mockService.fetchAndSaveBranchesOrAgents(any(), any(), any())(any())).thenReturn(
+      when(mockService.fetchAndSaveBranchesOrAgents(any(), any(), any())).thenReturn(
         Future.successful(Redirect(routes.IdentifyLinkedTransactionsController.get()))
       )
 
@@ -134,7 +134,7 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
         "countries[0]" -> "GB"
       )
 
-      when(mockService.fetchAndSaveBranchesOrAgents(any(), any(), any())(any())).thenReturn(
+      when(mockService.fetchAndSaveBranchesOrAgents(any(), any(), any())).thenReturn(
         Future.successful(Redirect(routes.SummaryController.get))
       )
 

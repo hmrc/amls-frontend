@@ -60,7 +60,7 @@ class BusinessEmailAddressControllerSpec extends AmlsSpec with MockitoSugar with
 
       "load the page with the pre populated data" in new Fixture {
 
-        when(mockService.getEmailAddress(any())(any())).thenReturn(Future.successful(Some(email)))
+        when(mockService.getEmailAddress(any())).thenReturn(Future.successful(Some(email)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -69,7 +69,7 @@ class BusinessEmailAddressControllerSpec extends AmlsSpec with MockitoSugar with
 
       "load the page with no data" in new Fixture {
 
-        when(mockService.getEmailAddress(any())(any())).thenReturn(Future.successful(None))
+        when(mockService.getEmailAddress(any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -86,7 +86,7 @@ class BusinessEmailAddressControllerSpec extends AmlsSpec with MockitoSugar with
           "email" -> "test@test.com"
         )
 
-        when(mockService.updateEmailAddress(any(), any())(any())).thenReturn(Future.successful(Some(emptyCache)))
+        when(mockService.updateEmailAddress(any(), any())).thenReturn(Future.successful(Some(emptyCache)))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)

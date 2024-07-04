@@ -30,6 +30,6 @@ trait ServiceFlowMocks extends MockitoSugar {
 
   def mockIsNewActivityNewAuth(value: Boolean, activity: Option[BusinessActivity] = None) =
     activity map { a =>
-      when(mockServiceFlow.isNewActivity(any(), eqTo(a))(any(), any())) thenReturn Future.successful(value)
-    } getOrElse when(mockServiceFlow.isNewActivity(any(), any())(any(), any())) thenReturn Future.successful(value)
+      when(mockServiceFlow.isNewActivity(any(), eqTo(a))(any())) thenReturn Future.successful(value)
+    } getOrElse when(mockServiceFlow.isNewActivity(any(), any())(any())) thenReturn Future.successful(value)
 }

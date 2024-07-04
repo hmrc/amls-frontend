@@ -46,7 +46,7 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar wit
 
       "load the your answers page when section data is available" in new Fixture {
         val model = ResponsiblePerson(None, None)
-        when(mockService.completeAndIncompleteRP(any())(any())
+        when(mockService.completeAndIncompleteRP(any())
         ).thenReturn(Future.successful(Some((Seq.empty, Seq(model).zipWithIndex.reverse))))
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -58,7 +58,7 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar wit
         val rp1 = ResponsiblePerson(Some(PersonName("firstName1", Some("middleName"), "lastName1")))
         val rp2 = ResponsiblePerson(Some(PersonName("firstName2", None, "lastName2")))
 
-        when(mockService.completeAndIncompleteRP(any())(any())
+        when(mockService.completeAndIncompleteRP(any())
         ).thenReturn(Future.successful(Some((Seq(rp1).zipWithIndex, Seq(rp2).zipWithIndex))))
 
         val result = controller.get()(request)
@@ -76,7 +76,7 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar wit
         val rp1 = ResponsiblePerson(Some(PersonName("firstName1", Some("middleName"), "lastName1")))
         val rp2 = ResponsiblePerson(Some(PersonName("firstName2", None, "lastName2")))
 
-        when(mockService.completeAndIncompleteRP(any())(any())
+        when(mockService.completeAndIncompleteRP(any())
         ).thenReturn(Future.successful(Some((Seq(rp1).zipWithIndex, Seq(rp2).zipWithIndex))))
 
         val result = controller.get()(request)
@@ -89,7 +89,7 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar wit
       }
 
       "redirect to the main AMLS summary page when section data is unavailable" in new Fixture {
-        when(mockService.completeAndIncompleteRP(any())(any())
+        when(mockService.completeAndIncompleteRP(any())
         ).thenReturn(Future.successful(None))
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)

@@ -27,8 +27,9 @@ import models.responsiblepeople.ResponsiblePerson.filter
 import models.responsiblepeople.{NonUKResidence, ResponsiblePerson}
 import models.status._
 import models.supervision.{AnotherBody, AnotherBodyNo, AnotherBodyYes, Supervision}
-import play.api.i18n.{Lang, Messages}
+import play.api.i18n.Messages
 import play.api.mvc.Request
+import play.twirl.api.HtmlFormat
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import services.cache.Cache
@@ -166,7 +167,7 @@ object ControllerHelper {
 
   def rpTitleName(rp:Option[ResponsiblePerson]):String = rp.fold("")(_.personName.fold("")(_.titleName))
 
-  def notFoundView(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig, error: views.html.ErrorView) = {
+  def notFoundView(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig, error: views.html.ErrorView): HtmlFormat.Appendable = {
     error(Messages("error.not-found.title"),
       Messages("error.not-found.heading"),
       Messages("error.not-found.message"))
@@ -180,14 +181,14 @@ object ControllerHelper {
     case None => None
   }
 
-  def isAnotherBodyYes(abCompleteAndYes: Option[(Boolean, Boolean)]) = {
+  def isAnotherBodyYes(abCompleteAndYes: Option[(Boolean, Boolean)]): Boolean = {
     abCompleteAndYes match {
       case Some(yes) if yes._2=> true
       case _ => false
     }
   }
 
-  def isAnotherBodyComplete(abCompleteAndYes: Option[(Boolean, Boolean)]) = {
+  def isAnotherBodyComplete(abCompleteAndYes: Option[(Boolean, Boolean)]): Boolean = {
     abCompleteAndYes match {
       case Some(complete) if complete._1=> true
       case _ => false
@@ -200,7 +201,7 @@ object ControllerHelper {
     names <- whoIsYourAccountant.names
   } yield names.accountantsName).getOrElse("")
 
-  def supervisionComplete(cache: Cache) = cache.getEntry[Supervision](Supervision.key) match {
+  def supervisionComplete(cache: Cache): Boolean = cache.getEntry[Supervision](Supervision.key) match {
     case Some(supervision) => supervision.isComplete
     case _ => false
   }

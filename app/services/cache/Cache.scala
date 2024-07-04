@@ -70,21 +70,22 @@ case class Cache(id: String, data: Map[String, JsValue], lastUpdated: LocalDateT
     val rebuiltCache: Map[String, JsValue] = this.data.foldLeft(Map.empty[String, JsValue]) { (newCache, keyValue) =>
       val plainText: PlainText = decryptFn(keyValue._2.toString())
 
-      applyEncryption match {
-        case true => newCache + (keyValue._1 -> JsString(encryptFn(plainText).value))
-        case false => newCache + (keyValue._1 -> Json.parse(plainText.value))
+      if (applyEncryption) {
+        newCache + (keyValue._1 -> JsString(encryptFn(plainText).value))
+      } else {
+        newCache + (keyValue._1 -> Json.parse(plainText.value))
       }
     }
 
     Cache(this.id, rebuiltCache)
   }
 
-  def tryDecrypt[T](key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Try[Option[T]] = {
+  def tryDecrypt[T](key: String)(implicit reads: Reads[T]): Try[Option[T]] = {
     Try(getEntry(key))
   }
 
   def sanitiseDoubleDecrypt[T](key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Option[T] = {
-    tryDecrypt(key)(reads, c) match {
+    tryDecrypt(key)(reads) match {
       case Success(value) => value
       case Failure(_: Exception) => {
         val sensitiveDecrypter: Reads[SensitiveT[T]] = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)

@@ -57,7 +57,7 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
     "get is called" must {
       "display the how many employees page with an empty form" in new Fixture {
 
-        when(mockService.getEmployeeCount(any())(any()))
+        when(mockService.getEmployeeCount(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -70,7 +70,7 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "display the how many employees page with pre populated data" in new Fixture {
 
-        when(mockService.getEmployeeCount(any())(any()))
+        when(mockService.getEmployeeCount(any()))
           .thenReturn(Future.successful(Some("163")))
 
         val result = controller.get()(request)
@@ -100,7 +100,7 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
           "employeeCount" -> "456"
         )
 
-        when(mockService.updateEmployeeCount(any(), any())(any()))
+        when(mockService.updateEmployeeCount(any(), any()))
           .thenReturn(Future.successful(Some(emptyCache)))
 
         val result = controller.post(false)(newRequest)
@@ -115,7 +115,7 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
           "employeeCount" -> "54321"
         )
 
-        when(mockService.updateEmployeeCount(any(), any())(any()))
+        when(mockService.updateEmployeeCount(any(), any()))
           .thenReturn(Future.successful(Some(emptyCache)))
 
         val resultTrue = controller.post(true)(newRequest)

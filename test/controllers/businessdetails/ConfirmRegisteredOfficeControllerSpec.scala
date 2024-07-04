@@ -66,10 +66,10 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
     "Get Option:" must {
       "load register Office" in new Fixture {
 
-        when(mockService.hasRegisteredAddress(any())(any()))
+        when(mockService.hasRegisteredAddress(any()))
           .thenReturn(Future.successful(Some(false)))
 
-        when(mockService.getAddress(any())(any()))
+        when(mockService.getAddress(any()))
           .thenReturn(Future.successful(Some(address)))
 
         val result = controller.get()(request)
@@ -79,10 +79,10 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
 
       "load Registered office or main place of business when has registered address returns None" in new Fixture {
 
-        when(mockService.hasRegisteredAddress(any())(any()))
+        when(mockService.hasRegisteredAddress(any()))
           .thenReturn(Future.successful(None))
 
-        when(mockService.getAddress(any())(any()))
+        when(mockService.getAddress(any()))
           .thenReturn(Future.successful(Some(address)))
 
         val result = controller.get()(request)
@@ -92,10 +92,10 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
 
       "load Registered office or main place of business when Business Address from mongoCache returns None" in new Fixture {
 
-        when(mockService.hasRegisteredAddress(any())(any()))
+        when(mockService.hasRegisteredAddress(any()))
           .thenReturn(Future.successful(Some(false)))
 
-        when(mockService.getAddress(any())(any()))
+        when(mockService.getAddress(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -105,10 +105,10 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
 
       "load Registered office or main place of business when there is already a registered address in BusinessDetails" in new Fixture {
 
-        when(mockService.hasRegisteredAddress(any())(any()))
+        when(mockService.hasRegisteredAddress(any()))
           .thenReturn(Future.successful(Some(true)))
 
-        when(mockService.getAddress(any())(any()))
+        when(mockService.getAddress(any()))
           .thenReturn(Future.successful(Some(address)))
 
         val result = controller.get()(request)
@@ -123,14 +123,14 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
         )
 
-        when(mockService.updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(true)))(any()))
+        when(mockService.updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(true))))
           .thenReturn(Future.successful(Some(ukAddress)))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.BusinessEmailAddressController.get().url))
 
-        verify(mockService).updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(true)))(any())
+        verify(mockService).updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(true)))
       }
 
       "successfully redirect to the page on selection of Option 'No' [this is not registered address]" in new Fixture {
@@ -139,14 +139,14 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           "isRegOfficeOrMainPlaceOfBusiness" -> "false"
         )
 
-        when(mockService.updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(false)))(any()))
+        when(mockService.updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(false))))
           .thenReturn(Future.successful(Some(ukAddress)))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
 
-        verify(mockService).updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(false)))(any())
+        verify(mockService).updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(false)))
       }
 
       "successfully redirect to the page on selection of Option 'Yes' [this is registered address] update returns None" in new Fixture {
@@ -155,14 +155,14 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
         )
 
-        when(mockService.updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(true)))(any()))
+        when(mockService.updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(true))))
           .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
 
-        verify(mockService).updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(true)))(any())
+        verify(mockService).updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(true)))
       }
 
 
@@ -172,14 +172,14 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           "isRegOfficeOrMainPlaceOfBusiness" -> "foo"
         )
 
-        when(mockService.getAddress(any())(any()))
+        when(mockService.getAddress(any()))
           .thenReturn(Future.successful(Some(address)))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(messages("error.required.atb.confirm.office"))
 
-        verify(mockService, times(0)).updateRegisteredOfficeAddress(any(), any())(any())
+        verify(mockService, times(0)).updateRegisteredOfficeAddress(any(), any())
       }
 
       "on post with invalid data show error" in new Fixture {
@@ -187,14 +187,14 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           "isRegOfficeOrMainPlaceOfBusiness" -> ""
         )
 
-        when(mockService.getAddress(any())(any()))
+        when(mockService.getAddress(any()))
           .thenReturn(Future.successful(Some(address)))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(messages("err.summary"))
 
-        verify(mockService, times(0)).updateRegisteredOfficeAddress(any(), any())(any())
+        verify(mockService, times(0)).updateRegisteredOfficeAddress(any(), any())
       }
 
       "on post with invalid data must redirect if no address is found" in new Fixture {
@@ -202,13 +202,13 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           "isRegOfficeOrMainPlaceOfBusiness" -> ""
         )
 
-        when(mockService.getAddress(any())(any()))
+        when(mockService.getAddress(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)
         redirectLocation(result) mustBe Some(routes.RegisteredOfficeIsUKController.get().url)
 
-        verify(mockService, times(0)).updateRegisteredOfficeAddress(any(), any())(any())
+        verify(mockService, times(0)).updateRegisteredOfficeAddress(any(), any())
       }
     }
   }

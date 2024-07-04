@@ -149,7 +149,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
                   href = if (isPreSubmission) {
                     controllers.businessmatching.routes.RegisterServicesController.get().url
                   } else {
-                    controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get.url
+                    controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get().url
                   },
                   content = Text(messages("button.edit")),
                   attributes = Map("id" -> "businessactivities-edit")

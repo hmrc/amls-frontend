@@ -18,7 +18,6 @@ package services.responsiblepeople
 
 import connectors.DataCacheConnector
 import models.responsiblepeople.ResponsiblePerson
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.StatusConstants
 
 import javax.inject.{Inject, Singleton}
@@ -27,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class YourResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) {
 
-  def completeAndIncompleteRP(credId: String)(implicit hc: HeaderCarrier): Future[Option[(Seq[(ResponsiblePerson, Int)], Seq[(ResponsiblePerson, Int)])]] = {
+  def completeAndIncompleteRP(credId: String): Future[Option[(Seq[(ResponsiblePerson, Int)], Seq[(ResponsiblePerson, Int)])]] = {
     val completeIncompleteRp: Future[Option[Seq[(ResponsiblePerson, Int)]]] =
       dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key).map { optResponsiblePeople =>
         optResponsiblePeople.map { rp =>

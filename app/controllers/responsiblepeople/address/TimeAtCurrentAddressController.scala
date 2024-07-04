@@ -22,8 +22,9 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.address.TimeAtAddressFormProvider
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.StatusService
+import services.cache.Cache
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.TimeAtAddressView
 
@@ -87,8 +88,7 @@ class TimeAtCurrentAddressController @Inject() (val dataCacheConnector: DataCach
       }
   }
 
-  private def doUpdate(credId: String, index: Int, rp: ResponsiblePersonCurrentAddress)
-                      (implicit request: Request[AnyContent]) = {
+  private def doUpdate(credId: String, index: Int, rp: ResponsiblePersonCurrentAddress): Future[Cache] = {
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
       res.addressHistory(
         res.addressHistory match {
@@ -102,7 +102,7 @@ class TimeAtCurrentAddressController @Inject() (val dataCacheConnector: DataCach
 
   private def redirectTo(index: Int, timeAtAddress: TimeAtAddress,
                          edit: Boolean,
-                         flow: Option[String]) = {
+                         flow: Option[String]): Result = {
     timeAtAddress match {
       case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(index, edit, flow))
       case ThreeYearsPlus | OneToThreeYears if edit => Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))

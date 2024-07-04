@@ -33,7 +33,7 @@ class MsbSubSectorsPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
     val result = model.subSectors map {
       case sectors if sectors.contains(TransmittingMoney) =>
         routes.PSRNumberController.get(edit)
-      case _ => routes.SummaryController.get
+      case _ => routes.SummaryController.get()
     }
 
     result.fold(error(SubSectorsPageId))(Redirect)

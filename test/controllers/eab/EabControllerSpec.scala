@@ -190,7 +190,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val status = "Approved"
 
-      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(true))
+      when(mockServiceFlow.isNewActivity(any(), any())(any())).thenReturn(Future.successful(true))
 
       val result = controller.requireDateOfChange(credId, status)(postRequest)
 
@@ -207,7 +207,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val status = "Approved"
 
-      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
+      when(mockServiceFlow.isNewActivity(any(), any())(any())).thenReturn(Future.successful(false))
 
       when(mockCacheConnector.fetch[Eab](any(), any())(any())).thenReturn(
         Future.successful(Some(completeEabModel))
@@ -228,7 +228,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val status = "NotYetSubmitted"
 
-      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
+      when(mockServiceFlow.isNewActivity(any(), any())(any())).thenReturn(Future.successful(false))
 
       when(mockCacheConnector.fetch[Eab](any(), any())(any())).thenReturn(
         Future.successful(Some(updatedEabModel))
@@ -249,7 +249,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val status = "Approved"
 
-      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
+      when(mockServiceFlow.isNewActivity(any(), any())(any())).thenReturn(Future.successful(false))
 
       when(mockCacheConnector.fetch[Eab](any(), any())(any())).thenReturn(
         Future.successful(Some(updatedEabModel))
@@ -270,7 +270,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val status = "NotYetSubmitted"
 
-      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
+      when(mockServiceFlow.isNewActivity(any(), any())(any())).thenReturn(Future.successful(false))
 
       when(mockCacheConnector.fetch[Eab](any(), any())(any())).thenReturn(
         Future.successful(Some(noEabModel))

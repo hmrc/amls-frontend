@@ -77,8 +77,7 @@ class TimeAtAdditionalExtraAddressController @Inject() (val dataCacheConnector: 
       }
   }
 
-  private def updateAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
-                               (implicit request: Request[AnyContent]): Future[Result] = {
+  private def updateAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String]): Future[Result] = {
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
       res.addressHistory(
         res.addressHistory match {

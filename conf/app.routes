@@ -63,7 +63,7 @@ POST        /submit-application/who-is-registering/:id                          
 GET         /update-information/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.get
 GET         /update-information/who-is-registering-renewal                            @controllers.declaration.WhoIsRegisteringController.get
 
-GET         /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.get
+GET         /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.get()
 POST        /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.post()
 
 GET         /submit-application/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get
