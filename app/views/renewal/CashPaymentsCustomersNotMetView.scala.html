@@ -42,16 +42,29 @@
 
     @heading("renewal.receiving.title")
 
-    <p class="govuk-body">@messages("renewal.receiving.info.line1")</p>
-    <p class="govuk-body">@messages("renewal.receiving.info.line2")</p>
+    <p class="govuk-body">@messages("renewal.receiving.text.line1")</p>
+    <p class="govuk-body">@messages("renewal.receiving.text.line2")</p>
 
-    <ul class="govuk-list govuk-list--bullet">
-        <li>@messages("renewal.receiving.list.line1")</li>
-        <li>@messages("renewal.receiving.list.line2")</li>
-        <li>@messages("renewal.receiving.list.line3")</li>
-    </ul>
+    <details class="govuk-details">
+        <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          @messages("renewal.cash.payment.summary.details")
+        </span>
+        </summary>
+        <div class="govuk-details__text">
+            <p class="govuk-body">@messages("renewal.receiving.info.line1")</p>
+            <p class="govuk-body">@messages("renewal.receiving.info.line2")</p>
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>@messages("renewal.receiving.list.line1")</li>
+                    <li>@messages("renewal.receiving.list.line2")</li>
+                    <li>@messages("renewal.receiving.list.line3")</li>
+                </ul>
+        <div/>
+    </details>
 
-    <p class="govuk-body">@messages("renewal.receiving.text")</p>
+    <h2 class="govuk-heading-m">@messages("renewal.cash.payments.not.met")</h2>
+
+
 
     @formHelper(controllers.renewal.routes.CashPaymentsCustomersNotMetController.post(edit)) {
 
