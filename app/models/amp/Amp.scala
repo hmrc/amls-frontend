@@ -37,12 +37,12 @@ final case class Amp(data: JsObject = Json.obj(),
   def data(p: JsObject): Amp =
     this.copy(data = p, hasChanged = hasChanged || this.data != p, hasAccepted = hasAccepted && this.data == p)
 
-  val typeOfParticipant            = JsPath \ "typeOfParticipant"
-  val typeOfParticipantDetail      = JsPath \ "typeOfParticipantDetail"
-  val soldOverThreshold            = JsPath \ "soldOverThreshold"
-  val identifyLinkedTransactions   = JsPath \ "identifyLinkedTransactions"
-  val dateTransactionOverThreshold = JsPath \ "dateTransactionOverThreshold"
-  val percentageExpectedTurnover   = JsPath \ "percentageExpectedTurnover"
+  val typeOfParticipant: JsPath = JsPath \ "typeOfParticipant"
+  val typeOfParticipantDetail: JsPath = JsPath \ "typeOfParticipantDetail"
+  val soldOverThreshold: JsPath = JsPath \ "soldOverThreshold"
+  val identifyLinkedTransactions: JsPath = JsPath \ "identifyLinkedTransactions"
+  val dateTransactionOverThreshold: JsPath = JsPath \ "dateTransactionOverThreshold"
+  val percentageExpectedTurnover: JsPath = JsPath \ "percentageExpectedTurnover"
   val otherTypeOfParticipant       = "somethingelse"
   val notPresent                   = "null"
 
@@ -121,9 +121,7 @@ object Amp {
     }
   }
 
-  implicit val mongoKey: MongoKey[Amp] = new MongoKey[Amp] {
-    override def apply(): String = key
-  }
+  implicit val mongoKey: MongoKey[Amp] = () => key
 
   implicit lazy val reads: Reads[Amp] = {
 

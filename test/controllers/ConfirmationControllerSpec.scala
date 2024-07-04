@@ -268,7 +268,7 @@ class ConfirmationControllerSpec extends AmlsSpec
         setupStatus(RenewalSubmitted(None))
 
         when {
-          controller.confirmationService.isRenewalDefined(any[String]())(any(), any())
+          controller.confirmationService.isRenewalDefined(any[String]())(any())
         } thenReturn Future.successful(true)
 
         when {

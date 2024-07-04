@@ -72,10 +72,10 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
         "dateOfChange.year" -> "1990"
       )
 
-      when(mockService.getModelWithDate(any())(any()))
+      when(mockService.getModelWithDate(any()))
         .thenReturn(Future.successful((Asp(), Some(ActivityStartDate(LocalDate.of(1990, 2, 24))))))
 
-      when(mockService.updateAsp(any(), any(), any())(any()))
+      when(mockService.updateAsp(any(), any(), any()))
         .thenReturn(Future.successful(Some(Asp())))
 
       val result = controller.post()(newRequest)

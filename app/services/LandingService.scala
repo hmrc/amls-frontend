@@ -52,7 +52,7 @@ class LandingService @Inject()(val cacheConnector: DataCacheConnector,
 
   def cacheMap(credId: String): Future[Option[Cache]] = cacheConnector.fetchAll(credId)
 
-  def initialiseGetWithAmendments(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Cache]] = {
+  def initialiseGetWithAmendments(credId: String)(implicit ec: ExecutionContext): Future[Option[Cache]] = {
     cacheConnector.fetchAll(credId).map { optCacheMap =>
       if (optCacheMap.isDefined) {
         val cacheMap = optCacheMap.head
@@ -104,7 +104,7 @@ class LandingService @Inject()(val cacheConnector: DataCacheConnector,
   def writeEmptyBankDetails(bankDetailsSeq: Seq[BankDetails]): Seq[BankDetails] = {
     val empty = Seq.empty[BankDetails]
     bankDetailsSeq match {
-      case `empty` => Seq(BankDetails(None, None, None, false, true, None, true))
+      case `empty` => Seq(BankDetails(None, None, None, hasChanged = false, refreshedFromServer = true, None, hasAccepted = true))
       case _ =>
         bankDetailsSeq map {
           bank => bank.copy(hasAccepted = true)
@@ -182,43 +182,43 @@ class LandingService @Inject()(val cacheConnector: DataCacheConnector,
     cacheConnector.saveAll(cacheId, cachedRenewal)
   }
 
-  private def viewResponseSection(viewResponse: ViewResponse) = {
+  private def viewResponseSection(viewResponse: ViewResponse): Option[BusinessMatching] = {
     Some(businessMatchingSection(viewResponse.businessMatchingSection))
   }
 
-  private def eabSection(viewResponse: ViewResponse) = {
-    if(viewResponse.eabSection.isDefined) {
+  private def eabSection(viewResponse: ViewResponse): Option[Eab] = {
+    if (viewResponse.eabSection.isDefined) {
       viewResponse.eabSection.map(eab => eab.copy(hasAccepted = true))
     } else {
       None
     }
   }
 
-  private def aboutSection(viewResponse: ViewResponse) = {
+  private def aboutSection(viewResponse: ViewResponse): BusinessDetails = {
     viewResponse.businessDetailsSection.copy(hasAccepted = true)
   }
 
-  private def activitySection(viewResponse: ViewResponse) = {
+  private def activitySection(viewResponse: ViewResponse): Option[BusinessActivities] = {
     Some(viewResponse.businessActivitiesSection.copy(hasAccepted = true))
   }
 
-  private def tcspSection(viewResponse: ViewResponse) = {
-    if(viewResponse.tcspSection.tcspTypes.nonEmpty) {
+  private def tcspSection(viewResponse: ViewResponse): Option[Tcsp] = {
+    if (viewResponse.tcspSection.tcspTypes.nonEmpty) {
       Some(viewResponse.tcspSection.copy(hasAccepted = true))
     } else {
       None
     }
   }
 
-  private def aspSection(viewResponse: ViewResponse) = {
-    if(viewResponse.aspSection.services.nonEmpty) {
+  private def aspSection(viewResponse: ViewResponse): Option[Asp] = {
+    if (viewResponse.aspSection.services.nonEmpty) {
       Some(viewResponse.aspSection.copy(hasAccepted = true))
     } else {
       None
     }
   }
 
-  private def msbSection(viewResponse: ViewResponse) = {
+  private def msbSection(viewResponse: ViewResponse):Option[MoneyServiceBusiness] = {
     if(viewResponse.msbSection.throughput.nonEmpty) {
       Some(viewResponse.msbSection.copy(hasAccepted = true))
     } else {
@@ -226,19 +226,19 @@ class LandingService @Inject()(val cacheConnector: DataCacheConnector,
     }
   }
 
-  private def ampSection(viewResponse: ViewResponse) = {
+  private def ampSection(viewResponse: ViewResponse): Option[Amp] = {
     viewResponse.ampSection.map(amp => amp.copy(hasAccepted = true))
   }
 
-  private def hvdSection(viewResponse: ViewResponse) = {
-    if(viewResponse.hvdSection.products.nonEmpty) {
+  private def hvdSection(viewResponse: ViewResponse): Option[Hvd] = {
+    if (viewResponse.hvdSection.products.nonEmpty) {
       Some(viewResponse.hvdSection.copy(hasAccepted = true))
     } else {
       None
     }
   }
 
-  private def supervisionSection(viewResponse: ViewResponse) = {
+  private def supervisionSection(viewResponse: ViewResponse): Option[Supervision] = {
     Some(viewResponse.supervisionSection.copy(hasAccepted = true))
   }
 
@@ -309,7 +309,7 @@ class LandingService @Inject()(val cacheConnector: DataCacheConnector,
     }
   }
 
-  private def fixAddress(model: BusinessDetails) = (model.correspondenceAddress, model.altCorrespondenceAddress) match {
+  private def fixAddress(model: BusinessDetails): BusinessDetails = (model.correspondenceAddress, model.altCorrespondenceAddress) match {
     case (Some(_), None) => model.copy(altCorrespondenceAddress = Some(true), hasAccepted = true)
     case (None, None) => model.copy(altCorrespondenceAddress = Some(false), hasAccepted = true)
     case _ => model

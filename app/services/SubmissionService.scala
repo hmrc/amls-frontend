@@ -34,7 +34,6 @@ import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Conversions._
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePerson
-import models.responsiblepeople.ResponsiblePerson.FilterUtils
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
@@ -155,11 +154,11 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
   }
 
   private def saveResponse[T](credId: String, response: T, key: String, isRenewalAmendment: Boolean = false)
-                                    (implicit hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = {
+                             (implicit ex: ExecutionContext, fmt: Format[T]): Future[Cache] = {
 
-      for {
+    for {
       _ <- cacheConnector.save[T](credId, key, response)
-      c <- cacheConnector.save[SubmissionRequestStatus](credId, SubmissionRequestStatus.key, SubmissionRequestStatus(true, Some(isRenewalAmendment)))
+      c <- cacheConnector.save[SubmissionRequestStatus](credId, SubmissionRequestStatus.key, SubmissionRequestStatus(hasSubmitted = true, Some(isRenewalAmendment)))
     } yield c
   }
 

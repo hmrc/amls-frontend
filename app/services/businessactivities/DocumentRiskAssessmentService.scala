@@ -19,18 +19,17 @@ package services.businessactivities
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, RiskAssessmentPolicy, RiskAssessmentTypes}
 import models.businessmatching.BusinessMatching
-import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DocumentRiskAssessmentService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit val ec: ExecutionContext) {
 
-  def getRiskAssessmentPolicy(credId: String)(implicit hc: HeaderCarrier): Future[Option[RiskAssessmentPolicy]] = {
+  def getRiskAssessmentPolicy(credId: String): Future[Option[RiskAssessmentPolicy]] = {
     dataCacheConnector.fetch[BusinessActivities](credId, BusinessActivities.key).map(_.flatMap(_.riskAssessmentPolicy))
   }
 
-  def updateRiskAssessmentType(credId: String, data: RiskAssessmentTypes)(implicit hc: HeaderCarrier): Future[Option[BusinessMatching]] = {
+  def updateRiskAssessmentType(credId: String, data: RiskAssessmentTypes): Future[Option[BusinessMatching]] = {
     dataCacheConnector.fetchAll(credId).map { optCacheMap =>
       val businessMatchingAndActivities: Option[(BusinessMatching, BusinessActivities)] = for {
         cacheMap <- optCacheMap

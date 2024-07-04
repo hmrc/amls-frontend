@@ -72,7 +72,7 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
 
   "get returns 200" when {
     "no amp section in cache" in new Fixture {
-      when(proxyCacheService.getAmp(any())(any())).thenReturn(Future.successful(Some(Json.obj())))
+      when(proxyCacheService.getAmp(any())).thenReturn(Future.successful(Some(Json.obj())))
 
 
 
@@ -84,7 +84,7 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
     }
 
     "amp section in cache" in new Fixture {
-      when(proxyCacheService.getAmp(any())(any())).thenReturn(Future.successful(Some(completeJson)))
+      when(proxyCacheService.getAmp(any())).thenReturn(Future.successful(Some(completeJson)))
 
       val result = controller.get(credId)(request)
       status(result) must be(OK)
@@ -100,7 +100,7 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
         .withHeaders(CONTENT_TYPE -> "application/json")
         .withBody[JsValue](completeJson)
 
-      when(proxyCacheService.setAmp(any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
+      when(proxyCacheService.setAmp(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.set(credId)(postRequest)
       status(result) must be(OK)

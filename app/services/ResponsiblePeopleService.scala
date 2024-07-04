@@ -17,16 +17,16 @@
 package services
 
 import connectors.DataCacheConnector
-import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.ResponsiblePerson
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{RepeatingSection, StatusConstants}
-import scala.concurrent.ExecutionContext
+
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnector) extends RepeatingSection {
 
-  def getAll(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext) =
+  def getAll(credId: String)(implicit ec: ExecutionContext): Future[Seq[ResponsiblePerson]] =
     dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key) map {
       _.getOrElse(Seq.empty)
     }
@@ -45,24 +45,24 @@ class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnec
 
 object ResponsiblePeopleService {
 
-  def isActive(person: ResponsiblePerson) = !person.status.contains(StatusConstants.Deleted) && person.isComplete
+  def isActive(person: ResponsiblePerson): Boolean = !person.status.contains(StatusConstants.Deleted) && person.isComplete
 
-  def nonDeleted(person: ResponsiblePerson) = !person.status.contains(StatusConstants.Deleted)
+  def nonDeleted(person: ResponsiblePerson): Boolean = !person.status.contains(StatusConstants.Deleted)
 
   implicit class ResponsiblePeopleZipListHelpers(people: Seq[(ResponsiblePerson, Int)]) {
-    def exceptInactive = people filter {
+    def exceptInactive: Seq[(ResponsiblePerson, Int)] = people filter {
       case (person, _) if isActive(person) => true
       case _ => false
     }
 
-    def exceptDeleted = people filter {
+    def exceptDeleted: Seq[(ResponsiblePerson, Int)] = people filter {
       case (person, _) if nonDeleted(person) => true
       case _ => false
     }
   }
 
   implicit class ResponsiblePeopleListHelpers(people: Seq[ResponsiblePerson]) {
-    def exceptInactive = people filter {
+    def exceptInactive: Seq[ResponsiblePerson] = people filter {
       case person if isActive(person) => true
       case _ => false
     }

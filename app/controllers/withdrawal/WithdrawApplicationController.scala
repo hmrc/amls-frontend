@@ -53,7 +53,7 @@ class WithdrawApplicationController @Inject()(authAction: AuthAction,
   }
 
   def post: Action[AnyContent] = authAction {
-    Redirect(routes.WithdrawalReasonController.get)
+    Redirect(routes.WithdrawalReasonController.get())
   }
 
 }

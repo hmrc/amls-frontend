@@ -62,7 +62,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
     "get is called" must {
       "load the Document Risk assessment Page" in new Fixture {
 
-        when(mockService.getRiskAssessmentPolicy(any())(any())).thenReturn(Future.successful(None))
+        when(mockService.getRiskAssessmentPolicy(any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -74,7 +74,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
       "pre-populate the Document Risk assessment Page" in new Fixture {
 
-        when(mockService.getRiskAssessmentPolicy(any())(any()))
+        when(mockService.getRiskAssessmentPolicy(any()))
           .thenReturn(Future.successful(Some(
             RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased, Digital)))
           )))
@@ -98,7 +98,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
             "riskassessments[2]" -> "digital"
           )
 
-          when(mockService.updateRiskAssessmentType(any(), any())(any()))
+          when(mockService.updateRiskAssessmentType(any(), any()))
             .thenReturn(Future.successful(
               Some(BusinessMatching(None, Some(BMBusinessActivities(Set(AccountancyServices, MoneyServiceBusiness)))))
             ))
@@ -116,7 +116,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
             "riskassessments[2]" -> "digital"
           )
 
-          when(mockService.updateRiskAssessmentType(any(), any())(any()))
+          when(mockService.updateRiskAssessmentType(any(), any()))
             .thenReturn(Future.successful(
               Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness)))))
             ))
@@ -164,7 +164,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
             "riskassessments[2]" -> "digital"
           )
 
-          when(mockService.updateRiskAssessmentType(any(), any())(any()))
+          when(mockService.updateRiskAssessmentType(any(), any()))
             .thenReturn(Future.successful(
               Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness)))))
             ))

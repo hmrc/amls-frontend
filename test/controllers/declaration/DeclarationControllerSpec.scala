@@ -95,7 +95,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     when(declarationController.renewalService.getRenewal(any())).thenReturn(Future.successful(Some(completeRenewal)))
 
-    when(declarationController.renewalService.isRenewalComplete(any(), any())(any(), any()))
+    when(declarationController.renewalService.isRenewalComplete(any(), any())(any()))
       .thenReturn(Future.successful(true))
   }
 

@@ -86,7 +86,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     } thenReturn Seq(defaultTaskRow)
 
     when {
-      renewalService.getTaskRow(any())(any(), any())
+      renewalService.getTaskRow(any())(any())
     } thenReturn Future.successful(renewalTaskRow)
 
     val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))

@@ -126,7 +126,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
   "get returns 200" when {
     "no eab section in cache" in new Fixture {
-      when(proxyCacheService.getEab(any())(any())).thenReturn(Future.successful(Some(Json.obj())))
+      when(proxyCacheService.getEab(any())).thenReturn(Future.successful(Some(Json.obj())))
 
 
 
@@ -138,7 +138,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
     }
 
     "eab section in cache" in new Fixture {
-      when(proxyCacheService.getEab(any())(any())).thenReturn(Future.successful(Some(completeEabJson)))
+      when(proxyCacheService.getEab(any())).thenReturn(Future.successful(Some(completeEabJson)))
 
       val result = controller.get(credId)(request)
       status(result) must be(OK)
@@ -154,7 +154,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
         .withHeaders(CONTENT_TYPE -> "application/json")
         .withBody[JsValue](completeEabJson)
 
-      when(proxyCacheService.setEab(any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
+      when(proxyCacheService.setEab(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.set(credId)(postRequest)
       status(result) must be(OK)

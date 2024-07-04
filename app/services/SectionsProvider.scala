@@ -34,7 +34,6 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.i18n.Messages
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
 
 import javax.inject.Inject

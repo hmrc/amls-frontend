@@ -18,7 +18,6 @@ package services.businessactivities
 
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, BusinessFranchise}
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
 
 import javax.inject.Inject
@@ -26,11 +25,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class BusinessFranchiseService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) {
 
-  def getBusinessFranchise(credId: String)(implicit hc: HeaderCarrier): Future[Option[BusinessFranchise]] = {
+  def getBusinessFranchise(credId: String): Future[Option[BusinessFranchise]] = {
     dataCacheConnector.fetch[BusinessActivities](credId, BusinessActivities.key).map(_.flatMap(_.businessFranchise))
   }
 
-  def updateBusinessFranchise(credId: String, bf: BusinessFranchise)(implicit hc: HeaderCarrier): Future[Cache] = {
+  def updateBusinessFranchise(credId: String, bf: BusinessFranchise): Future[Cache] = {
     dataCacheConnector.fetch[BusinessActivities](credId, BusinessActivities.key) flatMap {
       optBA => dataCacheConnector.save[BusinessActivities](credId, BusinessActivities.key, optBA.map(_.businessFranchise(bf)))
     }

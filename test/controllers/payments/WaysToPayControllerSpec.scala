@@ -125,7 +125,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
     when(controller.renewalService.getRenewal(any())).thenReturn(Future.successful(Some(completeRenewal)))
 
-    when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
+    when(controller.renewalService.isRenewalComplete(any(), any())(any()))
       .thenReturn(Future.successful(true))
 
   }

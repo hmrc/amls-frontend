@@ -60,7 +60,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
     "get is called" must {
       "on get display the is your business a franchise page" in new Fixture {
-        when(mockService.getBusinessFranchise(any())(any()))
+        when(mockService.getBusinessFranchise(any()))
           .thenReturn(Future.successful(None))
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -74,7 +74,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
       }
 
       "on get display the is your business a franchise page with pre populated data" in new Fixture {
-        when(mockService.getBusinessFranchise(any())(any()))
+        when(mockService.getBusinessFranchise(any()))
           .thenReturn(Future.successful(Some(BusinessFranchiseYes("test test"))))
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -100,7 +100,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
             "franchiseName" -> franchiseName
           )
 
-          when(mockService.updateBusinessFranchise(any(), eqTo(BusinessFranchiseYes(franchiseName)))(any()))
+          when(mockService.updateBusinessFranchise(any(), eqTo(BusinessFranchiseYes(franchiseName))))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(false)(newRequest)
@@ -114,7 +114,7 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
             "franchiseName" -> franchiseName
           )
 
-          when(mockService.updateBusinessFranchise(any(), eqTo(BusinessFranchiseYes(franchiseName)))(any()))
+          when(mockService.updateBusinessFranchise(any(), eqTo(BusinessFranchiseYes(franchiseName))))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(true)(newRequest)

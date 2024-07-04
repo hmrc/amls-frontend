@@ -57,7 +57,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
     "get is called" must {
       "display the how many employees work on activities covered by AMLS page with an empty form" in new Fixture {
 
-        when(mockService.getEmployeeCountAMLSSupervision(any())(any()))
+        when(mockService.getEmployeeCountAMLSSupervision(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -72,7 +72,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
         val count = "17"
 
-        when(mockService.getEmployeeCountAMLSSupervision(any())(any()))
+        when(mockService.getEmployeeCountAMLSSupervision(any()))
           .thenReturn(Future.successful(Some(count)))
 
         val result = controller.get()(request)
@@ -102,7 +102,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
           "employeeCountAMLSSupervision" -> count
         )
 
-        when(mockService.updateHowManyEmployees(any(), eqTo(EmployeeCountAMLSSupervision(count)))(any()))
+        when(mockService.updateHowManyEmployees(any(), eqTo(EmployeeCountAMLSSupervision(count))))
           .thenReturn(Future.successful(Some(emptyCache)))
 
         val result = controller.post(false)(newRequest)
@@ -119,7 +119,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
           "employeeCountAMLSSupervision" -> count
         )
 
-        when(mockService.updateHowManyEmployees(any(), eqTo(EmployeeCountAMLSSupervision(count)))(any()))
+        when(mockService.updateHowManyEmployees(any(), eqTo(EmployeeCountAMLSSupervision(count))))
           .thenReturn(Future.successful(Some(emptyCache)))
 
         val resultTrue = controller.post(true)(newRequest)

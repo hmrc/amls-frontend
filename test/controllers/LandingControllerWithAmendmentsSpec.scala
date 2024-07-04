@@ -84,7 +84,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
     def setUpMocksForDataExistsInSaveForLater(controller: LandingController, testData: Cache = mock[Cache]) = {
       when(controller.landingService.cacheMap(any[String])).thenReturn(Future.successful(Some(testData)))
-      when(controller.landingService.initialiseGetWithAmendments(any[String])(any(), any())).thenReturn(Future.successful(Some(testData)))
+      when(controller.landingService.initialiseGetWithAmendments(any[String])(any())).thenReturn(Future.successful(Some(testData)))
     }
 
     //noinspection ScalaStyle
@@ -459,7 +459,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       "there is no data in S4L" should {
         "refresh from API5 and redirect to status controller" in new Fixture {
           when(controller.landingService.cacheMap(any[String])).thenReturn(Future.successful(None))
-          when(controller.landingService.initialiseGetWithAmendments(any[String])(any(), any())).thenReturn(Future.successful(None))
+          when(controller.landingService.initialiseGetWithAmendments(any[String])(any())).thenReturn(Future.successful(None))
 
           when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
             .thenReturn(Future.successful(Some(SubscriptionResponse("", "", None))))

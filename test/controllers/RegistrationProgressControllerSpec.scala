@@ -612,7 +612,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             controller.statusService.getStatus(any(), any(), any())(any(), any(), any())
           } thenReturn Future.successful(RenewalSubmitted(None))
 
-          when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
+          when(controller.renewalService.isRenewalComplete(any(), any())(any()))
             .thenReturn(Future.successful(true))
 
           when(controller.renewalService.getRenewal(any())).thenReturn(Future.successful(Some(completeRenewal)))
@@ -637,7 +637,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             controller.statusService.getStatus(any(), any(), any())(any(), any(), any())
           } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
 
-          when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
+          when(controller.renewalService.isRenewalComplete(any(), any())(any()))
             .thenReturn(Future.successful(false))
 
           when(controller.renewalService.getRenewal(any())).thenReturn(Future.successful(Some(inCompleteRenewal)))
@@ -655,7 +655,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           controller.statusService.getStatus(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(RenewalSubmitted(None))
 
-        when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
+        when(controller.renewalService.isRenewalComplete(any(), any())(any()))
           .thenReturn(Future.successful(true))
 
         when(controller.renewalService.getRenewal(any())).thenReturn(Future.successful(Some(completeRenewal)))
