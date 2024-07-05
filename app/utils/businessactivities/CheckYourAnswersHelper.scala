@@ -28,16 +28,14 @@ import javax.inject.Inject
 
 class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions {
 
-  def createSummaryList(
-                         businessActivities: BusinessActivities,
-                         businessMatching: BusinessMatching,
-                         needsAccountancyQuestions: Boolean)(implicit messages: Messages): SummaryList = {
+  def createSummaryList(businessActivities: BusinessActivities,
+                        needsAccountancyQuestions: Boolean)(implicit messages: Messages): SummaryList = {
 
     val rows =
       involvedInOthersRows(businessActivities).getOrElse(Nil) ++
         Seq(
           expectedBusinessTurnoverRow(businessActivities),
-          expectedAMLSTurnoverRow(businessActivities, businessMatching)
+          expectedAMLSTurnoverRow(businessActivities)
         ).flatten ++
         businessFranchiseRows(businessActivities).getOrElse(Nil) ++
         howManyEmployeesRows(businessActivities).getOrElse(Nil) ++
@@ -100,20 +98,11 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
     }
   }
 
-  private def expectedAMLSTurnoverRow(
-                                       businessActivities: BusinessActivities,
-                                       businessMatching: BusinessMatching
-                                     )(implicit messages: Messages): Option[SummaryListRow] = {
-
-    val title = businessMatching.alphabeticalBusinessActivitiesLowerCase() match {
-      case Some(types) if types.length > 1 => messages("businessactivities.turnover.heading.multiple")
-      case Some(types) if types.nonEmpty => messages("businessactivities.turnover.heading", types.head)
-      case _ => messages("businessactivities.turnover.heading.multiple")
-    }
+  private def expectedAMLSTurnoverRow(businessActivities: BusinessActivities)(implicit messages: Messages): Option[SummaryListRow] = {
 
     businessActivities.expectedAMLSTurnover.map { et =>
       row(
-        title,
+        "businessactivities.turnover.heading",
         messages(s"businessactivities.business-turnover.lbl.${et.value}"),
         editAction(
           controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).url,

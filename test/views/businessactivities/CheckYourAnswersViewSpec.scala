@@ -18,8 +18,6 @@ package views.businessactivities
 
 import models.businessactivities.TransactionTypes.{DigitalSoftware, DigitalSpreadsheet, Paper}
 import models.businessactivities._
-import models.businessmatching.BusinessActivity.MoneyServiceBusiness
-import models.businessmatching.{BusinessMatching, BusinessActivities => BMBusinessActivities}
 import org.jsoup.Jsoup
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.mvc.Request
@@ -79,8 +77,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
           taxMatters = Some(TaxMatters(true)),
           transactionRecordTypes = Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("SoftwareName"))))
         ),
-        BusinessMatching(activities = Some(BMBusinessActivities(Set(MoneyServiceBusiness)))),
-        false
+        needsAccountancyQuestions = false
       )
 
       def view = summary(list)

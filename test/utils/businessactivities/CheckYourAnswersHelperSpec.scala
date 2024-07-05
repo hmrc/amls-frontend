@@ -19,8 +19,8 @@ package utils.businessactivities
 import models.Country
 import models.businessactivities.TransactionTypes.{DigitalSoftware, Paper}
 import models.businessactivities._
+import models.businessmatching.BusinessActivity
 import models.businessmatching.BusinessActivity._
-import models.businessmatching.{BusinessActivity, BusinessMatching, BusinessActivities => BusinessMatchingActivities}
 import org.scalatest.Assertion
 import play.api.test.Injecting
 import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryListRow
@@ -65,8 +65,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
     identifySuspiciousActivity = Some(BusinessActivitiesValues.defaultIdentifySuspiciousActivity),
     whoIsYourAccountant = Some(BusinessActivitiesValues.defaultWhoIsYourAccountant),
     taxMatters = Some(BusinessActivitiesValues.defaultTaxMatters),
-    transactionRecordTypes = Some(BusinessActivitiesValues.defaultTransactionRecordTypes),
-    hasChanged = false
+    transactionRecordTypes = Some(BusinessActivitiesValues.defaultTransactionRecordTypes)
   )
 
   val businessMatchingActivitiesList: Set[BusinessActivity] = Set(
@@ -78,9 +77,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
     TrustAndCompanyServices,
     TelephonePaymentService
   )
-
-  val businessMatchingActivities: BusinessMatching =
-    BusinessMatching(activities = Some(BusinessMatchingActivities(businessMatchingActivitiesList)))
 
   def checkChangeLink(slr: SummaryListRow, href: String, id: String): Assertion = {
     val changeLink = slr.actions.flatMap(_.items.headOption).getOrElse(fail("No edit link present"))
@@ -94,7 +90,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
     val summaryListRows = cyaHelper.createSummaryList(
       completeModel,
-      businessMatchingActivities,
       needsAccountancyQuestions = true
     ).rows
 
@@ -153,41 +148,26 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
         }
       }
 
-      "contains Expected AMLS Turnover" when {
+      "contains Expected AMLS Turnover" in {
 
-        "AMLS turnover is present with single activity" in {
+        val result = cyaHelper.createSummaryList(
+          completeModel,
+          needsAccountancyQuestions = true
+        ).rows.lift(expectedAMLSTurnoverIndex).getOrElse(fail(s"Row for index $expectedAMLSTurnoverIndex does not exist"))
 
-          val result = cyaHelper.createSummaryList(
-            completeModel,
-            BusinessMatching(activities = Some(BusinessMatchingActivities(Set(MoneyServiceBusiness)))),
-            needsAccountancyQuestions = true
-          ).rows.lift(expectedAMLSTurnoverIndex).getOrElse(fail(s"Row for index $expectedAMLSTurnoverIndex does not exist"))
+        result.key.toString must include(
+          messages("businessactivities.turnover.heading", messages("businessactivities.registerservices.servicename.lbl.06"))
+        )
 
-          result.key.toString must include(
-            messages("businessactivities.turnover.heading", messages("businessactivities.registerservices.servicename.lbl.06"))
-          )
+        result.value.toString must include(
+          messages(s"businessactivities.turnover.lbl.${BusinessActivitiesValues.defaultAMLSTurnover.value}")
+        )
 
-          result.value.toString must include(
-            messages(s"businessactivities.turnover.lbl.${BusinessActivitiesValues.defaultAMLSTurnover.value}")
-          )
-
-          checkChangeLink(
-            result,
-            controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).url,
-            "expectedamlsturnover-edit"
-          )
-        }
-
-        "AMLS turnover is present with multiple activities" in {
-
-          assertRowMatches(
-            expectedAMLSTurnoverIndex,
-            messages("businessactivities.turnover.heading.multiple"),
-            messages(s"businessactivities.business-turnover.lbl.${BusinessActivitiesValues.defaultAMLSTurnover.value}"),
-            controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).url,
-            "expectedamlsturnover-edit"
-          )
-        }
+        checkChangeLink(
+          result,
+          controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).url,
+          "expectedamlsturnover-edit"
+        )
       }
 
       "contains Business Franchise Information" when {
@@ -343,7 +323,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
                 )
               )
             ),
-            businessMatchingActivities,
             needsAccountancyQuestions = true
           ).rows.lift(riskAssessmentTypesIndex).getOrElse(fail(s"Row for index $riskAssessmentTypesIndex does not exist"))
 
@@ -403,7 +382,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
                 )
               )
             ),
-            businessMatchingActivities,
             needsAccountancyQuestions = true
           ).rows.lift(accountantNameIndex).getOrElse(fail(s"Row for index $accountantNameIndex does not exist"))
 
@@ -470,7 +448,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
                 )
               )
             ),
-            businessMatchingActivities,
             needsAccountancyQuestions = true
           ).rows.lift(accountantAddressIndex).getOrElse(fail(s"Row for index $accountantAddressIndex does not exist"))
 
@@ -507,7 +484,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
         "needsAccountancyQuestions is false" in {
 
-          val result = cyaHelper.createSummaryList(completeModel, businessMatchingActivities, needsAccountancyQuestions = false)
+          val result = cyaHelper.createSummaryList(completeModel, needsAccountancyQuestions = false)
 
           Seq(
             accountantForAMLSRegulationsIndex,

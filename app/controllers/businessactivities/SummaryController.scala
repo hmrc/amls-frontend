@@ -49,7 +49,7 @@ class SummaryController @Inject()(val dataCache: DataCacheConnector,
             bmActivities <- businessMatching.activities
             needsAccountancyQuestions = !bmActivities.businessActivities.contains(AccountancyServices)
           } yield {
-              val summaryList = cyaHelper.createSummaryList(businessActivity, businessMatching, needsAccountancyQuestions)
+              val summaryList = cyaHelper.createSummaryList(businessActivity, needsAccountancyQuestions)
               Ok(view(summaryList))
           }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
       }
