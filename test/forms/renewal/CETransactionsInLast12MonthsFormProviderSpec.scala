@@ -38,13 +38,28 @@ class CETransactionsInLast12MonthsFormProviderSpec extends StringFieldBehaviours
 
     behave like fieldWithMaxLength(form, fieldName, fp.length, FormError(fieldName, lengthAndRegexError, Seq(fp.length)))
 
-    "strip spaces and commas from input" in {
+    "bind a single digit value" in {
+      val result = form.bind(Map(fieldName -> "1"))
+      result.hasErrors shouldBe false
+      result.value shouldBe Some(CETransactionsInLast12Months("1"))
+    }
 
-      val input = s" 12,345,678,901 "
-      form.bind(Map(fieldName -> input)).fold(
-        error => fail("Invalid input, cannot bind: " + error.errors.toString),
-        data => assert(data.ceTransaction == input.trim.replace(",", ""))
-      )
+    "strip spaces from input" in {
+      val result = form.bind(Map(fieldName -> "  5 "))
+      result.hasErrors shouldBe false
+      result.value shouldBe Some(CETransactionsInLast12Months("5"))
+    }
+
+    "strip commas from input" in {
+      val result = form.bind(Map(fieldName -> "1,000"))
+      result.hasErrors shouldBe false
+      result.value shouldBe Some(CETransactionsInLast12Months("1000"))
+    }
+
+    "strip spaces and commas from input" in {
+      val result = form.bind(Map(fieldName -> " 12,345,678,901 "))
+      result.hasErrors shouldBe false
+      result.value shouldBe Some(CETransactionsInLast12Months("12345678901"))
     }
 
     "fail to bind non-numbers" in {
