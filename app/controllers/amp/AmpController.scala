@@ -29,13 +29,13 @@ import services.ProxyCacheService
 import utils.AuthAction
 
 class AmpController @Inject()(proxyCacheService: ProxyCacheService,
-                              authAction     : AuthAction,
+                              authAction: AuthAction,
                               val cacheConnector : DataCacheConnector,
                               val ds: CommonPlayDependencies,
                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(credId: String): Action[AnyContent] = Action.async {
-    implicit _ => {
+    implicit request => {
       proxyCacheService.getAmp(credId).map {
         _.map(Ok(_: JsValue)).getOrElse(NotFound)
       }
