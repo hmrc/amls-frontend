@@ -18,6 +18,7 @@ package views.responsiblepeople
 
 import forms.responsiblepeople.CountryOfBirthFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 import utils.AmlsViewSpec
@@ -29,7 +30,7 @@ class CountryOfBirthViewSpec extends AmlsViewSpec with Matchers {
   lazy val country_of_birth = inject[CountryOfBirthView]
   lazy val fp = inject[CountryOfBirthFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   val name = "Person Name"
 
@@ -38,7 +39,7 @@ class CountryOfBirthViewSpec extends AmlsViewSpec with Matchers {
   )
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "CountryOfBirthView view" must {

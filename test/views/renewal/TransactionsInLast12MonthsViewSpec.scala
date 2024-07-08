@@ -18,6 +18,7 @@ package views.renewal
 
 import forms.renewal.TransactionsInLast12MonthsFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.TransactionsInLast12MonthsView
@@ -26,7 +27,7 @@ class TransactionsInLast12MonthsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val transactions_in_last_12_months = inject[TransactionsInLast12MonthsView]
   lazy val fp = inject[TransactionsInLast12MonthsFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
     override def view = transactions_in_last_12_months(fp(), edit = false)

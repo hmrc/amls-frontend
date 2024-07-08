@@ -18,6 +18,7 @@ package views.responsiblepeople
 
 import forms.responsiblepeople.DateOfBirthFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -28,10 +29,10 @@ class DateOfBirthViewSpec extends AmlsViewSpec with Matchers {
   lazy val date_of_birth = inject[DateOfBirthView]
   lazy val fp = inject[DateOfBirthFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "DateOfBirthView view" must {

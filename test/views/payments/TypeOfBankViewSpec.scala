@@ -20,6 +20,7 @@ import forms.payments.TypeOfBankFormProvider
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import org.scalatestplus.play.PlaySpec
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -30,11 +31,11 @@ class TypeOfBankViewSpec extends PlaySpec with AmlsViewSpec {
   lazy val typeOfBankView = inject[TypeOfBankView]
   lazy val fp = inject[TypeOfBankFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   val secondaryHeading = "Submit application"
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "TypeOfBankView" must {

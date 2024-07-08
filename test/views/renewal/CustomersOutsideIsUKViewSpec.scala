@@ -19,6 +19,7 @@ package views.renewal
 import forms.renewal.CustomersOutsideIsUKFormProvider
 import models.renewal.CustomersOutsideIsUK
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.CustomersOutsideIsUKView
@@ -29,7 +30,7 @@ class CustomersOutsideIsUKViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val customers_outside_uk_isUK = inject[CustomersOutsideIsUKView]
   lazy val fp = inject[CustomersOutsideIsUKFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   "CustomersOutsideIsUKView" must {
     "have correct title" in new ViewFixture {

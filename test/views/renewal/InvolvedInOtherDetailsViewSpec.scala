@@ -21,6 +21,7 @@ import models.renewal.InvolvedInOtherYes
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
@@ -30,7 +31,7 @@ class InvolvedInOtherDetailsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val involved_in_other_details = inject[InvolvedInOtherDetailsView]
   lazy val fp = inject[InvolvedInOtherDetailsFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   val requiredTextErrorMsg = "error.required.renewal.ba.involved.in.other.text"
   val textMaxLengthErrorMsg = "error.invalid.maxlength.255.renewal.ba.involved.in.other"

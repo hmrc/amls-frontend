@@ -19,6 +19,7 @@ package views.renewal
 import forms.renewal.MoneySourcesFormProvider
 import models.renewal.MoneySources
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.MoneySourcesView
@@ -29,7 +30,7 @@ class MoneySourcesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val money_sources = inject[MoneySourcesView]
   lazy val fp = inject[MoneySourcesFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   "money sources view" must {
     "have correct title" in new ViewFixture {

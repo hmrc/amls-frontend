@@ -18,6 +18,7 @@ package views.renewal
 
 import forms.renewal.InvolvedInOtherFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.InvolvedInOtherView
@@ -26,7 +27,7 @@ class InvolvedInOtherViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val involved_in_other = inject[InvolvedInOtherView]
   lazy val fp = inject[InvolvedInOtherFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
 

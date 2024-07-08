@@ -20,6 +20,7 @@ import models.businessmatching.{BusinessActivities, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessActivity.{AccountancyServices, ArtMarketParticipant, HighValueDealing, MoneyServiceBusiness}
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.WhatYouNeedView
@@ -27,7 +28,7 @@ import views.html.renewal.WhatYouNeedView
 class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val what_you_need = inject[WhatYouNeedView]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
 

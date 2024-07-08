@@ -19,6 +19,7 @@ package views.msb
 import forms.msb.IdentifyLinkedTransactionsFormProvider
 import models.moneyservicebusiness.IdentifyLinkedTransactions
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -29,10 +30,10 @@ class IdentifyLinkedTransactionsViewSpec extends AmlsViewSpec with Matchers {
   lazy val transactionsView = inject[IdentifyLinkedTransactionsView]
   lazy val fp = inject[IdentifyLinkedTransactionsFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "IdentifyLinkedTransactionsView view" must {

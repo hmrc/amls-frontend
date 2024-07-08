@@ -18,6 +18,7 @@ package views.renewal
 
 import forms.renewal.BusinessTurnoverFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.BusinessTurnoverView
@@ -26,7 +27,7 @@ class BusinessTurnoverViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val business_turnover = inject[BusinessTurnoverView]
   lazy val fp = inject[BusinessTurnoverFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
 

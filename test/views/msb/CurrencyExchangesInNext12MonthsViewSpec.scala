@@ -19,6 +19,7 @@ package views.msb
 import forms.msb.CurrencyExchangesInNext12MonthsFormProvider
 import models.moneyservicebusiness.CETransactionsInNext12Months
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -29,10 +30,10 @@ class CurrencyExchangesInNext12MonthsViewSpec extends AmlsViewSpec with Matchers
   lazy val exchangesView = inject[CurrencyExchangesInNext12MonthsView]
   lazy val fp = inject[CurrencyExchangesInNext12MonthsFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "CurrencyExchangesInNext12MonthsView view" must {

@@ -18,6 +18,7 @@ package views.renewal
 
 import forms.renewal.CustomersOutsideUKFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.renewal.CustomersOutsideUKView
@@ -28,7 +29,7 @@ class CustomersOutsideUKViewSpec extends AmlsViewSpec with Matchers with AutoCom
 
   lazy val customers_outside_uk = inject[CustomersOutsideUKView]
   lazy val fp = inject[CustomersOutsideUKFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   "percentage view" must {
     "have correct title" in new ViewFixture {

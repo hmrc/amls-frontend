@@ -20,6 +20,7 @@ import forms.hvd.SalesChannelFormProvider
 import models.hvd.HowWillYouSellGoods
 import models.hvd.SalesChannel.{Retail, Wholesale}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -30,10 +31,10 @@ class HowWillYouSellGoodsViewSpec extends AmlsViewSpec with Matchers  {
   lazy val goodsView = inject[HowWillYouSellGoodsView]
   lazy val fp = inject[SalesChannelFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "HowWillYouSellGoodsView view" must {

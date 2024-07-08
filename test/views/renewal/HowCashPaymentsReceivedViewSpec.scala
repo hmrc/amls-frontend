@@ -18,6 +18,7 @@ package views.renewal
 
 import forms.renewal.HowCashPaymentsReceivedFormProvider
 import models.renewal.{HowCashPaymentsReceived, PaymentMethods}
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.HowCashPaymentsReceivedView
@@ -28,7 +29,7 @@ class HowCashPaymentsReceivedViewSpec extends AmlsViewSpec {
 
   lazy val receivedView = inject[HowCashPaymentsReceivedView]
   lazy val fp = inject[HowCashPaymentsReceivedFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
   val howReceived = HowCashPaymentsReceived(paymentMethods)

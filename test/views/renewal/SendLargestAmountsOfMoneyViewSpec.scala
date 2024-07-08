@@ -20,6 +20,7 @@ import forms.renewal.SendLargestAmountsOfMoneyFormProvider
 import models.Country
 import models.renewal.SendTheLargestAmountsOfMoney
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.renewal.SendLargestAmountsOfMoneyView
@@ -28,7 +29,7 @@ class SendLargestAmountsOfMoneyViewSpec extends AmlsViewSpec with Matchers with 
 
   lazy val send_largest_amounts_of_money = inject[SendLargestAmountsOfMoneyView]
   lazy val fp = inject[SendLargestAmountsOfMoneyFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
 

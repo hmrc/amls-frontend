@@ -20,6 +20,7 @@ import forms.msb.MostTransactionsFormProvider
 import models.Country
 import models.moneyservicebusiness.MostTransactions
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
@@ -30,10 +31,10 @@ class MostTransactionsViewSpec extends AmlsViewSpec with Matchers with AutoCompl
   lazy val most_transactions = inject[MostTransactionsView]
   lazy val fp = inject[MostTransactionsFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "MostTransactionsView" must {

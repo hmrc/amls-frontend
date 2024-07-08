@@ -17,7 +17,6 @@
 package views.notifications.v5m0
 
 import models.notifications.NotificationParams
-import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
 import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.twirl.api.HtmlFormat

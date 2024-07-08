@@ -19,6 +19,7 @@ package views.msb
 import forms.msb.BranchesOrAgentsFormProvider
 import models.moneyservicebusiness.BranchesOrAgentsHasCountries
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
@@ -29,10 +30,10 @@ class BranchesOrAgentsViewSpec extends AmlsViewSpec with Matchers {
   lazy val branches_or_agents = inject[BranchesOrAgentsView]
   lazy val fp = inject[BranchesOrAgentsFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "BranchesOrAgentsView view" must {

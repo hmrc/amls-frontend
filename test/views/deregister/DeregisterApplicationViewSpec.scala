@@ -18,6 +18,7 @@ package views.deregister
 
 import generators.AmlsReferenceNumberGenerator
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.deregister.DeregisterApplicationView
@@ -26,7 +27,7 @@ class DeregisterApplicationViewSpec extends AmlsViewSpec with Matchers with Amls
 
   trait ViewFixture extends Fixture {
     lazy val deregisterView = inject[DeregisterApplicationView]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val businessName = "Test Business"
 

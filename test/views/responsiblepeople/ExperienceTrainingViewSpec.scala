@@ -21,6 +21,7 @@ import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueD
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
 import models.responsiblepeople.{ExperienceTrainingNo, ExperienceTrainingYes}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -35,10 +36,10 @@ class ExperienceTrainingViewSpec extends AmlsViewSpec with Matchers  {
   def businessMatching(activities: Set[BusinessActivity]): BusinessMatching =
     BusinessMatching(activities = Some(BusinessActivities(activities)))
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "ExperienceTrainingView view" must {

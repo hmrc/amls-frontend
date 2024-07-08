@@ -19,6 +19,7 @@ package views.renewal
 import forms.renewal.FXTransactionsInLast12MonthsFormProvider
 import models.renewal.FXTransactionsInLast12Months
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.FXTransactionsInLast12MonthsView
@@ -29,7 +30,7 @@ class FXTransactionsInLast12MonthsViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val last12MonthsView = inject[FXTransactionsInLast12MonthsView]
   lazy val fp = inject[FXTransactionsInLast12MonthsFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   "FXTransactionsInLast12MonthsView" must {
 

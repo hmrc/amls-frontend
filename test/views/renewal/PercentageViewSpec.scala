@@ -19,6 +19,7 @@ package views.renewal
 import forms.renewal.PercentageFormProvider
 import models.renewal.PercentageOfCashPaymentOver15000.{Second, Third}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.PercentageView
@@ -29,7 +30,7 @@ class PercentageViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val percentage = inject[PercentageView]
   lazy val fp = inject[PercentageFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   "PercentageView" must {
     "have correct title" in new ViewFixture {

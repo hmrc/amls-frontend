@@ -21,6 +21,7 @@ import models.businessmatching._
 import models.renewal._
 import org.jsoup.Jsoup
 import org.scalatest.prop.TableDrivenPropertyChecks
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import utils.renewal.CheckYourAnswersHelper
@@ -33,7 +34,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
   lazy val cyaView = inject[CheckYourAnswersView]
   lazy val cyaHelper = inject[CheckYourAnswersHelper]
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   trait ViewFixture extends Fixture
 
   "CheckYourAnswersView" must {
@@ -102,8 +103,6 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
       val list = cyaHelper.getSummaryList(model, businessMatching)
 
       def view = cyaView(list)
-
-      val rows = doc.getElementsByClass("govuk-summary-list__row")
 
       doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
         doc.getElementsByClass("govuk-summary-list__value").asScala

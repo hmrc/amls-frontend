@@ -19,6 +19,7 @@ package views.hvd
 import forms.hvd.LinkedCashPaymentsFormProvider
 import models.hvd.LinkedCashPayments
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -29,10 +30,10 @@ class LinkedCashPaymentsViewSpec extends AmlsViewSpec with Matchers  {
   lazy val paymentsView = inject[LinkedCashPaymentsView]
   lazy val fp = inject[LinkedCashPaymentsFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "linked_cash_payments view" must {
