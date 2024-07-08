@@ -38,14 +38,14 @@ class CashPaymentsCustomersNotMetViewSpec extends AmlsViewSpec{
 
       def view = cash_payments_customers_not_met(fp().fill(cashPaymentsCustomersNotMet), true)
 
-      doc.title must startWith("In the last 12 months did you receive cash payments of €10,000 or more from customers you have not met in person?" + " - " + "Renewal")
+      doc.title must startWith("Recent cash payments of over €10,000" + " - " + "Renewal")
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = cash_payments_customers_not_met(fp().fill(cashPaymentsCustomersNotMet), true)
 
-      heading.text() must be("In the last 12 months did you receive cash payments of €10,000 or more from customers you have not met in person?")
+      heading.text() must be("Recent cash payments of over €10,000")
       subHeading.text() must include("Renewal")
     }
 
