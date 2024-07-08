@@ -20,6 +20,7 @@ import models.supervision.ProfessionalBodies._
 import models.supervision._
 import org.jsoup.Jsoup
 import org.scalatest.prop.TableDrivenPropertyChecks
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import utils.supervision.CheckYourAnswersHelper
@@ -34,7 +35,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
   trait ViewFixture extends Fixture {
     lazy val checkYourAnswersView = inject[CheckYourAnswersView]
     lazy val cyaHelper = inject[CheckYourAnswersHelper]
-    implicit val requestWithToken = addTokenForView(FakeRequest())
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView(FakeRequest())
 
     val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24)))  //scalastyle:off magic.number
     val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24)))//scalastyle:off magic.number

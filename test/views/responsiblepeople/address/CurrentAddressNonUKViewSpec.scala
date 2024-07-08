@@ -18,6 +18,7 @@ package views.responsiblepeople.address
 
 import forms.responsiblepeople.address.CurrentAddressNonUKFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 import utils.AmlsViewSpec
@@ -29,7 +30,7 @@ class CurrentAddressNonUKViewSpec extends AmlsViewSpec with Matchers {
   lazy val nonUKView = inject[CurrentAddressNonUKView]
   lazy val fp = inject[CurrentAddressNonUKFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   val name = "firstName lastName"
 
@@ -38,7 +39,7 @@ class CurrentAddressNonUKViewSpec extends AmlsViewSpec with Matchers {
   )
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "CurrentAddressNonUKView" must {

@@ -20,6 +20,7 @@ import forms.responsiblepeople.PositionWithinBusinessStartDateFormProvider
 import models.businessmatching.BusinessType
 import models.responsiblepeople._
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -34,10 +35,10 @@ class PositionWithinBusinessStartDateViewSpec extends AmlsViewSpec with Matchers
 
   val positions: Set[PositionWithinBusiness] =Set(Director, NominatedOfficer, Partner, Other("Wizard"))
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "PositionWithinBusinessStartDateView view" must {

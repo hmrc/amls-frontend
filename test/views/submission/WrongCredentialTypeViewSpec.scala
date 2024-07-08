@@ -17,6 +17,7 @@
 package views.submission
 
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.submission.WrongCredentialTypeView
@@ -25,7 +26,7 @@ class WrongCredentialTypeViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val wrongCredentialTypeView = app.injector.instanceOf[WrongCredentialTypeView]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val url = "/foo"
     override def view = wrongCredentialTypeView(url)

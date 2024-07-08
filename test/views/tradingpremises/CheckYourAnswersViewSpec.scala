@@ -22,6 +22,7 @@ import models.tradingpremises.TradingPremisesMsbService._
 import models.tradingpremises._
 import org.jsoup.Jsoup
 import org.scalatest.prop.TableDrivenPropertyChecks
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import utils.tradingpremises.CheckYourAnswersHelper
@@ -74,7 +75,7 @@ sealed trait TestHelper extends AmlsSummaryViewSpec {
   lazy val cyaView = inject[CheckYourAnswersView]
   lazy val cyaHelper = inject[CheckYourAnswersHelper]
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView(FakeRequest())
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView(FakeRequest())
   }
 }
 

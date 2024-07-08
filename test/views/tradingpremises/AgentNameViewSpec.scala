@@ -18,6 +18,7 @@ package views.tradingpremises
 
 import forms.tradingpremises.AgentNameFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -28,10 +29,10 @@ class AgentNameViewSpec extends AmlsViewSpec with Matchers {
   lazy val agent_name: AgentNameView = inject[AgentNameView]
   lazy val fp: AgentNameFormProvider = inject[AgentNameFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "have correct title and heading" in new ViewFixture {

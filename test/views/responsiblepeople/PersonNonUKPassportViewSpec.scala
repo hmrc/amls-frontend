@@ -18,6 +18,7 @@ package views.responsiblepeople
 
 import forms.responsiblepeople.PersonNonUKPassportFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -28,12 +29,12 @@ class PersonNonUKPassportViewSpec extends AmlsViewSpec with Matchers {
   lazy val passportView = inject[PersonNonUKPassportView]
   lazy val fp = inject[PersonNonUKPassportFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   val name = "firstName lastName"
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "PersonNonUKPassportView" must {

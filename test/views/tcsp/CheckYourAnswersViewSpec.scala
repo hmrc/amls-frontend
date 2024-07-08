@@ -17,13 +17,12 @@
 package views.tcsp
 
 import generators.AmlsReferenceNumberGenerator
-import models.tcsp._
-import models.tcsp.TcspTypes._
 import models.tcsp.ProvidedServices._
+import models.tcsp.TcspTypes._
+import models.tcsp._
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import play.api.i18n.Messages
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import utils.tcsp.CheckYourAnswersHelper
@@ -37,10 +36,10 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
   lazy val summary = inject[CheckYourAnswersView]
   lazy val cyaHelper = inject[CheckYourAnswersHelper]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView(FakeRequest())
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView(FakeRequest())
   }
 
   "CheckYourAnswersView" must {

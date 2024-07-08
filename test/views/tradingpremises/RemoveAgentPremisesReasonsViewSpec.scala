@@ -18,6 +18,7 @@ package views.tradingpremises
 
 import forms.tradingpremises.RemoveAgentPremisesReasonsFormProvider
 import models.tradingpremises._
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -30,10 +31,10 @@ class RemoveAgentPremisesReasonsViewSpec extends AmlsViewSpec {
   lazy val remove_agent_premises_reasons = inject[RemoveAgentPremisesReasonsView]
   lazy val fp = inject[RemoveAgentPremisesReasonsFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "RemoveAgentPremisesReasonsView" must {

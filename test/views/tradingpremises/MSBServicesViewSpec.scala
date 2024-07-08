@@ -21,6 +21,7 @@ import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.tradingpremises.TradingPremisesMsbService
 import models.tradingpremises.TradingPremisesMsbService._
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.Aliases
 import utils.AmlsViewSpec
@@ -32,7 +33,7 @@ class MSBServicesViewSpec extends AmlsViewSpec with Matchers {
   lazy val msb_services: MSBServicesView = inject[MSBServicesView]
   lazy val fp: MSBServicesFormProvider = inject[MSBServicesFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   val filteredModels: Seq[TradingPremisesMsbService] = Seq(
     ChequeCashingScrapMetal, ChequeCashingNotScrapMetal, CurrencyExchange, ForeignExchange
@@ -40,7 +41,7 @@ class MSBServicesViewSpec extends AmlsViewSpec with Matchers {
   val checkboxes: Seq[Aliases.CheckboxItem] = TradingPremisesMsbService.formValues(Some(filteredModels))
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "MSBServicesView" must {

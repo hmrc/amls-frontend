@@ -19,6 +19,7 @@ package views.tradingpremises
 import forms.tradingpremises.WhatDoesYourBusinessDoFormProvider
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -29,10 +30,10 @@ class WhatDoesYourBusinessDoViewSpec extends AmlsViewSpec with Matchers {
   lazy val what_does_your_business_do = inject[WhatDoesYourBusinessDoView]
   lazy val fp = inject[WhatDoesYourBusinessDoFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "WhatDoesYourBusinessDoView" must {

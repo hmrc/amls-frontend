@@ -19,6 +19,7 @@ package views.responsiblepeople.address
 import forms.responsiblepeople.address.AdditionalAddressNonUKFormProvider
 import models.responsiblepeople.{PersonAddressUK, ResponsiblePersonAddress}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 import utils.AmlsViewSpec
@@ -32,14 +33,14 @@ class AdditionalExtraAddressNonUKViewSpec extends AmlsViewSpec with Matchers {
 
   val name = "firstName lastName"
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   val countries = Seq(
     SelectItem(Some("ES"), "Spain")
   )
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "additional_extra_address view" must {

@@ -17,6 +17,7 @@
 package views.withdrawal
 
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.withdrawal.WithdrawApplicationView
@@ -27,7 +28,7 @@ class WithdrawApplicationViewSpec extends AmlsViewSpec with MockitoSugar {
 
   trait ViewFixture extends Fixture {
     lazy val withdraw_application = inject[WithdrawApplicationView]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     //noinspection ScalaStyle
     val date = LocalDateTime.of(2001, 1, 1, 12, 0, 0)

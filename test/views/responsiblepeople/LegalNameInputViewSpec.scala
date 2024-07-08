@@ -18,6 +18,7 @@ package views.responsiblepeople
 
 import forms.responsiblepeople.LegalNameInputFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -28,12 +29,12 @@ class LegalNameInputViewSpec extends AmlsViewSpec with Matchers {
   lazy val legal_name_input = inject[LegalNameInputView]
   lazy val fp = inject[LegalNameInputFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   val name = "firstName lastName"
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "LegalNameInputView" must {

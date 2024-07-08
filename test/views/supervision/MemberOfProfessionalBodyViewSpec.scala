@@ -18,6 +18,7 @@ package views.supervision
 
 import forms.supervision.MemberOfProfessionalBodyFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -28,10 +29,10 @@ class MemberOfProfessionalBodyViewSpec extends AmlsViewSpec with Matchers {
   lazy val member_of_professional_body = inject[MemberOfProfessionalBodyView]
   lazy val fp = app.injector.instanceOf[MemberOfProfessionalBodyFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "MemberOfProfessionalBodyView" must {

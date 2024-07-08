@@ -18,6 +18,7 @@ package views.tradingpremises
 
 import forms.tradingpremises.BusinessStructureFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -28,10 +29,10 @@ class BusinessStructureViewSpec extends AmlsViewSpec with Matchers {
   lazy val business_structure = app.injector.instanceOf[BusinessStructureView]
   lazy val fp = inject[BusinessStructureFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "BusinessStructureView" must {

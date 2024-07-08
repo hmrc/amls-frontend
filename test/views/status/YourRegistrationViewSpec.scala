@@ -23,7 +23,7 @@ import models.status._
 import org.jsoup.nodes.{Document, Element}
 import org.mockito.Mockito.when
 import org.scalatest.matchers.must.Matchers
-import play.api.mvc.Call
+import play.api.mvc.{AnyContentAsEmpty, Call, Request}
 import play.twirl.api.{Html, HtmlFormat}
 import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture
@@ -50,7 +50,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
     lazy val application_renewal_due = inject[ApplicationRenewalDue]
     lazy val application_renewal_submitted = inject[ApplicationRenewalSubmitted]
     lazy val withdrawOrDeregisterInformation = inject[WithdrawOrDeregisterInformation]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val feeResponse = FeeResponse(
       SubscriptionResponseType,
@@ -119,7 +119,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
       doc.getElementById("incomplete-description").html() must be("Your application to register with HMRC is incomplete. You have 28 days to complete your application from when you last saved your progress.")
       doc.getElementById("return-to-saved-application").html() must include("Return to your application")
       doc.getElementById("return-to-saved-application").nextElementSibling().html() must include("for business Name")
-      doc.getElementById("return-to-saved-application").attr("href") must be(controllers.routes.RegistrationProgressController.get.url)
+      doc.getElementById("return-to-saved-application").attr("href") must be(controllers.routes.RegistrationProgressController.get().url)
     }
 
     "contain correct content for status SubmissionWithdrawn" in new ViewFixture {
@@ -247,7 +247,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
         doc.getElementById("registration-info").html() must include("You have completed your renewal but have not submitted it. If you do not submit your renewal, your registration with HMRC will expire.")
         doc.getElementById("go-to-about-your-business").html() must include("Check business information and submit renewal")
         doc.getElementById("go-to-about-your-business").nextElementSibling().html() must include("for business Name")
-        doc.getElementById("go-to-about-your-business").attr("href") must be(controllers.routes.RegistrationProgressController.get.url)
+        doc.getElementById("go-to-about-your-business").attr("href") must be(controllers.routes.RegistrationProgressController.get().url)
       }
 
       "renewal section is incomplete" in new ViewFixture {
@@ -316,7 +316,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
       yourBusinessCell.getElementsByClass("govuk-heading-s").first().html() must include("Your business")
       yourBusinessCell.getElementById("business-name").html() must include("business Name")
       yourBusinessCell.getElementsMatchingOwnText("Check or update your business information")
-        .attr("href") must be(controllers.routes.RegistrationProgressController.get.url)
+        .attr("href") must be(controllers.routes.RegistrationProgressController.get().url)
     }
 
     "contain your registration status information cell with right content for status SubmissionReadyForReview" in new ViewFixture {
@@ -482,7 +482,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
         withdrawOrDeregisterInformation = withdrawOrDeregisterInformation(SubmissionReadyForReview))
 
       doc.getElementsMatchingOwnText("withdraw your application")
-        .attr("href") must be(controllers.withdrawal.routes.WithdrawApplicationController.get.url)
+        .attr("href") must be(controllers.withdrawal.routes.WithdrawApplicationController.get().url)
     }
 
     "contain deregister link for status SubmissionDecisionApproved" in new ViewFixture {
@@ -497,7 +497,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
         withdrawOrDeregisterInformation = withdrawOrDeregisterInformation(SubmissionDecisionApproved))
 
       doc.getElementsMatchingOwnText("deregister your business")
-        .attr("href") must be(controllers.deregister.routes.DeRegisterApplicationController.get.url)
+        .attr("href") must be(controllers.deregister.routes.DeRegisterApplicationController.get().url)
     }
   }
 }

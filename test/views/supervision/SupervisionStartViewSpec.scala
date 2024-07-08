@@ -18,6 +18,7 @@ package views.supervision
 
 import forms.supervision.SupervisionStartFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.{FakeRequest, Injecting}
 import utils.AmlsViewSpec
 import views.Fixture
@@ -28,10 +29,10 @@ class SupervisionStartViewSpec extends AmlsViewSpec with Matchers with Injecting
   lazy val supervision_start = inject[SupervisionStartView]
   lazy val fp = inject[SupervisionStartFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "SupervisionStartView view" must {
