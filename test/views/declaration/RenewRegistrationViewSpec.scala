@@ -18,6 +18,7 @@ package views.declaration
 
 import forms.declaration.RenewRegistrationFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -30,10 +31,10 @@ class RenewRegistrationViewSpec extends AmlsViewSpec with Matchers {
   lazy val renewView: RenewRegistrationView = inject[RenewRegistrationView]
   lazy val fp: RenewRegistrationFormProvider = inject[RenewRegistrationFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   val endDate = LocalDate.now().minusDays(1)

@@ -16,18 +16,18 @@
 
 package utils
 
-import org.apache.pekko.stream.Materializer
 import config.ApplicationConfig
 import controllers.CommonPlayDependencies
+import org.apache.pekko.stream.Materializer
 import org.jsoup.Jsoup
-import org.jsoup.nodes.{Document, Element}
+import org.jsoup.nodes.Document
 import org.mockito.Mockito.when
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
-import play.api.i18n.{Lang, MessagesApi}
+import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.{FakeRequest, Injecting}
@@ -44,14 +44,14 @@ trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar w
 
   val commonDependencies = app.injector.instanceOf(classOf[CommonPlayDependencies])
 
-  implicit lazy val messagesApi = app.injector.instanceOf(classOf[MessagesApi])
-  implicit lazy val messages = messagesApi.preferred(FakeRequest())
+  implicit lazy val messagesApi: MessagesApi = app.injector.instanceOf(classOf[MessagesApi])
+  implicit lazy val messages: Messages = messagesApi.preferred(FakeRequest())
 
-  implicit val headerCarrier = HeaderCarrier()
+  implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
-  implicit val lang = mock[Lang]
-  implicit val appConfig = mock[ApplicationConfig]
-  implicit val mat = mock[Materializer]
+  implicit val lang: Lang = mock[Lang]
+  implicit val appConfig: ApplicationConfig = mock[ApplicationConfig]
+  implicit val mat: Materializer = mock[Materializer]
 
   val mockMcc = mock[MessagesControllerComponents]
 

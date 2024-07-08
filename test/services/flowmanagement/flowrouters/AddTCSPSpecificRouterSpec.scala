@@ -55,7 +55,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
 
           val result = await(router.getRoute("internalId", SelectBusinessTypesPageId, model))
 
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -69,7 +69,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
             activity = Some(TrustAndCompanyServices))
           val result = await(router.getRoute("internalId", SelectBusinessTypesPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }

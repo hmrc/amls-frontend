@@ -18,14 +18,13 @@ package controllers.businessmatching.updateservice
 
 import cats.implicits._
 import config.ApplicationConfig
-import controllers.actions.SuccessfulAuthAction
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessActivitiesGenerator
 import models.businessactivities.{AccountantForAMLSRegulations, InvolvedInOtherNo, TaxMatters, WhoIsYourAccountant, BusinessActivities => BABusinessActivities}
+import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
-import models.businessmatching.BusinessMatchingMsbService._
-import models.businessmatching.BusinessActivity._
 import models.flowmanagement.AddBusinessTypeFlowModel
 import models.supervision._
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}

@@ -32,7 +32,6 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
 import utils.{AmlsSpec, StatusConstants}
 import views.html.responsiblepeople.PositionWithinBusinessStartDateView

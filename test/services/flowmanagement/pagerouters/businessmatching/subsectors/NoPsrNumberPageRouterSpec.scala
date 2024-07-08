@@ -36,7 +36,7 @@ class NoPsrNumberPageRouterSpec extends AmlsSpec {
       val model = ChangeSubSectorFlowModel()
       val result = router.getRoute("internalId", model)
 
-      redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }
   }
 
@@ -45,13 +45,13 @@ class NoPsrNumberPageRouterSpec extends AmlsSpec {
       val model = ChangeSubSectorFlowModel()
       val result = router.getRoute("internalId", model)
 
-      redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }
     "route to the 'Check company' page if company not registered is true" in new NotRegisteredFixture {
       val model = ChangeSubSectorFlowModel()
       val result = router.getRoute("internalId", model, includeCompanyNotRegistered = true)
 
-      redirectLocation(result) mustBe Some(routes.CheckCompanyController.get.url)
+      redirectLocation(result) mustBe Some(routes.CheckCompanyController.get().url)
     }
   }
 }

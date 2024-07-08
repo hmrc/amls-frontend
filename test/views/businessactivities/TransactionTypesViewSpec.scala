@@ -17,9 +17,10 @@
 package views.businessactivities
 
 import forms.businessactivities.TransactionTypesFormProvider
+import models.businessactivities.TransactionTypes
 import models.businessactivities.TransactionTypes.{DigitalSoftware, Paper}
-import models.businessactivities.{TransactionType, TransactionTypes}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.html.businessactivities.TransactionTypesView
@@ -31,10 +32,10 @@ class TransactionTypesViewSpec extends AmlsViewSpec with Matchers {
   lazy val transaction: TransactionTypesView = inject[TransactionTypesView]
   lazy val formProvider: TransactionTypesFormProvider = inject[TransactionTypesFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "transaction_types view" must {

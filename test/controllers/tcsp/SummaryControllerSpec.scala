@@ -38,7 +38,7 @@ class SummaryControllerSpec extends AmlsSpec with Injecting {
     self =>
 
     val request = addToken(authRequest)
-    implicit val ec = inject[ExecutionContext]
+    implicit val ec: ExecutionContext = inject[ExecutionContext]
 
     val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
     val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes(Some("12345678"))
@@ -87,7 +87,7 @@ class SummaryControllerSpec extends AmlsSpec with Injecting {
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get.url
+      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get().url
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
@@ -108,7 +108,7 @@ class SummaryControllerSpec extends AmlsSpec with Injecting {
 
         val result = controller.post()(request)
 
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
         verify(controller.dataCache).save[Tcsp](any(), any(), eqTo(model.copy(hasAccepted = true)))(any())
 

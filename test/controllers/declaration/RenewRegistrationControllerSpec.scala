@@ -113,7 +113,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
         }
 
         "redirect to the url provided by progressService" in new Fixture {
-          val call = controllers.routes.RegistrationProgressController.get
+          val call = controllers.routes.RegistrationProgressController.get()
           val newRequest = FakeRequest(POST, routes.RenewRegistrationController.post().url)
           .withFormUrlEncodedBody("renewRegistration" -> "false")
           val date = LocalDate.now()

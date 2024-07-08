@@ -42,7 +42,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
     lazy val view = inject[MostTransactionsView]
-    implicit val ec = inject[ExecutionContext]
+    implicit val ec: ExecutionContext = inject[ExecutionContext]
 
     val controller = new MostTransactionsController(
       SuccessfulAuthAction,

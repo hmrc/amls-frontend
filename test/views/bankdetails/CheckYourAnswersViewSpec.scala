@@ -18,6 +18,7 @@ package views.bankdetails
 
 import models.bankdetails.BankAccountType._
 import models.bankdetails._
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import utils.bankdetails.CheckYourAnswersHelper
@@ -30,7 +31,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with HtmlAssertions {
   lazy val cyaHelper = inject[CheckYourAnswersHelper]
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView(FakeRequest())
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView(FakeRequest())
 
     val toHide = 6
 

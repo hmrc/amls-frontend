@@ -111,7 +111,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get.url))
+        redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
       }
 
       "answer is no on post with valid data in edit mode" in new Fixture {
@@ -123,7 +123,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get.url))
+        redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
       }
 
       "when answer given is the same as previously cached answer" in new Fixture {
@@ -135,7 +135,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get.url))
+        redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
 
         verify(mockCacheConnector, never()).save(any(), any(), any())(any())
       }

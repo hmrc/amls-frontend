@@ -121,7 +121,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
 
             status(result) mustBe SEE_OTHER
             verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any())
-            redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get.url)
+            redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get().url)
           }
         }
 

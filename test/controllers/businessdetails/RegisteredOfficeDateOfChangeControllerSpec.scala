@@ -60,7 +60,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
   "handle the date of change form post" when {
     "given valid data for a UK address" in new Fixture {
 
-      val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post.url)
+      val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post().url)
         .withFormUrlEncodedBody(
         "dateOfChange.year" -> "2010",
         "dateOfChange.month" -> "10",
@@ -95,7 +95,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
 
     "given valid data for a Non-UK address" in new Fixture {
 
-      val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post.url)
+      val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post().url)
         .withFormUrlEncodedBody(
         "dateOfChange.year" -> "2005",
         "dateOfChange.month" -> "04",
@@ -136,7 +136,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any())).
         thenReturn(Future.successful(Some(BusinessDetails())))
 
-      val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post.url)
+      val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post().url)
         .withFormUrlEncodedBody("invalid" -> "data")
 
       val result = controller.post(postRequest)
@@ -146,7 +146,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
 
     }
     "dateOfChange is earlier than Business Activities Start Date" in new Fixture {
-      val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post.url)
+      val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post().url)
         .withFormUrlEncodedBody(
         "dateOfChange.year" -> "2010",
         "dateOfChange.month" -> "10",

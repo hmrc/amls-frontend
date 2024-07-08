@@ -26,7 +26,7 @@ import scala.concurrent.Future
 
 trait ServiceFlowMocks extends MockitoSugar {
 
-  implicit val mockServiceFlow = mock[ServiceFlow]
+  implicit val mockServiceFlow: ServiceFlow = mock[ServiceFlow]
 
   def mockIsNewActivityNewAuth(value: Boolean, activity: Option[BusinessActivity] = None) =
     activity map { a =>

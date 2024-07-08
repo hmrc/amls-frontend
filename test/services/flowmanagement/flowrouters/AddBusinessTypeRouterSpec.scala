@@ -58,7 +58,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
           activity = Some(HighValueDealing))
         val result = await(router.getRoute("internalId", SelectBusinessTypesPageId, model))
 
-        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
+        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
       }
     }
 
@@ -68,7 +68,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
         val model = AddBusinessTypeFlowModel(Some(HighValueDealing))
         val result = await(router.getRoute("internalId", SelectBusinessTypesPageId, model, edit = true))
 
-        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
+        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
       }
     }
 
@@ -80,7 +80,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute("internalId", SelectBusinessTypesPageId, model))
 
-        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
+        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
       }
     }
 
@@ -92,7 +92,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute("internalId", SelectBusinessTypesPageId, model, edit = true))
 
-        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
+        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
       }
     }
 
@@ -104,7 +104,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute("internalId", SelectBusinessTypesPageId, model, edit = true))
 
-        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
+        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
       }
     }
 
@@ -114,7 +114,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
           activity = Some(HighValueDealing))
         val result = await(router.getRoute("internalId", SelectBusinessTypesPageId, model))
 
-        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
+        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
       }
     }
 
@@ -126,7 +126,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute("internalId", SelectBusinessTypesPageId, model))
 
-        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
+        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
       }
     }
 
@@ -141,7 +141,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute("internalId", AddBusinessTypeSummaryPageId, model))
 
-        result mustBe Redirect(addRoutes.AddMoreBusinessTypesController.get)
+        result mustBe Redirect(addRoutes.AddMoreBusinessTypesController.get())
       }
     }
 
@@ -158,7 +158,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute("internalId", AddBusinessTypeSummaryPageId, AddBusinessTypeFlowModel(Some(BillPaymentServices))))
 
-        result mustBe Redirect(addRoutes.NeedMoreInformationController.get)
+        result mustBe Redirect(addRoutes.NeedMoreInformationController.get())
       }
     }
 
@@ -175,7 +175,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute("internalId", AddBusinessTypeSummaryPageId, AddBusinessTypeFlowModel(Some(HighValueDealing))))
 
-        result mustBe Redirect(addRoutes.NeedMoreInformationController.get)
+        result mustBe Redirect(addRoutes.NeedMoreInformationController.get())
       }
     }
 
@@ -207,7 +207,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute("internalId", AddMoreBusinessTypesPageId, model))
 
-        result mustBe Redirect(addRoutes.NeedMoreInformationController.get)
+        result mustBe Redirect(addRoutes.NeedMoreInformationController.get())
       }
     }
 
@@ -225,7 +225,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute("internalId", AddMoreBusinessTypesPageId, model))
 
-        result mustBe Redirect(addRoutes.NeedMoreInformationController.get)
+        result mustBe Redirect(addRoutes.NeedMoreInformationController.get())
       }
     }
 
@@ -236,7 +236,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute("internalId", NeedMoreInformationPageId, model))
 
-        result mustBe Redirect(controllers.routes.RegistrationProgressController.get)
+        result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
       }
     }
   }

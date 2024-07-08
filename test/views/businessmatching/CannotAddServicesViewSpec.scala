@@ -16,6 +16,7 @@
 
 package views.businessmatching
 
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -24,7 +25,7 @@ import views.html.businessmatching.CannotAddServicesView
 class CannotAddServicesViewSpec extends AmlsViewSpec {
 
   lazy val cannotAddServicesView = inject[CannotAddServicesView]
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   "CannotAddServicesView" must {
 
@@ -54,7 +55,7 @@ class CannotAddServicesViewSpec extends AmlsViewSpec {
       val button = doc.getElementById("cannot-continue-with-application")
 
       button.text() mustBe messages("businessmatching.cannotchangeservices.button.text")
-      button.attr("href") mustBe controllers.routes.RegistrationProgressController.get.url
+      button.attr("href") mustBe controllers.routes.RegistrationProgressController.get().url
     }
   }
 }

@@ -239,7 +239,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
           val result = controller.get(1)(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
         }
       }
 
@@ -254,7 +254,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
           val result = controller.get(1)(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
+          redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
         }
 
       }
@@ -273,7 +273,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
             val result = controller.post(1, None)(request)
 
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
             verify(controller.dataCacheConnector).save(any(), any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any())
           }
@@ -294,7 +294,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
             val result = controller.post(1, flow)(request)
 
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
             verify(controller.dataCacheConnector).save(any(), any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any())
 
@@ -328,7 +328,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.post(1, flow)(request)
-          redirectLocation(result) must be(Some(controllers.declaration.routes.RegisterPartnersController.get.url))
+          redirectLocation(result) must be(Some(controllers.declaration.routes.RegisterPartnersController.get().url))
         }
       }
 

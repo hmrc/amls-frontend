@@ -29,7 +29,6 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.StatusService
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.tradingpremises.YourTradingPremisesView
@@ -40,7 +39,7 @@ import scala.concurrent.Future
 
 class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with generators.tradingpremises.TradingPremisesGenerator {
 
-  implicit val request = FakeRequest
+  implicit val request: FakeRequest.type = FakeRequest
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
   val mockStatusService = mock[StatusService]
@@ -94,7 +93,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
         .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
       val result = ytpController.get()(request)
-      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
+      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
       status(result) must be(SEE_OTHER)
     }
 
@@ -181,7 +180,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
         val result = ytpController.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
       }
 
     }

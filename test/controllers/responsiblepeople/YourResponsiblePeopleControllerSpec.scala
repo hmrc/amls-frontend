@@ -93,7 +93,7 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar wit
         ).thenReturn(Future.successful(None))
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
       }
     }
   }

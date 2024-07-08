@@ -51,7 +51,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
     self =>
     val request = addToken(authRequest)
     lazy val view = inject[UsesForeignCurrenciesView]
-    implicit val ec = inject[ExecutionContext]
+    implicit val ec: ExecutionContext = inject[ExecutionContext]
 
     when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
       .thenReturn(Future.successful(None))
@@ -95,7 +95,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
       inject[UsesForeignCurrenciesFormProvider],
       view
     )
-    implicit val ec = inject[ExecutionContext]
+    implicit val ec: ExecutionContext = inject[ExecutionContext]
 
     when {
       mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())

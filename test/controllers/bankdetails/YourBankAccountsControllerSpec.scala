@@ -22,72 +22,75 @@ import models.bankdetails._
 import models.status.SubmissionReady
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.mvc.{AnyContentAsEmpty, Request, Result}
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import views.html.bankdetails.YourBankAccountsView
+
+import scala.concurrent.Future
 
 class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
 
-    val ukAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12341234", "000000")))
+    val ukAccount: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12341234", "000000")))
 
-    val completeModel1 = BankDetails(
+    val completeModel1: BankDetails = BankDetails(
       Some(PersonalAccount),
       Some("Completed First Account Name"),
       Some(ukAccount),
-        false,
-        false,
-        None,
-        true)
+      hasChanged = false,
+      refreshedFromServer = false,
+      None,
+      hasAccepted = true)
 
-    val completeModel2 = BankDetails(
+    val completeModel2: BankDetails = BankDetails(
       Some(BelongsToBusiness),
       Some("Completed Second Account Name"),
       Some(ukAccount),
-        false,
-        false,
-        None,
-        true)
+      hasChanged = false,
+      refreshedFromServer = false,
+      None,
+      hasAccepted = true)
 
-    val completeModel3 = BankDetails(
+    val completeModel3: BankDetails = BankDetails(
       Some(BelongsToOtherBusiness),
       Some("Completed Third Account Name"),
       Some(ukAccount),
-      false,
-      false,
+      hasChanged = false,
+      refreshedFromServer = false,
       None,
-      true
+      hasAccepted = true
     )
 
-    val deletedCompleteModel4 = completeModel3.copy(
+    val deletedCompleteModel4: BankDetails = completeModel3.copy(
       status = Some(StatusConstants.Deleted),
       hasAccepted = true,
       accountName = Some("Completed Deleted Fourth Account Name")
     )
 
-    val inCompleteModel1 = BankDetails(
+    val inCompleteModel1: BankDetails = BankDetails(
       Some(PersonalAccount),
       None,
       Some(ukAccount)
     )
-    val inCompleteModel2 = BankDetails(
+    val inCompleteModel2: BankDetails = BankDetails(
       Some(BelongsToBusiness),
       Some("Incomplete Second Account Name"))
 
-    val inCompleteModel3 = BankDetails(
+    val inCompleteModel3: BankDetails = BankDetails(
       None,
       Some("Incomplete Third Account Name"))
 
-    val deletedInCompleteModel4 = inCompleteModel3.copy(
+    val deletedInCompleteModel4: BankDetails = inCompleteModel3.copy(
       status = Some(StatusConstants.Deleted),
       accountName = Some("Incomplete delete Fourth Account Name")
     )
 
-    lazy val bankAccountView = app.injector.instanceOf[YourBankAccountsView]
+    lazy val bankAccountView: YourBankAccountsView = app.injector.instanceOf[YourBankAccountsView]
 
     val controller = new YourBankAccountsController(
       dataCacheConnector = mockCacheConnector,
@@ -104,7 +107,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
       mockApplicationStatus(SubmissionReady)
 
-      val result = controller.get()(request)
+      val result: Future[Result] = controller.get()(request)
 
       status(result) must be(OK)
 
@@ -127,7 +130,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
       mockApplicationStatus(SubmissionReady)
 
-      val result = controller.get()(request)
+      val result: Future[Result] = controller.get()(request)
 
       status(result) must be(OK)
 
@@ -149,7 +152,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
       mockApplicationStatus(SubmissionReady)
 
-      val result = controller.get()(request)
+      val result: Future[Result] = controller.get()(request)
 
       status(result) must be(OK)
 
@@ -171,7 +174,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
       mockApplicationStatus(SubmissionReady)
 
-      val result = controller.get()(request)
+      val result: Future[Result] = controller.get()(request)
 
       status(result) must be(OK)
 
@@ -187,7 +190,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
       mockApplicationStatus(SubmissionReady)
 
-      val result = controller.get()(request)
+      val result: Future[Result] = controller.get()(request)
 
       status(result) mustBe OK
 
@@ -201,7 +204,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
       mockApplicationStatus(SubmissionReady)
 
-      val result = controller.get()(request)
+      val result: Future[Result] = controller.get()(request)
 
       status(result) mustBe OK
 
@@ -215,7 +218,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
       mockApplicationStatus(SubmissionReady)
 
-      val result = controller.get()(request)
+      val result: Future[Result] = controller.get()(request)
 
       status(result) mustBe OK
 

@@ -27,12 +27,12 @@ import services.flowmanagement.{Router, Router2}
 import scala.concurrent.Future
 
 trait RouterMocks extends MockitoSugar {
-  implicit def createRouter[T](implicit m: Manifest[Router[T]]) = {
+  implicit def createRouter[T](implicit m: Manifest[Router[T]]): Router[T] = {
     val r = mock[Router[T]]
     r.mockRoute
     r
   }
-  implicit def createRouter2[T](implicit m: Manifest[Router2[T]]) = {
+  implicit def createRouter2[T](implicit m: Manifest[Router2[T]]): Router2[T] = {
     val r = mock[Router2[T]]
     r.mockRoute
     r

@@ -22,12 +22,16 @@ import models.bankdetails.BankDetails
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalacheck.Gen
+import org.scalatest.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import play.api.i18n.Messages
+import play.api.mvc.{AnyContentAsEmpty, Request, Result}
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import views.TitleValidator
 import views.html.bankdetails.WhatYouNeedView
+
+import scala.concurrent.Future
 
 class WhatYouNeedControllerSpec
   extends AmlsSpec
@@ -37,8 +41,8 @@ class WhatYouNeedControllerSpec
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
-    lazy val whatYouNeed = app.injector.instanceOf[WhatYouNeedView]
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    lazy val whatYouNeed: WhatYouNeedView = app.injector.instanceOf[WhatYouNeedView]
 
     val controller = new WhatYouNeedController(SuccessfulAuthAction,
       commonDependencies,
@@ -46,7 +50,7 @@ class WhatYouNeedControllerSpec
       mockMcc,
       whatYouNeed)
 
-    def assertHref(url: String)(implicit doc: Document) = {
+    def assertHref(url: String)(implicit doc: Document): Assertion = {
       doc.getElementById("button").attr("href") mustBe url
     }
   }
@@ -55,22 +59,22 @@ class WhatYouNeedControllerSpec
     "respond with SEE_OTHER and show the 'what you need' page" in new Fixture {
       mockCacheFetch(Gen.listOfN(3, bankDetailsGen).sample, Some(BankDetails.key))
 
-      val result = controller.get()(request)
+      val result: Future[Result] = controller.get()(request)
 
       status(result) must be(OK)
 
-      implicit val doc = Jsoup.parse(contentAsString(result))
+      implicit val doc: Document = Jsoup.parse(contentAsString(result))
       validateTitle(s"${Messages("title.wyn")} - ${Messages("summary.bankdetails")}")
 
       contentAsString(result) must include(Messages("button.continue"))
     }
 
     "remove the itemIndex from session if there was one present" in new Fixture {
-      override val request = addTokenWithSessionParam(authRequest)(("itemIndex" -> "4"))
+      override val request: Request[AnyContentAsEmpty.type] = addTokenWithSessionParam(authRequest)(("itemIndex" -> "4"))
 
       mockCacheFetch(Gen.listOfN(3, bankDetailsGen).sample, Some(BankDetails.key))
 
-      val result = controller.get()(request)
+      val result: Future[Result] = controller.get()(request)
 
       status(result) must be(OK)
       session(result).get("itemIndex") mustBe None
@@ -82,9 +86,9 @@ class WhatYouNeedControllerSpec
         "there are no bank accounts currently in the system" in new Fixture {
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))
 
-          val result = controller.get()(request)
+          val result: Future[Result] = controller.get()(request)
 
-          implicit val doc = Jsoup.parse(contentAsString(result))
+          implicit val doc: Document = Jsoup.parse(contentAsString(result))
 
           assertHref(controllers.bankdetails.routes.HasBankAccountController.get.url)
         }
@@ -94,9 +98,9 @@ class WhatYouNeedControllerSpec
             _.map(_.copy(status = Some(StatusConstants.Deleted)))
           })
 
-          val result = controller.get()(request)
+          val result: Future[Result] = controller.get()(request)
 
-          implicit val doc = Jsoup.parse(contentAsString(result))
+          implicit val doc: Document = Jsoup.parse(contentAsString(result))
 
           assertHref(controllers.bankdetails.routes.HasBankAccountController.get.url)
         }
@@ -106,8 +110,8 @@ class WhatYouNeedControllerSpec
         "there are already bank accounts in the system" in new Fixture {
           mockCacheFetch(Gen.listOfN(3, bankDetailsGen).sample, Some(BankDetails.key))
 
-          val result = controller.get()(request)
-          implicit val doc = Jsoup.parse(contentAsString(result))
+          val result: Future[Result] = controller.get()(request)
+          implicit val doc: Document = Jsoup.parse(contentAsString(result))
 
           assertHref(controllers.bankdetails.routes.BankAccountNameController.getNoIndex.url)
         }

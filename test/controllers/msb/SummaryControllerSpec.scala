@@ -39,7 +39,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-    implicit val ec = inject[ExecutionContext]
+    implicit val ec: ExecutionContext = inject[ExecutionContext]
     lazy val view = inject[CheckYourAnswersView]
     val controller = new SummaryController(
       SuccessfulAuthAction,
@@ -183,7 +183,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
         val result = controller.post()(request)
 
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
         verify(controller.dataCache).save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(completeModel.copy(hasAccepted = true)))(any())
       }

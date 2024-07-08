@@ -24,6 +24,7 @@ import models.businessmatching._
 import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.AmlsViewSpec
 import utils.businessmatching.CheckYourAnswersHelper
@@ -37,7 +38,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
   trait ViewFixture extends Fixture {
     lazy val checkYourAnswersView = app.injector.instanceOf[CheckYourAnswersView]
     lazy val cyaHelper = app.injector.instanceOf[CheckYourAnswersHelper]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val defaultActivitiesUrl = controllers.businessmatching.routes.RegisterServicesController.get().url
   }

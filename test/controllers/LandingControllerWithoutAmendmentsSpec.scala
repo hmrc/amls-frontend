@@ -214,7 +214,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.BusinessTypeController.get.url)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.BusinessTypeController.get().url)
 
           verify(controllerNoAmlsNumber.auditConnector).sendExtendedEvent(any[ExtendedDataEvent])(any(), any())
         }
@@ -232,7 +232,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.ConfirmPostCodeController.get.url)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.ConfirmPostCodeController.get().url)
         }
 
         "the landing service has review details without UK postcode" in new Fixture {
@@ -248,7 +248,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.ConfirmPostCodeController.get.url)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.ConfirmPostCodeController.get().url)
         }
 
         "the landing service has review details without postcode but other country" in new Fixture {
@@ -264,7 +264,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.BusinessTypeController.get.url)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.BusinessTypeController.get().url)
         }
 
         "the landing service has review details without postcode and country" in new Fixture {
@@ -280,7 +280,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.ConfirmPostCodeController.get.url)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.ConfirmPostCodeController.get().url)
         }
 
 

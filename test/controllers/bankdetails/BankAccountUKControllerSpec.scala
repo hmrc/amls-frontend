@@ -27,6 +27,7 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.mockito.ArgumentCaptor
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Request, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
@@ -41,13 +42,13 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
-    val request = addToken(authRequest)
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
-    val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12345678", "11-11-11")))
+    val ukBankAccount: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12345678", "11-11-11")))
 
-    val accountType = PersonalAccount
+    val accountType: BankAccountType.PersonalAccount.type = PersonalAccount
 
-    val bankAcc = inject[BankAccountUKView]
+    val bankAcc: BankAccountUKView = inject[BankAccountUKView]
 
     val controller = new BankAccountUKController(
       mockCacheConnector,
@@ -63,7 +64,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
   }
 
-  val fieldElements = Array("accountNumber", "sortCode")
+  val fieldElements: Array[String] = Array("accountNumber", "sortCode")
 
   "BankAccountUKController" when {
     "get is called" must {
@@ -74,7 +75,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
           mockApplicationStatus(SubmissionReady)
 
-          val result = controller.get(1, false)(request)
+          val result: Future[Result] = controller.get(1, false)(request)
           val document: Document = Jsoup.parse(contentAsString(result))
 
           status(result) must be(OK)
@@ -88,7 +89,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
           mockApplicationStatus(SubmissionReady)
 
-          val result = controller.get(1, true)(request)
+          val result: Future[Result] = controller.get(1, edit = true)(request)
           status(result) must be(OK)
         }
 
@@ -98,7 +99,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
             mockApplicationStatus(SubmissionDecisionApproved)
 
-            val result = controller.get(1, edit = true)(request)
+            val result: Future[Result] = controller.get(1, edit = true)(request)
             val document: Document = Jsoup.parse(contentAsString(result))
 
             status(result) must be(OK)
@@ -116,7 +117,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
           mockApplicationStatus(SubmissionReady)
 
-          val result = controller.get(1)(request)
+          val result: Future[Result] = controller.get(1)(request)
 
           status(result) must be(NOT_FOUND)
         }
@@ -133,7 +134,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
           mockApplicationStatus(SubmissionReadyForReview)
 
-          val result = controller.get(1, true)(request)
+          val result: Future[Result] = controller.get(1, edit = true)(request)
 
           status(result) must be(NOT_FOUND)
 
@@ -151,7 +152,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
           mockApplicationStatus(SubmissionDecisionApproved)
 
-          val result = controller.get(1, true)(request)
+          val result: Future[Result] = controller.get(1, edit = true)(request)
 
           status(result) must be(NOT_FOUND)
 
@@ -164,7 +165,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
         "given valid data in edit mode" in new Fixture {
 
 
-          val newRequest = FakeRequest(POST, routes.BankAccountUKController.post(1, true).url)
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountUKController.post(1, edit = true).url)
             .withFormUrlEncodedBody(
             "accountNumber" -> "12345678",
             "sortCode" -> "123456"
@@ -176,14 +177,14 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(1, true)(newRequest)
+          val result: Future[Result] = controller.post(1, edit = true)(newRequest)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest = FakeRequest(POST, routes.BankAccountUKController.post(1, false).url)
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountUKController.post(1, false).url)
             .withFormUrlEncodedBody(
             "accountNumber" -> "12345678",
             "sortCode" -> "123456"
@@ -195,7 +196,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(1)(newRequest)
+          val result: Future[Result] = controller.post(1)(newRequest)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
@@ -206,7 +207,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest = FakeRequest(POST, routes.BankAccountUKController.post(50, true).url)
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountUKController.post(50, edit = true).url)
             .withFormUrlEncodedBody(
             "accountNumber" -> "12345678",
             "sortCode" -> "123456"
@@ -215,7 +216,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(50, true)(newRequest)
+          val result: Future[Result] = controller.post(50, edit = true)(newRequest)
 
           status(result) must be(NOT_FOUND)
         }
@@ -225,7 +226,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = FakeRequest(POST, routes.BankAccountUKController.post(1, true).url)
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountUKController.post(1, edit = true).url)
             .withFormUrlEncodedBody(
             "accountNumber" -> "%!@£%",
             "sortCode" -> "&^%$"
@@ -234,7 +235,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(1, true)(newRequest)
+          val result: Future[Result] = controller.post(1, edit = true)(newRequest)
 
           status(result) must be(BAD_REQUEST)
         }
@@ -243,7 +244,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
     "an account is created" must {
       "send an audit event" in new Fixture {
-        val newRequest = FakeRequest(POST, routes.BankAccountUKController.post(1, false).url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountUKController.post(1, false).url)
           .withFormUrlEncodedBody(
           "accountNumber" -> "12345678",
           "sortCode" -> "123456"
@@ -260,7 +261,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
         mockCacheSave[Seq[BankDetails]]
 
-        val result = controller.post(1)(newRequest)
+        val result: Future[Result] = controller.post(1)(newRequest)
 
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))

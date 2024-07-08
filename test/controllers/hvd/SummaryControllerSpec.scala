@@ -47,7 +47,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
     self =>
     val request = addToken(authRequest)
 
-    implicit val headerCarrier = HeaderCarrier()
+    implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
     lazy val view = inject[CheckYourAnswersView]
     lazy val controller =
       new SummaryController(
@@ -185,7 +185,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
       val result = controller.post()(request)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
+      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
       val captor = ArgumentCaptor.forClass(classOf[Hvd])
       verify(controller.dataCache).save[Hvd](any(), eqTo(Hvd.key), captor.capture())(any())

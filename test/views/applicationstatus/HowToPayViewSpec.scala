@@ -17,8 +17,8 @@
 package views.applicationstatus
 
 import config.ApplicationConfig
-import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.applicationstatus.HowToPayView
@@ -27,7 +27,7 @@ class HowToPayViewSpec extends AmlsViewSpec with Matchers {
 
   implicit lazy val config: ApplicationConfig = inject[ApplicationConfig]
   lazy val howToPay = app.injector.instanceOf[HowToPayView]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
 

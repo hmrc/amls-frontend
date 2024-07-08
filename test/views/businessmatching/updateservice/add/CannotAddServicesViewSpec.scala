@@ -16,6 +16,7 @@
 
 package views.businessmatching.updateservice.add
 
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add.CannotAddServicesView
@@ -23,7 +24,7 @@ import views.html.businessmatching.updateservice.add.CannotAddServicesView
 class CannotAddServicesViewSpec extends AmlsViewSpec {
 
   lazy val cannot_add_services = app.injector.instanceOf[CannotAddServicesView]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
     def view = cannot_add_services()

@@ -18,14 +18,13 @@ package models.tcsp
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
 
   "services of another Tcsp" must {
 
     "JSON validation" when {
-      import play.api.libs.json.JsonValidationError
 
       "successfully validate given an enum value" in {
 

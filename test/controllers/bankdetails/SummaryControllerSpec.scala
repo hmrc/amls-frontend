@@ -23,22 +23,25 @@ import models.status.SubmissionReady
 import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.{AnyContentAsEmpty, Request, Result}
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import utils.bankdetails.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.bankdetails.CheckYourAnswersView
 
+import scala.concurrent.Future
+
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
-    val ukAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456789", "111111")))
-    val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some(NonUKIBANNumber("DE89370400440532013000")))
-    val nonUkAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
-    lazy val summaryView = inject[CheckYourAnswersView]
+    val ukAccount: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456789", "111111")))
+    val nonUkIban: BankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some(NonUKIBANNumber("DE89370400440532013000")))
+    val nonUkAccount: BankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
+    lazy val summaryView: CheckYourAnswersView = inject[CheckYourAnswersView]
 
     val controller = new SummaryController(
       dataCacheConnector = mockCacheConnector,
@@ -53,13 +56,13 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
     "load the summary page with the correct text when UK" in new Fixture {
 
-      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount))
-      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
+      val model1: BankDetails = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount))
+      val model2: BankDetails = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
 
       mockCacheFetch[Seq[BankDetails]](Some(Seq(model1, model2)))
       mockApplicationStatus(SubmissionReady)
 
-      val result = controller.get(1)(request)
+      val result: Future[Result] = controller.get(1)(request)
 
       status(result) must be(OK)
       contentAsString(result) must include("My Personal Account")
@@ -74,21 +77,21 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       mockCacheFetch[Seq[BankDetails]](None)
       mockApplicationStatus(SubmissionReady)
 
-      val result = controller.get(1)(request)
+      val result: Future[Result] = controller.get(1)(request)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
+      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
     }
 
     "load the summary page with correct text when IBAN" in new Fixture {
 
-      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount))
-      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
+      val model1: BankDetails = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount))
+      val model2: BankDetails = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
 
       mockCacheFetch[Seq[BankDetails]](Some(Seq(model1, model2)))
       mockApplicationStatus(SubmissionReady)
 
-      val result = controller.get(2)(request)
+      val result: Future[Result] = controller.get(2)(request)
 
       status(result) must be(OK)
       contentAsString(result) must include("My IBAN Account")
@@ -101,32 +104,32 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
   "post is called" must {
     "respond with OK and redirect to the bank account details page" in new Fixture {
 
-      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount))
-      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
+      val model1: BankDetails = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount))
+      val model2: BankDetails = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
 
       mockCacheFetch[Seq[BankDetails]](Some(Seq(model1, model2)))
 
       mockCacheSave[Seq[BankDetails]]
 
-      val result = controller.post(2)(request)
+      val result: Future[Result] = controller.post(2)(request)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.bankdetails.routes.YourBankAccountsController.get.url))
+      redirectLocation(result) must be(Some(controllers.bankdetails.routes.YourBankAccountsController.get().url))
     }
 
     "update the accepted flag" in new Fixture {
-      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount), hasAccepted = true)
-      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
+      val model1: BankDetails = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount), hasAccepted = true)
+      val model2: BankDetails = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
 
-      val completeModel1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount), hasAccepted = true)
-      val completeModel2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban), hasAccepted = true)
+      val completeModel1: BankDetails = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount), hasAccepted = true)
+      val completeModel2: BankDetails = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban), hasAccepted = true)
 
-      val bankAccounts = Seq(model1, model2)
+      val bankAccounts: Seq[BankDetails] = Seq(model1, model2)
 
       mockCacheFetch[Seq[BankDetails]](Some(bankAccounts))
       mockCacheSave[Seq[BankDetails]]
 
-      val result = controller.post(2)(request)
+      val result: Future[Result] = controller.post(2)(request)
 
       status(result) must be(SEE_OTHER)
 
@@ -134,16 +137,16 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
         meq(Seq(completeModel1, completeModel2)))(any())
     }
     "remove the itemIndex from session if there was one present" in new Fixture {
-      override val request = addTokenWithSessionParam(authRequest)(("itemIndex" -> "4"))
+      override val request: Request[AnyContentAsEmpty.type] = addTokenWithSessionParam(authRequest)(("itemIndex" -> "4"))
 
-      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount), hasAccepted = true)
-      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
+      val model1: BankDetails = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount), hasAccepted = true)
+      val model2: BankDetails = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
 
-      val bankAccounts = Seq(model1, model2)
+      val bankAccounts: Seq[BankDetails] = Seq(model1, model2)
 
       mockCacheFetch[Seq[BankDetails]](Some(bankAccounts))
       mockCacheSave[Seq[BankDetails]]
-      val result = controller.post(2)(request)
+      val result: Future[Result] = controller.post(2)(request)
 
       status(result) must be(SEE_OTHER)
       session(result).get("itemIndex") mustBe None

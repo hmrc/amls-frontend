@@ -175,7 +175,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
       val result = controller.accept.apply(FakeRequest())
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get.toString
+      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get().toString
 
       verify(mockCacheConnector).save[Eab](any(), eqTo(Eab.key),
         eqTo(completeEabJson.as[Eab].copy(hasAccepted = true)))(any())

@@ -147,7 +147,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
       status(result) mustBe SEE_OTHER
 
-      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
+      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
     }
 
@@ -162,7 +162,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
         .thenReturn(bmWithoutTCSPOrMSB)
 
       val sections = Seq(
-        TaskRow("supervision", controllers.supervision.routes.SummaryController.get.url, false, Completed, TaskRow.completedTag),
+        TaskRow("supervision", controllers.supervision.routes.SummaryController.get().url, false, Completed, TaskRow.completedTag),
         TaskRow("asp", controllers.asp.routes.SummaryController.get.url, true, Completed, TaskRow.updatedTag)
       )
 

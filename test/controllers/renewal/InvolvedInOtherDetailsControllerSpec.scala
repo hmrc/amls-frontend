@@ -19,7 +19,7 @@ package controllers.renewal
 import config.AmlsErrorHandler
 import controllers.actions.SuccessfulAuthAction
 import forms.renewal.InvolvedInOtherDetailsFormProvider
-import models.businessmatching.BusinessActivity.{AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
+import models.businessmatching.BusinessActivity.{AccountancyServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.renewal.{InvolvedInOtherYes, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.any

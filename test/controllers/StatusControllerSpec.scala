@@ -39,7 +39,6 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import services._
-import uk.gov.hmrc.http.HttpResponse
 import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
 import views.html.status.YourRegistrationView
@@ -642,7 +641,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
         val result = controller.get()(request)
 
-        redirectLocation(result) must be(Some(controllers.routes.LandingController.get.url))
+        redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
       }
     }
 
@@ -669,7 +668,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         val result = controllerNoAmlsNumber.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get.url}]").text mustBe s"${messages("status.withdraw.link-text")}."
+        doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get().url}]").text mustBe s"${messages("status.withdraw.link-text")}."
       }
     }
 
@@ -696,7 +695,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         val result = controller.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get.url}]").text mustBe s"${messages("your.registration.deregister.link")}."
+        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe s"${messages("your.registration.deregister.link")}."
       }
     }
 

@@ -16,7 +16,6 @@
 
 package models
 
-import java.sql.Timestamp
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsObject, JsResult, JsSuccess, Json}

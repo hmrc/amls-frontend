@@ -27,7 +27,6 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import services.RenewalService
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.renewal.WhatYouNeedView
 

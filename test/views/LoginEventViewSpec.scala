@@ -17,7 +17,7 @@
 package views
 
 import org.scalatest.matchers.must.Matchers
-import play.api.mvc.Call
+import play.api.mvc.{AnyContentAsEmpty, Call, Request}
 import utils.AmlsViewSpec
 import views.html.LoginEventView
 
@@ -25,8 +25,8 @@ class LoginEventViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val login_event = inject[LoginEventView]
-    implicit val requestWithToken = addTokenForView()
-    implicit val redirectCall = Call("GET", "someurl")
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
+    implicit val redirectCall: Call = Call("GET", "someurl")
   }
 
   "Login Event Page View" must {

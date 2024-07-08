@@ -19,6 +19,7 @@ package views.businessmatching.updateservice
 import forms.businessmatching.updateservice.ChangeBusinessTypesFormProvider
 import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.ChangeServicesView
@@ -29,7 +30,7 @@ class ChangeServicesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val change_services = inject[ChangeServicesView]
   lazy val fp = inject[ChangeBusinessTypesFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
     def view = change_services(fp(), allowAdd)

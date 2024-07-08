@@ -126,7 +126,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
 
           val result = controller.get()(request)
 
-          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
+          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
         }
       }
     }

@@ -25,6 +25,7 @@ import cats.implicits._
 import config.ApplicationConfig
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import play.api.i18n.{Lang, Messages}
+import play.api.mvc.AnyContentAsEmpty
 import play.api.mvc.Results._
 import play.api.test.FakeRequest
 import utils.StatusConstants
@@ -33,12 +34,12 @@ import views.html.ErrorView
 class TPControllerHelperSpec extends PlaySpec with MockitoSugar {
 
   trait TestFixture {
-    implicit val request = FakeRequest()
-    val cache = mock[Cache]
-    implicit val lang = mock[Lang]
-    implicit val messages = mock[Messages]
-    implicit val appConfig = mock[ApplicationConfig]
-    implicit val errorView = mock[ErrorView]
+    implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+    val cache: Cache = mock[Cache]
+    implicit val lang: Lang = mock[Lang]
+    implicit val messages: Messages = mock[Messages]
+    implicit val appConfig: ApplicationConfig = mock[ApplicationConfig]
+    implicit val errorView: ErrorView = mock[ErrorView]
 
     def setUpTradingPremise(model: Option[TradingPremises]) = when {
       cache.getEntry[Seq[TradingPremises]](any())(any())

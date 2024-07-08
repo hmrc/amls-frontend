@@ -159,7 +159,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         val result = controller.post(true)(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get.url))
+        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
       }
     }
 
@@ -189,7 +189,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get.url))
+      redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
     }
 
     "on post with valid data for AnotherBodyNo" in new Fixture {

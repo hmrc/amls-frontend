@@ -26,7 +26,6 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
 import utils.AmlsSpec
 import views.html.responsiblepeople.address.MovedAddressView
@@ -85,7 +84,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecti
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get(1)(request)
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
         status(result) must be(SEE_OTHER)
 
       }
@@ -196,7 +195,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecti
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post(1)(newRequest)
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
         status(result) must be(SEE_OTHER)
       }
 

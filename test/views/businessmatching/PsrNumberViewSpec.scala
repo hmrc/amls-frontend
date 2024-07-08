@@ -18,9 +18,9 @@ package views.businessmatching
 
 import forms.businessmatching.PSRNumberFormProvider
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
-import org.jsoup.nodes.Element
 import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.PsrNumberView
@@ -29,7 +29,7 @@ class PsrNumberViewSpec extends AmlsViewSpec {
 
     lazy val psr_number = app.injector.instanceOf[PsrNumberView]
     lazy val formProvider = app.injector.instanceOf[PSRNumberFormProvider]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     trait ViewFixture extends Fixture
 

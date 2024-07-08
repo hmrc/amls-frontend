@@ -18,6 +18,7 @@ package views.bankdetails
 
 import forms.bankdetails.BankAccountIBANNumberFormProvider
 import models.bankdetails.NonUKIBANNumber
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
@@ -29,10 +30,10 @@ class BankAccountIBANNumberViewSpec extends AmlsViewSpec {
   lazy val iban = inject[BankAccountIBANNumberView]
   lazy val fp = inject[BankAccountIBANNumberFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "BankAccountIBANNumberView view " must{

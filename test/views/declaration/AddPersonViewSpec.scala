@@ -21,6 +21,7 @@ import models.businessmatching.BusinessType
 import models.declaration.AddPerson
 import models.declaration.release7.{ExternalAccountant, RoleWithinBusinessRelease7}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -31,10 +32,10 @@ class AddPersonViewSpec extends AmlsViewSpec with Matchers  {
   lazy val personView = inject[AddPersonView]
   lazy val fp = inject[AddPersonFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "AddPersonView" must {

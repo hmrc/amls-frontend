@@ -19,6 +19,7 @@ package views.businessactivities
 import forms.businessactivities.RiskAssessmentFormProvider
 import models.businessactivities.RiskAssessmentHasPolicy
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import play.api.test.FakeRequest
 import views.Fixture
@@ -30,10 +31,10 @@ class RiskAssessmentPolicyViewSpec extends AmlsViewSpec with Matchers {
   lazy val policy: RiskAssessmentPolicyView = inject[RiskAssessmentPolicyView]
   lazy val formProvider: RiskAssessmentFormProvider = inject[RiskAssessmentFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "risk_assessment_policy view" must {

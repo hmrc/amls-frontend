@@ -19,7 +19,7 @@ package views.businessdetails
 import forms.businessdetails.RegisteredOfficeUKFormProvider
 import models.businessdetails.RegisteredOfficeUK
 import org.scalatest.matchers.must.Matchers
-import play.api.mvc.Request
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
@@ -35,7 +35,7 @@ class RegisteredOfficeUKViewSpec extends AmlsViewSpec with Matchers  {
   implicit val request: Request[_] = FakeRequest()
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "registered_office view" must {

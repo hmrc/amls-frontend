@@ -40,7 +40,7 @@ import scala.concurrent.Future
 
 class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with OptionValues with BeforeAndAfter with Injecting {
 
-  implicit val hc = HeaderCarrier()
+  implicit val hc: HeaderCarrier = HeaderCarrier()
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
   val emptyCache = Cache.empty

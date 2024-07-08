@@ -146,7 +146,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with Injecting {
 
               captor.getValue.deregistrationReason mustBe DeregistrationReason.OutOfScope
 
-              redirectLocation(result) must be(Some(controllers.routes.LandingController.get.url))
+              redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
             }
 
             "DeregistrationReason is selection with other reason" in new TestFixture {
@@ -166,7 +166,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with Injecting {
               captor.getValue.deregistrationReason mustBe DeregistrationReason.Other("reason")
               captor.getValue.deregReasonOther mustBe "reason".some
 
-              redirectLocation(result) must be(Some(controllers.routes.LandingController.get.url))
+              redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
             }
           }
         }

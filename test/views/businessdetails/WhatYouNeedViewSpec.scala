@@ -16,8 +16,8 @@
 
 package views.businessdetails
 
-import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.WhatYouNeedView
@@ -25,7 +25,7 @@ import views.html.businessdetails.WhatYouNeedView
 class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val what_you_need = app.injector.instanceOf[WhatYouNeedView]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
 

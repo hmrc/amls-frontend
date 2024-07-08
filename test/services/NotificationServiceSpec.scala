@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class NotificationServiceSpec extends AmlsSpec with MockitoSugar with ScalaCheckDrivenPropertyChecks {
 
-  implicit val hc = HeaderCarrier()
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   trait Fixture {
 

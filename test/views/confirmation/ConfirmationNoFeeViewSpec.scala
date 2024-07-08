@@ -20,6 +20,7 @@ import config.ApplicationConfig
 import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.confirmation.ConfirmationNoFeeView
@@ -28,8 +29,8 @@ class ConfirmationNoFeeViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val confirmation_no_fee = inject[ConfirmationNoFeeView]
-    implicit val requestWithToken = addTokenForView()
-    implicit val config = app.injector.instanceOf[ApplicationConfig]
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
+    implicit val config: ApplicationConfig = app.injector.instanceOf[ApplicationConfig]
 
     val businessName = "Test Business Ltd"
 
@@ -80,7 +81,7 @@ class ConfirmationNoFeeViewSpec extends AmlsViewSpec with Matchers {
       val button = doc.getElementById("confirm-continue")
 
       button.text() mustBe messages("confirmation.payment.status_button.text")
-      button.attr("href") mustBe controllers.routes.LandingController.get.url
+      button.attr("href") mustBe controllers.routes.LandingController.get().url
     }
 
     "display the correct feedback section" in new ViewFixture {

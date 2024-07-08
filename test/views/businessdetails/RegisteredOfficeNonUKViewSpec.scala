@@ -20,6 +20,7 @@ import forms.businessdetails.RegisteredOfficeNonUkFormProvider
 import models.businessdetails.{RegisteredOffice, RegisteredOfficeUK}
 import org.scalatest.matchers.must.Matchers
 import play.api.data.Form
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
@@ -31,10 +32,10 @@ class RegisteredOfficeNonUKViewSpec extends AmlsViewSpec with Matchers with Auto
   lazy val registered_office_non_uk = app.injector.instanceOf[RegisteredOfficeNonUKView]
   lazy val formProvider = app.injector.instanceOf[RegisteredOfficeNonUkFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "registered_office view" must {

@@ -33,8 +33,8 @@ import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{BodyParsers, Request}
+import play.api.libs.json.Json
+import play.api.mvc.BodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.cache.Cache
@@ -438,10 +438,6 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
               .thenReturn(Future.successful((NotCompleted, None)))
 
-            val mergedCache = cacheMapOne.data
-              .+(SubscriptionResponse.key -> Json.toJson(SubscriptionResponse("", "", None)))
-              .+(ResponsiblePerson.key -> Json.toJson(None))
-
             when(controller.cacheConnector.save[TradingPremises](any(), meq(TradingPremises.key), any())(any())).thenReturn(Future.successful(fixedCache))
 
             when(controller.cacheConnector.save[ResponsiblePerson](any(), meq(ResponsiblePerson.key), any())(any())).thenReturn(Future.successful(fixedCache))
@@ -519,7 +515,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             val result = controller.get()(request)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessmatching.routes.BusinessTypeController.get.url))
+            redirectLocation(result) must be(Some(controllers.businessmatching.routes.BusinessTypeController.get().url))
 
             Mockito.verify(controller.landingService, times(1)).updateReviewDetails(any[ReviewDetails], any[String])
           }

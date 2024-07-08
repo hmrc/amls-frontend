@@ -18,6 +18,7 @@ package views.businessmatching.updateservice.remove
 
 import forms.businessmatching.RemoveBusinessActivitiesFormProvider
 import models.businessmatching.BusinessActivities
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
@@ -27,7 +28,7 @@ class RemoveActivitiesViewSpec extends AmlsViewSpec {
 
   lazy val formProvider = inject[RemoveBusinessActivitiesFormProvider]
   lazy val remove_activities = inject[RemoveActivitiesView]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   def createView = remove_activities(formProvider(2),
     edit = true,

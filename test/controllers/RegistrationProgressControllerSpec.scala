@@ -517,12 +517,12 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-          val completeTaskRow = TaskRow(BusinessMatching.messageKey, controllers.routes.LandingController.get.url, true, Started, TaskRow.incompleteTag)
+          val completeTaskRow = TaskRow(BusinessMatching.messageKey, controllers.routes.LandingController.get().url, true, Started, TaskRow.incompleteTag)
           when(mockSectionsProvider.taskRows(meq(mockCacheMap))(any())) thenReturn Seq(completeTaskRow)
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get.url)
+          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
         }
       }
 
@@ -535,7 +535,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-          val completeTaskRow = TaskRow(BusinessMatching.messageKey, controllers.routes.LandingController.get.url, true, Started, TaskRow.incompleteTag)
+          val completeTaskRow = TaskRow(BusinessMatching.messageKey, controllers.routes.LandingController.get().url, true, Started, TaskRow.incompleteTag)
           when(mockSectionsProvider.taskRows(any[Cache])(any())) thenReturn Seq(completeTaskRow)
 
           val result = controller.get()(request)
@@ -606,7 +606,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
       "when not in a position to renew" must {
         "redirect to the url provided by progressService" in new Fixture {
-          val call = controllers.routes.RegistrationProgressController.get
+          val call = controllers.routes.RegistrationProgressController.get()
 
           when {
             controller.statusService.getStatus(any(), any(), any())(any(), any(), any())
@@ -646,7 +646,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           val result = controller.post()(request)
 
-          redirectLocation(result) must be(Some(controllers.declaration.routes.RenewRegistrationController.get.url))
+          redirectLocation(result) must be(Some(controllers.declaration.routes.RenewRegistrationController.get().url))
         }
       }
 

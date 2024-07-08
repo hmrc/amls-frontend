@@ -19,6 +19,7 @@ package views.businessactivities
 import forms.businessactivities.EmployeeCountAMLSSupervisionFormProvider
 import models.businessactivities.EmployeeCountAMLSSupervision
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -29,10 +30,10 @@ class BusinessEmployeesAMLSSupervisionViewSpec extends AmlsViewSpec with Matcher
   lazy val business: BusinessEmployeesAMLSSupervisionView = inject[BusinessEmployeesAMLSSupervisionView]
   lazy val formProvider: EmployeeCountAMLSSupervisionFormProvider = inject[EmployeeCountAMLSSupervisionFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "business_employees view" must {

@@ -86,7 +86,7 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
       val result = controller.post()(postRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.BusinessTypeController.get.url))
+      redirectLocation(result) must be(Some(routes.BusinessTypeController.get().url))
 
       verify(controller.dataCacheConnector).save[BusinessMatching](any(), meq(BusinessMatching.key), meq(updatedModel))(any())
     }
@@ -111,7 +111,7 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
       val result = controller.post()(postRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.BusinessTypeController.get.url))
+      redirectLocation(result) must be(Some(routes.BusinessTypeController.get().url))
 
       verify(controller.dataCacheConnector).save[BusinessMatching](any(), meq(BusinessMatching.key), meq(updatedModel))(any())
     }
@@ -130,7 +130,7 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
       val result = controller.post()(postRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.BusinessTypeController.get.url))
+      redirectLocation(result) must be(Some(routes.BusinessTypeController.get().url))
     }
 
     "throw validation error on invalid field" in new Fixture {

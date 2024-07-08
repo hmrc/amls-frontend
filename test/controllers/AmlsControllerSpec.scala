@@ -18,18 +18,18 @@ package controllers
 
 import controllers.actions.SuccessfulAuthAction
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.mvc.BodyParsers
+import play.api.mvc.{AnyContentAsEmpty, BodyParsers}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.AmlsSpec
-import views.html.{UnauthorisedView, UnauthorisedRoleView}
+import views.html.{UnauthorisedRoleView, UnauthorisedView}
 
 class AmlsControllerSpec extends AmlsSpec {
 
     trait UnauthenticatedFixture extends MockitoSugar {
       self =>
 
-      implicit val unauthenticatedRequest = FakeRequest()
+      implicit val unauthenticatedRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
       val request = addToken(unauthenticatedRequest)
       lazy val view1 = app.injector.instanceOf[UnauthorisedView]
       lazy val view2 = app.injector.instanceOf[UnauthorisedRoleView]

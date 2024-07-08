@@ -18,6 +18,7 @@ package views.asp
 
 import models.asp._
 import org.scalatest.prop.TableDrivenPropertyChecks
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import views.Fixture
@@ -29,7 +30,7 @@ class SummaryViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks
 
   trait ViewFixture extends Fixture {
     lazy val summary = app.injector.instanceOf[SummaryView]
-    implicit val requestWithToken = addTokenForView(FakeRequest())
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView(FakeRequest())
   }
 
   "summary view" must {

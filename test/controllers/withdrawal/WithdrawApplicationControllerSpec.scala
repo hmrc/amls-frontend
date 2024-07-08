@@ -102,7 +102,7 @@ class WithdrawApplicationControllerSpec extends AmlsSpec {
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe routes.WithdrawalReasonController.get.url.some
+        redirectLocation(result) mustBe routes.WithdrawalReasonController.get().url.some
 
       }
     }

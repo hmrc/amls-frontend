@@ -55,7 +55,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
         val notStartedTaskRow = TaskRow(
           "supervision",
-          controllers.supervision.routes.WhatYouNeedController.get.url,
+          controllers.supervision.routes.WhatYouNeedController.get().url,
           hasChanged = false,
           NotStarted,
           TaskRow.notStartedTag
@@ -70,7 +70,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
         val notStartedTaskRow = TaskRow(
           "supervision",
-          controllers.supervision.routes.WhatYouNeedController.get.url,
+          controllers.supervision.routes.WhatYouNeedController.get().url,
           hasChanged = false,
           NotStarted,
           TaskRow.notStartedTag
@@ -85,7 +85,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
         val notStartedTaskRow = TaskRow(
           "supervision",
-          controllers.supervision.routes.WhatYouNeedController.get.url,
+          controllers.supervision.routes.WhatYouNeedController.get().url,
           false,
           NotStarted,
           TaskRow.notStartedTag
@@ -101,7 +101,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
         val complete = mock[Supervision]
         val completedTaskRow = TaskRow(
           "supervision",
-          controllers.supervision.routes.SummaryController.get.url,
+          controllers.supervision.routes.SummaryController.get().url,
           false,
           Completed,
           TaskRow.completedTag
@@ -118,7 +118,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
         val complete = mock[Supervision]
         val updatedTaskRow = TaskRow(
           "supervision",
-          controllers.supervision.routes.SummaryController.get.url,
+          controllers.supervision.routes.SummaryController.get().url,
           true,
           Updated,
           TaskRow.updatedTag
@@ -136,7 +136,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
         val incomplete = mock[Supervision]
         val incompleteTaskRow = TaskRow(
           "supervision",
-          controllers.supervision.routes.WhatYouNeedController.get.url,
+          controllers.supervision.routes.WhatYouNeedController.get().url,
           false,
           Started,
           TaskRow.incompleteTag

@@ -17,10 +17,9 @@
 package controllers.businessmatching.updateservice
 
 import config.ApplicationConfig
-import controllers.actions.SuccessfulAuthAction
 import models.asp.Asp
-import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.eab.Eab
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.hvd.Hvd
@@ -32,7 +31,6 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import utils._
-
 
 import scala.concurrent.Future
 

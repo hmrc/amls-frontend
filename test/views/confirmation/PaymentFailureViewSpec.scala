@@ -18,6 +18,7 @@ package views.confirmation
 
 import models.confirmation.Currency
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.confirmation.PaymentFailureView
@@ -26,7 +27,7 @@ class PaymentFailureViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val payment_failure = inject[PaymentFailureView]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     //noinspection ScalaStyle
     override def view = payment_failure("confirmation.payment.failed.reason.failure", 100, "X123456789")

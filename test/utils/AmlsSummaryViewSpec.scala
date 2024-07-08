@@ -22,9 +22,9 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
-import play.api.i18n.{Lang, MessagesApi}
+import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.Request
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.auth.core.AuthConnector
 import views.HtmlAssertions
@@ -47,9 +47,9 @@ trait AmlsSummaryViewSpec extends PlaySpec with GuiceOneAppPerSuite with Mockito
     CSRFRequest(request).withCSRFToken
   }
 
-  implicit val requestWithToken = addTokenForView(FakeRequest())
-  val messagesApi = app.injector.instanceOf[MessagesApi]
-  implicit val messages = messagesApi.preferred(requestWithToken)
-  implicit val lang = Lang.defaultLang
-  implicit val appConfig = mock[ApplicationConfig]
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView(FakeRequest())
+  val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
+  implicit val messages: Messages = messagesApi.preferred(requestWithToken)
+  implicit val lang: Lang = Lang.defaultLang
+  implicit val appConfig: ApplicationConfig = mock[ApplicationConfig]
 }

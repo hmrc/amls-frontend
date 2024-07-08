@@ -20,17 +20,11 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.tradingpremises.MSBServicesFormProvider
 import models.TradingPremisesSection
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, TransmittingMoney}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
+import models.tradingpremises.TradingPremisesMsbService.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, ForeignExchange, CurrencyExchange => TPCurrencyExchange, TransmittingMoney => TPTransmittingMoney}
 import models.tradingpremises.{TradingPremises, TradingPremisesMsbService, TradingPremisesMsbServices => TPMsbServices}
-import models.tradingpremises.TradingPremisesMsbService.{
-  ChequeCashingNotScrapMetal,
-  ChequeCashingScrapMetal,
-  ForeignExchange,
-  CurrencyExchange => TPCurrencyExchange,
-  TransmittingMoney => TPTransmittingMoney,
-}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -39,7 +33,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
 import utils.AmlsSpec
 import views.html.tradingpremises.MSBServicesView

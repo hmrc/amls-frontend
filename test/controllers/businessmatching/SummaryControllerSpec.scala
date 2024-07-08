@@ -132,7 +132,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
           val result = controller.post()(postRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
+          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
           val captor = ArgumentCaptor.forClass(classOf[BusinessMatching])
           verify(mockBusinessMatchingService).updateModel(any(), captor.capture())(any())

@@ -20,10 +20,12 @@ import controllers.actions.SuccessfulAuthAction
 import forms.businessactivities.EmployeeCountAMLSSupervisionFormProvider
 import models.businessactivities.EmployeeCountAMLSSupervision
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Request, Result}
 import play.api.test
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -36,11 +38,11 @@ import scala.concurrent.Future
 
 class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
-  val mockService = mock[EmployeeCountAMLSSupervisionService]
+  val mockService: EmployeeCountAMLSSupervisionService = mock[EmployeeCountAMLSSupervisionService]
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[BusinessEmployeesAMLSSupervisionView]
+    self => val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    lazy val view: BusinessEmployeesAMLSSupervisionView = app.injector.instanceOf[BusinessEmployeesAMLSSupervisionView]
     val controller = new EmployeeCountAMLSSupervisionController (
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -50,7 +52,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
       view = view)
   }
 
-  val emptyCache = Cache.empty
+  val emptyCache: Cache = Cache.empty
 
   "EmployeeCountAMLSSupervisionController" when {
 
@@ -60,10 +62,10 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
         when(mockService.getEmployeeCountAMLSSupervision(any()))
           .thenReturn(Future.successful(None))
 
-        val result = controller.get()(request)
+        val result: Future[Result] = controller.get()(request)
         status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
+        val document: Document = Jsoup.parse(contentAsString(result))
 
         document.select("input[name=employeeCountAMLSSupervision]").`val` must be("")
       }
@@ -75,10 +77,10 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
         when(mockService.getEmployeeCountAMLSSupervision(any()))
           .thenReturn(Future.successful(Some(count)))
 
-        val result = controller.get()(request)
+        val result: Future[Result] = controller.get()(request)
         status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
+        val document: Document = Jsoup.parse(contentAsString(result))
 
         document.select("input[name=employeeCountAMLSSupervision]").`val` must be(count)
       }
@@ -86,18 +88,18 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
     "post is called" must {
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest = FakeRequest(POST, routes.EmployeeCountAMLSSupervisionController.post().url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.EmployeeCountAMLSSupervisionController.post().url)
           .withFormUrlEncodedBody(
           "employeeCountAMLSSupervision" -> ""
         )
-        val result = controller.post()(newRequest)
+        val result: Future[Result] = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
       }
 
       "redirect to the TransactionRecordController when given valid data and edit is false" in new Fixture {
 
         val count = "123"
-        val newRequest = test.FakeRequest(POST, routes.EmployeeCountAMLSSupervisionController.post().url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test.FakeRequest(POST, routes.EmployeeCountAMLSSupervisionController.post().url)
           .withFormUrlEncodedBody(
           "employeeCountAMLSSupervision" -> count
         )
@@ -105,7 +107,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
         when(mockService.updateHowManyEmployees(any(), eqTo(EmployeeCountAMLSSupervision(count))))
           .thenReturn(Future.successful(Some(emptyCache)))
 
-        val result = controller.post(false)(newRequest)
+        val result: Future[Result] = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.HowManyEmployeesController.get().url))
       }
@@ -114,7 +116,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
         val count = "12345"
 
-        val newRequest = test.FakeRequest(POST, routes.EmployeeCountAMLSSupervisionController.post(true).url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test.FakeRequest(POST, routes.EmployeeCountAMLSSupervisionController.post(true).url)
           .withFormUrlEncodedBody(
           "employeeCountAMLSSupervision" -> count
         )
@@ -122,7 +124,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
         when(mockService.updateHowManyEmployees(any(), eqTo(EmployeeCountAMLSSupervision(count))))
           .thenReturn(Future.successful(Some(emptyCache)))
 
-        val resultTrue = controller.post(true)(newRequest)
+        val resultTrue: Future[Result] = controller.post(true)(newRequest)
         status(resultTrue) must be(SEE_OTHER)
         redirectLocation(resultTrue) must be(Some(routes.SummaryController.get.url))
       }

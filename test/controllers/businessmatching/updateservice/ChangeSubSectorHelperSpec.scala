@@ -16,22 +16,16 @@
 
 package controllers.businessmatching.updateservice
 
-import controllers.actions.SuccessfulAuthAction
-import models.businessmatching._
-import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService._
+import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.ChangeSubSectorFlowModel
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSB, _}
-import org.mockito.Mockito.{never, verify}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import models.tradingpremises.TradingPremisesMsbService.{ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, TransmittingMoney => TPTransmittingMoney, ChequeCashingNotScrapMetal => _}
 import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo}
-import models.tradingpremises.TradingPremisesMsbService.{
-  ChequeCashingScrapMetal => TPChequeCashingScrapMetal,
-  CurrencyExchange => TPCurrencyExchange,
-  TransmittingMoney => TPTransmittingMoney,
-  ChequeCashingNotScrapMetal => _
-}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}

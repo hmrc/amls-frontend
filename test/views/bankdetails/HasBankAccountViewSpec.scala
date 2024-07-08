@@ -18,6 +18,7 @@ package views.bankdetails
 
 import forms.bankdetails.HasBankAccountFormProvider
 import play.api.i18n.Messages
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -28,9 +29,9 @@ class HasBankAccountViewSpec extends AmlsViewSpec {
   lazy val hasBankAccount = inject[HasBankAccountView]
   lazy val fp = inject[HasBankAccountFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   trait ViewFixture extends Fixture {
-    implicit val csrfRequest = addTokenForView()
+    implicit val csrfRequest: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "HasBankAccountView" should {

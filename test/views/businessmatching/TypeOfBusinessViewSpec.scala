@@ -19,9 +19,9 @@ package views.businessmatching
 import forms.businessmatching.TypeOfBusinessFormProvider
 import models.businessmatching.TypeOfBusiness
 import org.scalatest.matchers.must.Matchers
-import utils.AmlsViewSpec
-import org.jsoup.nodes.Element
 import play.api.data.{Form, FormError}
+import play.api.mvc.{AnyContentAsEmpty, Request}
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.TypeOfBusinessView
 
@@ -29,7 +29,7 @@ class TypeOfBusinessViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val type_of_business = app.injector.instanceOf[TypeOfBusinessView]
   lazy val formProvider = app.injector.instanceOf[TypeOfBusinessFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
 

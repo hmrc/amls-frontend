@@ -37,7 +37,7 @@ trait Fixture extends Matchers with ParagraphHelpers with TitleValidator {
 
   def view: HtmlFormat.Appendable
   lazy val html = view.body
-  implicit lazy val doc = Jsoup.parse(html)
+  implicit lazy val doc: Document = Jsoup.parse(html)
   lazy val form = doc.getElementsByTag("form").first()
   lazy val heading = doc.getElementsByTag("h1").first()
   lazy val caption = doc.getElementById("stage-caption")

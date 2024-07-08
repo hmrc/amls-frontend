@@ -17,8 +17,8 @@
 package views.businessmatching.updateservice.remove
 
 import models.businessmatching.BusinessActivity.{AccountancyServices, MoneyServiceBusiness}
-import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.remove.NeedMoreInformationView
@@ -26,7 +26,7 @@ import views.html.businessmatching.updateservice.remove.NeedMoreInformationView
 class NeedMoreInformationViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val informationView = app.injector.instanceOf[NeedMoreInformationView]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
 
