@@ -37,8 +37,8 @@ class TestOnlyStubConnectorSpec extends AmlsSpec
 
   // scalastyle:off magic.number
   trait Fixture {
-    val http = mock[HttpClient]
-    val config = mock[ApplicationConfig]
+    val http: HttpClient = mock[HttpClient]
+    val config: ApplicationConfig = mock[ApplicationConfig]
     val connector = new TestOnlyStubConnector(http, mock[ApplicationConfig],  mock[Configuration])
   }
 

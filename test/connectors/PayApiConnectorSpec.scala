@@ -22,6 +22,7 @@ import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent._
 import play.api.libs.json.{JsNull, Json}
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
@@ -33,7 +34,7 @@ import scala.concurrent.Future
 
 class PayApiConnectorSpec extends AmlsSpec with IntegrationPatience  {
 
-  implicit val request = FakeRequest("GET", "/anti-money-laundering/confirmation")
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/anti-money-laundering/confirmation")
 
   trait TestFixture {
 
@@ -42,18 +43,18 @@ class PayApiConnectorSpec extends AmlsSpec with IntegrationPatience  {
     val paymentId = "1234567890"
     val paymentUrl = "http://tax.service.gov.uk/pay/1234567890"
 
-    val validRequest = CreatePaymentRequest(
+    val validRequest: CreatePaymentRequest = CreatePaymentRequest(
       "other",
       "X12345678901234",
       "An example payment",
       paymentAmount,
       ReturnLocation("/confirmation", "http://localhost:9222"))
 
-    val validResponse = CreatePaymentResponse(NextUrl(paymentUrl), paymentId)
-    val http = mock[HttpClient]
+    val validResponse: CreatePaymentResponse = CreatePaymentResponse(NextUrl(paymentUrl), paymentId)
+    val http: HttpClient = mock[HttpClient]
     val payApiUrl = "http://localhost:9057"
 
-    val auditConnector = mock[AuditConnector]
+    val auditConnector: AuditConnector = mock[AuditConnector]
 
     val connector = new PayApiConnector(http, mock[DefaultAuditConnector], appConfig)
 
@@ -71,7 +72,7 @@ class PayApiConnectorSpec extends AmlsSpec with IntegrationPatience  {
             HttpResponse(OK, Json.toJson(validResponse), Map.empty[String, Seq[String]])
           )
 
-          val result = await(connector.createPayment(validRequest))
+          val result: Option[CreatePaymentResponse] = await(connector.createPayment(validRequest))
 
           result mustBe Some(validResponse)
           verify(connector.auditConnector).sendExtendedEvent(any())(any(), any())
@@ -88,7 +89,7 @@ class PayApiConnectorSpec extends AmlsSpec with IntegrationPatience  {
             HttpResponse(BAD_REQUEST, JsNull, Map.empty[String, Seq[String]])
           )
 
-          val result = await(connector.createPayment(validRequest))
+          val result: Option[CreatePaymentResponse] = await(connector.createPayment(validRequest))
 
           result must not be defined
           verify(connector.auditConnector).sendExtendedEvent(any())(any(), any())

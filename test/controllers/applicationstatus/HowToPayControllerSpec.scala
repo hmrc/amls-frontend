@@ -21,8 +21,10 @@ import generators.submission.SubscriptionResponseGenerator
 import models.ResponseType.SubscriptionResponseType
 import models.{FeeResponse, ResponseType}
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
+import play.api.mvc.{AnyContentAsEmpty, Request, Result}
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, FeeHelper}
 import views.html.applicationstatus.HowToPayView
@@ -35,8 +37,8 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
-    val request = addToken(authRequest)
-    lazy val howToPay = app.injector.instanceOf[HowToPayView]
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    lazy val howToPay: HowToPayView = app.injector.instanceOf[HowToPayView]
     val controller = new HowToPayController(
       authAction = SuccessfulAuthAction,
       feeHelper = mock[FeeHelper],
@@ -69,10 +71,10 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
 
-          val result = controller.get()(request)
+          val result: Future[Result] = controller.get()(request)
           status(result) must be(OK)
 
-          val doc = Jsoup.parse(contentAsString(result))
+          val doc: Document = Jsoup.parse(contentAsString(result))
           doc.getElementById("payment-ref").html must include(paymentReferenceNumber)
         }
 
@@ -82,10 +84,10 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(None)
 
-          val result = controller.get()(request)
+          val result: Future[Result] = controller.get()(request)
           status(result) must be(OK)
 
-          val doc = Jsoup.parse(contentAsString(result))
+          val doc: Document = Jsoup.parse(contentAsString(result))
           doc.getElementById("find-email-no-reference").html must include(messages("howtopay.para.3.link"))
         }
 
@@ -95,10 +97,10 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType).copy(paymentReference = Some("    "))))
 
-          val result = controller.get()(request)
+          val result: Future[Result] = controller.get()(request)
           status(result) must be(OK)
 
-          val doc = Jsoup.parse(contentAsString(result))
+          val doc: Document = Jsoup.parse(contentAsString(result))
           doc.getElementById("find-email-no-reference").html must include(messages("howtopay.para.3.link"))
         }
       }

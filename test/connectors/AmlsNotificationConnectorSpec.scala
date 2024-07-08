@@ -33,11 +33,11 @@ import scala.concurrent.Future
 class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   val safeId = "SAFEID"
-  val accountTypeId = ("org","id")
+  val accountTypeId: (String, String) = ("org","id")
   val amlsRegistrationNumber = "amlsRefNumber"
-  val dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC)
+  val dateTime: LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC)
 
-  implicit val hc = HeaderCarrier()
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   private trait Fixture {
     val connector = new AmlsNotificationConnector (mock[HttpClient], mock[ApplicationConfig])
@@ -47,8 +47,8 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
     "retrieve notifications" when {
       "given amlsRegNo" in new Fixture {
 
-        val response = Seq(
-          NotificationRow(None, None, None, true, LocalDateTime.of(1981, 12, 1, 1, 3), false, "amlsRefNumber", "1", IDType(""))
+        val response: Seq[NotificationRow] = Seq(
+          NotificationRow(None, None, None, variation = true, LocalDateTime.of(1981, 12, 1, 1, 3), isRead = false, "amlsRefNumber", "1", IDType(""))
         )
 
         when {
@@ -62,8 +62,8 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
 
       "given safeId" in new Fixture {
         val safeId = "AA1234567891234"
-        val response = Seq(
-          NotificationRow(None, None, None, true, LocalDateTime.of(1981, 12, 1, 1, 3), false, "XJML00000200000", "1", IDType(""))
+        val response: Seq[NotificationRow] = Seq(
+          NotificationRow(None, None, None, variation = true, LocalDateTime.of(1981, 12, 1, 1, 3), isRead = false, "XJML00000200000", "1", IDType(""))
         )
 
         when {
@@ -85,7 +85,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
             Some(Status(Some(StatusType.Approved),
             Some(RejectedReason.FailedToPayCharges))),
             Some("Text of the message"),
-            false,
+            variation = false,
             dateTime
           )))
 
@@ -95,7 +95,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
             Some(Status(Some(StatusType.Approved),
             Some(RejectedReason.FailedToPayCharges))),
             Some("Text of the message"),
-            false,
+            variation = false,
             dateTime
           )))
         }

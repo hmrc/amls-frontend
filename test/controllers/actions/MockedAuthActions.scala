@@ -26,8 +26,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object SuccessfulAuthAction extends AuthAction {
 
-  val affinityGroup = AffinityGroup.Organisation
-  val enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
+  val affinityGroup: AffinityGroup.Organisation.type = AffinityGroup.Organisation
+  val enrolments: Enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
 
   override def parser: BodyParser[AnyContent] = Helpers.stubControllerComponents().parsers.anyContent
 
@@ -39,8 +39,8 @@ object SuccessfulAuthAction extends AuthAction {
 
 object SuccessfulAuthActionNoAmlsRefNo extends AuthAction {
 
-  val affinityGroup = AffinityGroup.Organisation
-  val enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
+  val affinityGroup: AffinityGroup.Organisation.type = AffinityGroup.Organisation
+  val enrolments: Enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
 
   override def parser: BodyParser[AnyContent] = Helpers.stubControllerComponents().parsers.anyContent
 
@@ -52,8 +52,8 @@ object SuccessfulAuthActionNoAmlsRefNo extends AuthAction {
 
 object SuccessfulAuthActionNoUserRole extends AuthAction {
 
-  val affinityGroup = AffinityGroup.Organisation
-  val enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
+  val affinityGroup: AffinityGroup.Organisation.type = AffinityGroup.Organisation
+  val enrolments: Enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
 
   override def parser: BodyParser[AnyContent] = Helpers.stubControllerComponents().parsers.anyContent
 

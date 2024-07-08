@@ -54,8 +54,8 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
       .build()
   }
 
-  val mockApplicationConfig = mock[ApplicationConfig]
-  val mockParser = mock[BodyParsers.Default]
+  val mockApplicationConfig: ApplicationConfig = mock[ApplicationConfig]
+  val mockParser: BodyParsers.Default = mock[BodyParsers.Default]
 
   private lazy val unauthorisedUrl = URLEncoder.encode(
     ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(mockApplicationConfig).absoluteUrl, "utf-8"
@@ -65,7 +65,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
   def fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
 
-  lazy val headerCarrierForPartialsConverter = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
+  lazy val headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
 
   implicit val hc: HeaderCarrier = headerCarrierForPartialsConverter.fromRequestWithEncryptedCookie(fakeRequest)
 
@@ -217,7 +217,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 }
 
 object AuthActionSpec extends AmlsReferenceNumberGenerator{
-  private def fakeAuthConnector(stubbedRetrievalResult: Future[_]) = new AuthConnector {
+  private def fakeAuthConnector(stubbedRetrievalResult: Future[_]): AuthConnector = new AuthConnector {
 
     def authorise[A](predicate: Predicate, retrieval: Retrieval[A])
                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] = {
@@ -225,7 +225,7 @@ object AuthActionSpec extends AmlsReferenceNumberGenerator{
     }
   }
 
-  val enrolments = Enrolments(Set(
+  val enrolments: Enrolments = Enrolments(Set(
     Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"),
     Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated")
   ))
@@ -233,7 +233,7 @@ object AuthActionSpec extends AmlsReferenceNumberGenerator{
     new ~ (new ~ (new ~(new ~(enrolments, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Organisation)), Some("groupIdentifier")), Some(User))
   )
 
-  val enrolmentsSa = Enrolments(Set(
+  val enrolmentsSa: Enrolments = Enrolments(Set(
     Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"),
     Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"),
     Enrolment("IR-SA", Seq(EnrolmentIdentifier("UTR", "saRef")), "Activated")
@@ -242,7 +242,7 @@ object AuthActionSpec extends AmlsReferenceNumberGenerator{
     new ~ (new ~(new ~(new~(enrolmentsSa, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)), Some("groupIdentifier")), Some(User))
   )
 
-  val enrolmentsSaInactive = Enrolments(Set(
+  val enrolmentsSaInactive: Enrolments = Enrolments(Set(
     Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Active"),
     Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Active"),
     Enrolment("IR-SA", Seq(EnrolmentIdentifier("UTR", "saRef")), "Inactive")
@@ -251,7 +251,7 @@ object AuthActionSpec extends AmlsReferenceNumberGenerator{
     new ~ (new ~(new ~(new~(enrolmentsSaInactive, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)), Some("groupIdentifier")), Some(User))
   )
 
-  val enrolmentsCt = Enrolments(Set(
+  val enrolmentsCt: Enrolments = Enrolments(Set(
     Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"),
     Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"),
     Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", "ctRef")), "Activated")
@@ -260,7 +260,7 @@ object AuthActionSpec extends AmlsReferenceNumberGenerator{
     new ~ (new ~(new ~(new ~(enrolmentsCt, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)), Some("groupIdentifier")), Some(User))
   )
 
-  val enrolmentsCtInactive = Enrolments(Set(
+  val enrolmentsCtInactive: Enrolments = Enrolments(Set(
     Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Active"),
     Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Active"),
     Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", "ctRef")), "Inactive")

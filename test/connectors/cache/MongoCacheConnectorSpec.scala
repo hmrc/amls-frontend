@@ -24,10 +24,9 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
+import play.api.libs.json._
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import uk.gov.hmrc.http.HeaderCarrier
-import services.cache.Cache
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -42,20 +41,20 @@ class MongoCacheConnectorSpec extends AnyFreeSpec
   case class Model(tmp: String)
 
   object Model {
-    implicit val formats = Json.format[Model]
+    implicit val formats: OFormat[Model] = Json.format[Model]
 
     def apply(): Model = Model(arbitrary[String].sample.get)
   }
 
   trait Fixture {
-    implicit val hc = HeaderCarrier()
+    implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    val factory = mock[MongoCacheClientFactory]
-    val client = mock[MongoCacheClient]
+    val factory: MongoCacheClientFactory = mock[MongoCacheClientFactory]
+    val client: MongoCacheClient = mock[MongoCacheClient]
     val credId = "12345678"
-    val key = arbitrary[String].sample.get
+    val key: String = arbitrary[String].sample.get
 
-    val cacheMap = Cache("12345678", Map("id" -> Json.toJson("12345678")))
+    val cacheMap: Cache = Cache("12345678", Map("id" -> Json.toJson("12345678")))
 
     when(factory.createClient) thenReturn client
 
@@ -73,7 +72,7 @@ class MongoCacheConnectorSpec extends AnyFreeSpec
 
   "fetch" - {
     "should delegate the call to the underlying mongo client for credId" in new Fixture {
-      val model = Model("data")
+      val model: Model = Model("data")
 
       when(client.find[Model](any(), any())(any())).thenReturn(Future.successful(Some(model)))
 
@@ -83,7 +82,7 @@ class MongoCacheConnectorSpec extends AnyFreeSpec
 
   "fetchAll" - {
     "should delegate the call to the underlying mongo client for CredId" in new Fixture with Conversions {
-      val cache = Cache(credId, referenceMap())
+      val cache: Cache = Cache(credId, referenceMap())
 
       when {
         client.fetchAll(Some(credId))
@@ -96,8 +95,8 @@ class MongoCacheConnectorSpec extends AnyFreeSpec
 
   "save" - {
     "should delegate the call to the underlying mongo client for CredId" in new Fixture with Conversions {
-      val model = Model()
-      val cache = Cache(credId, referenceMap())
+      val model: Model = Model()
+      val cache: Cache = Cache(credId, referenceMap())
 
       when(client.createOrUpdate(any(), any(), meq(key))(any())) thenReturn Future.successful(cache)
 
@@ -148,8 +147,8 @@ class MongoCacheConnectorSpec extends AnyFreeSpec
 
   "update" - {
     "should fetch and then save into the underlying mongo client" in new Fixture {
-      val model = Model()
-      val updatedModel = model.copy(tmp = "this has been updated")
+      val model: Model = Model()
+      val updatedModel: Model = model.copy(tmp = "this has been updated")
       val f: Option[Model] => Model = { _ => updatedModel }
 
       when(client.find[Model](any(), meq(key))(any())) thenReturn Future.successful(Some(model))

@@ -18,6 +18,7 @@ package audit
 
 import audit.AddressConversions._
 import cats.implicits._
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
@@ -26,7 +27,7 @@ import utils.AmlsSpec
 
 class AddressModifiedEventSpec extends AmlsSpec {
 
-  implicit val request = FakeRequest("GET", "/test-path")
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/test-path")
   implicit override val headerCarrier: HeaderCarrier = HeaderCarrier()
 
   "The AddressModifiedAuditEvent" must {

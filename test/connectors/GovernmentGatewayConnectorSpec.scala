@@ -21,12 +21,13 @@ import generators.{AmlsReferenceNumberGenerator, BaseGenerator, GovernmentGatewa
 import models.governmentgateway.EnrolmentRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
+import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.play.audit.DefaultAuditConnector
 import uk.gov.hmrc.play.audit.model.Audit
-import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.Future
@@ -38,15 +39,15 @@ class GovernmentGatewayConnectorSpec extends AmlsSpec
   with ScalaFutures {
 
   //noinspection ScalaStyle
-  implicit val defaultPatience =
+  implicit val defaultPatience: PatienceConfig =
     PatienceConfig(timeout = Span(15, Seconds), interval = Span(500, Millis))
 
   trait Fixture extends DependencyMocks {
-    val audit = mock[Audit]
+    val audit: Audit = mock[Audit]
 
     val connector = new GovernmentGatewayConnector(mock[HttpClient], appConfig, mock[DefaultAuditConnector])
 
-    def mockHttpCall(response: Future[HttpResponse]) = when {
+    def mockHttpCall(response: Future[HttpResponse]): OngoingStubbing[Future[HttpResponse]] = when {
       connector.http.POST[EnrolmentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
     } thenReturn response
   }

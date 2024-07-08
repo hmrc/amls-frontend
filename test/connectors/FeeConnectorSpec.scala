@@ -28,7 +28,6 @@ import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import java.time.LocalDateTime
-import java.time.ZoneOffset.UTC
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -40,9 +39,9 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with
       appConfig = mock[ApplicationConfig])
 
     val safeId = "SAFEID"
-    val accountTypeId = ("org", "id")
+    val accountTypeId: (String, String) = ("org", "id")
 
-    implicit val hc = HeaderCarrier()
+    implicit val hc: HeaderCarrier = HeaderCarrier()
 
     when {
       connector.feePaymentUrl

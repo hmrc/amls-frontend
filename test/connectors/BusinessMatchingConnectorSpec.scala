@@ -28,7 +28,7 @@ import scala.concurrent.Future
 
 class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
-  val validReviewDetailsJson =
+  val validReviewDetailsJson: String =
     """
       |{
       |  "businessName": "Test Business",
@@ -60,9 +60,9 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
     val testBusinessMatchingConnector = new BusinessMatchingConnector(mock[HttpClient], appConfig)
 
-    val address = BusinessMatchingAddress("1 Test Street", Some("Test Town"), None, None, None, "UK")
+    val address: BusinessMatchingAddress = BusinessMatchingAddress("1 Test Street", Some("Test Town"), None, None, None, "UK")
 
-    val validResponseDetail = BusinessMatchingReviewDetails(
+    val validResponseDetail: BusinessMatchingReviewDetails = BusinessMatchingReviewDetails(
       businessName = "Test Business",
       businessType = None,
       businessAddress = address,

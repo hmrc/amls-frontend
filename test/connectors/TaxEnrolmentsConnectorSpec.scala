@@ -39,20 +39,20 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
   with UserDetailsGenerator
   with BaseGenerator {
 
-  implicit override val patienceConfig = PatienceConfig(timeout = Span(2, Seconds), interval = Span(20, Millis))
+  implicit override val patienceConfig: PatienceConfig = PatienceConfig(timeout = Span(2, Seconds), interval = Span(20, Millis))
 
   trait Fixture {
 
-    val http = mock[HttpClient]
-    val appConfig = mock[ApplicationConfig]
-    val auditConnector = mock[AuditConnector]
-    val groupIdentfier = stringOfLengthGen(10).sample.get
+    val http: HttpClient = mock[HttpClient]
+    val appConfig: ApplicationConfig = mock[ApplicationConfig]
+    val auditConnector: AuditConnector = mock[AuditConnector]
+    val groupIdentfier: String = stringOfLengthGen(10).sample.get
     implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
     val connector = new TaxEnrolmentsConnector(http, appConfig, auditConnector)
     val baseUrl = "http://localhost:3001"
     val serviceStub = "tax-enrolments"
-    val enrolKey = AmlsEnrolmentKey(amlsRegistrationNumber)
+    val enrolKey: AmlsEnrolmentKey = AmlsEnrolmentKey(amlsRegistrationNumber)
 
     when {
       appConfig.enrolmentStoreUrl
@@ -62,7 +62,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
       appConfig.enrolmentStubsUrl
     } thenReturn serviceStub
 
-    val enrolment = TaxEnrolment("123456789", postcodeGen.sample.get)
+    val enrolment: TaxEnrolment = TaxEnrolment("123456789", postcodeGen.sample.get)
 
     def jsonError(code: String, message: String): String = Json.toJson(ErrorResponse(code, message)).toString
   }

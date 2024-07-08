@@ -17,17 +17,20 @@
 package controllers.asp
 
 import controllers.actions.SuccessfulAuthAction
+import play.api.mvc.{AnyContentAsEmpty, Request, Result}
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.asp.WhatYouNeedView
+
+import scala.concurrent.Future
 
 class WhatYouNeedControllerSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
-    lazy val whatYouNeed = app.injector.instanceOf[WhatYouNeedView]
+    lazy val whatYouNeed: WhatYouNeedView = app.injector.instanceOf[WhatYouNeedView]
 
     val controller = new WhatYouNeedController(SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc, whatYouNeed)
   }
@@ -38,11 +41,11 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
 
       "load the page" in new Fixture {
 
-        val pageTitle = messages("title.wyn") + " - " +
+        val pageTitle: String = messages("title.wyn") + " - " +
           messages("summary.asp") + " - " +
           messages("title.amls") + " - " + messages("title.gov")
 
-        val result = controller.get()(request)
+        val result: Future[Result] = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include(pageTitle)
       }
