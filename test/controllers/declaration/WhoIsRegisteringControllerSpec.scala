@@ -31,6 +31,7 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.{RenewalService, SectionsProvider, StatusService}
@@ -45,11 +46,11 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
-    val mockSectionsProvider = mock[SectionsProvider]
-    lazy val view1 = inject[WhoIsRegisteringThisUpdateView]
-    lazy val view2 = inject[WhoIsRegisteringThisRenewalView]
-    lazy val view3 = inject[WhoIsRegisteringThisRegistrationView]
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    val mockSectionsProvider: SectionsProvider = mock[SectionsProvider]
+    lazy val view1: WhoIsRegisteringThisUpdateView = inject[WhoIsRegisteringThisUpdateView]
+    lazy val view2: WhoIsRegisteringThisRenewalView = inject[WhoIsRegisteringThisRenewalView]
+    lazy val view3: WhoIsRegisteringThisRegistrationView = inject[WhoIsRegisteringThisRegistrationView]
     val controller = new WhoIsRegisteringController(
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
@@ -65,15 +66,15 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
       error = errorView
     )
 
-    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None,
-      None, false)
+    val pendingReadStatusResponse: ReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None,
+      None, renewalConFlag = false)
 
-    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None,
-      None, false)
+    val notCompletedReadStatusResponse: ReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None,
+      None, renewalConFlag = false)
 
-    val cacheMap = mock[Cache]
+    val cacheMap: Cache = mock[Cache]
 
-    val responsiblePeople = (for {
+    val responsiblePeople: Seq[ResponsiblePerson] = (for {
       p1 <- responsiblePersonGen
       p2 <- responsiblePersonGen.map(p => p.copy(status = Some(StatusConstants.Deleted)))
     } yield {
@@ -107,14 +108,14 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
     }
   }
 
-  val emptyCache = Cache.empty
+  val emptyCache: Cache = Cache.empty
 
   "WhoIsRegisteringController" must {
     "Get" must {
       "with completed sections" must {
         val completedSections = Seq(
-          TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
-          TaskRow("s2", "/bar", true, Completed, TaskRow.completedTag)
+          TaskRow("s1", "/foo", hasChanged = true, Completed, TaskRow.completedTag),
+          TaskRow("s2", "/bar", hasChanged = true, Completed, TaskRow.completedTag)
         )
 
         "load the who is registering page" when {
@@ -200,8 +201,8 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 
       "with incomplete sections" must {
         val incompleteSections = Seq(
-          TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
-          TaskRow("s2", "/bar", true, Started, TaskRow.incompleteTag)
+          TaskRow("s1", "/foo", hasChanged = true, Completed, TaskRow.completedTag),
+          TaskRow("s2", "/bar", hasChanged = true, Started, TaskRow.incompleteTag)
         )
 
         "redirect to the RegistrationProgressController" in new Fixture {
@@ -212,7 +213,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
           run(SubmissionReadyForReview) { _ =>
             val result = controller.get()(request)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
+            redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
           }
         }
       }
@@ -238,7 +239,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
             val result = controller.post("registration")(newRequest)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.AddPersonController.get.url))
+            redirectLocation(result) must be(Some(routes.AddPersonController.get().url))
           }
         }
       }
@@ -257,7 +258,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
           val result = controller.post("registration")(newRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.DeclarationController.get.url)
+          redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
 
           val expectedAddPersonModel = AddPerson(name.firstName, name.middleName, name.lastName, RoleWithinBusinessRelease7(Set(models.declaration.release7.InternalAccountant)))
           verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), eqTo(expectedAddPersonModel))(any())
@@ -272,7 +273,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
           val result = controller.post("registration")(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DeclarationController.get.url))
+          redirectLocation(result) must be(Some(routes.DeclarationController.get().url))
 
           verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), any())(any())
         }
@@ -333,7 +334,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
             val result = controller.post("registration")(newRequest)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) mustBe Some(routes.DeclarationController.get.url)
+            redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
 
             verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), any())(any())
           }

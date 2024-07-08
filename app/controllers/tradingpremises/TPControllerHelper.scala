@@ -16,7 +16,6 @@
 
 package controllers.tradingpremises
 
-import config.ApplicationConfig
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request, Result, Results}
@@ -28,7 +27,6 @@ object TPControllerHelper {
   def redirectToNextPage(maybeCache: Option[Cache], index: Int, edit: Boolean)
                         (implicit request: Request[AnyContent],
                          messages: Messages,
-                         appConfig: ApplicationConfig,
                          error: views.html.ErrorView): Result = {
     maybeCache map { cache =>
 

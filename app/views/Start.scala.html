@@ -15,11 +15,10 @@
  *@
 
 @import components.{Heading, Button}
-@import config.ApplicationConfig
 
 @this(layout: Layout, heading: Heading, button: Button)
 
-@()(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
+@()(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = s"${messages("start.title")}",

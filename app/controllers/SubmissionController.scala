@@ -20,7 +20,7 @@ import exceptions.{DuplicateEnrolmentException, DuplicateSubscriptionException, 
 import models.status._
 import models.{SubmissionResponse, SubscriptionResponse}
 import play.api.Logging
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{RenewalService, SectionsProvider, StatusService, SubmissionService}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import utils.{AuthAction, DeclarationHelper}
@@ -92,7 +92,7 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
   }
 
   private def subscribeBasedOnStatus(status: SubmissionStatus, groupIdentifier: Option[String], credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
-                                    (implicit hc: HeaderCarrier, request: Request[_]): Future[SubmissionResponse] =
+                                    (implicit hc: HeaderCarrier): Future[SubmissionResponse] =
     status match {
       case SubmissionReadyForReview => subscriptionService.update(credId, amlsRegistrationNumber, accountTypeId)
       case SubmissionDecisionApproved => subscriptionService.variation(credId, amlsRegistrationNumber, accountTypeId)

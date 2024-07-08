@@ -39,7 +39,6 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.i18n.Messages
-import play.api.mvc.Request
 import services.cache.Cache
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -112,7 +111,7 @@ class LandingService @Inject()(val cacheConnector: DataCacheConnector,
     }
   }
 
-  def reviewDetails(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[Option[ReviewDetails]] =
+  def reviewDetails(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ReviewDetails]] =
     businessMatchingConnector.getReviewDetails map {
       case Some(details) => Some(ReviewDetails.convert(details))
       case _ => None

@@ -24,12 +24,11 @@ import models.registrationprogress.{Completed, TaskList, TaskRow, Updated}
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePerson
 import models.status._
-import play.api.i18n.Messages
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services._
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper, DeclarationHelper}
 import views.html.registrationamendment.RegistrationAmendmentView
 import views.html.registrationprogress.RegistrationProgressView
@@ -100,12 +99,12 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                   ))
                 }
               } getOrElse InternalServerError("Unable to retrieve the business details")
-            }) getOrElse Redirect(controllers.routes.LandingController.get)
+            }) getOrElse Redirect(controllers.routes.LandingController.get())
         }
   }
 
   private def isRenewalFlow(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
-                           (implicit hc: HeaderCarrier, request: Request[AnyContent]): Future[Boolean] = {
+                           (implicit hc: HeaderCarrier): Future[Boolean] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) flatMap {
       case ReadyForRenewal(_) =>
         dataCache.fetch[Renewal](cacheId, Renewal.key) map {
@@ -117,7 +116,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
     }
   }
 
-  private def declarationAvailable(seq: Seq[TaskRow])(implicit messages: Messages): Boolean = {
+  private def declarationAvailable(seq: Seq[TaskRow]): Boolean = {
     seq forall { row =>
       row.status == Completed || row.status == Updated
     }

@@ -17,15 +17,13 @@
 package connectors
 
 import config.ApplicationConfig
-
-import javax.inject.Inject
 import play.api.Logging
 import play.api.libs.json.{Json, OFormat}
-import play.api.mvc.Request
-
-import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 case class BusinessMatchingAddress(line_1: String,
                                    line_2: Option[String],
@@ -68,7 +66,7 @@ class BusinessMatchingConnector @Inject()(val http: HttpClient,
 
   val serviceName = "amls"
 
-  def getReviewDetails(implicit request: Request[_], headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[BusinessMatchingReviewDetails]] = {
+  def getReviewDetails(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[BusinessMatchingReviewDetails]] = {
 
     val url = s"${applicationConfig.businessMatchingUrl}/fetch-review-details/$serviceName"
     val logPrefix = "[BusinessMatchingConnector][getReviewDetails]"

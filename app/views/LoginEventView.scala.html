@@ -15,7 +15,6 @@
  *@
 
 @import views.html.components.{Anchor, Heading, Button}
-@import config.ApplicationConfig
 
 @this(
     layout: Layout,
@@ -24,7 +23,7 @@
     anchor: Anchor
 )
 
-@(call: Call)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(call: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = messages("login-event.title"),

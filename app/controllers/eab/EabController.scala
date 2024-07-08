@@ -39,7 +39,7 @@ class EabController @Inject()(proxyCacheService  : ProxyCacheService,
                               val serviceFlow: ServiceFlow) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(credId: String): Action[AnyContent] = Action.async {
-    implicit request => {
+    implicit _ => {
       proxyCacheService.getEab(credId).map {
         _.map(Ok(_: JsValue)).getOrElse(NotFound)
       }

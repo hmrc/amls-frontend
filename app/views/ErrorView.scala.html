@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import config.ApplicationConfig
 @import views.html.components.Heading
 
 @this(
@@ -22,7 +21,7 @@
     heading: Heading
 )
 
-@(title: String, headingText: String, message: String)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(title: String, headingText: String, message: String)(implicit request: Request[_], messages: Messages)
 
 @layout(title, showBackLink = false, showDeskproLink = false) {
     @heading(headingText)

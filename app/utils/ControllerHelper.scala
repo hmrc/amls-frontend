@@ -16,7 +16,6 @@
 
 package utils
 
-import config.ApplicationConfig
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities => BA}
 import models.businessmatching.BusinessActivity._
@@ -167,7 +166,7 @@ object ControllerHelper {
 
   def rpTitleName(rp:Option[ResponsiblePerson]):String = rp.fold("")(_.personName.fold("")(_.titleName))
 
-  def notFoundView(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig, error: views.html.ErrorView): HtmlFormat.Appendable = {
+  def notFoundView(implicit request: Request[_], messages: Messages, error: views.html.ErrorView): HtmlFormat.Appendable = {
     error(Messages("error.not-found.title"),
       Messages("error.not-found.heading"),
       Messages("error.not-found.message"))
