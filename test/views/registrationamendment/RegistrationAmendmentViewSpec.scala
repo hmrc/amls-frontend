@@ -79,7 +79,7 @@ class RegistrationAmendmentViewSpec extends AmlsViewSpec with MockitoSugar with 
         hasCompleteNominatedOfficer = true,
         nominatedOfficerName = Some(officerName))
 
-      val element = doc.getElementById("nominated-officer").text()
+      val element = doc.getElementsByClass("govuk-summary-list__row").get(1).text()
 
       element must include("Nominated officer")
       element must include(officerName)
