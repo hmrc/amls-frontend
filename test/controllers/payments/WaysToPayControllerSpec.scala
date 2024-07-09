@@ -171,6 +171,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
           } thenReturn Future.successful(NextUrl("/payments-next-url"))
 
           val result = controller.post()(postRequest)
+          val body = contentAsString(result)
 
           verify(controller.paymentsService).requestPaymentsUrl(
             eqTo(fees),
