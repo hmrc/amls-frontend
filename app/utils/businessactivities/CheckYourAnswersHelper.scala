@@ -18,7 +18,6 @@ package utils.businessactivities
 
 import models.businessactivities.TransactionTypes.DigitalSoftware
 import models.businessactivities._
-import models.businessmatching.BusinessMatching
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases._
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
