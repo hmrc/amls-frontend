@@ -30,7 +30,7 @@ import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
-import play.api.mvc.Result
+import play.api.mvc.{AnyContentAsEmpty, Request, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
@@ -44,7 +44,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
 
   trait Fixture {
     self =>
-    implicit val request = addToken(authRequest)
+    implicit val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
     val renewalService = mock[RenewalService]
     val dataCacheConnector = mock[DataCacheConnector]
     val renewal = Renewal()

@@ -16,10 +16,10 @@
 
 package models.businessmatching.updateservice
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class TradingPremisesActivities(index: Set[Int])
 
 object TradingPremisesActivities {
-  implicit def format = Json.format[TradingPremisesActivities]
+  implicit def format: OFormat[TradingPremisesActivities] = Json.format[TradingPremisesActivities]
 }

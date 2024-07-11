@@ -17,8 +17,8 @@
 package views.notifications.v3m0
 
 import models.notifications._
-import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.notifications.v3m0.MindedToRejectView
@@ -27,7 +27,7 @@ class MindedToRejectViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val minded_to_reject = app.injector.instanceOf[MindedToRejectView]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val notificationParams = NotificationParams(msgContent = "msgContent", businessName = Some("Fake Name Ltd."), safeId = Some("reference"))
   }

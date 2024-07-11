@@ -32,7 +32,7 @@ object SaRegistered {
       case false => Reads(_ => JsSuccess(SaRegisteredNo))
     }
 
-  implicit val jsonWrites = Writes[SaRegistered] {
+  implicit val jsonWrites: Writes[SaRegistered] = Writes[SaRegistered] {
     case SaRegisteredYes(value) => Json.obj(
       "saRegistered" -> true,
       "utrNumber" -> value

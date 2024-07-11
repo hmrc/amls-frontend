@@ -81,7 +81,7 @@ class WaysToPayController @Inject()(val authAction: AuthAction,
                   paymentsService.amountFromSubmissionData(fees).fold(0)(_.map(_ * 100).value.toInt)),
                 request.accountTypeId
               ).map { _ =>
-                Redirect(controllers.payments.routes.TypeOfBankController.get)
+                Redirect(controllers.payments.routes.TypeOfBankController.get())
               }
             }("Unable to save BACS info")
         }

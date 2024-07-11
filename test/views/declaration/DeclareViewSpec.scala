@@ -17,6 +17,7 @@
 package views.declaration
 
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -26,10 +27,10 @@ class DeclareViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val declare = app.injector.instanceOf[DeclareView]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "declaration view" must {

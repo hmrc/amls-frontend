@@ -204,7 +204,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
             statusService.getStatus(any(),any(), any())(any(),any(), any())
           } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
 
-          when(renewalService.isRenewalComplete(any(), any())(any(), any()))
+          when(renewalService.isRenewalComplete(any(), any())(any()))
             .thenReturn(Future.successful(false))
 
           when(renewalService.getRenewal(any())).thenReturn(Future.successful(Some(inCompleteRenewal)))
@@ -219,7 +219,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
             statusService.getStatus(any(),any(), any())(any(),any(), any())
           } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
 
-          when(renewalService.isRenewalComplete(any(), any())(any(), any()))
+          when(renewalService.isRenewalComplete(any(), any())(any()))
             .thenReturn(Future.successful(false))
 
           when(renewalService.getRenewal(any())).thenReturn(Future.successful(None))
@@ -234,7 +234,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
             statusService.getStatus(any(),any(), any())(any(),any(), any())
           } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
 
-          when(renewalService.isRenewalComplete(any(), any())(any(), any()))
+          when(renewalService.isRenewalComplete(any(), any())(any()))
             .thenReturn(Future.successful(true))
 
           when(renewalService.getRenewal(any())).thenReturn(Future.successful(Some(completeRenewal)))
@@ -250,7 +250,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
           statusService.getStatus(any(),any(), any())(any(),any(), any())
         } thenReturn Future.successful(RenewalSubmitted(None))
 
-        when(renewalService.isRenewalComplete(any(), any())(any(), any()))
+        when(renewalService.isRenewalComplete(any(), any())(any()))
           .thenReturn(Future.successful(true))
 
         when(renewalService.getRenewal(any())).thenReturn(Future.successful(Some(completeRenewal)))
@@ -297,7 +297,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
         statusService.getStatus(any(),any(), any())(any(),any(), any())
       } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
 
-      when(renewalService.isRenewalComplete(any(), any())(any(), any()))
+      when(renewalService.isRenewalComplete(any(), any())(any()))
         .thenReturn(Future.successful(true))
 
       val result = getSubheadingBasedOnStatus(credId, amlsRegNo, accountTypeId, statusService, renewalService).value

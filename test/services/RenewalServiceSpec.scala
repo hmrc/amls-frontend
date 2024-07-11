@@ -39,7 +39,7 @@ import scala.concurrent.Future
 
 class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
-  implicit val hc = HeaderCarrier()
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   trait Fixture {
 

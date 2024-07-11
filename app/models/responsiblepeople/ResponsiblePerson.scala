@@ -267,7 +267,7 @@ object ResponsiblePerson {
             _.isComplete
           } => TaskRow(
             messageKey,
-            controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url,
+            controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url,
             anyChanged(rp),
             Updated,
             TaskRow.updatedTag
@@ -276,7 +276,7 @@ object ResponsiblePerson {
             _.isComplete
           } => TaskRow(
             messageKey,
-            controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url,
+            controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url,
             anyChanged(rp),
             Completed,
             TaskRow.completedTag
@@ -288,7 +288,7 @@ object ResponsiblePerson {
             }
             TaskRow(
               messageKey,
-              controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url,
+              controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url,
               anyChanged(rp),
               Started,
               TaskRow.incompleteTag
@@ -400,7 +400,7 @@ object ResponsiblePerson {
     }
   }
 
-  implicit val formatOption = Reads.optionWithNull[Seq[ResponsiblePerson]]
+  implicit val formatOption: Reads[Option[Seq[ResponsiblePerson]]] = Reads.optionWithNull[Seq[ResponsiblePerson]]
 
   private def hasUkPassportNumber(rp: ResponsiblePerson): Boolean = rp.ukPassport match {
     case Some(UKPassportYes(_)) => true

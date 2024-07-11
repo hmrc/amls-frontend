@@ -91,7 +91,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       val result = controller.post()(request)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
+      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
       val captor = ArgumentCaptor.forClass(classOf[Supervision])
       verify(controller.dataCacheConnector).save[Supervision](any(), eqTo(Supervision.key), captor.capture())(any())

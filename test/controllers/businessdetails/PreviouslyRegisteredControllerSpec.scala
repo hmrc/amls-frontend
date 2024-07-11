@@ -61,7 +61,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
   "BusinessRegisteredWithHMRCBeforeController" must {
 
     "on get display the previously registered with HMRC page" in new Fixture {
-      when(mockService.getPreviouslyRegistered(any())(any()))
+      when(mockService.getPreviouslyRegistered(any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -71,7 +71,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
     "on get display the previously registered with HMRC with pre populated data" in new Fixture {
 
-      when(mockService.getPreviouslyRegistered(any())(any()))
+      when(mockService.getPreviouslyRegistered(any()))
         .thenReturn(Future.successful(Some(PreviouslyRegisteredYes(Some("12345678")))))
 
       val result = controller.get()(request)
@@ -95,7 +95,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
 
-      when(mockService.updatePreviouslyRegistered(any(), meq(update))(any()))
+      when(mockService.updatePreviouslyRegistered(any(), meq(update)))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
 
@@ -103,7 +103,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.businessdetails.routes.ActivityStartDateController.get(false).url))
 
-      verify(mockService).updatePreviouslyRegistered(any(), meq(update))(any())
+      verify(mockService).updatePreviouslyRegistered(any(), meq(update))
     }
 
     "on post with valid data and update returns None" in new Fixture {
@@ -119,14 +119,14 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
 
-      when(mockService.updatePreviouslyRegistered(any(), meq(update))(any()))
+      when(mockService.updatePreviouslyRegistered(any(), meq(update)))
         .thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.ConfirmRegisteredOfficeController.get().url))
 
-      verify(mockService).updatePreviouslyRegistered(any(), meq(update))(any())
+      verify(mockService).updatePreviouslyRegistered(any(), meq(update))
     }
 
     "on post with valid data in edit mode and load summary page" in new Fixture {
@@ -143,14 +143,14 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
 
-      when(mockService.updatePreviouslyRegistered(any(), meq(update))(any()))
+      when(mockService.updatePreviouslyRegistered(any(), meq(update)))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.businessdetails.routes.SummaryController.get.url))
 
-      verify(mockService).updatePreviouslyRegistered(any(), meq(update))(any())
+      verify(mockService).updatePreviouslyRegistered(any(), meq(update))
     }
 
     "on post with invalid data" in new Fixture {
@@ -164,7 +164,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
       contentAsString(result) must include(messages("err.summary"))
 
-      verify(mockService, times(0)).updatePreviouslyRegistered(any(), any())(any())
+      verify(mockService, times(0)).updatePreviouslyRegistered(any(), any())
     }
   }
 }

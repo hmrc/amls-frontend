@@ -77,7 +77,7 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
           case Some(data) =>
             removeCacheData(request.credId) flatMap { _ =>
               stubsService.update(request.credId, data) map { _ =>
-                Redirect(controllers.routes.LandingController.get)
+                Redirect(controllers.routes.LandingController.get())
               }
             }
           case _ => Future.successful(BadRequest)

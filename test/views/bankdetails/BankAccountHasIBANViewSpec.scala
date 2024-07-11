@@ -20,6 +20,7 @@ import forms.bankdetails.BankAccountHasIBANFormProvider
 import models.bankdetails.BankAccountHasIban
 import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
@@ -31,9 +32,9 @@ class BankAccountHasIBANViewSpec extends AmlsViewSpec with Matchers {
   lazy val bankAccountHasIban: BankAccountHasIBANView = inject[BankAccountHasIBANView]
   lazy val fp: BankAccountHasIBANFormProvider = inject[BankAccountHasIBANFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "BankAccountHasIBANView" must {

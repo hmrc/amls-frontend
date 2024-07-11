@@ -17,8 +17,8 @@
 package views.notifications.v1m0
 
 import models.notifications.NotificationParams
-import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.notifications.v1m0.NoLongerMindedToRejectView
@@ -27,7 +27,7 @@ class NoLongerMindedToRejectViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val no_longer_minded_to_reject = app.injector.instanceOf[NoLongerMindedToRejectView]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val notificationParams = NotificationParams(safeId = Some("reference"))
   }

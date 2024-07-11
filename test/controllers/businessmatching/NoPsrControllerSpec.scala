@@ -27,7 +27,7 @@ import views.html.businessmatching.{CannotAddServicesView, CannotContinueWithApp
 //noinspection ScalaStyle
 class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
 
-  implicit val defaultPatience =
+  implicit val defaultPatience: PatienceConfig =
     PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
 
   trait Fixture extends DependencyMocks { self =>

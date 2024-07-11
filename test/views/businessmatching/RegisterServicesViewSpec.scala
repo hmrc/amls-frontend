@@ -21,7 +21,7 @@ import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import org.scalatest.matchers.must.Matchers
 import play.api.data.{Form, FormError}
-import play.api.i18n.Messages
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.RegisterServicesView
@@ -31,7 +31,7 @@ class RegisterServicesViewSpec extends AmlsViewSpec with Matchers  {
   trait ViewFixture extends Fixture {
     lazy val formProvider = app.injector.instanceOf[RegisterBusinessActivitiesFormProvider]
     lazy val register_services = app.injector.instanceOf[RegisterServicesView]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "RegisterServicesView" must {

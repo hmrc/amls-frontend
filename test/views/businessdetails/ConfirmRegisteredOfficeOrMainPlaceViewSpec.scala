@@ -18,8 +18,8 @@ package views.businessdetails
 
 import forms.businessdetails.ConfirmRegisteredOfficeFormProvider
 import models.businessdetails.{ConfirmRegisteredOffice, RegisteredOfficeUK}
-import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.ConfirmRegisteredOfficeOrMainPlaceView
@@ -28,7 +28,7 @@ class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with Match
 
   lazy val place = app.injector.instanceOf[ConfirmRegisteredOfficeOrMainPlaceView]
   lazy val formProvider = app.injector.instanceOf[ConfirmRegisteredOfficeFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
 

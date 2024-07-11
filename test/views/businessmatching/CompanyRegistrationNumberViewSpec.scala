@@ -20,6 +20,7 @@ import forms.businessmatching.CompanyRegistrationNumberFormProvider
 import models.businessmatching.CompanyRegistrationNumber
 import org.scalatest.matchers.must.Matchers
 import play.api.data.Form
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.CompanyRegistrationNumberView
@@ -29,7 +30,7 @@ class CompanyRegistrationNumberViewSpec extends AmlsViewSpec with Matchers  {
 
   trait ViewFixture extends Fixture {
     lazy val viewUnderTest = app.injector.instanceOf[CompanyRegistrationNumberView]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   val formProvider = new CompanyRegistrationNumberFormProvider()()
@@ -58,8 +59,6 @@ class CompanyRegistrationNumberViewSpec extends AmlsViewSpec with Matchers  {
 
 
     "show errors in the correct locations" in new ViewFixture {
-
-      val errorMessage = messages("error.invalid.bm.registration.number.allowed")
 
       val formWithInvalidData: Form[CompanyRegistrationNumber] = formProvider.bind(Map("value" -> "12345£"))
 

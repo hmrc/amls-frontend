@@ -26,6 +26,7 @@ import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionRea
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Request, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.SectionsProvider
@@ -39,8 +40,8 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
   trait Fixture extends DependencyMocks { self =>
 
-    val request = addToken(authRequest)
-    val mockSectionsProvider = mock[SectionsProvider]
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    val mockSectionsProvider: SectionsProvider = mock[SectionsProvider]
 
     lazy val controller = new WhoIsTheBusinessNominatedOfficerController(
       mockCacheConnector,
@@ -80,8 +81,8 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
     "load 'Who is the business’s nominated officer?' page successfully" when {
       "with completed sections" must {
         val completedSections = Seq(
-          TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
-          TaskRow("s2", "/bar", true, Completed, TaskRow.completedTag)
+          TaskRow("s1", "/foo", hasChanged = true, Completed, TaskRow.completedTag),
+          TaskRow("s2", "/bar", hasChanged = true, Completed, TaskRow.completedTag)
         )
 
         "status is pre-submission" in new Fixture {
@@ -93,7 +94,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
-          val result = controller.get()(request)
+          val result: Future[Result] = controller.get()(request)
           status(result) must be(OK)
 
           contentAsString(result) must include(messages("submit.registration"))
@@ -108,7 +109,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
-          val result = controller.get()(request)
+          val result: Future[Result] = controller.get()(request)
           status(result) must be(OK)
 
           contentAsString(result) must include(messages("submit.amendment.application"))
@@ -123,7 +124,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
-          val result = controller.get()(request)
+          val result: Future[Result] = controller.get()(request)
           status(result) must be(OK)
 
           contentAsString(result) must include(messages("submit.amendment.application"))
@@ -138,7 +139,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
-          val result = controller.get()(request)
+          val result: Future[Result] = controller.get()(request)
           status(result) must be(OK)
 
           contentAsString(result) must include(messages("submit.renewal.application"))
@@ -147,8 +148,8 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
       "with incomplete sections" must {
         val incompleteSections = Seq(
-          TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
-          TaskRow("s2", "/bar", true, Started, TaskRow.incompleteTag)
+          TaskRow("s1", "/foo", hasChanged = true, Completed, TaskRow.completedTag),
+          TaskRow("s2", "/bar", hasChanged = true, Started, TaskRow.incompleteTag)
         )
 
         "redirect to the RegistrationProgressController" in new Fixture {
@@ -160,10 +161,10 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
-          val result = controller.get()(request)
+          val result: Future[Result] = controller.get()(request)
           status(result) must be(SEE_OTHER)
 
-          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
+          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
         }
       }
     }
@@ -174,10 +175,10 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "selected option is a valid responsible person in amendment mode" in new Fixture {
 
-          val newRequest = FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
           .withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
-          val updatedList = Seq(rp.copy(
+          val updatedList: Seq[ResponsiblePerson] = Seq(rp.copy(
             positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
           ), rp2)
 
@@ -185,17 +186,17 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
           mockApplicationStatus(SubmissionDecisionApproved)
           mockCacheSave[Option[Seq[ResponsiblePerson]]](Some(updatedList))
 
-          val result = controller.post()(newRequest)
+          val result: Future[Result] = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.WhoIsRegisteringController.get.url))
         }
 
         "selected option is a valid responsible person" in new Fixture {
 
-          val newRequest = FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
           .withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
-          val updatedList = Seq(rp.copy(
+          val updatedList: Seq[ResponsiblePerson] = Seq(rp.copy(
             positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
           ), rp2)
 
@@ -203,7 +204,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
           mockApplicationStatus(SubmissionReadyForReview)
           mockCacheSave[Option[Seq[ResponsiblePerson]]](Some(updatedList))
 
-          val result = controller.post()(newRequest)
+          val result: Future[Result] = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get.url))
         }
@@ -213,27 +214,27 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
     "successfully redirect to adding new responsible people .i.e what you need page of RP" when {
       "selected option is 'Register someone else'" in new Fixture {
-        val newRequest = FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
         .withFormUrlEncodedBody("value" -> "-1")
 
         mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
         mockApplicationStatus(SubmissionReady)
 
-        val result = controller.post()(newRequest)
+        val result: Future[Result] = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration)).url))
+        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(displayGuidance = true, Some(flowFromDeclaration)).url))
       }
     }
 
     "fail validation" when {
       "no option is selected on the UI" in new Fixture {
-        val newRequest = FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
         .withFormUrlEncodedBody("" -> "")
 
         mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
         mockApplicationStatus(SubmissionReady)
 
-        val result = controller.post()(newRequest)
+        val result: Future[Result] = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(messages("error.required.declaration.nominated.officer"))
       }

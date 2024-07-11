@@ -17,11 +17,11 @@
 package views.businessmatching
 
 import forms.businessmatching.MsbSubSectorsFormProvider
-import models.businessmatching.{BusinessMatchingMsbService, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
-import org.jsoup.nodes.Element
+import models.businessmatching.{BusinessMatchingMsbService, BusinessMatchingMsbServices}
 import org.scalatest.matchers.must.Matchers
 import play.api.data.{Form, FormError}
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.MsbServicesView
@@ -31,7 +31,7 @@ class MsbServicesViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val services = app.injector.instanceOf[MsbServicesView]
   lazy val formProvider = app.injector.instanceOf[MsbSubSectorsFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
 

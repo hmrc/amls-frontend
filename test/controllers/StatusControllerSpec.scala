@@ -39,7 +39,6 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import services._
-import uk.gov.hmrc.http.HttpResponse
 import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
 import views.html.status.YourRegistrationView
@@ -250,7 +249,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful((NotCompleted, Some(statusResponse))))
 
-      when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+      when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -272,7 +271,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((NotCompleted, None)))
 
-        when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+        when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val result = controllerNoAmlsNumber.get()(request)
         status(result) must be(OK)
@@ -292,7 +291,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful((SubmissionReadyForReview, None)))
 
-          when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+          when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -310,7 +309,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful((SubmissionReadyForReview, None)))
 
-          when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+          when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(OK)
@@ -336,7 +335,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionApproved, Some(readStatusResponse))))
 
-        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+        when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -359,7 +358,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionRejected, None)))
 
-        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+        when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -384,7 +383,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionRevoked, None)))
 
-        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+        when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -410,7 +409,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionExpired, None)))
 
-        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+        when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -432,7 +431,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionWithdrawn, None)))
 
-        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+        when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -458,7 +457,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((DeRegistered, None)))
 
-        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+        when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -484,7 +483,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((RenewalSubmitted(Some(LocalDate.now)), None)))
 
-        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+        when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -504,7 +503,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
-        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+        when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val renewalDate = LocalDate.now().plusDays(15)
 
@@ -534,10 +533,10 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
-        when(controller.renewalService.isRenewalComplete(any(), any[String]())(any(), any()))
+        when(controller.renewalService.isRenewalComplete(any(), any[String]())(any()))
           .thenReturn(Future.successful(false))
 
-        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+        when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val renewalDate = LocalDate.now().plusDays(15)
 
@@ -579,7 +578,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(dataCache.fetchAll(any[String]()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(controller.renewalService.isRenewalComplete(any(), any[String]())(any(), any()))
+        when(controller.renewalService.isRenewalComplete(any(), any[String]())(any()))
           .thenReturn(Future.successful(true))
 
         val renewalDate = LocalDate.now().plusDays(15)
@@ -590,7 +589,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
-        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+        when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         private val completeRenewal = Renewal(
           Some(InvolvedInOtherYes("test")),
@@ -638,11 +637,11 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
         when(controller.landingService.refreshCache(any(), any(), any())(any(), any(), any())).thenReturn(Future.successful(cacheMap))
 
-        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(false))
+        when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(false))
 
         val result = controller.get()(request)
 
-        redirectLocation(result) must be(Some(controllers.routes.LandingController.get.url))
+        redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
       }
     }
 
@@ -664,12 +663,12 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionReadyForReview, statusResponse.some)))
 
-        when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+        when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val result = controllerNoAmlsNumber.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get.url}]").text mustBe s"${messages("status.withdraw.link-text")}."
+        doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get().url}]").text mustBe s"${messages("status.withdraw.link-text")}."
       }
     }
 
@@ -691,12 +690,12 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionApproved, statusResponse.some)))
 
-        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+        when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val result = controller.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get.url}]").text mustBe s"${messages("your.registration.deregister.link")}."
+        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe s"${messages("your.registration.deregister.link")}."
       }
     }
 
@@ -732,31 +731,31 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
     "have canOrCannotTradeInformation method which" must {
       "return correct content if no msb or tcsp in BA" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(noMsbNoTcsp)(request)
+        val result = controller.canOrCannotTradeInformation(noMsbNoTcsp)
 
         result.body must include("You can trade and carry out business activities while your application is pending")
       }
 
       "return correct content if msb only in BA" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(onlyMsb)(request)
+        val result = controller.canOrCannotTradeInformation(onlyMsb)
 
         result.body must include("You cannot trade or carry out business activities while your application is pending")
       }
 
       "return correct content if tcsp only in BA" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(onlyTcsp)(request)
+        val result = controller.canOrCannotTradeInformation(onlyTcsp)
 
         result.body must include("You cannot trade or carry out business activities while your application is pending")
       }
 
       "return correct content if tcsp and msb only in BA" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(msbAndTcspOnly)(request)
+        val result = controller.canOrCannotTradeInformation(msbAndTcspOnly)
 
         result.body must include("You cannot trade or carry out business activities while your application is pending")
       }
 
       "return correct content if msb and other in BA" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(msbAndOther)(request)
+        val result = controller.canOrCannotTradeInformation(msbAndOther)
 
         result.body must include("There are some services you cannot provide while your application is pending")
         result.body must include("https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register")
@@ -764,7 +763,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       }
 
       "return correct content if tcsp and other in BA" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(tcspAndOther)(request)
+        val result = controller.canOrCannotTradeInformation(tcspAndOther)
 
         result.body must include("There are some services you cannot provide while your application is pending")
         result.body must include("https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register")
@@ -772,7 +771,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       }
 
       "return correct content if tcsp, msb and other in BA" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(msbAndTcsp)(request)
+        val result = controller.canOrCannotTradeInformation(msbAndTcsp)
 
         result.body must include("There are some services you cannot provide while your application is pending")
         result.body must include("https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register")
@@ -780,7 +779,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       }
 
       "return default content if BA is empty" in new Fixture {
-        val result = controller.canOrCannotTradeInformation(None)(request)
+        val result = controller.canOrCannotTradeInformation(None)
 
         result.body must include("https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register")
         result.body must include("Find out if you can trade")

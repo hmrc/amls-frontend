@@ -53,7 +53,7 @@ class PSRNumberController @Inject()(authAction: AuthAction,
           val form = bm.businessAppliedForPSRNumber.fold(formProvider())(formProvider().fill)
 
           Ok(psr_number(form, edit, bm.preAppComplete, statusService.isPreSubmission(status), bm.businessAppliedForPSRNumber.isDefined))
-        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
+        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
    }
 
   def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = false): Action[AnyContent] = authAction.async {

@@ -173,7 +173,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
             result.value.toString must include(messages(s"businessmatching.registerservices.servicename.lbl.${HighValueDealing.value}"))
 
-            checkChangeLink(result, controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get.url, id)
+            checkChangeLink(result, controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get().url, id)
           }
 
           "has no change link when is pending" in {
@@ -231,7 +231,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
               result.value.toString must include(messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}"))
             }
 
-            checkChangeLink(result, controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get.url, id)
+            checkChangeLink(result, controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get().url, id)
           }
 
           "has no change link when is pending" in {

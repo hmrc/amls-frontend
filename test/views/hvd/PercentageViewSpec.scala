@@ -19,6 +19,7 @@ package views.hvd
 import forms.hvd.PercentagePaymentFormProvider
 import models.hvd.PercentageOfCashPaymentOver15000.{Second, Third}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -29,10 +30,10 @@ class PercentageViewSpec extends AmlsViewSpec with Matchers {
   lazy val percentage = inject[PercentageView]
   lazy val fp = inject[PercentagePaymentFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "PercentageView view" must {

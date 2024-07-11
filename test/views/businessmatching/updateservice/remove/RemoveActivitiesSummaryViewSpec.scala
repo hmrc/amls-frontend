@@ -19,6 +19,7 @@ package views.businessmatching.updateservice.remove
 import models.DateOfChange
 import models.businessmatching.BusinessActivities
 import models.flowmanagement.RemoveBusinessTypeFlowModel
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import utils.{AmlsViewSpec, DateHelper}
@@ -30,7 +31,7 @@ import java.time.LocalDate
 class RemoveActivitiesSummaryViewSpec extends AmlsViewSpec {
 
   lazy val removeView = inject[RemoveActivitiesSummaryView]
-  implicit val requestWithToken = FakeRequest()
+  implicit val requestWithToken: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   val model = RemoveBusinessTypeFlowModel(
     Some(BusinessActivities.all),

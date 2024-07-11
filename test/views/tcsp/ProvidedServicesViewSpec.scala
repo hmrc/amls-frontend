@@ -17,8 +17,8 @@
 package views.tcsp
 
 import forms.tcsp.ProvidedServicesFormProvider
-
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.{FakeRequest, Injecting}
 import utils.AmlsViewSpec
 import views.Fixture
@@ -29,10 +29,10 @@ class ProvidedServicesViewSpec extends AmlsViewSpec with Matchers with Injecting
   lazy val provided_services: ProvidedServicesView = inject[ProvidedServicesView]
   lazy val fp: ProvidedServicesFormProvider = inject[ProvidedServicesFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "ProvidedServicesView" must {

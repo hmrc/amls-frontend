@@ -17,17 +17,16 @@
 package services.businessmatching
 
 import cats.implicits._
-import connectors.DataCacheConnector
-import javax.inject.Inject
 import models.businessmatching.BusinessActivity
-import uk.gov.hmrc.http.HeaderCarrier
+
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 case class NextService(url: String, activity: BusinessActivity)
 
-class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService, cacheConnector: DataCacheConnector) {
+class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService) {
 
-  def isNewActivity(cacheId: String, activity: BusinessActivity)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
+  def isNewActivity(cacheId: String, activity: BusinessActivity)(implicit ec: ExecutionContext): Future[Boolean] =
     businessMatchingService.getAdditionalBusinessActivities(cacheId)
       .map {
         _.contains(activity)

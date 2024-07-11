@@ -66,7 +66,7 @@ class SummaryController @Inject()(
 
           Ok(view(summaryList, submissionButton, isPreSubmission))
 
-        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
+        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
   }
 
   def post(): Action[AnyContent] = authAction.async {
@@ -74,7 +74,7 @@ class SummaryController @Inject()(
         for {
           businessMatching <- businessMatchingService.getModel(request.credId)
           _ <- businessMatchingService.updateModel(request.credId, businessMatching.copy(hasAccepted = true, preAppComplete = true))
-        } yield Redirect(controllers.routes.RegistrationProgressController.get)
+        } yield Redirect(controllers.routes.RegistrationProgressController.get())
       } getOrElse InternalServerError("Unable to update business matching")
   }
 }

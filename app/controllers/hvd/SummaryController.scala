@@ -45,7 +45,7 @@ class SummaryController @Inject() (val authAction: AuthAction,
         hvd <- dataCache.fetch[Hvd](request.credId, Hvd.key)
       } yield hvd match {
         case Some(data) => Ok(view(cyaHelper.getSummaryList(data)))
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get)
+        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 
@@ -54,6 +54,6 @@ class SummaryController @Inject() (val authAction: AuthAction,
       (for {
         hvd <- OptionT(dataCache.fetch[Hvd](request.credId, Hvd.key))
         _ <- OptionT.liftF(dataCache.save[Hvd](request.credId, Hvd.key, hvd.copy(hasAccepted = true)))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update HVD")
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update HVD")
   }
 }

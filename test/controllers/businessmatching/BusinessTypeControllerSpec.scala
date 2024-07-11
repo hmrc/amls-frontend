@@ -54,7 +54,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
 
     "display business Types Page" in new Fixture {
 
-      when(mockService.getBusinessType(any())(any(), any())).thenReturn(Future.successful(None))
+      when(mockService.getBusinessType(any())(any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -62,7 +62,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
 
     "display Registration Number page for CORPORATE_BODY" in new Fixture {
 
-      when(mockService.getBusinessType(any())(any(), any()))
+      when(mockService.getBusinessType(any())(any()))
         .thenReturn(Future.successful(Some(BusinessType.LimitedCompany)))
 
       val result = controller.get()(request)
@@ -72,7 +72,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
 
     "display Registration Number page for LLP" in new Fixture {
 
-      when(mockService.getBusinessType(any())(any(), any()))
+      when(mockService.getBusinessType(any())(any()))
         .thenReturn(Future.successful(Some(BusinessType.LPrLLP)))
 
       val result = controller.get()(request)
@@ -82,7 +82,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
 
     "display Type of Business Page" in new Fixture {
 
-      when(mockService.getBusinessType(any())(any(), any()))
+      when(mockService.getBusinessType(any())(any()))
         .thenReturn(Future.successful(Some(BusinessType.UnincorporatedBody)))
 
       val result = controller.get()(request)
@@ -92,7 +92,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
 
     "display Register Services Page" in new Fixture {
 
-      when(mockService.getBusinessType(any())(any(), any()))
+      when(mockService.getBusinessType(any())(any()))
         .thenReturn(Future.successful(Some(BusinessType.LPrLLP)))
 
       val result = controller.get()(request)
@@ -102,7 +102,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
 
     "redirect to register services controller when sole proprietor" in new Fixture {
 
-      when(mockService.getBusinessType(any())(any(), any()))
+      when(mockService.getBusinessType(any())(any()))
         .thenReturn(Future.successful(Some(BusinessType.SoleProprietor)))
 
       val result = controller.get()(request)
@@ -116,7 +116,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
       val newRequest = FakeRequest(POST, routes.BusinessTypeController.post().url)
         .withFormUrlEncodedBody("businessType" -> BusinessType.LimitedCompany.toString)
 
-      when(mockService.updateBusinessType(any(), eqTo(BusinessType.LimitedCompany))(any(), any()))
+      when(mockService.updateBusinessType(any(), eqTo(BusinessType.LimitedCompany))(any()))
         .thenReturn(Future.successful(Some(BusinessType.LimitedCompany)))
 
       val result = controller.post()(newRequest)
@@ -129,7 +129,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
       val newRequest = test.FakeRequest(POST, routes.BusinessTypeController.post().url)
         .withFormUrlEncodedBody("businessType" -> BusinessType.LimitedCompany.toString)
 
-      when(mockService.updateBusinessType(any(), eqTo(BusinessType.LimitedCompany))(any(), any()))
+      when(mockService.updateBusinessType(any(), eqTo(BusinessType.LimitedCompany))(any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)

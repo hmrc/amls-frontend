@@ -18,6 +18,7 @@ package views.businessmatching
 
 import forms.businessmatching.ConfirmPostcodeFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.ConfirmPostcodeView
@@ -26,7 +27,7 @@ class ConfirmPostcodeViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val confirm_postcode = inject[ConfirmPostcodeView]
   lazy val fp = inject[ConfirmPostcodeFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
 

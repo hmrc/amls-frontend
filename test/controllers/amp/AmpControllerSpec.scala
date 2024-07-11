@@ -23,10 +23,12 @@ import models.amp.Amp
 import org.mockito.Mockito._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture, CacheMocks}
 import org.mockito.ArgumentMatchers.{eq => eqTo, _}
+import play.api.Application
+import play.api.mvc.{AnyContentAsEmpty, Request, Result}
 import play.api.test.FakeRequest
 import services.ProxyCacheService
 
@@ -34,9 +36,9 @@ import scala.concurrent.Future
 
 class AmpControllerSpec extends AmlsSpec with CacheMocks {
 
-  val dateVal = LocalDateTime.now
+  val dateVal: LocalDateTime = LocalDateTime.now
 
-  val completeData = Json.obj(
+  val completeData: JsObject = Json.obj(
     "typeOfParticipant"             -> Seq("artGalleryOwner"),
     "soldOverThreshold"             -> true,
     "dateTransactionOverThreshold"  -> LocalDate.now,
@@ -44,7 +46,7 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
     "percentageExpectedTurnover"    -> "fortyOneToSixty"
   )
 
-  val completeJson = Json.obj(
+  val completeJson: JsObject = Json.obj(
     "_id"            -> "someid",
     "data"           -> completeData,
     "lastUpdated"    -> Json.obj("$date" -> dateVal.atZone(ZoneOffset.UTC).toInstant.toEpochMilli),
@@ -54,11 +56,11 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
 
   trait Fixture extends AuthorisedFixture {
     self =>
-    val request         = addToken(authRequest)
-    val proxyCacheService = mock[ProxyCacheService]
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    val proxyCacheService: ProxyCacheService = mock[ProxyCacheService]
     val credId          = "someId"
 
-    lazy val app = new GuiceApplicationBuilder()
+    lazy val app: Application = new GuiceApplicationBuilder()
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[ProxyCacheService].to(proxyCacheService))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
@@ -67,45 +69,45 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
       )
       .build()
 
-    val controller      = app.injector.instanceOf[AmpController]
+    val controller: AmpController = app.injector.instanceOf[AmpController]
   }
 
   "get returns 200" when {
     "no amp section in cache" in new Fixture {
-      when(proxyCacheService.getAmp(any())(any())).thenReturn(Future.successful(Some(Json.obj())))
+      when(proxyCacheService.getAmp(any())).thenReturn(Future.successful(Some(Json.obj())))
 
 
 
-      val result = controller.get(credId)(request)
+      val result: Future[Result] = controller.get(credId)(request)
       status(result) must be(OK)
 
-      val document = Json.parse(contentAsString(result))
-      document mustBe(Json.obj())
+      val document: JsValue = Json.parse(contentAsString(result))
+      document mustBe Json.obj()
     }
 
     "amp section in cache" in new Fixture {
-      when(proxyCacheService.getAmp(any())(any())).thenReturn(Future.successful(Some(completeJson)))
+      when(proxyCacheService.getAmp(any())).thenReturn(Future.successful(Some(completeJson)))
 
-      val result = controller.get(credId)(request)
+      val result: Future[Result] = controller.get(credId)(request)
       status(result) must be(OK)
 
-      val document = Json.parse(contentAsString(result))
-      document mustBe(completeJson)
+      val document: JsValue = Json.parse(contentAsString(result))
+      document mustBe completeJson
     }
   }
 
   "set" when {
     "passed valid json" in new Fixture {
-      val postRequest = FakeRequest("POST", "/")
+      val postRequest: FakeRequest[JsValue] = FakeRequest("POST", "/")
         .withHeaders(CONTENT_TYPE -> "application/json")
         .withBody[JsValue](completeJson)
 
-      when(proxyCacheService.setAmp(any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
+      when(proxyCacheService.setAmp(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-      val result = controller.set(credId)(postRequest)
+      val result: Future[Result] = controller.set(credId)(postRequest)
       status(result) must be(OK)
-      val document = Json.parse(contentAsString(result))
-      document mustBe(Json.obj("_id" -> credId))
+      val document: JsValue = Json.parse(contentAsString(result))
+      document mustBe Json.obj("_id" -> credId)
     }
   }
 
@@ -118,10 +120,10 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
       when(mockCacheConnector.save[Amp](any(), any(), any())(any()))
         .thenReturn(Future.successful(mockCacheMap))
 
-      val result = controller.accept.apply(FakeRequest())
+      val result: Future[Result] = controller.accept.apply(FakeRequest())
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get.toString
+      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get().toString
 
       verify(mockCacheConnector).save[Amp](any(), eqTo(Amp.key),
         eqTo(completeJson.as[Amp].copy(hasAccepted = true)))(any())

@@ -19,18 +19,21 @@ package controllers.bankdetails
 import controllers.actions.SuccessfulAuthAction
 import forms.bankdetails.HasBankAccountFormProvider
 import models.bankdetails.BankDetails
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Request, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.bankdetails.HasBankAccountView
+
+import scala.concurrent.Future
 
 class HasBankAccountControllerSpec extends AmlsSpec with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
 
-    lazy val hasBankAcc = inject[HasBankAccountView]
-    val request = addToken(authRequest)
+    lazy val hasBankAcc: HasBankAccountView = inject[HasBankAccountView]
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
     val controller = new HasBankAccountController(
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -52,9 +55,9 @@ class HasBankAccountControllerSpec extends AmlsSpec with Injecting {
     "redirect to the 'bank name' page" when {
       "'yes' is selected" in new Fixture {
 
-        val newRequest = FakeRequest(POST, routes.HasBankAccountController.post().url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.HasBankAccountController.post().url)
           .withFormUrlEncodedBody("hasBankAccount" -> "true")
-        val result = controller.post()(newRequest)
+        val result: Future[Result] = controller.post()(newRequest)
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.bankdetails.routes.BankAccountNameController.getNoIndex.url)
@@ -64,19 +67,19 @@ class HasBankAccountControllerSpec extends AmlsSpec with Injecting {
         "also saves an empty list of bank details into the cache" in new Fixture {
           mockCacheSave(Seq.empty[BankDetails], Some(BankDetails.key))
 
-          val newRequest = FakeRequest(POST, routes.HasBankAccountController.post().url)
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.HasBankAccountController.post().url)
             .withFormUrlEncodedBody("hasBankAccount" -> "false")
-          val result = controller.post()(newRequest)
+          val result: Future[Result] = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.bankdetails.routes.YourBankAccountsController.get.url)
+          redirectLocation(result) mustBe Some(controllers.bankdetails.routes.YourBankAccountsController.get().url)
         }
       }
     }
 
     "return the view with a Bad Request status" when {
       "nothing is selected" in new Fixture {
-        val result = controller.post()(request)
+        val result: Future[Result] = controller.post()(request)
 
         status(result) mustBe BAD_REQUEST
       }

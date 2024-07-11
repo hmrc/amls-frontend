@@ -17,7 +17,6 @@
 package services.flowmanagement.flowrouters
 
 import config.ApplicationConfig
-import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
 import generators.tradingpremises.TradingPremisesGenerator
@@ -76,7 +75,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
 
           val result = await(router.getRoute("internalId", WhatBusinessTypesToRemovePageId, model))
 
-          result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get)
+          result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
         }
       }
     }
@@ -126,7 +125,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
           )
           val result = await(router.getRoute("internalId", WhatDateRemovedPageId, model))
 
-          result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get)
+          result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
         }
       }
     }
@@ -145,7 +144,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
 
           val result = await(router.getRoute("internalId", RemoveBusinessTypesSummaryPageId, model))
 
-          result mustBe Redirect(removeRoutes.NeedMoreInformationController.get)
+          result mustBe Redirect(removeRoutes.NeedMoreInformationController.get())
         }
       }
     }
@@ -162,7 +161,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
           )
           val result = await(router.getRoute("internalId", RemoveBusinessTypesSummaryPageId, model))
 
-          result mustBe Redirect(removeRoutes.NeedMoreInformationController.get)
+          result mustBe Redirect(removeRoutes.NeedMoreInformationController.get())
         }
 
         "there are incomplete trading premises in the data" in new Fixture {
@@ -176,7 +175,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
 
           val result = await(router.getRoute("internalId", RemoveBusinessTypesSummaryPageId, model))
 
-          result mustBe Redirect(removeRoutes.NeedMoreInformationController.get)
+          result mustBe Redirect(removeRoutes.NeedMoreInformationController.get())
         }
       }
     }
@@ -192,7 +191,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
           )
           val result = await(router.getRoute("internalId", NeedToUpdatePageId, model))
 
-          result mustBe Redirect(controllers.routes.RegistrationProgressController.get)
+          result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
         }
       }
     }
@@ -225,7 +224,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
 
         val result = await(router.getRoute("internalId", WhatDateRemovedPageId, model, edit = true))
 
-        result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get)
+        result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
       }
     }
 
@@ -239,7 +238,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
 
         val result = await(router.getRoute("internalId", WhatBusinessTypesToRemovePageId, model, edit = true))
 
-        result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get)
+        result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
       }
     }
   }

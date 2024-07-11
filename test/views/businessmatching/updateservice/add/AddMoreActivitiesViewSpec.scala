@@ -18,6 +18,7 @@ package views.businessmatching.updateservice.add
 
 import forms.businessmatching.updateservice.add.AddMoreActivitiesFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add.AddMoreActivitiesView
@@ -26,7 +27,7 @@ class AddMoreActivitiesViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val activitiesView = app.injector.instanceOf[AddMoreActivitiesView]
   lazy val fp = app.injector.instanceOf[AddMoreActivitiesFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
     def view = activitiesView(fp())

@@ -49,16 +49,16 @@ class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnect
               status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
             } yield status match {
               case ReadyForRenewal(_) if renewalComplete =>
-                Ok(view("declaration.declaration.amendment.title", "submit.renewal.application", name, false))
+                Ok(view("declaration.declaration.amendment.title", "submit.renewal.application", name, isAmendment = false))
               case ReadyForRenewal(_) | SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_) =>
-                Ok(view("declaration.declaration.amendment.title", "submit.amendment.application", name, true))
+                Ok(view("declaration.declaration.amendment.title", "submit.amendment.application", name, isAmendment = true))
               case _ =>
-                Ok(view("declaration.declaration.amendment.title", "submit.registration", name, false))
+                Ok(view("declaration.declaration.amendment.title", "submit.registration", name, isAmendment = false))
             }
           }
           case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
         }
-        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get.url))
+        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
       }
     }
   }
@@ -74,14 +74,14 @@ class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnect
             Future.successful(Ok(view(title, subtitle, name, isAmendment)))
           case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
         }
-        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get.url))
+        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
       }
   }
 
   private def redirectToAddPersonPage(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)(implicit hc: HeaderCarrier): Future[Result] =
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case SubmissionReadyForReview => Redirect(routes.AddPersonController.getWithAmendment())
-      case _ => Redirect(routes.AddPersonController.get)
+      case _ => Redirect(routes.AddPersonController.get())
     }
 
 }

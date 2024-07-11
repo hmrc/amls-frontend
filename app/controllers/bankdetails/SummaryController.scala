@@ -44,7 +44,7 @@ class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
         case Some(data) =>
           val summaryList = cyaHelper.createSummaryList(bankDetails, index)
           Ok(view(summaryList, index))
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get)
+        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 

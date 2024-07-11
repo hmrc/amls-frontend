@@ -263,7 +263,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(
             CompleteResponsiblePeople2,
@@ -284,7 +284,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(
             CompleteResponsiblePeople2,
@@ -305,7 +305,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(
             CompleteResponsiblePeople2,
@@ -327,7 +327,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(
             CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true),
@@ -350,7 +350,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(
             CompleteResponsiblePeople2,
@@ -378,7 +378,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(
             CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true,
@@ -410,7 +410,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           val result = controller.remove(1)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
           val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key), captor.capture())(any())

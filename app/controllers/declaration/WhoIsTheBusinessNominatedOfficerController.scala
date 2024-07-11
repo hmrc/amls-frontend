@@ -66,22 +66,22 @@ class WhoIsTheBusinessNominatedOfficerController @Inject()(val dataCacheConnecto
               } yield businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, formProvider(), ResponsiblePerson.filter(responsiblePeople))
                 ) getOrElse businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, formProvider(), Seq.empty)
           }
-          case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get.url))
+          case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
         }
   }
 
-  def getWithAmendment(): Action[AnyContent] = get //TODO this can be removed unless there is a GTM need for it
+  def getWithAmendment: Action[AnyContent] = get //TODO this can be removed unless there is a GTM need for it
 
   private def updateNominatedOfficer(eventualMaybePeoples: Option[Seq[ResponsiblePerson]],
                                      data: BusinessNominatedOfficer): Future[Option[Seq[ResponsiblePerson]]] = {
     eventualMaybePeoples match {
       case Some(rpSeq) =>
         val updatedList = ResponsiblePerson.filter(rpSeq).map { responsiblePerson =>
-          responsiblePerson.personName.exists(name => name.fullNameWithoutSpace.equals(data.value)) match {
-            case true =>
-              val position = responsiblePerson.positions.fold[Option[Positions]](None)(p => Some(Positions(p.positions. + (NominatedOfficer), p.startDate)))
-              responsiblePerson.copy(positions = position)
-            case false => responsiblePerson
+          if (responsiblePerson.personName.exists(name => name.fullNameWithoutSpace.equals(data.value))) {
+            val position = responsiblePerson.positions.fold[Option[Positions]](None)(p => Some(Positions(p.positions.+(NominatedOfficer), p.startDate)))
+            responsiblePerson.copy(positions = position)
+          } else {
+            responsiblePerson
           }
         }
         Future.successful(Some(updatedList))
@@ -93,7 +93,7 @@ class WhoIsTheBusinessNominatedOfficerController @Inject()(val dataCacheConnecto
     implicit request =>
       validateRequest(request.amlsRefNumber, request.accountTypeId, request.credId, formProvider()){ data =>
           data.value match {
-            case "-1" => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration))))
+            case "-1" => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(displayGuidance = true, Some(flowFromDeclaration))))
             case _ => for {
               serviceStatus <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
               responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)

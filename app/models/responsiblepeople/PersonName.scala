@@ -24,12 +24,12 @@ case class PersonName(
                        lastName: String
                      ) {
 
-  val fullName = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString(" ")
-  val titleName = Seq(Some(firstName), Some(lastName)).flatten[String].mkString(" ")
-  val fullNameWithoutSpace = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString("")
+  val fullName: String = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString(" ")
+  val titleName: String = Seq(Some(firstName), Some(lastName)).flatten[String].mkString(" ")
+  val fullNameWithoutSpace: String = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString("")
 
 }
 
 object PersonName {
-  implicit val format = Json.format[PersonName]
+  implicit val format: OFormat[PersonName] = Json.format[PersonName]
 }

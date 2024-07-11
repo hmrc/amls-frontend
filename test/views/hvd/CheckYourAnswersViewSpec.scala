@@ -21,6 +21,7 @@ import models.hvd.Products._
 import models.hvd._
 import org.jsoup.Jsoup
 import org.scalatest.prop.TableDrivenPropertyChecks
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.{FakeRequest, Injecting}
 import utils.AmlsSummaryViewSpec
 import utils.hvd.CheckYourAnswersHelper
@@ -36,7 +37,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
   lazy val cyaHelper = inject[CheckYourAnswersHelper]
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView(FakeRequest())
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView(FakeRequest())
   }
 
   "CheckYourAnswersView view" must {
@@ -74,8 +75,6 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
     )
 
       def view = cyaView(list)
-
-      val rows = doc.getElementsByClass("govuk-summary-list__row")
 
       doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
         doc.getElementsByClass("govuk-summary-list__value").asScala

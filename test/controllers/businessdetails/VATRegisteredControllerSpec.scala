@@ -30,7 +30,6 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessdetails.VATRegisteredView
 
@@ -121,7 +120,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorporationTaxRegisteredController.get.url))
+            redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorporationTaxRegisteredController.get().url))
           }
 
           "customer is a Limited Company" in new Fixture {
@@ -139,7 +138,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorporationTaxRegisteredController.get.url))
+            redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorporationTaxRegisteredController.get().url))
           }
         }
 

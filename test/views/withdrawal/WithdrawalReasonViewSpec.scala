@@ -19,6 +19,7 @@ package views.withdrawal
 import forms.withdrawal.WithdrawalReasonFormProvider
 import models.withdrawal.WithdrawalReason
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.withdrawal.WithdrawalReasonView
@@ -27,7 +28,7 @@ class WithdrawalReasonViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val withdrawal_reason = inject[WithdrawalReasonView]
   lazy val fp = inject[WithdrawalReasonFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   trait TestFixture extends Fixture
 
   "WithdrawalReasonView" must {

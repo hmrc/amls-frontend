@@ -43,7 +43,7 @@ import scala.concurrent.Future
 class SectionsProviderSpec extends AmlsSpec with IntegrationPatience {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  implicit val mockCache = mock[Cache]
+  implicit val mockCache: Cache = mock[Cache]
 
   lazy val sectionsProvider = new SectionsProvider(mockCacheConnector, appConfig)
 

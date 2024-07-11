@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.supervision.SupervisionEndFormProvider
 import models.supervision._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import utils.AuthAction
 import views.html.supervision.SupervisionEndView
 
@@ -98,10 +98,11 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
     updatedAnotherBody
   }
 
-  private def redirect(edit: Boolean) = {
-    edit match {
-      case true => Redirect(routes.SummaryController.get)
-      case false => Redirect(routes.SupervisionEndReasonsController.get(false))
+  private def redirect(edit: Boolean): Result = {
+    if (edit) {
+      Redirect(routes.SummaryController.get())
+    } else {
+      Redirect(routes.SupervisionEndReasonsController.get(false))
     }
   }
 }

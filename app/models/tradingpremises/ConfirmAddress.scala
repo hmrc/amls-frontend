@@ -16,10 +16,10 @@
 
 package models.tradingpremises
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class ConfirmAddress(confirmAddress: Boolean)
 
 object ConfirmAddress {
-  implicit val formats = Json.format[ConfirmAddress]
+  implicit val formats: OFormat[ConfirmAddress] = Json.format[ConfirmAddress]
 }

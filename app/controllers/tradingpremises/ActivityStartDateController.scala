@@ -23,7 +23,6 @@ import models.tradingpremises._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc._
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection}
 import views.html.tradingpremises.ActivityStartDateView
 

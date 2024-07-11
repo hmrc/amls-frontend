@@ -18,6 +18,7 @@ package views.renewal
 
 import forms.renewal.CashPaymentsCustomersNotMetFormProvider
 import models.renewal.CashPaymentsCustomerNotMet
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.CashPaymentsCustomersNotMetView
@@ -28,7 +29,7 @@ class CashPaymentsCustomersNotMetViewSpec extends AmlsViewSpec{
 
   lazy val cash_payments_customers_not_met = inject[CashPaymentsCustomersNotMetView]
   lazy val fp = inject[CashPaymentsCustomersNotMetFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   val cashPaymentsCustomersNotMet = CashPaymentsCustomerNotMet(true)
 

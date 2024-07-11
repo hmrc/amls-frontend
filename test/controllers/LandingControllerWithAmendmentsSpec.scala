@@ -33,8 +33,8 @@ import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{BodyParsers, Request}
+import play.api.libs.json.Json
+import play.api.mvc.BodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.cache.Cache
@@ -84,7 +84,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
     def setUpMocksForDataExistsInSaveForLater(controller: LandingController, testData: Cache = mock[Cache]) = {
       when(controller.landingService.cacheMap(any[String])).thenReturn(Future.successful(Some(testData)))
-      when(controller.landingService.initialiseGetWithAmendments(any[String])(any(), any())).thenReturn(Future.successful(Some(testData)))
+      when(controller.landingService.initialiseGetWithAmendments(any[String])(any())).thenReturn(Future.successful(Some(testData)))
     }
 
     //noinspection ScalaStyle
@@ -438,10 +438,6 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
               .thenReturn(Future.successful((NotCompleted, None)))
 
-            val mergedCache = cacheMapOne.data
-              .+(SubscriptionResponse.key -> Json.toJson(SubscriptionResponse("", "", None)))
-              .+(ResponsiblePerson.key -> Json.toJson(None))
-
             when(controller.cacheConnector.save[TradingPremises](any(), meq(TradingPremises.key), any())(any())).thenReturn(Future.successful(fixedCache))
 
             when(controller.cacheConnector.save[ResponsiblePerson](any(), meq(ResponsiblePerson.key), any())(any())).thenReturn(Future.successful(fixedCache))
@@ -459,7 +455,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       "there is no data in S4L" should {
         "refresh from API5 and redirect to status controller" in new Fixture {
           when(controller.landingService.cacheMap(any[String])).thenReturn(Future.successful(None))
-          when(controller.landingService.initialiseGetWithAmendments(any[String])(any(), any())).thenReturn(Future.successful(None))
+          when(controller.landingService.initialiseGetWithAmendments(any[String])(any())).thenReturn(Future.successful(None))
 
           when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
             .thenReturn(Future.successful(Some(SubscriptionResponse("", "", None))))
@@ -511,7 +507,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
               Address("Line1", Some("Line2"), None, None, Some("AA11AA"), Country("United Kingdom", "UK")),
               "testSafeId")
 
-            when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext], any[Request[_]]))
+            when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(Some(reviewDetails)))
 
             when(controller.landingService.updateReviewDetails(any(), any())).thenReturn(Future.successful(mock[Cache]))
@@ -519,7 +515,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             val result = controller.get()(request)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessmatching.routes.BusinessTypeController.get.url))
+            redirectLocation(result) must be(Some(controllers.businessmatching.routes.BusinessTypeController.get().url))
 
             Mockito.verify(controller.landingService, times(1)).updateReviewDetails(any[ReviewDetails], any[String])
           }
@@ -528,7 +524,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         "there is no data in keystore" should {
           "redirect to business customer" in new FixtureNoAmlsNumber {
             when(controller.landingService.cacheMap(any[String])).thenReturn(Future.successful(None))
-            when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext], any[Request[_]]))
+            when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(None))
 
             val result = controller.get()(request)

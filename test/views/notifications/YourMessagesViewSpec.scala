@@ -20,6 +20,7 @@ import models.notifications.ContactType.RenewalApproval
 import models.notifications.StatusType.{Approved, Rejected}
 import models.notifications._
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import uk.gov.hmrc.govukfrontend.views.Aliases.Table
 import utils.AmlsViewSpec
 import views.Fixture
@@ -30,7 +31,7 @@ import java.time.LocalDateTime
 class YourMessagesViewSpec extends AmlsViewSpec with Matchers  {
 
     lazy val your_messages = app.injector.instanceOf[YourMessagesView]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val businessName = "Fake Name Ltd."
     val headingWithBusinessName = "Messages for Fake Name Ltd."

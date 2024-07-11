@@ -20,9 +20,8 @@ import forms.businessdetails.BusinessEmailAddressFormProvider
 import models.businessdetails.ContactingYouEmail
 import org.scalatest.matchers.must.Matchers
 import play.api.data.Form
-import play.api.mvc.Request
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
-import play.twirl.api.Html
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.BusinessEmailAddressView
@@ -36,7 +35,7 @@ class BusinessEmailAddressViewSpec extends AmlsViewSpec with Matchers  {
   implicit val request: Request[_] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "contacting_you view" must {

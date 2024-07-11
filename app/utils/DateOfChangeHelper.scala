@@ -19,13 +19,11 @@ package utils
 import controllers.hvd.routes
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionStatus}
 import models.tradingpremises.TradingPremises
-
-import java.time.LocalDate
 import play.api.Logging
 import play.api.i18n.Messages
 import play.api.mvc.Call
 
-import java.time.format.DateTimeFormatter
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter.ofPattern
 
 trait DateOfChangeHelper extends Logging {

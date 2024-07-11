@@ -20,6 +20,7 @@ import forms.hvd.ProductsFormProvider
 import models.hvd.Products
 import models.hvd.Products.{Cars, OtherMotorVehicles}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -30,10 +31,10 @@ class ProductsViewSpec extends AmlsViewSpec with Matchers {
   lazy val products = inject[ProductsView]
   lazy val fp = inject[ProductsFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "products view" must {

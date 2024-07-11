@@ -20,6 +20,7 @@ import forms.businessactivities.ExpectedBusinessTurnoverFormProvider
 import models.businessactivities.ExpectedBusinessTurnover
 import org.scalatest.matchers.must.Matchers
 import play.api.data.FormError
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -30,10 +31,10 @@ class ExpectedBusinessTurnoverViewSpec extends AmlsViewSpec with Matchers {
   lazy val turnover = inject[ExpectedBusinessTurnoverView]
   lazy val formProvider = inject[ExpectedBusinessTurnoverFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "expected_business_turnover view" must {

@@ -20,10 +20,11 @@ import cats.implicits._
 import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+
 import javax.inject.Inject
 import models.eab.Eab
 import play.api.libs.json._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ProxyCacheService
 import utils.AuthAction
 import models.businessmatching.BusinessActivity.{EstateAgentBusinessService => EAB}
@@ -37,15 +38,13 @@ class EabController @Inject()(proxyCacheService  : ProxyCacheService,
                               val cc: MessagesControllerComponents,
                               val serviceFlow: ServiceFlow) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
-  def get(credId: String) = Action.async {
-    implicit request => {
+  def get(credId: String): Action[AnyContent] = Action.async {
       proxyCacheService.getEab(credId).map {
         _.map(Ok(_: JsValue)).getOrElse(NotFound)
       }
-    }
   }
 
-  def set(credId: String) = Action.async(parse.json) {
+  def set(credId: String): Action[JsValue] = Action.async(parse.json) {
     implicit request => {
       proxyCacheService.setEab(credId, request.body).map {
         _ => {
@@ -82,11 +81,11 @@ class EabController @Inject()(proxyCacheService  : ProxyCacheService,
     }
   }
 
-  def accept = authAction.async {
+  def accept: Action[AnyContent] = authAction.async {
     implicit request =>
       (for {
         eab <- OptionT(cacheConnector.fetch[Eab](request.credId, Eab.key))
         _ <- OptionT.liftF(cacheConnector.save[Eab](request.credId, Eab.key, eab.copy(hasAccepted = true)))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update EAB")
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update EAB")
   }
 }

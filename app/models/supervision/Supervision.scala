@@ -70,7 +70,7 @@ object Supervision {
   def taskRow(implicit cache: Cache, messages: Messages): TaskRow = {
     val notStarted = TaskRow(
       key,
-      controllers.supervision.routes.WhatYouNeedController.get.url,
+      controllers.supervision.routes.WhatYouNeedController.get().url,
       hasChanged = false,
       NotStarted,
       TaskRow.notStartedTag
@@ -79,14 +79,14 @@ object Supervision {
     cache.getEntry[Supervision](key).fold(notStarted) {
       case m if m.isComplete && m.hasChanged => TaskRow(
         key,
-        controllers.supervision.routes.SummaryController.get.url,
+        controllers.supervision.routes.SummaryController.get().url,
         hasChanged = true,
         status = Updated,
         tag = TaskRow.updatedTag
       )
       case model @ m if m.isComplete => TaskRow(
         key,
-        controllers.supervision.routes.SummaryController.get.url,
+        controllers.supervision.routes.SummaryController.get().url,
         model.hasChanged,
         Completed,
         TaskRow.completedTag
@@ -94,7 +94,7 @@ object Supervision {
       case m if m.isEmpty => notStarted
       case model => TaskRow(
         key,
-        controllers.supervision.routes.WhatYouNeedController.get.url,
+        controllers.supervision.routes.WhatYouNeedController.get().url,
         model.hasChanged,
         Started,
         TaskRow.incompleteTag
@@ -107,9 +107,7 @@ object Supervision {
 
   val key = "supervision"
 
-  implicit val mongoKey = new MongoKey[Supervision] {
-    override def apply(): String = "supervision"
-  }
+  implicit val mongoKey: MongoKey[Supervision] = () => "supervision"
 
   def professionalBodiesReader: Reads[Option[ProfessionalBodies]] =
     (__ \ "professionalBodies").readNullable[ProfessionalBodies] flatMap {
@@ -132,7 +130,7 @@ object Supervision {
 
   implicit val writes: Writes[Supervision] = Json.writes[Supervision]
 
-  implicit val formatOption = Reads.optionWithNull[Supervision]
+  implicit val formatOption: Reads[Option[Supervision]] = Reads.optionWithNull[Supervision]
 
   implicit def default(supervision: Option[Supervision]): Supervision =
     supervision.getOrElse(Supervision())

@@ -28,7 +28,7 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import services.{RenewalService, SectionsProvider, StatusService, SubmissionService}
-import uk.gov.hmrc.http.{BadRequestException, HttpResponse, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{BadRequestException, UpstreamErrorResponse}
 import utils.AmlsSpec
 import views.ParagraphHelpers
 
@@ -103,7 +103,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         }.thenReturn(Future.successful(incompleteSections))
 
         when {
-          controller.subscriptionService.subscribe(any(), any(), any())(any(), any(), any())
+          controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
         } thenReturn Future.successful(response)
 
         when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any()))
@@ -112,7 +112,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
       }
 
       "return to the confirmation page on first submission" in new Fixture {
@@ -121,7 +121,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         }.thenReturn(Future.successful(completedSections))
 
         when {
-          controller.subscriptionService.subscribe(any(), any(), any())(any(), any(), any())
+          controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
         } thenReturn Future.successful(response)
 
         when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any()))
@@ -130,7 +130,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
+        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get().url)
       }
 
       "return to the landing controller when recovers from duplicate response" in new Fixture {
@@ -139,7 +139,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         }.thenReturn(Future.successful(completedSections))
 
         when {
-          controller.subscriptionService.subscribe(any(), any(), any())(any(), any(), any())
+          controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
         } thenReturn Future.successful(response.copy(previouslySubmitted = Some(true)))
 
         when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any()))
@@ -148,7 +148,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.LandingController.get.url)
+        redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
       }
     }
 
@@ -167,7 +167,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       val result = controller.post()(request)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
+      redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get().url)
     }
 
     "redirect to the correct help page when a duplicate enrolment error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
@@ -177,7 +177,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       }.thenReturn(Future.successful(completedSections))
 
       when {
-        controller.subscriptionService.subscribe(any(), any(), any())(any(), any(), any())
+        controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
       } thenReturn Future.failed(DuplicateEnrolmentException(msg, UpstreamErrorResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
 
       when {
@@ -197,7 +197,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       }.thenReturn(Future.successful(completedSections))
 
       when {
-        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any(), any())
+        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any())
       } thenReturn Future.failed(DuplicateSubscriptionException(msg))
 
       when {
@@ -221,7 +221,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       } thenReturn Future.successful(SubmissionReady)
 
       when {
-        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any(), any())
+        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any())
       } thenReturn Future.failed(InvalidEnrolmentCredentialsException(msg, UpstreamErrorResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
 
       val result = controller.post()(request)
@@ -236,7 +236,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       }.thenReturn(Future.successful(completedSections))
 
       when {
-        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any(), any())
+        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any())
       } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
 
       when {
@@ -287,7 +287,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
+        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get().url)
       }
 
       "redirect to the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
@@ -331,7 +331,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
+        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get().url)
 
         verify(controller.renewalService).getRenewal(any[String]())
       }
@@ -403,7 +403,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
+        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get().url)
       }
 
       "redirect to the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {

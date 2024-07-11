@@ -20,7 +20,7 @@ import config.ApplicationConfig
 import models.notifications.NotificationParams
 import play.api.i18n.{Lang, Messages}
 import play.api.mvc.Request
-import play.twirl.api.{BaseScalaTemplate, Format, Html, HtmlFormat, Template5}
+import play.twirl.api.{BaseScalaTemplate, Format, HtmlFormat, Template5}
 
 trait VersionedView {
   type NotificationViewScalaTemplate5 = BaseScalaTemplate[HtmlFormat.Appendable, Format[HtmlFormat.Appendable]]

@@ -77,7 +77,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
     val customersOutsideIsUK = CustomersOutsideIsUK(true)
 
     when {
-      renewalService.fetchAndUpdateRenewal(any(), any())(any())
+      renewalService.fetchAndUpdateRenewal(any(), any())
     } thenReturn Future.successful(Some(cache))
 
     when {
@@ -156,7 +156,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
         "return 500" in new FormSubmissionFixture {
           when {
-            renewalService.fetchAndUpdateRenewal(any(), any())(any())
+            renewalService.fetchAndUpdateRenewal(any(), any())
           } thenReturn Future.successful(None)
           post() { res =>
             status(Future.successful(res)) mustBe INTERNAL_SERVER_ERROR

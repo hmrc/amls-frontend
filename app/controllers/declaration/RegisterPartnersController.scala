@@ -62,7 +62,7 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
           ))
         }
           result getOrElse InternalServerError("failure getting status")
-        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get.url))
+        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
       }
     }
   }

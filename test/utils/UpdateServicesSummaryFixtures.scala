@@ -22,6 +22,7 @@ import models.businessmatching._
 import models.flowmanagement.AddBusinessTypeFlowModel
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import models.tradingpremises.Address
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import views.Fixture
 import views.html.businessmatching.updateservice.add.UpdateServicesSummaryView
 
@@ -39,7 +40,7 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * All other traits will extend to inherit oAuth
     */
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   /**

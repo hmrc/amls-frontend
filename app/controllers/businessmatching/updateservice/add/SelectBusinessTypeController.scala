@@ -28,7 +28,6 @@ import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection}
 import views.html.businessmatching.updateservice.add.SelectActivitiesView
 
@@ -74,7 +73,7 @@ class SelectBusinessTypeController @Inject()(authAction: AuthAction,
       )
   }
 
-  private def getFormData(credId: String)(implicit hc: HeaderCarrier, messages: Messages): OptionT[Future, Seq[BusinessActivity]] = for {
+  private def getFormData(credId: String)(implicit messages: Messages): OptionT[Future, Seq[BusinessActivity]] = for {
     model <- businessMatchingService.getModel(credId)
     activities <- OptionT.fromOption[Future](model.activities) map {
       _.businessActivities

@@ -52,7 +52,7 @@ class TypeOfBusinessController @Inject()(val dataCacheConnector: DataCacheConnec
             businessMatching.typeOfBusiness(data)
           )
         } yield if (edit) {
-          Redirect(routes.SummaryController.get)
+          Redirect(routes.SummaryController.get())
         } else {
           Redirect(routes.RegisterServicesController.get())
         }

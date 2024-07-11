@@ -21,6 +21,7 @@ import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.businessmatching.{BusinessMatchingMsbService, BusinessMatchingMsbServices}
 import play.api.data.Form
 import play.api.i18n.Messages
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add.MsbSubSectorsView
@@ -29,7 +30,7 @@ class MsbSubSectorsViewSpec extends AmlsViewSpec {
 
   lazy val msb_subservices = inject[MsbSubSectorsView]
   lazy val formProvider = inject[MsbSubSectorsFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
     def view = msb_subservices(formProvider(), edit = false)

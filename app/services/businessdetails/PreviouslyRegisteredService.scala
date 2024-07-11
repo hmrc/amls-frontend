@@ -19,7 +19,6 @@ package services.businessdetails
 import connectors.DataCacheConnector
 import models.businessdetails.{BusinessDetails, PreviouslyRegistered}
 import play.api.Logging
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
 
 import javax.inject.Inject
@@ -27,13 +26,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class PreviouslyRegisteredService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) extends Logging {
 
-  def getPreviouslyRegistered(credId: String)(implicit hc: HeaderCarrier): Future[Option[PreviouslyRegistered]] = {
+  def getPreviouslyRegistered(credId: String): Future[Option[PreviouslyRegistered]] = {
     dataCacheConnector.fetch[BusinessDetails](credId, BusinessDetails.key) map { optBusinessDetails =>
       optBusinessDetails.flatMap(_.previouslyRegistered)
     }
   }
 
-  def updatePreviouslyRegistered(credId: String, data: PreviouslyRegistered)(implicit hc: HeaderCarrier): Future[Option[Cache]] = {
+  def updatePreviouslyRegistered(credId: String, data: PreviouslyRegistered): Future[Option[Cache]] = {
 
     val businessDetailsOptF = dataCacheConnector.fetchAll(credId) map {
       _.map { cache =>

@@ -17,6 +17,7 @@
 package views.submission
 
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.submission.DuplicateSubmissionView
@@ -25,7 +26,7 @@ class DuplicateSubmissionViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val duplicateSubmissionView = app.injector.instanceOf[DuplicateSubmissionView]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val url = "/foo"
 

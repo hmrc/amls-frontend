@@ -148,7 +148,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
       } thenReturn Future.successful(Some(payment.copy(reference = paymentReferenceNumber, amountInPence = amountInPence)))
 
       when {
-        controller.paymentsService.paymentsUrlOrDefault(any(), any(), any(), any(), any(), any())(any(), any(), any())
+        controller.paymentsService.paymentsUrlOrDefault(any(), any(), any(), any(), any(), any())(any(), any())
       } thenReturn Future.successful(paymentResponse.nextUrl)
 
       val result = controller.retryPayment()(requestWithUrlEncodedBody(postData))

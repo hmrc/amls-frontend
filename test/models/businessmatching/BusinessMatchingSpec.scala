@@ -387,7 +387,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
 
         BusinessMatching.taskRow mustBe TaskRow(
           "businessmatching",
-          controllers.businessmatching.routes.SummaryController.get.url,
+          controllers.businessmatching.routes.SummaryController.get().url,
           false,
           Completed,
           TaskRow.completedTag
@@ -403,7 +403,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
 
         BusinessMatching.taskRow mustBe TaskRow(
           "businessmatching",
-          controllers.businessmatching.routes.SummaryController.get.url,
+          controllers.businessmatching.routes.SummaryController.get().url,
           true,
           Updated,
           TaskRow.updatedTag

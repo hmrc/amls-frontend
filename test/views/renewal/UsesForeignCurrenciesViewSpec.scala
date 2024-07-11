@@ -19,6 +19,7 @@ package views.renewal
 import forms.renewal.UsesForeignCurrenciesFormProvider
 import models.renewal.UsesForeignCurrenciesYes
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.UsesForeignCurrenciesView
@@ -27,7 +28,7 @@ class UsesForeignCurrenciesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val uses_foreign_currencies = inject[UsesForeignCurrenciesView]
   lazy val fp = inject[UsesForeignCurrenciesFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
 

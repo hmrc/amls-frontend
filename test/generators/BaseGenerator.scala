@@ -20,8 +20,8 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Gen.{alphaChar, alphaNumChar, listOfN, numChar}
 
-import java.time.{Instant, LocalDate, ZoneOffset}
 import java.time.ZoneOffset.UTC
+import java.time.{Instant, LocalDate}
 
 //noinspection ScalaStyle
 trait BaseGenerator {

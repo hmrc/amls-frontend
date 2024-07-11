@@ -19,6 +19,7 @@ package views.businessactivities
 import forms.businessactivities.AccountantIsUKAddressFormProvider
 import models.businessactivities.{UkAccountantsAddress, WhoIsYourAccountantIsUk, WhoIsYourAccountantName}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
@@ -29,10 +30,10 @@ class AccountantIsUKAddressViewSpec extends AmlsViewSpec with Matchers {
   lazy val address = inject[AccountantIsUKAddressView]
   lazy val fp = inject[AccountantIsUKAddressFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   val defaultName = WhoIsYourAccountantName("accountantName",Some("tradingName"))

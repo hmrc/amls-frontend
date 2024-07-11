@@ -18,14 +18,13 @@ package services
 
 import config.ApplicationConfig
 import connectors.{AmlsConnector, PayApiConnector}
-import javax.inject.Inject
 import models.confirmation.Currency
 import models.payments._
 import models.{FeeResponse, ReturnLocation}
 import play.api.Logging
-import play.api.mvc.Request
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
@@ -34,7 +33,7 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
                                 val applicationConfig: ApplicationConfig) extends Logging {
 
   def requestPaymentsUrl(fees: FeeResponse, returnUrl: String, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
-                        (implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[NextUrl] =
+                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[NextUrl] =
     fees match {
       case f: FeeResponse if f.difference.isDefined & f.paymentReference.isDefined =>
         paymentsUrlOrDefault(f.paymentReference.get, f.difference.get.toDouble, returnUrl, amlsRefNo, safeId, accountTypeId)
@@ -44,7 +43,7 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
     }
 
   def paymentsUrlOrDefault(paymentReference: String, amount: Double, returnUrl: String, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
-                          (implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[NextUrl] = {
+                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[NextUrl] = {
 
     val amountInPence = (amount * 100).toInt
 

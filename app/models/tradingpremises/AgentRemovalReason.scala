@@ -20,7 +20,7 @@ import models.tradingpremises.AgentRemovalReason.{CeasedTrading, LackOfProfit, M
 import models.tradingpremises.RemovalReasonConstants.Schema
 import models.{Enumerable, WithName}
 import play.api.i18n.Messages
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
@@ -91,7 +91,7 @@ object AgentRemovalReason extends Enumerable.Implicits {
     }
   }
 
-  implicit val formats = Json.format[AgentRemovalReason]
+  implicit val formats: OFormat[AgentRemovalReason] = Json.format[AgentRemovalReason]
 }
 
 object RemovalReasonConstants {

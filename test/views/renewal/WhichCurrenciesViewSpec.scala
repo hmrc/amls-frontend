@@ -19,6 +19,7 @@ package views.renewal
 import forms.renewal.WhichCurrenciesFormProvider
 import models.renewal.WhichCurrencies
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import services.CurrencyAutocompleteService
 import utils.AmlsViewSpec
 import views.Fixture
@@ -29,7 +30,7 @@ class WhichCurrenciesViewSpec extends AmlsViewSpec with Matchers {
   lazy val which_currencies = inject[WhichCurrenciesView]
   lazy val fp = inject[WhichCurrenciesFormProvider]
   lazy val autocompleteService = inject[CurrencyAutocompleteService]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
 

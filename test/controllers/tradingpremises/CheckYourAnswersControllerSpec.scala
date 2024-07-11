@@ -29,7 +29,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers.{OK, contentAsString, status, _}
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
 import utils.AmlsSpec
 import utils.tradingpremises.CheckYourAnswersHelper
@@ -41,7 +40,7 @@ import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
-  implicit val request = FakeRequest
+  implicit val request: FakeRequest.type = FakeRequest
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
   val mockCacheMap = mock[Cache]

@@ -18,6 +18,7 @@ package audit
 
 import models.bankdetails.BankAccountType._
 import models.bankdetails._
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
@@ -25,12 +26,12 @@ import utils.AmlsSpec
 
 class AddBankAccountEventSpec extends AmlsSpec {
 
-  implicit val request = FakeRequest("GET", "/test-path")
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/test-path")
   implicit override val headerCarrier: HeaderCarrier = HeaderCarrier()
 
-  val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("ASD123", "1234567")))
-  val nonUkBankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("98374389hjk")))
-  val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some( NonUKIBANNumber("9ds8ofidf")))
+  val ukBankAccount: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("ASD123", "1234567")))
+  val nonUkBankAccount: BankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("98374389hjk")))
+  val nonUkIban: BankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some( NonUKIBANNumber("9ds8ofidf")))
 
   "The bank account audit event" must {
     "serialize to the correct json" when {

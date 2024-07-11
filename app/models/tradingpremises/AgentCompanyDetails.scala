@@ -26,9 +26,7 @@ object AgentCompanyDetails {
   def apply(agentCompanyName: String, companyRegistrationNumber: String): AgentCompanyDetails =
     new AgentCompanyDetails(agentCompanyName, Some(companyRegistrationNumber))
 
-  implicit val mongoKey = new MongoKey[AgentCompanyDetails] {
-    override def apply(): String = "agent-company-name"
-  }
+  implicit val mongoKey: MongoKey[AgentCompanyDetails] = () => "agent-company-name"
 
   implicit val reads: Reads[AgentCompanyDetails] = {
     import play.api.libs.functional.syntax._

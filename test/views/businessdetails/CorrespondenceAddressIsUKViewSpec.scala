@@ -20,7 +20,7 @@ import forms.businessdetails.CorrespondenceAddressIsUKFormProvider
 import models.autocomplete.NameValuePair
 import models.businessdetails.CorrespondenceAddressIsUk
 import org.scalatest.matchers.must.Matchers
-import play.api.mvc.Request
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -34,7 +34,7 @@ class CorrespondenceAddressIsUKViewSpec extends AmlsViewSpec with Matchers {
 
   implicit val request: Request[_] = FakeRequest()
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
     val countries = Some(Seq(
       NameValuePair("Country 1", "country:1")
     ))

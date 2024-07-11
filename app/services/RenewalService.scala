@@ -26,7 +26,6 @@ import models.registrationprogress._
 import models.renewal._
 import play.api.i18n.Messages
 import services.RenewalService.BusinessAndOtherActivities
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
 
 import javax.inject.{Inject, Singleton}
@@ -35,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class RenewalService @Inject()(dataCache: DataCacheConnector)(implicit ec: ExecutionContext) {
 
-  def getTaskRow(credId: String)(implicit headerCarrier: HeaderCarrier, messages: Messages): Future[TaskRow] = {
+  def getTaskRow(credId: String)(implicit messages: Messages): Future[TaskRow] = {
 
     val notStarted = TaskRow(
       Renewal.sectionKey,
@@ -84,7 +83,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector)(implicit ec: Execu
   def updateRenewal(credId: String, renewal: Renewal): Future[Cache] =
     dataCache.save[Renewal](credId, Renewal.key, renewal)
 
-  def isRenewalComplete(renewal: Renewal, credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
+  def isRenewalComplete(renewal: Renewal, credId: String)(implicit ec: ExecutionContext): Future[Boolean] = {
 
     val isComplete = for {
       cache <- OptionT(dataCache.fetchAll(credId))
@@ -106,7 +105,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector)(implicit ec: Execu
     isComplete.getOrElse(false)
   }
 
-  def isCachePresent(credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
+  def isCachePresent(credId: String)(implicit ec: ExecutionContext): Future[Boolean] = {
 
     val isCache = for {
       cache <- dataCache.fetchAll(credId)
@@ -156,7 +155,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector)(implicit ec: Execu
   }
 
   def getFirstBusinessActivityInLowercase(cacheId: String)
-                                         (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Option[String]] = {
+                                         (implicit ec: ExecutionContext, messages: Messages): Future[Option[String]] = {
     getBusinessMatching(cacheId)
       .map(optBm => optBm.flatMap(bm => bm.alphabeticalBusinessActivitiesLowerCase())
         .flatMap(activities => if (activities.length == 1) activities.headOption else None))
@@ -170,7 +169,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector)(implicit ec: Execu
     - Update controllers usages of updateRenewal with this
     - Make old method private
    */
-  def fetchAndUpdateRenewal(credId: String, updateAction: Renewal => Renewal)(implicit headerCarrier: HeaderCarrier): Future[Option[Cache]] = {
+  def fetchAndUpdateRenewal(credId: String, updateAction: Renewal => Renewal): Future[Option[Cache]] = {
     for {
       renewal <- OptionT(getRenewal(credId))
       updatedCache <- OptionT.liftF(updateRenewal(credId, updateAction(renewal)))

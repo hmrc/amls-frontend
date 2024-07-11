@@ -16,13 +16,12 @@
 
 package controllers.responsiblepeople
 
-import config.AmlsErrorHandler
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.responsiblepeople.ExperienceTrainingFormProvider
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
-import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{ExperienceTrainingNo, ExperienceTrainingYes, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
@@ -31,11 +30,9 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.businessmatching.RecoverActivitiesService
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
 import utils.AmlsSpec
 import views.html.responsiblepeople.ExperienceTrainingView

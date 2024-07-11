@@ -24,8 +24,10 @@ import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.responsiblepeople.ResponsiblePerson
 import models.status._
 import models.{FeeResponse, ReadStatusResponse}
+
 import java.time.LocalDate
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
+import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName}
@@ -70,7 +72,7 @@ class StatusController @Inject()(val landingService: LandingService,
                                  tradeInformationFindOut: TradeInformationFindOut,
                                  view: YourRegistrationView) extends AmlsBaseController(ds, cc) {
 
-  def get(fromDuplicateSubmission: Boolean = false) = authAction.async {
+  def get(fromDuplicateSubmission: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       // MUST ensure we have a cache here! If no cache go back to landing controller and refresh.
       renewalService.isCachePresent(request.credId) flatMap {
@@ -81,7 +83,7 @@ class StatusController @Inject()(val landingService: LandingService,
           request.groupIdentifier,
           fromDuplicateSubmission
         )
-        case _ => Future.successful(Redirect(controllers.routes.LandingController.get))
+        case _ => Future.successful(Redirect(controllers.routes.LandingController.get()))
       }
   }
 
@@ -94,7 +96,7 @@ class StatusController @Inject()(val landingService: LandingService,
     }
   }
 
-  def newSubmission = authAction.async {
+  def newSubmission: Action[AnyContent] = authAction.async {
     implicit request => {
       val redirect = for {
         amlsRegNumber <- OptionT.fromOption[Future](request.amlsRefNumber)
@@ -108,7 +110,7 @@ class StatusController @Inject()(val landingService: LandingService,
 
   private def getPage(amlsRefNumber: Option[String], credId: String, accountTypeId: (String, String),
                       groupIdentifier: Option[String], fromDuplicateSubmission: Boolean)
-                     (implicit request: Request[AnyContent]) = {
+                     (implicit request: Request[AnyContent]): Future[Result] = {
     for {
       refNo <- enrolmentsService.amlsRegistrationNumber(amlsRefNumber, groupIdentifier)
       statusInfo <- statusService.getDetailedStatus(refNo, accountTypeId, credId)
@@ -143,7 +145,7 @@ class StatusController @Inject()(val landingService: LandingService,
                                    accountTypeId: (String, String),
                                    cacheId: String,
                                    unreadNotifications: Int)
-                                  (implicit request: Request[AnyContent]) = {
+                                  (implicit request: Request[AnyContent]): Future[Result] = {
     statusInfo match {
       case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
         getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission, accountTypeId, cacheId, activities, unreadNotifications)
@@ -199,7 +201,7 @@ class StatusController @Inject()(val landingService: LandingService,
           Ok(view(
             regNo = mlrRegNumber.getOrElse(""),
             businessName = businessNameOption,
-            yourRegistrationInfo = Some(applicationSubmissionReady(controllers.routes.RegistrationProgressController.get, businessNameOption)),
+            yourRegistrationInfo = Some(applicationSubmissionReady(controllers.routes.RegistrationProgressController.get(), businessNameOption)),
             unreadNotifications = unreadNotifications,
             registrationStatus = registrationStatus(
               amlsRegNo = mlrRegNumber,
@@ -232,7 +234,7 @@ class StatusController @Inject()(val landingService: LandingService,
                               responsiblePeople: Option[Seq[ResponsiblePerson]],
                               maybeActivities: Option[BusinessActivities],
                               accountTypeId: (String, String),
-                              unreadNotifications: Int)(implicit request: Request[AnyContent]) = {
+                              unreadNotifications: Int)(implicit request: Request[AnyContent]): Result = {
     statusInfo match {
       case (SubmissionDecisionApproved, statusDtls) => {
         val endDate = statusDtls.fold[Option[LocalDate]](None)(_.currentRegYearEndDate)
@@ -332,7 +334,7 @@ class StatusController @Inject()(val landingService: LandingService,
                                  maybeActivities: Option[BusinessActivities],
                                  cacheId: String,
                                  unreadNotifications: Int)
-                                (implicit request: Request[AnyContent]) = {
+                                (implicit request: Request[AnyContent]): Future[Result] = {
 
     statusInfo match {
       case (RenewalSubmitted(renewalDate), _) =>
@@ -409,19 +411,19 @@ class StatusController @Inject()(val landingService: LandingService,
   private def getBusinessName(credId: String, safeId: Option[String], accountTypeId: (String, String))(implicit hc: HeaderCarrier, ec: ExecutionContext) =
     BusinessName.getName(credId, safeId, accountTypeId)(hc, ec, dataCache, amlsConnector)
 
-  def hasMsb(activities: Option[BusinessActivities]) = {
+  def hasMsb(activities: Option[BusinessActivities]): Boolean = {
     activities.fold(false)(_.businessActivities.contains(MoneyServiceBusiness))
   }
 
-  def hasTcsp(activities: Option[BusinessActivities]) = {
+  def hasTcsp(activities: Option[BusinessActivities]): Boolean = {
     activities.fold(false)(_.businessActivities.contains(TrustAndCompanyServices))
   }
 
-  def hasOther(activities: Option[BusinessActivities]) = {
+  def hasOther(activities: Option[BusinessActivities]): Boolean = {
     activities.fold(false)(ba => (ba.businessActivities -- Set(MoneyServiceBusiness, TrustAndCompanyServices)).nonEmpty)
   }
 
-  def canOrCannotTradeInformation(activities: Option[BusinessActivities])(implicit request: Request[AnyContent]) =
+  def canOrCannotTradeInformation(activities: Option[BusinessActivities]): HtmlFormat.Appendable =
     (hasMsb(activities), hasTcsp(activities), hasOther(activities)) match {
       case (false, false, true) => tradeInformationNoActivities()
       case (true, _, false) | (_, true, false) => tradeInformationOneActivity()
@@ -429,7 +431,7 @@ class StatusController @Inject()(val landingService: LandingService,
       case (_, _, _) => tradeInformationFindOut()
     }
 
-  def countUnreadNotifications(amlsRefNo: Option[String], safeId: Option[String], accountTypeId: (String, String))(implicit headerCarrier: HeaderCarrier) = {
+  def countUnreadNotifications(amlsRefNo: Option[String], safeId: Option[String], accountTypeId: (String, String))(implicit headerCarrier: HeaderCarrier): Future[Int] = {
     val notifications = (amlsRefNo, safeId) match {
       case (Some(ref), _) => notificationConnector.fetchAllByAmlsRegNo(ref, accountTypeId)
       case (None, Some(id)) => notificationConnector.fetchAllBySafeId(id, accountTypeId)

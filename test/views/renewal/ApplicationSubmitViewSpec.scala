@@ -18,6 +18,7 @@ package views.renewal
 
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.components.ApplicationSubmitView
@@ -28,7 +29,7 @@ class ApplicationSubmitViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val applicationSubmit = inject[ApplicationSubmitView]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val renewalDate = LocalDate.now().plusDays(15)
 

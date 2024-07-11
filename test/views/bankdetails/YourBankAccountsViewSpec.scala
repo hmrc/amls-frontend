@@ -18,6 +18,7 @@ package views.bankdetails
 
 import models.bankdetails.BankAccountType._
 import models.bankdetails._
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import views.Fixture
@@ -27,7 +28,7 @@ class YourBankAccountsViewSpec extends AmlsSummaryViewSpec {
 
   trait ViewFixture extends Fixture {
     lazy val bankAccounts = app.injector.instanceOf[YourBankAccountsView]
-    implicit val requestWithToken = addTokenForView(FakeRequest())
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView(FakeRequest())
 
     val ukAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12341234", "000000")))
     val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some( NonUKIBANNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))

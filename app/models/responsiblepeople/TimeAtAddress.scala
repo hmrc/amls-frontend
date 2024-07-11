@@ -75,7 +75,7 @@ object TimeAtAddress extends Enumerable.Implicits {
       }
     }
 
-  implicit val jsonWrites = Writes[TimeAtAddress] {
+  implicit val jsonWrites: Writes[TimeAtAddress] = Writes[TimeAtAddress] {
       case Empty => JsNull
       case timeAtAddress: TimeAtAddress => Json.obj("timeAtAddress" -> timeAtAddress.value)
     }

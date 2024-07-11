@@ -19,7 +19,7 @@ package connectors
 import config.ApplicationConfig
 import generators.BaseGenerator
 import models.enrolment.{EnrolmentIdentifier, GovernmentGatewayEnrolment}
-import org.mockito.ArgumentMatchers.{any}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpClient
@@ -31,13 +31,13 @@ class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
 
   // scalastyle:off magic.number
   trait TestFixture {
-    val enrolments = Seq(GovernmentGatewayEnrolment("HMRC-MLR-ORG",
+    val enrolments: Seq[GovernmentGatewayEnrolment] = Seq(GovernmentGatewayEnrolment("HMRC-MLR-ORG",
       List(EnrolmentIdentifier("MLRRefNumber", "AV23456789")), ""))
 
-    val http = mock[HttpClient]
-    val config = mock[ApplicationConfig]
+    val http: HttpClient = mock[HttpClient]
+    val config: ApplicationConfig = mock[ApplicationConfig]
     val connector = new EnrolmentStubConnector(http, config)
-    val groupId = stringOfLengthGen(10).sample.get
+    val groupId: String = stringOfLengthGen(10).sample.get
 
     when(config.enrolmentStubsUrl) thenReturn "http://stubs"
   }
@@ -48,7 +48,7 @@ class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
         http.GET[Seq[GovernmentGatewayEnrolment]](any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(enrolments)
 
-      val result = await(connector.enrolments(groupId))
+      val result: Seq[GovernmentGatewayEnrolment] = await(connector.enrolments(groupId))
 
       result mustBe enrolments
 
@@ -60,7 +60,7 @@ class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
         http.GET[Seq[GovernmentGatewayEnrolment]](any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(enrolments)
 
-      val result = await(connector.enrolments(groupId))
+      val result: Seq[GovernmentGatewayEnrolment] = await(connector.enrolments(groupId))
 
       result mustBe enrolments
 

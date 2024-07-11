@@ -28,7 +28,7 @@ object SupervisionEnd {
     (__ \ "supervisionEndDate").read[LocalDate].map(SupervisionEnd.apply) map identity[SupervisionEnd]
   }
 
-  implicit val jsonWrites = Writes[SupervisionEnd] {
-    case a: SupervisionEnd => Json.obj("supervisionEndDate" -> a.endDate)
+  implicit val jsonWrites: Writes[SupervisionEnd] = Writes[SupervisionEnd] {
+    a: SupervisionEnd => Json.obj("supervisionEndDate" -> a.endDate)
   }
 }

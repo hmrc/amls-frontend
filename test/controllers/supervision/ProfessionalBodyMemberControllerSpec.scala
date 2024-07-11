@@ -211,7 +211,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
           val result: Future[Result] = Future(controller.redirectTo(supervision, false))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get.url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
 
         }
 
@@ -240,7 +240,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
 
               val result = controller.post(true)(newRequest)
               status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(routes.SummaryController.get.url))
+              redirectLocation(result) must be(Some(routes.SummaryController.get().url))
             }
           }
         }

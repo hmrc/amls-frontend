@@ -23,7 +23,7 @@ import models.tcsp.TcspTypes.CompanyFormationAgent
 
 import javax.inject.Inject
 import models.tcsp._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import utils.AuthAction
 import views.html.tcsp.OnlyOffTheShelfCompsSoldView
 
@@ -62,10 +62,10 @@ class OnlyOffTheShelfCompsSoldController @Inject()(val authAction: AuthAction,
       )
   }
 
-  def redirectTo(edit: Boolean, tcsp: Tcsp) = {
+  def redirectTo(edit: Boolean, tcsp: Tcsp): Result = {
     (edit, tcsp.tcspTypes.map(t => t.serviceProviders.contains(CompanyFormationAgent))) match {
       case (_, Some(true)) => Redirect(routes.ComplexCorpStructureCreationController.get(edit))
-      case _ => Redirect(routes.SummaryController.get)
+      case _ => Redirect(routes.SummaryController.get())
     }
   }
 }

@@ -26,7 +26,7 @@ import play.api.mvc.ControllerComponents
 
 class SalesChannelSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
   import play.api.i18n._
-  implicit val lang = Lang("en-US")
+  implicit val lang: Lang = Lang("en-US")
 
   override def fakeApplication(): Application = {
     new GuiceApplicationBuilder()

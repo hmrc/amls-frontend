@@ -183,7 +183,7 @@ object BusinessMatching {
         if (model.isComplete && model.hasChanged) {
           TaskRow(
             messageKey,
-            controllers.businessmatching.routes.SummaryController.get.url,
+            controllers.businessmatching.routes.SummaryController.get().url,
             true,
             Updated,
             TaskRow.updatedTag
@@ -191,7 +191,7 @@ object BusinessMatching {
         } else if (model.isComplete) {
           TaskRow(
             messageKey,
-            controllers.businessmatching.routes.SummaryController.get.url,
+            controllers.businessmatching.routes.SummaryController.get().url,
             model.hasChanged,
             Completed,
             TaskRow.completedTag

@@ -36,6 +36,6 @@ class CheckCompanyController @Inject()(authAction: AuthAction,
 
 
   def post(): Action[AnyContent] = authAction { _ =>
-    Redirect(routes.SummaryController.get)
+    Redirect(routes.SummaryController.get())
   }
 }

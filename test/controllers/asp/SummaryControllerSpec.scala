@@ -21,6 +21,7 @@ import models.asp.Asp
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
@@ -32,10 +33,10 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
-    implicit val ec = app.injector.instanceOf[ExecutionContext]
-    lazy val summaryView = app.injector.instanceOf[SummaryView]
+    implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+    lazy val summaryView: SummaryView = app.injector.instanceOf[SummaryView]
     val controller = new SummaryController(mockCacheConnector, mockServiceFlow, mockStatusService, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc, summaryView)
 
     mockCacheSave[Asp]
@@ -49,11 +50,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "load the summary page when section data is available" in new Fixture {
 
-      val model = Asp(None, None)
+      val model: Asp = Asp(None, None)
 
       mockCacheFetch[Asp](Some(model))
 
-      val result = controller.get()(request)
+      val result: Future[Result] = controller.get()(request)
       status(result) must be(OK)
     }
 
@@ -61,21 +62,21 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
       mockCacheFetch[Asp](None)
 
-      val result = controller.get()(request)
+      val result: Future[Result] = controller.get()(request)
       status(result) must be(SEE_OTHER)
     }
   }
 
   "Post" must {
     "load the Asp model and set hasAccepted to true" in new Fixture {
-      val postRequest = FakeRequest(POST, routes.SummaryController.post().url).withFormUrlEncodedBody("" -> "")
+      val postRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.SummaryController.post().url).withFormUrlEncodedBody("" -> "")
 
-      val model = Asp(None, None)
+      val model: Asp = Asp(None, None)
       mockCacheFetch(Some(model))
 
-      val result = controller.post()(postRequest)
+      val result: Future[Result] = controller.post()(postRequest)
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
+      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
       verify(mockCacheConnector).save[Asp](any(), eqTo(Asp.key), eqTo(model.copy(hasAccepted = true)))(any())
     }

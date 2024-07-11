@@ -18,7 +18,7 @@ package forms.supervision
 
 import forms.behaviours.BooleanFieldBehaviours
 import forms.mappings.Constraints
-import models.supervision.{ProfessionalBody, ProfessionalBodyNo, ProfessionalBodyYes}
+import models.supervision.ProfessionalBody
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 

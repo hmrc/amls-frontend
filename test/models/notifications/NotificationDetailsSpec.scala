@@ -23,7 +23,7 @@ import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
 import java.time.ZoneOffset._
-import java.time.{Instant, LocalDate, LocalDateTime, ZoneOffset}
+import java.time.{Instant, LocalDate, LocalDateTime}
 
 class NotificationDetailsSpec extends PlaySpec with Matchers {
 

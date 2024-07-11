@@ -40,7 +40,7 @@ case class Eab(data: JsObject = Json.obj(),
     Reads.optionNoError(Reads.at(path)).reads(data).getOrElse(None)
 
   def valueAt(path: JsPath): String = {
-    get[JsValue](path).getOrElse(Eab.notPresent).toString().toLowerCase()
+    get[JsValue](path).getOrElse(Eab.notPresent).toString.toLowerCase()
   }
 
   def accept: Eab = this.copy(hasAccepted = true)

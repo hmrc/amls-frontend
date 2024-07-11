@@ -22,13 +22,12 @@ import models.ReadStatusResponse
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, TaskRow, Updated}
 import models.status._
-
-import java.time.{Clock, LocalDate, ZoneOffset}
 import play.api.i18n.Messages
 import play.api.{Environment, Logging, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.ZoneOffset.UTC
+import java.time.{Clock, LocalDate}
 import scala.concurrent.{ExecutionContext, Future}
 
 class StatusService @Inject() (val amlsConnector: AmlsConnector,
@@ -116,7 +115,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
         // $COVERAGE-OFF$
         logger.debug("StatusService:getDetailedStatus: No mlrRegNumber")
         // $COVERAGE-ON$
-        notYetSubmitted(cacheId)(hc, ec, messages) map { status =>
+        notYetSubmitted(cacheId)(ec, messages) map { status =>
           (status, None)
         }
     }
@@ -134,7 +133,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
           // $COVERAGE-OFF$
           logger.debug("StatusService:getStatus: No mlrRegNumber")
           // $COVERAGE-ON$
-          notYetSubmitted(credId)(hc, ec, messages)
+          notYetSubmitted(credId)(ec, messages)
       }
   }
 
@@ -155,9 +154,9 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
   }
 
   def getReadStatus(amlsRegistrationNumber: String, accountTypeId: (String, String))
-                   (implicit hc: HeaderCarrier, ec: ExecutionContext) = etmpReadStatus(amlsRegistrationNumber, accountTypeId)
+                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ReadStatusResponse] = etmpReadStatus(amlsRegistrationNumber, accountTypeId)
 
-  private def notYetSubmitted(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages) = {
+  private def notYetSubmitted(cacheId: String)(implicit ec: ExecutionContext, messages: Messages): Future[SubmissionStatus] = {
 
     def isComplete(seq: Seq[TaskRow]): Boolean =
       seq forall { row =>
@@ -200,7 +199,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
-  def isPending(status: SubmissionStatus) = status match {
+  def isPending(status: SubmissionStatus): Boolean = status match {
     case SubmissionReadyForReview | RenewalSubmitted(_) => true
     case _ => false
   }
@@ -208,5 +207,5 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
   def isPreSubmission(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Boolean] =
     getStatus(amlsRegistrationNo, accountTypeId, credId) map isPreSubmission
 
-  def isPreSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady).contains(status)
+  def isPreSubmission(status: SubmissionStatus): Boolean = Set(NotCompleted, SubmissionReady).contains(status)
 }

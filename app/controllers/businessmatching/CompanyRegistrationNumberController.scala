@@ -48,7 +48,7 @@ class CompanyRegistrationNumberController @Inject()(authAction: AuthAction,
         } yield {
           val form = bm.companyRegistrationNumber.map(formProvider().fill)
           Ok(view(form.getOrElse(formProvider()), edit, bm.hasAccepted , statusService.isPreSubmission(status)))
-        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
+        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
     }
 
 
@@ -67,7 +67,7 @@ class CompanyRegistrationNumberController @Inject()(authAction: AuthAction,
               businessMatching.companyRegistrationNumber(value)
             )
           } yield if (edit) {
-            Redirect(routes.SummaryController.get)
+            Redirect(routes.SummaryController.get())
           } else {
             Redirect(routes.RegisterServicesController.get())
           }

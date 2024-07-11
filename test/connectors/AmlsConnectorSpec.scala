@@ -45,9 +45,9 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
                                         appConfig = mock[ApplicationConfig])
 
   val safeId = "SAFEID"
-  val accountTypeId = ("org", "id")
+  val accountTypeId: (String, String) = ("org", "id")
 
-  val subscriptionRequest = SubscriptionRequest(
+  val subscriptionRequest: SubscriptionRequest = SubscriptionRequest(
     businessMatchingSection = None,
     eabSection = None,
     tradingPremisesSection = None,
@@ -64,7 +64,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     supervisionSection = None
   )
 
-  val viewResponse = ViewResponse(
+  val viewResponse: ViewResponse = ViewResponse(
     etmpFormBundleNumber = "FORMBUNDLENUMBER",
     businessMatchingSection = None,
     eabSection = None,
@@ -82,7 +82,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     supervisionSection = None
   )
 
-  val subscriptionResponse = SubscriptionResponse(
+  val subscriptionResponse: SubscriptionResponse = SubscriptionResponse(
     etmpFormBundleNumber = "",
     amlsRefNo = amlsRegistrationNumber,
     Some(SubscriptionFees(
@@ -98,7 +98,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     )
   )
 
-  val amendmentResponse = AmendVariationRenewalResponse(
+  val amendmentResponse: AmendVariationRenewalResponse = AmendVariationRenewalResponse(
     processingDate = "",
     etmpFormBundleNumber = "",
     registrationFee = 0,
@@ -113,7 +113,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     difference = Some(0)
   )
 
-  val renewalResponse = AmendVariationRenewalResponse(
+  val renewalResponse: AmendVariationRenewalResponse = AmendVariationRenewalResponse(
     processingDate = "",
     etmpFormBundleNumber = "",
     registrationFee = 0,
@@ -128,9 +128,9 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     difference = Some(0)
   )
 
-  val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, None, false)
+  val readStatusResponse: ReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, None, renewalConFlag = false)
 
-  implicit val hc = HeaderCarrier()
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   "subscribe" must {
 

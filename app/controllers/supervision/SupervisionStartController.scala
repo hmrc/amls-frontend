@@ -20,8 +20,9 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.supervision.SupervisionStartFormProvider
 import models.supervision._
+
 import java.time.LocalDate
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import utils.AuthAction
 import views.html.supervision.SupervisionStartView
 
@@ -96,9 +97,9 @@ class SupervisionStartController @Inject()(val dataCacheConnector: DataCacheConn
     updatedAnotherBody
   }
 
-  private def redirect(edit: Boolean) = {
+  private def redirect(edit: Boolean): Result = {
     if (edit) {
-      Redirect(routes.SummaryController.get)
+      Redirect(routes.SummaryController.get())
     } else {
       Redirect(routes.SupervisionEndController.get())
     }

@@ -21,7 +21,6 @@ import connectors.DataCacheConnector
 import models.businesscustomer.Address
 import models.businessdetails._
 import models.businessmatching.BusinessMatching
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
 
 import javax.inject.Inject
@@ -29,20 +28,19 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmRegisteredOfficeService @Inject() (val dataCache: DataCacheConnector)(implicit ec: ExecutionContext) {
 
-  def hasRegisteredAddress(credId: String)(implicit hc: HeaderCarrier): Future[Option[Boolean]] = {
+  def hasRegisteredAddress(credId: String): Future[Option[Boolean]] = {
     dataCache.fetch[BusinessDetails](credId, BusinessDetails.key).map { optBusinessDetails =>
       optBusinessDetails.map(_.registeredOffice.isDefined)
     }
   }
 
-  def getAddress(credId: String)(implicit hc: HeaderCarrier): Future[Option[Address]] = {
+  def getAddress(credId: String): Future[Option[Address]] = {
     dataCache.fetch[BusinessMatching](credId, BusinessMatching.key).map { optBusinessMatching =>
       optBusinessMatching.flatMap(_.reviewDetails.map(_.businessAddress))
     }
   }
 
-  def updateRegisteredOfficeAddress(credId: String, data: ConfirmRegisteredOffice)(implicit hc: HeaderCarrier): Future[Option[RegisteredOffice]] = {
-
+  def updateRegisteredOfficeAddress(credId: String, data: ConfirmRegisteredOffice): Future[Option[RegisteredOffice]] = {
     def updateFromCacheMap(optCache: Option[Cache]): Option[Future[RegisteredOffice]] = optCache.flatMap { cache =>
       cache.getEntry[BusinessMatching](BusinessMatching.key).flatMap { bm =>
         cache.getEntry[BusinessDetails](BusinessDetails.key).flatMap { bd =>

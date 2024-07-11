@@ -20,6 +20,7 @@ import forms.tradingpremises.IsResidentialFormProvider
 import models.Country
 import models.businesscustomer.Address
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -30,14 +31,14 @@ class IsResidentialViewSpec extends AmlsViewSpec with Matchers {
   lazy val is_residential = inject[IsResidentialView]
   lazy val fp = inject[IsResidentialFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   val address = Address("56 Southview Road", Some("Newcastle Upon Tyne"), Some("Tyne and Wear"), Some("Whitehill"), Some("NE3 6JAX"), Country(
     "United Kingdom", "UK"
   ))
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "IsResidentialView" must {

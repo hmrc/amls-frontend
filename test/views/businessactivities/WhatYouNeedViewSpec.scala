@@ -19,6 +19,7 @@ package views.businessactivities
 import models.businessmatching.BusinessActivities
 import models.businessmatching.BusinessActivity.{AccountancyServices, MoneyServiceBusiness}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -28,10 +29,10 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val need = app.injector.instanceOf[WhatYouNeedView]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "What you need View" must {

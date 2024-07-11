@@ -21,6 +21,7 @@ import forms.declaration.BusinessNominatedOfficerFormProvider
 import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -31,7 +32,7 @@ class SelectBusinessNominatedOfficerViewSpec extends AmlsViewSpec with Matchers 
   lazy val officerView = inject[SelectBusinessNominatedOfficerView]
   lazy val fp = inject[BusinessNominatedOfficerFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   val people = Seq(
     ResponsiblePerson(PersonName("Test", None, "Person1").some),
@@ -39,7 +40,7 @@ class SelectBusinessNominatedOfficerViewSpec extends AmlsViewSpec with Matchers 
   )
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "SelectBusinessNominatedOfficerView" must {

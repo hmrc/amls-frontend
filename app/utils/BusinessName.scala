@@ -31,7 +31,7 @@ object BusinessName extends Logging {
 
   private val warn: String => Unit = msg => logger.warn(s"[BusinessName] $msg")
 
-  def getNameFromCache(credId: String)(implicit hc: HeaderCarrier,  cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
+  def getNameFromCache(credId: String)(implicit cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
     for {
       bm <- OptionT(cache.fetch[BusinessMatching](credId, BusinessMatching.key))
       rd <- OptionT.fromOption[Future](bm.reviewDetails)
@@ -54,12 +54,12 @@ object BusinessName extends Logging {
   }
 
   def getName(credId: String, safeId: Option[String], accountTypeId: (String, String))
-             (implicit hc: HeaderCarrier, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
+             (implicit hc: HeaderCarrier, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector): OptionT[Future, String] =
     safeId.fold(getNameFromCache(credId))(v => getNameFromAmls(accountTypeId, v) orElse getNameFromCache(credId))
 
   def getBusinessNameFromAmls(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
                              (implicit hc: HeaderCarrier, amls: AmlsConnector, ec: ExecutionContext,
-                              dc: DataCacheConnector, statusService: StatusService, messages: Messages) = {
+                              dc: DataCacheConnector, statusService: StatusService, messages: Messages): OptionT[Future, String] = {
     for {
       (_, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(amlsRegistrationNumber, accountTypeId, cacheId))
       businessName <- detailedStatus.fold[OptionT[Future, String]](OptionT.some("")) { r =>

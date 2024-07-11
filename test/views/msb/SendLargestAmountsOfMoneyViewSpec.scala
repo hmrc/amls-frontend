@@ -20,6 +20,7 @@ import forms.msb.SendLargestAmountsFormProvider
 import models.Country
 import models.moneyservicebusiness.SendTheLargestAmountsOfMoney
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
@@ -30,10 +31,10 @@ class SendLargestAmountsOfMoneyViewSpec extends AmlsViewSpec with Matchers with 
   lazy val moneyView = inject[SendLargestAmountsOfMoneyView]
   lazy val fp = inject[SendLargestAmountsFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "SendLargestAmountsOfMoneyView view" must {

@@ -18,6 +18,7 @@ package views.responsiblepeople
 
 import forms.responsiblepeople.PersonResidentTypeFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -30,10 +31,10 @@ class PersonResidenceTypeViewSpec extends AmlsViewSpec with Matchers {
 
   val name = "Firstname Lastname"
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "PersonResidenceTypeView view" must {

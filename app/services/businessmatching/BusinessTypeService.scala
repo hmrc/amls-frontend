@@ -19,7 +19,6 @@ package services.businessmatching
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessmatching.{BusinessMatching, BusinessType}
-import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -28,7 +27,7 @@ class BusinessTypeService @Inject()(
                                    val cacheConnector: DataCacheConnector
                                    ) {
 
-  def getBusinessType(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[BusinessType]] =
+  def getBusinessType(credId: String)(implicit ec: ExecutionContext): Future[Option[BusinessType]] =
     cacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key) map { bmOpt =>
       for {
         bm <- bmOpt
@@ -39,7 +38,7 @@ class BusinessTypeService @Inject()(
       }
     }
 
-  def updateBusinessType(credId: String, businessType: BusinessType)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[BusinessType]] = {
+  def updateBusinessType(credId: String, businessType: BusinessType)(implicit ec: ExecutionContext): Future[Option[BusinessType]] = {
     cacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key) map { bm =>
       bm.reviewDetails map { rd =>
         cacheConnector.save[BusinessMatching](

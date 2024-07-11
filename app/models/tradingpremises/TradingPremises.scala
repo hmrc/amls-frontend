@@ -199,7 +199,7 @@ object TradingPremises {
     }
   }
 
-  implicit val mongoKey = new MongoKey[TradingPremises] {
+  implicit val mongoKey: MongoKey[TradingPremises] = new MongoKey[TradingPremises] {
     override def apply(): String = "trading-premises"
   }
 
@@ -248,7 +248,7 @@ object TradingPremises {
 
   implicit val writes: Writes[TradingPremises] = Json.writes[TradingPremises]
 
-  implicit val formatOption = Reads.optionWithNull[Seq[TradingPremises]]
+  implicit val formatOption: Reads[Option[Seq[TradingPremises]]] = Reads.optionWithNull[Seq[TradingPremises]]
 
   implicit def default(tradingPremises: Option[TradingPremises]): TradingPremises =
     tradingPremises.getOrElse(TradingPremises())

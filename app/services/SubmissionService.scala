@@ -34,14 +34,12 @@ import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Conversions._
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePerson
-import models.responsiblepeople.ResponsiblePerson.FilterUtils
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.tradingpremises.TradingPremises.FilterUtils
 import play.api.http.Status.UNPROCESSABLE_ENTITY
 import play.api.libs.json.Format
-import play.api.mvc.Request
 import services.cache.Cache
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import utils.StatusConstants
@@ -65,7 +63,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     }
 
   def subscribe(credId: String, accountTypeId: (String, String), groupId: Option[String])
-               (implicit ec: ExecutionContext, hc: HeaderCarrier, request: Request[_]): Future[SubscriptionResponse] = {
+               (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubscriptionResponse] = {
     (for {
       cache <- getCache(credId)
       safeId <- safeId(cache)
@@ -155,15 +153,15 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
   }
 
   private def saveResponse[T](credId: String, response: T, key: String, isRenewalAmendment: Boolean = false)
-                                    (implicit hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = {
+                             (implicit ex: ExecutionContext, fmt: Format[T]): Future[Cache] = {
 
-      for {
+    for {
       _ <- cacheConnector.save[T](credId, key, response)
-      c <- cacheConnector.save[SubmissionRequestStatus](credId, SubmissionRequestStatus.key, SubmissionRequestStatus(true, Some(isRenewalAmendment)))
+      c <- cacheConnector.save[SubmissionRequestStatus](credId, SubmissionRequestStatus.key, SubmissionRequestStatus(hasSubmitted = true, Some(isRenewalAmendment)))
     } yield c
   }
 
-  private def safeId(cache: Cache)(implicit ec: ExecutionContext, request: Request[_], headerCarrier: HeaderCarrier): Future[String] =
+  private def safeId(cache: Cache)(implicit ec: ExecutionContext, headerCarrier: HeaderCarrier): Future[String] =
     (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
       rd <- bm.reviewDetails

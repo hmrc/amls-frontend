@@ -19,6 +19,7 @@ package views.renewal
 import forms.renewal.SendMoneyToOtherCountryFormProvider
 import models.renewal.SendMoneyToOtherCountry
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.SendMoneyToOtherCountryView
@@ -27,7 +28,7 @@ class SendMoneyToOtherCountryViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val send_money_to_other_country = inject[SendMoneyToOtherCountryView]
   lazy val fp = inject[SendMoneyToOtherCountryFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   trait ViewFixture extends Fixture
 
   "SendMoneyToOtherCountryView" must {

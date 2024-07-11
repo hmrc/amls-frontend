@@ -20,6 +20,7 @@ import forms.supervision.AnotherBodyFormProvider
 import models.supervision.AnotherBodyYes
 import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -30,10 +31,10 @@ class AnotherBodyViewSpec extends AmlsViewSpec with Matchers  {
   lazy val another_body = inject[AnotherBodyView]
   lazy val fp = inject[AnotherBodyFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "AnotherBodyView" must {

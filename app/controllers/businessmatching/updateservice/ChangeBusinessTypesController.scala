@@ -26,12 +26,12 @@ import models.flowmanagement.ChangeBusinessTypesPageId
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection}
 import views.html.businessmatching.updateservice.ChangeServicesView
 
 import javax.inject.Inject
 import scala.collection.immutable.SortedSet
+import scala.concurrent.Future
 
 class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
                                               val ds: CommonPlayDependencies,
@@ -68,7 +68,7 @@ class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
       )
   }
 
-  private def getFormData(credId: String)(implicit hc: HeaderCarrier) = for {
+  private def getFormData(credId: String): OptionT[Future, SortedSet[String]] = for {
     activities <- businessMatchingService.getRemainingBusinessActivities(credId)
     remainingActivities = activities.map(_.toString)
   } yield {

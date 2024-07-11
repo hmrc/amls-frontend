@@ -140,7 +140,7 @@ object ProvidedServices extends Enumerable.Implicits {
         }
       } map ProvidedServices.apply
 
-  implicit val jsonWrites = Writes[ProvidedServices] { ps =>
+  implicit val jsonWrites: Writes[ProvidedServices] = Writes[ProvidedServices] { ps =>
     Json.obj(
       "services" -> (ps.services map {_.value}).toSeq
     ) ++ ps.services.foldLeft[JsObject](Json.obj()) {

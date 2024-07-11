@@ -19,12 +19,13 @@ package models.payments
 import config.ApplicationConfig
 import models.ReturnLocation
 import play.api.libs.json.Json
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import utils.AmlsSpec
 
 class CreatePaymentRequestSpec extends AmlsSpec {
 
-  implicit val request = FakeRequest("GET", "http://localhost:9222")
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "http://localhost:9222")
 
   "The CreatePaymentRequest model" must {
     "round-trip through JSON serialization correctly" in {

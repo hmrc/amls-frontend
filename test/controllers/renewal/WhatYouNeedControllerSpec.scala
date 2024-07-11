@@ -27,7 +27,6 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import services.RenewalService
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.renewal.WhatYouNeedView
 
@@ -60,7 +59,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
         when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any())) thenReturn(Future.successful(bm))
 
         when {
-          renewalService.getTaskRow(any())(any[HeaderCarrier], any())
+          renewalService.getTaskRow(any())(any())
         } thenReturn Future.successful(
           TaskRow("renewal", controllers.renewal.routes.SummaryController.get.url, Renewal().hasChanged, NotStarted, TaskRow.notStartedTag))
 
@@ -81,7 +80,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
         when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any())) thenReturn(Future.successful(bm))
 
         when {
-          renewalService.getTaskRow(meq("internalId"))(any(), any())
+          renewalService.getTaskRow(meq("internalId"))(any())
         } thenReturn Future.successful(
           TaskRow("renewal", controllers.renewal.routes.SummaryController.get.url, Renewal().hasChanged, Completed, TaskRow.completedTag))
 
@@ -94,7 +93,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any())) thenReturn (Future.successful(None))
 
           when {
-            renewalService.getTaskRow(meq("internalId"))(any(), any())
+            renewalService.getTaskRow(meq("internalId"))(any())
           } thenReturn Future.successful(
             TaskRow("renewal", controllers.renewal.routes.SummaryController.get.url, Renewal().hasChanged, Completed, TaskRow.completedTag))
 

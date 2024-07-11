@@ -19,7 +19,6 @@ package services.msb
 import connectors.DataCacheConnector
 import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountries, BranchesOrAgentsWhichCountries, MoneyServiceBusiness}
 import play.api.mvc.Result
-import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class BranchesOrAgentsWhichCountriesService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) {
 
-  def fetchBranchesOrAgents(credId: String)(implicit hc: HeaderCarrier): Future[Option[BranchesOrAgentsWhichCountries]] = {
+  def fetchBranchesOrAgents(credId: String): Future[Option[BranchesOrAgentsWhichCountries]] = {
     dataCacheConnector.fetch[MoneyServiceBusiness](credId, MoneyServiceBusiness.key).map { optMsb =>
       for {
         msb <- optMsb
@@ -37,7 +36,7 @@ class BranchesOrAgentsWhichCountriesService @Inject()(val dataCacheConnector: Da
     }
   }
 
-  def fetchAndSaveBranchesOrAgents(credId: String, data: BranchesOrAgentsWhichCountries, redirect: Result)(implicit hc: HeaderCarrier): Future[Result] = {
+  def fetchAndSaveBranchesOrAgents(credId: String, data: BranchesOrAgentsWhichCountries, redirect: Result): Future[Result] = {
     for {
       msb <- dataCacheConnector.fetch[MoneyServiceBusiness](credId, MoneyServiceBusiness.key)
       _ <- dataCacheConnector.save[MoneyServiceBusiness](credId, MoneyServiceBusiness.key,

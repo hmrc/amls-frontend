@@ -20,6 +20,7 @@ import forms.renewal.TotalThroughputFormProvider
 import models.moneyservicebusiness.ExpectedThroughput
 import org.jsoup.nodes.Document
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.TotalThroughputView
@@ -28,7 +29,7 @@ class TotalThroughputViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val total_throughput = inject[TotalThroughputView]
   lazy val fp = inject[TotalThroughputFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
     override def view = total_throughput(fp(), edit = false)

@@ -17,6 +17,7 @@
 package views.confirmation
 
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.confirmation.PaymentConfirmationView
@@ -25,7 +26,7 @@ class PaymentConfirmedViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val payment_confirmation = app.injector.instanceOf[PaymentConfirmationView]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val businessName = "Test Business Ltd"
     val paymentReference = "XMHSG000000000"

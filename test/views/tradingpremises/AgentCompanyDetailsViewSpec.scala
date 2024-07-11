@@ -20,6 +20,7 @@ import forms.tradingpremises.AgentCompanyDetailsFormProvider
 import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import models.tradingpremises.AgentCompanyDetails
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import views.Fixture
 import views.html.tradingpremises.AgentCompanyDetailsView
@@ -29,10 +30,10 @@ class AgentCompanyDetailsViewSpec extends AmlsViewSpec with Matchers {
   lazy val agent_company_details = inject[AgentCompanyDetailsView]
   lazy val fp = inject[AgentCompanyDetailsFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "AgentCompanyDetailsView" must {

@@ -74,7 +74,7 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
   }
 
   private def updateData(supervision: Supervision, data: SupervisionEndReasons): Supervision = {
-    def updatedAnotherBody = supervision.anotherBody match {
+    def updatedAnotherBody: AnotherBodyYes = supervision.anotherBody match {
       case Some(ab) => ab.asInstanceOf[AnotherBodyYes].endingReason(data)
       case None => throw new Exception("An UnknownException has occurred : SupervisionEndReasonsController")
     }
@@ -86,7 +86,7 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
     import utils.ControllerHelper.supervisionComplete
 
       if (supervisionComplete(cache)) {
-        Redirect(routes.SummaryController.get)
+        Redirect(routes.SummaryController.get())
       } else {
         Redirect(routes.ProfessionalBodyMemberController.get())
       }

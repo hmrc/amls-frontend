@@ -37,7 +37,7 @@ object TaxType {
 
   import utils.MappingUtils.Implicits._
 
-  implicit val jsonReadsTaxType = {
+  implicit val jsonReadsTaxType: Reads[TaxType] = {
     (__ \ "taxType").read[String].flatMap[TaxType] {
       case "01" => TaxTypeSelfAssesment
       case "02" => TaxTypeCorporationTax
@@ -45,7 +45,7 @@ object TaxType {
     }
   }
 
-  implicit val jsonWritesTaxType = Writes[TaxType] {
+  implicit val jsonWritesTaxType: Writes[TaxType] = Writes[TaxType] {
     case TaxTypeSelfAssesment => Json.obj("taxType" -> "01")
     case TaxTypeCorporationTax => Json.obj("taxType" -> "02")
   }

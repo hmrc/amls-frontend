@@ -19,7 +19,6 @@ package controllers.responsiblepeople.address
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.address.NewHomeAddressNonUKFormProvider
-import models.responsiblepeople.NewHomeAddress._
 import models.responsiblepeople._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AutoCompleteService

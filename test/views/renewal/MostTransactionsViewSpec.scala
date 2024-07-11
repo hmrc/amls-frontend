@@ -20,6 +20,7 @@ import forms.renewal.MostTransactionsFormProvider
 import models.Country
 import models.renewal.MostTransactions
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.renewal.MostTransactionsView
@@ -28,7 +29,7 @@ class MostTransactionsViewSpec extends AmlsViewSpec with Matchers with AutoCompl
 
   lazy val most_transactions = inject[MostTransactionsView]
   lazy val fp = inject[MostTransactionsFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   trait ViewFixture extends Fixture
 
   "MostTransactionsView" must {

@@ -19,6 +19,7 @@ package views.msb
 import forms.msb.ExpectedThroughputFormProvider
 import models.moneyservicebusiness.ExpectedThroughput.First
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -29,10 +30,10 @@ class ExpectedThroughputViewSpec extends AmlsViewSpec with Matchers {
   lazy val throughputView = inject[ExpectedThroughputView]
   lazy val fp = inject[ExpectedThroughputFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "ExpectedThroughputView view" must {

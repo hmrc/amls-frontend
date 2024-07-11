@@ -17,6 +17,7 @@
 package views.payments
 
 import generators.PaymentGenerator
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -25,10 +26,10 @@ import views.html.payments.BankDetailsView
 class BankDetailsViewSpec extends AmlsViewSpec with PaymentGenerator {
 
   lazy val bankDetailsView = inject[BankDetailsView]
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   val secondaryHeading = "Submit application"
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "BankDetailsView" must {

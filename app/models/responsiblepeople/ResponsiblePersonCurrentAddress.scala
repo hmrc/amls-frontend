@@ -25,5 +25,5 @@ case class ResponsiblePersonCurrentAddress(personAddress: PersonAddress,
                                            dateOfChange: Option[DateOfChange] = None)
 
 object ResponsiblePersonCurrentAddress {
-  implicit val format = Json.format[ResponsiblePersonCurrentAddress]
+  implicit val format: OFormat[ResponsiblePersonCurrentAddress] = Json.format[ResponsiblePersonCurrentAddress]
 }

@@ -16,7 +16,7 @@
 
 package models.responsiblepeople
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class NewHomeAddress(personAddress: PersonAddress)
 
@@ -24,5 +24,5 @@ object NewHomeAddress {
 
   val key = "new-home-address"
 
-  implicit val format = Json.format[NewHomeAddress]
+  implicit val format: OFormat[NewHomeAddress] = Json.format[NewHomeAddress]
 }

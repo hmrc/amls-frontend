@@ -19,8 +19,7 @@ package views.registrationprogress
 import generators.businesscustomer.AddressGenerator
 import models.registrationprogress.{Completed, Section, TaskList, TaskRow}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
-import play.api.mvc.Call
+import play.api.mvc.{AnyContentAsEmpty, Call, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.registrationprogress._
@@ -32,7 +31,7 @@ class RegistrationProgressViewSpec extends AmlsViewSpec with MockitoSugar with A
   val serviceNames = Seq("Service 1", "Service 2", "Service 3")
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val sections = Seq(
       Section("section1", Completed, true, mock[Call])

@@ -55,7 +55,7 @@ class CurrentAddressNonUKControllerSpec extends AmlsSpec with Injecting {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    implicit val hc = HeaderCarrier()
+    implicit val hc: HeaderCarrier = HeaderCarrier()
     val mockDataCacheConnector = mock[DataCacheConnector]
     val RecordId = 1
 

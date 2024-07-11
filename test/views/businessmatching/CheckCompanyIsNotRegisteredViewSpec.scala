@@ -16,6 +16,7 @@
 
 package views.businessmatching
 
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -24,7 +25,7 @@ import views.html.businessmatching.CheckCompanyIsNotRegisteredView
 class CheckCompanyIsNotRegisteredViewSpec extends AmlsViewSpec {
 
   lazy val checkView = inject[CheckCompanyIsNotRegisteredView]
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   "CheckCompanyIsNotRegisteredView" must {
 
@@ -56,7 +57,7 @@ class CheckCompanyIsNotRegisteredViewSpec extends AmlsViewSpec {
       val button = doc.getElementById("submit-button")
 
       button.text() mustBe messages("businessmatching.checkbusiness.button")
-      button.parent().attr("action") mustBe controllers.businessmatching.routes.SummaryController.get.url
+      button.parent().attr("action") mustBe controllers.businessmatching.routes.SummaryController.get().url
     }
   }
 }

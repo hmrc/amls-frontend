@@ -18,8 +18,8 @@ package views.confirmation
 
 import config.ApplicationConfig
 import models.confirmation.Currency
-import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.confirmation.ConfirmationNewView
@@ -28,8 +28,8 @@ class ConfirmationNewViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val newView = app.injector.instanceOf[ConfirmationNewView]
-    implicit val requestWithToken = addTokenForView()
-    implicit val config = app.injector.instanceOf[ApplicationConfig]
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
+    implicit val config: ApplicationConfig = app.injector.instanceOf[ApplicationConfig]
 
     val totalAmount = Currency(BigDecimal(215))
     val referenceNumber = "XA1000000000001"

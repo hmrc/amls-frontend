@@ -20,18 +20,17 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessdetails.{BusinessDetails, ContactingYou, ContactingYouEmail}
 import services.cache.Cache
-import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class BusinessEmailAddressService @Inject()(val dataCache: DataCacheConnector)(implicit ec: ExecutionContext) {
 
-  def getEmailAddress(credId: String)(implicit hc: HeaderCarrier): Future[Option[String]] = {
+  def getEmailAddress(credId: String): Future[Option[String]] = {
     dataCache.fetch[BusinessDetails](credId, BusinessDetails.key).map(_.flatMap(_.contactingYou.flatMap(_.email)))
   }
 
-  def updateEmailAddress(credId: String, data: ContactingYouEmail)(implicit hc: HeaderCarrier): Future[Option[Cache]] = {
+  def updateEmailAddress(credId: String, data: ContactingYouEmail): Future[Option[Cache]] = {
     dataCache.fetch[BusinessDetails](credId, BusinessDetails.key).map {
       _ map { businessDetails =>
         val updatedBusinessDetails = businessDetails.contactingYou(

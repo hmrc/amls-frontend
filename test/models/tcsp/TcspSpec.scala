@@ -110,12 +110,12 @@ class TcspSpec extends AmlsSpec with TcspValues {
 
     "have a task row function that" must {
 
-      implicit val cache = mock[Cache]
+      implicit val cache: Cache = mock[Cache]
 
       "returns a Not Started task row when model is empty" in {
 
         val notStartedTaskRow = TaskRow(
-          "tcsp", controllers.tcsp.routes.WhatYouNeedController.get.url, false, NotStarted, TaskRow.notStartedTag
+          "tcsp", controllers.tcsp.routes.WhatYouNeedController.get().url, false, NotStarted, TaskRow.notStartedTag
         )
 
         when(cache.getEntry[Tcsp]("tcsp")) thenReturn None
@@ -127,7 +127,7 @@ class TcspSpec extends AmlsSpec with TcspValues {
 
         val complete = mock[Tcsp]
         val completedTaskRow = TaskRow(
-          "tcsp", controllers.tcsp.routes.SummaryController.get.url, false, Completed, TaskRow.completedTag
+          "tcsp", controllers.tcsp.routes.SummaryController.get().url, false, Completed, TaskRow.completedTag
         )
 
         when(complete.isComplete) thenReturn true
@@ -140,7 +140,7 @@ class TcspSpec extends AmlsSpec with TcspValues {
 
         val complete = mock[Tcsp]
         val completedTaskRow = TaskRow(
-          "tcsp", controllers.tcsp.routes.SummaryController.get.url, true, Updated, TaskRow.updatedTag
+          "tcsp", controllers.tcsp.routes.SummaryController.get().url, true, Updated, TaskRow.updatedTag
         )
 
         when(complete.isComplete) thenReturn true
@@ -154,7 +154,7 @@ class TcspSpec extends AmlsSpec with TcspValues {
 
         val incompleteTcsp = mock[Tcsp]
         val incompleteTaskRow = TaskRow(
-          "tcsp", controllers.tcsp.routes.WhatYouNeedController.get.url, false, Started, TaskRow.incompleteTag
+          "tcsp", controllers.tcsp.routes.WhatYouNeedController.get().url, false, Started, TaskRow.incompleteTag
         )
 
         when(incompleteTcsp.isComplete) thenReturn false

@@ -18,6 +18,7 @@ package views.supervision
 
 import forms.supervision.SupervisionEndFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -28,10 +29,10 @@ class SupervisionEndViewSpec extends AmlsViewSpec with Matchers  {
   lazy val supervision_end = app.injector.instanceOf[SupervisionEndView]
   lazy val fp = app.injector.instanceOf[SupervisionEndFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "supervision_end view" must {

@@ -23,19 +23,18 @@ import forms.tradingpremises.AgentNameFormProvider
 import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
-import java.time.LocalDate
 import play.api.data.Form
 import play.api.libs.json.Format
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
 import services.StatusService
-import typeclasses.MongoKey
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
+import typeclasses.MongoKey
 import utils.{AuthAction, DateHelper, DateOfChangeHelper, RepeatingSection}
 import views.html.DateOfChangeView
 import views.html.tradingpremises.AgentNameView
 
+import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
@@ -109,8 +108,8 @@ class AgentNameController @Inject()(
 
   }
 
-  def getTradingPremises(result: Option[Cache], index: Int)(implicit hc: HeaderCarrier,
-                                                               formats: Format[TradingPremises],
+  def getTradingPremises(result: Option[Cache], index: Int)(implicit
+                                                            formats: Format[TradingPremises],
                                                                key: MongoKey[TradingPremises]): Option[TradingPremises] =
     result flatMap { cache => getData(cache, index) }
 
@@ -150,7 +149,7 @@ class AgentNameController @Inject()(
       )
   }
 
-  private def redirectToAgentNameDateOfChange(tradingPremises: TradingPremises, agent: AgentName) = {
+  private def redirectToAgentNameDateOfChange(tradingPremises: TradingPremises, agent: AgentName): Boolean = {
     def isAgentNameAndDobChanged = tradingPremises.agentName match {
       case Some(AgentName(agentName, _, agentDateOfBirth)) if isAgentDataUnchanged(agentName, agentDateOfBirth, agent) => false
       case _ => true

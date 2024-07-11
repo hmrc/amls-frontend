@@ -19,6 +19,7 @@ package views.bankdetails
 import forms.bankdetails.BankAccountNonUKFormProvider
 import models.bankdetails.NonUKAccountNumber
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
@@ -30,10 +31,10 @@ class BankAccountNonUKViewSpec extends AmlsViewSpec with Matchers {
   lazy val accountNumber: BankAccountNonUKView = inject[BankAccountNonUKView]
   lazy val fp: BankAccountNonUKFormProvider = inject[BankAccountNonUKFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "BankAccountNonUKView view " must {

@@ -20,7 +20,7 @@ import exceptions.{DuplicateEnrolmentException, DuplicateSubscriptionException, 
 import models.status._
 import models.{SubmissionResponse, SubscriptionResponse}
 import play.api.Logging
-import play.api.mvc.{MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{RenewalService, SectionsProvider, StatusService, SubmissionService}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import utils.{AuthAction, DeclarationHelper}
@@ -38,7 +38,7 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
                                      val sectionsProvider: SectionsProvider) extends AmlsBaseController(ds, cc) with Logging {
 
   private def handleRenewalAmendment(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
-                                    (implicit headerCarrier: HeaderCarrier) = {
+                                    (implicit headerCarrier: HeaderCarrier): Future[SubmissionResponse] = {
 
     renewalService.getRenewal(credId) flatMap {
       case Some(renewal) => subscriptionService.renewalAmendment(credId, amlsRegistrationNumber, accountTypeId, renewal)
@@ -46,7 +46,7 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
     }
   }
 
-  def post() = authAction.async {
+  def post(): Action[AnyContent] = authAction.async {
     implicit request =>
       DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
         case true => {
@@ -60,12 +60,12 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
             // $COVERAGE-OFF$
             logger.info("[SubmissionController][post]:SubscriptionResponse(previouslySubmitted=true)")
             // $COVERAGE-ON$
-              Future.successful(Redirect(controllers.routes.LandingController.get))
+              Future.successful(Redirect(controllers.routes.LandingController.get()))
           case _ =>
             // $COVERAGE-OFF$
             logger.info("[SubmissionController][post]:SubmissionResponse or SubscriptionResponse(previouslySubmitted=false)")
             // $COVERAGE-ON$
-            Future.successful(Redirect(controllers.routes.ConfirmationController.get))
+            Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
         } recoverWith {
           case _: DuplicateEnrolmentException =>
             logger.warn("[SubmissionController][post] handling DuplicateEnrolmentException")
@@ -87,12 +87,12 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
           // $COVERAGE-OFF$
           logger.info("[SubmissionController][post]:false")
           // $COVERAGE-ON$
-          Future.successful(Redirect(controllers.routes.RegistrationProgressController.get.url))
+          Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
       }
   }
 
   private def subscribeBasedOnStatus(status: SubmissionStatus, groupIdentifier: Option[String], credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
-                                    (implicit hc: HeaderCarrier, request: Request[_]) =
+                                    (implicit hc: HeaderCarrier): Future[SubmissionResponse] =
     status match {
       case SubmissionReadyForReview => subscriptionService.update(credId, amlsRegistrationNumber, accountTypeId)
       case SubmissionDecisionApproved => subscriptionService.variation(credId, amlsRegistrationNumber, accountTypeId)
@@ -102,5 +102,5 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
       }
       case RenewalSubmitted(_) => handleRenewalAmendment(credId, amlsRegistrationNumber, accountTypeId)
       case _ => subscriptionService.subscribe(credId, accountTypeId, groupIdentifier)
-  }
+    }
 }

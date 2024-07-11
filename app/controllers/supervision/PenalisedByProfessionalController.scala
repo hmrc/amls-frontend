@@ -19,10 +19,9 @@ package controllers.supervision
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.supervision.PenalisedByProfessionalFormProvider
-import models.supervision.{ProfessionalBody, ProfessionalBodyNo, ProfessionalBodyYes, Supervision}
+import models.supervision.{ProfessionalBodyYes, Supervision}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import utils.CharacterCountParser.cleanData
 import views.html.supervision.PenalisedByProfessionalView
 
 import javax.inject.Inject
@@ -60,14 +59,14 @@ class PenalisedByProfessionalController @Inject()(
             answerEqualsExisting = existingAnswer.exists(_.getClass == data.getClass)
           } yield {
             if(answerEqualsExisting) {
-              Future.successful(Redirect(routes.SummaryController.get))
+              Future.successful(Redirect(routes.SummaryController.get()))
             } else {
               dataCacheConnector.save[Supervision](
                 request.credId, Supervision.key, supervision.professionalBody(data)
               ) map { _ =>
                 (data, edit) match {
                   case (ProfessionalBodyYes(_), _) => Redirect(routes.PenaltyDetailsController.get(edit))
-                  case _ => Redirect(routes.SummaryController.get)
+                  case _ => Redirect(routes.SummaryController.get())
                 }
               }
             }

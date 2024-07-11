@@ -42,7 +42,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    implicit val ec = app.injector.instanceOf[ExecutionContext]
+    implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
     lazy val view = app.injector.instanceOf[CompanyRegistrationNumberView]
     val controller = new CompanyRegistrationNumberController(
@@ -123,7 +123,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
 
       val result = controller.post(true)(validRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get.url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
     "on post() redirect correctly if valid data sent and edit is false" in new Fixture {

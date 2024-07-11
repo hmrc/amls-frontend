@@ -22,6 +22,7 @@ import models.businessmatching.BusinessMatchingMsbServices
 import models.moneyservicebusiness._
 import org.jsoup.Jsoup
 import org.scalatest.prop.TableDrivenPropertyChecks
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import utils.msb.CheckYourAnswersHelper
@@ -35,7 +36,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
   trait ViewFixture extends Fixture {
     lazy val summary = inject[CheckYourAnswersView]
     lazy val helper = inject[CheckYourAnswersHelper]
-    implicit val requestWithToken = addTokenForView(FakeRequest())
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView(FakeRequest())
 
     val fullMSB: MoneyServiceBusiness = MoneyServiceBusiness(
       Some(ExpectedThroughput.First),
@@ -81,8 +82,6 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
       )
 
       def view = summary(list)
-
-      val rows = doc.getElementsByClass("govuk-summary-list__row")
 
       doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
         doc.getElementsByClass("govuk-summary-list__value").asScala

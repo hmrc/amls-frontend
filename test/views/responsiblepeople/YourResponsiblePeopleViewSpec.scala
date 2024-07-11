@@ -18,6 +18,7 @@ package views.responsiblepeople
 
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.YourResponsiblePeopleView
@@ -26,7 +27,7 @@ class YourResponsiblePeopleViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val peopleView = inject[YourResponsiblePeopleView]
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   val completePersonName: Option[PersonName] = Some(PersonName("Katie", None, "Test"))

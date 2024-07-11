@@ -19,10 +19,12 @@ package controllers.businessactivities
 import controllers.actions.SuccessfulAuthAction
 import forms.businessactivities.EmployeeCountFormProvider
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Request, Result}
 import play.api.test
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -35,12 +37,12 @@ import scala.concurrent.Future
 
 class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
-  val mockService = mock[HowManyEmployeesService]
+  val mockService: HowManyEmployeesService = mock[HowManyEmployeesService]
 
   trait Fixture {
-    self => val request = addToken(authRequest)
+    self => val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
-    lazy val view = inject[BusinessEmployeesCountView]
+    lazy val view: BusinessEmployeesCountView = inject[BusinessEmployeesCountView]
     val controller = new HowManyEmployeesController (
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -50,33 +52,33 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
       view = view)
   }
 
-  val emptyCache = Cache.empty
+  val emptyCache: Cache = Cache.empty
 
   "HowManyEmployeesController" when {
 
     "get is called" must {
       "display the how many employees page with an empty form" in new Fixture {
 
-        when(mockService.getEmployeeCount(any())(any()))
+        when(mockService.getEmployeeCount(any()))
           .thenReturn(Future.successful(None))
 
-        val result = controller.get()(request)
+        val result: Future[Result] = controller.get()(request)
         status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
+        val document: Document = Jsoup.parse(contentAsString(result))
 
         document.select("input[name=employeeCount]").`val` must be("")
       }
 
       "display the how many employees page with pre populated data" in new Fixture {
 
-        when(mockService.getEmployeeCount(any())(any()))
+        when(mockService.getEmployeeCount(any()))
           .thenReturn(Future.successful(Some("163")))
 
-        val result = controller.get()(request)
+        val result: Future[Result] = controller.get()(request)
         status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
+        val document: Document = Jsoup.parse(contentAsString(result))
 
         document.select("input[name=employeeCount]").`val` must be("163")
 
@@ -85,40 +87,40 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
     "post is called" must {
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest = FakeRequest(POST, routes.HowManyEmployeesController.post().url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.HowManyEmployeesController.post().url)
           .withFormUrlEncodedBody(
           "employeeCount" -> ""
         )
-        val result = controller.post()(newRequest)
+        val result: Future[Result] = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
       }
 
       "redirect to the EmployeeCountAMLSSupervisionController when given valid data and edit is false" in new Fixture {
 
-        val newRequest = test.FakeRequest(POST, routes.HowManyEmployeesController.post().url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test.FakeRequest(POST, routes.HowManyEmployeesController.post().url)
           .withFormUrlEncodedBody(
           "employeeCount" -> "456"
         )
 
-        when(mockService.updateEmployeeCount(any(), any())(any()))
+        when(mockService.updateEmployeeCount(any(), any()))
           .thenReturn(Future.successful(Some(emptyCache)))
 
-        val result = controller.post(false)(newRequest)
+        val result: Future[Result] = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.TransactionRecordController.get().url))
       }
 
       "redirect to the SummaryController when given valid data and edit is true" in new Fixture {
 
-        val newRequest = test.FakeRequest(POST, routes.HowManyEmployeesController.post(true).url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test.FakeRequest(POST, routes.HowManyEmployeesController.post(true).url)
           .withFormUrlEncodedBody(
           "employeeCount" -> "54321"
         )
 
-        when(mockService.updateEmployeeCount(any(), any())(any()))
+        when(mockService.updateEmployeeCount(any(), any()))
           .thenReturn(Future.successful(Some(emptyCache)))
 
-        val resultTrue = controller.post(true)(newRequest)
+        val resultTrue: Future[Result] = controller.post(true)(newRequest)
         status(resultTrue) must be(SEE_OTHER)
         redirectLocation(resultTrue) must be(Some(routes.SummaryController.get.url))
       }

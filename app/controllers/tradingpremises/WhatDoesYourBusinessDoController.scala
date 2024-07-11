@@ -31,9 +31,8 @@ import play.api.data.Form
 import play.api.mvc._
 import play.twirl.api.Html
 import services.StatusService
-import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
-import uk.gov.hmrc.http.HeaderCarrier
 import services.cache.Cache
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import utils.{AuthAction, DateHelper, DateOfChangeHelper, RepeatingSection}
 import views.html.DateOfChangeView
 import views.html.tradingpremises.WhatDoesYourBusinessDoView
@@ -52,7 +51,7 @@ class WhatDoesYourBusinessDoController @Inject () (
                                                     dateChangeView: DateOfChangeView,
                                                     implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with Logging {
 
-  private def data(credId: String, index: Int, edit: Boolean)(implicit hc: HeaderCarrier)
+  private def data(credId: String, index: Int, edit: Boolean)
   : Future[Either[Result, (Cache, Set[BusinessActivity])]] = {
     dataCacheConnector.fetchAll(credId).map {
       cache =>
@@ -113,16 +112,17 @@ class WhatDoesYourBusinessDoController @Inject () (
   private def redirectBasedOnstatus(status: SubmissionStatus,
                                     tradingPremises: Option[TradingPremises],
                                     data: WhatDoesYourBusinessDo,
-                                    edit: Boolean, index: Int) = {
-      if (!data.activities.contains(MoneyServiceBusiness)
-        && redirectToDateOfChange(tradingPremises, data, status) && edit) {
-        Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
+                                    edit: Boolean, index: Int): Result = {
+    if (!data.activities.contains(MoneyServiceBusiness)
+      && redirectToDateOfChange(tradingPremises, data, status) && edit) {
+      Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
+    } else {
+      if (data.activities.contains(MoneyServiceBusiness)) {
+        Redirect(routes.MSBServicesController.get(index, edit, modelHasChanged(tradingPremises, data)))
       } else {
-        data.activities.contains(MoneyServiceBusiness)  match {
-          case true => Redirect(routes.MSBServicesController.get(index, edit, modelHasChanged(tradingPremises, data)))
-          case _ => Redirect(routes.CheckYourAnswersController.get(index))
-        }
+        Redirect(routes.CheckYourAnswersController.get(index))
       }
+    }
   }
 
   def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
@@ -151,7 +151,7 @@ class WhatDoesYourBusinessDoController @Inject () (
                       tp.agentPartnership,
                       Some(data),
                       None,
-                      true,
+                      hasChanged = true,
                       tp.lineId,
                       tp.status,
                       tp.endDate
@@ -205,15 +205,17 @@ class WhatDoesYourBusinessDoController @Inject () (
 
   private def getFormValues(activities: Set[BusinessActivity]): Seq[CheckboxItem] = {
     BusinessActivities.all.diff(activities).toSeq match {
-      case seq if seq.isEmpty => BusinessActivities.formValues(None, false)
-      case seq => BusinessActivities.formValues(Some(seq), false)
+      case seq if seq.isEmpty => BusinessActivities.formValues(None, hasHints = false)
+      case seq => BusinessActivities.formValues(Some(seq), hasHints = false)
     }
   }
 
-  def modelHasChanged(tradingPremises: TradingPremises, model: WhatDoesYourBusinessDo) =
-    tradingPremises.whatDoesYourBusinessDoAtThisAddress.fold(false) { _.activities != model.activities }
+  def modelHasChanged(tradingPremises: TradingPremises, model: WhatDoesYourBusinessDo): Boolean =
+    tradingPremises.whatDoesYourBusinessDoAtThisAddress.fold(false) {
+      _.activities != model.activities
+    }
 
-  def redirectToDateOfChange(tradingPremises: Option[TradingPremises], model: WhatDoesYourBusinessDo, status: SubmissionStatus) =
+  def redirectToDateOfChange(tradingPremises: Option[TradingPremises], model: WhatDoesYourBusinessDo, status: SubmissionStatus): Boolean =
     tradingPremises.lineId.isDefined && isEligibleForDateOfChange(status) && modelHasChanged(tradingPremises, model)
 
   // scalastyle:on cyclomatic.complexity

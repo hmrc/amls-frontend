@@ -129,7 +129,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
-          _ mustEqual Some(controllers.declaration.routes.RegisterPartnersController.get)
+          _ mustEqual Some(controllers.declaration.routes.RegisterPartnersController.get())
         }
       }
     }

@@ -186,7 +186,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
       }
 
     }

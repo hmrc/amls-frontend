@@ -18,6 +18,7 @@ package views.businessactivities
 
 import forms.businessactivities.TransactionRecordFormProvider
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -28,10 +29,10 @@ class CustomerTransactionRecordsViewSpec extends AmlsViewSpec with Matchers {
   lazy val customer: CustomerTransactionRecordsView = inject[CustomerTransactionRecordsView]
   lazy val formProvider: TransactionRecordFormProvider = inject[TransactionRecordFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "CustomerTransactionRecordsView" must {

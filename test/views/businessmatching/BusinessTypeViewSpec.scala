@@ -19,6 +19,7 @@ package views.businessmatching
 import forms.businessmatching.BusinessTypeFormProvider
 import models.businessmatching.BusinessType.LimitedCompany
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -29,7 +30,7 @@ class BusinessTypeViewSpec extends AmlsViewSpec with Matchers {
   lazy val business_type = inject[BusinessTypeView]
   lazy val fp = inject[BusinessTypeFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture
 

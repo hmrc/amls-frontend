@@ -19,6 +19,7 @@ package views.msb
 import forms.msb.WhichCurrenciesFormProvider
 import models.moneyservicebusiness.WhichCurrencies
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import services.CurrencyAutocompleteService
 import utils.AmlsViewSpec
@@ -30,10 +31,10 @@ class WhichCurrenciesViewSpec extends AmlsViewSpec with Matchers {
   lazy val which_currencies = inject[WhichCurrenciesView]
   lazy val fp = inject[WhichCurrenciesFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "WhichCurrenciesView" must {

@@ -87,7 +87,7 @@ class LandingController @Inject()(val landingService: LandingService,
   def start(allowRedirect: Boolean = true): Action[AnyContent] = messagesAction(parser).async {
     implicit request: MessagesRequest[AnyContent] =>
       if (isAuthorised && allowRedirect) {
-        Future.successful(Redirect(controllers.routes.LandingController.get))
+        Future.successful(Redirect(controllers.routes.LandingController.get()))
       } else {
         Future.successful(Ok(start()))
       }
@@ -165,7 +165,7 @@ class LandingController @Inject()(val landingService: LandingService,
     logger.debug("getWithoutAmendments:AMLSReference:" + amlsRegistrationNumber.getOrElse("Amls registration number not available"))
     // $COVERAGE-ON$
 
-    implicit val hc = headerCarrierForPartialsConverter.fromRequestWithEncryptedCookie(request)
+    implicit val hc: HeaderCarrier = headerCarrierForPartialsConverter.fromRequestWithEncryptedCookie(request)
 
     landingService.cacheMap(credId) flatMap {
       case Some(cache) => preApplicationComplete(cache, amlsRegistrationNumber, accountTypeId, credId)
@@ -191,20 +191,21 @@ class LandingController @Inject()(val landingService: LandingService,
   private def businessTypePostcodeRedirectLogic(rd: ReviewDetails): Result = {
     (rd.businessAddress.postcode, rd.businessAddress.country) match {
       case (Some(postcode), Country.unitedKingdom) =>
-        postcode.matches(postcodeRegex) match {
-          case true => Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
-          case false => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
+        if (postcode.matches(postcodeRegex)) {
+          Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
+        } else {
+          Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
         }
-      case (_, Country.unitedKingdom) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
-      case (_, country) if !country.isUK && !country.isEmpty => Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
-      case (_, _) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
+      case (_, Country.unitedKingdom) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
+      case (_, country) if !country.isUK && !country.isEmpty => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
+      case (_, _) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
     }
   }
 
   private def preApplicationComplete(cache: Cache, amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
                                     (implicit headerCarrier: HeaderCarrier): Future[Result] = {
 
-    val deleteAndRedirect = () => cacheConnector.remove(cacheId).map(_ =>Redirect(controllers.routes.LandingController.get))
+    val deleteAndRedirect = () => cacheConnector.remove(cacheId).map(_ =>Redirect(controllers.routes.LandingController.get()))
 
     cache.getEntry[BusinessMatching](BusinessMatching.key) map { bm =>
       // $COVERAGE-OFF$
@@ -258,7 +259,7 @@ class LandingController @Inject()(val landingService: LandingService,
     }
   }
 
-  private def dataHasChanged(cache: Cache) = {
+  private def dataHasChanged(cache: Cache): Boolean = {
     Seq(
       cache.sanitiseDoubleDecrypt[Asp](Asp.key).fold(false)(_.hasChanged),
       cache.sanitiseDoubleDecrypt[Amp](Amp.key).fold(false)(_.hasChanged),

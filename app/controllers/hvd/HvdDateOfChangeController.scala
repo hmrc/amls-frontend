@@ -25,7 +25,6 @@ import models.hvd.Hvd
 import play.api.data.Form
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, DateHelper, DateOfChangeHelper, RepeatingSection}
 import views.html.DateOfChangeView
 
@@ -81,7 +80,7 @@ class HvdDateOfChangeController @Inject() (val dataCacheConnector: DataCacheConn
       )
   }
 
-  private def getModelWithDateMap(credId: String)(implicit hc: HeaderCarrier): Future[(Hvd, Option[ActivityStartDate])] = {
+  private def getModelWithDateMap(credId: String): Future[(Hvd, Option[ActivityStartDate])] = {
     dataCacheConnector.fetchAll(credId) map {
       optionalCache =>
         (for {

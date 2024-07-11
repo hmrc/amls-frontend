@@ -26,21 +26,24 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Request, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.asp.ServicesOfBusinessView
 
+import scala.concurrent.Future
+
 class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
-  val emptyCache = Cache.empty
+  val emptyCache: Cache = Cache.empty
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
-    lazy val servicesOfBusiness = inject[ServicesOfBusinessView]
+    lazy val servicesOfBusiness: ServicesOfBusinessView = inject[ServicesOfBusinessView]
     val controller = new ServicesOfBusinessController(
       mockCacheConnector,
       mockStatusService,
@@ -54,21 +57,21 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with I
 
     mockCacheFetch[Asp](None)
     mockCacheSave[Asp]
-    mockIsNewActivityNewAuth(false)
+    mockIsNewActivityNewAuth(value = false)
   }
 
   "ServicesOfBusinessController" must {
 
     "on get display Which services does your business provide page" in new Fixture {
 
-      val result = controller.get()(request)
+      val result: Future[Result] = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("asp.services.title"))
     }
 
     "submit with valid data" in new Fixture {
 
-      val newRequest = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
+      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
         .withFormUrlEncodedBody(
         "services[1]" -> BookKeeping.toString,
         "services[2]" -> Accountancy.toString
@@ -76,7 +79,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with I
 
       mockApplicationStatus(SubmissionDecisionRejected)
 
-      val result = controller.post()(newRequest)
+      val result: Future[Result] = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.asp.routes.OtherBusinessTaxMattersController.get().url))
     }
@@ -85,7 +88,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with I
 
       mockCacheFetch(Some(Asp(Some(ServicesOfBusiness(Set(BookKeeping, Accountancy))), None)))
 
-      val result = controller.get()(request)
+      val result: Future[Result] = controller.get()(request)
       status(result) must be(OK)
 
       val document: Document = Jsoup.parse(contentAsString(result))
@@ -95,12 +98,12 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with I
 
     "fail submission on invalid value" in new Fixture {
 
-      val newRequest = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
+      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
         .withFormUrlEncodedBody(
           "services[1]" -> "foo"
         )
 
-      val result = controller.post()(newRequest)
+      val result: Future[Result] = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
       document.getElementsByClass("govuk-error-summary").text() must include(messages("error.required.asp.business.services"))
@@ -108,12 +111,12 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with I
 
     "fail submission when no check boxes were selected" in new Fixture {
 
-      val newRequest = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
+      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
       .withFormUrlEncodedBody(
         "services[1]" -> ""
       )
 
-      val result = controller.post()(newRequest)
+      val result: Future[Result] = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
       document.getElementsByClass("govuk-error-summary").text() must include(messages("error.required.asp.business.services"))
@@ -121,7 +124,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with I
 
     "submit with valid data in edit mode" in new Fixture {
 
-      val newRequest = FakeRequest(POST, routes.ServicesOfBusinessController.post(true).url)
+      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.ServicesOfBusinessController.post(true).url)
       .withFormUrlEncodedBody(
         "services[1]" -> BookKeeping.toString,
         "services[2]" -> Accountancy.toString,
@@ -130,7 +133,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with I
 
       mockApplicationStatus(SubmissionDecisionRejected)
 
-      val result = controller.post(true)(newRequest)
+      val result: Future[Result] = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.asp.routes.SummaryController.get.url))
     }
@@ -140,13 +143,13 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with I
 
         mockApplicationStatus(SubmissionDecisionApproved)
 
-        val newRequest = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
         .withFormUrlEncodedBody(
           "services[1]" -> BookKeeping.toString,
           "services[2]" -> Accountancy.toString,
           "services[3]" -> Auditing.toString
         )
-        val result = controller.post()(newRequest)
+        val result: Future[Result] = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.asp.routes.ServicesOfBusinessDateOfChangeController.get.url))
@@ -158,13 +161,13 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with I
 
         mockApplicationStatus(ReadyForRenewal(None))
 
-        val newRequest = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
         .withFormUrlEncodedBody(
           "services[1]" -> BookKeeping.toString,
           "services[2]" -> Accountancy.toString,
           "services[3]" -> Auditing.toString
         )
-        val result = controller.post()(newRequest)
+        val result: Future[Result] = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.asp.routes.ServicesOfBusinessDateOfChangeController.get.url))
@@ -175,7 +178,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with I
       "the status is approved" when {
         "the service has just been added" must {
           "redirect to the next page in the flow" in new Fixture {
-            val newRequest = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
+            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
             .withFormUrlEncodedBody(
               "services[1]" -> BookKeeping.toString,
               "services[2]" -> Accountancy.toString,
@@ -183,9 +186,9 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with I
             )
 
             mockApplicationStatus(SubmissionDecisionApproved)
-            mockIsNewActivityNewAuth(true, Some(AccountancyServices))
+            mockIsNewActivityNewAuth(value = true, Some(AccountancyServices))
 
-            val result = controller.post()(newRequest)
+            val result: Future[Result] = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.asp.routes.OtherBusinessTaxMattersController.get().url))
           }

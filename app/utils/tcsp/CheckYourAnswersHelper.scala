@@ -86,7 +86,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
 
   private def onlyOffTheShelfCompsSoldRow(model: Tcsp)(implicit messages: Messages): Option[SummaryListRow] = {
 
-    def label(answer: OnlyOffTheShelfCompsSold) = answer match {
+    def label(answer: OnlyOffTheShelfCompsSold): String = answer match {
       case OnlyOffTheShelfCompsSoldYes => booleanToLabel(bool = true)
       case OnlyOffTheShelfCompsSoldNo => booleanToLabel(bool = false)
     }
@@ -105,7 +105,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
 
   private def complexCorpStructureCreationRow(model: Tcsp)(implicit messages: Messages): Option[SummaryListRow] = {
 
-    def label(answer: ComplexCorpStructureCreation) = answer match {
+    def label(answer: ComplexCorpStructureCreation): String = answer match {
       case ComplexCorpStructureCreationYes => booleanToLabel(bool = true)
       case ComplexCorpStructureCreationNo => booleanToLabel(bool = false)
     }
@@ -124,7 +124,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
 
   private def providedServicesRow(model: Tcsp)(implicit messages: Messages): Option[SummaryListRow] = {
 
-    def label(answer: ProvidedServices) = answer.services.toSeq match {
+    def label(answer: ProvidedServices): Value = answer.services.toSeq match {
       case Seq(x) => Value(Text(x.getMessage))
       case seq =>
         toBulletList(
@@ -170,7 +170,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
 
   private def anotherTCSPSupervisionRows(model: Tcsp)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
 
-    def yesNoRow(boolean: Boolean) = row(
+    def yesNoRow(boolean: Boolean): SummaryListRow = row(
       "tcsp.anothertcspsupervision.title",
       booleanToLabel(boolean),
       editAction(
@@ -202,7 +202,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
     messages("lbl.no")
   }
 
-  private def toBulletList[A](coll: Seq[A])(implicit messages: Messages): Value = Value(
+  private def toBulletList[A](coll: Seq[A]): Value = Value(
     HtmlContent(
       Html(
         "<ul class=\"govuk-list govuk-list--bullet\">" +

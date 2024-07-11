@@ -60,30 +60,30 @@ class ConfirmationController @Inject()(authAction: AuthAction,
   }
 
   private def showRenewalConfirmation(fees: FeeResponse, status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus], credId: String)
-                                     (implicit request: Request[AnyContent]) = {
+                                     (implicit request: Request[AnyContent]): Future[Result] = {
 
     confirmationService.isRenewalDefined(credId) map { isRenewalDefined =>
       if (isRenewalDefined) {
         Ok(confirmationRenewal(fees.paymentReference,
           fees.toPay(status, submissionRequestStatus),
-          controllers.payments.routes.WaysToPayController.get.url,
+          controllers.payments.routes.WaysToPayController.get().url,
           submissionRequestStatus.fold[Boolean](false)(_.isRenewalAmendment.getOrElse(false))))
       } else {
         Ok(confirmationAmendment(fees.paymentReference,
           fees.toPay(status, submissionRequestStatus),
-          controllers.payments.routes.WaysToPayController.get.url))
+          controllers.payments.routes.WaysToPayController.get().url))
       }
     }
   }
 
   private def showAmendmentVariationConfirmation(fees: FeeResponse, status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus])
-                                                (implicit request: Request[AnyContent]) = {
+                                                (implicit request: Request[AnyContent]): Future[Result] = {
 
     val amount = fees.toPay(status, submissionRequestStatus)
 
     Future.successful(Ok(confirmationAmendment(fees.paymentReference,
       amount,
-      controllers.payments.routes.WaysToPayController.get.url)))
+      controllers.payments.routes.WaysToPayController.get().url)))
   }
 
   private def resultFromStatus(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus],
@@ -110,7 +110,7 @@ class ConfirmationController @Inject()(authAction: AuthAction,
           case ReadyForRenewal(_) | RenewalSubmitted(_) =>
             showRenewalConfirmation(fees, status, submissionRequestStatus, credId)
           case _ =>
-            Future.successful(Ok(confirmationNew(fees.paymentReference, fees.totalFees, controllers.payments.routes.WaysToPayController.get.url)))
+            Future.successful(Ok(confirmationNew(fees.paymentReference, fees.totalFees, controllers.payments.routes.WaysToPayController.get().url)))
         }
 
       case _ =>

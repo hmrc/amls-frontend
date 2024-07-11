@@ -20,7 +20,7 @@ import config.ApplicationConfig
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
+import play.api.libs.json.{JsBoolean, JsString, JsValue, Json, OFormat}
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import utils.AmlsSpec
 
@@ -36,7 +36,7 @@ class DataCacheConnectorSpec
 
   case class Model(value: String)
   object Model {
-    implicit val format = Json.format[Model]
+    implicit val format: OFormat[Model] = Json.format[Model]
   }
 
   trait Fixture {
@@ -44,17 +44,17 @@ class DataCacheConnectorSpec
     val key = "key"
     val oId = "oldId"
     val credId = "12345678"
-    val cache = Cache(oId, referenceMap())
-    val newCache = cache.copy(id = credId)
+    val cache: Cache = Cache(oId, referenceMap())
+    val newCache: Cache = cache.copy(id = credId)
 
-    val factory = mock[MongoCacheClientFactory]
-    val client = mock[MongoCacheClient]
+    val factory: MongoCacheClientFactory = mock[MongoCacheClientFactory]
+    val client: MongoCacheClient = mock[MongoCacheClient]
 
     when(factory.createClient) thenReturn client
 
-    val appConfig = mock[ApplicationConfig]
+    val appConfig: ApplicationConfig = mock[ApplicationConfig]
 
-    val dataCacheConnector = new MongoCacheConnector(factory) {
+    val dataCacheConnector: MongoCacheConnector = new MongoCacheConnector(factory) {
       override lazy val mongoCache: MongoCacheClient =  mock[MongoCacheClient]
     }
   }
@@ -70,7 +70,7 @@ class DataCacheConnectorSpec
 
   "DataCacheConnector" must {
     "save data to Mongo" in new Fixture {
-      val model = Model("data")
+      val model: Model = Model("data")
 
       when {
         dataCacheConnector.mongoCache.createOrUpdate(credId, model, key)
@@ -83,7 +83,7 @@ class DataCacheConnectorSpec
     }
 
     "fetch saved data from Mongo" in new Fixture {
-      val model = Model("data")
+      val model: Model = Model("data")
 
       when {
         dataCacheConnector.mongoCache.find[Model](credId, key)

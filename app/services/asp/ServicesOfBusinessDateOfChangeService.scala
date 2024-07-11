@@ -20,14 +20,13 @@ import connectors.DataCacheConnector
 import models.DateOfChange
 import models.asp.Asp
 import models.businessdetails.{ActivityStartDate, BusinessDetails}
-import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ServicesOfBusinessDateOfChangeService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) {
 
-  def getModelWithDate(cacheId: String)(implicit hc: HeaderCarrier): Future[(Asp, Option[ActivityStartDate])] = {
+  def getModelWithDate(cacheId: String): Future[(Asp, Option[ActivityStartDate])] = {
     dataCacheConnector.fetchAll(cacheId) map {
       optionalCache =>
         (for {
@@ -42,7 +41,7 @@ class ServicesOfBusinessDateOfChangeService @Inject()(val dataCacheConnector: Da
     }
   }
 
-  def updateAsp(asp: Asp, dateOfChange: DateOfChange, credId: String)(implicit hc: HeaderCarrier): Future[Option[Asp]] = {
+  def updateAsp(asp: Asp, dateOfChange: DateOfChange, credId: String): Future[Option[Asp]] = {
     val updatedAsp = asp.services match {
       case Some(sob) => asp.copy(services = Some(sob.copy(dateOfChange = Some(dateOfChange))))
       case None => asp

@@ -32,7 +32,7 @@ object OnlyOffTheShelfCompsSold {
     }
   }
 
-  implicit val jsonWrite = Writes[OnlyOffTheShelfCompsSold] {
+  implicit val jsonWrite: Writes[OnlyOffTheShelfCompsSold] = Writes[OnlyOffTheShelfCompsSold] {
     case OnlyOffTheShelfCompsSoldYes => Json.obj("onlyOffTheShelfCompsSold" -> true)
     case OnlyOffTheShelfCompsSoldNo => Json.obj("onlyOffTheShelfCompsSold" -> false)
   }

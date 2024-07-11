@@ -20,6 +20,7 @@ import forms.businessdetails.CorrespondenceAddressNonUKFormProvider
 import models.Country
 import models.businessdetails.CorrespondenceAddressNonUk
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 import utils.AmlsViewSpec
@@ -32,14 +33,14 @@ class CorrespondenceAddressNonUKViewSpec extends AmlsViewSpec with Matchers  {
   lazy val correspondence_address_non_uk = app.injector.instanceOf[CorrespondenceAddressNonUKView]
   lazy val formProvider = app.injector.instanceOf[CorrespondenceAddressNonUKFormProvider]
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   val countries = Seq(
     SelectItem(text = "Country 1", value = Some("country:1"))
   )
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "correspondence_address view" must {

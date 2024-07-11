@@ -31,7 +31,7 @@ object NonUKPassport {
       case false => Reads(_ => JsSuccess(NoPassport))
     }
 
-  implicit val jsonWrites = Writes[NonUKPassport] {
+  implicit val jsonWrites: Writes[NonUKPassport] = Writes[NonUKPassport] {
     case NonUKPassportYes(value) => Json.obj(
       "nonUKPassport" -> true,
       "nonUKPassportNumber" -> value

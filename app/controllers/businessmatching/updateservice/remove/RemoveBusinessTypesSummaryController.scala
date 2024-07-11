@@ -19,16 +19,15 @@ package controllers.businessmatching.updateservice.remove
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
-import javax.inject.Inject
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, RemoveBusinessTypesSummaryPageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.flowmanagement.Router
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.businessmatching.updateservice.remove.RemoveActivitiesSummaryView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class RemoveBusinessTypesSummaryController @Inject()(authAction: AuthAction,
@@ -56,8 +55,7 @@ class RemoveBusinessTypesSummaryController @Inject()(authAction: AuthAction,
     } getOrElse InternalServerError("Unable to remove the business type")
   }
 
-  private def updateSubscription(credId: String)
-                                (implicit hc: HeaderCarrier): OptionT[Future, RemoveBusinessTypeFlowModel] = for {
+  private def updateSubscription(credId: String): OptionT[Future, RemoveBusinessTypeFlowModel] = for {
     model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](credId, RemoveBusinessTypeFlowModel.key))
     _ <- helper.removeFitAndProper(credId, model)
     _ <- helper.removeBusinessMatchingBusinessTypes(credId, model)

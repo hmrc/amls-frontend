@@ -52,7 +52,7 @@ class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
           } yield {
             val summaryList = cyaHelper.getSummaryList(renewal, businessMatching)
             Ok(view(summaryList))
-          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
+          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 

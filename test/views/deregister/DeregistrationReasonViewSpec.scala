@@ -21,6 +21,7 @@ import models.deregister.DeregistrationReason
 import models.deregister.DeregistrationReason.HVDPolicyOfNotAcceptingHighValueCashPayments
 import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.deregister.DeregistrationReasonView
@@ -31,7 +32,7 @@ class DeregistrationReasonViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val deregistration_reason = inject[DeregistrationReasonView]
   lazy val fp = inject[DeregistrationReasonFormProvider]
-  implicit val requestWithToken = addTokenForView()
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   "DeregistrationReasonView" must {
     "have correct title" in new TestFixture {

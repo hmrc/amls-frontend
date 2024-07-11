@@ -16,14 +16,14 @@
 
 package models.responsiblepeople
 
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{Json, OWrites, Reads}
 
 case class PreviousName(hasPreviousName: Option[Boolean] = None,
                         firstName: Option[String],
                         middleName: Option[String],
                         lastName: Option[String]) {
 
-  val fullName = Seq(firstName, middleName, lastName).flatten[String].mkString(" ")
+  val fullName: String = Seq(firstName, middleName, lastName).flatten[String].mkString(" ")
 }
 
 object PreviousName {
@@ -38,5 +38,5 @@ object PreviousName {
       (__ \ "lastName").readNullable[String]
   }.apply(PreviousName.apply _)
 
-  implicit val jsonWrites = Json.writes[PreviousName]
+  implicit val jsonWrites: OWrites[PreviousName] = Json.writes[PreviousName]
 }

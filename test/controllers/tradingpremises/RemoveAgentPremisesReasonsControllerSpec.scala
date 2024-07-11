@@ -25,7 +25,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.JsValue
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.cache.Cache
@@ -40,7 +40,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
   trait Fixture {
     self =>
-    implicit val request = addToken(authRequest)
+    implicit val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
     lazy val view = inject[RemoveAgentPremisesReasonsView]
     val controller = new RemoveAgentPremisesReasonsController (
       dataCacheConnector = mock[DataCacheConnector],

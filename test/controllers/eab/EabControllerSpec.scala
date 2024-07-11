@@ -126,7 +126,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
   "get returns 200" when {
     "no eab section in cache" in new Fixture {
-      when(proxyCacheService.getEab(any())(any())).thenReturn(Future.successful(Some(Json.obj())))
+      when(proxyCacheService.getEab(any())).thenReturn(Future.successful(Some(Json.obj())))
 
 
 
@@ -138,7 +138,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
     }
 
     "eab section in cache" in new Fixture {
-      when(proxyCacheService.getEab(any())(any())).thenReturn(Future.successful(Some(completeEabJson)))
+      when(proxyCacheService.getEab(any())).thenReturn(Future.successful(Some(completeEabJson)))
 
       val result = controller.get(credId)(request)
       status(result) must be(OK)
@@ -154,7 +154,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
         .withHeaders(CONTENT_TYPE -> "application/json")
         .withBody[JsValue](completeEabJson)
 
-      when(proxyCacheService.setEab(any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
+      when(proxyCacheService.setEab(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.set(credId)(postRequest)
       status(result) must be(OK)
@@ -175,7 +175,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
       val result = controller.accept.apply(FakeRequest())
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get.toString
+      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get().toString
 
       verify(mockCacheConnector).save[Eab](any(), eqTo(Eab.key),
         eqTo(completeEabJson.as[Eab].copy(hasAccepted = true)))(any())
@@ -190,7 +190,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val status = "Approved"
 
-      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(true))
+      when(mockServiceFlow.isNewActivity(any(), any())(any())).thenReturn(Future.successful(true))
 
       val result = controller.requireDateOfChange(credId, status)(postRequest)
 
@@ -207,7 +207,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val status = "Approved"
 
-      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
+      when(mockServiceFlow.isNewActivity(any(), any())(any())).thenReturn(Future.successful(false))
 
       when(mockCacheConnector.fetch[Eab](any(), any())(any())).thenReturn(
         Future.successful(Some(completeEabModel))
@@ -228,7 +228,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val status = "NotYetSubmitted"
 
-      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
+      when(mockServiceFlow.isNewActivity(any(), any())(any())).thenReturn(Future.successful(false))
 
       when(mockCacheConnector.fetch[Eab](any(), any())(any())).thenReturn(
         Future.successful(Some(updatedEabModel))
@@ -249,7 +249,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val status = "Approved"
 
-      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
+      when(mockServiceFlow.isNewActivity(any(), any())(any())).thenReturn(Future.successful(false))
 
       when(mockCacheConnector.fetch[Eab](any(), any())(any())).thenReturn(
         Future.successful(Some(updatedEabModel))
@@ -270,7 +270,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val status = "NotYetSubmitted"
 
-      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
+      when(mockServiceFlow.isNewActivity(any(), any())(any())).thenReturn(Future.successful(false))
 
       when(mockCacheConnector.fetch[Eab](any(), any())(any())).thenReturn(
         Future.successful(Some(noEabModel))

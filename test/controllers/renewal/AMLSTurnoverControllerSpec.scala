@@ -59,7 +59,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
     def testRenewal: Option[Renewal] = None
 
-    when(controller.renewalService.getFirstBusinessActivityInLowercase(any())(any(), any(), any()))
+    when(controller.renewalService.getFirstBusinessActivityInLowercase(any())(any(), any()))
       .thenReturn(Future.successful(Some(AccountancyServices.getMessage().toLowerCase)))
 
     when(mockRenewalService.getBusinessMatching(any())).thenReturn(Future.successful(Some(businessMatching)))
@@ -223,7 +223,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
               activities = Some(Activities(Set(AccountancyServices, MoneyServiceBusiness)))
             )
 
-            when(controller.renewalService.getFirstBusinessActivityInLowercase(any())(any(), any(), any()))
+            when(controller.renewalService.getFirstBusinessActivityInLowercase(any())(any(), any()))
               .thenReturn(Future.successful(None))
 
             when(controller.renewalService.getBusinessMatching(any())).thenReturn(Future.successful(Some(businessMatching)))
@@ -247,7 +247,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
             val expected = AccountancyServices.getMessage()
 
-            when(controller.renewalService.getFirstBusinessActivityInLowercase(any())(any(), any(), any()))
+            when(controller.renewalService.getFirstBusinessActivityInLowercase(any())(any(), any()))
               .thenReturn(Future.successful(Some(expected)))
 
             when(controller.renewalService.getBusinessMatching(any())).thenReturn(Future.successful(Some(businessMatching)))
@@ -272,7 +272,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
               activities = Some(Activities(Set()))
             )
 
-            when(controller.renewalService.getFirstBusinessActivityInLowercase(any())(any(), any(), any()))
+            when(controller.renewalService.getFirstBusinessActivityInLowercase(any())(any(), any()))
               .thenReturn(Future.successful(None))
 
             when(controller.renewalService.getBusinessMatching(any())).thenReturn(Future.successful(Some(businessMatching)))

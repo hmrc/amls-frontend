@@ -32,7 +32,7 @@ object ComplexCorpStructureCreation {
     }
   }
 
-  implicit val jsonWrite = Writes[ComplexCorpStructureCreation] {
+  implicit val jsonWrite: Writes[ComplexCorpStructureCreation] = Writes[ComplexCorpStructureCreation] {
     case ComplexCorpStructureCreationYes => Json.obj("complexCorpStructureCreation" -> true)
     case ComplexCorpStructureCreationNo => Json.obj("complexCorpStructureCreation" -> false)
   }

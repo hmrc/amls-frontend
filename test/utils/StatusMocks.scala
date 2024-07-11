@@ -26,7 +26,7 @@ import scala.concurrent.Future
 
 trait StatusMocks extends MockitoSugar {
 
-  implicit val mockStatusService = mock[StatusService]
+  implicit val mockStatusService: StatusService = mock[StatusService]
 
   def mockApplicationStatus(status: SubmissionStatus)(implicit service: StatusService) = when {
     service.getStatus(any[Option[String]], any(), any())(any(), any(), any())

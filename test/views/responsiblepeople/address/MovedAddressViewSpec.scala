@@ -19,6 +19,7 @@ package views.responsiblepeople.address
 import forms.responsiblepeople.address.MovedAddressFormProvider
 import models.responsiblepeople.PersonAddressUK
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -32,10 +33,10 @@ class MovedAddressViewSpec extends AmlsViewSpec with Matchers {
   val name = "firstName lastName"
   val address = PersonAddressUK("#11", Some("some building"), Some("Some street"), Some("city"), "AA111AA")
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "MovedAddressView view" must {

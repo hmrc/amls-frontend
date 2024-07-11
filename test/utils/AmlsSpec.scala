@@ -16,21 +16,21 @@
 
 package utils
 
-import org.apache.pekko.stream.Materializer
 import config.ApplicationConfig
 import controllers.CommonPlayDependencies
+import org.apache.pekko.stream.Materializer
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
-import play.api.i18n.{Lang, MessagesApi, MessagesImpl, MessagesProvider}
+import play.api.i18n._
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{AnyContentAsEmpty, MessagesControllerComponents, Request}
 import play.api.test.FakeRequest
 import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, CompositeSymmetricCrypto, Decrypter, Encrypter}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
 import scala.concurrent.ExecutionContext
@@ -48,19 +48,19 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
       .build()
   }
 
-  implicit val requestWithToken = CSRFRequest(FakeRequest()).withCSRFToken
-  val messagesApi = app.injector.instanceOf[MessagesApi]
-  implicit val messages = messagesApi.preferred(requestWithToken)
-  implicit val lang = Lang.defaultLang
-  implicit val appConfig = app.injector.instanceOf[ApplicationConfig]
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = CSRFRequest(FakeRequest()).withCSRFToken
+  val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
+  implicit val messages: Messages = messagesApi.preferred(requestWithToken)
+  implicit val lang: Lang = Lang.defaultLang
+  implicit val appConfig: ApplicationConfig = app.injector.instanceOf[ApplicationConfig]
 
   val commonDependencies = new CommonPlayDependencies(appConfig, messagesApi)
 
   implicit val messagesProvider: MessagesProvider = MessagesImpl(lang, messagesApi)
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-  implicit val mat = mock[Materializer]
+  implicit val mat: Materializer = mock[Materializer]
 
-  lazy val mockMcc = app.injector.instanceOf[MessagesControllerComponents]
+  lazy val mockMcc: MessagesControllerComponents = app.injector.instanceOf[MessagesControllerComponents]
 
   // ================================== Encryption/Decryption ==================================
   val applicationCrypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]

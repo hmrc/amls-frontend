@@ -104,7 +104,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
         val result = controller.get()(request)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
       }
 
       "redirect to RegistrationProgressController if there is MSB with no TM defined" in new Fixture {
@@ -113,7 +113,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
         val result = controller.get()(request)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
       }
     }
 

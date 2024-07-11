@@ -23,7 +23,6 @@ import org.mongodb.scala.model._
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json._
 import services.encryption.CryptoService
-import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto._
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
@@ -32,7 +31,6 @@ import java.time.{LocalDateTime, ZoneOffset}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.SECONDS
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success, Try}
 
 /**
   * An injectible factory for creating new MongoCacheClients

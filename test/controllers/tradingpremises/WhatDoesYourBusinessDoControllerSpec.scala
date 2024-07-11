@@ -37,10 +37,9 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
+import services.cache.Cache
 import uk.gov.hmrc.auth.core.AffinityGroup.Individual
 import uk.gov.hmrc.auth.core.{Enrolments, User}
-import uk.gov.hmrc.http.HeaderCarrier
-import services.cache.Cache
 import utils.{AmlsSpec, AuthorisedRequest, DateHelper}
 import views.html.DateOfChangeView
 import views.html.tradingpremises.WhatDoesYourBusinessDoView

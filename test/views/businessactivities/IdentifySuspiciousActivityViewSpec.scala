@@ -18,7 +18,7 @@ package views.businessactivities
 
 import forms.businessactivities.IdentifySuspiciousActivityFormProvider
 import org.scalatest.matchers.must.Matchers
-import play.api.mvc.Request
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -33,7 +33,7 @@ class IdentifySuspiciousActivityViewSpec extends AmlsViewSpec with Matchers {
   implicit val request: Request[_] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "Spec view" must {

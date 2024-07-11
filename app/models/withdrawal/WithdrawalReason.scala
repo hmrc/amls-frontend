@@ -67,7 +67,7 @@ object WithdrawalReason extends Enumerable.Implicits {
     }
   }
 
-  implicit val jsonRedressWrites = Writes[WithdrawalReason] {
+  implicit val jsonRedressWrites: Writes[WithdrawalReason] = Writes[WithdrawalReason] {
     case OutOfScope => Json.obj("withdrawalReason" -> "Out of scope")
     case NotTradingInOwnRight => Json.obj("withdrawalReason" -> "Not trading in own right")
     case UnderAnotherSupervisor => Json.obj("withdrawalReason" -> "Under another supervisor")

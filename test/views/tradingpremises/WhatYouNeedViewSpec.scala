@@ -20,6 +20,7 @@ import models.businessmatching.{BusinessActivities, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing, MoneyServiceBusiness}
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, TransmittingMoney}
 import org.scalatest.matchers.must.Matchers
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
@@ -32,10 +33,10 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
   val agentCall = controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(1)
   val confirmAddressCall = controllers.tradingpremises.routes.ConfirmAddressController.get(1)
 
-  implicit val request = FakeRequest()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addTokenForView()
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
   "WhatYouNeedView" must {

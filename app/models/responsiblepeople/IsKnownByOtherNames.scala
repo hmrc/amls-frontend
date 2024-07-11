@@ -39,7 +39,7 @@ object IsKnownByOtherNames {
       case false => Reads(_ => JsSuccess(IsKnownByOtherNamesNo))
     }
 
-  implicit val jsonWrites = Writes[IsKnownByOtherNames] {
+  implicit val jsonWrites: Writes[IsKnownByOtherNames] = Writes[IsKnownByOtherNames] {
     case a : IsKnownByOtherNamesYes => Json.obj(
       "isKnownByOtherNames" -> true,
       "otherfirstnames" -> a.otherfirstnames,
