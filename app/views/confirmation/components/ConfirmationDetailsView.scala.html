@@ -44,11 +44,11 @@
     <p id="take-note" class="govuk-body">@messages("confirmation.submission.info")</p>
 
     <div class="reg-online--pay-fee">
-        <p class="govuk-body">@messages("confirmation.fee") <span hidden>is</span>
+        <p class="govuk-body">@messages("confirmation.fee")
             <span id="total" class="govuk-heading-l">@total</span>
         </p>
         @paymentReference.map { ref =>
-            <p class="govuk-body">@messages("confirmation.sidebar.code") <span hidden>is</span>
+            <p class="govuk-body">@messages("confirmation.sidebar.code")
                 <span id="reference" class="govuk-heading-l">@messages(ref)</span>
             </p>
         }
