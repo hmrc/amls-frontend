@@ -801,7 +801,7 @@ hint.9.digits = It is 9 numbers, like 123456789.
 hint.10.digits = For example: 1234567890
 hint.255.chars = Enter 255 characters or less.
 
-lbl.hint.crn = This is 8 characters and can be a mix of numbers and capital letters. Find it on your certificate of incorporation
+lbl.hint.crn = It is 8 characters. For example, 01234567 or AC012345.
 
 lbl.hint.vat = This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789. You can find it on your VAT registration certificate.
 
@@ -1618,6 +1618,8 @@ businessmatching.registerservices.servicename.details.07 = They form companies, 
 businessmatching.registerservices.servicename.details.08 = They act as a link between customers and suppliers. They handle payments made through devices like mobile phones, computers, and smart TVs.
 businessmatching.registrationnumber.title = What is your company registration number?
 businessmatching.registrationnumber.lbl = Company registration number
+businessmatching.registrationnumber.line_1 = You can
+businessmatching.registrationnumber.line_2 = search Companies House for your company registration number (opens in new tab)
 businessmatching.typeofbusiness.title = What type of unincorporated association or trust are you registering?
 businessmatching.typeofbusiness.lbl = Type of business
 businessmatching.typeofbusiness.lbl.hint = For example, association, charity, trust.
