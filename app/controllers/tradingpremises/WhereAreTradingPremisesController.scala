@@ -145,7 +145,7 @@ class WhereAreTradingPremisesController @Inject () (
                       )))
                   }
                 } map { _ =>
-                  Redirect(routes.CheckYourAnswersController.get(1))
+                  Redirect(routes.CheckYourAnswersController.get(index))
                 }
               case Some(date) =>
                 Future.successful(BadRequest(getDateView(
