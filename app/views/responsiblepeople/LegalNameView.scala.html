@@ -33,13 +33,15 @@
 
 @(form: Form[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
+@hintText = {
+    <p class="govuk-hint">@messages("responsiblepeople.legalnamechangedate.paragraph")</p>
+    }
+
 @layout(pageTitle = messages("responsiblepeople.legalName.title") + " - " + messages("summary.responsiblepeople")) {
 
     @errorSummary(form)
 
     @subtitle("summary.responsiblepeople")
-
-    @heading("responsiblepeople.legalName.heading", personName)
 
     @formHelper(action = controllers.responsiblepeople.routes.LegalNameController.post(index, edit, flow)) {
 
@@ -48,12 +50,13 @@
                 fieldset = Some(Fieldset(
                     legend = Some(
                         Legend(
-                            content = Text(messages("responsiblepeople.legalnamechangedate.paragraph")),
-                            classes = "govuk-body",
-                            isPageHeading = false
+                            content = Text(messages("responsiblepeople.legalName.heading", personName)),
+                            classes = "govuk-fieldset__legend--xl",
+                            isPageHeading = true
                         )
                     )
                 )),
+                hint = Some(Hint(content = HtmlContent(hintText))),
                 name = "hasPreviousName",
                 items = HmrcYesNoRadioItems(),
                 classes = "govuk-radios govuk-radios--inline"
