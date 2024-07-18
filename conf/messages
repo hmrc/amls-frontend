@@ -2250,9 +2250,6 @@ responsiblepeople.check_your_answers.subheading.4 = Home addresses
 responsiblepeople.check_your_answers.subheading.5 = Business details
 responsiblepeople.check_your_answers.subheading.6 = Experience
 responsiblepeople.check_your_answers.button = Accept and add this responsible person
-responsiblepeople.check_your_answers.visuallyhidden.change = Change your registered services
-responsiblepeople.check_your_answers.visuallyhidden.change.Name = Change the name of this responsible person
-responsiblepeople.check_your_answers.visuallyhidden.change.LegallyChanged = Change whether this person has ever legally changed their name
 
 responsiblepeople.check_your_answers.hasNonUKresident.1 = Because at least one of the people you’ve registered lives outside of the UK, HMRC will likely need more information about them.
 responsiblepeople.check_your_answers.hasNonUKresident.2 = They’ll contact you on the email address you give in the ‘Business Details’ section and let you know what they need.
