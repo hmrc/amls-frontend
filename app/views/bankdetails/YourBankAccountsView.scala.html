@@ -97,13 +97,13 @@
                     <dd id="incomplete-action-panel-@index" class="hmrc-add-to-a-list__change">
                         <a id="incomplete-detail-edit-@index" class="govuk-link" href="@controllers.bankdetails.routes.BankAccountNameController.getIndex(index + 1).url">
                             <span aria-label="true">@messages("bankdetails.yourbankaccount.edit")</span>
-                            <span hidden>@messages("bankdetails.yourbankaccount.edit") @bankDetail.accountName</span>
+                            <span class="govuk-visually-hidden">@messages("bankdetails.yourbankaccount.edit") @bankDetail.accountName</span>
                         </a>
                     </dd>
                     <dd class="hmrc-add-to-a-list__remove">
                         <a id="incomplete-detail-remove-@index" class="govuk-link" href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1).url">
                             <span aria-label="Remove">@messages("bankdetails.yourbankaccount.remove")</span>
-                            <span hidden>@messages("bankdetails.yourbankaccount.remove") @bankDetail.accountName</span>
+                            <span class="govuk-visually-hidden">@messages("bankdetails.yourbankaccount.remove") @bankDetail.accountName</span>
                         </a>
                     </dd>
                 </div>
@@ -127,7 +127,7 @@
                         <dd id="completed-action-panel-@index" class="hmrc-add-to-a-list__remove">
                             <a id="completed-detail-remove-@index" class="govuk-link" href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1).url">
                                 <span aria-label="Remove">@messages("bankdetails.yourbankaccount.remove")</span>
-                                <span hidden>@messages("bankdetails.yourbankaccount.remove") @bankDetail.accountName</span>
+                                <span class="govuk-visually-hidden">@messages("bankdetails.yourbankaccount.remove") @bankDetail.accountName</span>
                             </a>
                         </dd>
                     </div>
