@@ -24,6 +24,7 @@ sealed trait DeregistrationReason {
 }
 
 object DeregistrationReason extends Enumerable.Implicits {
+  val key: String = "deregistrationReason"
 
   case object OutOfScope extends WithName("outOfScope") with DeregistrationReason {
     override val value: String = "01"

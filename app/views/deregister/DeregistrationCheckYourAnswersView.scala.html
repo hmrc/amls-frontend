@@ -1,0 +1,62 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.deregister.DeregistrationReason
+@import views.html.components.forms.{ErrorSummary, InputText}
+@import views.html.components.{Button, Heading, SectionSubtitle}
+
+@this(
+        layout: Layout,
+        errorSummary: ErrorSummary,
+        subtitle: SectionSubtitle,
+        formHelper: FormWithCSRF,
+        radios: GovukRadios,
+        inputText: InputText,
+        button: Button,
+        heading: Heading
+)
+
+@(deregistrationReason: DeregistrationReason)(implicit messages: Messages, request: Request[_])
+
+
+@layout(messages("deregistration.reason.heading") + " - " + messages("title.yapp")) {
+
+    @subtitle("summary.status")
+
+    @heading("deregistration.cya.heading")
+
+
+    <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                @messages("deregistration.cya.question")
+            </dt>
+            <dd class="govuk-summary-list__value">
+                @Text(messages(s"deregistration.reason.lbl.${deregistrationReason.value}")).asHtml
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link" id="cya-change-link" href="@{controllers.deregister.routes.DeregistrationReasonController.get}">
+                    Change
+                </a>
+            </dd>
+        </div>
+    </dl>
+
+    @formHelper(controllers.deregister.routes.DeregistrationCheckYourAnswersController.post, Symbol("disable-on-submit") -> "true") {
+        @button("button.acceptandcontinue")
+    }
+
+}

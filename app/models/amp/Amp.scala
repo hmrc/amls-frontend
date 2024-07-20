@@ -25,6 +25,9 @@ import play.api.mvc.Call
 import typeclasses.MongoKey
 import services.cache.Cache
 
+/**
+ * Art Market Participant (Amp).
+ */
 final case class Amp(data: JsObject = Json.obj(),
                      hasChanged: Boolean = false,
                      hasAccepted: Boolean = false) {
