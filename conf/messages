@@ -639,7 +639,7 @@ error.required.renewal.amp.percentage = Select how much of your turnover in the 
 
 error.invalid.renewal.msb.wc.moneySources = Select who supplied your physical foreign currency in the last 12 months
 
-error.required.renewal.country.name = Enter an official country name: for example, Holland is Netherlands
+error.required.renewal.country.name = Enter a real country. Use official country names if appropriate
 error.required.renewal.customer.country.name = Enter the countries where customers lived or worked
 
 error.required.renewal.ce.transactions.in.12months = Enter how many currency exchange transactions you made in the last 12 months
