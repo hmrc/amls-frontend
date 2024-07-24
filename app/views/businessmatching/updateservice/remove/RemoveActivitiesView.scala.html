@@ -50,7 +50,8 @@
 
     @formHelper(action = controllers.businessmatching.updateservice.remove.routes.RemoveBusinessTypesController.post(edit)) {
 
-        @errorSummary(form, Some(Map("value" -> "value_0")))
+        @errorSummary(form, Some(Map("value" -> s"value_${(BusinessActivities.all.toSeq diff activityValues).map(activity =>
+            activity.value.substring(1)).head}")))
 
         @subtitle("summary.updateservice")
 

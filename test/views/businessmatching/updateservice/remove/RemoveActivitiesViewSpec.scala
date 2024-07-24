@@ -26,11 +26,11 @@ import views.html.businessmatching.updateservice.remove.RemoveActivitiesView
 
 class RemoveActivitiesViewSpec extends AmlsViewSpec {
 
-  lazy val formProvider = inject[RemoveBusinessActivitiesFormProvider]
-  lazy val remove_activities = inject[RemoveActivitiesView]
+  lazy val formProvider: RemoveBusinessActivitiesFormProvider = inject[RemoveBusinessActivitiesFormProvider]
+  lazy val remove_activities: RemoveActivitiesView = inject[RemoveActivitiesView]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
-  def createView = remove_activities(formProvider(2),
+  def createView: HtmlFormat.Appendable = remove_activities(formProvider(2),
     edit = true,
     Seq.empty
   )
@@ -57,7 +57,7 @@ class RemoveActivitiesViewSpec extends AmlsViewSpec {
 
     "show the correct content" in new ViewFixture {
 
-      override def view = remove_activities(
+      override def view: HtmlFormat.Appendable = remove_activities(
         formProvider(2),
         edit = true,
         Seq.empty
