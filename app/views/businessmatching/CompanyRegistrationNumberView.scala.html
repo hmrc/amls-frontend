@@ -15,13 +15,14 @@
  *@
 
 @import components.forms.{ErrorSummary, InputText}
-@import components.{Button, ReturnLink}
+@import components.{Button, ReturnLink, Heading}
 @import config.ApplicationConfig
 @import views.ViewUtils._
 
 @this(
     formHelper: FormWithCSRF,
     layout: Layout,
+    heading: Heading,
     input: InputText,
     errorSummary: ErrorSummary,
     button: Button,
@@ -46,14 +47,21 @@
 
     <span id="stage-caption" class="govuk-caption-xl">@messages(section)</span>
 
+    @heading("businessmatching.registrationnumber.title")
+
+    <p class="govuk-body">
+        @messages("businessmatching.registrationnumber.line_1")
+        <a href="@appConfig.companiesHouseUrl" target="_blank" class="govuk-link"> @messages("businessmatching.registrationnumber.line_2")</a>.
+    </p>
+
     @formHelper(action = controllers.businessmatching.routes.CompanyRegistrationNumberController.post(edit), 'autoComplete -> "off") {
 
         @input(
             input = Input(
                 label = Label(
-                    isPageHeading = true,
                     content = Text(messages("businessmatching.registrationnumber.title")),
-                    classes = "govuk-label--xl"
+                    classes = "govuk-visually-hidden",
+                    isPageHeading = false,
                 ),
                 hint = Some(
                     Hint(
