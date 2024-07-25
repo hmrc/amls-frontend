@@ -15,7 +15,6 @@
  *@
 
 @import config.ApplicationConfig
-@import views.html.components.Button
 @import views.html.confirmation.components.InformationNoticeView
 @import views.html.components.FeedbackSurveyLink
 
@@ -23,11 +22,25 @@
     layout: Layout,
     govukPanel: GovukPanel,
     informationNotice: InformationNoticeView,
-    button: Button,
     feedbackSurveyLink: FeedbackSurveyLink
 )
 
-@(businessName: String)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(businessName: String, refNo: String)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@panelContent = @{
+    HtmlFormat.fill(
+        scala.collection.immutable.Seq(
+            HtmlFormat.escape(businessName),
+            HtmlFormat.raw("<br>"),
+            HtmlFormat.raw("<br>"),
+            HtmlFormat.escape(messages("fee.reference.number.lbl")),
+            HtmlFormat.raw("<br>"),
+            HtmlFormat.raw("<strong>"),
+            HtmlFormat.escape(refNo),
+            HtmlFormat.raw("</strong>"),
+        )
+    )
+}
 
 @layout(
     pageTitle = messages("confirmation.payment.bacs.title") + " - " + messages("submit.registration"),
@@ -37,7 +50,7 @@
     @govukPanel(
         Panel(
             title = Text(messages("confirmation.payment.bacs.header")),
-            content = Text(businessName)
+            content = HtmlContent(panelContent)
         )
     )
 
@@ -47,9 +60,9 @@
 
     @informationNotice()
 
-    @button(
-        "confirmation.payment.continue_button.text", "payment-continue", Some(controllers.routes.LandingController.get.url)
-    )
+    <p class="govuk-body">
+        <a href="@controllers.routes.LandingController.get.url" id="goto-reg-link" class="govuk-link">@messages("link.navigate.registration.Goto")</a>
+    </p>
 
     @feedbackSurveyLink()
 

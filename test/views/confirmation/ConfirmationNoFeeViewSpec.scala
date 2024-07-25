@@ -76,12 +76,20 @@ class ConfirmationNoFeeViewSpec extends AmlsViewSpec with Matchers {
       listElements must include(messages("confirmation.payment.info.keep_up_to_date.item3"))
     }
 
-    "show the correct button" in new ViewFixture {
+    "display the print link" in new ViewFixture {
 
-      val button = doc.getElementById("confirm-continue")
+      val button = doc.getElementById("confirmation-print")
 
-      button.text() mustBe messages("confirmation.payment.status_button.text")
-      button.attr("href") mustBe controllers.routes.LandingController.get().url
+      button.text() mustBe messages("link.print")
+      button.attr("href") mustBe "javascript:window.print()"
+    }
+
+    "display the Return to Your Registration link" in new ViewFixture {
+
+      val button = doc.getElementById("return-your-registration")
+
+      button.text() mustBe messages("link.navigate.registration.Returnto")
+      button.attr("href") mustBe "/anti-money-laundering/start"
     }
 
     "display the correct feedback section" in new ViewFixture {
