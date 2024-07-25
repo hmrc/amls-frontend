@@ -57,13 +57,6 @@ class RemoveBusinessTypesController @Inject()(
           val formForView = model.activitiesToRemove.fold(form) { x =>
             form.fill(x.toSeq)
           }
-          println("XXXXXXXXXXXX")
-          println("XXXXXXXXXXXX")
-          println("XXXXXXXXXXXX")
-          println((BusinessActivities.all.toSeq diff valuesAsActivities).map(activity => activity.value.substring(1)).head)
-          println("XXXXXXXXXXXX")
-          println("XXXXXXXXXXXX")
-          println("XXXXXXXXXXXX")
           Ok(view(formForView, edit, valuesAsActivities))
         }) getOrElse InternalServerError("Get: Unable to show remove Activities page. Failed to retrieve data")
   }
