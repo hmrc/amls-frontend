@@ -18,7 +18,6 @@ package views.responsiblepeople
 
 import forms.responsiblepeople.PositionWithinBusinessFormProvider
 import models.businessmatching.BusinessType
-import models.responsiblepeople.{InternalAccountant, NominatedOfficer, PositionStartDate, Positions}
 import org.scalatest.matchers.must.Matchers
 import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
@@ -27,15 +26,13 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.PositionWithinBusinessView
 
-import java.time.LocalDate
-
 class PositionWithinBusinessViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val businessView: PositionWithinBusinessView = inject[PositionWithinBusinessView]
   lazy val fp: PositionWithinBusinessFormProvider = inject[PositionWithinBusinessFormProvider]
 
   val name = "firstName lastName"
-  val positions: Option[Positions] = Some(Positions(Set(NominatedOfficer, InternalAccountant), Some(PositionStartDate(LocalDate.now()))))
+  val positions: Seq[String] = Seq("01", "02", "03", "04")
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 

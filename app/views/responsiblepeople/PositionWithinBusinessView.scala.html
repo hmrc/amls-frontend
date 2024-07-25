@@ -42,7 +42,7 @@
     personName: String,
     displayNominatedOfficer: Boolean,
     flow: Option[String],
-    positionValue: Option[Positions]
+    positionValue: Seq[String]
 )(implicit messages: Messages, request: Request[_], appConfig: ApplicationConfig)
 
 @conditionalHtml = {
@@ -62,7 +62,7 @@
 
 @layout(pageTitle = messages("responsiblepeople.position_within_business.title") + " - " + messages("summary.responsiblepeople")) {
 
-    @errorSummary(form, Some(Map("positions" -> s"positions_${positionValue.map(_.positions.map(_.value.substring(1)).head).getOrElse("")}")))
+    @errorSummary(form, Some(Map("positions" -> s"positions_${positionValue.head.substring(1)}")))
 
     @subtitle("summary.responsiblepeople")
 
