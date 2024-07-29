@@ -108,6 +108,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         name.fullName,
         editAction(
           controllers.responsiblepeople.routes.PersonNameController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.responsiblePersonName",
           "rp-personname-edit"
         )
       )
@@ -123,6 +124,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           DateHelper.formatDate(date),
           editAction(
             controllers.responsiblepeople.routes.LegalNameChangeDateController.get(idx, true, flow).url,
+            "responsiblepeople.checkYourAnswers.change.whenNameChanged",
             "rp-legalnamechangedate-edit"
           )
         )
@@ -133,6 +135,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(boolean),
         editAction(
           controllers.responsiblepeople.routes.LegalNameController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.personChangedName",
           "rp-legalname-yes-no-edit"
         )
       )
@@ -145,6 +148,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             name.fullName,
             editAction(
               controllers.responsiblepeople.routes.LegalNameInputController.get(idx, true, flow).url,
+              "responsiblepeople.checkYourAnswers.change.personsPreviousName",
               "rp-legalname-edit"
             )
           ),
@@ -164,6 +168,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(boolean),
         editAction(
           controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.knownByOtherNames",
           "rp-knownby-edit"
         )
       )
@@ -176,6 +181,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             knownBy.otherName,
             editAction(
               controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).url,
+              "responsiblepeople.checkYourAnswers.change.otherNamesKnownBy",
               "rp-knownby-true-edit"
             )
           )
@@ -193,6 +199,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         DateHelper.formatDate(dob.dateOfBirth),
         editAction(
           controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.personsDoB",
           "date-of-birth"
         )
       )
@@ -207,6 +214,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(boolean),
         editAction(
           controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.personUKRes",
           "rp-ukresident-edit"
         )
       )
@@ -220,6 +228,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               nino.value,
               editAction(
                 controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true, flow).url,
+                "responsiblepeople.checkYourAnswers.change.personsNINo",
                 "rp-ukresident-true-edit"
               )
             )
@@ -237,6 +246,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(boolean),
         editAction(
           controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.hasUKPassport",
           "uk-passport"
         )
       )
@@ -250,6 +260,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               number,
               editAction(
                 controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true, flow).url,
+                "responsiblepeople.checkYourAnswers.change.personsPassportNo",
                 "uk-passport-true-edit"
               )
             )
@@ -267,6 +278,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(boolean),
         editAction(
           controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.passportFrAnotherCountry",
           "rp-nonukpassport-edit"
         )
       )
@@ -280,6 +292,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               number,
               editAction(
                 controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true, flow).url,
+                "responsiblepeople.checkYourAnswers.change.anotherCountryPassportNumber",
                 "rp-nonukpassport-true-edit"
               )
             )
@@ -301,6 +314,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         },
         editAction(
           controllers.responsiblepeople.routes.NationalityController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.personsNationality",
           "rp-nationality-edit"
         )
       )
@@ -312,6 +326,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             if (country.isUK) booleanToLabel(true) else booleanToLabel(false),
             editAction(
               controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true, flow).url,
+              "responsiblepeople.checkYourAnswers.change.bornInUK",
               "rp-countryofbirth-edit"
             )
           ),
@@ -320,6 +335,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             country.name,
             editAction(
               controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true, flow).url,
+              "responsiblepeople.checkYourAnswers.change.countryOfBirth",
               "rp-countryofbirth-answer-edit"
             )
           )
@@ -334,6 +350,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
                 residenceType.nationality.fold("")(_.name),
                 editAction(
                   controllers.responsiblepeople.routes.NationalityController.get(idx, true, flow).url,
+                  "responsiblepeople.checkYourAnswers.change.countryNationalTo",
                   "rp-nationality-other-edit"
                 )
               )
@@ -354,6 +371,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           """)),
         actions = editAction(
           controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.contactDetails",
           "rp-contactDetails-edit"
         )
       )
@@ -377,6 +395,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             } else {
               controllers.responsiblepeople.address.routes.CurrentAddressController.get(idx, true, flow).url
             },
+            "responsiblepeople.checkYourAnswers.change.homeAddressUK",
             "rpaddress-isUK-edit"
           )
         ),
@@ -392,6 +411,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               case (_: PersonAddressUK, false) =>
                 controllers.responsiblepeople.address.routes.CurrentAddressUKController.get(idx, true, flow).url
             },
+            "responsiblepeople.checkYourAnswers.change.homeAddress",
             "rpaddress-edit"
           )
         ),
@@ -400,6 +420,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           currentAddress.timeAtAddress.fold("")(x => messages(s"responsiblepeople.timeataddress.${x.toString}")),
           editAction(
             controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(idx, true, flow).url,
+            "responsiblepeople.checkYourAnswers.change.addressDuration",
             "rp-timeatataddress-edit"
           )
         )
@@ -419,6 +440,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           additionalAddress.personAddress.isUK(),
           editAction(
             controllers.responsiblepeople.address.routes.AdditionalAddressController.get(idx, true, flow).url,
+            "responsiblepeople.checkYourAnswers.change.previousAddressUK",
             "rp-previousaddress-isUK-edit"
           )
         ),
@@ -432,6 +454,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               case _: PersonAddressUK =>
                 controllers.responsiblepeople.address.routes.AdditionalAddressUKController.get(idx, true, flow).url
             },
+            "responsiblepeople.checkYourAnswers.change.previousAddress",
             "rp-previousaddress-edit"
           )
         ),
@@ -440,6 +463,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           additionalAddress.timeAtAddress.fold("")(x => messages(s"responsiblepeople.timeataddress.${x.toString}")),
           editAction(
             controllers.responsiblepeople.address.routes.TimeAtAdditionalAddressController.get(idx, true, flow).url,
+            "responsiblepeople.checkYourAnswers.change.previousAddressDuration",
             "rp-timeatatpreviousaddress-edit"
           )
         )
@@ -459,6 +483,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           extraAddress.personAddress.isUK(),
           editAction(
             controllers.responsiblepeople.address.routes.AdditionalExtraAddressController.get(idx, true, flow).url,
+            "responsiblepeople.checkYourAnswers.change.previousAddressUK",
             "rp-otherpreviousaddress-isUK-edit"
           )
         ),
@@ -472,6 +497,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               case _: PersonAddressUK =>
                 controllers.responsiblepeople.address.routes.AdditionalExtraAddressUKController.get(idx, true, flow).url
             },
+            "responsiblepeople.checkYourAnswers.change.previousAddress",
             "rp-otherpreviousaddress-edit"
           )
         ),
@@ -480,6 +506,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           extraAddress.timeAtAddress.fold("")(x => messages(s"responsiblepeople.timeataddress.${x.toString}")),
           editAction(
             controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController.get(idx, true, flow).url,
+            "responsiblepeople.checkYourAnswers.change.previousAddressDuration",
             "rp-timeatotherpreviousaddress-edit"
           )
         )
@@ -504,6 +531,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           },
           actions = editAction(
             controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true, flow).url,
+            "responsiblepeople.checkYourAnswers.change.role",
             "rp-positionwithinbusiness-edit"
           )
         ),
@@ -512,6 +540,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           pos.startDate.map(sd => DateHelper.formatDate(sd.startDate)).getOrElse(""),
           editAction(
             controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(idx, true, flow).url,
+            "responsiblepeople.checkYourAnswers.change.roleStarted",
             "rp-positionstartdate-edit"
           )
         )
@@ -531,6 +560,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(anotherBusiness.soleProprietorOfAnotherBusiness),
         editAction(
           controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.soleProprietorAnotherBus",
           "rp-soleproprietor-edit"
         )
       )
@@ -549,6 +579,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(isRegistered),
         editAction(
           controllers.responsiblepeople.routes.VATRegisteredController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.registeredVAT",
           "rp-registeredforvat-edit"
         )
       )
@@ -563,6 +594,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             regNumber,
             editAction(
               controllers.responsiblepeople.routes.VATRegisteredController.get(idx, true, flow).url,
+              "responsiblepeople.checkYourAnswers.change.VATRegistrationNo",
               "rp-registeredforvat-answer-edit"
             )
           )
@@ -583,6 +615,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(isRegistered),
         editAction(
           controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.selfAssessmentRegistered",
           "rp-registeredforsa-edit"
         )
       )
@@ -597,6 +630,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             regNumber,
             editAction(
               controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(idx, true, flow).url,
+              "responsiblepeople.checkYourAnswers.change.UTR",
               "rp-registeredforsa-answer-edit"
             )
           )
@@ -628,6 +662,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(hasTraining),
         editAction(
           controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.previousExperience",
           "rp-training-edit"
         )
       )
@@ -642,6 +677,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             info,
             editAction(
               controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true, flow).url,
+              "responsiblepeople.checkYourAnswers.change.previousExperienceDesc",
               "rp-training-answer-edit"
             )
           )
@@ -662,6 +698,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(hasTraining),
         editAction(
           controllers.responsiblepeople.routes.TrainingController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.AMLTraining",
           "rp-traininginmlre-edit"
         )
       )
@@ -676,6 +713,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             info,
             editAction(
               controllers.responsiblepeople.routes.TrainingController.get(idx, true, flow).url,
+              "responsiblepeople.checkYourAnswers.change.trainingDesc",
               "rp-traininginmlre-answer-edit"
             )
           )
@@ -696,6 +734,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(fp),
         editAction(
           controllers.responsiblepeople.routes.FitAndProperController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.fitProperPass",
           "fit-and-proper"
         )
       )
@@ -714,6 +753,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(fp),
         editAction(
           controllers.responsiblepeople.routes.ApprovalCheckController.get(idx, true, flow).url,
+          "responsiblepeople.checkYourAnswers.change.HMRCChargedApproval",
           "approval-check"
         )
       )
