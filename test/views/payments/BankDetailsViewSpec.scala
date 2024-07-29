@@ -60,12 +60,12 @@ class BankDetailsViewSpec extends AmlsViewSpec with PaymentGenerator {
 
         def view = bankDetailsView(false, 100, paymentReferenceNumber, secondaryHeading)
 
-        doc.getElementsContainingOwnText(messages("payments.bankdetails.bics.name")) must not be empty
-        doc.getElementsContainingOwnText(messages("payments.bankdetails.bics.value")) must not be empty
-        doc.getElementsContainingOwnText(messages("payments.bankdetails.iban.name")) must not be empty
-        doc.getElementsContainingOwnText(messages("payments.bankdetails.iban.value")) must not be empty
+        doc.getElementsByClass("govuk-summary-list__key").text() must include(messages("payments.bankdetails.bics.name"))
+        doc.getElementsByClass("govuk-summary-list__value").text() must include(messages("payments.bankdetails.bics.value"))
+        doc.getElementsByClass("govuk-summary-list__key").text() must include(messages("payments.bankdetails.iban.name"))
+        doc.getElementsByClass("govuk-summary-list__value").text() must include(messages("payments.bankdetails.iban.value"))
         doc.getElementById("bank-details-print").html() mustBe messages("link.print")
-        doc.getElementById("fee-to-pay").text() must include("£100.00")
+        doc.getElementsByClass("govuk-summary-list__value").text() must include("£100.00")
 
       }
     }
@@ -76,12 +76,12 @@ class BankDetailsViewSpec extends AmlsViewSpec with PaymentGenerator {
 
         def view = bankDetailsView(true, 100, paymentReferenceNumber, secondaryHeading)
 
-        doc.getElementsContainingOwnText(messages("payments.bankdetails.sortcode.name")) must not be empty
-        doc.getElementsContainingOwnText(messages("payments.bankdetails.sortcode.value")) must not be empty
-        doc.getElementsContainingOwnText(messages("payments.bankdetails.accountnumber.name")) must not be empty
-        doc.getElementsContainingOwnText(messages("payments.bankdetails.accountnumber.value")) must not be empty
+        doc.getElementsByClass("govuk-summary-list__key").text() must include(messages("payments.bankdetails.sortcode.name"))
+        doc.getElementsByClass("govuk-summary-list__value").text() must include(messages("payments.bankdetails.sortcode.value"))
+        doc.getElementsByClass("govuk-summary-list__key").text() must include(messages("payments.bankdetails.accountnumber.name"))
+        doc.getElementsByClass("govuk-summary-list__value").text() must include(messages("payments.bankdetails.accountnumber.value"))
         doc.getElementById("bank-details-print").html() mustBe messages("link.print")
-        doc.getElementById("fee-to-pay").text() must include("£100.00")
+        doc.getElementsByClass("govuk-summary-list__value").text() must include("£100.00")
       }
     }
 

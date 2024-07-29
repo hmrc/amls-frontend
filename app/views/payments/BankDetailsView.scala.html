@@ -23,7 +23,8 @@
     subtitle: SectionSubtitle,
     heading: Heading,
     printLink: PrintLink,
-    button: Button
+    button: Button,
+    govukSummaryList: GovukSummaryList
 )
 
 @(isUK: Boolean, fee: Currency, paymentReference: String, sectionHeading: String)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
@@ -35,70 +36,34 @@
     @heading("payments.bankdetails.header")
 
     <p class="govuk-body">@messages("payments.bankdetails.hint")</p>
-
     <div class="govuk-grid govuk-!-margin-top-6">
-        <div id="bank-code" class="govuk-grid-row">
-            <div class="govuk-grid-column-one-half">
-                @if(isUK){
-                    <p class="govuk-body govuk-!-margin-0">@messages("payments.bankdetails.sortcode.name")</p>
-                } else {
-                    <p class="govuk-body govuk-!-margin-0">@messages("payments.bankdetails.bics.name")</p>
-                }
-            </div>
-            <div class="govuk-grid-column-one-half">
-                @if(isUK){
-                    <p class="govuk-body govuk-!-margin-0">@messages("payments.bankdetails.sortcode.value")</p>
-                } else {
-                    <p class="govuk-body govuk-!-margin-0">@messages("payments.bankdetails.bics.value")</p>
-                }
-            </div>
-        </div>
-        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-        <div id="account-number" class="govuk-grid-row">
-            <div class="govuk-grid-column-one-half">
-                @if(isUK){
-                    <p class="govuk-body govuk-!-margin-0">@messages("payments.bankdetails.accountnumber.name")</p>
-                } else {
-                    <p class="govuk-body govuk-!-margin-0">@messages("payments.bankdetails.iban.name")</p>
-                }
-            </div>
-            <div class="govuk-grid-column-one-half">
-                @if(isUK){
-                    <p class="govuk-body govuk-!-margin-0">@messages("payments.bankdetails.accountnumber.value")</p>
-                } else {
-                    <p class="govuk-body govuk-!-margin-0">@messages("payments.bankdetails.iban.value")</p>
-                }
-            </div>
-        </div>
-        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-        <div id="account-name" class="govuk-grid-row">
-            <div class="govuk-grid-column-one-half">
-                <p class="govuk-body govuk-!-margin-0">@messages("payments.bankdetails.accountname.name")</p>
-            </div>
-            <div class="govuk-grid-column-one-half">
-                <p class="govuk-body govuk-!-margin-0">@messages("payments.bankdetails.accountname.value")</p>
-            </div>
-        </div>
-        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-        <div id="fee-to-pay" class="govuk-grid-row">
-            <div class="govuk-grid-column-one-half">
-                <p class="govuk-body govuk-!-margin-0">@messages("payments.bankdetails.fee.name")</p>
-            </div>
-            <div class="govuk-grid-column-one-half">
-                <p class="govuk-body govuk-!-margin-0">@fee</p>
-            </div>
-        </div>
-        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-        <div id="payment-reference" class="govuk-grid-row">
-            <div class="govuk-grid-column-one-half">
-                <p class="govuk-body govuk-!-margin-0">@messages("payments.bankdetails.reference.name")</p>
-            </div>
-            <div class="govuk-grid-column-one-half">
-                <p class="govuk-body govuk-!-margin-0">@paymentReference</p>
-            </div>
-        </div>
-    </div>
-    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+    @govukSummaryList(
+        SummaryList(
+            rows = Seq(
+                SummaryListRow(
+                    key = Key(content = Text(if (isUK) messages("payments.bankdetails.sortcode.name") else messages("payments.bankdetails.bics.name"))),
+                    value = Value(content = Text(if (isUK) messages("payments.bankdetails.sortcode.value") else messages("payments.bankdetails.bics.value")))
+                ),
+                SummaryListRow(
+                    key = Key(content = Text(if (isUK) messages("payments.bankdetails.accountnumber.name") else messages("payments.bankdetails.iban.name"))),
+                    value = Value(content = Text(if (isUK) messages("payments.bankdetails.accountnumber.value") else messages("payments.bankdetails.iban.value")))
+                ),
+                SummaryListRow(
+                    key = Key(content = Text(messages("payments.bankdetails.accountname.name"))),
+                    value = Value(content = Text(messages("payments.bankdetails.accountname.value")))
+                ),
+                SummaryListRow(
+                    key = Key(content = Text(messages("payments.bankdetails.fee.name"))),
+                    value = Value(content = Text(fee.toString))
+                ),
+                SummaryListRow(
+                    key = Key(content = Text(messages("payments.bankdetails.reference.name"))),
+                    value = Value(content = Text(paymentReference))
+                )
+            )
+        )
+     )
 
     @printLink(
         linkId="bank-details-print",
