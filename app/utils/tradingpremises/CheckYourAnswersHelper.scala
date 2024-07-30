@@ -90,7 +90,7 @@ class CheckYourAnswersHelper @Inject()() {
         editAction(
           controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).url,
           "tradingpremises.checkYourAnswers.change.agentCompDtls",
-          "tradingpremisesagentcompanyname-edit",
+          "tradingpremisesagentcompanyname-edit"
 
         )
       )

@@ -340,7 +340,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
                 editAction(
                   controllers.msb.routes.MoneySourcesController.get(true).url,
                   "msb.checkYourAnswers.change.banksSupplyForeignCurrency",
-                  "moneysources-banks-edit",
+                  "moneysources-banks-edit"
                 )
               )
             },

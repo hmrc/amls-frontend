@@ -95,7 +95,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         editAction(
           controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true).url,
           "businessactivities.checkYourAnswers.change.totalNProfit",
-          "expectedbusinessturnover-edit",
+          "expectedbusinessturnover-edit"
         )
       )
     }

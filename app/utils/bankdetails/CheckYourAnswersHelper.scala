@@ -43,7 +43,7 @@ class CheckYourAnswersHelper @Inject()() {
         editAction(
           controllers.bankdetails.routes.BankAccountNameController.getIndex(index, edit = true).url,
           "bankdetails.checkYourAnswers.change.infrmlNmBankAcc",
-          "accountname-edit",
+          "accountname-edit"
         )
       )
     }
@@ -57,7 +57,7 @@ class CheckYourAnswersHelper @Inject()() {
         editAction(
           controllers.bankdetails.routes.BankAccountTypeController.get(index, edit = true).url,
           "bankdetails.checkYourAnswers.change.bankAccountType",
-          "accounttype-edit",
+          "accounttype-edit"
         )
       )
     }
@@ -73,7 +73,7 @@ class CheckYourAnswersHelper @Inject()() {
           editAction(
             controllers.bankdetails.routes.BankAccountIsUKController.get(index, true).url,
             "bankdetails.checkYourAnswers.change.UKBankAcc",
-            "accountisuk-edit",
+            "accountisuk-edit"
           )
         )
       }
@@ -133,7 +133,7 @@ class CheckYourAnswersHelper @Inject()() {
           editAction(
             controllers.bankdetails.routes.BankAccountIbanController.get(index, true).url,
             "bankdetails.checkYourAnswers.change.IBAN",
-            "ibannumber-edit",
+            "ibannumber-edit"
           )
         )
       )
