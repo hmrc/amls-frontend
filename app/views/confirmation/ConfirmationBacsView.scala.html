@@ -27,20 +27,11 @@
 
 @(businessName: String, refNo: String)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
-@panelContent = @{
-    HtmlFormat.fill(
-        scala.collection.immutable.Seq(
-            HtmlFormat.escape(businessName),
-            HtmlFormat.raw("<br>"),
-            HtmlFormat.raw("<br>"),
-            HtmlFormat.escape(messages("fee.reference.number.lbl")),
-            HtmlFormat.raw("<br>"),
-            HtmlFormat.raw("<strong>"),
-            HtmlFormat.escape(refNo),
-            HtmlFormat.raw("</strong>"),
-        )
-    )
-}
+@panelContent = {
+                <p>@businessName</p>
+                @messages("fee.reference.number.lbl")
+                <strong>@refNo</strong>
+        }
 
 @layout(
     pageTitle = messages("confirmation.payment.bacs.title") + " - " + messages("submit.registration"),
