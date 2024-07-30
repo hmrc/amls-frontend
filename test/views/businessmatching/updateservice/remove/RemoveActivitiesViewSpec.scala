@@ -17,7 +17,7 @@
 package views.businessmatching.updateservice.remove
 
 import forms.businessmatching.RemoveBusinessActivitiesFormProvider
-import models.businessmatching.BusinessActivities
+import models.businessmatching.BusinessActivity.{AccountancyServices, MoneyServiceBusiness}
 import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
@@ -32,7 +32,7 @@ class RemoveActivitiesViewSpec extends AmlsViewSpec {
 
   def createView: HtmlFormat.Appendable = remove_activities(formProvider(2),
     edit = true,
-    Seq.empty
+    Seq(AccountancyServices, MoneyServiceBusiness)
   )
 
   trait ViewFixture extends Fixture {
@@ -60,21 +60,28 @@ class RemoveActivitiesViewSpec extends AmlsViewSpec {
       override def view: HtmlFormat.Appendable = remove_activities(
         formProvider(2),
         edit = true,
-        Seq.empty
+        Seq(AccountancyServices, MoneyServiceBusiness)
       )
-
-      BusinessActivities.all foreach { a =>
-        doc.body().text must include(messages(a.getMessage()))
-        doc.body().html() must include(a.toString)
-      }
 
       doc.body().text() must include (messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
       doc.getElementById("button").text() must include (messages("businessmatching.updateservice.removeactivities.button"))
     }
 
+    "show the correct checkbox values" in new ViewFixture {
+
+      override def view: HtmlFormat.Appendable = remove_activities(
+        formProvider(2),
+        edit = true,
+        Seq(AccountancyServices, MoneyServiceBusiness)
+      )
+
+      doc.select("#main-content > div > div > div > form > div.govuk-form-group > fieldset > div.govuk-checkboxes > div:nth-child(1) > label").text() mustBe "Accountancy service provider"
+      doc.select("#main-content > div > div > div > form > div.govuk-form-group > fieldset > div.govuk-checkboxes > div:nth-child(2) > label").text() mustBe "Money service business"
+      }
+
     behave like pageWithErrors(
       remove_activities(
-        formProvider(2).withError("value", "error.required.bm.remove.service.multiple"), false, Seq.empty
+        formProvider(2).withError("value", "error.required.bm.remove.service.multiple"), false, Seq(AccountancyServices, MoneyServiceBusiness)
       ),
       "value", "error.required.bm.remove.service.multiple"
     )
