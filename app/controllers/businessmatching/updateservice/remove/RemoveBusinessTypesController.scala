@@ -51,7 +51,7 @@ class RemoveBusinessTypesController @Inject()(
           model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key))
             .orElse(OptionT.some(RemoveBusinessTypeFlowModel()))
           (_, values) <- getFormData(request.credId)
-          valuesAsActivities = BusinessActivities.all.toSeq diff values.map(BusinessActivities.getBusinessActivity)
+          valuesAsActivities = values.map(BusinessActivities.getBusinessActivity)
           form = formProvider(valuesAsActivities.length)
         } yield {
           val formForView = model.activitiesToRemove.fold(form) { x =>
@@ -72,7 +72,7 @@ class RemoveBusinessTypesController @Inject()(
               BadRequest(view(
                 formWithErrors,
                 edit,
-                BusinessActivities.all.toSeq diff data._2.map(BusinessActivities.getBusinessActivity)
+                data._2.map(BusinessActivities.getBusinessActivity)
             ))),
             formValue => saveAndRedirect(formValue, edit)
           )

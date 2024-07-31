@@ -24,11 +24,12 @@ import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.renewal.Renewal
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.mvc.Result
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Request, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.businessmatching.RecoverActivitiesService
@@ -43,16 +44,16 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
   trait Fixture {
     self =>
-    val request = addToken(authRequest)
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
-    val mockCacheMap = mock[Cache]
+    val mockCacheMap: Cache = mock[Cache]
 
-    val emptyCache = Cache.empty
+    val emptyCache: Cache = Cache.empty
 
-    lazy val mockDataCacheConnector = mock[DataCacheConnector]
-    lazy val mockStatusService = mock[StatusService]
-    lazy val mockRenewalService = mock[RenewalService]
-    lazy val view = inject[InvolvedInOtherView]
+    lazy val mockDataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
+    lazy val mockStatusService: StatusService = mock[StatusService]
+    lazy val mockRenewalService: RenewalService = mock[RenewalService]
+    lazy val view: InvolvedInOtherView = inject[InvolvedInOtherView]
     val controller = new InvolvedInOtherController(
       dataCacheConnector = mockDataCacheConnector,
       recoverActivitiesService = mock[RecoverActivitiesService],
@@ -66,7 +67,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
   "InvolvedInOtherController" must {
       "add a/an to sorted business type list" in new Fixture {
-        val businessMatching = BusinessMatching(
+        val businessMatching: BusinessMatching = BusinessMatching(
           activities = Some(BMActivities(Set(
             TelephonePaymentService,
             HighValueDealing,
@@ -84,7 +85,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         when(mockCacheMap.getEntry[Renewal](Renewal.key)).thenReturn(None)
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(businessMatching))
 
-        val result = controller.get()(request)
+        val result: Future[Result] = controller.get()(request)
 
         val expectedSpecialCase: String = messages("businessmatching.registerservices.servicename.lbl.08")
 
@@ -108,7 +109,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(None)
         when(mockDataCacheConnector.fetchAll(any())).thenReturn(Future.successful(Some(mockCacheMap)))
 
-        val result = controller.get()(request)
+        val result: Future[Result] = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include(messages("renewal.involvedinother.title"))
       }
@@ -141,26 +142,26 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
       "when there is pre-existing Renewal Data" must {
         "redirect to InvolvedInOtherDetailsController with option yes" in new Fixture {
 
-          val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url)
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post().url)
             .withFormUrlEncodedBody("involvedInOther" -> "true")
 
           when(mockRenewalService.createOrUpdateRenewal(any(), any(), any())).thenReturn(Future.successful(emptyCache))
           when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(Some(Renewal())))
 
-          val result = controller.post()(newRequest)
+          val result: Future[Result] = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.InvolvedInOtherDetailsController.get().url))
         }
 
         "redirect to AMLSTurnoverController with valid data with option no" in new Fixture {
 
-          val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url)
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post().url)
             .withFormUrlEncodedBody("involvedInOther" -> "false")
 
           when(mockRenewalService.createOrUpdateRenewal(any(), any(), any())).thenReturn(Future.successful(emptyCache))
           when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(Some(Renewal())))
 
-          val result = controller.post()(newRequest)
+          val result: Future[Result] = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.AMLSTurnoverController.get().url))
         }
@@ -169,52 +170,52 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
       "when there is no Renewal data at all yet" must {
         "redirect to InvolvedInOtherDetailsController with option yes" in new Fixture {
 
-          val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url)
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post().url)
             .withFormUrlEncodedBody("involvedInOther" -> "true")
 
           when(mockRenewalService.createOrUpdateRenewal(any(), any(), any())).thenReturn(Future.successful(emptyCache))
           when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(Some(Renewal())))
 
-          val result = controller.post()(newRequest)
+          val result: Future[Result] = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.InvolvedInOtherDetailsController.get().url))
         }
 
         "redirect to AMLSTurnoverController with valid data with option no" in new Fixture {
 
-          val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url)
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post().url)
             .withFormUrlEncodedBody("involvedInOther" -> "false")
 
           when(mockRenewalService.createOrUpdateRenewal(any(), any(), any())).thenReturn(Future.successful(emptyCache))
           when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(Some(Renewal())))
 
-          val result = controller.post()(newRequest)
+          val result: Future[Result] = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.AMLSTurnoverController.get().url))
         }
 
         "redirect to SummaryController with valid data with option no in edit mode" in new Fixture {
 
-          val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url)
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post().url)
             .withFormUrlEncodedBody("involvedInOther" -> "false")
 
           when(mockRenewalService.createOrUpdateRenewal(any(), any(), any())).thenReturn(Future.successful(emptyCache))
           when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(Some(Renewal())))
 
-          val result = controller.post(true)(newRequest)
+          val result: Future[Result] = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get.url))
         }
 
         "redirect to InvolvedInOtherDetailsController with valid data in edit mode" in new Fixture {
 
-          val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url)
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post().url)
             .withFormUrlEncodedBody("involvedInOther" -> "true")
 
           when(mockRenewalService.createOrUpdateRenewal(any(), any(), any())).thenReturn(Future.successful(emptyCache))
           when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(Some(Renewal())))
 
-          val result = controller.post(true)(newRequest)
+          val result: Future[Result] = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.InvolvedInOtherDetailsController.get(true).url))
         }
@@ -224,34 +225,34 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
         "with invalid data with business activities" in new Fixture {
 
-          val businessMatching = BusinessMatching(activities = Some(BMActivities(Set(AccountancyServices))))
+          val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BMActivities(Set(AccountancyServices))))
 
           when(mockRenewalService.getBusinessMatching(any())).thenReturn(Future.successful(Some(businessMatching)))
 
-          val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
             "involvedInOther" -> "test"
           )
 
-          val result = controller.post()(newRequest)
+          val result: Future[Result] = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
           contentAsString(result) must include(messages("businessmatching.registerservices.servicename.lbl.01").toLowerCase)
 
-          val document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#involvedInOther]").html() must include(messages("error.required.renewal.ba.involved.in.other"))
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#involvedInOther-true]").html() must include(messages("error.required.renewal.ba.involved.in.other"))
         }
 
         "with invalid data without business activities" in new Fixture {
 
           when(mockRenewalService.getBusinessMatching(any())).thenReturn(Future.successful(None))
 
-          val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url)
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post().url)
             .withFormUrlEncodedBody("involvedInOther" -> "test")
 
-          val result = controller.post()(newRequest)
+          val result: Future[Result] = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
 
-          val document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#involvedInOther]").html() must include(messages("error.required.renewal.ba.involved.in.other"))
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("a[href=#involvedInOther-true]").html() must include(messages("error.required.renewal.ba.involved.in.other"))
         }
       }
     }

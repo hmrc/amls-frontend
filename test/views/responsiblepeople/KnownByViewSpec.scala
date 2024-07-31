@@ -21,14 +21,15 @@ import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
+import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.KnownByView
 
 class KnownByViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val known_by = inject[KnownByView]
-  lazy val fp = inject[KnownByFormProvider]
+  lazy val known_by: KnownByView = inject[KnownByView]
+  lazy val fp: KnownByFormProvider = inject[KnownByFormProvider]
 
   val name = "firstName lastName"
 
@@ -41,7 +42,7 @@ class KnownByViewSpec extends AmlsViewSpec with Matchers {
   "KnownByView view" must {
     "have correct title, headings and form fields" in new ViewFixture {
 
-      def view = known_by(fp(), true, 1, None, name)
+      def view: HtmlFormat.Appendable = known_by(fp(), edit = true, 1, None, name)
 
       doc.title must startWith(Messages("responsiblepeople.knownby.title"))
       heading.html must be(Messages("responsiblepeople.knownby.heading", name))
@@ -52,15 +53,15 @@ class KnownByViewSpec extends AmlsViewSpec with Matchers {
     }
 
     behave like pageWithErrors(
-      known_by(fp().withError("hasOtherNames", "error.required.rp.hasOtherNames"), false, 1, None, name),
+      known_by(fp().withError("hasOtherNames", "error.required.rp.hasOtherNames"), edit = false, 1, None, name),
       "hasOtherNames", "error.required.rp.hasOtherNames"
     )
 
     behave like pageWithErrors(
-      known_by(fp().withError("otherNames", "error.invalid.rp.char"), false, 1, None, name),
+      known_by(fp().withError("otherNames", "error.invalid.rp.char"), edit = false, 1, None, name),
       "otherNames", "error.invalid.rp.char"
     )
 
-    behave like pageWithBackLink(known_by(fp(), false, 1, None, name))
+    behave like pageWithBackLink(known_by(fp(), edit = false, 1, None, name))
   }
 }
