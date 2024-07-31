@@ -31,7 +31,7 @@ class ConfirmationBacsViewSpec extends AmlsViewSpec with Matchers {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
     implicit val config: ApplicationConfig = app.injector.instanceOf[ApplicationConfig]
 
-    override def view = confirmationBacsView("businessName")(requestWithToken, messages, config)
+    override def view = confirmationBacsView("businessName", "refNo")(requestWithToken, messages, config)
   }
 
   "The bacs confirmation view" must {
@@ -61,7 +61,7 @@ class ConfirmationBacsViewSpec extends AmlsViewSpec with Matchers {
       doc.html() must include(messages("confirmation.payment.info.keep_up_to_date.item2"))
       doc.html() must include(messages("confirmation.payment.info.keep_up_to_date.item3"))
       doc.getElementsByClass("print-link").first().text() mustBe messages("link.print")
-      doc.getElementById("payment-continue").text() mustBe messages("confirmation.payment.continue_button.text")
+      doc.getElementById("goto-reg-link").text() mustBe messages("link.navigate.registration.Goto")
     }
 
     "display the correct feedback section" in new ViewFixture {

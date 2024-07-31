@@ -42,7 +42,7 @@ class BacsConfirmationController @Inject()(authAction: AuthAction,
           refNo <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
           status <- OptionT.liftF(statusService.getReadStatus(refNo, request.accountTypeId))
           name <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
-        } yield Ok(view(name))
+        } yield Ok (view (name, refNo))
 
         okResult getOrElse InternalServerError("Unable to get BACS confirmation")
   }

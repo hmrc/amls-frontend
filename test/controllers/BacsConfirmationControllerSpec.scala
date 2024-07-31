@@ -62,9 +62,6 @@ class BacsConfirmationControllerSpec extends AmlsSpec
       cc = mockMcc,
       view = view)
 
-    when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
-      .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
     val amlsRegistrationNumber = "amlsRefNumber"
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
@@ -94,6 +91,9 @@ class BacsConfirmationControllerSpec extends AmlsSpec
     when {
       controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(), eqTo(SubmissionRequestStatus.key))(any())
     } thenReturn Future.successful(Some(SubmissionRequestStatus(true)))
+
+    when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
+      .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
     def feeResponse(responseType: ResponseType) = FeeResponse(
       responseType = responseType,
@@ -164,7 +164,6 @@ class BacsConfirmationControllerSpec extends AmlsSpec
         Jsoup.parse(contentAsString(result)).getElementsByTag("h1").first().text() must include(
           messages("confirmation.payment.bacs.header")
         )
-
       }
 
       "bacs confirmation is requested and is a transitional renewal" in new Fixture {
