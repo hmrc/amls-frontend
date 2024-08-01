@@ -18,7 +18,7 @@ package forms.bankdetails
 
 import forms.behaviours.StringFieldBehaviours
 import forms.mappings.Constraints
-import models.bankdetails.NonUKIBANNumber
+import models.bankdetails.{BankAccountHasIban, NonUKIBANNumber}
 import play.api.data.{Form, FormError}
 
 class BankAccountIBANNumberFormProviderSpec extends StringFieldBehaviours with Constraints {
@@ -33,6 +33,18 @@ class BankAccountIBANNumberFormProviderSpec extends StringFieldBehaviours with C
     behave like fieldThatBindsValidData(form, fieldName, alphaStringsShorterThan(fp.length).suchThat(_.nonEmpty))
 
     behave like mandatoryField(form, fieldName, FormError(fieldName, "error.required.bankdetails.iban"))
+
+    "bind successfully when the value contains whitespaces" in {
+
+      val ibanNumber = " 123456 A B C "
+      val ibanNumberTransformed = "123456ABC"
+
+      val result = form.bind(Map(
+        "IBANNumber" -> ibanNumber
+      ))
+
+      result.value shouldBe Some(NonUKIBANNumber(ibanNumberTransformed))
+    }
 
     "fail to bind" when {
 

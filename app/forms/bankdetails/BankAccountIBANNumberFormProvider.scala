@@ -26,7 +26,9 @@ class BankAccountIBANNumberFormProvider @Inject()() extends Mappings {
 
   val length = 34
   def apply(): Form[NonUKIBANNumber] = Form[NonUKIBANNumber](
-    "IBANNumber" -> text("error.required.bankdetails.iban").verifying(
+    "IBANNumber" -> text("error.required.bankdetails.iban")
+      .transform[String](_.replace(" ", "").trim, x => x)
+      .verifying(
       firstError(
         maxLength(length, "error.max.length.bankdetails.iban"),
         regexp(alphanumericRegex, "error.invalid.bankdetails.iban")
