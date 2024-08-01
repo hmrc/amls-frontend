@@ -18,7 +18,7 @@ package forms.bankdetails
 
 import forms.behaviours.StringFieldBehaviours
 import forms.mappings.Constraints
-import models.bankdetails.{BankAccountHasIban, NonUKIBANNumber}
+import models.bankdetails.NonUKIBANNumber
 import play.api.data.{Form, FormError}
 
 class BankAccountIBANNumberFormProviderSpec extends StringFieldBehaviours with Constraints {
