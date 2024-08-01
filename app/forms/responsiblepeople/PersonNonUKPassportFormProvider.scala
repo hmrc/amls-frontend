@@ -36,7 +36,9 @@ class PersonNonUKPassportFormProvider @Inject()() extends Mappings {
       booleanFieldName -> boolean(emptyError, emptyError),
       "nonUKPassportNumber" -> mandatoryIfTrue(
         booleanFieldName,
-        text(s"$emptyError.number").verifying(
+        text(s"$emptyError.number")
+          .transform[String](_.replace(" ", "").trim, x => x)
+          .verifying(
           firstError(
             maxLength(length, "error.invalid.non.uk.passport.number.length.40"),
             regexp(basicPunctuationRegex, "error.invalid.non.uk.passport.number")
