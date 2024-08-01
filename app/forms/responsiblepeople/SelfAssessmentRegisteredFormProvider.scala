@@ -35,7 +35,9 @@ class SelfAssessmentRegisteredFormProvider @Inject()() extends Mappings {
       booleanFieldName -> boolean(booleanError, booleanError),
       "utrNumber" -> mandatoryIfTrue(
         booleanFieldName,
-        text("error.required.utr.number").verifying(
+        text("error.required.utr.number")
+          .transform[String](_.replace(" ","").trim, x => x)
+          .verifying(
           regexp(utrRegex, "error.invalid.length.utr.number")
         )
       )
