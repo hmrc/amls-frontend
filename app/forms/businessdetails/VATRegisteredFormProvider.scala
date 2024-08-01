@@ -31,7 +31,7 @@ class VATRegisteredFormProvider @Inject()() extends Mappings {
   def apply(): Form[VATRegistered] = Form[VATRegistered](
     mapping(
       "registeredForVAT" -> boolean("error.required.atb.registered.for.vat", "error.required.atb.registered.for.vat"),
-      "vrnNumber" -> mandatoryIfTrue("registeredForVAT", text("error.required.vat.number")
+      "vrnNumber" -> mandatoryIfTrue("registeredForVAT", text("error.required.vat.number").transform[String](_.replace(" ","").trim, x => x)
         .verifying(
           firstError(
             correctLength(length, "error.invalid.vat.number.length"),

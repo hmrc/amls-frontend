@@ -56,7 +56,23 @@ class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours[VATRegistered
           boundForm.errors shouldBe Nil
         }
       }
+
+      "'Yes' is submitted with a VAT number which contains spaces" in {
+
+        val vatNum = " 1 2 34 5 6 78 9"
+        val vatStringTransformed = "123456789"
+
+
+          val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> vatNum))
+
+          boundForm.value shouldBe Some(VATRegisteredYes(vatStringTransformed))
+          boundForm.errors shouldBe Nil
+
+
+      }
     }
+
+
 
     "fail to bind and give the correct error" when {
 
@@ -82,6 +98,8 @@ class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours[VATRegistered
 
         boundForm.errors.headOption shouldBe Some(FormError(inputFieldName, "error.required.vat.number"))
       }
+
+
 
       "'Yes' is submitted with a VAT number" which {
         "is too long" in {
