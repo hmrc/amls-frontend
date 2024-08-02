@@ -34,6 +34,18 @@ class BankAccountIBANNumberFormProviderSpec extends StringFieldBehaviours with C
 
     behave like mandatoryField(form, fieldName, FormError(fieldName, "error.required.bankdetails.iban"))
 
+    "bind successfully when the value contains whitespaces" in {
+
+      val ibanNumber = " 123456 A B C "
+      val ibanNumberTransformed = "123456ABC"
+
+      val result = form.bind(Map(
+        "IBANNumber" -> ibanNumber
+      ))
+
+      result.value shouldBe Some(NonUKIBANNumber(ibanNumberTransformed))
+    }
+
     "fail to bind" when {
 
       "max length is exceeded" in {
