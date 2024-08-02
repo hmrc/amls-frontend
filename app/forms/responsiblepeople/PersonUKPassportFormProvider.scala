@@ -39,7 +39,6 @@ class PersonUKPassportFormProvider @Inject()() extends Mappings {
       "ukPassportNumber" -> mandatoryIfTrue(
         booleanFieldName,
         textAllowWhitespace(s"$booleanError.number")
-          .transform[String](_.replace(" ", "").trim, x => x)
           .verifying(
             firstError(
               maxLength(length, lengthError),
