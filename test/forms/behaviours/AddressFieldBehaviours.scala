@@ -145,6 +145,17 @@ trait AddressFieldBehaviours extends FieldBehaviours with Constraints {
         }
       }
 
+      "bind a valid postcode with spaces" in {
+        val validPostcodesWithSpaces = Seq("NW 1 8 YD", "NW 1 8 YD", " NW18 YD")
+
+        validPostcodesWithSpaces.foreach { postcode =>
+          val formDataValid: MutableMap[String, String] = addressLinesData += (postcodeField -> postcode)
+          val newFormValid = bindForm(formDataValid)
+
+          newFormValid(postcodeField).value shouldBe Some(postcode)
+        }
+      }
+
       "fail to bind" when {
 
         "postcode is empty" in {
