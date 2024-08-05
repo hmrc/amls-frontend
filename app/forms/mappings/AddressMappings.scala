@@ -45,7 +45,9 @@ trait AddressMappings extends Mappings {
   protected def postcodeOrCountryMapping(isUKAddress: Boolean): (String, Mapping[String]) = {
     if (isUKAddress) {
       "postCode" -> text("error.required.postcode")
+        .transform[String](normalizePostcode,identity)
         .verifying(regexp(postcodeRegex, "error.invalid.postcode"))
+
     } else {
       "country" -> text("error.required.country").verifying(countryConstraintExcludeUK())
     }

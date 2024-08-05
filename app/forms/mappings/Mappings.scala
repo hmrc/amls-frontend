@@ -53,4 +53,8 @@ trait Mappings extends Formatters with Constraints {
   protected def textAllowWhitespace(errorKey: String = "error.required"): Mapping[String]= {
     text(errorKey).transform[String](_.replace(" ", "").trim, x => x)
   }
+
+  protected def normalizePostcode(postcode: String): String = {
+    if (postcode.matches(postcodeRegex)) postcode else postcode.replaceAll("\\s+", "")
+  }
 }
