@@ -75,6 +75,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         messages(s"msb.throughput.lbl.${expectedThroughput.value}"),
         editAction(
           controllers.msb.routes.ExpectedThroughputController.get(true).url,
+          "msb.checkYourAnswers.change.totalTransValue",
           "msbthroughput-edit"
         )
       )
@@ -91,6 +92,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             booleanToLabel(true),
             editAction(
               controllers.msb.routes.BranchesOrAgentsController.get(true).url,
+              "msb.checkYourAnswers.change.branchesInOtherCountries",
               "msbbranchesoragents-edit"
             )
           ),
@@ -102,6 +104,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             },
             actions = editAction(
               controllers.msb.routes.BranchesOrAgentsWhichCountriesController.get(true).url,
+              "msb.checkYourAnswers.change.branchesOrAgentsCountries",
               "msbwhichcountries-edit"
             )
           )
@@ -113,6 +116,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             booleanToLabel(false),
             editAction(
               controllers.msb.routes.BranchesOrAgentsController.get(true).url,
+              "msb.checkYourAnswers.change.branchesOrAgentsCountries",
               "msbbranchesoragents-edit"
             )
           )
@@ -127,6 +131,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(ilt.linkedTxn),
         editAction(
           controllers.msb.routes.IdentifyLinkedTransactionsController.get(true).url,
+          "msb.checkYourAnswers.change.canIdentifyLinkedTransactions",
           "msblinkedtransactions-edit"
         )
       )
@@ -143,6 +148,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             booleanToLabel(false),
             editAction(
               controllers.msb.routes.BusinessUseAnIPSPController.get(true).url,
+              "msb.checkYourAnswers.change.ISPUsed",
               "msbipsp-edit"
             )
           )
@@ -154,6 +160,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             booleanToLabel(true),
             editAction(
               controllers.msb.routes.BusinessUseAnIPSPController.get(true).url,
+              "msb.checkYourAnswers.change.ISPUsed",
               "msbipsp-edit"
             )
           ),
@@ -162,6 +169,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             name,
             editAction(
               controllers.msb.routes.BusinessUseAnIPSPController.get(true).url,
+              "msb.checkYourAnswers.change.ISPSname",
               "msbipsp-name-edit"
             )
           ),
@@ -170,6 +178,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             reference,
             editAction(
               controllers.msb.routes.BusinessUseAnIPSPController.get(true).url,
+              "msb.checkYourAnswers.change.ISPSMLReregNo",
               "msbipsp-number-edit"
             )
           )
@@ -184,6 +193,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(ft.transferWithoutFormalSystems),
         editAction(
           controllers.msb.routes.FundsTransferController.get(true).url,
+          "msb.checkYourAnswers.change.transferWithoutFormalBanking",
           "msbfundstransfer-edit"
         )
       )
@@ -197,6 +207,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         transactions.txnAmount,
         editAction(
           controllers.msb.routes.TransactionsInNext12MonthsController.get(true).url,
+          "msb.checkYourAnswers.change.transfersExpected",
           "msbtransactionsexpected-edit"
         )
       )
@@ -213,6 +224,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             booleanToLabel(false),
             editAction(
               controllers.msb.routes.SendMoneyToOtherCountryController.get(true).url,
+              "msb.checkYourAnswers.change.sendToOtherCountry",
               "msbsendmoneytoothercountries-edit"
             )
           )
@@ -224,6 +236,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             booleanToLabel(true),
             editAction(
               controllers.msb.routes.SendMoneyToOtherCountryController.get(true).url,
+              "msb.checkYourAnswers.change.sendToOtherCountry",
               "msbsendmoneytoothercountries-edit"
             )
           )),
@@ -236,6 +249,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               },
               actions = editAction(
                 controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).url,
+                "msb.checkYourAnswers.change.countryLargestAmounts",
                 "msbsendlargestamounts-edit"
               )
             )
@@ -249,6 +263,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               },
               actions = editAction(
                 controllers.msb.routes.MostTransactionsController.get(true).url,
+                "msb.checkYourAnswers.change.countryMostTransactions",
                 "msbmosttransactions-edit"
               )
             )
@@ -264,6 +279,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         transactions.ceTransaction,
         editAction(
           controllers.msb.routes.CurrencyExchangesInNext12MonthsController.get(true).url,
+          "msb.checkYourAnswers.change.currencyExchangeTransactionsExpected",
           "msbcetransactionsexpected-edit"
         )
       )
@@ -283,6 +299,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             },
             actions = editAction(
               controllers.msb.routes.WhichCurrenciesController.get(true).url,
+              "msb.checkYourAnswers.change.currenciesExpectToSupply",
               "whichCurrencies-edit"
             )
           )),
@@ -292,6 +309,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               booleanToLabel(foreignCurrencies.value),
               editAction(
                 controllers.msb.routes.UsesForeignCurrenciesController.get(true).url,
+                "msb.checkYourAnswers.change.physicalForeignCurrencies",
                 "usesForeignCurrencies-edit"
               )
             )
@@ -309,6 +327,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
                   },
                   actions = editAction(
                     controllers.msb.routes.MoneySourcesController.get(true).url,
+                    "msb.checkYourAnswers.change.whoSupplyForeignCurrency",
                     "moneysources-edit"
                   )
                 ))
@@ -320,6 +339,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
                 bms.bankNames,
                 editAction(
                   controllers.msb.routes.MoneySourcesController.get(true).url,
+                  "msb.checkYourAnswers.change.banksSupplyForeignCurrency",
                   "moneysources-banks-edit"
                 )
               )
@@ -330,6 +350,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
                 wms.wholesalerNames,
                 editAction(
                   controllers.msb.routes.MoneySourcesController.get(true).url,
+                  "msb.checkYourAnswers.change.wholesalersSupplyForeignCurrency",
                   "moneysources-wholesalers-edit"
                 )
               )
@@ -346,6 +367,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         transactions.fxTransaction,
         editAction(
           controllers.msb.routes.FXTransactionsInNext12MonthsController.get(true).url,
+          "msb.checkYourAnswers.change.foreignExchangeTransactionsExpected",
           "msbfxtransactionsexpected-edit"
         )
       )

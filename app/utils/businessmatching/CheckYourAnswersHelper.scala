@@ -102,6 +102,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
                   items = Seq(ActionItem(
                     controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).url,
                     Text(messages("button.edit")),
+                    visuallyHiddenText = Some(messages("businessmatching.checkYourAnswers.change.CompanyReg")),
                     attributes = Map("id" -> "edit-registration-number")
                   ))
               ))
@@ -116,7 +117,8 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
                 Some(Actions(
                   items = Seq(ActionItem(
                     href = controllers.businessmatching.routes.TypeOfBusinessController.get(true).url,
-                    content = Text(messages("button.edit"))
+                    content = Text(messages("button.edit")),
+                    visuallyHiddenText = Some(messages("businessmatching.checkYourAnswers.change.CompanyReg"))
                   ))
                 ))
               } else {
@@ -152,6 +154,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
                     controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get().url
                   },
                   content = Text(messages("button.edit")),
+                  visuallyHiddenText = Some(messages("businessmatching.checkYourAnswers.change.ServicesRegstd")),
                   attributes = Map("id" -> "businessactivities-edit")
                 )
               )))
@@ -183,6 +186,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
                 ActionItem(
                   href = controllers.businessmatching.routes.MsbSubSectorsController.get(true).url,
                   content = Text(messages("button.edit")),
+                  visuallyHiddenText = Some(messages("businessmatching.checkYourAnswers.change.MSBActivities")),
                   attributes = Map("id" -> "msbservices-edit")
                 )
               )))
@@ -226,6 +230,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
                       ActionItem(
                         href = controllers.businessmatching.routes.PSRNumberController.get(true).url,
                         content = Text(messages("button.edit")),
+                        visuallyHiddenText = Some(messages("businessmatching.checkYourAnswers.change.PSRReg")),
                         attributes = Map("id" -> "edit-psr-number")
                       )
                     )

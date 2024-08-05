@@ -42,6 +42,7 @@ class CheckYourAnswersHelper @Inject()() {
         accName,
         editAction(
           controllers.bankdetails.routes.BankAccountNameController.getIndex(index, edit = true).url,
+          "bankdetails.checkYourAnswers.change.infrmlNmBankAcc",
           "accountname-edit"
         )
       )
@@ -55,6 +56,7 @@ class CheckYourAnswersHelper @Inject()() {
         messages(s"bankdetails.summary.accounttype.lbl.${bankAccountType.value}"),
         editAction(
           controllers.bankdetails.routes.BankAccountTypeController.get(index, edit = true).url,
+          "bankdetails.checkYourAnswers.change.bankAccountType",
           "accounttype-edit"
         )
       )
@@ -70,6 +72,7 @@ class CheckYourAnswersHelper @Inject()() {
           booleanToLabel(isUK.isUk),
           editAction(
             controllers.bankdetails.routes.BankAccountIsUKController.get(index, true).url,
+            "bankdetails.checkYourAnswers.change.UKBankAcc",
             "accountisuk-edit"
           )
         )
@@ -83,6 +86,7 @@ class CheckYourAnswersHelper @Inject()() {
           booleanToLabel(hasIBAN.hasIban),
           editAction(
             controllers.bankdetails.routes.BankAccountHasIbanController.get(index, true).url,
+            "bankdetails.checkYourAnswers.change.hasIBAN",
             "accounthasiban-edit"
           )
         )
@@ -97,6 +101,7 @@ class CheckYourAnswersHelper @Inject()() {
             account.displaySortCode,
             editAction(
               controllers.bankdetails.routes.BankAccountUKController.get(index, true).url,
+              "bankdetails.checkYourAnswers.change.bankSC",
               "sortcode-edit"
             )
           ),
@@ -105,6 +110,7 @@ class CheckYourAnswersHelper @Inject()() {
             accountNumber,
             editAction(
               controllers.bankdetails.routes.BankAccountUKController.get(index, true).url,
+              "bankdetails.checkYourAnswers.change.bankAccNo",
               "accountnumber-edit"
             )
           )
@@ -115,6 +121,7 @@ class CheckYourAnswersHelper @Inject()() {
           accountNumber,
           editAction(
             controllers.bankdetails.routes.BankAccountNonUKController.get(index, true).url,
+            "bankdetails.checkYourAnswers.change.bankAccNo",
             "nonukaccountnumber-edit"
           )
         )
@@ -125,6 +132,7 @@ class CheckYourAnswersHelper @Inject()() {
           ibanNumber,
           editAction(
             controllers.bankdetails.routes.BankAccountIbanController.get(index, true).url,
+            "bankdetails.checkYourAnswers.change.IBAN",
             "ibannumber-edit"
           )
         )
@@ -156,11 +164,12 @@ class CheckYourAnswersHelper @Inject()() {
     )
   }
 
-  private def editAction(route: String, id: String)(implicit messages: Messages): Option[Actions] = {
+  private def editAction(route: String, hiddenText: String, id: String)(implicit messages: Messages): Option[Actions] = {
     Some(Actions(
       items = Seq(ActionItem(
         route,
         Text(messages("button.edit")),
+        visuallyHiddenText = Some(messages(hiddenText)),
         attributes = Map("id" -> id)
       ))
     ))

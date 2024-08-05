@@ -56,6 +56,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
 
     val yesNoEditAction = editAction(
       controllers.businessactivities.routes.InvolvedInOtherController.get(true).url,
+      "businessactivities.checkYourAnswers.change.busInvolvedInDiffActs",
       "involvedinother-edit"
     )
 
@@ -77,7 +78,9 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           "businessactivities.confirm-activities.lbl.details",
           details,
           editAction(
-            controllers.businessactivities.routes.InvolvedInOtherController.get(true).url, "involvedinotherdetails-edit"
+            controllers.businessactivities.routes.InvolvedInOtherController.get(true).url,
+            "businessactivities.checkYourAnswers.change.descOthrActs",
+            "involvedinotherdetails-edit"
           )
         )
       )
@@ -91,6 +94,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         messages(s"businessactivities.turnover.lbl.${ebt.value}"),
         editAction(
           controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true).url,
+          "businessactivities.checkYourAnswers.change.totalNProfit",
           "expectedbusinessturnover-edit"
         )
       )
@@ -105,6 +109,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         messages(s"businessactivities.business-turnover.lbl.${et.value}"),
         editAction(
           controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).url,
+          "businessactivities.checkYourAnswers.change.totalNProfitFromRegServs",
           "expectedamlsturnover-edit"
         )
       )
@@ -119,6 +124,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(bool),
         editAction(
           controllers.businessactivities.routes.BusinessFranchiseController.get(true).url,
+          "businessactivities.checkYourAnswers.change.businessFranchise",
           "businessfranchise-edit"
         )
       )
@@ -133,6 +139,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           name,
           editAction(
             controllers.businessactivities.routes.BusinessFranchiseController.get(true).url,
+            "businessactivities.checkYourAnswers.change.franchisorName",
             "businessfranchisename-edit"
           )
         )
@@ -150,6 +157,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             amlsCount,
             editAction(
               controllers.businessactivities.routes.EmployeeCountAMLSSupervisionController.get(true).url,
+              "businessactivities.checkYourAnswers.change.pplAmtOnActs",
               "employeescountline2-edit"
             )
           ),
@@ -158,6 +166,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             employeeCount,
             editAction(
               controllers.businessactivities.routes.HowManyEmployeesController.get(true).url,
+              "businessactivities.checkYourAnswers.change.pplInBus",
               "employeescountline1-edit"
             )
           )
@@ -175,6 +184,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(record),
         editAction(
           controllers.businessactivities.routes.TransactionRecordController.get(true).url,
+          "businessactivities.checkYourAnswers.change.recordsKeptOfTrans",
           "keeprecords-edit"
         )
       )
@@ -190,6 +200,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           name,
           actions = editAction(
             controllers.businessactivities.routes.TransactionTypesController.get(true).url,
+            "businessactivities.checkYourAnswers.change.softwarePckgToRcrdTrans",
             "software-edit"
           )
         )
@@ -206,6 +217,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             value,
             actions = editAction(
               controllers.businessactivities.routes.TransactionTypesController.get(true).url,
+              "businessactivities.checkYourAnswers.change.howRecordsKept",
               "keeprecordtypes-edit"
             )
           )
@@ -223,6 +235,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(suspiciousActivity.hasWrittenGuidance),
         editAction(
           controllers.businessactivities.routes.IdentifySuspiciousActivityController.get(true).url,
+          "businessactivities.checkYourAnswers.change.writtenGuidance",
           "suspiciousactivity-edit"
         )
       )
@@ -237,6 +250,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(answer.ncaRegistered),
         editAction(
           controllers.businessactivities.routes.NCARegisteredController.get(true).url,
+          "businessactivities.checkYourAnswers.change.NCAregistered",
           "ncaregistered-edit"
         )
       )
@@ -253,6 +267,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             booleanToLabel(false),
             editAction(
               controllers.businessactivities.routes.RiskAssessmentController.get(true).url,
+              "businessactivities.checkYourAnswers.change.NCAregistered",
               "riskassessment-edit"
             )
           )
@@ -265,6 +280,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               booleanToLabel(true),
               editAction(
                 controllers.businessactivities.routes.RiskAssessmentController.get(true).url,
+                "businessactivities.checkYourAnswers.change.documentedRAP",
                 "riskassessment-edit"
               )
             )
@@ -277,6 +293,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               value,
               actions = editAction(
                 controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).url,
+                "businessactivities.checkYourAnswers.change.howRAPDocumntd",
                 "documentriskassessment-edit"
               )
             )
@@ -293,6 +310,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(hasAccountant),
         editAction(
           controllers.businessactivities.routes.AccountantForAMLSRegulationsController.get(true).url,
+          "businessactivities.checkYourAnswers.change.receivedAdviceMLR",
           "accountantforamlsregulations-edit"
         )
       )
@@ -304,6 +322,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         nameValues(name),
         actions = editAction(
           controllers.businessactivities.routes.WhoIsYourAccountantNameController.get(true).url,
+          "businessactivities.checkYourAnswers.change.advisersName",
           "whoisyouraccountant-edit"
         )
       )
@@ -315,6 +334,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         Value(Text(booleanToLabel(uk.isUk))),
         actions = editAction(
           controllers.businessactivities.routes.WhoIsYourAccountantIsUkController.get(true).url,
+          "businessactivities.checkYourAnswers.change.adviserAddressInUK",
           "accountantisuk-edit"
         )
       )
@@ -330,6 +350,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           } else {
             controllers.businessactivities.routes.WhoIsYourAccountantNonUkAddressController.get(true).url
           },
+          "businessactivities.checkYourAnswers.change.advisersAddress",
           "accountantaddress-edit"
         )
       )
@@ -341,6 +362,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         Value(Text(booleanToLabel(matters.manageYourTaxAffairs))),
         actions = editAction(
           controllers.businessactivities.routes.TaxMattersController.get(true).url,
+          "businessactivities.checkYourAnswers.change.adviserManagesTax",
           "taxmatters-edit"
         )
       )

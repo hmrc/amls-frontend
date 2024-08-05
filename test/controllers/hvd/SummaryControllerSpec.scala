@@ -16,6 +16,7 @@
 
 package controllers.hvd
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.BusinessActivity.HighValueDealing
 import models.businessmatching.updateservice.ServiceChangeRegister
@@ -126,7 +127,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         answerRows.size mustBe 9
 
         for ( el <- answerRows ) {
-          el.getElementsByTag("a").first().text() mustBe messages("button.edit")
+          el.getElementsByTag("a").first().text() must include(messages("button.edit"))
         }
       }
     }
