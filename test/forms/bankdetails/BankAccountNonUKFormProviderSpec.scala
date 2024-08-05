@@ -57,6 +57,15 @@ class BankAccountNonUKFormProviderSpec extends StringFieldBehaviours with Constr
           result.errors shouldBe Seq(FormError(fieldName, "error.invalid.bankdetails.account", Seq(alphanumericRegex)))
         }
       }
+      "accept valid alphanumeric input with spaces" in {
+        val validInputWithSpaces = "123 456 78"
+        val trimmedInput = "12345678"
+
+        val result = form.bind(Map(fieldName -> validInputWithSpaces))
+
+        result.value shouldBe Some(NonUKAccountNumber(trimmedInput))
+        result.errors shouldBe Seq.empty
+      }
     }
   }
 }

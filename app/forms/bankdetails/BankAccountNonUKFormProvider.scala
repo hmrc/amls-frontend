@@ -26,7 +26,7 @@ class BankAccountNonUKFormProvider @Inject()() extends Mappings {
 
   val length = 40
   def apply(): Form[NonUKAccountNumber] = Form[NonUKAccountNumber](
-    "nonUKAccountNumber" -> text("error.bankdetails.accountnumber").verifying(
+    "nonUKAccountNumber" -> textAllowWhitespace("error.bankdetails.accountnumber").verifying(
       firstError(
         maxLength(length, "error.invalid.bankdetails.account.length"),
         regexp(alphanumericRegex, "error.invalid.bankdetails.account")
