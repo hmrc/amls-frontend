@@ -54,7 +54,4 @@ trait Mappings extends Formatters with Constraints {
     text(errorKey).transform[String](_.replace(" ", "").trim, x => x)
   }
 
-  protected def normalizePostcode(postcode: String): String = {
-    if (postcode.matches(postcodeRegex)) postcode else postcode.replaceAll("\\s+", "")
-  }
 }

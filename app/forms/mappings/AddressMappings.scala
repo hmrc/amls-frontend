@@ -32,6 +32,9 @@ trait AddressMappings extends Mappings {
 
   private def regexError(line: String) = s"error.text.validation.address.$line"
 
+  private def normalizePostcode(postcode: String): String = if (postcode.matches(postcodeRegex)) postcode else postcode.replaceAll("\\s+", "")
+
+
   protected def addressLineMapping(line: String): Mapping[String] = {
     text(requiredError(line))
       .verifying(
@@ -41,6 +44,8 @@ trait AddressMappings extends Mappings {
         )
       )
   }
+
+
 
   protected def postcodeOrCountryMapping(isUKAddress: Boolean): (String, Mapping[String]) = {
     if (isUKAddress) {
