@@ -103,6 +103,20 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours[BusinessAppliedFo
           }
         }
 
+        "has white spaces" in {
+
+          val passString = " 1 2 34 5 6 "
+          val passStringTransformed = "123456"
+
+          val result = form.bind(Map(
+            fieldName -> "true",
+            inputFieldName -> passString
+          ))
+
+          result.value shouldBe Some(BusinessAppliedForPSRNumberYes(passStringTransformed))
+          result.errors shouldBe empty
+        }
+
         "is invalid" in {
 
           forAll(numSequence(formProvider.length).suchThat(_.length == formProvider.length), Gen.alphaChar) { (psrNum, char) =>
