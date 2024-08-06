@@ -95,9 +95,9 @@ private[mappings] class LocalDateFormatter(oneInvalidKey: String,
     val monthKey: String = s"$key.month"
     val yearKey: String = s"$key.year"
 
-    val dayValue: Option[String] = data.get(dayKey).filter(_.nonEmpty)
-    val monthValue: Option[String] = data.get(monthKey).filter(_.nonEmpty)
-    val yearValue: Option[String] = data.get(yearKey).filter(_.nonEmpty)
+    val dayValue: Option[String] = data.get(dayKey).map(textWhitespaceRemove).filter(_.nonEmpty)
+    val monthValue: Option[String] = data.get(monthKey).map(textWhitespaceRemove).filter(_.nonEmpty)
+    val yearValue: Option[String] = data.get(yearKey).map(textWhitespaceRemove).filter(_.nonEmpty)
 
     val errors = validateDayMonthYear(key, dayValue, monthValue, yearValue)
 
@@ -106,6 +106,8 @@ private[mappings] class LocalDateFormatter(oneInvalidKey: String,
       case _ => Left(errors)
     }
   }
+
+  private def textWhitespaceRemove(s: String): String = s.replaceAll(" ", "").trim
 
   override def unbind(key: String, value: LocalDate): Map[String, String] =
     Map(

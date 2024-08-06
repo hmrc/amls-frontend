@@ -55,6 +55,26 @@ class ActivityStartDateFormProviderSpec extends DateBehaviours {
       }
     }
 
+    "remove whitespace and bind valid data" in {
+
+      val dataDay = " 3 "
+      val dataMonth = "1 0 "
+      val dataYear = "20 20"
+
+
+
+      val data = Map(
+        s"$formField.day" -> dataDay,
+        s"$formField.month" -> dataMonth,
+        s"$formField.year" -> dataYear
+      )
+
+      val result = form.bind(data)
+
+      result.value.value shouldEqual ActivityStartDate(LocalDate.of(2020, 10, 3))
+
+    }
+
     "fail to bind" when {
 
       val fields = List("day", "month", "year")
