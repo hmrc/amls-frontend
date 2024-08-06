@@ -14,21 +14,22 @@
  * limitations under the License.
  *@
 
-@import components.{Heading, TaskRowComponent, Button, ServicesSidebar}
+@import components.{Heading, Button, ServicesSidebar}
 @import config.ApplicationConfig
 @import views.html.helper.CSRF
-@import models.registrationprogress.TaskList
+@import models.registrationprogress.{TaskList => AmlsTaskList}
+@import views.ViewUtils
 
 @this(
     layout: Layout,
     heading: Heading,
     servicesSidebar: ServicesSidebar,
-    taskRow: TaskRowComponent,
+    govukTaskList: GovukTaskList,
     button: Button
 )
 
 @(
-    taskList: TaskList,
+    amlsTaskList: AmlsTaskList,
     declarationAvailable: Boolean,
     businessName: String,
     serviceNames: Seq[String],
@@ -58,9 +59,7 @@
         <div class="govuk-grid-column-full">
             <h2 class="govuk-heading-m">@messages("progress.sections.subheading")</h2>
             @* Main sections *@
-            <ul class="app-task-list__items govuk-!-padding-left-0">
-                @(taskList.rows.map(taskRow(_)))
-            </ul>
+            @(govukTaskList(TaskList(amlsTaskList.rows.map(ViewUtils.asTaskListItem))))
         </div>
     </div>
 
