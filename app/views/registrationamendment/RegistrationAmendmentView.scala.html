@@ -14,22 +14,22 @@
  * limitations under the License.
  *@
 
-@import components.{Heading, TaskRowComponent, Button, ServicesSidebar, TaskRowWithUpdateComponent}
+@import components.{Heading, Button, ServicesSidebar}
 @import config.ApplicationConfig
-@import models.registrationprogress.{TaskList, TaskRow, Started}
+@import models.registrationprogress.{TaskRow, Started, TaskList => AmlsTaskList}
+@import views.ViewUtils
 
 @this(
     layout: Layout,
     heading: Heading,
     servicesSidebar: ServicesSidebar,
     formHelper: FormWithCSRF,
-    taskRow: TaskRowComponent,
-    taskRowWithUpdate: TaskRowWithUpdateComponent,
+    govukTaskList: GovukTaskList,
     button: Button
 )
 
 @(
-    taskList: TaskList,
+    amlsTaskList: AmlsTaskList,
     declarationAvailable: Boolean,
     businessName: String,
     serviceNames: Seq[String],
@@ -40,7 +40,7 @@
 )(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @allRows = @{
-    taskList.rows.union(newSections.getOrElse(Seq()))
+    amlsTaskList.rows.union(newSections.getOrElse(Seq()))
 }
 
 @layout(
@@ -67,15 +67,11 @@
         <h2 class="govuk-heading-m">@messages("amendment.sections.subheading")</h2>
     </div>
 
-    <div class="grid-layout">
-        <ul class="app-task-list__items govuk-!-padding-left-0">
-            @{
-                allRows.map { row =>
-                    if(taskList.rows.contains(row)) taskRowWithUpdate(row) else taskRow(row)
-                }
-            }
-        </ul>
-    </div>
+    @govukTaskList(TaskList(
+        allRows.map { row =>
+            if(amlsTaskList.rows.contains(row)) ViewUtils.asTaskListItemUpdate(row) else ViewUtils.asTaskListItem(row)
+        }
+    ))
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
@@ -88,7 +84,7 @@
                 }
             } else {
                 <h2 class="govuk-heading-m override-heading-medium">@messages("progress.view.status")</h2>
-                <p class="govuk-body">@if(taskList.rows.exists(row => row.status == Started)) {
+                <p class="govuk-body">@if(amlsTaskList.rows.exists(row => row.status == Started)) {
                     @messages("progress.updates.incomplete")
                 } else {
                     @messages("progress.updates.not.made")

@@ -580,7 +580,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           val html = Jsoup.parse(contentAsString(result))
 
-          html.getElementById("high-value-dealer-status").text() must include(messages("progress.hvd.name"))
+          html.getElementsByClass("govuk-task-list__item").get(1).text() must include(messages("progress.hvd.name"))
         }
       }
     }

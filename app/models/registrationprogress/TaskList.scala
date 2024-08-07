@@ -42,6 +42,6 @@ object TaskRow {
 
   def notStartedTag(implicit messages: Messages): Tag = Tag(
     Text(messages("status.notstarted")),
-    "govuk-tag govuk-tag--grey registration-status-tag"
+    "govuk-tag govuk-tag--light-blue registration-status-tag"
   )
 }

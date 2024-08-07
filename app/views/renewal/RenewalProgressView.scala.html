@@ -14,21 +14,22 @@
  * limitations under the License.
  *@
 
-@import models.status.Renewal
 @import config.ApplicationConfig
-@import views.html.components.{Heading, TaskRowWithUpdateComponent, ServicesSidebar}
+@import models.registrationprogress.{TaskList => AmlsTaskList}
+@import models.status.Renewal
+@import views.html.components.{Heading, ServicesSidebar}
 @import views.html.renewal.components.ApplicationSubmitView
-@import models.registrationprogress.TaskList
+@import views.ViewUtils
 
 @this(
     layout: Layout,
     heading: Heading,
     servicesSidebar: ServicesSidebar,
-    taskRow: TaskRowWithUpdateComponent,
+    govukTaskList: GovukTaskList,
     applicationSubmit: ApplicationSubmitView
 )
 @(
-    taskList: TaskList,
+    amlsTaskList: AmlsTaskList,
     businessName: String,
     serviceNames: Seq[String],
     canSubmit: Boolean,
@@ -37,7 +38,7 @@
     renewalSectionCompleted: Boolean = false,
     hasCompleteNominatedOfficer: Boolean = false,
     nominatedOfficerName: Option[String] = None
-)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
+)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
 @layout(
     pageTitle = messages("renewal.progress.title"),
@@ -75,9 +76,7 @@
         <div class="govuk-grid-column-full">
             <h2 class="govuk-heading-m">@messages("renewal.progress.section")</h2>
             @* Main sections *@
-            <ul class="app-task-list__items govuk-!-padding-left-0">
-                @(taskList.rows.map(taskRow(_)))
-            </ul>
+            @(govukTaskList(TaskList(amlsTaskList.rows.map(ViewUtils.asTaskListItemUpdate))))
         </div>
     </div>
 
