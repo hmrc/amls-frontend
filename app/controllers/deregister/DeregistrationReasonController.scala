@@ -16,28 +16,23 @@
 
 package controllers.deregister
 
-import cats.data.OptionT
-import cats.implicits._
-import connectors.{AmlsConnector, DataCacheConnector}
+import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.deregister.DeregistrationReasonFormProvider
 import models.businessmatching.BusinessActivity.HighValueDealing
 import models.businessmatching.BusinessMatching
-import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
+import models.deregister.DeregistrationReason
+import play.api.data.Form
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.AuthEnrolmentsService
-import utils.{AckRefGenerator, AuthAction}
+import utils.AuthAction
 import views.html.deregister.DeregistrationReasonView
 
-import java.time.LocalDate
 import javax.inject.Inject
 
 class DeregistrationReasonController @Inject()(authAction: AuthAction,
-                                               val ds: CommonPlayDependencies,
-                                               val dataCacheConnector: DataCacheConnector,
-                                               amls: AmlsConnector,
-                                               enrolments: AuthEnrolmentsService,
-                                               val cc: MessagesControllerComponents,
+                                               ds: CommonPlayDependencies,
+                                               dataCacheConnector: DataCacheConnector,
+                                               cc: MessagesControllerComponents,
                                                formProvider: DeregistrationReasonFormProvider,
                                                view: DeregistrationReasonView) extends AmlsBaseController(ds, cc) {
 
@@ -45,42 +40,31 @@ class DeregistrationReasonController @Inject()(authAction: AuthAction,
     implicit request =>
       dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
         (for {
-          bm <- businessMatching
+          bm: BusinessMatching <- businessMatching
           activities <- bm.activities
         } yield {
           Ok(view(formProvider(), activities.businessActivities.contains(HighValueDealing)))
-        }) getOrElse Ok(view(formProvider()))
+        }) getOrElse Ok(view(formProvider(), false))
       }
   }
 
   def post: Action[AnyContent] = authAction.async {
     implicit request =>
       formProvider().bindFromRequest().fold(
-        formWithErrors =>
+        (formWithErrors: Form[DeregistrationReason]) =>
           dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
             (for {
               bm <- businessMatching
               activities <- bm.activities
             } yield {
               BadRequest(view(formWithErrors, activities.businessActivities.contains(HighValueDealing)))
-            }) getOrElse BadRequest(view(formWithErrors))
+            }) getOrElse BadRequest(view(formWithErrors, hvdRequired = false))
           },
-        data => {
-          val deregistrationReasonOthers = data match {
-            case DeregistrationReason.Other(reason) => reason.some
-            case _ => None
-          }
-          val deregistration = DeRegisterSubscriptionRequest(
-            AckRefGenerator(),
-            LocalDate.now(),
-            data,
-            deregistrationReasonOthers
-          )
-          (for {
-            regNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-            _ <- OptionT.liftF(amls.deregister(regNumber, deregistration, request.accountTypeId))
-          } yield Redirect(controllers.routes.LandingController.get())) getOrElse InternalServerError("Unable to deregister the application")
+        (deregistrationReason: DeregistrationReason) => {
+          dataCacheConnector
+            .save[DeregistrationReason](request.credId, DeregistrationReason.key, deregistrationReason)
+            .map(_ => Redirect(controllers.deregister.routes.DeregistrationCheckYourAnswersController.get))
         }
-    )
+      )
   }
 }
