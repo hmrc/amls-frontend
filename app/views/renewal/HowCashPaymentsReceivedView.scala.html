@@ -55,14 +55,19 @@
 
     @subtitle("summary.renewal")
 
-    @heading("renewal.cash.payments.received.title")
-
     <p class="govuk-body">@messages("renewal.cash.payments.received.text")</p>
 
     @formHelper(action = controllers.renewal.routes.HowCashPaymentsReceivedController.post(edit)) {
 
         @inputCheckbox(
             Checkboxes(
+                    fieldset = Some(Fieldset(
+                        legend = Some(Legend(
+                        content = Text(messages("renewal.cash.payments.received.title")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
                 name = "paymentMethods",
                 hint = Some(Hint(content = Text(messages("lbl.select.all")))),
                 items = PaymentMethods.formValues(conditionalHtml)

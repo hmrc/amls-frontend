@@ -45,6 +45,13 @@
 
         @inputCheckbox(
             Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("renewal.msb.money_sources.header")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
                 name = "serviceProviders",
                 hint = Some(Hint(content = Text(messages("lbl.select.all")))),
                 items = TcspTypes.formValues
