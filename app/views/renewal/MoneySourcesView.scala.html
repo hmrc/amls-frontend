@@ -71,12 +71,17 @@
 
     @subtitle("summary.renewal")
 
-    @heading("renewal.msb.money_sources.header")
-
     @formHelper(action = controllers.renewal.routes.MoneySourcesController.post(edit)) {
 
         @inputCheckbox(
             Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("renewal.msb.money_sources.header")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
                 name = "moneySources",
                 hint = Some(Hint(content = Text(messages("lbl.select.all")))),
                 items = Seq(

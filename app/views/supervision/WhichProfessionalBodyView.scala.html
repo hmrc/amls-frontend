@@ -55,12 +55,17 @@
 
     @subtitle("summary.supervision")
 
-    @heading("supervision.whichprofessionalbody.title")
-
     @formHelper(action = controllers.supervision.routes.WhichProfessionalBodyController.post(edit)) {
 
         @inputCheckbox(
             Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("supervision.whichprofessionalbody.title")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
                 name = "businessType",
                 hint = Some(Hint(content = Text(messages("lbl.select.all")))),
                 items = ProfessionalBodies.formValues(conditionalHtml)
