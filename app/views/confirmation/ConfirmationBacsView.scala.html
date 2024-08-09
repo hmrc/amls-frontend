@@ -25,7 +25,7 @@
     feedbackSurveyLink: FeedbackSurveyLink
 )
 
-@(businessName: String, refNo: String)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(businessName: String, refNo: String, isRenewal : Boolean = false)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
 @panelContent = {
                 <p>@businessName</p>
@@ -40,7 +40,7 @@
 
     @govukPanel(
         Panel(
-            title = Text(messages("confirmation.payment.bacs.header")),
+            title = Text(messages(if(isRenewal) "confirmation.payment.bacs.header.renewal" else "confirmation.payment.bacs.header")),
             content = HtmlContent(panelContent)
         )
     )
@@ -52,7 +52,7 @@
     @informationNotice()
 
     <p class="govuk-body">
-        <a href="@controllers.routes.LandingController.get.url" id="goto-reg-link" class="govuk-link">@messages("link.navigate.registration.Goto")</a>
+        <a href="@controllers.routes.LandingController.get.url" id="goto-reg-link" class="govuk-link">@messages(if(isRenewal) "link.navigate.registration.Returnto" else "link.navigate.registration.Goto")</a>
     </p>
 
     @feedbackSurveyLink()

@@ -1218,6 +1218,7 @@ confirmation.payment.amendvariation.info.keep_up_to_date = If any of your inform
 
 confirmation.payment.bacs.title = You have submitted the application
 confirmation.payment.bacs.header = Application complete
+confirmation.payment.bacs.header.renewal = Re-registration complete
 
 confirmation.payment.renewal.lede = You have submitted your renewal and paid
 confirmation.payment.renewal.title = You have submitted your renewal and paid
