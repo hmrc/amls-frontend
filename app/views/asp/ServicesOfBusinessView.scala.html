@@ -39,12 +39,17 @@
 
     @subtitle("summary.asp")
 
-    @heading("asp.services.title")
-
     @formHelper(action = controllers.asp.routes.ServicesOfBusinessController.post(edit)) {
 
         @inputCheckbox(
             Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("asp.services.title")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
                 name = "services",
                 hint = Some(Hint(content = Text(messages("lbl.select.all")))),
                 items = Service.formValues

@@ -66,12 +66,17 @@
 
     @subtitle("summary.responsiblepeople")
 
-    @heading("responsiblepeople.position_within_business.heading", personName)
-
     @formHelper(action = controllers.responsiblepeople.routes.PositionWithinBusinessController.post(index, edit, flow)) {
 
         @inputCheckbox(
             Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("responsiblepeople.position_within_business.heading", personName)),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
                 name = "positions",
                 hint = Some(Hint(content = Text(messages("lbl.select.all")))),
                 items = PositionWithinBusiness.formValues(

@@ -55,12 +55,17 @@
 
     @subtitle("summary.tcsp")
 
-    @heading("tcsp.provided_services.title")
-
     @formHelper(action = controllers.tcsp.routes.ProvidedServicesController.post(edit)) {
 
         @inputCheckbox(
             Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("tcsp.provided_services.title")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
                 name = "services",
                 hint = Some(Hint(content = Text(messages("lbl.select.all")))),
                 items = ProvidedServices.formValues(conditionalHtml)

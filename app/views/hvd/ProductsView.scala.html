@@ -55,12 +55,17 @@
 
     @subtitle("summary.hvd")
 
-    @heading("hvd.products.title")
-
     @formHelper(action = controllers.hvd.routes.ProductsController.post(edit)) {
 
         @inputCheckbox(
             Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("hvd.products.title")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
                 name = "products",
                 hint = Some(Hint(content = Text(messages("lbl.select.all")))),
                 items = Products.formValues(conditionalHtml)
