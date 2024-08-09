@@ -55,7 +55,7 @@
 
     @subtitle("summary.renewal")
 
-    <p class="govuk-body">@messages("renewal.cash.payments.received.text")</p>
+    @heading("renewal.cash.payments.received.title")
 
     @formHelper(action = controllers.renewal.routes.HowCashPaymentsReceivedController.post(edit)) {
 
@@ -63,9 +63,9 @@
             Checkboxes(
                     fieldset = Some(Fieldset(
                         legend = Some(Legend(
-                        content = Text(messages("renewal.cash.payments.received.title")),
-                        classes = "govuk-fieldset__legend--xl",
-                        isPageHeading = true
+                            content = Text(messages("renewal.cash.payments.received.text")),
+                            classes = "govuk-body",
+                            isPageHeading = false
                     ))
                 )),
                 name = "paymentMethods",
