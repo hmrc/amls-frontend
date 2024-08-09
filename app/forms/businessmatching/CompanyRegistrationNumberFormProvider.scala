@@ -30,7 +30,7 @@ class CompanyRegistrationNumberFormProvider @Inject()() extends Mappings {
     val registrationNumberRegex = "^[A-Z0-9]{8}$"
 
     Form[CompanyRegistrationNumber](
-      "value" -> text("error.required.bm.registration.number")
+      "value" -> textAllowWhitespace("error.required.bm.registration.number")
         .verifying(
           firstError(
             correctLength(length, "error.invalid.bm.registration.number.length"),

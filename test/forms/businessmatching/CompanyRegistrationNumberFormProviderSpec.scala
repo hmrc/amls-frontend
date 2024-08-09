@@ -18,6 +18,7 @@ package forms.businessmatching
 
 import forms.behaviours.StringFieldBehaviours
 import forms.mappings.Constraints
+import models.businessmatching.CompanyRegistrationNumber
 import org.scalacheck.Gen
 import play.api.data.FormError
 
@@ -54,6 +55,17 @@ class CompanyRegistrationNumberFormProviderSpec extends StringFieldBehaviours wi
         val result = form.bind(Map(fieldName -> invalidString)).apply(fieldName)
         result.errors shouldEqual Seq(FormError(fieldName, Seq("error.invalid.bm.registration.number.allowed"), Seq("^[A-Z0-9]{8}$")))
       }
+    }
+
+    "contains whitespace" in {
+
+      val validInputWithSpaces = "123 AB6 78"
+      val trimmedInput = "123AB678"
+
+      val result = form.bind(Map(fieldName -> validInputWithSpaces))
+
+      result.value shouldBe Some(CompanyRegistrationNumber(trimmedInput))
+      result.errors shouldBe Seq.empty
     }
 
     "not bind submissions with lower case letters" in {
