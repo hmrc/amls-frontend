@@ -72,12 +72,17 @@
 
     @subtitle("summary.msb")
 
-    @heading("msb.supply_foreign_currencies.title")
-
     @formHelper(action = controllers.msb.routes.MoneySourcesController.post(edit)) {
 
         @inputCheckbox(
             Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("msb.supply_foreign_currencies.title")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
                 name = "moneySources",
                 hint = Some(Hint(content = Text(messages("lbl.select.all")))),
                 items = Seq(
