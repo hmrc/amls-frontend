@@ -21,6 +21,7 @@
 @import views.html.helper.CSPNonce
 @import config.ApplicationConfig
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcAccessibleAutocompleteJavascript
 
 @this(
     appConfig: ApplicationConfig,
@@ -73,8 +74,9 @@
         initAll()
     </script>
     <script @CSPNonce.attr>window.HMRCFrontend.initAll()</script>
-    @autocompleteJavascript()
     <script @CSPNonce.attr src='@controllers.routes.Assets.versioned("submitButtonDisable.js")'></script>
+    @autocompleteJavascript()
+    <script @CSPNonce.attr src='@controllers.routes.Assets.versioned("javascripts/accessible-autocomplete-fixes.js")'></script>
 }
 
 @mainContentWithGetHelp = {
