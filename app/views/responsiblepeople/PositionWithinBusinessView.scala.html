@@ -16,6 +16,7 @@
 
 @import config.ApplicationConfig
 @import models.responsiblepeople.PositionWithinBusiness
+@import models.responsiblepeople.Positions
 @import models.businessmatching.BusinessType
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
 @import views.html.components.forms.{ErrorSummary, InputCheckbox, InputText}
@@ -40,7 +41,8 @@
     businessType: BusinessType,
     personName: String,
     displayNominatedOfficer: Boolean,
-    flow: Option[String]
+    flow: Option[String],
+    positionValue: Seq[String]
 )(implicit messages: Messages, request: Request[_], appConfig: ApplicationConfig)
 
 @conditionalHtml = {
@@ -60,16 +62,21 @@
 
 @layout(pageTitle = messages("responsiblepeople.position_within_business.title") + " - " + messages("summary.responsiblepeople")) {
 
-    @errorSummary(form, Some(Map("positions" -> "positions_0")))
+    @errorSummary(form, Some(Map("positions" -> s"positions_${positionValue.head.substring(1)}")))
 
     @subtitle("summary.responsiblepeople")
-
-    @heading("responsiblepeople.position_within_business.heading", personName)
 
     @formHelper(action = controllers.responsiblepeople.routes.PositionWithinBusinessController.post(index, edit, flow)) {
 
         @inputCheckbox(
             Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("responsiblepeople.position_within_business.heading", personName)),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
                 name = "positions",
                 hint = Some(Hint(content = Text(messages("lbl.select.all")))),
                 items = PositionWithinBusiness.formValues(

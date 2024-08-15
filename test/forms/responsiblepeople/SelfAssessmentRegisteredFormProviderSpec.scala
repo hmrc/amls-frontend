@@ -51,91 +51,106 @@ class SelfAssessmentRegisteredFormProviderSpec extends StringFieldBehaviours wit
         }
       }
 
-      "false is submitted" in {
+      "true is submitted with a UTR number which contains spaces" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> "false"
-        ))
-
-        result.value shouldBe Some(SaRegisteredNo)
-        assert(result.errors.isEmpty)
-      }
-    }
-
-    "fail to bind" when {
-
-      s"$booleanFieldName is an invalid value" in {
-
-        forAll(Gen.alphaNumStr.suchThat(_.nonEmpty)) { invalid =>
+        val utrString = " 1 2 34 5 6 78 90 "
+        val utrStringTransformed = "1234567890"
 
           val result = form.bind(Map(
-            booleanFieldName -> invalid
+            booleanFieldName -> "true",
+            stringFieldName -> utrString
           ))
 
-          result.value shouldBe None
-          result.errors shouldBe Seq(FormError(booleanFieldName, "error.required.sa.registration"))
+          result.value shouldBe Some(SaRegisteredYes(utrStringTransformed))
+          assert(result.errors.isEmpty)
         }
-      }
 
-      s"$booleanFieldName is empty" in {
+
+    "false is submitted" in {
+
+      val result = form.bind(Map(
+        booleanFieldName -> "false"
+      ))
+
+      result.value shouldBe Some(SaRegisteredNo)
+      assert(result.errors.isEmpty)
+    }
+  }
+
+  "fail to bind" when {
+
+    s"$booleanFieldName is an invalid value" in {
+
+      forAll(Gen.alphaNumStr.suchThat(_.nonEmpty)) { invalid =>
 
         val result = form.bind(Map(
-          booleanFieldName -> ""
+          booleanFieldName -> invalid
         ))
 
         result.value shouldBe None
         result.errors shouldBe Seq(FormError(booleanFieldName, "error.required.sa.registration"))
       }
+    }
 
-      s"$stringFieldName is empty when $booleanFieldName is true" in {
+    s"$booleanFieldName is empty" in {
 
+      val result = form.bind(Map(
+        booleanFieldName -> ""
+      ))
+
+      result.value shouldBe None
+      result.errors shouldBe Seq(FormError(booleanFieldName, "error.required.sa.registration"))
+    }
+
+    s"$stringFieldName is empty when $booleanFieldName is true" in {
+
+      val result = form.bind(Map(
+        booleanFieldName -> "true",
+        stringFieldName -> ""
+      ))
+
+      result.value shouldBe None
+      result.errors shouldBe Seq(FormError(stringFieldName, "error.required.utr.number"))
+    }
+
+    s"$stringFieldName is shorter than ${utrLength} when $booleanFieldName is true" in {
+
+      forAll(numStringOfLength(utrLength - 1).suchThat(_.nonEmpty)) { utr =>
         val result = form.bind(Map(
           booleanFieldName -> "true",
-          stringFieldName -> ""
+          stringFieldName -> utr
         ))
 
         result.value shouldBe None
-        result.errors shouldBe Seq(FormError(stringFieldName, "error.required.utr.number"))
+        result.errors shouldBe Seq(FormError(stringFieldName, "error.invalid.length.utr.number", Seq(utrRegex)))
       }
+    }
 
-      s"$stringFieldName is shorter than ${utrLength} when $booleanFieldName is true" in {
+    s"$stringFieldName is longer than ${utrLength} when $booleanFieldName is true" in {
 
-        forAll(numStringOfLength(utrLength - 1).suchThat(_.nonEmpty)) { utr =>
-          val result = form.bind(Map(
-            booleanFieldName -> "true",
-            stringFieldName -> utr
-          ))
+      forAll(numStringOfLength(utrLength + 1).suchThat(_.nonEmpty)) { utr =>
+        val result = form.bind(Map(
+          booleanFieldName -> "true",
+          stringFieldName -> utr
+        ))
 
-          result.value shouldBe None
-          result.errors shouldBe Seq(FormError(stringFieldName, "error.invalid.length.utr.number", Seq(utrRegex)))
-        }
+        result.value shouldBe None
+        result.errors shouldBe Seq(FormError(stringFieldName, "error.invalid.length.utr.number", Seq(utrRegex)))
       }
+    }
 
-      s"$stringFieldName is longer than ${utrLength} when $booleanFieldName is true" in {
+    s"$stringFieldName is an invalid format when $booleanFieldName is true" in {
 
-        forAll(numStringOfLength(utrLength + 1).suchThat(_.nonEmpty)) { utr =>
-          val result = form.bind(Map(
-            booleanFieldName -> "true",
-            stringFieldName -> utr
-          ))
+      forAll(stringOfLengthGen(utrLength)) { utr =>
+        val result = form.bind(Map(
+          booleanFieldName -> "true",
+          stringFieldName -> utr
+        ))
 
-          result.value shouldBe None
-          result.errors shouldBe Seq(FormError(stringFieldName, "error.invalid.length.utr.number", Seq(utrRegex)))
-        }
-      }
-
-      s"$stringFieldName is an invalid format when $booleanFieldName is true" in {
-
-        forAll(stringOfLengthGen(utrLength)) { utr =>
-          val result = form.bind(Map(
-            booleanFieldName -> "true",
-            stringFieldName -> utr
-          ))
-
-          result.value shouldBe None
-          result.errors shouldBe Seq(FormError(stringFieldName, "error.invalid.length.utr.number", Seq(utrRegex)))
-        }
+        result.value shouldBe None
+        result.errors shouldBe Seq(FormError(stringFieldName, "error.invalid.length.utr.number", Seq(utrRegex)))
       }
     }
   }
+}
 }

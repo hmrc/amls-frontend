@@ -79,6 +79,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
       answer,
       actions = editAction(
         controllers.tcsp.routes.TcspTypesController.get(true).url,
+        "tcsp.checkYourAnswers.change.tcspType",
         "tcspkindserviceprovider-edit"
       )
     )
@@ -97,6 +98,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
         label(s),
         editAction(
           controllers.tcsp.routes.OnlyOffTheShelfCompsSoldController.get(true).url,
+          "tcsp.checkYourAnswers.change.otsCompanies",
           "onlyOffTheShelfCompsSold-edit"
         )
       )
@@ -116,6 +118,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
         label(s),
         editAction(
           controllers.tcsp.routes.ComplexCorpStructureCreationController.get(true).url,
+          "tcsp.checkYourAnswers.change.complexCompStructs",
           "complexCorpStructureCreation-edit"
         )
       )
@@ -144,6 +147,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
             label(services),
             actions = editAction(
               controllers.tcsp.routes.ProvidedServicesController.get(true).url,
+              "tcsp.checkYourAnswers.change.servicesProvided",
               "tcsptypes-edit"
             )
           )
@@ -162,6 +166,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
         booleanToLabel(x),
         editAction(
           controllers.tcsp.routes.ServicesOfAnotherTCSPController.get(true).url,
+          "tcsp.checkYourAnswers.change.whereServicesProvided",
           "servicesofanothertcsp-edit"
         )
       )
@@ -175,6 +180,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
       booleanToLabel(boolean),
       editAction(
         controllers.tcsp.routes.AnotherTCSPSupervisionController.get(true).url,
+        "tcsp.checkYourAnswers.change.otherBusAtAddressSupervised",
         "anothertcsp-edit"
       )
     )
@@ -187,6 +193,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
           mlrRefNumber,
           editAction(
             controllers.tcsp.routes.AnotherTCSPSupervisionController.get(true).url,
+            "tcsp.checkYourAnswers.change.tcspMLRNo",
             "mlrrefnumber-edit"
           )
         )
@@ -222,11 +229,12 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
     )
   }
 
-  private def editAction(route: String, id: String)(implicit messages: Messages): Option[Actions] = {
+  private def editAction(route: String, hiddenText: String, id: String)(implicit messages: Messages): Option[Actions] = {
     Some(Actions(
       items = Seq(ActionItem(
         route,
         Text(messages("button.edit")),
+        visuallyHiddenText = Some(messages(hiddenText)),
         attributes = Map("id" -> id)
       ))
     ))

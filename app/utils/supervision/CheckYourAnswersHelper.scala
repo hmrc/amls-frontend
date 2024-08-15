@@ -46,6 +46,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           booleanToLabel(false),
           editAction(
             controllers.supervision.routes.AnotherBodyController.get(true).url,
+            "supervision.checkYourAnswers.change.registeredBefore",
             "supervisionanotherbody-edit"
           )
         )
@@ -56,6 +57,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           booleanToLabel(true),
           editAction(
             controllers.supervision.routes.AnotherBodyController.get(true).url,
+            "supervision.checkYourAnswers.change.registeredBefore",
             "supervisionanotherbody-edit-name"
           )
         ),
@@ -64,6 +66,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           supervisorName,
           editAction(
             controllers.supervision.routes.AnotherBodyController.get(true).url,
+            "supervision.checkYourAnswers.change.prevSupervisor",
             "supervisionanotherbody-edit-previous-name"
           )
         ),
@@ -72,6 +75,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           DateHelper.formatDate(startDate.startDate),
           editAction(
             controllers.supervision.routes.SupervisionStartController.get(true).url,
+            "supervision.checkYourAnswers.change.whenLastStrt",
             "supervisionanotherbody-edit-start-date"
           )
         ),
@@ -80,6 +84,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           DateHelper.formatDate(endDate.endDate),
           editAction(
             controllers.supervision.routes.SupervisionEndController.get(true).url,
+            "supervision.checkYourAnswers.change.whenLastEnd",
             "supervisionanotherbody-edit-end-date"
           )
         ),
@@ -88,6 +93,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           reasons.endingReason,
           editAction(
             controllers.supervision.routes.SupervisionEndReasonsController.get(true).url,
+            "supervision.checkYourAnswers.change.whyLastEnd",
             "supervisionanotherbody-edit-ending-reason"
           )
         )
@@ -107,6 +113,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         answer,
         editAction(
           controllers.supervision.routes.ProfessionalBodyMemberController.get(true).url,
+          "supervision.checkYourAnswers.change.professionalBodiesMmbr",
           "supervisionmemberofbody-edit"
         )
       )
@@ -127,6 +134,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         answer,
         actions = editAction(
           controllers.supervision.routes.WhichProfessionalBodyController.get(true).url,
+          "supervision.checkYourAnswers.change.whichProfessionalBodiesMmbr",
           "supervisionwhichbody-edit"
         )
       )
@@ -141,6 +149,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           booleanToLabel(false),
           editAction(
             controllers.supervision.routes.PenalisedByProfessionalController.get(true).url,
+            "supervision.checkYourAnswers.change.penaltyDtls",
             "penalisedbyprofessional-edit"
           )
         )
@@ -151,6 +160,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           booleanToLabel(true),
           editAction(
             controllers.supervision.routes.PenalisedByProfessionalController.get(true).url,
+            "supervision.checkYourAnswers.change.penaltyDtls",
             "penalisedbyprofessional-edit"
           )
         ),
@@ -159,6 +169,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           details,
           editAction(
             controllers.supervision.routes.PenaltyDetailsController.get(true).url,
+            "supervision.checkYourAnswers.change.penaltyDtlsDesc",
             "penaltydetails-edit"
           )
         )

@@ -15,7 +15,6 @@
  *@
 
 @import config.ApplicationConfig
-@import views.html.components.Button
 @import views.html.confirmation.components.InformationNoticeView
 @import views.html.components.FeedbackSurveyLink
 
@@ -23,7 +22,6 @@
     layout: Layout,
     govukPanel: GovukPanel,
     informationNotice: InformationNoticeView,
-    button: Button,
     feedbackSurveyLink: FeedbackSurveyLink
 )
 
@@ -55,7 +53,9 @@
 
     @informationNotice()
 
-    @button("confirmation.payment.status_button.text", "confirm-continue", Some(controllers.routes.LandingController.get.url))
+    <p class="govuk-body">
+        <a href="@controllers.routes.LandingController.get.url" id="return-your-registration" class="govuk-link">@messages("link.navigate.registration.Returnto")</a>
+    </p>
 
     @feedbackSurveyLink()
 

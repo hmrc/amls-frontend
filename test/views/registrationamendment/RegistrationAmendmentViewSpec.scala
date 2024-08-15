@@ -58,11 +58,10 @@ class RegistrationAmendmentViewSpec extends AmlsViewSpec with MockitoSugar with 
             true
           )
 
-        val expectedFullCompletedString = s"This section is ${messages("progress.visuallyhidden.view.updated")}"
-        doc.getElementById("progress.section1.name-status").text must include(expectedFullCompletedString)
+        val statuses = doc.getElementsByClass("registration-status-tag")
 
-        val expectedFullIncompleteString = s"This section is ${messages("progress.visuallyhidden.view.started")}"
-        doc.getElementById("progress.section2.name-status").text must include(expectedFullIncompleteString)
+        statuses.first.text must include(messages("progress.visuallyhidden.view.updated"))
+        statuses.get(1).text must include(messages("progress.visuallyhidden.view.started"))
       }
     }
 

@@ -24,7 +24,6 @@
     heading: Heading,
     anchor: Anchor,
     applicationIncomplete: ApplicationIncomplete,
-    feedbackSurveyLink: FeedbackSurveyLink,
     printLink: PrintLink
 )
 
@@ -38,8 +37,7 @@
     registrationStatus: Html,
     feeInformation: Option[Html],
     displayContactLink: Boolean = false,
-    withdrawOrDeregisterInformation: Html = HtmlFormat.empty,
-    showFeedbackLink: Boolean = false
+    withdrawOrDeregisterInformation: Html = HtmlFormat.empty
 )(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
 @layout(
@@ -121,10 +119,6 @@
             @withdrawOrDeregisterInformation
         </div>
     </div>
-
-    @if(showFeedbackLink) {
-        @feedbackSurveyLink()
-    }
 
     @printLink(linkId="status-submitted-print", gaTag=Some("status-submitted:click:print"))
 }

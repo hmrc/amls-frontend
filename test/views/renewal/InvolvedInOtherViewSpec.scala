@@ -19,14 +19,15 @@ package views.renewal
 import forms.renewal.InvolvedInOtherFormProvider
 import org.scalatest.matchers.must.Matchers
 import play.api.mvc.{AnyContentAsEmpty, Request}
+import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.InvolvedInOtherView
 
 class InvolvedInOtherViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val involved_in_other = inject[InvolvedInOtherView]
-  lazy val fp = inject[InvolvedInOtherFormProvider]
+  lazy val involved_in_other: InvolvedInOtherView = inject[InvolvedInOtherView]
+  lazy val fp: InvolvedInOtherFormProvider = inject[InvolvedInOtherFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -34,14 +35,14 @@ class InvolvedInOtherViewSpec extends AmlsViewSpec with Matchers {
   "InvolvedInOtherView" must {
     "have correct title" in new ViewFixture {
 
-      def view = involved_in_other(fp().fill(false), true, None)
+      def view: HtmlFormat.Appendable = involved_in_other(fp().fill(false), edit = true, None)
 
       doc.title must startWith(messages("renewal.involvedinother.title"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = involved_in_other(fp().fill(false), true, None)
+      def view: HtmlFormat.Appendable = involved_in_other(fp().fill(false), edit = true, None)
 
       heading.html must be(messages("renewal.involvedinother.title"))
       subHeading.html must include(messages("summary.renewal"))
@@ -50,7 +51,7 @@ class InvolvedInOtherViewSpec extends AmlsViewSpec with Matchers {
 
     "correctly list business activities" in new ViewFixture {
 
-      def view = involved_in_other(fp().fill(false), true, Some(List("test activities string")))
+      def view: HtmlFormat.Appendable = involved_in_other(fp().fill(false), edit = true, Some(List("test activities string")))
 
       html must include(messages("businessactivities.confirm-activities.subtitle_4"))
       html must include("test activities string")
@@ -58,12 +59,12 @@ class InvolvedInOtherViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       involved_in_other(
-        fp().withError("involvedInOther", "error.required.renewal.ba.involved.in.other"), false, None
+        fp().withError("involvedInOther", "error.required.renewal.ba.involved.in.other"), edit = false, None
       ),
       "involvedInOther",
       "error.required.renewal.ba.involved.in.other"
     )
 
-    behave like pageWithBackLink(involved_in_other(fp(), false, None))
+    behave like pageWithBackLink(involved_in_other(fp(), edit = false, None))
   }
 }

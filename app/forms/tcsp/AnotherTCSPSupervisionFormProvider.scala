@@ -35,7 +35,7 @@ class AnotherTCSPSupervisionFormProvider @Inject()() extends Mappings {
   def apply(): Form[ServicesOfAnotherTCSP] = Form[ServicesOfAnotherTCSP](
     mapping(
       radioFieldName -> boolean(radioError, radioError),
-      "mlrRefNumber" -> optional(text("error.required.tcsp.services.another.tcsp.number")
+      "mlrRefNumber" -> optional(textAllowWhitespace("error.required.tcsp.services.another.tcsp.number")
         .verifying(
           firstError(
             minLength(minLength, lengthError),

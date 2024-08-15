@@ -33,6 +33,22 @@
 
 @(form: Form[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit messages: Messages, request: Request[_])
 
+@hasKnownByErrors = @{
+    form.errors match {
+        case Nil => false
+        case x if x.head.key == "otherNames" => true
+        case _ => false
+    }
+}
+
+@preparedErrorSummary = @{
+    if(hasKnownByErrors) {
+        errorSummary(form, Some(Map("otherNames" -> "otherNames")))
+        } else {
+        errorSummary(form, Some(Map("hasOtherNames" -> "hasOtherNames-true")))
+    }
+}
+
 @conditionalHtml = {
     @inputText(
         Input(
@@ -65,7 +81,7 @@
 
 @layout(pageTitle = messages("responsiblepeople.knownby.title") + " - " + messages("summary.responsiblepeople")) {
 
-    @errorSummary(form)
+    @preparedErrorSummary
 
     @subtitle("summary.responsiblepeople")
 

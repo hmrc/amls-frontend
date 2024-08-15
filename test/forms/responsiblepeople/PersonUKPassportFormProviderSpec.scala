@@ -59,6 +59,20 @@ class PersonUKPassportFormProviderSpec extends StringFieldBehaviours with Constr
       }
     }
 
+    "true is submitted with a Password number which contains spaces" in {
+
+      val passString = " 1 2 34 5 6 78 9 "
+      val passStringTransformed = "123456789"
+
+      val result = form.bind(Map(
+        booleanFieldName -> "true",
+        stringFieldName -> passString
+      ))
+
+      result.value shouldBe Some(UKPassportYes(passStringTransformed))
+      assert(result.errors.isEmpty)
+    }
+
     "fail to bind" when {
 
       s"$booleanFieldName is an invalid value" in {

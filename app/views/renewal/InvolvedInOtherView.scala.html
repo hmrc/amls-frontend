@@ -45,7 +45,7 @@
 
 @layout(pageTitle = Messages("renewal.involvedinother.title") + " - " + Messages("summary.renewal")) {
 
-    @errorSummary(form)
+    @errorSummary(form, Some(Map("involvedInOther" -> "involvedInOther-true")))
 
     @subtitle("summary.renewal")
 

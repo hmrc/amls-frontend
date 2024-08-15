@@ -15,7 +15,6 @@
  *@
 
 @import config.ApplicationConfig
-@import views.html.components.Button
 @import views.html.confirmation.components.InformationNoticeView
 @import views.html.components.FeedbackSurveyLink
 
@@ -23,11 +22,16 @@
     layout: Layout,
     govukPanel: GovukPanel,
     informationNotice: InformationNoticeView,
-    button: Button,
     feedbackSurveyLink: FeedbackSurveyLink
 )
 
-@(businessName: String)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(businessName: String, refNo: String, isRenewal : Boolean = false)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@panelContent = {
+                <p>@businessName</p>
+                @messages("fee.reference.number.lbl")
+                <strong>@refNo</strong>
+        }
 
 @layout(
     pageTitle = messages("confirmation.payment.bacs.title") + " - " + messages("submit.registration"),
@@ -36,8 +40,8 @@
 
     @govukPanel(
         Panel(
-            title = Text(messages("confirmation.payment.bacs.header")),
-            content = Text(businessName)
+            title = Text(messages(if(isRenewal) "confirmation.payment.bacs.header.renewal" else "confirmation.payment.bacs.header")),
+            content = HtmlContent(panelContent)
         )
     )
 
@@ -47,9 +51,9 @@
 
     @informationNotice()
 
-    @button(
-        "confirmation.payment.continue_button.text", "payment-continue", Some(controllers.routes.LandingController.get.url)
-    )
+    <p class="govuk-body">
+        <a href="@controllers.routes.LandingController.get.url" id="goto-reg-link" class="govuk-link">@messages(if(isRenewal) "link.navigate.registration.Returnto" else "link.navigate.registration.Goto")</a>
+    </p>
 
     @feedbackSurveyLink()
 

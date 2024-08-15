@@ -25,6 +25,7 @@ import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching.BusinessMatching
 import models.payments._
+import models.renewal.Renewal
 import models.registrationdetails.RegistrationDetails
 import models.status._
 import models.{status => _, _}
@@ -62,9 +63,6 @@ class BacsConfirmationControllerSpec extends AmlsSpec
       cc = mockMcc,
       view = view)
 
-    when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
-      .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
-
     val amlsRegistrationNumber = "amlsRefNumber"
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
@@ -95,6 +93,9 @@ class BacsConfirmationControllerSpec extends AmlsSpec
       controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(), eqTo(SubmissionRequestStatus.key))(any())
     } thenReturn Future.successful(Some(SubmissionRequestStatus(true)))
 
+    when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
+      .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
     def feeResponse(responseType: ResponseType) = FeeResponse(
       responseType = responseType,
       amlsReferenceNumber = amlsRegistrationNumber,
@@ -113,6 +114,10 @@ class BacsConfirmationControllerSpec extends AmlsSpec
     when {
       controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any())
     } thenReturn Future.successful(Some(businessDetails))
+
+    when {
+      controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
+    } thenReturn Future.successful(None)
 
     val applicationConfig = app.injector.instanceOf[ApplicationConfig]
 
@@ -156,15 +161,11 @@ class BacsConfirmationControllerSpec extends AmlsSpec
         when {
           controller.statusService.getReadStatus(any[String](), any[(String, String)]())(any(), any())
         } thenReturn Future.successful(ReadStatusResponse(LocalDateTime.now(), "", None, None, None, None, false))
-
         val result = controller.bacsConfirmation()(request)
-
         status(result) mustBe OK
-
         Jsoup.parse(contentAsString(result)).getElementsByTag("h1").first().text() must include(
           messages("confirmation.payment.bacs.header")
         )
-
       }
 
       "bacs confirmation is requested and is a transitional renewal" in new Fixture {

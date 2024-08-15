@@ -32,10 +32,11 @@ class PSRNumberFormProvider @Inject()() extends Mappings {
       Form[BusinessAppliedForPSRNumber](
         mapping(
           "appliedFor" -> boolean("error.required.msb.psr.options", "error.required.msb.psr.options"),
-          "regNumber" -> mandatoryIfTrue("appliedFor", text("error.invalid.msb.psr.number")
+          "regNumber" -> mandatoryIfTrue("appliedFor", textAllowWhitespace("error.invalid.msb.psr.number")
             .verifying(
               firstError(
-                correctLength(length, "error.required.msb.psr.length"),
+                minLength(length, "error.required.msb.psr.length"),
+                maxLength(length, "error.required.msb.psr.length"),
                 regexp("^[0-9]*$", "error.max.msb.psr.number.format")
               )
             )

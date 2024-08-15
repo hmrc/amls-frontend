@@ -134,7 +134,7 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
 
   def confirmationBacs = authAction.async {
     implicit request =>
-      Future.successful(Ok(confirmationBacsView("Company Name")))
+      Future.successful(Ok(confirmationBacsView("Company Name", "X123456789", false)))
   }
 
   def confirmationBacsTransitionalRenewal = confirmationBacs

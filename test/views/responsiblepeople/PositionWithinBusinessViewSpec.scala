@@ -21,16 +21,18 @@ import models.businessmatching.BusinessType
 import org.scalatest.matchers.must.Matchers
 import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
+import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.PositionWithinBusinessView
 
 class PositionWithinBusinessViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val businessView = inject[PositionWithinBusinessView]
-  lazy val fp = inject[PositionWithinBusinessFormProvider]
+  lazy val businessView: PositionWithinBusinessView = inject[PositionWithinBusinessView]
+  lazy val fp: PositionWithinBusinessFormProvider = inject[PositionWithinBusinessFormProvider]
 
   val name = "firstName lastName"
+  val positions: Seq[String] = Seq("01", "02", "03", "04")
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,7 +44,7 @@ class PositionWithinBusinessViewSpec extends AmlsViewSpec with Matchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = businessView(fp(), true, 1, BusinessType.SoleProprietor, name, true, None)
+      def view: HtmlFormat.Appendable = businessView(fp(), edit = true, 1, BusinessType.SoleProprietor, name, displayNominatedOfficer = true, None, positions)
       doc.title must be(messages("responsiblepeople.position_within_business.title") +
         " - " + messages("summary.responsiblepeople") +
         " - " + messages("title.amls") +
@@ -50,7 +52,7 @@ class PositionWithinBusinessViewSpec extends AmlsViewSpec with Matchers {
     }
 
     "have correct headings" in new ViewFixture {
-      def view = businessView(fp(), true, 1, BusinessType.SoleProprietor, name, true, None)
+      def view: HtmlFormat.Appendable = businessView(fp(), edit = true, 1, BusinessType.SoleProprietor, name, displayNominatedOfficer = true, None, positions)
       heading.html must be(messages("responsiblepeople.position_within_business.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
     }
@@ -58,12 +60,13 @@ class PositionWithinBusinessViewSpec extends AmlsViewSpec with Matchers {
     behave like pageWithErrors(
       businessView(
         fp().withError("positions", "error.required.positionWithinBusiness"),
-        true,
+        edit = true,
         1,
         BusinessType.SoleProprietor,
         name,
-        true,
-        None
+        displayNominatedOfficer = true,
+        None,
+        positions
       ),
       "positions",
       "error.required.positionWithinBusiness"
@@ -72,17 +75,18 @@ class PositionWithinBusinessViewSpec extends AmlsViewSpec with Matchers {
     behave like pageWithErrors(
       businessView(
         fp().withError("otherPosition", "error.invalid.rp.position_within_business.other_position"),
-        true,
+        edit = true,
         1,
         BusinessType.SoleProprietor,
         name,
-        true,
-        None
+        displayNominatedOfficer = true,
+        None,
+        positions
       ),
       "otherPosition",
       "error.invalid.rp.position_within_business.other_position"
     )
 
-    behave like pageWithBackLink(businessView(fp(), true, 1, BusinessType.SoleProprietor, name, true, None))
+    behave like pageWithBackLink(businessView(fp(), edit = true, 1, BusinessType.SoleProprietor, name, displayNominatedOfficer = true, None, positions))
   }
 }

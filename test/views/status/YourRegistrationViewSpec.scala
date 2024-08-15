@@ -129,11 +129,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
         yourRegistrationInfo = Some(application_withdrawn(Some("business Name"))),
         registrationStatus = registration_status(status = SubmissionWithdrawn),
         unreadNotifications = 10,
-        feeInformation = None,
-        showFeedbackLink = true)
-
-      val feedbackUrl = "/foo"
-      when(appConfig.logoutUrlWithFeedback) thenReturn feedbackUrl
+        feeInformation = None)
 
       doc.getElementById("application-withdrawn-description-1").text() must be("You have withdrawn your application to register with HMRC.")
       doc.getElementById("application-withdrawn-description-2").text() must be("If the Money Laundering Regulations apply to your business, you need to be registered with an appropriate supervisory body.")
@@ -142,7 +138,6 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
       doc.getElementById("registration-status").html() must include("Not supervised. Application withdrawn.")
       doc.getElementById("new.application.button").html() must include("Start a new application")
 
-      assertFeedbackSectionExists(doc, feedbackUrl)
     }
 
     "contain correct content for status SubmissionDecisionRejected" in new ViewFixture {
@@ -201,11 +196,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
         yourRegistrationInfo = Some(application_deregistered(Some("business Name"))),
         registrationStatus = registration_status(status = DeRegistered, endDate = deregistrationDate),
         unreadNotifications = 10,
-        feeInformation = None,
-        showFeedbackLink = true)
-
-      val feedbackUrl = "/foo"
-      when(appConfig.logoutUrlWithFeedback) thenReturn feedbackUrl
+        feeInformation = None)
 
       doc.getElementById("application-deregistered-description-1").text() must be("You have deregistered your business.")
       doc.getElementById("application-deregistered-description-2").text() must be("If the Money Laundering Regulations apply to your business, you need to be registered with an appropriate supervisory body.")
@@ -214,7 +205,6 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
       doc.getElementById("registration-status").html() must include("Not supervised. Deregistered on " + DateHelper.formatDate(deregistrationDate.value) + ".")
       doc.getElementById("new.application.button").html() must include("Start a new application")
 
-      assertFeedbackSectionExists(doc, feedbackUrl)
     }
 
     "contain registration information for status SubmissionReady" in new ViewFixture {
@@ -449,22 +439,17 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
         registrationStatus = HtmlFormat.empty,
         feeInformation = None,
         unreadNotifications = 100,
-        displayContactLink = true,
-        showFeedbackLink = true)
+        displayContactLink = true)
 
       val contactUrl = "/bar"
-      val feedbackUrl = "/foo"
 
       when(appConfig.contactHmrcLink) thenReturn contactUrl
-      when(appConfig.logoutUrlWithFeedback) thenReturn feedbackUrl
 
       val messagesCell = doc.getElementById("messages")
       messagesCell.getElementsByClass("hmrc-notification-badge").isEmpty must be(false)
       messagesCell.getElementsByClass("hmrc-notification-badge").first().html() must include("100")
 
       doc.getElementsMatchingOwnText("contact HMRC").attr("href") must be(contactUrl)
-
-      assertFeedbackSectionExists(doc, feedbackUrl)
 
       doc.getElementsMatchingOwnText("Print this page")
         .attr("href") must be("javascript:window.print()")

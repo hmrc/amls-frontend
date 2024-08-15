@@ -33,7 +33,8 @@
 @(form: Form[_], edit: Boolean, activityValues: Seq[BusinessActivity])(implicit request: Request[_], messages: Messages)
 
 @messageSuffix = @{
-    if(activityValues.size == 2) {
+val activities = BusinessActivities.all.toSeq diff activityValues
+    if(activities.size == 2) {
         "twobusinesses"
     } else {
         "multibusinesses"
@@ -50,7 +51,8 @@
 
     @formHelper(action = controllers.businessmatching.updateservice.remove.routes.RemoveBusinessTypesController.post(edit)) {
 
-        @errorSummary(form, Some(Map("value" -> "value_0")))
+        @errorSummary(form, Some(Map("value" -> s"value_${activityValues.map(activity =>
+            activity.value.substring(1)).head}")))
 
         @subtitle("summary.updateservice")
 
@@ -71,7 +73,7 @@
                     )
                 ),
                 name = "value",
-                items = BusinessActivities.formValues(Some(activityValues), false)
+                items = BusinessActivities.formValues(Some((BusinessActivities.all.toSeq diff activityValues)), false)
             ).withFormField(form("value"))
         )
 

@@ -61,6 +61,7 @@ class CheckYourAnswersHelper @Inject()() {
         booleanToLabel(agentPremises.agentPremises),
         editAction(
           controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index, true).url,
+          "tradingpremises.checkYourAnswers.change.agentPremRgstr",
           "tradingpremisessummarywho-edit"
         )
       )
@@ -74,6 +75,7 @@ class CheckYourAnswersHelper @Inject()() {
         messages(structure.message),
         editAction(
           controllers.tradingpremises.routes.BusinessStructureController.get(index, true).url,
+          "tradingpremises.checkYourAnswers.change.agentBusType",
           "tradingpremisesbusinessstructure-edit"
         )
       )
@@ -87,7 +89,9 @@ class CheckYourAnswersHelper @Inject()() {
         details.agentCompanyName,
         editAction(
           controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).url,
+          "tradingpremises.checkYourAnswers.change.agentCompDtls",
           "tradingpremisesagentcompanyname-edit"
+
         )
       )
     }
@@ -101,6 +105,7 @@ class CheckYourAnswersHelper @Inject()() {
           name.agentName,
           editAction(
             controllers.tradingpremises.routes.AgentNameController.get(index, true).url,
+            "tradingpremises.checkYourAnswers.change.agentName",
             "tradingpremisesagentnametitle-edit"
           )
         )
@@ -111,6 +116,7 @@ class CheckYourAnswersHelper @Inject()() {
             DateHelper.formatDate(dob),
             editAction(
               controllers.tradingpremises.routes.AgentNameController.get(index, true).url,
+              "tradingpremises.checkYourAnswers.change.agentDOB",
               "tradingpremisesagentdobtitle-edit"
             )
           )
@@ -126,6 +132,7 @@ class CheckYourAnswersHelper @Inject()() {
         partnership.agentPartnership,
         editAction(
           controllers.tradingpremises.routes.AgentPartnershipController.get(index, true).url,
+          "tradingpremises.checkYourAnswers.change.agentPrtnrs",
           "tradingpremisesagentpartnershiptitle-edit"
         )
       )
@@ -142,6 +149,7 @@ class CheckYourAnswersHelper @Inject()() {
         regNumber,
         editAction(
           controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).url,
+          "tradingpremises.checkYourAnswers.change.agentCompDtls",
           "tradingpremisesyouragentcrn-edit"
         )
       )
@@ -163,6 +171,7 @@ class CheckYourAnswersHelper @Inject()() {
           nameAndAddressToLines(name, address),
           actions = editAction(
             controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).url,
+            "tradingpremises.checkYourAnswers.change.tradingPremDtls",
             "tradingpremisesdetails-edit"
           )
         ),
@@ -171,6 +180,7 @@ class CheckYourAnswersHelper @Inject()() {
           DateHelper.formatDate(startDate),
           editAction(
             controllers.tradingpremises.routes.ActivityStartDateController.get(index, true).url,
+            "tradingpremises.checkYourAnswers.change.tradingPremFrom",
             "tradingprmisedsummarystartdate-edit"
           )
         ),
@@ -180,6 +190,7 @@ class CheckYourAnswersHelper @Inject()() {
           booleanToLabel(isResidential),
           editAction(
             controllers.tradingpremises.routes.IsResidentialController.get(index, true).url,
+            "tradingpremises.checkYourAnswers.change.resAddr",
             "tradingpremisessummaryresidential-edit"
           )
         )
@@ -201,6 +212,7 @@ class CheckYourAnswersHelper @Inject()() {
       } else {
         editAction(
           controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true).url,
+          "tradingpremises.checkYourAnswers.change.srvsPrvdd",
           "tradingpremisedsummaryservices-edit"
         )
       }
@@ -226,6 +238,7 @@ class CheckYourAnswersHelper @Inject()() {
       } else {
         editAction(
           controllers.tradingpremises.routes.MSBServicesController.get(index, true).url,
+          "tradingpremises.checkYourAnswers.change.MSBOnPrem",
           "tradingpremisesmsbservices-edit"
         )
       }
@@ -252,11 +265,12 @@ class CheckYourAnswersHelper @Inject()() {
     )
   }
 
-  private def editAction(route: String, id: String)(implicit messages: Messages): Option[Actions] = {
+  private def editAction(route: String, hiddenText: String, id: String)(implicit messages: Messages): Option[Actions] = {
     Some(Actions(
       items = Seq(ActionItem(
         route,
         Text(messages("button.edit")),
+        visuallyHiddenText = Some(messages(hiddenText)),
         attributes = Map("id" -> id)
       ))
     ))

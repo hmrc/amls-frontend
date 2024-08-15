@@ -117,7 +117,7 @@ object PositionWithinBusiness extends Enumerable.Implicits {
     }
   }
 
-  private def buildOptionsList(businessType: BusinessType, isDeclaration: Boolean, displayNominatedOfficer: Boolean): Seq[PositionWithinBusiness] = {
+  def buildOptionsList(businessType: BusinessType, isDeclaration: Boolean, displayNominatedOfficer: Boolean): Seq[PositionWithinBusiness] = {
 
     val optionalCheckboxes = Seq(
       if (isDeclaration) Some(ExternalAccountant) else None,

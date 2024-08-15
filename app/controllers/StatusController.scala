@@ -300,8 +300,7 @@ class StatusController @Inject()(val landingService: LandingService,
             unreadNotifications = unreadNotifications,
             registrationStatus = registrationStatus(
               status = statusInfo._1),
-            feeInformation = None,
-            showFeedbackLink = true)
+            feeInformation = None)
         }
       }
       case (DeRegistered, _) =>
@@ -320,8 +319,7 @@ class StatusController @Inject()(val landingService: LandingService,
             registrationStatus = registrationStatus(
               status = statusInfo._1,
               endDate = deregistrationDate),
-            feeInformation = None,
-            showFeedbackLink = true)
+            feeInformation = None)
         }
       case _ => InternalServerError("Post: An UnknowException has occurred: RegisterServicesController")
     }

@@ -60,6 +60,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         productsValue(products),
         actions = editAction(
           controllers.hvd.routes.ProductsController.get(true).url,
+          "hvd.checkYourAnswers.change.products",
           "hvdproducts-edit"
         )
       )
@@ -79,6 +80,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             booleanToLabel(exciseGoods.exciseGoods),
             editAction(
               controllers.hvd.routes.ExciseGoodsController.get(true).url,
+              "hvd.checkYourAnswers.change.duty-suspendedProducts",
               "hvdexcisegoods-edit"
             )
           )
@@ -105,6 +107,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         goodsValue(goods),
         actions = editAction(
           controllers.hvd.routes.HowWillYouSellGoodsController.get(true).url,
+          "hvd.checkYourAnswers.change.howSold",
           "hvdsellgoods-edit"
         )
       )
@@ -121,6 +124,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             booleanToLabel(payment.acceptedPayment.acceptedAnyPayment),
             editAction(
               controllers.hvd.routes.CashPaymentController.get(true).url,
+              "hvd.checkYourAnswers.change.cashPayments",
               "hvdcashpayment-edit"
             )
           )
@@ -131,6 +135,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             DateHelper.formatDate(date.paymentDate),
             editAction(
               controllers.hvd.routes.CashPaymentFirstDateController.get(true).url,
+              "hvd.checkYourAnswers.change.firstPayDate",
               "hvdcashpaymentfirstdate-edit"
             )
           )
@@ -147,6 +152,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(payments.linkedCashPayments),
         editAction(
           controllers.hvd.routes.LinkedCashPaymentsController.get(true).url,
+          "hvd.checkYourAnswers.change.autoIdentifyLinkdPay",
           "hvdlinkedcashpayments-edit"
         )
       )
@@ -161,6 +167,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(payments),
         editAction(
           controllers.hvd.routes.ReceiveCashPaymentsController.get(true).url,
+          "hvd.checkYourAnswers.change.receiveHighPay",
           "hvdreceivecashpayments-edit"
         )
       )
@@ -183,6 +190,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         paymentsValue(cpm),
         actions = editAction(
           controllers.hvd.routes.ExpectToReceiveCashPaymentsController.get(true).url,
+          "hvd.checkYourAnswers.change.howMoneySent",
           "hvdcashpaymentmethods-edit"
         )
       )
@@ -197,6 +205,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         messages(s"hvd.percentage.lbl.${percentage.value}"),
         editAction(
           controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).url,
+          "hvd.checkYourAnswers.change.whatPercent",
           "hvdpercentcashpayment-edit"
         )
       )

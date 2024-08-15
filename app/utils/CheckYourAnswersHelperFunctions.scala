@@ -62,11 +62,12 @@ trait CheckYourAnswersHelperFunctions {
     )
   }
 
-  def editAction(route: String, id: String)(implicit messages: Messages): Option[Actions] = {
+  def editAction(route: String, hiddenText: String, id: String)(implicit messages: Messages): Option[Actions] = {
     Some(Actions(
       items = Seq(ActionItem(
         route,
         Text(messages("button.edit")),
+        visuallyHiddenText = Some(messages(hiddenText)),
         attributes = Map("id" -> id)
       ))
     ))

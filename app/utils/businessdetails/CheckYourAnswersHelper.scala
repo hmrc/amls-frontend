@@ -59,6 +59,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
             items = Seq(ActionItem(
               controllers.businessdetails.routes.PreviouslyRegisteredController.get(true).url,
               Text(messages("button.edit")),
+              visuallyHiddenText = Some(messages("businessactivities.checkYourAnswers.change.descOthrActs")),
               attributes = Map("id" -> "businessdetailsregform-edit")
             ))
           ))
@@ -77,6 +78,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
           items = Seq(ActionItem(
             controllers.businessdetails.routes.ActivityStartDateController.get(true).url,
             Text(messages("button.edit")),
+            visuallyHiddenText = Some(messages("businessdetails.checkYourAnswers.change.whenActvsStartd")),
             attributes = Map("id" -> "businessdetailsactivitystartdate-edit")
           ))
         ))
@@ -88,6 +90,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
 
     val vatAction = editAction(
       controllers.businessdetails.routes.VATRegisteredController.get(true).url,
+      "businessdetails.checkYourAnswers.change.busRegtdVAT",
       "businessdetailsregformvat-edit"
     )
 
@@ -104,6 +107,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
 
     val yesNoEdit = editAction(
       controllers.businessdetails.routes.RegisteredOfficeIsUKController.get(true).url,
+      "businessdetails.checkYourAnswers.change.officeInUK",
       "businessdetailsregisteredofficeisuk-edit"
     )
 
@@ -122,6 +126,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
             addressToLines(ukAddress.toLines),
             actions = editAction(
               controllers.businessdetails.routes.RegisteredOfficeUKController.get(true).url,
+              "businessdetails.checkYourAnswers.change.officeRegstd",
               "businessdetailsregoffice-edit"
             )
           )
@@ -141,6 +146,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
             addressToLines(nonUkAddress.toLines),
             actions = editAction(
               controllers.businessdetails.routes.RegisteredOfficeNonUKController.get(true).url,
+              "businessdetails.checkYourAnswers.change.addrUkBased",
               "businessdetailsregoffice-edit"
             )
           )
@@ -161,6 +167,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
           email,
           editAction(
             controllers.businessdetails.routes.BusinessEmailAddressController.get(true).url,
+            "businessdetails.checkYourAnswers.change.busEmail",
             "businessdetailscontactyou-edit"
           )
         ),
@@ -169,6 +176,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
           phoneNumber,
           editAction(
             controllers.businessdetails.routes.ContactingYouPhoneController.get(true).url,
+            "businessdetails.checkYourAnswers.change.busTelNo",
             "businessdetailscontactphone-edit"
           )
         )
@@ -183,6 +191,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
       messages(label),
       editAction(
         controllers.businessdetails.routes.LettersAddressController.get(true).url,
+        "businessdetails.checkYourAnswers.change.addrSame",
         "businessdetailslettersaddress-edit"
       )
     )
@@ -192,6 +201,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
       messages(label),
       editAction(
         controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get(true).url,
+        "businessdetails.checkYourAnswers.change.addrUkBased",
         "businessdetailscorraddressisuk-edit"
       )
     )
@@ -211,6 +221,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
               addressToLines(address.toLines),
               actions = editAction(
                 controllers.businessdetails.routes.CorrespondenceAddressUkController.get(true).url,
+                "businessdetails.checkYourAnswers.change.addrForLettrs",
                 "businessdetailscorraddress-edit"
               )
             )
@@ -229,6 +240,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
               addressToLines(address.toLines),
               actions = editAction(
                 controllers.businessdetails.routes.CorrespondenceAddressNonUkController.get(true).url,
+                "businessdetails.checkYourAnswers.change.addrForLettrs",
                 "businessdetailscorraddress-edit"
               )
             )
@@ -245,11 +257,12 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
     )
   }
 
-  private def editAction(route: String, id: String)(implicit messages: Messages) = {
+  private def editAction(route: String, hiddenText: String, id: String)(implicit messages: Messages) = {
     Some(Actions(
       items = Seq(ActionItem(
         route,
         Text(messages("button.edit")),
+        visuallyHiddenText = Some(messages(hiddenText)),
         attributes = Map("id" -> id)
       ))
     ))

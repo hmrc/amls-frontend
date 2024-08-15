@@ -62,6 +62,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         booleanToLabel(bool),
         editAction(
           controllers.renewal.routes.InvolvedInOtherController.get(true).url,
+          "renewal.checkYourAnswers.change.busotherActivities",
           "involvedinotheractivities-edit"
         )
       )
@@ -75,6 +76,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             details,
             editAction(
               controllers.renewal.routes.InvolvedInOtherController.get(true).url,
+              "renewal.checkYourAnswers.change.otherActivitiesDesc",
               "involvedinotheractivities-details-edit"
             )
           )
@@ -92,6 +94,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         messages(s"businessactivities.turnover.lbl.${businessTurnover.value}"),
         editAction(
           controllers.renewal.routes.BusinessTurnoverController.get(true).url,
+          "renewal.checkYourAnswers.change.turnover",
           "businessturnover-edit"
         )
       )
@@ -106,6 +109,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         messages(s"businessactivities.business-turnover.lbl.$answer"),
         editAction(
           controllers.renewal.routes.AMLSTurnoverController.get(true).url,
+          "renewal.checkYourAnswers.change.ampTurnover",
           "turnover-edit"
         )
       )
@@ -128,6 +132,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         messages(s"hvd.percentage.lbl.${ampTurnover.value}"),
         editAction(
           controllers.renewal.routes.AMPTurnoverController.get(true).url,
+          "renewal.checkYourAnswers.change.ampTurnover",
           "ampTurnover-edit"
         )
       )
@@ -143,6 +148,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           TotalThroughput.labelFor(totalThroughput),
           editAction(
             controllers.renewal.routes.TotalThroughputController.get(true).url,
+            "renewal.checkYourAnswers.change.totalThroughput",
             "msbtotalthroughput-edit"
           )
         )
@@ -153,6 +159,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           transactions.transfers,
           editAction(
             controllers.renewal.routes.TransactionsInLast12MonthsController.get(true).url,
+            "renewal.checkYourAnswers.change.totalMoneyTrans",
             "msbtransfers-edit"
           )
         )
@@ -170,6 +177,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           booleanToLabel(otherCountry.money),
           editAction(
             controllers.renewal.routes.SendMoneyToOtherCountryController.get(edit = true).url,
+            "renewal.checkYourAnswers.change.transToOtherCountry",
             "msbsendmoney-edit"
           )
         )
@@ -184,6 +192,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           },
           actions = editAction(
             controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).url,
+            "renewal.checkYourAnswers.change.whichCountries",
             "msblargestamounts-edit"
           )
         )
@@ -198,6 +207,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           },
           actions = editAction(
             controllers.renewal.routes.MostTransactionsController.get(edit = true).url,
+            "renewal.checkYourAnswers.change.whereSentMost",
             "msbmostransactions-edit"
           )
         )
@@ -215,6 +225,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         value,
         actions = editAction(
           controllers.renewal.routes.MoneySourcesController.get(edit = true).url,
+          "renewal.checkYourAnswers.change.whoSuppliedFCurrency",
           "msbmoneysources-edit"
         )
       )
@@ -228,6 +239,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             transactions.ceTransaction,
             editAction(
               controllers.renewal.routes.CETransactionsInLast12MonthsController.get(edit = true).url,
+              "renewal.checkYourAnswers.change.whereSentMost",
               "msbcetransactionsexpected-edit"
             )
           )
@@ -242,6 +254,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             },
             actions = editAction(
               controllers.renewal.routes.WhichCurrenciesController.get(edit = true).url,
+              "renewal.checkYourAnswers.change.currencySupplied",
               "msbwhichcurrencies-edit"
             )
           )
@@ -255,6 +268,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             },
             editAction(
               controllers.renewal.routes.UsesForeignCurrenciesController.get(true).url,
+              "renewal.checkYourAnswers.change.currencySupplied",
               "msbusesforeigncurrencies-edit"
             )
           )
@@ -272,6 +286,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
                 source.bankNames,
                 editAction(
                   controllers.renewal.routes.MoneySourcesController.get(true).url,
+                  "renewal.checkYourAnswers.change.whoSuppliedFCurrency",
                   "msbbankmoneysources-edit"
                 )
               )
@@ -282,6 +297,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
                 source.wholesalerNames,
                 editAction(
                   controllers.renewal.routes.MoneySourcesController.get(true).url,
+                  "renewal.checkYourAnswers.change.whoSuppliedFCurrency",
                   "msbwholesalermoneysources-edit"
                 )
               )
@@ -299,6 +315,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           transactions.fxTransaction,
           editAction(
             controllers.renewal.routes.FXTransactionsInLast12MonthsController.get(edit = true).url,
+            "renewal.checkYourAnswers.change.howManyFExchangeTrans",
             "msbfxtransactionsexpected-edit"
           )
         )
@@ -314,6 +331,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           booleanToLabel(boa.isOutside),
           editAction(
             controllers.renewal.routes.CustomersOutsideIsUKController.get(true).url,
+            "renewal.checkYourAnswers.change.custOutsideUK",
             "customersoutsideisuk-edit"
           )
         )
@@ -325,6 +343,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             value,
             actions = editAction(
               controllers.renewal.routes.CustomersOutsideUKController.get(true).url,
+              "renewal.checkYourAnswers.change.whichCountryCust",
               "customersoutsideuk-edit"
             )
           )
@@ -347,6 +366,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         messages(s"hvd.percentage.lbl.${percentage.value}"),
         editAction(
           controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get(true).url,
+          "renewal.checkYourAnswers.change.percentageCashPayments",
           "hvdpercentage-edit"
         )
       )
@@ -369,6 +389,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             },
             editAction(
               controllers.renewal.routes.CashPaymentsCustomersNotMetController.get(true).url,
+              "renewal.checkYourAnswers.change.receivedCashPayments",
               "receivecashpayments-edit"
             )
           )
@@ -382,6 +403,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             },
             actions = editAction(
               controllers.renewal.routes.HowCashPaymentsReceivedController.get(true).url,
+              "renewal.checkYourAnswers.change.howReceivedCashPayments",
               "receivecashpaymentshowreceived-edit"
             )
           )

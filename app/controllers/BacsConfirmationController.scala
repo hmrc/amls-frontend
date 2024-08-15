@@ -19,6 +19,7 @@ package controllers
 import cats.data.OptionT
 import cats.implicits._
 import connectors._
+import models.renewal.Renewal
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthAction, BusinessName}
@@ -37,13 +38,14 @@ class BacsConfirmationController @Inject()(authAction: AuthAction,
                                            view: ConfirmationBacsView) extends AmlsBaseController(ds, cc) {
 
   def bacsConfirmation(): Action[AnyContent] = authAction.async {
-      implicit request =>
-        val okResult = for {
-          refNo <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-          status <- OptionT.liftF(statusService.getReadStatus(refNo, request.accountTypeId))
-          name <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
-        } yield Ok(view(name))
+    implicit request =>
+      val okResult = for {
+        refNo <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+        status <- OptionT.liftF(statusService.getReadStatus(refNo, request.accountTypeId))
+        name <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
+        isRenewal <- OptionT.liftF(dataCacheConnector.fetch[Renewal](request.credId, Renewal.key).map(_.isDefined))
+      } yield Ok(view(name, refNo, isRenewal))
 
-        okResult getOrElse InternalServerError("Unable to get BACS confirmation")
+      okResult getOrElse InternalServerError("Unable to get BACS confirmation")
   }
 }
