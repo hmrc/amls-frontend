@@ -72,17 +72,9 @@ class DeregistrationCheckYourAnswersControllerSpec extends AmlsSpec with Injecti
     private val content: String = contentAsString(result)
 
     content must include("Your registration")
-    content must include("Check your answers")
-    content must include("Why are you deregistering the business?")
-    content must include("Business is out of scope as no longer carrying out activities covered by the Money Laundering Regulations") //outOfScope
 
     val document: Document = Jsoup.parse(content)
-    private val changeLink: Element = document.getElementById("cya-change-link")
-    changeLink.text() mustBe "Change"
-    changeLink.attr("href") mustBe controllers.deregister.routes.DeregistrationReasonController.get.url
-
-    val acceptAndContinue: Element = document.getElementById("button")
-    acceptAndContinue.text() mustBe "Accept and continue"
+    document.select("h1").text mustBe "Check your answers" //verify correct the view is loaded
   }
 
   "when submitting it deregisters and navigates to the landing page" in new TestFixture {

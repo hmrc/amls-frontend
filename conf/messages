@@ -700,6 +700,7 @@ button.saveandreturn = Save and continue
 button.checkYourAnswers = Check your answers
 button.back = Back
 button.edit = Change
+button.change = Change
 button.remove = Remove
 button.delete = Delete
 button.continue = Continue

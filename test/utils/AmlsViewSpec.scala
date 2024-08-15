@@ -55,7 +55,7 @@ trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar w
 
   val mockMcc = mock[MessagesControllerComponents]
 
-  def addTokenForView[T]() = {
+  def addTokenForView() = {
     import play.api.test.CSRFTokenHelper._
 
     CSRFRequest(authRequest).withCSRFToken

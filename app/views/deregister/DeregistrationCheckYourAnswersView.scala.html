@@ -15,18 +15,15 @@
  *@
 
 @import models.deregister.DeregistrationReason
-@import views.html.components.forms.{ErrorSummary, InputText}
 @import views.html.components.{Button, Heading, SectionSubtitle}
 
 @this(
         layout: Layout,
-        errorSummary: ErrorSummary,
         subtitle: SectionSubtitle,
         formHelper: FormWithCSRF,
-        radios: GovukRadios,
-        inputText: InputText,
         button: Button,
-        heading: Heading
+        heading: Heading,
+        govukSummaryList: GovukSummaryList
 )
 
 @(deregistrationReason: DeregistrationReason)(implicit messages: Messages, request: Request[_])
@@ -38,23 +35,9 @@
 
     @heading("deregistration.cya.heading")
 
-
-    <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-                @messages("deregistration.cya.question")
-            </dt>
-            <dd class="govuk-summary-list__value">
-                @Text(messages(s"deregistration.reason.lbl.${deregistrationReason.value}")).asHtml
-            </dd>
-            <dd class="govuk-summary-list__actions">
-                <a class="govuk-link" id="cya-change-link" href="@{controllers.deregister.routes.DeregistrationReasonController.get}">
-                    Change
-                </a>
-            </dd>
-        </div>
-    </dl>
-
+    @govukSummaryList(
+        _root_.utils.deregister.CheckYourAnswersHelper.createSummaryList(deregistrationReason)
+    )
     @formHelper(controllers.deregister.routes.DeregistrationCheckYourAnswersController.post, Symbol("disable-on-submit") -> "true") {
         @button("button.acceptandcontinue")
     }

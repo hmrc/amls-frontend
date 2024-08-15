@@ -22,6 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessmatching.BusinessActivity.HighValueDealing
 import models.businessmatching.BusinessMatching
 import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
+import play.api.Logger
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AuthEnrolmentsService
 import services.cache.Cache
@@ -46,11 +47,15 @@ class DeregistrationCheckYourAnswersController @Inject()(authAction: AuthAction,
         .fetchAll(request.credId)
         .map(_.getOrElse(throw new RuntimeException("missing 'Cache' in mongo")))
         .map { cache: Cache =>
-          val deregistrationReason: DeregistrationReason = cache
+          cache
             .getEntry[DeregistrationReason](DeregistrationReason.key)
-            .getOrElse(throw new RuntimeException("missing 'DeregistrationReason'"))
-          Ok(view(deregistrationReason = deregistrationReason))
-      }
+            .fold {
+              logger.warn("expected 'DeregistrationReason' which is missing, sending user to the landing page")
+              Redirect(controllers.routes.LandingController.start(allowRedirect = true))
+            }(deregistrationReason =>
+              Ok(view(deregistrationReason = deregistrationReason))
+            )
+        }
   }
 
   def post: Action[AnyContent] = authAction.async {
@@ -80,4 +85,6 @@ class DeregistrationCheckYourAnswersController @Inject()(authAction: AuthAction,
         )
       } yield Redirect(controllers.routes.LandingController.get)
   }
+
+  private lazy val logger: Logger = Logger(this.getClass)
 }

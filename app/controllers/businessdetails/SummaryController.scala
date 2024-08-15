@@ -23,6 +23,7 @@ import models.businessdetails.BusinessDetails
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.AuthAction
 import utils.businessdetails.CheckYourAnswersHelper
 import views.html.businessdetails.CheckYourAnswersView
@@ -48,7 +49,7 @@ class SummaryController @Inject () (
             case NotCompleted | SubmissionReady | SubmissionReadyForReview => true
             case _ => false
           }
-          val summaryListRows = cyaHelper.createSummaryList(data, showRegisteredForMLR)
+          val summaryListRows: SummaryList = cyaHelper.createSummaryList(data, showRegisteredForMLR)
           Ok(view(summaryListRows))
         }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
