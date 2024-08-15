@@ -19,7 +19,7 @@ package views.deregister
 import models.deregister.DeregistrationReason
 import org.jsoup.nodes.Element
 import play.api.mvc.{AnyContentAsEmpty, Request}
-import play.twirl.api.{Html, HtmlFormat}
+import play.twirl.api.Html
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.deregister.DeregistrationCheckYourAnswersView
@@ -40,9 +40,9 @@ class DeregistrationCheckYourAnswersViewSpec extends AmlsViewSpec {
     val changeLink: Element = doc.getElementById("cya-change-link")
 
     changeLink.text() mustBe "Change"
-//    changeLink.attr("href") mustBe controllers.deregister.routes.DeregistrationReasonController.get.url
-//    val acceptAndContinue: Element = doc.getElementById("button")
-//    acceptAndContinue.text() mustBe "Accept and continue"
+    changeLink.attr("href") mustBe controllers.deregister.routes.DeregistrationReasonController.get.url
+    val acceptAndContinue: Element = doc.getElementById("button")
+    acceptAndContinue.text() mustBe "Accept and continue"
   }
 
 }
