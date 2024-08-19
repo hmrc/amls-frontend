@@ -26,10 +26,10 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.AuthEnrolmentsService
 import services.cache.Cache
 import uk.gov.hmrc.mongo.play.json.Codecs
-import utils.{AckRefGenerator, AuthAction}
+import utils.{AckRefGenerator, AuthAction, AuthorisedRequest}
 import views.html.deregister.DeregistrationCheckYourAnswersView
 
-import java.time.{LocalDate}
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.Future
 import cats.implicits._
@@ -44,38 +44,16 @@ class DeregistrationCheckYourAnswersController @Inject()(authAction: AuthAction,
                                                          cc: MessagesControllerComponents,
                                                          view: DeregistrationCheckYourAnswersView) extends AmlsBaseController(ds, cc) {
 
-
-  private val redirectToLandingPage = Redirect(controllers.routes.LandingController.start(true))
-
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-
-      val eitherT = for {
-        cache <- EitherT.fromOptionF(
-          dataCacheConnector.fetchAll(request.credId),
-          redirectToLandingPage
-        )
-        deregistrationReason <- EitherT.fromOption[Future](
-          cache.getEntry[DeregistrationReason](DeregistrationReason.key),
-          redirectToLandingPage
-        )
-      } yield Ok(view(deregistrationReason = deregistrationReason))
-
-      eitherT.value.map(_.fold(identity, identity))
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+      fetchDeregistrationReason()
+        .map(deregistrationReason => Ok(view(deregistrationReason = deregistrationReason)))
+        .value.map(_.fold(identity, identity))
   }
 
   def post: Action[AnyContent] = authAction.async { implicit request =>
 
-    def deregistrationResonOthers(deregistrationReason: DeregistrationReason): Option[String] = deregistrationReason match {
-      case DeregistrationReason.Other(reason) => Some(reason)
-      case _ => None
-    }
-
     val eitherT: EitherT[Future, Result, Result] = for {
-      deregistrationReason <- EitherT.fromOptionF[Future, Result, DeregistrationReason](
-        dataCacheConnector.fetch[DeregistrationReason](request.credId, DeregistrationReason.key),
-        redirectToLandingPage
-      )
+      deregistrationReason <- fetchDeregistrationReason()
       deRegisterSubscriptionRequest = DeRegisterSubscriptionRequest(
         acknowledgementReference = AckRefGenerator(),
         deregistrationDate = LocalDate.now(),
@@ -94,4 +72,17 @@ class DeregistrationCheckYourAnswersController @Inject()(authAction: AuthAction,
     } yield Redirect(controllers.routes.LandingController.get)
     eitherT.value.map(_.fold(identity, identity))
   }
+
+  private val redirectToLandingPage = Redirect(controllers.routes.LandingController.start(true))
+
+  private def fetchDeregistrationReason()(implicit request: AuthorisedRequest[AnyContent]) = EitherT.fromOptionF[Future, Result, DeregistrationReason](
+    dataCacheConnector.fetch[DeregistrationReason](request.credId, DeregistrationReason.key),
+    redirectToLandingPage
+  )
+
+  private def deregistrationResonOthers(deregistrationReason: DeregistrationReason): Option[String] = deregistrationReason match {
+    case DeregistrationReason.Other(reason) => Some(reason)
+    case _ => None
+  }
+
 }
