@@ -117,14 +117,12 @@
             form("lastName")
         )
 
-        <h2 class="govuk-heading-m">@messages("responsiblepeople.position_within_business.h2")</h2>
-
         @inputCheckbox(
             Checkboxes(
                 fieldset = Some(Fieldset(
                     legend = Some(Legend(
                         content = Text(messages("responsiblepeople.position_within_business.h2")),
-                        classes = "govuk-visually-hidden",
+                        classes = "govuk-fieldset__legend--m",
                         isPageHeading = false
                     ))
                 )),
