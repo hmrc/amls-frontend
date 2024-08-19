@@ -16,6 +16,7 @@
 
 @import models.deregister.DeregistrationReason
 @import views.html.components.{Button, Heading, SectionSubtitle}
+@import _root_.utils.deregister.CheckYourAnswersHelper
 
 @this(
         layout: Layout,
@@ -36,7 +37,7 @@
     @heading("deregistration.cya.heading")
 
     @govukSummaryList(
-        _root_.utils.deregister.CheckYourAnswersHelper.createSummaryList(deregistrationReason)
+        CheckYourAnswersHelper.createSummaryList(deregistrationReason)
     )
     @formHelper(controllers.deregister.routes.DeregistrationCheckYourAnswersController.post, Symbol("disable-on-submit") -> "true") {
         @button("button.acceptandcontinue")
