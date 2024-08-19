@@ -121,11 +121,14 @@
 
         @inputCheckbox(
             Checkboxes(
-                hint = Some(
-                    Hint(
-                        content = Text(messages("lbl.select.all"))
-                    )
-                ),
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("responsiblepeople.position_within_business.h2")),
+                        classes = "govuk-visually-hidden",
+                        isPageHeading = false
+                    ))
+                )),
+                hint = Some(Hint(content = Text(messages("lbl.select.all")))),
                 name = "positions",
                 items = RoleWithinBusinessRelease7.formValues(businessType, conditionalHtml)
             ).withFormField(form("positions"))

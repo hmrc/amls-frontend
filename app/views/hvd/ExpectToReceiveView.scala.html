@@ -65,6 +65,13 @@
 
         @inputCheckbox(
             Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("hvd.expect.to.receive.title")),
+                        classes = "govuk-visually-hidden",
+                        isPageHeading = false
+                    ))
+                )),
                 name = "paymentMethods",
                 hint = Some(Hint(content = Text(messages("lbl.select.all")))),
                 items = PaymentMethods.formValues(conditionalHtml)
