@@ -62,9 +62,8 @@ class DeregistrationCheckYourAnswersControllerSpec extends AmlsSpec with Injecti
   }
 
   "when entering to the page it displays check your answers page" in new TestFixture {
-    when(dataCacheConnector.fetchAll(credentialId)).thenReturn(Future.successful(Some(
-      Cache(credentialId, Map(DeregistrationReason.key -> Json.toJson[DeregistrationReason](DeregistrationReason.OutOfScope)))
-    )))
+    when(dataCacheConnector.fetch[DeregistrationReason](eqTo(credentialId), eqTo(DeregistrationReason.key))(any()))
+      .thenReturn(Future.successful(Some(DeregistrationReason.OutOfScope)))
 
     val result: Future[Result] = controller.get()(request)
     status(result) must be(OK)
