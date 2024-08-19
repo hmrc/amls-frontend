@@ -58,7 +58,7 @@ class DeregistrationCheckYourAnswersController @Inject()(authAction: AuthAction,
         acknowledgementReference = AckRefGenerator(),
         deregistrationDate = LocalDate.now(),
         deregistrationReason = deregistrationReason,
-        deregReasonOther = deregistrationResonOthers(deregistrationReason)
+        deregReasonOther = deregistrationReasonOthers(deregistrationReason)
       )
       amlsRegistrationNumber <- EitherT.fromOptionF(
         authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier),
@@ -80,7 +80,7 @@ class DeregistrationCheckYourAnswersController @Inject()(authAction: AuthAction,
     redirectToLandingPage
   )
 
-  private def deregistrationResonOthers(deregistrationReason: DeregistrationReason): Option[String] = deregistrationReason match {
+  private def deregistrationReasonOthers(deregistrationReason: DeregistrationReason): Option[String] = deregistrationReason match {
     case DeregistrationReason.Other(reason) => Some(reason)
     case _ => None
   }
