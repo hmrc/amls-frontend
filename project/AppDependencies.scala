@@ -21,7 +21,7 @@ private object AppDependencies {
     // OTHER
     "com.vladsch.flexmark"   % "flexmark-all"                          % flexmarkVersion,
     "com.beachape"          %% "enumeratum-play"                       % "1.8.0",
-    "org.typelevel"         %% "cats-core"                             % "2.10.0",
+    "org.typelevel"         %% "cats-core"                             % "2.12.0",
     "commons-codec"          % "commons-codec"                         % "1.15"
   )
 

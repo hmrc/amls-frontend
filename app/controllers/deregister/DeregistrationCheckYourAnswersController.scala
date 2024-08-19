@@ -16,21 +16,25 @@
 
 package controllers.deregister
 
-import cats.implicits._
+
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessmatching.BusinessActivity.HighValueDealing
 import models.businessmatching.BusinessMatching
 import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.AuthEnrolmentsService
 import services.cache.Cache
 import uk.gov.hmrc.mongo.play.json.Codecs
 import utils.{AckRefGenerator, AuthAction}
 import views.html.deregister.DeregistrationCheckYourAnswersView
 
-import java.time.{Clock, LocalDate}
+import java.time.{LocalDate}
 import javax.inject.Inject
+import scala.concurrent.Future
+import cats.implicits._
+import cats.instances.future._
+import cats.data.EitherT
 
 class DeregistrationCheckYourAnswersController @Inject()(authAction: AuthAction,
                                                          ds: CommonPlayDependencies,
@@ -40,44 +44,54 @@ class DeregistrationCheckYourAnswersController @Inject()(authAction: AuthAction,
                                                          cc: MessagesControllerComponents,
                                                          view: DeregistrationCheckYourAnswersView) extends AmlsBaseController(ds, cc) {
 
+
+  private val redirectToLandingPage = Redirect(controllers.routes.LandingController.start(true))
+
   def get: Action[AnyContent] = authAction.async {
     implicit request =>
-      dataCacheConnector
-        .fetchAll(request.credId)
-        .map(_.getOrElse(throw new RuntimeException("missing 'Cache' in mongo")))
-        .map { cache: Cache =>
-          val deregistrationReason: DeregistrationReason = cache
-            .getEntry[DeregistrationReason](DeregistrationReason.key)
-            .getOrElse(throw new RuntimeException("missing 'DeregistrationReason'"))
-          Ok(view(deregistrationReason = deregistrationReason))
-      }
+
+      val eitherT = for {
+        cache <- EitherT.fromOptionF(
+          dataCacheConnector.fetchAll(request.credId),
+          redirectToLandingPage
+        )
+        deregistrationReason <- EitherT.fromOption[Future](
+          cache.getEntry[DeregistrationReason](DeregistrationReason.key),
+          redirectToLandingPage
+        )
+      } yield Ok(view(deregistrationReason = deregistrationReason))
+
+      eitherT.value.map(_.fold(identity, identity))
   }
 
-  def post: Action[AnyContent] = authAction.async {
-    implicit request =>
+  def post: Action[AnyContent] = authAction.async { implicit request =>
 
-      for {
-        deregistrationReason: DeregistrationReason <- dataCacheConnector
-          .fetch[DeregistrationReason](request.credId, DeregistrationReason.key)
-          .map(_.getOrElse(throw new RuntimeException("missing 'DeregistrationReason'")))
-        deregistrationReasonOthers: Option[String] = deregistrationReason match {
-          case DeregistrationReason.Other(reason) => reason.some
-          case _ => None
-        }
-        deRegisterSubscriptionRequest: DeRegisterSubscriptionRequest = DeRegisterSubscriptionRequest(
-          acknowledgementReference = AckRefGenerator(),
-          deregistrationDate = LocalDate.now(),
-          deregistrationReason = deregistrationReason,
-          deregReasonOther = deregistrationReasonOthers
-        )
-        amlsRegistrationNumber: String <- authEnrolmentsService
-          .amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier)
-          .map(_.getOrElse(throw new RuntimeException("Missing 'amlsRegistrationNumber'")))
-        _ <- amlsConnector.deregister(
-          amlsRegistrationNumber = amlsRegistrationNumber,
-          request = deRegisterSubscriptionRequest,
-          accountTypeId = request.accountTypeId
-        )
-      } yield Redirect(controllers.routes.LandingController.get)
+    def deregistrationResonOthers(deregistrationReason: DeregistrationReason): Option[String] = deregistrationReason match {
+      case DeregistrationReason.Other(reason) => Some(reason)
+      case _ => None
+    }
+
+    val eitherT: EitherT[Future, Result, Result] = for {
+      deregistrationReason <- EitherT.fromOptionF[Future, Result, DeregistrationReason](
+        dataCacheConnector.fetch[DeregistrationReason](request.credId, DeregistrationReason.key),
+        redirectToLandingPage
+      )
+      deRegisterSubscriptionRequest = DeRegisterSubscriptionRequest(
+        acknowledgementReference = AckRefGenerator(),
+        deregistrationDate = LocalDate.now(),
+        deregistrationReason = deregistrationReason,
+        deregReasonOther = deregistrationResonOthers(deregistrationReason)
+      )
+      amlsRegistrationNumber <- EitherT.fromOptionF(
+        authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier),
+        redirectToLandingPage
+      )
+      _ <- EitherT.right(amlsConnector.deregister(
+        amlsRegistrationNumber = amlsRegistrationNumber,
+        request = deRegisterSubscriptionRequest,
+        accountTypeId = request.accountTypeId
+      ))
+    } yield Redirect(controllers.routes.LandingController.get)
+    eitherT.value.map(_.fold(identity, identity))
   }
 }
