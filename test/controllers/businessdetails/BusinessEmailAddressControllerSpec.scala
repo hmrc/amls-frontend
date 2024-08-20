@@ -82,7 +82,6 @@ class BusinessEmailAddressControllerSpec extends AmlsSpec with MockitoSugar with
 
       "on post of valid data" in new Fixture {
         val newRequest = FakeRequest(POST, routes.BusinessEmailAddressController.post().url).withFormUrlEncodedBody(
-          "confirmEmail" -> "test@test.com",
           "email" -> "test@test.com"
         )
 
@@ -104,16 +103,6 @@ class BusinessEmailAddressControllerSpec extends AmlsSpec with MockitoSugar with
         status(result) must be(BAD_REQUEST)
       }
 
-      "on post of different email addresses" in new Fixture {
-
-        val newRequest = FakeRequest(POST, routes.BusinessEmailAddressController.post().url).withFormUrlEncodedBody(
-          "confirmEmail" -> "test@test.com",
-          "email" -> "test1@test.com"
-        )
-
-        val result = controller.post()(newRequest)
-        status(result) must be(BAD_REQUEST)
-      }
     }
   }
 }
