@@ -1,0 +1,110 @@
+/*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.deregister
+
+import cats.implicits._
+import connectors.{AmlsConnector, DataCacheConnector}
+import controllers.actions.SuccessfulAuthAction
+import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse, DeregistrationReason}
+import org.jsoup.Jsoup
+import org.jsoup.nodes.{Document, Element}
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{eq => eqTo, _}
+import org.mockito.Mockito._
+import play.api.libs.json.Json
+import play.api.mvc.Result
+import play.api.test.Helpers._
+import play.api.test.Injecting
+import services.AuthEnrolmentsService
+import services.cache.Cache
+import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.deregister.DeregistrationCheckYourAnswersView
+
+import scala.concurrent.Future
+
+class DeregistrationCheckYourAnswersControllerSpec extends AmlsSpec with Injecting {
+
+  trait TestFixture extends AuthorisedFixture {
+    self =>
+
+    val credentialId: String = SuccessfulAuthAction.credentialId
+
+    val request = addToken(authRequest)
+
+    val amlsConnector: AmlsConnector = mock[AmlsConnector]
+    val authEnrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
+    val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
+
+    lazy val view = inject[DeregistrationCheckYourAnswersView]
+    lazy val controller = new DeregistrationCheckYourAnswersController(
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      dataCacheConnector = dataCacheConnector,
+      amlsConnector = amlsConnector,
+      authEnrolmentsService = authEnrolmentsService,
+      cc = mockMcc,
+      view = view
+    )
+  }
+
+  "when entering to the page it displays check your answers page" in new TestFixture {
+    when(dataCacheConnector.fetch[DeregistrationReason](eqTo(credentialId), eqTo(DeregistrationReason.key))(any()))
+      .thenReturn(Future.successful(Some(DeregistrationReason.OutOfScope)))
+
+    val result: Future[Result] = controller.get()(request)
+    status(result) must be(OK)
+
+    private val content: String = contentAsString(result)
+
+    content must include("Your registration")
+
+    val document: Document = Jsoup.parse(content)
+    document.select("h1").text mustBe "Check your answers" //verify correct the view is loaded
+  }
+
+  "when submitting it deregisters and navigates to the landing page" in new TestFixture {
+
+    when(dataCacheConnector.fetch[DeregistrationReason](eqTo(credentialId), eqTo(DeregistrationReason.key))(any()))
+      .thenReturn(Future.successful(Some(DeregistrationReason.OutOfScope)))
+
+    val amlsRegistrationNumber: String = "XA1234567890L"
+
+    when {
+      authEnrolmentsService.amlsRegistrationNumber(Some(any()), Some(any()))(any(), any())
+    } thenReturn Future.successful(amlsRegistrationNumber.some)
+
+    when {
+      amlsConnector.deregister(eqTo(amlsRegistrationNumber), any(), any())(any(), any())
+    } thenReturn Future.successful(mock[DeRegisterSubscriptionResponse])
+
+    val result: Future[Result] = controller.post()(request)
+
+    status(result) must be(SEE_OTHER)
+    redirectLocation(result).value mustBe controllers.routes.LandingController.get().url
+
+    val captor: ArgumentCaptor[DeRegisterSubscriptionRequest] = ArgumentCaptor.forClass(classOf[DeRegisterSubscriptionRequest])
+
+    verify(amlsConnector).deregister(
+      amlsRegistrationNumber = eqTo(amlsRegistrationNumber),
+      request = captor.capture(),
+      accountTypeId = any())(any(), any())
+
+    captor.getValue.deregistrationReason mustBe DeregistrationReason.OutOfScope
+
+  }
+
+}

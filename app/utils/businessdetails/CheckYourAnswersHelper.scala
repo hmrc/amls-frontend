@@ -31,7 +31,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
 
   def createSummaryList(businessDetails: BusinessDetails, showRegisteredForMLR: Boolean)(implicit messages: Messages): SummaryList = {
 
-    val rows = Seq(
+    val rows: Seq[SummaryListRow] = Seq(
       businessCurrentlyRegisteredRow(showRegisteredForMLR, businessDetails),
       activityStartDateRow(businessDetails)
     ).flatten ++

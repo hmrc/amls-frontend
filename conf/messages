@@ -700,6 +700,7 @@ button.saveandreturn = Save and continue
 button.checkYourAnswers = Check your answers
 button.back = Back
 button.edit = Change
+button.change = Change
 button.remove = Remove
 button.delete = Delete
 button.continue = Continue
@@ -707,6 +708,7 @@ button.continuetopayment = Continue to payment
 button.returntosummary = Return to Summary
 button.confirmandsubmit = Confirm and submit
 button.confirmandcontinue = Confirm and continue
+button.acceptandcontinue = Accept and continue
 
 button.returntoapplicationprogress = Return to about your business
 
@@ -1329,6 +1331,8 @@ dateofchange.hint = For example, 31 03 1980.
 
 deregistration.reason.title = De-Register
 deregistration.reason.heading = Why are you deregistering the business?
+deregistration.cya.heading = Check your answers
+deregistration.cya.question = Why are you deregistering the business?
 
 deregistration.reason.lbl.01 = Business is out of scope as no longer carrying out activities covered by the Money Laundering Regulations
 deregistration.reason.lbl.02 = Business is not trading in its own right because it is now an agent of a money service business
