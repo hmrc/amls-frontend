@@ -33,8 +33,21 @@ object SuccessfulAuthAction extends AuthAction {
 
   override protected def executionContext: ExecutionContext = Helpers.stubControllerComponents().executionContext
 
-  override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
-    Future.successful(Right(AuthorisedRequest(request, Some("amlsRefNumber"), "internalId", affinityGroup, enrolments, ("accType", "id"), Some("GROUP_ID"), Some(User))))
+  val credentialId: String = "internalId"
+  val amlsRefNumber = "amlsRefNumber"
+
+  override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
+    Future.successful(Right(AuthorisedRequest(
+      request = request,
+      amlsRefNumber = Some(amlsRefNumber),
+      credId = credentialId,
+      affinityGroup = affinityGroup,
+      enrolments = enrolments,
+      accountTypeId = ("accType", "id"),
+      groupIdentifier = Some("GROUP_ID"),
+      credentialRole = Some(User)))
+    )
+  }
 }
 
 object SuccessfulAuthActionNoAmlsRefNo extends AuthAction {

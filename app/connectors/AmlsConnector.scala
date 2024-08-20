@@ -38,7 +38,7 @@ class AmlsConnector @Inject()(val http: HttpClient,
 
   private[connectors] val registrationUrl: String = s"${appConfig.amlsUrl}/amls/registration"
 
-  private[connectors] val paymentUrl: String= s"${appConfig.amlsUrl}/amls/payment"
+  private[connectors] val paymentUrl: String = s"${appConfig.amlsUrl}/amls/payment"
 
   def subscribe(subscriptionRequest: SubscriptionRequest, safeId: String, accountTypeId: (String, String))
                (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[SubscriptionRequest], resW: Writes[SubscriptionResponse]): Future[SubscriptionResponse] = {
@@ -179,16 +179,21 @@ class AmlsConnector @Inject()(val http: HttpClient,
 
   def withdraw(amlsRegistrationNumber: String, request: WithdrawSubscriptionRequest, accountTypeId: (String, String))
               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[WithdrawSubscriptionResponse] = {
-    
+
     val (accountType, accountId) = accountTypeId
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/withdrawal"
 
     http.POST[WithdrawSubscriptionRequest, WithdrawSubscriptionResponse](postUrl, request)
   }
 
-  def deregister(amlsRegistrationNumber: String, request: DeRegisterSubscriptionRequest, accountTypeId: (String, String))
-                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[DeRegisterSubscriptionResponse] = {
-    
+  def deregister(
+    amlsRegistrationNumber: String,
+    request: DeRegisterSubscriptionRequest,
+    accountTypeId: (String, String))(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[DeRegisterSubscriptionResponse] = {
+
     val (accountType, accountId) = accountTypeId
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/deregistration"
 

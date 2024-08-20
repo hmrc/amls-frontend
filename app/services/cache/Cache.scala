@@ -25,7 +25,11 @@ import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, PlainText}
 import java.time.{LocalDateTime, ZoneOffset}
 import scala.util.{Failure, Success, Try}
 
-case class Cache(id: String, data: Map[String, JsValue], lastUpdated: LocalDateTime = LocalDateTime.now(ZoneOffset.UTC)) {
+case class Cache(
+                  id: String,
+                  data: Map[String, JsValue],
+                  lastUpdated: LocalDateTime = LocalDateTime.now(ZoneOffset.UTC)
+                ) {
 
   /**
     * Upsert a value into the cache given its key.
