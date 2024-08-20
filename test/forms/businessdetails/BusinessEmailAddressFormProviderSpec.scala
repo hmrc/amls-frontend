@@ -26,7 +26,7 @@ class BusinessEmailAddressFormProviderSpec extends StringFieldBehaviours {
   val form = new BusinessEmailAddressFormProvider()
 
   val emailField = "email"
-  val confirmEmailField = "confirmEmail"
+
 
   val requiredError = "error.required.email"
   val lengthError = "error.invalid.email.max.length"
@@ -43,11 +43,11 @@ class BusinessEmailAddressFormProviderSpec extends StringFieldBehaviours {
           val result = form().bind(
             Map(
               emailField -> email,
-              confirmEmailField -> email
+
             )
           )
 
-          result.value shouldBe Some(ContactingYouEmail(email, email))
+          result.value shouldBe Some(ContactingYouEmail(email))
           result.errors shouldBe Nil
         }
       }
@@ -60,15 +60,13 @@ class BusinessEmailAddressFormProviderSpec extends StringFieldBehaviours {
         forAll(emailGen) { email =>
           val result = form().bind(
             Map(
-              emailField -> "",
-              confirmEmailField -> ""
+              emailField -> ""
             )
           )
 
           result.value shouldBe None
           result.errors shouldBe Seq(
             FormError(emailField, requiredError),
-            FormError(confirmEmailField, s"$requiredError.reenter")
           )
         }
       }
@@ -79,14 +77,12 @@ class BusinessEmailAddressFormProviderSpec extends StringFieldBehaviours {
           val result = form().bind(
             Map(
               emailField -> invalidEmail,
-              confirmEmailField -> invalidEmail
             )
           )
 
           result.value shouldBe None
           result.errors shouldBe Seq(
             FormError(emailField, lengthError, Seq(form.length)),
-            FormError(confirmEmailField, lengthError, Seq(form.length))
           )
         }
       }
@@ -97,14 +93,12 @@ class BusinessEmailAddressFormProviderSpec extends StringFieldBehaviours {
           val result = form().bind(
             Map(
               emailField -> (email + invalidChar),
-              confirmEmailField -> (email + invalidChar)
             )
           )
 
           result.value shouldBe None
           result.errors shouldBe Seq(
             FormError(emailField, invalidError, Seq(form.regex)),
-            FormError(confirmEmailField, s"$invalidError.reenter", Seq(form.regex))
           )
         }
       }
@@ -114,7 +108,6 @@ class BusinessEmailAddressFormProviderSpec extends StringFieldBehaviours {
         val result = form().bind(
           Map(
             emailField -> "john.doe@gmail.com",
-            confirmEmailField -> "john.doe@gmail.co"
           )
         )
 

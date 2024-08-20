@@ -25,7 +25,7 @@ class ContactingYouEmailSpec extends PlaySpec with MockitoSugar {
 
     "round trip through JSON" in {
       val email = "person@email.com"
-      val model = ContactingYouEmail(email, email)
+      val model = ContactingYouEmail(email)
 
       Json.toJson(model).as[ContactingYouEmail] mustBe model
     }

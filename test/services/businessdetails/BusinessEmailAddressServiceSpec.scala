@@ -96,7 +96,7 @@ class BusinessEmailAddressServiceSpec extends AmlsSpec with BeforeAndAfterEach w
         )(any())
         ).thenReturn(Future.successful(mockCacheMap))
 
-        service.updateEmailAddress(credId, ContactingYouEmail(email, email)).futureValue mustBe Some(mockCacheMap)
+        service.updateEmailAddress(credId, ContactingYouEmail(email)).futureValue mustBe Some(mockCacheMap)
 
         verify(mockCacheConnector).save[BusinessDetails](
           eqTo(credId),
@@ -112,7 +112,7 @@ class BusinessEmailAddressServiceSpec extends AmlsSpec with BeforeAndAfterEach w
           when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
             .thenReturn(Future.successful(None))
 
-          service.updateEmailAddress(credId, ContactingYouEmail(email, email)).futureValue mustBe None
+          service.updateEmailAddress(credId, ContactingYouEmail(email)).futureValue mustBe None
 
           verify(mockCacheConnector, times(0))
             .save[BusinessDetails](any(), any(), any())(any())
