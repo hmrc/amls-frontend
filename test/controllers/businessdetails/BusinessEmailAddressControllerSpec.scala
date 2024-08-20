@@ -96,7 +96,7 @@ class BusinessEmailAddressControllerSpec extends AmlsSpec with MockitoSugar with
       "on post of incomplete data" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.BusinessEmailAddressController.post().url).withFormUrlEncodedBody(
-          "email" -> "test@test.com"
+          "email" -> ""
         )
 
         val result = controller.post()(newRequest)
