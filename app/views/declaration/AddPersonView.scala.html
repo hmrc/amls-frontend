@@ -117,15 +117,16 @@
             form("lastName")
         )
 
-        <h2 class="govuk-heading-m">@messages("responsiblepeople.position_within_business.h2")</h2>
-
         @inputCheckbox(
             Checkboxes(
-                hint = Some(
-                    Hint(
-                        content = Text(messages("lbl.select.all"))
-                    )
-                ),
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("responsiblepeople.position_within_business.h2")),
+                        classes = "govuk-fieldset__legend--m",
+                        isPageHeading = false
+                    ))
+                )),
+                hint = Some(Hint(content = Text(messages("lbl.select.all")))),
                 name = "positions",
                 items = RoleWithinBusinessRelease7.formValues(businessType, conditionalHtml)
             ).withFormField(form("positions"))

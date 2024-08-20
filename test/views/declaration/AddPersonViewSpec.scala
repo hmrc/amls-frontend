@@ -65,7 +65,7 @@ class AddPersonViewSpec extends AmlsViewSpec with Matchers  {
       def view = personView("string1", "string2", Some(BusinessType.LPrLLP), formWithData)
 
       doc.getElementsByClass("govuk-heading-m").text() must include("Name")
-      doc.getElementsByClass("govuk-heading-m").text() must include("Role in the business")
+      doc.getElementsByClass("govuk-fieldset__legend--m").text() must include("Role in the business")
     }
 
     "pre-populate the fields correctly" in new ViewFixture {
