@@ -102,18 +102,6 @@ class BusinessEmailAddressFormProviderSpec extends StringFieldBehaviours {
           )
         }
       }
-
-      "inputs do not match" in {
-
-        val result = form().bind(
-          Map(
-            emailField -> "john.doe@gmail.com",
-          )
-        )
-
-        result.value shouldBe None
-        result.errors shouldBe List(FormError("", List(s"$invalidError.match")))
-      }
     }
   }
 }
