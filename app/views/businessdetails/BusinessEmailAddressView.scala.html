@@ -51,22 +51,13 @@
                 label = Label(
                     content = Text(messages("businessdetails.contactingyou.email.lbl"))
                 ),
-                classes = "govuk-!-width-one-half"
+                classes = "govuk-!-width-one-half",
+                attributes = Map(
+                    "autocomplete" -> "work email",
+                    "spellcheck" -> "false"
+                )
             ),
             form("email")
-        )
-
-        @inputText(
-            Input(
-                id = "confirmEmail",
-                name = "confirmEmail",
-                inputType = "email",
-                label = Label(
-                    content = Text(messages("businessdetails.contactingyou.confirm.email.lbl"))
-                ),
-                classes = "govuk-!-width-one-half"
-            ),
-            form("confirmEmail")
         )
 
         @button()
