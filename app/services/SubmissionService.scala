@@ -48,7 +48,6 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
-                                  val ggService: GovernmentGatewayService,
                                   val authEnrolmentsService: AuthEnrolmentsService,
                                   val amlsConnector: AmlsConnector,
                                   config: ApplicationConfig,
