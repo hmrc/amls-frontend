@@ -17,7 +17,6 @@
 package services
 
 import com.google.inject.Inject
-import connectors.GovernmentGatewayConnector
 import models.governmentgateway.EnrolmentRequest
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 

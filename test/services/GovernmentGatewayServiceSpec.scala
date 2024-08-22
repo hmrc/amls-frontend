@@ -16,7 +16,6 @@
 
 package services
 
-import connectors.GovernmentGatewayConnector
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
