@@ -56,11 +56,8 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
 
   private def enrol(safeId: String, amlsRegistrationNumber: String, postcode: String, groupId: Option[String], credId: String)
                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[_] =
-    if (config.enrolmentStoreToggle) {
-      authEnrolmentsService.enrol(amlsRegistrationNumber, postcode, groupId, credId)
-    } else {
-      ggService.enrol(amlsRegistrationNumber, safeId, postcode)
-    }
+
+    authEnrolmentsService.enrol(amlsRegistrationNumber, postcode, groupId, credId)
 
   def subscribe(credId: String, accountTypeId: (String, String), groupId: Option[String])
                (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubscriptionResponse] = {
@@ -83,7 +80,8 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
   private def createSubscriptionRequest(cache: Cache): SubscriptionRequest = {
 
     def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
-    def filteredTradingPremises     = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
+
+    def filteredTradingPremises = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
 
     SubscriptionRequest(
       businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),
@@ -167,7 +165,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
       rd <- bm.reviewDetails
     } yield rd.safeId) match {
       case Some(a) =>
-        if(a.trim.isEmpty) {
+        if (a.trim.isEmpty) {
           businessMatchingConnector.getReviewDetails map {
             case Some(details) => details.safeId
             case _ => throw new Exception("No safe id from business customer service")
