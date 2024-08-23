@@ -67,7 +67,6 @@ class SubmissionServiceSpec extends AmlsSpec
 
     val submissionService = new SubmissionService (
       mockCacheConnector,
-      mock[GovernmentGatewayService],
       mock[AuthEnrolmentsService],
       mock[AmlsConnector],
       config,
@@ -172,14 +171,6 @@ class SubmissionServiceSpec extends AmlsSpec
             submissionService.amlsConnector.subscribe(any(), eqTo(safeId), any())(any(), any(), any(), any())
           } thenReturn Future.successful(subscriptionResponse)
 
-          when {
-            submissionService.ggService.enrol(any(), any(), any())(any(), any())
-          } thenReturn Future.successful(enrolmentResponse)
-
-          whenReady(submissionService.subscribe("12345678", ("accType", "id"), Some("GROUP_ID"))) { response =>
-            response mustBe subscriptionResponse
-            verify(submissionService.ggService).enrol(eqTo("amlsRef"), eqTo(safeId), eqTo("postcode"))(any(), any())
-          }
         }
       }
 
