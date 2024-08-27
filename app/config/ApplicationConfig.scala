@@ -82,8 +82,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   def allNotificationsUrl = s"$notificationsUrl/amls-notification"
 
-  def ggUrl = baseUrl("government-gateway")
-
   val mongoEncryptionEnabled = configuration.getOptional[Boolean]("appCache.mongo.encryptionEnabled").getOrElse(true)
   val cacheExpiryInSeconds = configuration.getOptional[Int]("appCache.expiryInSeconds").getOrElse(60)
 
