@@ -22,9 +22,16 @@ $govuk-assets-path: "/agent/assets/lib/govuk-frontend/dist/govuk/assets/";
 }
 
 .background-grey {
-    height: 205px;
+    min-height: 310px;
     background-color: #f3f2f1;
 }
+
+@media (min-width: 641px) {
+    .border-white {
+        border-right: 20px solid white;
+    }
+}
+
 
 div.currencies-autocomplete-wrapper > div.govuk-form-group > div > div.autocomplete__wrapper > span > input.autocomplete__hint {
   width: 25%

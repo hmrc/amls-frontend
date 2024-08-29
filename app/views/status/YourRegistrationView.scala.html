@@ -56,8 +56,8 @@
         </div>
     }
 
-    <div class="govuk-grid-column govuk-!-margin-bottom-8">
-        <div id="your-business" class="govuk-grid-column-one-third govuk-!-margin-bottom-2 govuk-!-padding-3 background-grey">
+    <div class="govuk-grid-row govuk-!-margin-bottom-8">
+        <div id="your-business" class="govuk-grid-column-one-third govuk-!-margin-bottom-2 govuk-!-padding-3 background-grey border-white">
         @businessName.map { bn =>
             <h2 id="status-submitted-business" class="govuk-heading-m">@messages("status.business")</h2>
             <p class="govuk-body" id="business-name">@bn</p>
@@ -72,11 +72,11 @@
             }
         }
         </div>
-        <div id="registration-status" class="govuk-grid-column-one-third govuk-!-margin-bottom-2 govuk-!-padding-3 background-grey">
+        <div id="registration-status" class="govuk-grid-column-one-third govuk-!-margin-bottom-2  govuk-!-padding-3 background-grey border-white">
             <h2 class="govuk-heading-m">@messages("your.registration.status")</h2>
             @registrationStatus
         </div>
-        <div id="messages" class="govuk-grid-column-one-third govuk-!-margin-bottom-2 govuk-!-padding-3 background-grey">
+        <div id="messages" class="govuk-grid-column-one-third govuk-!-margin-bottom-2  govuk-!-padding-3 background-grey border-white">
             <h2 class="govuk-heading-m">@messages("your.registration.messages")</h2>
             <p class="govuk-body">
                 @anchor(
