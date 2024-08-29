@@ -41,7 +41,7 @@ class BusinessEmailAddressViewSpec extends AmlsViewSpec with Matchers  {
   "contacting_you view" must {
     "have correct title, headings and form fields" in new ViewFixture {
 
-      val formWithData: Form[ContactingYouEmail] = formProvider().fill(ContactingYouEmail("123456789789","test@test.com"))
+      val formWithData: Form[ContactingYouEmail] = formProvider().fill(ContactingYouEmail("test@test.com"))
 
       def view = {
         you(formWithData, true)
@@ -55,20 +55,17 @@ class BusinessEmailAddressViewSpec extends AmlsViewSpec with Matchers  {
       subHeading.html must include(messages("summary.businessdetails"))
 
       doc.getElementsByAttributeValue("name", "email") must not be empty
-      doc.getElementsByAttributeValue("name", "confirmEmail") must not be empty
+
 
     }
 
     val formWithErrors = formProvider().bind(
       Map(
-        "email" -> "",
-        "confirmEmail" -> ""
+        "email" -> ""
       )
     )
 
     behave like pageWithErrors(you(formWithErrors, true), "email", "error.required.email")
-
-    behave like pageWithErrors(you(formWithErrors, true), "confirmEmail", "error.required.email.reenter")
 
     behave like pageWithBackLink(you(formProvider(), true))
   }

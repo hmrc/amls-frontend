@@ -30,21 +30,12 @@ class BusinessEmailAddressFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[ContactingYouEmail] = Form[ContactingYouEmail](
     mapping(
-    "email" -> text("error.required.email").verifying(
-      firstError(
-        maxLength(length, "error.invalid.email.max.length"),
-        regexp(regex, "error.invalid.email")
+      "email" -> text("error.required.email").verifying(
+        firstError(
+          maxLength(length, "error.invalid.email.max.length"),
+          regexp(regex, "error.invalid.email")
+        )
       )
-    ),
-    "confirmEmail" -> text("error.required.email.reenter").verifying(
-      firstError(
-        maxLength(length, "error.invalid.email.max.length"),
-        regexp(regex, "error.invalid.email.reenter")
-      )
-    )
-    )(ContactingYouEmail.apply)(ContactingYouEmail.unapply).verifying(
-      "error.invalid.email.match",
-      emails => emails.email == emails.confirmEmail
-    )
+    )(ContactingYouEmail.apply)(ContactingYouEmail.unapply)
   )
 }

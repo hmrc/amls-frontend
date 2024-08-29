@@ -37,7 +37,7 @@ class BusinessEmailAddressController @Inject()(val authAction: AuthAction,
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       service.getEmailAddress(request.credId) map { detailsOpt =>
-        val form = detailsOpt.fold(formProvider())(x => formProvider().fill(ContactingYouEmail(x, x)))
+        val form = detailsOpt.fold(formProvider())(x => formProvider().fill(ContactingYouEmail(x)))
         Ok(view(form, edit))
       }
   }
