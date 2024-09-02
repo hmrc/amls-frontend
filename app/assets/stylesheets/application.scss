@@ -32,6 +32,11 @@ div.currencies-autocomplete-wrapper > div.govuk-form-group > div > div.autocompl
 
 }
 
+.border-white {
+        border-right: 15px solid white;
+        border-left: 15px solid white;
+    }
+
 @media (min-width: 641px) {
     .govuk-grid-row {
         display: flex;
