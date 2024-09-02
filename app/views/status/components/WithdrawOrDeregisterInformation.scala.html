@@ -30,10 +30,10 @@
             <p class="govuk-body no-print">
                 @messages("your.registration.withdraw")
                 @anchor(
-                    s"${messages("status.withdraw.link-text")}.",
+                    s"${messages("status.withdraw.link-text")}",
                     controllers.withdrawal.routes.WithdrawApplicationController.get.url,
                     "withdraw-application"
-                )
+                ).
             </p>
         </div>
     }
@@ -42,10 +42,10 @@
             <p class="govuk-body no-print">
                 @messages("your.registration.deregister")
                 @anchor(
-                    s"${messages("your.registration.deregister.link")}.",
+                    s"${messages("your.registration.deregister.link")}",
                     controllers.deregister.routes.DeRegisterApplicationController.get.url,
                     "deregister-link"
-                )
+                ).
             </p>
         </div>
     }
