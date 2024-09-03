@@ -53,6 +53,14 @@
 
         @inputYesNo(
             Radios(
+                    fieldset = Some(Fieldset(
+                        legend = Some(Legend(
+                            content = Text(messages("businessdetails.lettersaddress.title")),
+                            classes = "govuk-visually-hidden",
+                            isPageHeading = false
+                    ))
+                )),
+                name = "lettersAddress",
                 items = HmrcYesNoRadioItems(),
                 classes = "govuk-radios govuk-radios--inline"
             ).withFormField(form("lettersAddress"))

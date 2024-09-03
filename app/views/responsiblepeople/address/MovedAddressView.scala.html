@@ -54,10 +54,17 @@
 
         @inputYesNo(
             Radios(
-                name = "movedAddress",
-                items = HmrcYesNoRadioItems(),
-                classes = "govuk-radios govuk-radios--inline"
-            ).withFormField(form("movedAddress"))
+                    fieldset = Some(Fieldset(
+                        legend = Some(Legend(
+                            content = Text(messages("responsiblepeople.movedaddress.heading", personName)),
+                            classes = "govuk-visually-hidden",
+                            isPageHeading = false
+                        ))
+                    )),
+                    name = "movedAddress",
+                    items = HmrcYesNoRadioItems(),
+                    classes = "govuk-radios govuk-radios--inline"
+                ).withFormField(form("movedAddress"))
         )
 
         @button()

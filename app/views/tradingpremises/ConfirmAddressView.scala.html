@@ -52,6 +52,14 @@
 
         @inputYesNo(
             Radios(
+                    fieldset = Some(Fieldset(
+                        legend = Some(Legend(
+                            content = Text(messages("tradingpremises.confirmaddress.title")),
+                            classes = "govuk-visually-hidden",
+                            isPageHeading = false
+                    ))
+                )),
+                name = "confirmAddress",
                 items = HmrcYesNoRadioItems(),
                 classes = "govuk-radios govuk-radios--inline"
             ).withFormField(form("confirmAddress"))
