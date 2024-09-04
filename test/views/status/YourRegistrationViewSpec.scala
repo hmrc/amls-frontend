@@ -303,7 +303,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
         feeInformation = None)
 
       val yourBusinessCell = doc.getElementById("your-business")
-      yourBusinessCell.getElementsByClass("govuk-heading-s").first().html() must include("Your business")
+      yourBusinessCell.getElementsByClass("govuk-heading-m").first().html() must include("Your business")
       yourBusinessCell.getElementById("business-name").html() must include("business Name")
       yourBusinessCell.getElementsMatchingOwnText("Check or update your business information")
         .attr("href") must be(controllers.routes.RegistrationProgressController.get().url)
@@ -319,7 +319,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
         feeInformation = None)
 
       val registrationStatusCell = doc.getElementById("registration-status")
-      registrationStatusCell.getElementsByClass("govuk-heading-s").first().html() must include("Registration status")
+      registrationStatusCell.getElementsByClass("govuk-heading-m").first().html() must include("Registration status")
       registrationStatusCell.html() must include("Application pending.")
       registrationStatusCell.html() must include("some additional content")
     }
@@ -334,7 +334,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
         feeInformation = None)
 
       val registrationStatusCell = doc.getElementById("registration-status")
-      registrationStatusCell.getElementsByClass("govuk-heading-s").first().html() must include("Registration status")
+      registrationStatusCell.getElementsByClass("govuk-heading-m").first().html() must include("Registration status")
       registrationStatusCell.html() must include("Supervised to")
       registrationStatusCell.html() must include(DateHelper.formatDate(LocalDate.now()))
       registrationStatusCell.html() must include("Registration number XBML0987654345")
@@ -350,7 +350,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
         feeInformation = None)
 
       val registrationStatusCell = doc.getElementById("registration-status")
-      registrationStatusCell.getElementsByClass("govuk-heading-s").first().html() must include("Registration status")
+      registrationStatusCell.getElementsByClass("govuk-heading-m").first().html() must include("Registration status")
       registrationStatusCell.html() must include("Supervised.")
       registrationStatusCell.html() must include("Registration number XBML0987654345")
     }
@@ -365,7 +365,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
         feeInformation = None)
 
       val registrationStatusCell = doc.getElementById("registration-status")
-      registrationStatusCell.getElementsByClass("govuk-heading-s").first().html() must include("Registration status")
+      registrationStatusCell.getElementsByClass("govuk-heading-m").first().html() must include("Registration status")
       registrationStatusCell.html() must include("Application not submitted.")
     }
 
@@ -379,7 +379,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
         feeInformation = None)
 
       val registrationStatusCell = doc.getElementById("registration-status")
-      registrationStatusCell.getElementsByClass("govuk-heading-s").first().html() must include("Registration status")
+      registrationStatusCell.getElementsByClass("govuk-heading-m").first().html() must include("Registration status")
       registrationStatusCell.html() must include("Application incomplete.")
     }
 
@@ -393,7 +393,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
         feeInformation = None)
 
       val messagesCell = doc.getElementById("messages")
-      messagesCell.getElementsByClass("govuk-heading-s").first().html() must include("Messages")
+      messagesCell.getElementsByClass("govuk-heading-m").first().html() must include("Messages")
       messagesCell.getElementsMatchingOwnText("Check your messages")
         .attr("href") must be(controllers.routes.NotificationController.getMessages().url)
       messagesCell.getElementsByClass("hmrc-notification-badge").isEmpty must be(true)
