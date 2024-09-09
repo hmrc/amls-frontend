@@ -21,7 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.renewal.InvolvedInOtherDetailsFormProvider
 import models.renewal.InvolvedInOtherYes
 import play.api.Logging
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.mvc._
 import services.RenewalService
 import services.RenewalService.BusinessAndOtherActivities
 import utils.AuthAction
@@ -29,7 +29,7 @@ import utils.CharacterCountParser.cleanData
 import views.html.renewal.InvolvedInOtherDetailsView
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class InvolvedInOtherDetailsController @Inject()(
@@ -39,14 +39,14 @@ class InvolvedInOtherDetailsController @Inject()(
                                                   formProvider: InvolvedInOtherDetailsFormProvider,
                                                   view: InvolvedInOtherDetailsView,
                                                   renewalService: RenewalService,
-                                                  errorHandler: AmlsErrorHandler) extends AmlsBaseController(commonPlayDeps, messagesComps) with Logging {
+                                                  errorHandler: AmlsErrorHandler) (implicit ec: ExecutionContext) extends AmlsBaseController(commonPlayDeps, messagesComps) with Logging {
 
 
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
-    renewalService.getRenewal(request.credId).map {
+    renewalService.getRenewal(request.credId).flatMap {
       case Some(renewal) =>
-        renewal.involvedInOtherActivities.fold(internalServerError)(yes => Ok(view(formProvider().fill(yes.asInstanceOf[InvolvedInOtherYes]), edit)))
+        renewal.involvedInOtherActivities.fold(internalServerError)(yes => Future.successful(Ok(view(formProvider().fill(yes.asInstanceOf[InvolvedInOtherYes]), edit))))
       case None => internalServerError
     }
   }
@@ -55,14 +55,14 @@ class InvolvedInOtherDetailsController @Inject()(
     formProvider().bindFromRequest(cleanData(request.body, "details")).fold(
       formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
       involvedInOtherYes => renewalService.updateOtherBusinessActivities(request.credId, involvedInOtherYes)
-        .map(optBusinessAndOtherActivities => redirect(optBusinessAndOtherActivities, edit, request.credId))
+        .flatMap(optBusinessAndOtherActivities => redirect(optBusinessAndOtherActivities, edit, request.credId))
     )
   }
 
   private def redirect(optBusinessAndOtherActivities: Option[BusinessAndOtherActivities], edit: Boolean, credId: String)
-                      (implicit request: Request[_]): Result = {
+                      (implicit request: Request[_]): Future[Result] = {
     optBusinessAndOtherActivities match {
-      case Some(_) => Redirect(routes.BusinessTurnoverController.get(edit))
+      case Some(_) => Future.successful(Redirect(routes.BusinessTurnoverController.get(edit)))
       case None => {
         logger.error(s"Unable to fetch business activities or other activities for $credId")
         internalServerError
@@ -70,7 +70,7 @@ class InvolvedInOtherDetailsController @Inject()(
     }
   }
 
-  private def internalServerError(implicit request: Request[_]): Result = {
-    InternalServerError(errorHandler.internalServerErrorTemplate)
+  private def internalServerError(implicit request: Request[_]): Future[Result] = {
+    errorHandler.internalServerErrorTemplate.map(InternalServerError(_))
   }
 }

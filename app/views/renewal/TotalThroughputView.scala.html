@@ -31,7 +31,7 @@
     returnLink: ReturnLink
 )
 
-@(form: Form[_], edit: Boolean)(implicit messages: Messages, request: Request[_])
+@(form: Form[_], edit: Boolean)(implicit messages: Messages, requestHeader: RequestHeader)
 
 @radioItems = @{
     ExpectedThroughput.all.zipWithIndex.map { case (item, index) =>

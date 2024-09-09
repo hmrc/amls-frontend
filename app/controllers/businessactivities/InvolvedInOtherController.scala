@@ -30,61 +30,69 @@ import services.businessmatching.RecoverActivitiesService
 import utils.AuthAction
 import utils.CharacterCountParser.cleanData
 import views.html.businessactivities.InvolvedInOtherNameView
+import scala.concurrent.{ExecutionContext, Future}
 
-
-class InvolvedInOtherController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                           val recoverActivitiesService: RecoverActivitiesService,
-                                           implicit val statusService: StatusService,
-                                           val authAction: AuthAction,
-                                           val ds: CommonPlayDependencies,
-                                           val cc: MessagesControllerComponents,
-                                           formProvider: InvolvedInOtherFormProvider,
-                                           error: AmlsErrorHandler,
-                                           view: InvolvedInOtherNameView) extends AmlsBaseController(ds, cc) with Logging {
+class InvolvedInOtherController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                          val recoverActivitiesService: RecoverActivitiesService,
+                                          implicit val statusService: StatusService,
+                                          val authAction: AuthAction,
+                                          val ds: CommonPlayDependencies,
+                                          val cc: MessagesControllerComponents,
+                                          formProvider: InvolvedInOtherFormProvider,
+                                          error: AmlsErrorHandler,
+                                          view: InvolvedInOtherNameView)(implicit ec: ExecutionContext) extends AmlsBaseController(ds, cc) with Logging{
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetchAll(request.credId) map {
-        optionalCache =>
-          (for {
-            cache <- optionalCache
-            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-          } yield {
-            (for {
-              businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
-              involvedInOther <- businessActivities.involvedInOther
-            } yield Ok(view(formProvider().fill(involvedInOther), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false), formProvider.length)))
-              .getOrElse(Ok(view(formProvider(), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false), formProvider.length)))
-          }) getOrElse Ok(view(formProvider(), edit, None, formProvider.length))
-      } recoverWith {
-        case _: NoSuchElementException =>
-          logger.warn("[InvolvedInOtherController][get] - Business activities list was empty, attempting to recover")
-          recoverActivitiesService.recover(request).map {
-            case true => Redirect(routes.InvolvedInOtherController.get())
-            case false =>
-              logger.warn("[InvolvedInOtherController][get] - Unable to determine business types")
-              InternalServerError(error.internalServerErrorTemplate)
-          }
-      }
+   implicit request =>
+    dataCacheConnector.fetchAll(request.credId).flatMap {
+      case Some(cache) =>
+        val businessMatchingOpt = cache.getEntry[BusinessMatching](BusinessMatching.key)
+        val businessActivitiesOpt = cache.getEntry[BusinessActivities](BusinessActivities.key)
+
+        businessMatchingOpt match {
+          case Some(businessMatching) =>
+            val form = businessActivitiesOpt.flatMap(_.involvedInOther) match {
+              case Some(involvedInOther) => formProvider().fill(involvedInOther)
+              case None => formProvider()
+            }
+            Future.successful(Ok(view(form, edit, businessMatching.prefixedAlphabeticalBusinessTypes(false), formProvider.length)))
+
+          case None =>
+            Future.successful(Ok(view(formProvider(), edit, None, formProvider.length)))
+        }
+
+      case None =>
+        Future.successful(Ok(view(formProvider(), edit, None, formProvider.length)))
+    } recoverWith {
+      case _: NoSuchElementException =>
+        logger.warn("[InvolvedInOtherController][get] - Business activities list was empty, attempting to recover")
+        recoverActivitiesService.recover(request).flatMap {
+          case true => Future.successful(Redirect(routes.InvolvedInOtherController.get()))
+          case false =>
+            logger.warn("[InvolvedInOtherController][get] - Unable to determine business types")
+            error.internalServerErrorTemplate.map(template => InternalServerError(template))
+        }
+    }
   }
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
+    implicit request =>
       formProvider().bindFromRequest(cleanData(request.body, "details")).fold(
-        formWithErrors =>
-          for {
-            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-          } yield businessMatching match {
-            case Some(x) => BadRequest(view(formWithErrors, edit, businessMatching.prefixedAlphabeticalBusinessTypes(false), formProvider.length))
-            case None => BadRequest(view(formWithErrors, edit, None, formProvider.length))
-          },
-        data =>
-          for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, getUpdatedBA(businessActivities, data))
-          } yield redirectDependingOnResponse(data, edit)
-      )
-    }
+        formWithErrors => {
+          dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key).map {
+            case Some(businessMatching) =>
+              BadRequest(view(formWithErrors, edit, businessMatching.prefixedAlphabeticalBusinessTypes(false), formProvider.length))
+            case None =>
+              BadRequest(view(formWithErrors, edit, None, formProvider.length))
+          }
+        },
+      data => {
+        for {
+          businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
+          _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, getUpdatedBA(businessActivities, data))
+        } yield redirectDependingOnResponse(data, edit)
+      }
+    )
   }
 
   private def getUpdatedBA(businessActivities: Option[BusinessActivities], data: InvolvedInOther): BusinessActivities = {

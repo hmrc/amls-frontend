@@ -30,7 +30,7 @@
     button: Button
 )
 
-@(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], edit: Boolean)(implicit requestHeader: RequestHeader, messages: Messages)
 
 @layout(pageTitle = messages("renewal.involvedinother.details.title")) {
 

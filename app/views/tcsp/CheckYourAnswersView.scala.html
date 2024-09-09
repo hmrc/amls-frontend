@@ -26,7 +26,7 @@
     button: Button
 )
 
-@(summaryList: SummaryList)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(summaryList: SummaryList)(implicit requestHeader: RequestHeader, messages: Messages, appConfig: ApplicationConfig)
 
 @layout(
     pageTitle = messages("title.cya") + " - " + messages("summary.tcsp"),

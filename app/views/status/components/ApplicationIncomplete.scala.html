@@ -18,7 +18,7 @@
 
 @this(button: Button)
 
-@(businessName: Option[String])(implicit request: Request[_], messages: Messages)
+@(businessName: Option[String])(implicit requestHeader: RequestHeader, messages: Messages)
 
 <p class="govuk-body" id="incomplete-description">@messages("status.incomplete.description")</p>
 

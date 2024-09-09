@@ -19,7 +19,7 @@
 
 @this(whatYouNeedPage: WhatYouNeedPage)
 
-@(nextUrl: Call)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(nextUrl: Call)(implicit requestHeader: RequestHeader, messages: Messages, appConfig: ApplicationConfig)
 
 @whatYouNeedPage(
     pageTitleKey = s"${messages("title.wyn")} - ${messages("summary.asp")}",

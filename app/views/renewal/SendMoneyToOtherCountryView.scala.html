@@ -31,7 +31,7 @@
 )
 
 
-@(form: Form[SendMoneyToOtherCountry], edit: Boolean)(implicit messages: Messages, request: Request[_])
+@(form: Form[SendMoneyToOtherCountry], edit: Boolean)(implicit messages: Messages, requestHeader: RequestHeader)
 
 @layout(messages("renewal.msb.send.money.title") + " - " + messages("summary.renewal")) {
 

@@ -23,7 +23,7 @@
     button: Button
 )
 
-@()(implicit request: Request[_], appConfig: ApplicationConfig, messages: Messages)
+@()(implicit requestHeader: RequestHeader, appConfig: ApplicationConfig, messages: Messages)
 
 @layout(messages("unauthorised.title"), showBackLink = false) {
 

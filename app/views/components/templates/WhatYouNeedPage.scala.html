@@ -30,7 +30,7 @@
     subtitleKey: String,
     headingKey: String,
     buttonHref: String
-)(content: Html)(implicit request: Request[_], messages: Messages)
+)(content: Html)(implicit requestHeader: RequestHeader, messages: Messages)
 
 @layout(
     pageTitle = pageTitleKey

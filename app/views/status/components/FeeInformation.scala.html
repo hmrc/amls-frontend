@@ -23,7 +23,7 @@
 
 @this(anchor: Anchor)
 
-@(status: SubmissionStatus)(implicit messages: Messages, request: Request[_])
+@(status: SubmissionStatus)(implicit messages: Messages, requestHeader: RequestHeader)
 
 @status match {
     case SubmissionReadyForReview => {

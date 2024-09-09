@@ -30,7 +30,7 @@
     returnLink: ReturnLink
 )
 
-@(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(form: Form[_], edit: Boolean)(implicit requestHeader: RequestHeader, messages: Messages, appConfig: ApplicationConfig)
 
 @layout(
     pageTitle = s"${messages("hvd.cash.payment.date.title")} - ${messages("summary.hvd")}",

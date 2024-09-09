@@ -31,7 +31,7 @@
     returnLink: ReturnLink
 )
 
-@(form: Form[_], edit: Boolean)(implicit messages: Messages, request: Request[_], appConfig: ApplicationConfig)
+@(form: Form[_], edit: Boolean)(implicit messages: Messages, requestHeader: RequestHeader, appConfig: ApplicationConfig)
 
 @layout(pageTitle = messages("tcsp.kind.of.service.provider.title") + " - " + messages("summary.tcsp")) {
 

@@ -33,7 +33,7 @@
 
 @this()
 
-@(amlsRegNo: Option[String] = None, status: SubmissionStatus, canOrCannotTradeInformation: Html = HtmlFormat.empty, endDate: Option[LocalDate] = None)(implicit messages: Messages, request: Request[_])
+@(amlsRegNo: Option[String] = None, status: SubmissionStatus, canOrCannotTradeInformation: Html = HtmlFormat.empty, endDate: Option[LocalDate] = None)(implicit messages: Messages, requestHeader: RequestHeader)
 
 @status match {
     case SubmissionReadyForReview => {

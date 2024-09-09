@@ -16,7 +16,7 @@
 
 @this()
 
-@()(implicit request: Request[_], messages: Messages)
+@()(implicit requestHeader: RequestHeader, messages: Messages)
 
 <div class="govuk-!-margin-bottom-8">
     <p class="govuk-body" id="renewal-pending-description-1">@messages("your.registration.status.renewal.pending.description.line1")</p>
