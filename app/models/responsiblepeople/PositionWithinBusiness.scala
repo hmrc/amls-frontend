@@ -103,8 +103,8 @@ object PositionWithinBusiness extends Enumerable.Implicits {
         CheckboxItem(
           content = Text(messages("responsiblepeople.position_within_business.lbl.09")),
           value = position.toString,
-          id = Some(s"positions_9"),
-          name = Some(s"positions[9]"),
+          id = Some(s"positions_${position.index}"),
+          name = Some(s"positions[${position.index}]"),
           conditionalHtml = conditional
         )
       } else {
