@@ -280,7 +280,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         .thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "adasdasd", currentRegYearEndDate = Some(renewalDate))))
 
       whenReady(service.getStatus(amlsRegNo, accountTypeId, credId).failed) {
-        _.getMessage mustBe("ETMP returned status is inconsistent")
+        _.getMessage mustBe("ETMP returned status is inconsistent [status:adasdasd]")
       }
 
     }
