@@ -64,7 +64,7 @@ case object ExternalAccountant extends WithName("externalAccountant") with Posit
 }
 
 case class Other(override val value: String) extends WithName("other") with PositionWithinBusiness {
-  override def index: String = "other"
+  override def index: String = "9"
 }
 
 object PositionWithinBusiness extends Enumerable.Implicits {
@@ -103,8 +103,8 @@ object PositionWithinBusiness extends Enumerable.Implicits {
         CheckboxItem(
           content = Text(messages("responsiblepeople.position_within_business.lbl.09")),
           value = position.toString,
-          id = Some(s"positions_${BeneficialOwner.index}"),
-          name = Some(s"positions[${BeneficialOwner.index}]"),
+          id = Some(s"positions_${position.index}"),
+          name = Some(s"positions[${position.index}]"),
           conditionalHtml = conditional
         )
       } else {
@@ -176,6 +176,7 @@ object PositionWithinBusiness extends Enumerable.Implicits {
       case JsString("05") => JsSuccess(Partner)
       case JsString("06") => JsSuccess(SoleProprietor)
       case JsString("07") => JsSuccess(DesignatedMember)
+      //TODO: why no 08?
       case JsObject(m) if m.contains("other") => JsSuccess(Other(m("other").as[String]))
       case _ => JsError((JsPath \ "positions") -> play.api.libs.json.JsonValidationError("error.invalid"))
     }

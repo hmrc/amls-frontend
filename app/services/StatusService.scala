@@ -69,7 +69,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
       case `Withdrawal` => SubmissionWithdrawn
       case `DeRegistered` => models.status.DeRegistered
       case _ if environment.mode == Mode.Dev => models.status.NotCompleted
-      case _ => throw new RuntimeException("ETMP returned status is inconsistent")
+      case status: String => throw new RuntimeException(s"ETMP returned status is inconsistent [status:$status]")
     }
   }
 
