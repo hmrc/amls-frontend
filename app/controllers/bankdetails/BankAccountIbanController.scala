@@ -25,7 +25,7 @@ import models.bankdetails.{BankAccount, BankDetails, NonUKIBANNumber}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.{AuthAction, StatusConstants}
+import utils.{AuthAction, AuthorisedRequest, StatusConstants}
 import views.html.bankdetails.BankAccountIBANNumberView
 
 import javax.inject.{Inject, Singleton}
@@ -43,7 +43,7 @@ class BankAccountIbanController @Inject()(val dataCacheConnector: DataCacheConne
                                           implicit val error: views.html.ErrorView) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async{
-      implicit request =>
+      implicit request: AuthorisedRequest[AnyContent] =>
         for {
           bankDetails <- getData[BankDetails](request.credId, index)
           status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)

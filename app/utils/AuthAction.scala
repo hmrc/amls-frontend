@@ -80,14 +80,14 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
         Future.successful(
           Right(
             AuthorisedRequest(
-              request,
-              amlsRefNo(enrolments),
-              credentials.providerId,
-              affinityGroup,
-              enrolments,
-              accountTypeAndId(affinityGroup, enrolments, credentials.providerId),
-              groupIdentifier,
-              credentialRole
+              request = request,
+              amlsRefNumber = amlsRefNo(enrolments),
+              credId = credentials.providerId,
+              affinityGroup = affinityGroup,
+              enrolments = enrolments,
+              accountTypeId = accountTypeAndId(affinityGroup, enrolments, credentials.providerId),
+              groupIdentifier = groupIdentifier,
+              credentialRole = credentialRole
             )
           )
         )
@@ -146,7 +146,7 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
 
   private def accountTypeAndId(affinityGroup: AffinityGroup,
                                enrolments: Enrolments,
-                               credId: String) = {
+                               credId: String): (String, String) = {
     /*
     * Set the `accountType` to `"org"` if `affinityGroup = "Organisation"` (which you get through retrievals)
     * Set the `accountId` as a hash of the CredId. Its possible to get the `credId` through retrievals
@@ -164,12 +164,12 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
       case AffinityGroup.Organisation => ("org", UrlHelper.hash(credId))
       case _ =>
 
-        val sa = for {
+        val sa: Option[(String, String)] = for {
           enrolment <- getActiveEnrolment(enrolments, saKey)
           utr       <- enrolment.getIdentifier("UTR")
         } yield "sa" -> utr.value
 
-        val ct = for {
+        val ct: Option[(String, String)] = for {
           enrolment <- getActiveEnrolment(enrolments, ctKey)
           utr       <- enrolment.getIdentifier("UTR")
         } yield "ct" -> utr.value

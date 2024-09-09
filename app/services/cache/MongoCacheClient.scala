@@ -61,7 +61,7 @@ class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto
     with CacheOps
 {
 
-  implicit val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
+  val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
 
   /**
     * Inserts data into the cache with the specified key. If the data does not exist, it will be created.

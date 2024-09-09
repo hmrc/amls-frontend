@@ -45,7 +45,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 class LandingService @Inject()(val cacheConnector: DataCacheConnector,
-                               val desConnector: AmlsConnector,
+                               val amlsConnector: AmlsConnector,
                                val statusService: StatusService,
                                val businessMatchingConnector: BusinessMatchingConnector){
 
@@ -76,7 +76,7 @@ class LandingService @Inject()(val cacheConnector: DataCacheConnector,
       entry <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
     } yield entry
 
-    lazy val etmpModel = OptionT.liftF(desConnector.view(amlsRefNumber, accountTypeId) map { v => v.businessDetailsSection })
+    lazy val etmpModel = OptionT.liftF(amlsConnector.view(amlsRefNumber, accountTypeId) map { v => v.businessDetailsSection })
 
     (for {
       businessDetails <- cachedModel orElse etmpModel
@@ -90,7 +90,7 @@ class LandingService @Inject()(val cacheConnector: DataCacheConnector,
   def refreshCache(amlsRefNumber: String, credId: String, accountTypeId: (String, String))
                   (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Cache] =
     for {
-      viewResponse           <- desConnector.view(amlsRefNumber, accountTypeId)
+      viewResponse           <- amlsConnector.view(amlsRefNumber, accountTypeId)
       subscriptionResponse   <- cacheConnector.fetch[SubscriptionResponse](credId, SubscriptionResponse.key).recover { case _ => None }
       amendVariationResponse <- cacheConnector.fetch[AmendVariationRenewalResponse](credId, AmendVariationRenewalResponse.key) recover { case _ => None }
       _                      <- cacheConnector.remove(credId) // MUST clear cash first to remove stale data and reload from API5

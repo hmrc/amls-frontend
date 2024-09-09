@@ -55,7 +55,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
   val service = new LandingService (
     cacheConnector = mock[DataCacheConnector],
-    desConnector = mock[AmlsConnector],
+    amlsConnector = mock[AmlsConnector],
     statusService = mock[StatusService],
     businessMatchingConnector = mock[BusinessMatchingConnector]
   )
@@ -207,14 +207,14 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       } thenReturn None
 
       when {
-        service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
+        service.amlsConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
       } thenReturn Future.successful(viewResponse)
 
       setUpMockView(service.cacheConnector, cache, BusinessDetails.key, viewResponse.businessDetailsSection.copy(altCorrespondenceAddress = Some(true)))
 
       await(service.setAltCorrespondenceAddress("regNo", None, ("accType", "id"), credId)) mustEqual cache
 
-      verify(service.desConnector).view(any(), any())(any(), any(), any())
+      verify(service.amlsConnector).view(any(), any())(any(), any(), any())
     }
 
     "only call API 5 data" when {
@@ -222,7 +222,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         val cache = mock[Cache]
 
         reset(service.cacheConnector)
-        reset(service.desConnector)
+        reset(service.amlsConnector)
 
         val model = BusinessDetails()
 
@@ -237,7 +237,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
         await(service.setAltCorrespondenceAddress("regNo", Some(cache), ("accType", "id"), credId))
 
-        verify(service.desConnector, never()).view(any(), any())(any(), any(), any())
+        verify(service.amlsConnector, never()).view(any(), any())(any(), any(), any())
       }
     }
 
@@ -271,7 +271,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
       when {
-        service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
+        service.amlsConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
       } thenReturn Future.successful(viewResponse)
 
       when(service.cacheConnector.remove(any[String])).thenReturn(Future.successful(true))
@@ -360,7 +360,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
 
       when {
-        service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
+        service.amlsConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
       } thenReturn Future.successful(viewResponse)
 
       when(service.cacheConnector.remove(any())).thenReturn(Future.successful(true))
@@ -480,7 +480,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       } thenReturn Future.successful(cacheMap)
 
       when {
-        service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
+        service.amlsConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
       } thenReturn Future.successful(viewResponse)
 
       when {

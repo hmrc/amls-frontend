@@ -9,6 +9,7 @@
 # !!!WARNING!!! Every route defined in this file MUST be prefixed with "/test-only/". This is because NGINX is blocking every uri containing the string "test-only" in production.
 # Failing to follow this rule may result in test routes deployed in production.
 
+GET        /anti-money-laundering/test-only/show-mongoCache                      @controllers.testonly.TestOnlyController.showMongoCache
 GET        /anti-money-laundering/test-only/drop-mongoCache                      @controllers.testonly.TestOnlyController.dropMongoCache
 GET        /anti-money-laundering/test-only/update-mongoCache/:filename          @controllers.testonly.TestOnlyController.updateMongo(filename)
 
