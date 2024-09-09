@@ -21,10 +21,12 @@ import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+
 import javax.inject.Singleton
 import models.businessmatching.BusinessMatching
 import models.tradingpremises.TradingPremises
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.cache.Cache
 import utils.tradingpremises.CheckYourAnswersHelper
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.tradingpremises.CheckYourAnswersView
@@ -43,7 +45,7 @@ class CheckYourAnswersController @Inject()(val authAction: AuthAction,
   def get(index: Int): Action[AnyContent] = authAction.async {
     implicit request =>
       (for {
-        cache <- OptionT(dataCacheConnector.fetchAll(request.credId))
+        cache: Cache <- OptionT(dataCacheConnector.fetchAll(request.credId))
         tp <- OptionT.fromOption[Future](getData[TradingPremises](cache, index))
         bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
       } yield {

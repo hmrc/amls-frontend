@@ -16,25 +16,28 @@
 
 package controllers.testonly
 
-import java.time.LocalDate
 import config.BusinessCustomerSessionCache
 import connectors.cache.MongoCacheConnector
 import connectors.{AmlsConnector, DataCacheConnector, TestOnlyStubConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-
-import javax.inject.{Inject, Singleton}
+import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessActivity.HighValueDealing
 import models.tradingpremises.BusinessStructure.LimitedLiabilityPartnership
 import models.tradingpremises._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, Json}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.UpdateMongoCacheService
+import services.cache.Cache
+import services.encryption.CryptoService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import utils.AuthAction
-import views.html.confirmation._
+import views.TestOnlyViews
 import views.html.ErrorView
+import views.html.confirmation._
 import views.html.submission.{DuplicateEnrolmentView, DuplicateSubmissionView, WrongCredentialTypeView}
 
+import java.time.LocalDate
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -54,7 +57,9 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
                                    paymentConfirmationView: PaymentConfirmationView,
                                    paymentConfirmationTransitionalRenewalView: PaymentConfirmationTransitionalRenewalView,
                                    confirmationBacsView: ConfirmationBacsView,
-                                   errorView: ErrorView
+                                   cryptoService: CryptoService,
+                                   errorView: ErrorView,
+                                   testOnlyViews: TestOnlyViews
                                   ) extends AmlsBaseController(ds, cc) {
 
 
@@ -63,6 +68,22 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
         removeCacheData(request.credId) map { _ =>
           Ok("Cache successfully cleared")
         }
+  }
+
+  def showMongoCache: Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetchAll(request.credId).map{r =>
+      r.fold(Ok(testOnlyViews.simpleView(s"No data in cache for [credId=${request.credId}]"))) {
+        (cache: Cache) =>
+          //needs decrypting first
+          val decryptedCache = cache.data.keys.map { key =>
+            val string = cache.data(key).asInstanceOf[JsString].value
+            val decryptedString = cryptoService.doubleDecryptJsonString(string).value
+            val json = Json.parse(decryptedString)
+            (key -> json)
+          }.toMap
+          Ok(Json.prettyPrint(Json.toJson(decryptedCache)))
+      }
+    }
   }
 
   def removeCacheData(credId: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = for {

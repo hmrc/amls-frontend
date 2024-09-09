@@ -67,6 +67,8 @@ lazy val microservice = Project(appName, file("."))
     )
   )
   .disablePlugins(JUnitXmlReportPlugin)
+  .settings(commands ++= SbtCommands.commands)
+
 
 lazy val it = project
   .enablePlugins(play.sbt.PlayScala)

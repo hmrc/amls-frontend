@@ -33,10 +33,10 @@ trait CacheOps extends Logging {
     * @param key The cache key
     * @return The decrypted item from the cache as T, or None if the value wasn't present
     */
-  def decryptValue[T](cache: Cache, key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Option[T] = {
+  private def decryptValue[T](cache: Cache, key: String)(implicit reads: Reads[T], crypto: Encrypter with Decrypter): Option[T] = {
     val sensitiveDecrypter: Reads[SensitiveT[T]] = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
 
-    cache.data.get(key) flatMap { encryptedJson =>
+    cache.data.get(key) flatMap { encryptedJson: JsValue =>
       val decryptionResult: JsResult[SensitiveT[T]] = sensitiveDecrypter.reads(encryptedJson)
 
       if (decryptionResult.isSuccess) {

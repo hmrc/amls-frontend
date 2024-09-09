@@ -124,19 +124,6 @@ object Eab {
     Call(redirectCallType, destinationUrl)
   }
 
-  def section(appConfig: ApplicationConfig)(implicit cache: Cache): Section = {
-    val messageKey = "eab"
-    val notStarted = Section(messageKey, NotStarted, false, generateRedirect(appConfig.eabWhatYouNeedUrl))
-    cache.getEntry[Eab](key).fold(notStarted) {
-      model =>
-        if (model.isComplete && model.hasAccepted) {
-          Section(messageKey, Completed, model.hasChanged, generateRedirect(appConfig.eabSummaryUrl))
-        } else {
-          Section(messageKey, Started, model.hasChanged, generateRedirect(appConfig.eabWhatYouNeedUrl))
-        }
-    }
-  }
-
   def taskRow(appConfig: ApplicationConfig)(implicit cache: Cache, messages: Messages): TaskRow = {
     val messageKey = "eab"
     val notStarted = TaskRow(
