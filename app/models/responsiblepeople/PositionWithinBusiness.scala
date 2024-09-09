@@ -103,8 +103,8 @@ object PositionWithinBusiness extends Enumerable.Implicits {
         CheckboxItem(
           content = Text(messages("responsiblepeople.position_within_business.lbl.09")),
           value = position.toString,
-          id = Some(s"positions_${position.index}"),
-          name = Some(s"positions[${position.index}]"),
+          id = Some(s"positions_9"),
+          name = Some(s"positions[9]"),
           conditionalHtml = conditional
         )
       } else {
@@ -176,7 +176,6 @@ object PositionWithinBusiness extends Enumerable.Implicits {
       case JsString("05") => JsSuccess(Partner)
       case JsString("06") => JsSuccess(SoleProprietor)
       case JsString("07") => JsSuccess(DesignatedMember)
-      //TODO: why no 08?
       case JsObject(m) if m.contains("other") => JsSuccess(Other(m("other").as[String]))
       case _ => JsError((JsPath \ "positions") -> play.api.libs.json.JsonValidationError("error.invalid"))
     }
