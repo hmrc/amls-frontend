@@ -64,7 +64,7 @@ case object ExternalAccountant extends WithName("externalAccountant") with Posit
 }
 
 case class Other(override val value: String) extends WithName("other") with PositionWithinBusiness {
-  override def index: String = "other"
+  override def index: String = "9"
 }
 
 object PositionWithinBusiness extends Enumerable.Implicits {
@@ -103,8 +103,8 @@ object PositionWithinBusiness extends Enumerable.Implicits {
         CheckboxItem(
           content = Text(messages("responsiblepeople.position_within_business.lbl.09")),
           value = position.toString,
-          id = Some(s"positions_${BeneficialOwner.index}"),
-          name = Some(s"positions[${BeneficialOwner.index}]"),
+          id = Some(s"positions_${position.index}"),
+          name = Some(s"positions[${position.index}]"),
           conditionalHtml = conditional
         )
       } else {
