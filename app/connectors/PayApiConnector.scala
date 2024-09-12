@@ -24,7 +24,7 @@ import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
 import play.api.Logging
 import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
-import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
+import uk.gov.hmrc.play.audit.DefaultAuditConnector
 import utils.HttpResponseHelper
 
 import scala.concurrent.{ExecutionContext, Future}

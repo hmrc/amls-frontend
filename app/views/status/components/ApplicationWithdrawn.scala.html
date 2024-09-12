@@ -23,7 +23,7 @@
     button: Button
 )
 
-@(businessName: Option[String])(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(businessName: Option[String])(implicit requestHeader: RequestHeader, messages: Messages, appConfig: ApplicationConfig)
 
 <p class="govuk-body" id="application-withdrawn-description-1">@messages("your.registration.status.withdrawn.line1")</p>
 <p class="govuk-body" id="application-withdrawn-description-2">

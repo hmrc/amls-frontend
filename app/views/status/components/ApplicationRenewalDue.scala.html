@@ -20,7 +20,7 @@
 
 @this(button: Button)
 
-@(businessName: Option[String], endDate: Option[LocalDate] = None)(implicit request: Request[_], messages: Messages)
+@(businessName: Option[String], endDate: Option[LocalDate] = None)(implicit requestHeader: RequestHeader, messages: Messages)
 
 @endDate.map { date =>
     <p class="govuk-body">@messages("status.renewal.due", DateHelper.formatDate(date))</p>

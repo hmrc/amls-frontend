@@ -18,7 +18,7 @@
 
 @this(button: Button)
 
-@(businessName: Option[String])(implicit request: Request[_], messages: Messages)
+@(businessName: Option[String])(implicit requestHeader: RequestHeader, messages: Messages)
 
 <p class="govuk-body">@messages("status.renewalnotsubmitted.description")</p>
 @button("your.registration.status.renewal.not.submitted.button", "go-to-about-your-business", Some(controllers.routes.RegistrationProgressController.get.url))

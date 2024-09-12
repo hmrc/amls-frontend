@@ -29,7 +29,7 @@
     returnLink: ReturnLink
 )
 
-@(form: Form[_], subheadingMessage: String, controllerAction: Call, hasReturnLink: Boolean = true, buttonMsgKey: String = "button.saveandcontinue")(implicit request: Request[_], messages: Messages)
+@(form: Form[_], subheadingMessage: String, controllerAction: Call, hasReturnLink: Boolean = true, buttonMsgKey: String = "button.saveandcontinue")(implicit requestHeader: RequestHeader, messages: Messages)
 
 @layout(
     pageTitle = s"${messages("dateofchange.title")} - ${messages(subheadingMessage)}",

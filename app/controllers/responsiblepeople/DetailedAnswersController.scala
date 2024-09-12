@@ -74,14 +74,17 @@ class DetailedAnswersController @Inject () (
       } recoverWith {
         case _: NoSuchElementException =>
           logger.warn("[DetailedAnswersController][get] - Business activities list was empty, attempting to recover")
-          recoverActivitiesService.recover(request).map {
-            case true => Redirect(routes.DetailedAnswersController.get(index, flow))
+          recoverActivitiesService.recover(request).flatMap {
+            case true => Future.successful(Redirect(routes.DetailedAnswersController.get(index, flow)))
             case false =>
               logger.warn("[DetailedAnswersController][get] - Unable to determine business types")
-              InternalServerError(amlsErrorHandler.internalServerErrorTemplate)
+              amlsErrorHandler.internalServerErrorTemplate.map { errorPage =>
+                InternalServerError(errorPage)
+              }
           }
       }
   }
+
 
   private def redirect(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, cache: Cache, index: Int, flow: Option[String], businessMatching: BusinessMatching)
                       (implicit request: Request[_]): Future[Result] =

@@ -23,7 +23,7 @@
     anchor: Anchor
 )
 
-@(call: Call)(implicit request: Request[_], messages: Messages)
+@(call: Call)(implicit requestHeader: RequestHeader, messages: Messages)
 
 @layout(
     pageTitle = messages("login-event.title"),

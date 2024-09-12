@@ -38,7 +38,7 @@
     feeInformation: Option[Html],
     displayContactLink: Boolean = false,
     withdrawOrDeregisterInformation: Html = HtmlFormat.empty
-)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+)(implicit requestHeader: RequestHeader, messages: Messages, appConfig: ApplicationConfig)
 
 @layout(
     pageTitle = messages("status.title"),

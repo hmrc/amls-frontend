@@ -29,7 +29,7 @@
     returnLink: ReturnLink
 )
 
-@(form: Form[_], edit: Boolean, countryData: Seq[SelectItem])(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(form: Form[_], edit: Boolean, countryData: Seq[SelectItem])(implicit requestHeader: RequestHeader, messages: Messages, appConfig: ApplicationConfig)
 
 @preparedForm = @{
     form.error("mostTransactionsCountries") match {

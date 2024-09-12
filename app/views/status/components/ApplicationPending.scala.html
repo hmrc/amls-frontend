@@ -16,7 +16,7 @@
 
 @this()
 
-@()(implicit request: Request[_], messages: Messages)
+@()(implicit requestHeader: RequestHeader, messages: Messages)
 
 <div class="govuk-!-margin-bottom-8">
     <p class="govuk-body" id="submission-ready-for-review-description">@messages("status.submissionreadyforreview.description.2")</p>

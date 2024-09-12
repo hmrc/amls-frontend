@@ -18,7 +18,7 @@
 
 @this(formHelper: FormWithCSRF, button: Button)
 
-@(businessName: Option[String])(implicit request: Request[_], messages: Messages)
+@(businessName: Option[String])(implicit requestHeader: RequestHeader, messages: Messages)
 
 <p class="govuk-body" id="application-expired-description-1">@messages("your.registration.status.expired.line1")</p>
 <p class="govuk-body" id="application-expired-description-2">@messages("your.registration.status.expired.line2")</p>

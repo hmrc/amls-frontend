@@ -17,24 +17,19 @@
 package controllers.deregister
 
 
+import cats.data.EitherT
+import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import models.businessmatching.BusinessActivity.HighValueDealing
-import models.businessmatching.BusinessMatching
 import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.AuthEnrolmentsService
-import services.cache.Cache
-import uk.gov.hmrc.mongo.play.json.Codecs
 import utils.{AckRefGenerator, AuthAction, AuthorisedRequest}
 import views.html.deregister.DeregistrationCheckYourAnswersView
 
 import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.Future
-import cats.implicits._
-import cats.instances.future._
-import cats.data.EitherT
 
 class DeregistrationCheckYourAnswersController @Inject()(authAction: AuthAction,
                                                          ds: CommonPlayDependencies,

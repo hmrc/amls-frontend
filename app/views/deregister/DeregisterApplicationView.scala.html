@@ -27,7 +27,7 @@
     button: Button
 )
 
-@(businessName: String)(implicit request: Request[_], messages: Messages)
+@(businessName: String)(implicit requestHeader: RequestHeader, messages: Messages)
 
 @layout(messages("status.deregister.empty.title")) {
 

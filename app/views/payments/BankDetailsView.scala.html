@@ -27,7 +27,7 @@
     govukSummaryList: GovukSummaryList
 )
 
-@(isUK: Boolean, fee: Currency, paymentReference: String, sectionHeading: String)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
+@(isUK: Boolean, fee: Currency, paymentReference: String, sectionHeading: String)(implicit requestHeader: RequestHeader, messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @layout(pageTitle = messages("payments.bankdetails.title") + " - " + messages(sectionHeading)) {
 

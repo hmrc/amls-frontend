@@ -32,6 +32,7 @@ import utils.CharacterCountParser.cleanData
 import views.html.renewal.InvolvedInOtherView
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.Future
 
 @Singleton
 class InvolvedInOtherController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -61,11 +62,13 @@ class InvolvedInOtherController @Inject()(val dataCacheConnector: DataCacheConne
     } recoverWith {
       case _: NoSuchElementException =>
         logger.warn("[InvolvedInOtherController][get] - Business activities list was empty, attempting to recover")
-        recoverActivitiesService.recover(request).map {
-          case true => Redirect(routes.InvolvedInOtherController.get())
+        recoverActivitiesService.recover(request).flatMap {
+          case true => Future.successful(Redirect(routes.InvolvedInOtherController.get()))
           case false =>
             logger.warn("[InvolvedInOtherController][get] - Unable to determine business types")
-            InternalServerError(error.internalServerErrorTemplate)
+            error.internalServerErrorTemplate.map { html =>
+            InternalServerError(html)
+          }
         }
     }
   }

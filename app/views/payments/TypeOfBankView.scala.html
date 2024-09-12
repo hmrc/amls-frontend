@@ -29,7 +29,7 @@
     button: Button
 )
 
-@(form: Form[_], sectionHeading: String)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(form: Form[_], sectionHeading: String)(implicit requestHeader: RequestHeader, messages: Messages, appConfig: ApplicationConfig)
 
 @layout(pageTitle = messages("payments.typeofbank.title") + " - " + messages(sectionHeading)) {
 

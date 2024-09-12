@@ -38,7 +38,7 @@
     renewalSectionCompleted: Boolean = false,
     hasCompleteNominatedOfficer: Boolean = false,
     nominatedOfficerName: Option[String] = None
-)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+)(implicit requestHeader: RequestHeader, messages: Messages, appConfig: ApplicationConfig)
 
 @layout(
     pageTitle = messages("renewal.progress.title"),

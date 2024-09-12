@@ -31,7 +31,7 @@
     button: Button
 )
 
-@(form: Form[_], edit: Boolean, businessTypes: Option[List[String]])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], edit: Boolean, businessTypes: Option[List[String]])(implicit requestHeader: RequestHeader, messages: Messages)
 
 @radioItems = @{
     HmrcYesNoRadioItems().map { radioItem =>

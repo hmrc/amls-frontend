@@ -21,7 +21,7 @@
     heading: Heading
 )
 
-@(title: String, headingText: String, message: String)(implicit request: Request[_], messages: Messages)
+@(title: String, headingText: String, message: String)(implicit requestHeader: RequestHeader, messages: Messages)
 
 @layout(title, showBackLink = false, showDeskproLink = false) {
     @heading(headingText)

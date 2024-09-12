@@ -30,7 +30,7 @@
     returnLink: ReturnLink
 )
 
-@(form: Form[_], edit: Boolean, currencyData: Seq[SelectItem])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], edit: Boolean, currencyData: Seq[SelectItem])(implicit requestHeader: RequestHeader, messages: Messages)
 
 @preparedForm = @{
     form.error("currencies") match {

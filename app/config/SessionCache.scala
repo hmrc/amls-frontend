@@ -18,19 +18,21 @@ package config
 
 import com.google.inject.Inject
 import play.api.Configuration
-import uk.gov.hmrc.http.HttpReadsInstances.throwOnFailure
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReadsInstances.throwOnFailure
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.mongo.cache.CacheIdType.SessionCacheId.NoSessionException
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import java.net.URL
 import scala.concurrent.{ExecutionContext, Future}
 
 // The code in this trait was migrated verbatim from http-caching-client.
 // This supports access to keystore to clear the business-customer-frontend keystore cache, which
 // is currently required for acceptance testing purposes.
 trait SessionCache {
-  def http: HttpClient
+  def httpClientV2: HttpClientV2
   def defaultSource: String
   def baseUri: String
   def domain: String
@@ -46,8 +48,12 @@ trait SessionCache {
   protected def buildUri(source: String, id: String): String =
     s"$baseUri/$domain/$source/$id"
 
-  def delete(uri: String)(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[HttpResponse] =
-    http.DELETE[HttpResponse](uri)(legacyRawReads, hc, executionContext)
+  def delete(uri: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+    val url = new URL(uri)
+    httpClientV2
+      .delete(url"$url")
+      .execute[HttpResponse](implicitly[HttpReads[HttpResponse]], implicitly[ExecutionContext])
+  }
 
   def remove()(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[HttpResponse] =
     for {
@@ -57,9 +63,9 @@ trait SessionCache {
 }
 
 class BusinessCustomerSessionCache @Inject()(val configuration: Configuration,
-                                             val httpClient: HttpClient) extends ServicesConfig(configuration) with SessionCache {
-  override def http = httpClient
-  override def defaultSource: String = getConfString("cachable.session-cache.review-details.cache","business-customer-frontend")
+                                             val httpClientV2: HttpClientV2)
+                                             extends ServicesConfig(configuration) with SessionCache {
+  override def defaultSource: String = getConfString("cachable.session-cache.review-details.cache", "business-customer-frontend")
   override def baseUri = baseUrl("cachable.session-cache")
   override def domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
 }

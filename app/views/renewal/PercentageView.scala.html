@@ -30,7 +30,7 @@
     returnLink: ReturnLink
 )
 
-@(form: Form[_], edit: Boolean)(implicit messages: Messages, request: Request[_])
+@(form: Form[_], edit: Boolean)(implicit messages: Messages, requestHeader: RequestHeader)
 
 @radioItems = @{
     PercentageOfCashPaymentOver15000.all.map { i =>

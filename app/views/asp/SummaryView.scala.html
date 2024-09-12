@@ -27,7 +27,7 @@
     button: Button
 )
 
-@(model: Asp)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(model: Asp)(implicit requestHeader: RequestHeader, messages: Messages, appConfig: ApplicationConfig)
 
 @header = {
     @heading("title.cya", "summary.asp")
