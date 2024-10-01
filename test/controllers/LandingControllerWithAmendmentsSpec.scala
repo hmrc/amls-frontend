@@ -501,5 +501,38 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             when(controller.landingService.cacheMap(any[String])).thenReturn(Future.successful(None))
 
 
+            val reviewDetails = ReviewDetails(
+              "Business Name",
+              None,
+              Address("Line1", Some("Line2"), None, None, Some("AA11AA"), Country("United Kingdom", "UK")),
+              "testSafeId")
+
+            when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext]))
+              .thenReturn(Future.successful(Some(reviewDetails)))
+
+            when(controller.landingService.updateReviewDetails(any(), any())).thenReturn(Future.successful(mock[Cache]))
+
+            val result = controller.get()(request)
+
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.businessmatching.routes.BusinessTypeController.get().url))
+
+            Mockito.verify(controller.landingService, times(1)).updateReviewDetails(any[ReviewDetails], any[String])
+          }
+        }
+
+        "there is no data in keystore" should {
+          "redirect to business customer" in new FixtureNoAmlsNumber {
+            when(controller.landingService.cacheMap(any[String])).thenReturn(Future.successful(None))
+            when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext]))
+              .thenReturn(Future.successful(None))
+
+            val result = controller.get()(request)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some("http://localhost:9923/business-customer/amls"))
+          }
+        }
+      }
+    }
   }
 }
