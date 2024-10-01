@@ -82,7 +82,10 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
     val completeATB = mock[BusinessDetails]
 
-
+    def setUpMocksForDataExistsInSaveForLater(controller: LandingController, testData: Cache = mock[Cache]) = {
+      when(controller.landingService.cacheMap(any[String])).thenReturn(Future.successful(Some(testData)))
+      when(controller.landingService.initialiseGetWithAmendments(any[String])(any())).thenReturn(Future.successful(Some(testData)))
+    }
 
     //noinspection ScalaStyle
   }
@@ -115,6 +118,10 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
     when(controller.landingService.setAltCorrespondenceAddress(any(), any[String])).thenReturn(Future.successful(mock[Cache]))
 
     val completeATB = mock[BusinessDetails]
+
+    def setUpMocksForDataExistsInSaveForLater(controller: LandingController, testData: Cache = mock[Cache]) = {
+      when(controller.landingService.cacheMap(any[String])).thenReturn(Future.successful(Some(testData)))
+    }
 
     //noinspection ScalaStyle
   }
@@ -203,6 +210,295 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         redirectLocation(result) mustBe Some(controllers.routes.LoginEventController.get.url)
       }
     }
+
+    "an enrolment exists and" when {
+      "there is data in S4L and" when {
+        "the Save 4 Later data does not contain any sections" when {
+          "data has not changed" should {
+            "refresh from API5 and redirect to status controller" in new Fixture {
+              setUpMocksForDataExistsInSaveForLater(controller, Cache("test", Map.empty))
+
+              when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
+                .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
+
+              when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
+                .thenReturn(Future.successful((NotCompleted, None)))
+
+              val result = controller.get()(request)
+
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+              verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
+            }
+          }
+        }
+
+        "data has just been imported" should {
+
+          def runImportTest(hasChanged: Boolean): Unit = new Fixture {
+            val testCache = createTestCache(
+              hasChanged = hasChanged,
+              includesResponse = false,
+              includeSubmissionStatus = true,
+              includeDataImport = true)
+
+            setUpMocksForDataExistsInSaveForLater(controller, testCache)
+
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
+              .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
+            when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
+              .thenReturn(Future.successful((NotCompleted, None)))
+
+            val result = controller.get()(request)
+
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
+            verify(controller.landingService, never).refreshCache(any[String](), any(), any())(any(), any(), any())
+          }
+
+          "redirect to the status page without refreshing the cache" when {
+            "hasChanged is false" in {
+              runImportTest(hasChanged = false)
+            }
+
+            "hasChanged is true" in new Fixture {
+              runImportTest(hasChanged = true)
+            }
+          }
+        }
+
+        "data has not changed and" when {
+          "the user has just submitted" when {
+            "there are no incomplete responsible people" should {
+              "refresh from API5 and redirect to status controller" in new Fixture {
+                val testCache = createTestCache(
+                  hasChanged = true,
+                  includesResponse = false,
+                  includeSubmissionStatus = true)
+
+                setUpMocksForDataExistsInSaveForLater(controller, testCache)
+
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
+                  .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
+
+                when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
+                  .thenReturn(Future.successful((NotCompleted, None)))
+
+                val result = controller.get()(requestWithHeaders("test-context" -> "ESCS"))
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+
+                verify(controller.landingService).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
+              }
+            }
+
+            "there is an invalid redress scheme" should {
+              "refresh from API5 and redirect to login events controller" in new Fixture {
+
+                val completeRedressSchemeOther = Json.obj(
+                  "redressScheme" -> "other"
+                )
+                val eabOther = Eab(completeRedressSchemeOther, hasAccepted = true)
+
+                val testCache = createTestCache(
+                  hasChanged = true,
+                  includesResponse = false,
+                  includeSubmissionStatus = true)
+
+                val updatedCache = Cache("test-cache-id", testCache.data + (Eab.key -> Json.toJson(eabOther)))
+
+                setUpMocksForDataExistsInSaveForLater(controller, updatedCache)
+
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
+                  .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
+
+                when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
+                  .thenReturn(Future.successful((NotCompleted, None)))
+
+                val result = controller.get()(requestWithHeaders(("test-context" -> "ESCS")))
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get.url))
+
+                verify(controller.landingService).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
+              }
+            }
+          }
+
+          "the user has not just submitted" when {
+            "there are no incomplete responsible people" should {
+              "redirect to status controller without refreshing API5" in new Fixture {
+                val testCache = createTestCache(
+                  hasChanged = true,
+                  includesResponse = false)
+
+                when(controller.landingService.setAltCorrespondenceAddress(any(), any(), any(), any())(any(), any())).thenReturn(Future.successful(testCache))
+
+                setUpMocksForDataExistsInSaveForLater(controller, testCache)
+
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
+                  .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
+
+                when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
+                  .thenReturn(Future.successful((NotCompleted, None)))
+
+                val result = controller.get()(request)
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+
+                verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
+              }
+            }
+
+            "there is an invalid redress scheme" should {
+              "redirect to login events" in new Fixture {
+
+                val completeRedressScheme = Json.obj(
+                  "redressScheme" -> "ombudsmanServices",
+                  "redressSchemeDetail" -> "null"
+                )
+
+                val completeData = completeRedressScheme
+
+                val eabOmbudsmanServices = Eab(completeData)
+
+                val testCache = createTestCache(
+                  hasChanged = true,
+                  includesResponse = false)
+
+                val updatedCacheMap = Cache("test-cache-id", testCache.data + (Eab.key -> Json.toJson(eabOmbudsmanServices)))
+
+                when(controller.landingService.setAltCorrespondenceAddress(any(), any(), any(), any())(any(), any())).thenReturn(Future.successful(updatedCacheMap))
+
+                setUpMocksForDataExistsInSaveForLater(controller, updatedCacheMap)
+
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
+                  .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
+
+                when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
+                  .thenReturn(Future.successful((NotCompleted, None)))
+
+                val result = controller.get()(request)
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get.url))
+
+                verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
+              }
+            }
+          }
+        }
+
+        "data has not changed" should {
+          "refresh from API5 and redirect to status controller" in new Fixture {
+            val testCache: Cache = createTestCache(hasChanged = false, includesResponse = false)
+            setUpMocksForDataExistsInSaveForLater(controller, testCache)
+
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
+              .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
+
+            when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
+              .thenReturn(Future.successful((NotCompleted, None)))
+
+            val result = controller.get()(request)
+
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+            verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
+          }
+
+          "refresh from API5 and redirect to status controller with duplicate submission flag set" in new Fixture {
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any())).thenReturn(Future.successful(Some(SubscriptionResponse("", "", None, Some(true)))))
+
+            val testCache = createTestCache(hasChanged = false, includesResponse = false)
+            setUpMocksForDataExistsInSaveForLater(controller, testCache)
+            when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
+              .thenReturn(Future.successful((NotCompleted, None)))
+
+            val result = controller.get()(request)
+
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.routes.StatusController.get(true).url))
+            verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
+          }
+
+          "refresh from API5 and redirect to status controller when there is no TP or RP data" in new Fixture {
+            val cacheMapOne: Cache = createTestCache(hasChanged = false, includesResponse = false, noTP = true, noRP = true)
+            val testCache = cacheMapOne
+
+            setUpMocksForDataExistsInSaveForLater(controller, testCache)
+
+            val fixedCache = createTestCache(hasChanged = false, includesResponse = false)
+
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
+              .thenReturn(Future.successful(Some(SubscriptionResponse("", "", None))))
+
+            when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
+              .thenReturn(Future.successful((NotCompleted, None)))
+
+            when(controller.cacheConnector.save[TradingPremises](any(), meq(TradingPremises.key), any())(any())).thenReturn(Future.successful(fixedCache))
+
+            when(controller.cacheConnector.save[ResponsiblePerson](any(), meq(ResponsiblePerson.key), any())(any())).thenReturn(Future.successful(fixedCache))
+
+            val result = controller.get()(request)
+
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+            verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
+          }
+        }
+      }
+
+
+      "there is no data in S4L" should {
+        "refresh from API5 and redirect to status controller" in new Fixture {
+          when(controller.landingService.cacheMap(any[String])).thenReturn(Future.successful(None))
+          when(controller.landingService.initialiseGetWithAmendments(any[String])(any())).thenReturn(Future.successful(None))
+
+          when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
+            .thenReturn(Future.successful(Some(SubscriptionResponse("", "", None))))
+
+          when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
+            .thenReturn(Future.successful((NotCompleted, None)))
+
+          val result = controller.get()(request)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+          verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
+        }
+      }
+    }
+
+    "an enrolment does not exist" when {
+      "there is data in S4L " should {
+        "not refresh API5 and redirect to status controller" in new FixtureNoAmlsNumber {
+
+          val businessMatching = mock[BusinessMatching]
+          val cache = mock[Cache]
+
+          when(controller.landingService.cacheMap(any[String])) thenReturn Future.successful(Some(cache))
+          when(businessMatching.isCompleteLanding) thenReturn true
+          when(cache.getEntry[BusinessMatching](any())(any())).thenReturn(Some(businessMatching))
+          when(cache.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
+          when(cache.getEntry[Eab](meq(Eab.key))(any())).thenReturn(None)
+          when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
+            .thenReturn(Future.successful((NotCompleted, None)))
+
+          val result = controller.get()(request)
+
+          verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+        }
+      }
+
+      "there is no data in S4L" when {
+        "there is data in keystore " should {
+          "copy keystore data to S4L and redirect to business type controler" in new FixtureNoAmlsNumber {
+            when(controller.landingService.cacheMap(any[String])).thenReturn(Future.successful(None))
 
 
   }
