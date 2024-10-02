@@ -82,7 +82,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
     val completeATB = mock[BusinessDetails]
 
-    def setUpMocksForDataExistsInSaveForLater(controller: LandingController, testData: Cache = mock[Cache]) = {
+    def setUpMocksForDataExistsInMongoCache(controller: LandingController, testData: Cache = mock[Cache]) = {
       when(controller.landingService.cacheMap(any[String])).thenReturn(Future.successful(Some(testData)))
       when(controller.landingService.initialiseGetWithAmendments(any[String])(any())).thenReturn(Future.successful(Some(testData)))
     }
@@ -119,7 +119,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
     val completeATB = mock[BusinessDetails]
 
-    def setUpMocksForDataExistsInSaveForLater(controller: LandingController, testData: Cache = mock[Cache]) = {
+    def setUpMocksForDataExistsInMongoCache(controller: LandingController, testData: Cache = mock[Cache]) = {
       when(controller.landingService.cacheMap(any[String])).thenReturn(Future.successful(Some(testData)))
     }
 
@@ -216,7 +216,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         "the Save 4 Later data does not contain any sections" when {
           "data has not changed" should {
             "refresh from API5 and redirect to status controller" in new Fixture {
-              setUpMocksForDataExistsInSaveForLater(controller, Cache("test", Map.empty))
+              setUpMocksForDataExistsInMongoCache(controller, Cache("test", Map.empty))
 
               when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
                 .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
@@ -242,7 +242,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
               includeSubmissionStatus = true,
               includeDataImport = true)
 
-            setUpMocksForDataExistsInSaveForLater(controller, testCache)
+            setUpMocksForDataExistsInMongoCache(controller, testCache)
 
             when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
@@ -276,7 +276,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                   includesResponse = false,
                   includeSubmissionStatus = true)
 
-                setUpMocksForDataExistsInSaveForLater(controller, testCache)
+                setUpMocksForDataExistsInMongoCache(controller, testCache)
 
                 when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
@@ -308,7 +308,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
                 val updatedCache = Cache("test-cache-id", testCache.data + (Eab.key -> Json.toJson(eabOther)))
 
-                setUpMocksForDataExistsInSaveForLater(controller, updatedCache)
+                setUpMocksForDataExistsInMongoCache(controller, updatedCache)
 
                 when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
@@ -335,7 +335,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
                 when(controller.landingService.setAltCorrespondenceAddress(any(), any(), any(), any())(any(), any())).thenReturn(Future.successful(testCache))
 
-                setUpMocksForDataExistsInSaveForLater(controller, testCache)
+                setUpMocksForDataExistsInMongoCache(controller, testCache)
 
                 when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
@@ -372,7 +372,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
                 when(controller.landingService.setAltCorrespondenceAddress(any(), any(), any(), any())(any(), any())).thenReturn(Future.successful(updatedCacheMap))
 
-                setUpMocksForDataExistsInSaveForLater(controller, updatedCacheMap)
+                setUpMocksForDataExistsInMongoCache(controller, updatedCacheMap)
 
                 when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
@@ -394,7 +394,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         "data has not changed" should {
           "refresh from API5 and redirect to status controller" in new Fixture {
             val testCache: Cache = createTestCache(hasChanged = false, includesResponse = false)
-            setUpMocksForDataExistsInSaveForLater(controller, testCache)
+            setUpMocksForDataExistsInMongoCache(controller, testCache)
 
             when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
@@ -413,7 +413,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any())).thenReturn(Future.successful(Some(SubscriptionResponse("", "", None, Some(true)))))
 
             val testCache = createTestCache(hasChanged = false, includesResponse = false)
-            setUpMocksForDataExistsInSaveForLater(controller, testCache)
+            setUpMocksForDataExistsInMongoCache(controller, testCache)
             when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
               .thenReturn(Future.successful((NotCompleted, None)))
 
@@ -428,7 +428,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             val cacheMapOne: Cache = createTestCache(hasChanged = false, includesResponse = false, noTP = true, noRP = true)
             val testCache = cacheMapOne
 
-            setUpMocksForDataExistsInSaveForLater(controller, testCache)
+            setUpMocksForDataExistsInMongoCache(controller, testCache)
 
             val fixedCache = createTestCache(hasChanged = false, includesResponse = false)
 
