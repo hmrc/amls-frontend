@@ -60,7 +60,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   def businessCustomerUrl = getConfigString("business-customer.url")
 
-  lazy val mongoCacheUpdateUrl = baseUrl("amls-stub") + getConfigString("amls-stub.get-file-url")
+  lazy val mongoCacheUpdateUrl = baseUrl("amls-stub") + getConfigString("amls-stub.mongo-cache-url")
 
   def amlsUrl = baseUrl("amls")
 
