@@ -17,6 +17,7 @@
 @import views.html.components.{Button, Heading, SectionSubtitle, ReturnLink}
 @import views.html.components.forms.{ErrorSummary, InputYesNo, InputCountry}
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import views.html.helper.CSPNonce
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 
@@ -70,8 +71,10 @@
 }
 
 @layout(pageTitle = messages("responsiblepeople.nationality.title", personName) + " - " + messages("summary.responsiblepeople")) {
+    <link rel="stylesheet" href='@controllers.routes.Assets.versioned("autocomplete-polyfill.css")' />
 
-    @errorSummary(form, preparedErrorSummaryMapping)
+
+@errorSummary(form, preparedErrorSummaryMapping)
 
     @subtitle("summary.responsiblepeople")
 
@@ -96,4 +99,5 @@
 
         @returnLink(true)
     }
+    <script @CSPNonce.attr src='@controllers.routes.Assets.versioned("autocomplete-polyfill.js")'></script>
 }
