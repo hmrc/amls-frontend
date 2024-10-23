@@ -85,8 +85,8 @@ field = form("regNumber")
 
 @supportingContent = {
 <div>
-    <p class="govuk-body">@messages("businessmatching.psr.number.hint")</p>
-    <p class="govuk-body">@messages("businessmatching.psr.number.hint2")</p>
+    <p class="govuk-hint">@messages("businessmatching.psr.number.hint")</p>
+    <p class="govuk-hint">@messages("businessmatching.psr.number.hint2")</p>
 </div>
 }
 
@@ -111,8 +111,8 @@ content = Text(messages("businessmatching.psr.warning"))
 
 <input type="hidden" name="appliedFor" value=true />
 
-<p class="govuk-hint">@messages("businessmatching.psr.number.hint")</p>
-<p class="govuk-hint">@messages("businessmatching.psr.number.hint2")</p>
+<p class="govuk-body">@messages("businessmatching.psr.number.hint")</p>
+<p class="govuk-body">@messages("businessmatching.psr.number.hint2")</p>
 
 @inputText(
 input = Input(
