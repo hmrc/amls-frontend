@@ -1656,7 +1656,7 @@ businessmatching.typeofbusiness.title = What type of unincorporated association 
 businessmatching.typeofbusiness.lbl = Type of business
 businessmatching.typeofbusiness.lbl.hint = For example, association, charity, trust.
 businessmatching.psr.number.title = Does your business have a Payment Services Regulations (PSR) registration number?
-businessmatching.psr.number.title.post.submission = What is your business’s Payment Services Regulations number?
+businessmatching.psr.number.title.post.submission = Payment Services Regulations (PSR) registration number
 businessmatching.psr.number.cya.title = PSR registration number
 businessmatching.psr.number.lbl = PSR registration number
 businessmatching.psr.number.hint = This is a 6 or 7-digit number, for example 123456 or 0123456. You can find this number on your registration letter from the Financial Conduct Authority (FCA).
@@ -1754,6 +1754,7 @@ businessmatching.updateservice.msb.services.list.lbl.01 = Transmitting money
 
 businessmatching.updateservice.psr.number.title = Does your business have a Payment Services Regulations (PSR) registration number?
 businessmatching.updateservice.psr.number.lbl = PSR registration number
+businessmatching.updateservice.psr.number.lbl2 = What is your business’s PSR registration number?
 businessmatching.updateservice.psr.number.hint = It’s 6 numbers, like 123456. You received it when you registered with the Financial Conduct Authority (FCA).
 
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading = You’ll need a Payment Services Regulations (PSR) number to continue with your update

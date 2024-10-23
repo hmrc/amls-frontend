@@ -111,11 +111,15 @@ content = Text(messages("businessmatching.psr.warning"))
 
 <input type="hidden" name="appliedFor" value=true />
 
+<p class="govuk-body">@messages("businessmatching.psr.number.hint")</p>
+<p class="govuk-body">@messages("businessmatching.psr.number.hint2")</p>
+
 @inputText(
 input = Input(
-hint = Some(
-Hint(
-content = HtmlContent(supportingContent))
+label = Label(
+isPageHeading = false,
+content = Text(messages("businessmatching.updateservice.psr.number.lbl2")),
+classes = "govuk-label govuk-label--m"
 ),
 name = "regNumber",
 id = "regNumber",
