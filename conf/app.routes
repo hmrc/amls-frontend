@@ -64,7 +64,7 @@ GET         /submit-application/who-is-registering                              
 POST        /submit-application/who-is-registering/:id                                @controllers.declaration.WhoIsRegisteringController.post(id: String)
 
 GET         /update-information/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.get
-GET         /update-information/who-is-registering-renewal                            @controllers.declaration.WhoIsRegisteringController.getRenewal
+GET         /update-information/who-is-registering-renewal                            @controllers.declaration.WhoIsRegisteringController.get
 
 GET         /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.get()
 POST        /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.post()
