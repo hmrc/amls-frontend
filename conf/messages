@@ -1344,6 +1344,11 @@ deregistration.reason.lbl.specify.other.reason = Reason for deregistering your b
 
 deregistration.reason.lbl.04.hint = For example, you have changed your business type from a sole trader to a limited company.
 
+deregistration.confirmation.youhavederegistered = You have deregistered
+deregistration.confirmation.p1 = You have deregistered from your supervision with HMRC under the Anti-Money Laundering Supervision.
+deregistration.confirmation.p2 = Your given reason for doing so is: Business is not trading in its own right because it is now an agent of a money service business.
+deregistration.confirmation.p3 = You can re-register for supervision from your registration page.
+
 withdrawal.reason.title = Withdraw Application
 withdrawal.reason.heading = Why are you withdrawing your application?
 

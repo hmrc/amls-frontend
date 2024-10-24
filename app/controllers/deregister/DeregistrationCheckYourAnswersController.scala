@@ -64,7 +64,7 @@ class DeregistrationCheckYourAnswersController @Inject()(authAction: AuthAction,
         request = deRegisterSubscriptionRequest,
         accountTypeId = request.accountTypeId
       ))
-    } yield Redirect(controllers.routes.LandingController.get)
+    } yield Redirect(controllers.deregister.routes.DeregistrationConfirmationController.get)
     eitherT.value.map(_.fold(identity, identity))
   }
 

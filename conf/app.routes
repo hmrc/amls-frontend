@@ -60,6 +60,8 @@ POST        /your-registration/deregister-reason                                
 GET         /your-registration/deregistration/check-your-answers                      @controllers.deregister.DeregistrationCheckYourAnswersController.get
 POST        /your-registration/deregistration/check-your-answers                      @controllers.deregister.DeregistrationCheckYourAnswersController.post()
 
+GET         /your-registration/deregistration/confirmation                            @controllers.deregister.DeregistrationConfirmationController.get
+
 GET         /submit-application/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.get
 POST        /submit-application/who-is-registering/:id                                @controllers.declaration.WhoIsRegisteringController.post(id: String)
 
