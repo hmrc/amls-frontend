@@ -47,21 +47,26 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
                                              registrationView: WhoIsRegisteringThisRegistrationView,
                                              implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-      DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
-        case true =>  dataCacheConnector.fetchAll(request.credId) flatMap {
-          optionalCache =>
-            (for {
-              cache <- optionalCache
-              responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
-            } yield whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, ResponsiblePerson.filter(responsiblePeople))
-              ) getOrElse whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, Seq.empty)
-        }
-        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
-      }
+  def get: Action[AnyContent] = authAction.async { implicit request =>
 
+    lazy val renderProperViewWhenSectionsComplete = dataCacheConnector.fetchAll(request.credId) flatMap {
+      optionalCache =>
+        (for {
+          cache <- optionalCache
+          responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+        } yield whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, ResponsiblePerson.filter(responsiblePeople))
+          ) getOrElse whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, Seq.empty)
+    }
 
+    for {
+      isRenewal <- renewalService.isRenewalFlow(request.amlsRefNumber, request.accountTypeId, request.credId)
+      sectionsComplete <- DeclarationHelper.sectionsComplete(request.credId, sectionsProvider, isRenewal)
+      result <-
+        if(sectionsComplete)
+          renderProperViewWhenSectionsComplete
+        else
+          Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
+    } yield result
   }
 
   def post(identifier: String): Action[AnyContent] = authAction.async {

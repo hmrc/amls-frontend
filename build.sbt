@@ -63,7 +63,8 @@ lazy val microservice = Project(appName, file("."))
       "-unchecked",
       "-language:implicitConversions",
       "-Wconf:cat=unused-imports&src=.*routes.*:s",
-      "-Wconf:msg=legacy-binding:s"
+      "-Wconf:msg=legacy-binding:s",
+      "-nowarn"
     )
   )
   .disablePlugins(JUnitXmlReportPlugin)

@@ -53,7 +53,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
 
   def get(): Action[AnyContent] = authAction.async {
       implicit request =>
-        isRenewalFlow(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap {
+        renewalService.isRenewalFlow(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap {
           case true => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get))
           case _ =>
             (for {
@@ -101,19 +101,6 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
               } getOrElse InternalServerError("Unable to retrieve the business details")
             }) getOrElse Redirect(controllers.routes.LandingController.get())
         }
-  }
-
-  private def isRenewalFlow(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
-                           (implicit hc: HeaderCarrier): Future[Boolean] = {
-    statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) flatMap {
-      case ReadyForRenewal(_) =>
-        dataCache.fetch[Renewal](cacheId, Renewal.key) map {
-          case Some(_) => true
-          case None => false
-        }
-
-      case _ => Future.successful(false)
-    }
   }
 
   private def declarationAvailable(seq: Seq[TaskRow]): Boolean = {

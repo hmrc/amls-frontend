@@ -33,6 +33,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import play.api.Logging
 import play.api.i18n.Messages
 import services.cache.Cache
 
@@ -40,7 +41,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector,
-                                 val config: ApplicationConfig) {
+                                 val config: ApplicationConfig)  extends Logging {
 
   def taskRows(cacheId: String)(implicit ec: ExecutionContext, messages: Messages): Future[Seq[TaskRow]] =
     cacheConnector.fetchAll(cacheId) map {
@@ -53,6 +54,14 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
 
   def taskRows(cache: Cache)(implicit messages: Messages): Seq[TaskRow] =
     mandatoryTaskRows(cache, messages) ++ dependentTaskRows(cache, messages)
+
+  def taskRowsForRenewal(cache: Cache)(implicit messages: Messages): Seq[TaskRow] =
+    taskRows(cache).filter(isTaskRowsForRenewal)
+
+  def taskRowsForRenewal(cacheId: String)(implicit ec: ExecutionContext, messages: Messages): Future[Seq[TaskRow]] =
+    taskRows(cacheId).map(_.filter(isTaskRowsForRenewal))
+
+  private def isTaskRowsForRenewal(taskRow: TaskRow): Boolean = taskRow.msgKey != BusinessMatching.messageKey
 
   def taskRowsFromBusinessActivities(activities: Set[BusinessActivity],
                                      msbServices: Option[BusinessMatchingMsbServices])

@@ -24,15 +24,38 @@ import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, For
 import models.businessmatching._
 import models.registrationprogress._
 import models.renewal._
+import models.status.ReadyForRenewal
 import play.api.i18n.Messages
 import services.RenewalService.BusinessAndOtherActivities
 import services.cache.Cache
+import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RenewalService @Inject()(dataCache: DataCacheConnector)(implicit ec: ExecutionContext) {
+class RenewalService @Inject()(
+  dataCache: DataCacheConnector,
+  statusService: StatusService
+)(implicit ec: ExecutionContext) {
+
+  def isRenewalFlow(
+    amlsRegistrationNo: Option[String],
+    accountTypeId: (String, String),
+    cacheId: String)(implicit
+    hc: HeaderCarrier,
+    messages: Messages
+  ): Future[Boolean] = {
+
+    statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) flatMap {
+      case ReadyForRenewal(_) =>
+        dataCache.fetch[Renewal](cacheId, Renewal.key) map {
+          case Some(_) => true
+          case None => false
+        }
+      case _ => Future.successful(false)
+    }
+  }
 
   def getTaskRow(credId: String)(implicit messages: Messages): Future[TaskRow] = {
 

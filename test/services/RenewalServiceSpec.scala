@@ -44,8 +44,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
   trait Fixture {
 
     val dataCache = mock[DataCacheConnector]
+    val statusService = mock[StatusService]
 
-    val service = new RenewalService(dataCache)
+    val service = new RenewalService(dataCache, statusService)
 
     val credId = "12345678"
 
@@ -1035,8 +1036,10 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       when(dataCache.save[Renewal](eqTo(cacheId), eqTo(Renewal.key), eqTo(Renewal()))(any[Format[Renewal]]))
         .thenReturn(Future.successful(cache))
 
+      val statusService = mock[StatusService]
+
       // When
-      val service = new RenewalService(dataCache)
+      val service = new RenewalService(dataCache, statusService)
       val updatedCache = service.createOrUpdateRenewal(cacheId, r => r.copy(involvedInOtherActivities = None), Renewal()).futureValue
 
       // Then
@@ -1053,9 +1056,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       when(dataCache
         .save[Renewal](eqTo(cacheId), eqTo(Renewal.key), eqTo(Renewal(Some(InvolvedInOtherYes("selling software packages")))))(any[Format[Renewal]]))
         .thenReturn(Future.successful(cache))
-
+      val statusService = mock[StatusService]
       // When
-      val renewalService = new RenewalService(dataCache)
+      val renewalService = new RenewalService(dataCache, statusService)
       val updatedCache = renewalService.createOrUpdateRenewal(
         cacheId,
         r => r.copy(involvedInOtherActivities = Some(InvolvedInOtherYes("selling software packages"))),
@@ -1082,8 +1085,10 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         when(dataCache.fetch[BusinessMatching](eqTo(cacheId), eqTo(BusinessMatching.key))(any[Format[BusinessMatching]]))
           .thenReturn(Future.successful(Some(BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices, MoneyServiceBusiness)))))))
 
+        val statusService = mock[StatusService]
+
         // When
-        val renewalService = new RenewalService(dataCache)
+        val renewalService = new RenewalService(dataCache, statusService)
         val businessOtherActivities = renewalService.updateOtherBusinessActivities(cacheId, InvolvedInOtherYes("selling software packages"))
           .futureValue
           .value
@@ -1099,9 +1104,10 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         when(dataCache.fetch[Renewal](eqTo(cacheId), eqTo(Renewal.key))(any[Format[Renewal]])).thenReturn(Future.successful(None))
         when(dataCache.fetch[BusinessMatching](eqTo(cacheId), eqTo(BusinessMatching.key))(any[Format[BusinessMatching]]))
           .thenReturn(Future.successful(Some(BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices, MoneyServiceBusiness)))))))
+        val statusService = mock[StatusService]
 
         // When
-        val renewalService = new RenewalService(dataCache)
+        val renewalService = new RenewalService(dataCache, statusService)
         val businessOtherActivities = renewalService.updateOtherBusinessActivities(cacheId, InvolvedInOtherYes("trading")).futureValue.value
 
         // Then
@@ -1119,8 +1125,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         when(dataCache.fetch[BusinessMatching](eqTo(cacheId), eqTo(BusinessMatching.key))(any[Format[BusinessMatching]]))
           .thenReturn(Future.successful(None))
 
+        val statusService = mock[StatusService]
         // When
-        val renewalService = new RenewalService(dataCache)
+        val renewalService = new RenewalService(dataCache, statusService)
         val businessOtherActivities = renewalService.updateOtherBusinessActivities(cacheId, InvolvedInOtherYes("trading")).futureValue
 
         // Then

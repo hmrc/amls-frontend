@@ -43,8 +43,8 @@ object BusinessName extends Logging {
     }
 
   def getNameFromAmls(accountTypeId: (String, String), safeId: String)
-                     (implicit hc: HeaderCarrier,  amls: AmlsConnector, ec: ExecutionContext): OptionT[Future, String] = {
-    OptionT(amls.registrationDetails(accountTypeId, safeId) map { r =>
+                     (implicit hc: HeaderCarrier, amlsConnector: AmlsConnector, ec: ExecutionContext): OptionT[Future, String] = {
+    OptionT(amlsConnector.registrationDetails(accountTypeId, safeId) map { r =>
       Option(r.companyName)
     } recover {
       case ex =>
