@@ -47,9 +47,13 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
                                              registrationView: WhoIsRegisteringThisRegistrationView,
                                              implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
+  def get: Action[AnyContent] = get(isRenewal = false)
+
+  def getRenewal: Action[AnyContent] = get(isRenewal = true)
+
+  private def get(isRenewal: Boolean): Action[AnyContent] = authAction.async {
     implicit request =>
-      DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
+      DeclarationHelper.sectionsComplete(request.credId, sectionsProvider, isRenewal) flatMap {
         case true =>  dataCacheConnector.fetchAll(request.credId) flatMap {
           optionalCache =>
             (for {
@@ -60,8 +64,6 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
         }
         case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
       }
-
-
   }
 
   def post(identifier: String): Action[AnyContent] = authAction.async {
