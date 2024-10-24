@@ -16,16 +16,14 @@
 
 package controllers.withdrawal
 
-import cats.data.OptionT
-import cats.implicits._
-import connectors.AmlsConnector
+import cats.implicits.catsSyntaxOptionId
+import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.withdrawal.WithdrawalReasonFormProvider
-import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawalReason}
-import java.time.LocalDate
+import models.withdrawal.WithdrawalReason
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AuthEnrolmentsService
-import utils.{AckRefGenerator, AuthAction}
+import utils.AuthAction
 import views.html.withdrawal.WithdrawalReasonView
 
 import javax.inject.Inject
@@ -34,11 +32,12 @@ import scala.concurrent.Future
 class WithdrawalReasonController @Inject()(
                                             authAction: AuthAction,
                                             val ds: CommonPlayDependencies,
-                                            val amls: AmlsConnector,
                                             enrolments: AuthEnrolmentsService,
+                                            dataCacheConnector: DataCacheConnector,
                                             val cc: MessagesControllerComponents,
                                             formProvider: WithdrawalReasonFormProvider,
-                                            view: WithdrawalReasonView) extends AmlsBaseController(ds, cc) {
+                                            view: WithdrawalReasonView
+                                          ) extends AmlsBaseController(ds, cc) {
 
   def get: Action[AnyContent] = authAction {
     implicit request => Ok(view(formProvider()))
@@ -47,26 +46,22 @@ class WithdrawalReasonController @Inject()(
   def post: Action[AnyContent] = authAction.async {
     implicit request =>
       formProvider().bindFromRequest().fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+        formWithErrors => {
+          Future.successful(BadRequest(view(formWithErrors)))
+        },
         data => {
           val withdrawalReasonOthers = data match {
             case WithdrawalReason.Other(reason) => reason.some
             case _ => None
           }
 
-          val withdrawal = WithdrawSubscriptionRequest(
-            AckRefGenerator(),
-            LocalDate.now(),
-            data,
-            withdrawalReasonOthers
-          )
-
-          (for {
-            regNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-            _ <- OptionT.liftF(amls.withdraw(regNumber, withdrawal, request.accountTypeId))
-          } yield Redirect(controllers.routes.LandingController.get())) getOrElse InternalServerError("Unable to withdraw the application")
+          dataCacheConnector.save[WithdrawalReason](request.credId, WithdrawalReason.key, data).map { _ =>
+            Redirect(controllers.withdrawal.routes.WithdrawalCheckYourAnswersController.get)
+          }.recover {
+            case ex: Exception =>
+              InternalServerError("Error occurred while processing withdrawal reason")
+          }
         }
       )
   }
-
 }

@@ -1344,8 +1344,12 @@ deregistration.reason.lbl.specify.other.reason = Reason for deregistering your b
 
 deregistration.reason.lbl.04.hint = For example, you have changed your business type from a sole trader to a limited company.
 
+withdrawal.reason.heading = Withdrawal
 withdrawal.reason.title = Withdraw Application
 withdrawal.reason.heading = Why are you withdrawing your application?
+
+withdrawal.cya.heading = Check your answers
+withdrawal.cya.question = Why are you withdrawing your application?
 
 withdrawal.reason.lbl.01 = Business is out of scope as no longer carrying out activities covered by the Money Laundering Regulations
 withdrawal.reason.lbl.02 = Business is not trading in its own right because it is now an agent of a money service business
