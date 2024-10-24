@@ -25,6 +25,8 @@ sealed trait WithdrawalReason {
 
 object WithdrawalReason extends Enumerable.Implicits {
 
+  val key: String = "withdrawalReason"
+
   case object OutOfScope extends WithName("outOfScope") with WithdrawalReason {
     override val value: String = "01"
   }
