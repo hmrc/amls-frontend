@@ -23,9 +23,10 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
-import models.registrationprogress.{Completed, TaskList}
+import models.registrationprogress.{Completed, TaskList, TaskRow}
 import models.responsiblepeople.ResponsiblePerson
 import models.status.{ReadyForRenewal, RenewalSubmitted}
+import play.api.Logging
 import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
@@ -59,14 +60,24 @@ class RenewalProgressController @Inject()(val authAction: AuthAction,
             } yield {
               val businessName = businessMatching.reviewDetails.map(r => r.businessName).getOrElse("")
               val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage()).toSeq)
-              val variationTaskRows = sectionsProvider.taskRows(cache).filter(_.msgKey != BusinessMatching.messageKey)
+              val variationTaskRows = sectionsProvider.taskRowsForRenewal(cache)
               val canSubmit = renewals.canSubmit(renewalTaskRow, variationTaskRows)
               val msbOrTcspExists = ControllerHelper.isMSBSelected(Some(businessMatching)) ||
                 ControllerHelper.isTCSPSelected(Some(businessMatching))
               val hasCompleteNominatedOfficer = ControllerHelper.hasCompleteNominatedOfficer(Option(responsiblePeople))
               val nominatedOfficerName = ControllerHelper.completeNominatedOfficerTitleName(Option(responsiblePeople))
 
-              Ok(view(TaskList(variationTaskRows), businessName, activities, canSubmit, msbOrTcspExists, r, renewalTaskRow.status == Completed, hasCompleteNominatedOfficer, nominatedOfficerName))
+              Ok(view(
+                amlsTaskList = TaskList(variationTaskRows),
+                businessName = businessName,
+                serviceNames = activities,
+                canSubmit = canSubmit,
+                msbOrTcspExists = msbOrTcspExists,
+                renewal = r,
+                renewalSectionCompleted = renewalTaskRow.status == Completed,
+                hasCompleteNominatedOfficer = hasCompleteNominatedOfficer,
+                nominatedOfficerName = nominatedOfficerName
+              ))
             }
           }
           case (r:RenewalSubmitted, _) => OptionT.fromOption[Future](Some(Redirect(controllers.routes.RegistrationProgressController.get())))
