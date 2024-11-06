@@ -126,7 +126,7 @@ object DeclarationHelper extends Logging{
     }
   }
 
-  def sectionsComplete(cacheId: String, sectionsProvider: SectionsProvider, isRenewal: Boolean = false)
+  def sectionsComplete(cacheId: String, sectionsProvider: SectionsProvider, isRenewal: Boolean)
                       (implicit ec: ExecutionContext, messages: Messages): Future[Boolean] = {
     val taskRows: Future[Seq[TaskRow]] = if(isRenewal) sectionsProvider.taskRowsForRenewal(cacheId) else sectionsProvider.taskRows(cacheId)
     taskRows map areComplete

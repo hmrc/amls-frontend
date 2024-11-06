@@ -46,49 +46,46 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
     }
   }
 
-  def post(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
-        case true => {
-          // $COVERAGE-OFF$
-          logger.info("[SubmissionController][post]:true")
-          // $COVERAGE-ON$
-          statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap[SubmissionResponse](status =>
-            subscribeBasedOnStatus(status, request.groupIdentifier, request.credId, request.amlsRefNumber, request.accountTypeId))
-          }.flatMap {
-          case SubscriptionResponse(_, _, _, Some(true)) =>
-            // $COVERAGE-OFF$
-            logger.info("[SubmissionController][post]:SubscriptionResponse(previouslySubmitted=true)")
-            // $COVERAGE-ON$
-              Future.successful(Redirect(controllers.routes.LandingController.get()))
-          case _ =>
-            // $COVERAGE-OFF$
-            logger.info("[SubmissionController][post]:SubmissionResponse or SubscriptionResponse(previouslySubmitted=false)")
-            // $COVERAGE-ON$
-            Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
-        } recoverWith {
-          case _: DuplicateEnrolmentException =>
-            logger.warn("[SubmissionController][post] handling DuplicateEnrolmentException")
-            Future.successful(Redirect(routes.SubmissionErrorController.duplicateEnrolment()))
-          case e: DuplicateSubscriptionException =>
-            logger.warn("[SubmissionController][post] handling DuplicateSubscriptionException")
-            Future.successful(Redirect(routes.SubmissionErrorController.duplicateSubmission()))
-          case _: InvalidEnrolmentCredentialsException =>
-            logger.warn("[SubmissionController][post] handling InvalidEnrolmentCredentialsException")
-            Future.successful(Redirect(routes.SubmissionErrorController.wrongCredentialType()))
-          case _: BadRequestException =>
-            logger.warn("[SubmissionController][post] handling BadRequestException")
-            Future.successful(Redirect(routes.SubmissionErrorController.badRequest()))
-          case e: Exception =>
-            logger.warn("[SubmissionController][post] handling Exception")
-            throw e
-        }
+  def post(): Action[AnyContent] = authAction.async { implicit request =>
+    lazy val whenSectionsComplete = {
+      logger.info("[SubmissionController][post]:true")
+      statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap[SubmissionResponse](status =>
+        subscribeBasedOnStatus(status, request.groupIdentifier, request.credId, request.amlsRefNumber, request.accountTypeId))
+    }.flatMap {
+      case SubscriptionResponse(_, _, _, Some(true)) =>
+        logger.info("[SubmissionController][post]:SubscriptionResponse(previouslySubmitted=true)")
+        Future.successful(Redirect(controllers.routes.LandingController.get()))
+      case _ =>
+        logger.info("[SubmissionController][post]:SubmissionResponse or SubscriptionResponse(previouslySubmitted=false)")
+        Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
+    } recoverWith {
+      case _: DuplicateEnrolmentException =>
+        logger.warn("[SubmissionController][post] handling DuplicateEnrolmentException")
+        Future.successful(Redirect(routes.SubmissionErrorController.duplicateEnrolment()))
+      case e: DuplicateSubscriptionException =>
+        logger.warn("[SubmissionController][post] handling DuplicateSubscriptionException")
+        Future.successful(Redirect(routes.SubmissionErrorController.duplicateSubmission()))
+      case _: InvalidEnrolmentCredentialsException =>
+        logger.warn("[SubmissionController][post] handling InvalidEnrolmentCredentialsException")
+        Future.successful(Redirect(routes.SubmissionErrorController.wrongCredentialType()))
+      case _: BadRequestException =>
+        logger.warn("[SubmissionController][post] handling BadRequestException")
+        Future.successful(Redirect(routes.SubmissionErrorController.badRequest()))
+      case e: Exception =>
+        logger.warn("[SubmissionController][post] handling Exception")
+        throw e
+    }
+
+    for {
+      isRenewal <- renewalService.isRenewalFlow(request.amlsRefNumber, request.accountTypeId, request.credId)
+      sectionsComplete <- DeclarationHelper.sectionsComplete(request.credId, sectionsProvider, isRenewal)
+      result <- sectionsComplete match {
+        case true => whenSectionsComplete
         case false =>
-          // $COVERAGE-OFF$
-          logger.info("[SubmissionController][post]:false")
-          // $COVERAGE-ON$
+          logger.info("sections aren't complete, redirecting")
           Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
       }
+    } yield result
   }
 
   private def subscribeBasedOnStatus(status: SubmissionStatus, groupIdentifier: Option[String], credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))

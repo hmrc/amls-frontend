@@ -18,7 +18,6 @@ package controllers.declaration
 
 import javax.inject.{Inject, Singleton}
 import cats.data.OptionT
-import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.declaration.BusinessPartnersFormProvider
@@ -26,9 +25,10 @@ import models.declaration.BusinessPartners
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{Partner, Positions, ResponsiblePerson}
 import models.status.{RenewalSubmitted, _}
+import play.api.Logging
 import play.api.data.Form
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
-import services.{ProgressService, SectionsProvider, StatusService}
+import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
 import utils.DeclarationHelper._
 import utils.{AuthAction, DeclarationHelper}
 import views.html.declaration.RegisterPartnersView
@@ -44,27 +44,36 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
                                            val cc: MessagesControllerComponents,
                                            val sectionsProvider: SectionsProvider,
                                            formProvider: BusinessPartnersFormProvider,
-                                           view: RegisterPartnersView) extends AmlsBaseController(ds, cc) {
+                                           renewalService: RenewalService,
+                                           view: RegisterPartnersView) extends AmlsBaseController(ds, cc) with Logging {
 
-  def get(): Action[AnyContent] = authAction.async {
-    implicit request => {
-      DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
-        case true =>
-          val result = for {
-          subtitle <- OptionT.liftF(statusSubtitle(request.amlsRefNumber, request.accountTypeId, request.credId))
-          responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key))
-        } yield {
-          Ok(view(
-            subtitle,
-            formProvider(),
-            nonPartners(responsiblePeople),
-            currentPartnersNames(responsiblePeople)
-          ))
-        }
-          result getOrElse InternalServerError("failure getting status")
-        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
+  def get(): Action[AnyContent] = authAction.async { implicit request =>
+    lazy val whenSectionsComplete = {
+      val result = for {
+        subtitle <- OptionT.liftF(statusSubtitle(request.amlsRefNumber, request.accountTypeId, request.credId))
+        responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key))
+      } yield {
+        Ok(view(
+          subtitle,
+          formProvider(),
+          nonPartners(responsiblePeople),
+          currentPartnersNames(responsiblePeople)
+        ))
       }
+      //TODO: throw exception so it's possible to see why it failed
+      result getOrElse InternalServerError("failure getting status")
     }
+
+    for {
+      isRenewal <- renewalService.isRenewalFlow(request.amlsRefNumber, request.accountTypeId, request.credId)
+      sectionsComplete <- DeclarationHelper.sectionsComplete(request.credId, sectionsProvider, isRenewal)
+      result <- sectionsComplete match {
+        case true => whenSectionsComplete
+        case false =>
+          logger.warn("Sections aren't complete, redirecting")
+          Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
+      }
+    } yield result
   }
 
   def post(): Action[AnyContent] = authAction.async {
