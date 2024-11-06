@@ -29,7 +29,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Request, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import services.SectionsProvider
+import services.{RenewalService, SectionsProvider}
 import utils._
 import views.html.declaration.SelectBusinessNominatedOfficerView
 
@@ -42,18 +42,20 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
     val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
     val mockSectionsProvider: SectionsProvider = mock[SectionsProvider]
+    val renewalService = mock[RenewalService]
+    when(renewalService.isRenewalFlow(any(), any(), any())(any(), any())).thenReturn(Future.successful(false))
 
     lazy val controller = new WhoIsTheBusinessNominatedOfficerController(
-      mockCacheConnector,
-      SuccessfulAuthAction,
-      commonDependencies,
-      mockStatusService,
-      mockMcc,
-      inject[BusinessNominatedOfficerFormProvider],
-      mockSectionsProvider,
-      inject[SelectBusinessNominatedOfficerView]
+      dataCacheConnector = mockCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      statusService = mockStatusService,
+      cc = mockMcc,
+      formProvider = inject[BusinessNominatedOfficerFormProvider],
+      sectionsProvider = mockSectionsProvider,
+      renewalService = renewalService,
+      view = inject[SelectBusinessNominatedOfficerView]
     )
-
   }
 
   "WhoIsTheBusinessNominatedOfficerController" must {

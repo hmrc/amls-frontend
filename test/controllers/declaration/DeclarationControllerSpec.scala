@@ -45,13 +45,16 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     val request = addToken(authRequest)
     val mockSectionsProvider = mock[SectionsProvider]
     lazy val view = app.injector.instanceOf[DeclareView]
+    val renewalService: RenewalService = mock[RenewalService]
+    when(renewalService.isRenewalFlow(any(), any(), any())(any(), any())).thenReturn(Future.successful(false))
+
     val declarationController = new DeclarationController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mockStatusService,
       cc = mockMcc,
       sectionsProvider = mockSectionsProvider,
-      renewalService = mock[RenewalService],
+      renewalService = renewalService,
       view = view
     )
     val response = SubscriptionResponse(
