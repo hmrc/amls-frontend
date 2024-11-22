@@ -18,6 +18,7 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
+import connectors.AmlsConnector
 import controllers.actions.SuccessfulAuthAction
 import generators.AmlsReferenceNumberGenerator
 import generators.businesscustomer.ReviewDetailsGenerator
@@ -69,6 +70,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       sectionsProvider = mockSectionsProvider,
       businessMatchingService = mockBusinessMatchingService,
       serviceFlow = mockServiceFlow,
+      amlsConnector = mock[AmlsConnector],
       renewalService = mock[RenewalService],
       ds = commonDependencies,
       cc = mockMcc,
@@ -94,6 +96,10 @@ class RegistrationProgressControllerSpec extends AmlsSpec
     } thenReturn Some(BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)))
 
     when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
+
+    when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful((NotCompleted, None)))
+
   }
 
   "RegistrationProgressController" when {
@@ -140,8 +146,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
               TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
               TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
             ))
-
-          mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
 
           mockApplicationStatus(RenewalSubmitted(None))
 
