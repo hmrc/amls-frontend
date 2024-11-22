@@ -61,6 +61,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
     lazy val view1 = inject[RegistrationProgressView]
     lazy val view2 = inject[RegistrationAmendmentView]
 
+    val renewalService: RenewalService = mock[RenewalService]
     val controller = new RegistrationProgressController(
       SuccessfulAuthAction,
       progressService = mock[ProgressService],
@@ -79,6 +80,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
     mockApplicationStatus(SubmissionReady)
     mockCacheFetch[Renewal](None)
+    when(renewalService.isRenewalFlow(any(), any(), any())(any(), any())).thenReturn(Future.successful(false))
 
     when(mockBusinessMatching.isComplete) thenReturn true
     when(mockBusinessMatching.reviewDetails) thenReturn Some(reviewDetailsGen.sample.get)
@@ -128,6 +130,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         "redirect to renewal registration progress" in new Fixture {
 
           mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
+          when(renewalService.isRenewalFlow(any(), any(), any())(any(), any())).thenReturn(Future.successful(true))
 
           mockApplicationStatus(ReadyForRenewal(None))
 

@@ -19,9 +19,11 @@ package utils
 import cats.data.OptionT
 import cats.implicits._
 import controllers.declaration
-import models.registrationprogress.{Completed, Updated}
+import models.registrationprogress.{Completed, TaskRow, Updated}
 import models.responsiblepeople.{Partner, ResponsiblePerson}
 import models.status._
+import play.api.Logging
+
 import java.time.LocalDate
 import play.api.i18n.Messages
 import play.api.mvc.Call
@@ -30,7 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object DeclarationHelper {
+object DeclarationHelper extends Logging{
 
   def currentPartnersNames(responsiblePeople: Seq[ResponsiblePerson]): Seq[String] = {
     nonDeletedResponsiblePeopleWithPositions(responsiblePeople).collect {
@@ -124,14 +126,14 @@ object DeclarationHelper {
     }
   }
 
-  def sectionsComplete(cacheId: String, sectionsProvider: SectionsProvider)
+  def sectionsComplete(cacheId: String, sectionsProvider: SectionsProvider, isRenewal: Boolean)
                       (implicit ec: ExecutionContext, messages: Messages): Future[Boolean] = {
+    val taskRows: Future[Seq[TaskRow]] = if(isRenewal) sectionsProvider.taskRowsForRenewal(cacheId) else sectionsProvider.taskRows(cacheId)
+    taskRows map areComplete
+  }
 
-    sectionsProvider.taskRows(cacheId) map {
-      _ forall { row =>
-        row.status == Completed || row.status == Updated
-      }
-    }
+  private def areComplete(taskRows: Seq[TaskRow]): Boolean = taskRows.forall { row =>
+    row.status == Completed || row.status == Updated
   }
 
   def getSubheadingBasedOnStatus(credId: String, amlsRefNumber: Option[String], accountTypeId: (String, String), statusService: StatusService, renewalService: RenewalService)

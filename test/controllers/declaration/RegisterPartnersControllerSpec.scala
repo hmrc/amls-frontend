@@ -27,7 +27,7 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import services.{ProgressService, SectionsProvider}
+import services.{ProgressService, RenewalService, SectionsProvider}
 import services.cache.Cache
 import utils._
 import views.html.declaration.RegisterPartnersView
@@ -45,6 +45,8 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
     val statusService = mockStatusService
     val progressService = mock[ProgressService]
     val mockSectionsProvider = mock[SectionsProvider]
+    val renewalService = mock[RenewalService]
+    when(renewalService.isRenewalFlow(any(), any(), any())(any(), any())).thenReturn(Future.successful(false))
 
     val controller = new RegisterPartnersController(
       authAction = SuccessfulAuthAction,
@@ -55,6 +57,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
       cc = mockMcc,
       sectionsProvider = mockSectionsProvider,
       formProvider = inject[BusinessPartnersFormProvider],
+      renewalService = renewalService,
       view = inject[RegisterPartnersView]
     )
 

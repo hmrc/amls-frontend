@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
 @import views.html.components.forms.ErrorSummary
 @import views.html.components.{SectionSubtitle, Heading, Button, ReturnLink}
-
+@import views.html.helper.CSPNonce
 @this(
     layout: Layout,
     errorSummary: ErrorSummary,
@@ -53,6 +53,7 @@
 @layout(
     pageTitle = messages("renewal.msb.whichcurrencies.header") + " - " + messages("summary.renewal")
 ) {
+    <link rel="stylesheet" href='@controllers.routes.Assets.versioned("autocomplete-polyfill.css")' />
 
     @errorSummary(preparedForm, preparedErrorSummaryMapping)
 
@@ -86,4 +87,5 @@
     }
 
     @returnLink(true, Some("renewal"))
+    <script @CSPNonce.attr src='@controllers.routes.Assets.versioned("autocomplete-polyfill.js")'></script>
 }

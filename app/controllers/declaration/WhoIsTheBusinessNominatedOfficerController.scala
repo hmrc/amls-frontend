@@ -23,9 +23,10 @@ import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePerson}
 import models.status._
+import play.api.Logging
 import play.api.data.Form
 import play.api.mvc._
-import services.{SectionsProvider, StatusService}
+import services.{RenewalService, SectionsProvider, StatusService}
 import utils.{AuthAction, DeclarationHelper}
 import views.html.declaration.SelectBusinessNominatedOfficerView
 
@@ -39,7 +40,8 @@ class WhoIsTheBusinessNominatedOfficerController @Inject()(val dataCacheConnecto
                                                            val cc: MessagesControllerComponents,
                                                            formProvider: BusinessNominatedOfficerFormProvider,
                                                            val sectionsProvider: SectionsProvider,
-                                                           view: SelectBusinessNominatedOfficerView) extends AmlsBaseController(ds, cc) {
+                                                           renewalService: RenewalService,
+                                                           view: SelectBusinessNominatedOfficerView) extends AmlsBaseController(ds, cc) with Logging {
 
   private def businessNominatedOfficerView(amlsRegistrationNo: Option[String],
                                            accountTypeId: (String, String),
@@ -55,19 +57,26 @@ class WhoIsTheBusinessNominatedOfficerController @Inject()(val dataCacheConnecto
       case _ => throw new Exception("Incorrect status - Page not permitted for this status")
     }
 
-  def get: Action[AnyContent] = authAction.async {
-      implicit request =>
-        DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
-          case true =>  dataCacheConnector.fetchAll(request.credId) flatMap {
-            optionalCache =>
-              (for {
-                cache <- optionalCache
-                responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
-              } yield businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, formProvider(), ResponsiblePerson.filter(responsiblePeople))
-                ) getOrElse businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, formProvider(), Seq.empty)
-          }
-          case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
-        }
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+
+    lazy val whenSectionsComplete = dataCacheConnector.fetchAll(request.credId) flatMap { optionalCache =>
+      (for {
+        cache <- optionalCache
+        responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+      } yield businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, formProvider(), ResponsiblePerson.filter(responsiblePeople))
+      ) getOrElse businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, formProvider(), Seq.empty)
+    }
+
+    for {
+      isRenewal <- renewalService.isRenewalFlow(request.amlsRefNumber, request.accountTypeId, request.credId)
+      sectionsComplete <- DeclarationHelper.sectionsComplete(request.credId, sectionsProvider, isRenewal)
+      result <- sectionsComplete match {
+        case true => whenSectionsComplete
+        case false =>
+          logger.warn("Sections aren't complete, redirecting")
+          Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
+      }
+    } yield result
   }
 
   def getWithAmendment: Action[AnyContent] = get //TODO this can be removed unless there is a GTM need for it
