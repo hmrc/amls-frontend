@@ -18,7 +18,7 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.DataCacheConnector
+import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.{BusinessActivity, BusinessMatching}
 import models.registrationprogress.{Completed, TaskList, TaskRow, Updated}
 import models.renewal.Renewal
@@ -29,12 +29,12 @@ import services._
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import services.cache.Cache
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AuthAction, ControllerHelper, DeclarationHelper}
+import utils.{AuthAction, BusinessName, ControllerHelper, DeclarationHelper}
 import views.html.registrationamendment.RegistrationAmendmentView
 import views.html.registrationprogress.RegistrationProgressView
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RegistrationProgressController @Inject()(protected[controllers] val authAction: AuthAction,
@@ -46,6 +46,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                                                protected[controllers] val sectionsProvider: SectionsProvider,
                                                protected[controllers] val businessMatchingService: BusinessMatchingService,
                                                protected[controllers] val serviceFlow: ServiceFlow,
+                                               val amlsConnector: AmlsConnector,
                                                implicit val renewalService: RenewalService,
                                                val cc: MessagesControllerComponents,
                                                registration_progress: RegistrationProgressView,
@@ -63,6 +64,9 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
               responsiblePeople <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
               businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
               newActivities <- getNewActivities(request.credId) orElse OptionT.some(Set.empty[BusinessActivity])
+              statusInfo <- OptionT.liftF(statusService.getDetailedStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
+              statusResponse <- OptionT.liftF(Future(statusInfo._2))
+              maybeBusinessName <- OptionT.liftF(getBusinessName(request.credId, statusResponse.fold(none[String])(_.safeId), request.accountTypeId).value)
             } yield {
               businessMatching.reviewDetails map { reviewDetails =>
 
@@ -76,11 +80,14 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                 val hasCompleteNominatedOfficer = ControllerHelper.hasCompleteNominatedOfficer(Option(responsiblePeople))
                 val nominatedOfficerName = ControllerHelper.completeNominatedOfficerTitleName(Option(responsiblePeople))
 
+                var businessName = ""
+                maybeBusinessName.map{ bn => businessName = bn}
+
                 if (completePreApp) {
                   Ok(registration_amendment(
                     taskListToDisplay,
                     amendmentDeclarationAvailable(taskRows),
-                    reviewDetails.businessName,
+                    businessName,
                     activities,
                     canEditPreapplication,
                     Some(newTaskRows),
@@ -91,7 +98,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                   Ok(registration_progress(
                     taskListToDisplay,
                     declarationAvailable(taskRows),
-                    reviewDetails.businessName,
+                    businessName,
                     activities,
                     canEditPreapplication,
                     hasCompleteNominatedOfficer,
@@ -144,6 +151,9 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
 
   private def getNewActivities(cacheId: String): OptionT[Future, Set[BusinessActivity]] =
     businessMatchingService.getAdditionalBusinessActivities(cacheId)
+
+  private def getBusinessName(credId: String, safeId: Option[String], accountTypeId: (String, String))(implicit hc: HeaderCarrier, ec: ExecutionContext) =
+    BusinessName.getName(credId, safeId, accountTypeId)(hc, ec, dataCache, amlsConnector)
 
   def post(): Action[AnyContent] = authAction.async {
     implicit request =>
