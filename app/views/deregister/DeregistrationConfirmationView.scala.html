@@ -39,7 +39,10 @@
     <strong>@amlsRefNumber</strong>
 }
 
-@layout(messages("deregistration.confirmation.youhavederegistered") + " - " + messages("title.yapp")) {
+@layout(
+    pageTitle = messages("deregistration.confirmation.youhavederegistered") + " - " + messages("title.yapp"),
+    showBackLink = false
+) {
 
     @govukPanel(
         Panel(
