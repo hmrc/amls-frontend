@@ -82,7 +82,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     } thenReturn Future.successful(Some(cacheMap))
 
     when {
-      sectionsProvider.taskRows(eqTo(cacheMap))(any())
+      sectionsProvider.taskRowsForRenewal(eqTo(cacheMap))(any())
     } thenReturn Seq(defaultTaskRow)
 
     when {
@@ -166,7 +166,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
         TaskRow("asp", controllers.asp.routes.SummaryController.get.url, true, Completed, TaskRow.updatedTag)
       )
 
-      when(controller.sectionsProvider.taskRows(eqTo(cacheMap))(any()))
+      when(controller.sectionsProvider.taskRowsForRenewal(eqTo(cacheMap))(any()))
         .thenReturn(sections)
 
       when(controller.renewals.canSubmit(any(),any()))

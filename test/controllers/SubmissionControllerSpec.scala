@@ -42,15 +42,17 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     val request = addToken(authRequest)
 
     val mockSectionsProvider = mock[SectionsProvider]
+    val renewalService = mock[RenewalService]
+    when(renewalService.isRenewalFlow(any(), any(), any())(any(), any())).thenReturn(Future.successful(false))
 
     val controller = new SubmissionController(
-      mock[SubmissionService],
-      mock[StatusService],
-      mock[RenewalService],
-      SuccessfulAuthAction,
-      commonDependencies,
-      mockMcc,
-      mockSectionsProvider
+      subscriptionService = mock[SubmissionService],
+      statusService = mock[StatusService],
+      renewalService = renewalService,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      sectionsProvider = mockSectionsProvider
     )
   }
 

@@ -1349,8 +1349,12 @@ deregistration.confirmation.p1 = You have deregistered from your supervision wit
 deregistration.confirmation.p2 = Your given reason for doing so is: Business is not trading in its own right because it is now an agent of a money service business.
 deregistration.confirmation.p3 = You can re-register for supervision from your registration page.
 
+withdrawal.reason.heading = Withdrawal
 withdrawal.reason.title = Withdraw Application
 withdrawal.reason.heading = Why are you withdrawing your application?
+
+withdrawal.cya.heading = Check your answers
+withdrawal.cya.question = Why are you withdrawing your application?
 
 withdrawal.reason.lbl.01 = Business is out of scope as no longer carrying out activities covered by the Money Laundering Regulations
 withdrawal.reason.lbl.02 = Business is not trading in its own right because it is now an agent of a money service business

@@ -51,12 +51,15 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
     lazy val view1: WhoIsRegisteringThisUpdateView = inject[WhoIsRegisteringThisUpdateView]
     lazy val view2: WhoIsRegisteringThisRenewalView = inject[WhoIsRegisteringThisRenewalView]
     lazy val view3: WhoIsRegisteringThisRegistrationView = inject[WhoIsRegisteringThisRegistrationView]
+    val renewalService: RenewalService = mock[RenewalService]
+    when(renewalService.isRenewalFlow(any(), any(), any())(any(), any())).thenReturn(Future.successful(false))
+
     val controller = new WhoIsRegisteringController(
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       amlsConnector = mock[AmlsConnector],
       statusService = mock[StatusService],
-      renewalService = mock[RenewalService],
+      renewalService = renewalService,
       cc = mockMcc,
       sectionsProvider = mockSectionsProvider,
       formProvider = inject[WhoIsRegisteringFormProvider],
