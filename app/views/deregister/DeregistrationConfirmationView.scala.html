@@ -14,12 +14,11 @@
  * limitations under the License.
  *@
 
-@import models.deregister.DeregistrationReason
-@import views.html.components.{Button, Heading, SectionSubtitle}
-@import _root_.utils.deregister.CheckYourAnswersHelper
+@import views.html.components.{Anchor, Button, Heading, SectionSubtitle}
 @import views.html.components.PrintLink
 @import views.html.components.FeedbackSurveyLink
 @import config.ApplicationConfig
+
 @this(
         layout: Layout,
         subtitle: SectionSubtitle,
@@ -28,7 +27,8 @@
         heading: Heading,
         printLink: PrintLink,
         govukPanel: GovukPanel,
-        feedbackSurveyLink: FeedbackSurveyLink
+        feedbackSurveyLink: FeedbackSurveyLink,
+        anchor: Anchor
 )
 
 @(businessName: String, amlsRefNumber: String)(implicit messages: Messages, applicationConfig: ApplicationConfig, request: Request[_])
@@ -53,7 +53,8 @@
 
     <p class="govuk-body">@messages("deregistration.confirmation.p1")</p>
     <p class="govuk-body">@messages("deregistration.confirmation.p2")</p>
-    <p class="govuk-body">@messages("deregistration.confirmation.p3")</p>
+    <p class="govuk-body">@messages("deregistration.confirmation.p3._1")@anchor("deregistration.confirmation.p3._2", controllers.routes.LandingController.get().url, "landing-page")@messages("deregistration.confirmation.p3._3")</p>
+
 
     @printLink(
         linkId="confirmation-print",
