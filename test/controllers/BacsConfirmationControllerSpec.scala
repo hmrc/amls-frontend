@@ -32,6 +32,7 @@ import models.{status => _, _}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
@@ -51,7 +52,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
   trait Fixture {
     self =>
     val baseUrl = "http://localhost"
-    val request = addToken(authRequest(uri = baseUrl))
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest(uri = baseUrl))
     lazy val view = app.injector.instanceOf[ConfirmationBacsView]
     val controller = new BacsConfirmationController(
       authAction = SuccessfulAuthAction,

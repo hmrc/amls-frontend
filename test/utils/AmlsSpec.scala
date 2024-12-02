@@ -19,6 +19,7 @@ package utils
 import config.ApplicationConfig
 import controllers.CommonPlayDependencies
 import org.apache.pekko.stream.Materializer
+import org.scalatest.AppendedClues
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
@@ -36,7 +37,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import scala.concurrent.ExecutionContext
 
 
-trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with Matchers with AuthorisedFixture {
+trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with Matchers with AuthorisedFixture with AppendedClues{
 
   import play.api.test.CSRFTokenHelper._
 
