@@ -94,7 +94,7 @@ class DeregistrationCheckYourAnswersControllerSpec extends AmlsSpec with Injecti
     val result: Future[Result] = controller.post()(request)
 
     status(result) must be(SEE_OTHER)
-    redirectLocation(result).value mustBe controllers.routes.LandingController.get().url
+    redirectLocation(result).value mustBe controllers.deregister.routes.DeregistrationConfirmationController.get.url
 
     val captor: ArgumentCaptor[DeRegisterSubscriptionRequest] = ArgumentCaptor.forClass(classOf[DeRegisterSubscriptionRequest])
 
