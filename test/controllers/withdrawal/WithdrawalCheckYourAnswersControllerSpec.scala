@@ -19,7 +19,7 @@ package controllers.withdrawal
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.actions.SuccessfulAuthAction
-import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawalReason, WithdrawSubscriptionResponse}
+import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse, WithdrawalReason}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
@@ -95,7 +95,7 @@ class WithdrawalCheckYourAnswersControllerSpec extends AmlsSpec with Injecting {
         val result: Future[Result] = controller.post()(request)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result).value mustBe controllers.routes.LandingController.get().url
+        redirectLocation(result).value mustBe controllers.withdrawal.routes.WithdrawalConfirmationController.get.url
 
         val captor: ArgumentCaptor[WithdrawSubscriptionRequest] = ArgumentCaptor.forClass(classOf[WithdrawSubscriptionRequest])
 
