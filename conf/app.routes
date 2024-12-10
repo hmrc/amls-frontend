@@ -54,6 +54,8 @@ POST        /your-registration/withdraw-application-reason                      
 GET         /your-registration/withdrawal/check-your-answers                          @controllers.withdrawal.WithdrawalCheckYourAnswersController.get
 POST        /your-registration/withdrawal/check-your-answers                          @controllers.withdrawal.WithdrawalCheckYourAnswersController.post
 
+GET        /your-registration/withdrawal/confirmation                                @controllers.withdrawal.WithdrawalConfirmationController.get
+
 
 GET         /your-registration/deregister                                             @controllers.deregister.DeRegisterApplicationController.get()
 POST        /your-registration/deregister                                             @controllers.deregister.DeRegisterApplicationController.post()

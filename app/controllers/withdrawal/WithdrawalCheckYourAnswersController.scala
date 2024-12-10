@@ -68,7 +68,7 @@ class WithdrawalCheckYourAnswersController @Inject()(authAction: AuthAction,
         accountTypeId = request.accountTypeId
       ))
 
-    } yield Redirect(controllers.routes.LandingController.get)
+    } yield Redirect(controllers.withdrawal.routes.WithdrawalConfirmationController.get)
 
     eitherT.value.map(_.fold(identity, identity))
   }
