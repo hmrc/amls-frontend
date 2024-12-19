@@ -26,7 +26,8 @@ import javax.inject.Inject
 
 class PSRNumberFormProvider @Inject()() extends Mappings {
 
-  val length = 6
+  val min = 6
+  val max = 7
 
   def apply(): Form[BusinessAppliedForPSRNumber] =
       Form[BusinessAppliedForPSRNumber](
@@ -35,8 +36,8 @@ class PSRNumberFormProvider @Inject()() extends Mappings {
           "regNumber" -> mandatoryIfTrue("appliedFor", textAllowWhitespace("error.invalid.msb.psr.number")
             .verifying(
               firstError(
-                minLength(length, "error.required.msb.psr.length"),
-                maxLength(length, "error.required.msb.psr.length"),
+                minLength(min, "error.required.msb.psr.length"),
+                maxLength(max, "error.required.msb.psr.length"),
                 regexp("^[0-9]*$", "error.max.msb.psr.number.format")
               )
             )

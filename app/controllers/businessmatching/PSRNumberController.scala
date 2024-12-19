@@ -22,7 +22,7 @@ import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.businessmatching.PSRNumberFormProvider
-import models.businessmatching.BusinessAppliedForPSRNumberYes
+import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
 import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
@@ -72,7 +72,7 @@ class PSRNumberController @Inject()(authAction: AuthAction,
           data => {
             helper.getOrCreateFlowModel(request.credId) flatMap { flowModel =>
               dataCacheConnector.update[ChangeSubSectorFlowModel](request.credId, ChangeSubSectorFlowModel.key) { _ =>
-                flowModel.copy(psrNumber = Some(data))
+                flowModel.copy(psrNumber = Some(transformPSRNumber(data)))
               } flatMap {
                 case Some(m @ ChangeSubSectorFlowModel(_, Some(BusinessAppliedForPSRNumberYes(_)))) =>
                   helper.updateSubSectors(request.credId, m) flatMap { _ =>
@@ -86,5 +86,14 @@ class PSRNumberController @Inject()(authAction: AuthAction,
           }
         )
       }
+  }
+
+  private def transformPSRNumber(data: BusinessAppliedForPSRNumber): BusinessAppliedForPSRNumber = {
+    data match {
+      case BusinessAppliedForPSRNumberYes(regNumber) if regNumber.length == 7 =>
+        BusinessAppliedForPSRNumberYes("700000")
+      case other =>
+        other
+    }
   }
 }
