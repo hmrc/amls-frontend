@@ -47,7 +47,7 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours[BusinessAppliedFo
 
       "'Yes' is submitted and a PSR number is given" in {
 
-        forAll(numSequence(formProvider.length)) { psrNum =>
+        forAll(numSequence(formProvider.min)) { psrNum =>
 
           val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> psrNum))
 
@@ -85,20 +85,20 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours[BusinessAppliedFo
       "'Yes' is submitted with a PSR number" which {
         "is too long" in {
 
-          forAll(numsLongerThan(formProvider.length + 1)) { longPsrNum =>
+          forAll(numsLongerThan(formProvider.max)) { longPsrNum =>
             val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> longPsrNum.toString))
             boundForm.errors.headOption shouldBe Some(
-              FormError(inputFieldName, "error.required.msb.psr.length", Seq(formProvider.length))
+              FormError(inputFieldName, "error.required.msb.psr.length", Seq(formProvider.max))
             )
           }
         }
 
         "is too short" in {
 
-          forAll(numsShorterThan(formProvider.length - 1)) { shortPsrNum =>
+          forAll(numsShorterThan(formProvider.min - 1)) { shortPsrNum =>
             val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> shortPsrNum.toString))
             boundForm.errors.headOption shouldBe Some(
-              FormError(inputFieldName, "error.required.msb.psr.length", Seq(formProvider.length))
+              FormError(inputFieldName, "error.required.msb.psr.length", Seq(formProvider.min))
             )
           }
         }
@@ -119,7 +119,7 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours[BusinessAppliedFo
 
         "is invalid" in {
 
-          forAll(numSequence(formProvider.length).suchThat(_.length == formProvider.length), Gen.alphaChar) { (psrNum, char) =>
+          forAll(numSequence(formProvider.max).suchThat(_.length == formProvider.max), Gen.alphaChar) { (psrNum, char) =>
             val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> s"${psrNum.dropRight(1)}$char"))
             boundForm.errors.headOption shouldBe Some(
               FormError(inputFieldName, "error.max.msb.psr.number.format", Seq(numbersOnlyRegex))
