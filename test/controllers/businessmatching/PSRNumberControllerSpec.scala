@@ -187,6 +187,34 @@ class PSRNumberControllerSpec extends AmlsSpec
         val document: Document = Jsoup.parse(contentAsString(result))
         document.text() must include(messages("error.invalid.msb.psr.number"))
       }
+
+      "transform a 7-digit PSR number to 700000 when submitting the form" in new Fixture {
+        val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
+
+        when {
+          controller.helper.getOrCreateFlowModel(any())(any())
+        } thenReturn Future.successful(flowModel)
+
+        when {
+          controller.helper.updateSubSectors(any(), any())(any())
+        } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
+
+        mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
+
+        val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+          .withFormUrlEncodedBody(
+            "appliedFor" -> "true",
+            "regNumber" -> "1234567"
+          )
+
+        val result = controller.post()(newRequest)
+
+        status(result) mustBe SEE_OTHER
+
+        controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(
+          Some(Set(TransmittingMoney)),
+          Some(BusinessAppliedForPSRNumberYes("700000"))))
+      }
     }
   }
 }
