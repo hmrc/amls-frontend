@@ -21,6 +21,7 @@ import models.CheckYourAnswersField
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.businessmatching._
 import play.api.i18n.Messages
+import play.api.mvc.Request
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.Aliases._
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, SummaryList}
@@ -30,7 +31,8 @@ import javax.inject.Inject
 
 class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: ApplicationConfig) {
 
-  def createSummaryList(businessMatching: BusinessMatching, isPreSubmission: Boolean, isPending: Boolean)(implicit messages: Messages): SummaryList = {
+  def createSummaryList(businessMatching: BusinessMatching, isPreSubmission: Boolean, isPending: Boolean)
+                       (implicit messages: Messages, request: Request[_]): SummaryList = {
     SummaryList(
       Seq(
         businessAddress(businessMatching),
@@ -77,16 +79,17 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
           HtmlContent(
             Html(
               "<ul class=\"govuk-list\">" +
-              review.businessAddress.toLines.map { line =>
-                s"""<li>$line<li>"""
-              }.mkString
-              + "</ul>"
+                review.businessAddress.toLines.map { line =>
+                  s"""<li>$line<li>"""
+                }.mkString
+                + "</ul>"
             )
           )
         )
       )
     }
   }
+
   private def registrationType(businessMatching: BusinessMatching, isPreSubmission: Boolean)(implicit messages: Messages): Option[SummaryListRow] = {
     for {
       review <- businessMatching.reviewDetails
@@ -99,12 +102,12 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
               Key(Text(messages("businessmatching.registrationnumber.title"))),
               Value(Text(regNumber.companyRegistrationNumber), "registration-number"),
               actions = Some(Actions(
-                  items = Seq(ActionItem(
-                    controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).url,
-                    Text(messages("button.edit")),
-                    visuallyHiddenText = Some(messages("businessmatching.checkYourAnswers.change.CompanyReg")),
-                    attributes = Map("id" -> "edit-registration-number")
-                  ))
+                items = Seq(ActionItem(
+                  controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).url,
+                  Text(messages("button.edit")),
+                  visuallyHiddenText = Some(messages("businessmatching.checkYourAnswers.change.CompanyReg")),
+                  attributes = Map("id" -> "edit-registration-number")
+                ))
               ))
             )
           }
@@ -130,6 +133,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
       }
     }
   }.flatten
+
   private def registeredServices(businessMatching: BusinessMatching, isPreSubmission: Boolean, isPending: Boolean)(implicit messages: Messages): Option[SummaryListRow] = {
 
     val serviceValues = businessMatching.activities map { x =>
@@ -145,7 +149,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
           SummaryListRow(
             key = Key(Text(messages("businessmatching.registerservices.title"))),
             value = Value(values),
-            actions = if(!isPending) {
+            actions = if (!isPending) {
               Some(Actions(items = Seq(
                 ActionItem(
                   href = if (isPreSubmission) {
@@ -166,6 +170,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
       case _ => None
     }
   }.flatten
+
   private def moneyServiceBusinessActivities(businessMatching: BusinessMatching, isPending: Boolean)(implicit messages: Messages): Option[SummaryListRow] = {
 
     val msbValues = businessMatching.msbServices map { x =>
@@ -199,31 +204,25 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
     }
 
   }.flatten
-  private def psrRegistrationNumber(businessMatching: BusinessMatching)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+
+  private def psrRegistrationNumber(businessMatching: BusinessMatching)
+                                   (implicit messages: Messages, request: Request[_]): Option[Seq[SummaryListRow]] = {
     for {
       businessMatchingMsbServices <- businessMatching.msbServices
       isTransmittingMoney = businessMatchingMsbServices.msbServices.contains(TransmittingMoney)
       appliedForPSRNumber <- businessMatching.businessAppliedForPSRNumber
     } yield {
-      if(isTransmittingMoney) {
+      if (isTransmittingMoney) {
         appliedForPSRNumber match {
-          case BusinessAppliedForPSRNumberYes(regNumber) => Some(
+          case BusinessAppliedForPSRNumberYes(_) => Some(
             Seq(
               SummaryListRow(
-                Key(
-                  Text(messages("businessmatching.psr.number.title"))
-                ),
-                Value(
-                  Text(messages("lbl.yes"))
-                )
+                Key(Text(messages("businessmatching.psr.number.title"))),
+                Value(Text(messages("lbl.yes")))
               ),
               SummaryListRow(
-                Key(
-                  Text(messages("businessmatching.psr.number.cya.title"))
-                ),
-                Value(
-                  Text(regNumber)
-                ),
+                Key(Text(messages("businessmatching.psr.number.cya.title"))),
+                Value(Text(request.session.get("originalPsrNumber").getOrElse(""))), 
                 actions = Some(
                   Actions(
                     items = Seq(
@@ -252,11 +251,11 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
       case answers if answers.size > 1 =>
         Some(
           HtmlContent(
-          "<ul class=\"govuk-list govuk-list--bullet\">" +
-            answers.map { x =>
-              s"<li>${messages(s"$msgPrefix.${x.value}")}</li>"
-            }.mkString +
-            "</ul>"
+            "<ul class=\"govuk-list govuk-list--bullet\">" +
+              answers.map { x =>
+                s"<li>${messages(s"$msgPrefix.${x.value}")}</li>"
+              }.mkString +
+              "</ul>"
           )
         )
       case answers if answers.size == 1 => Some(Text(messages(s"$msgPrefix.${answers.head.value}")))
