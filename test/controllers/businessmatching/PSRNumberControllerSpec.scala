@@ -103,25 +103,21 @@ class PSRNumberControllerSpec extends AmlsSpec
       }
 
       "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?' with pre populated data" in new Fixture {
-        override val businessMatching = businessMatchingWithPsrGen.sample.get
-
-        val psr = businessMatching.businessAppliedForPSRNumber match {
-          case Some(BusinessAppliedForPSRNumberYes(num)) => num
-          case _ => "invalid"
-        }
+        override val businessMatching = BusinessMatching(
+          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("700000"))
+        )
 
         when {
           controller.businessMatchingService.getModel(any())
         } thenReturn OptionT.liftF(Future.successful(businessMatching))
 
-        val result = controller.get()(request)
+        val result = controller.get()(FakeRequest().withSession("originalPsrNumber" -> "1234567"))
         status(result) mustBe OK
 
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[value=true]").hasAttr("checked") must be(true)
-        document.select("input[name=regNumber]").`val` mustBe psr
+        document.select("input[name=regNumber]").`val` mustBe "1234567"
       }
-    }
 
     "post is called" must {
       "respond with SEE_OTHER and redirect to the SummaryController when Yes is selected and edit is false" in new Fixture {
@@ -148,9 +144,10 @@ class PSRNumberControllerSpec extends AmlsSpec
         status(result) mustBe SEE_OTHER
 
         controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(
-            Some(Set(TransmittingMoney)),
-            Some(BusinessAppliedForPSRNumberYes("123789"))))
+          Some(Set(TransmittingMoney)),
+          Some(BusinessAppliedForPSRNumberYes("123789"))))
       }
+    }
 
       "redirect when No is selected" in new Fixture {
         val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
