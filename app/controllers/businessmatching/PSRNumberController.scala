@@ -50,14 +50,8 @@ class PSRNumberController @Inject()(authAction: AuthAction,
         bm <- businessMatchingService.getModel(request.credId)
         status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
       } yield {
-
-        val originalPsrNumber = request.session.get("originalPsrNumber").getOrElse("")
-
-        val form = bm.businessAppliedForPSRNumber.fold(formProvider()) {
-          case BusinessAppliedForPSRNumberYes(_) =>
-            formProvider().fill(BusinessAppliedForPSRNumberYes(originalPsrNumber))
-          case other => formProvider().fill(other)
-        }
+        // Use the model's PSR number directly for prepopulation
+        val form = bm.businessAppliedForPSRNumber.fold(formProvider())(formProvider().fill)
 
         Ok(psr_number(form, edit, bm.preAppComplete, statusService.isPreSubmission(status), bm.businessAppliedForPSRNumber.isDefined))
       }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
