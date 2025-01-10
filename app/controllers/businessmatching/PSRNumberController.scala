@@ -50,7 +50,6 @@ class PSRNumberController @Inject()(authAction: AuthAction,
         bm <- businessMatchingService.getModel(request.credId)
         status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
       } yield {
-        // Use the model's PSR number directly for prepopulation
         val form = bm.businessAppliedForPSRNumber.fold(formProvider())(formProvider().fill)
 
         Ok(psr_number(form, edit, bm.preAppComplete, statusService.isPreSubmission(status), bm.businessAppliedForPSRNumber.isDefined))
