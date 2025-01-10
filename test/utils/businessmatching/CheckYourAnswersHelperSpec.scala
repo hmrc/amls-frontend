@@ -21,6 +21,8 @@ import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching.{BusinessActivities, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes, BusinessMatching, BusinessMatchingMsbServices, BusinessType, CompanyRegistrationNumber, TypeOfBusiness}
+import play.api.test.FakeRequest
+import play.test.Helpers.fakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import utils.AmlsSpec
 
@@ -341,8 +343,8 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
       }
 
       "contains PSR number" when {
-
         "the user has answered yes and supplied a PSR number" in {
+          val request = addTokenWithSessionParam(FakeRequest())("originalPsrNumber" -> "123456")
 
           val bm = BusinessMatching(
             reviewDetails = Some(reviewDetailsModel),
@@ -356,7 +358,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             bm,
             isPreSubmission = true,
             isPending = true
-          ).rows
+          )(messages, request).rows
 
           val hasPsrNumberRow = rows.lift(hasPsrNumberIndex).getOrElse(failIfEmpty)
           val psrNumberRow = rows.lift(psrNumberIndex).getOrElse(failIfEmpty)
@@ -365,7 +367,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
           hasPsrNumberRow.value.toString must include(messages("lbl.yes"))
 
           psrNumberRow.key.toString must include(messages("businessmatching.psr.number.cya.title"))
-          psrNumberRow.value.toString must include(businessAppliedForPSRNumberModel.regNumber)
+          psrNumberRow.value.toString must include("123456")
 
           checkChangeLink(psrNumberRow, controllers.businessmatching.routes.PSRNumberController.get(true).url, "edit-psr-number")
         }
