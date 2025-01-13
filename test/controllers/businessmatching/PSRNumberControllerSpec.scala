@@ -116,102 +116,101 @@ class PSRNumberControllerSpec extends AmlsSpec
 
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[value=true]").hasAttr("checked") must be(true)
-        document.select("input[name=regNumber]").`val` mustBe "1234567"
+        document.select("input[name=regNumber]").`val` mustBe "700000"
       }
 
-    "post is called" must {
-      "respond with SEE_OTHER and redirect to the SummaryController when Yes is selected and edit is false" in new Fixture {
-        val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
+      "post is called" must {
+        "respond with SEE_OTHER and redirect to the SummaryController when Yes is selected and edit is false" in new Fixture {
+          val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
-        when {
-          controller.helper.getOrCreateFlowModel(any())(any())
-        } thenReturn Future.successful(flowModel)
+          when {
+            controller.helper.getOrCreateFlowModel(any())(any())
+          } thenReturn Future.successful(flowModel)
 
-        when {
-          controller.helper.updateSubSectors(any(), any())(any())
-        } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
+          when {
+            controller.helper.updateSubSectors(any(), any())(any())
+          } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
-        val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
-          .withFormUrlEncodedBody(
-            "appliedFor" -> "true",
-            "regNumber" -> "123789"
-          )
+          val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+            .withFormUrlEncodedBody(
+              "appliedFor" -> "true",
+              "regNumber" -> "123789"
+            )
 
-        mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
+          mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
 
-        val result = controller.post()(newRequest)
+          val result = controller.post()(newRequest)
 
-        status(result) mustBe SEE_OTHER
+          status(result) mustBe SEE_OTHER
 
-        controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(
-          Some(Set(TransmittingMoney)),
-          Some(BusinessAppliedForPSRNumberYes("123789"))))
+          controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(
+            Some(Set(TransmittingMoney)),
+            Some(BusinessAppliedForPSRNumberYes("123789"))))
+        }
+
+        "redirect when No is selected" in new Fixture {
+          val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
+
+          when {
+            controller.helper.getOrCreateFlowModel(any())(any())
+          } thenReturn Future.successful(flowModel)
+
+          mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)
+
+          val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+            .withFormUrlEncodedBody("appliedFor" -> "false")
+
+          val result = controller.post(true)(newRequest)
+
+          status(result) mustBe SEE_OTHER
+          controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberNo)), edit = true)
+        }
+
+        "respond with BAD_REQUEST when given invalid data" in new Fixture {
+          val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+            .withFormUrlEncodedBody(
+              "appliedFor" -> "true",
+              "regNumber" -> ""
+            )
+
+          when {
+            controller.businessMatchingService.getModel(any())
+          } thenReturn OptionT.liftF(Future.successful(businessMatching))
+
+          val result = controller.post()(newRequest)
+          status(result) mustBe BAD_REQUEST
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.text() must include(messages("error.invalid.msb.psr.number"))
+        }
+
+        "transform a 7-digit PSR number to 700000 when submitting the form" in new Fixture {
+          val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
+
+          when {
+            controller.helper.getOrCreateFlowModel(any())(any())
+          } thenReturn Future.successful(flowModel)
+
+          when {
+            controller.helper.updateSubSectors(any(), any())(any())
+          } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
+
+          mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
+
+          val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+            .withFormUrlEncodedBody(
+              "appliedFor" -> "true",
+              "regNumber" -> "1234567"
+            )
+
+          val result = controller.post()(newRequest)
+
+          status(result) mustBe SEE_OTHER
+
+          controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(
+            Some(Set(TransmittingMoney)),
+            Some(BusinessAppliedForPSRNumberYes("700000"))))
+        }
       }
     }
-
-      "redirect when No is selected" in new Fixture {
-        val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
-
-        when {
-          controller.helper.getOrCreateFlowModel(any())(any())
-        } thenReturn Future.successful(flowModel)
-
-        mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)
-
-        val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
-          .withFormUrlEncodedBody("appliedFor" -> "false")
-
-        val result = controller.post(true)(newRequest)
-
-        status(result) mustBe SEE_OTHER
-        controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberNo)), edit = true)
-      }
-
-      "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
-          .withFormUrlEncodedBody(
-            "appliedFor" -> "true",
-            "regNumber" -> ""
-          )
-
-        when {
-          controller.businessMatchingService.getModel(any())
-        } thenReturn OptionT.liftF(Future.successful(businessMatching))
-
-        val result = controller.post()(newRequest)
-        status(result) mustBe BAD_REQUEST
-
-        val document: Document = Jsoup.parse(contentAsString(result))
-        document.text() must include(messages("error.invalid.msb.psr.number"))
-      }
-
-      "transform a 7-digit PSR number to 700000 when submitting the form" in new Fixture {
-        val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
-
-        when {
-          controller.helper.getOrCreateFlowModel(any())(any())
-        } thenReturn Future.successful(flowModel)
-
-        when {
-          controller.helper.updateSubSectors(any(), any())(any())
-        } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
-
-        mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
-
-        val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
-          .withFormUrlEncodedBody(
-            "appliedFor" -> "true",
-            "regNumber" -> "1234567"
-          )
-
-        val result = controller.post()(newRequest)
-
-        status(result) mustBe SEE_OTHER
-
-        controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(
-          Some(Set(TransmittingMoney)),
-          Some(BusinessAppliedForPSRNumberYes("700000"))))
-      }
-    }
-  }
-}
+  }}
