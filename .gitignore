@@ -1,6 +1,7 @@
 
 logs
-project/project
+project/project/target
+project/project/project.project.target.config-classes
 project/target
 target
 lib_managed
