@@ -116,7 +116,7 @@ class PSRNumberControllerSpec extends AmlsSpec
 
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[value=true]").hasAttr("checked") must be(true)
-        document.select("input[name=regNumber]").`val` mustBe "700000"
+        document.select("input[name=regNumber]").`val` mustBe "1234567"
       }
 
       "post is called" must {
@@ -213,4 +213,5 @@ class PSRNumberControllerSpec extends AmlsSpec
         }
       }
     }
-  }}
+  }
+}

@@ -50,7 +50,12 @@ class PSRNumberController @Inject()(authAction: AuthAction,
         bm <- businessMatchingService.getModel(request.credId)
         status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
       } yield {
-        val form = bm.businessAppliedForPSRNumber.fold(formProvider())(formProvider().fill)
+        val form = bm.businessAppliedForPSRNumber.fold(formProvider()) { psr =>
+          request.session.get("originalPsrNumber") match {
+            case Some(original) => formProvider().fill(BusinessAppliedForPSRNumberYes(original))
+            case None => formProvider().fill(psr)
+          }
+        }
 
         Ok(psr_number(form, edit, bm.preAppComplete, statusService.isPreSubmission(status), bm.businessAppliedForPSRNumber.isDefined))
       }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
