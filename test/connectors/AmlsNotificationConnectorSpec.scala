@@ -18,29 +18,35 @@ package connectors
 
 import config.ApplicationConfig
 import models.notifications._
-import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.http.{HttpClient, _}
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.http._
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import utils.HttpClientMocker
 
 import java.time.ZoneOffset.UTC
 import java.time.{Instant, LocalDateTime}
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   val safeId = "SAFEID"
   val accountTypeId: (String, String) = ("org","id")
+  val (accountType, accountId) = accountTypeId
+
   val amlsRegistrationNumber = "amlsRefNumber"
   val dateTime: LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   private trait Fixture {
-    val connector = new AmlsNotificationConnector (mock[HttpClient], mock[ApplicationConfig])
+    val mocker = new HttpClientMocker()
+    private val configuration: Configuration = Configuration.load(Environment.simple())
+    private val config = new ApplicationConfig(configuration, new ServicesConfig(configuration))
+    val connector = new AmlsNotificationConnector (mocker.httpClient, config)
+    val baseUrl = "http://localhost:8942/amls-notification"
   }
 
   "AmlsNotificationConnector" must {
@@ -51,10 +57,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
           NotificationRow(None, None, None, variation = true, LocalDateTime.of(1981, 12, 1, 1, 3), isRead = false, "amlsRefNumber", "1", IDType(""))
         )
 
-        when {
-          connector.http.GET[Seq[NotificationRow]](any(), any(), any())(any(), any(), any())
-        } thenReturn Future.successful(response)
-
+        mocker.mockGet[Seq[NotificationRow]](url"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber", response)
         whenReady(connector.fetchAllByAmlsRegNo(amlsRegistrationNumber, accountTypeId)) {
           _ mustBe response
         }
@@ -66,9 +69,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
           NotificationRow(None, None, None, variation = true, LocalDateTime.of(1981, 12, 1, 1, 3), isRead = false, "XJML00000200000", "1", IDType(""))
         )
 
-        when {
-          connector.http.GET[Seq[NotificationRow]](any(), any(), any())(any(), any(), any())
-        } thenReturn Future.successful(response)
+        mocker.mockGet[Seq[NotificationRow]](url"$baseUrl/$accountType/$accountId/safeId/$safeId", response)
 
         whenReady(connector.fetchAllBySafeId(safeId, accountTypeId)) {
           _ mustBe response
@@ -79,34 +80,28 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
     "the call to notification service is successful (using Amls Reg No)" must {
       "return the response" in new Fixture {
 
-        when(connector.http.GET[NotificationDetails](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(NotificationDetails(
-            Some(ContactType.MindedToReject),
-            Some(Status(Some(StatusType.Approved),
+        val response: NotificationDetails = NotificationDetails(
+          Some(ContactType.MindedToReject),
+          Some(Status(Some(StatusType.Approved),
             Some(RejectedReason.FailedToPayCharges))),
-            Some("Text of the message"),
-            variation = false,
-            dateTime
-          )))
+          Some("Text of the message"),
+          variation = false,
+          dateTime
+        )
 
-        whenReady(connector.getMessageDetailsByAmlsRegNo(amlsRegistrationNumber, "NOTIFICATIONID", accountTypeId)) { result =>
-          result must be (Some(NotificationDetails(
-            Some(ContactType.MindedToReject),
-            Some(Status(Some(StatusType.Approved),
-            Some(RejectedReason.FailedToPayCharges))),
-            Some("Text of the message"),
-            variation = false,
-            dateTime
-          )))
-        }
+        mocker.mockGet[Option[NotificationDetails]](url"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/NOTIFICATIONID", Some(response))
+
+        connector.getMessageDetailsByAmlsRegNo(amlsRegistrationNumber = amlsRegistrationNumber, contactNumber = "NOTIFICATIONID", accountTypeId = accountTypeId)
+          .futureValue
+          .value mustBe response
+
       }
     }
 
     "the call to notification service returns a Bad Request" must {
       "Fail the future with an upstream 5xx exception (using amls reg no)" in new Fixture {
 
-        when(connector.http.GET[NotificationDetails](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.failed(new BadRequestException("GET of blah returned status 400.")))
+        mocker.mockGet[Option[NotificationDetails]](url"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/NOTIFICATIONID", new BadRequestException("GET of blah returned status 400."))
 
         whenReady(connector.getMessageDetailsByAmlsRegNo(amlsRegistrationNumber, "NOTIFICATIONID", accountTypeId).failed) { exception =>
           exception mustBe a[BadRequestException]
@@ -117,10 +112,9 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
     "the call to notification service returns Not Found (when using amls reg no)" must {
       "return a None " in new Fixture {
 
-        when(connector.http.GET[NotificationDetails](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.failed(new NotFoundException("GET of blah returned status 404.")))
+        mocker.mockGet[Option[NotificationDetails]](url"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/NOTIFICATIONID", None)
 
-        whenReady(connector.getMessageDetailsByAmlsRegNo(amlsRegistrationNumber, "NOTIFICATIONID", accountTypeId)) { result =>
+        whenReady(connector.getMessageDetailsByAmlsRegNo(amlsRegistrationNumber = amlsRegistrationNumber, contactNumber = "NOTIFICATIONID", accountTypeId = accountTypeId)) { result =>
           result must be (None)
         }
       }

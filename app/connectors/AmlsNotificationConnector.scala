@@ -23,11 +23,12 @@ import models.notifications.{NotificationDetails, NotificationRow}
 import play.api.Logging
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmlsNotificationConnector @Inject()(val http: HttpClient,
-                                          val appConfig: ApplicationConfig) extends Logging {
+class AmlsNotificationConnector @Inject()(http: HttpClientV2,
+                                          appConfig: ApplicationConfig)(implicit ec: ExecutionContext) extends Logging {
 
   private[connectors] def baseUrl : String = appConfig.allNotificationsUrl
 
@@ -36,12 +37,12 @@ class AmlsNotificationConnector @Inject()(val http: HttpClient,
 
     val (accountType, accountId) = accountTypeId
 
-    val getUrl = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber"
+    val getUrl = url"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[AmlsNotificationConnector][fetchAllByAmlsRegNo]"
     // $COVERAGE-OFF$
     logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
     // $COVERAGE-ON$
-    http.GET[Seq[NotificationRow]](getUrl) map {
+    http.get(getUrl).execute[Seq[NotificationRow]] map {
       response =>
         // $COVERAGE-OFF$
         logger.debug(s"$prefix - Response Body: $response")
@@ -55,12 +56,12 @@ class AmlsNotificationConnector @Inject()(val http: HttpClient,
 
     val (accountType, accountId) = accountTypeId
 
-    val getUrl = s"$baseUrl/$accountType/$accountId/safeId/$safeId"
+    val getUrl = url"$baseUrl/$accountType/$accountId/safeId/$safeId"
     val prefix = "[AmlsNotificationConnector][fetchAllBySafeId]"
     // $COVERAGE-OFF$
     logger.debug(s"$prefix - Request : $safeId")
     // $COVERAGE-ON$
-    http.GET[Seq[NotificationRow]](getUrl) map {
+    http.get(getUrl).execute[Seq[NotificationRow]] map {
       response =>
         // $COVERAGE-OFF$
         logger.debug(s"$prefix - Response Body: $response")
@@ -73,12 +74,7 @@ class AmlsNotificationConnector @Inject()(val http: HttpClient,
                                   (implicit hc : HeaderCarrier, ec: ExecutionContext): Future[Option[NotificationDetails]]= {
 
     val (accountType, accountId) = accountTypeId
-
-    val url = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/$contactNumber"
-    http.GET[NotificationDetails](url)
-      .map {Some(_)}
-      .recover {
-        case _:NotFoundException => None
-      }
+    val url = url"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/$contactNumber"
+    http.get(url).execute[Option[NotificationDetails]]
   }
 }

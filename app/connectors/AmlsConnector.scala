@@ -17,20 +17,18 @@
 package connectors
 
 import config.ApplicationConfig
-
-import javax.inject.Inject
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse}
 import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse}
-import models.{AmendVariationRenewalResponse, _}
+import models._
 import play.api.Logging
-import play.api.libs.json.{Json, OWrites, Writes}
-import play.api.libs.ws.BodyWritable
-import uk.gov.hmrc.http._
+import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.HttpClientV2
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AmlsConnector @Inject()(val httpClient: HttpClientV2,
@@ -51,9 +49,6 @@ class AmlsConnector @Inject()(val httpClient: HttpClientV2,
     // $COVERAGE-OFF$
     logger.debug(s"$prefix - Request Body: ${Json.toJson(subscriptionRequest)}")
     // $COVERAGE-ON$
-
-    import uk.gov.hmrc.http.HttpReads.Implicits._
-
 
     httpClient
       .post(postUrl)

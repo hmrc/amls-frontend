@@ -35,31 +35,36 @@ class HttpClientMocker extends MockFactory {
 
   def mockGet[Res: HttpReads](url: URL, response: Res): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
     (httpClient.get(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
-    mockExecute(response)
+    mockExecute(Future.successful(response))
+  }
+
+  def mockGet[Res: HttpReads](url: URL, response: Exception): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
+    (httpClient.get(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
+    mockExecute(Future.failed(response))
   }
 
   def mockPostJson[B : Writes, Res: HttpReads](url: URL, requestBody: B, response: Res): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
     (httpClient.post(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
     mockWithBody(Json.toJson(requestBody))
-    mockExecute(response)
+    mockExecute(Future.successful(response))
   }
 
   def mockPostString[Res: HttpReads](url: URL, requestBody: String, response: Res): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
     (httpClient.post(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
     mockWithBody(requestBody)
-    mockExecute(response)
+    mockExecute(Future.successful(response))
   }
 
   def mockPut[B : Writes, Res: HttpReads](url: URL, requestBody: B, response: Res): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
     (httpClient.put(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
     mockWithBody(Json.toJson(requestBody))
-    mockExecute(response)
+    mockExecute(Future.successful(response))
   }
 
-  private def mockExecute[T: HttpReads](response: T) =
+  private def mockExecute[T: HttpReads](response: Future[T]) =
     (requestBuilder.execute[T](_: HttpReads[T], _: ExecutionContext))
       .expects(*, *)
-      .returning(Future.successful(response))
+      .returning(response)
 
   private def mockWithBody[B: BodyWritable: Tag](requestBody: B) = {
     (requestBuilder
