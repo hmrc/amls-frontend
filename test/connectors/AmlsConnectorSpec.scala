@@ -18,22 +18,23 @@ package connectors
 
 import config.ApplicationConfig
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
+import models._
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse, DeregistrationReason}
 import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.withdrawal._
-import models.{AmendVariationRenewalResponse, _}
-import org.mockito.ArgumentMatchers.{eq => eqTo, _}
-import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
+import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import utils.HttpClientMocker
 
+import java.net.URL
 import java.time.{LocalDate, LocalDateTime}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -41,11 +42,19 @@ import scala.concurrent.Future
 class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with
   AmlsReferenceNumberGenerator with PaymentGenerator {
 
-  val amlsConnector = new AmlsConnector(http = mock[HttpClient],
-                                        appConfig = mock[ApplicationConfig])
+  trait TestSetup {
+    val mocker = new HttpClientMocker()
+    private val configuration: Configuration = Configuration.load(Environment.simple())
+    private val config = new ApplicationConfig(configuration, new ServicesConfig(configuration))
+    val amlsConnector = new AmlsConnector(
+      httpClient = mocker.httpClient,
+      appConfig = config
+    )
+  }
 
-  val safeId = "SAFEID"
+  val safeId: String = "SAFEID"
   val accountTypeId: (String, String) = ("org", "id")
+  val (accountType, accountId) = accountTypeId
 
   val subscriptionRequest: SubscriptionRequest = SubscriptionRequest(
     businessMatchingSection = None,
@@ -134,25 +143,29 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
   "subscribe" must {
 
-    "successfully subscribe" in {
+    "successfully subscribe" in new TestSetup {
 
-      when {
-        amlsConnector.http.POST[SubscriptionRequest, SubscriptionResponse](eqTo(s"${amlsConnector.url}/org/id/$safeId"), eqTo(subscriptionRequest), any())(any(), any(), any(), any())
-      } thenReturn Future.successful(subscriptionResponse)
+      mocker.mockPost(
+        url = url"${amlsConnector.url}/org/id/$safeId",
+        requestBody = subscriptionRequest,
+        response = subscriptionResponse)
 
-      whenReady(amlsConnector.subscribe(subscriptionRequest, safeId, accountTypeId)) {
-        _ mustBe subscriptionResponse
-      }
+      val eventualResponse: Future[SubscriptionResponse] = amlsConnector.subscribe(subscriptionRequest, safeId, accountTypeId)
+
+      val result = eventualResponse.futureValue
+
+      println(result)
+      result mustBe subscriptionResponse
     }
   }
 
   "get status" must {
 
-    "return correct status" in {
+    "return correct status" in new TestSetup {
 
-      when {
-        amlsConnector.http.GET[ReadStatusResponse](any(), any(), any())(any(), any(), any())
-      } thenReturn Future.successful(readStatusResponse)
+      mocker.mockGet(
+        url = url"${amlsConnector.url}/$accountType/$accountId/$amlsRegistrationNumber/status",
+        response = readStatusResponse)
 
       whenReady(amlsConnector.status(amlsRegistrationNumber, accountTypeId)) {
         _ mustBe readStatusResponse
@@ -162,10 +175,11 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
   "get view" must {
 
-    "a view response" in {
-      when {
-        amlsConnector.http.GET[ViewResponse](any(), any(), any())(any(), any(), any())
-      } thenReturn Future.successful(viewResponse)
+    "a view response" in new TestSetup {
+
+      mocker.mockGet(
+        url = url"${amlsConnector.url}/$accountType/$accountId/$amlsRegistrationNumber",
+        response = viewResponse)
 
       whenReady(amlsConnector.view(amlsRegistrationNumber, accountTypeId)) {
         _ mustBe viewResponse
@@ -175,11 +189,11 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
   "update" must {
 
-    "successfully submit amendment" in {
-      when {
-        amlsConnector.http.POST[SubscriptionRequest, AmendVariationRenewalResponse](eqTo(s"${amlsConnector.url}/org/id/$amlsRegistrationNumber/update")
-          , eqTo(subscriptionRequest), any())(any(), any(), any(), any())
-      }.thenReturn(Future.successful(amendmentResponse))
+    "successfully submit amendment" in new TestSetup {
+      mocker.mockPost(
+        url = url"${amlsConnector.url}/org/id/$amlsRegistrationNumber/update",
+        requestBody = subscriptionRequest,
+        response = amendmentResponse)
 
       whenReady(amlsConnector.update(subscriptionRequest, amlsRegistrationNumber, accountTypeId)) {
         _ mustBe amendmentResponse
@@ -188,11 +202,12 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   }
 
   "variation" must {
-    "successfully submit variation" in {
-      when {
-        amlsConnector.http.POST[SubscriptionRequest, AmendVariationRenewalResponse](eqTo(s"${amlsConnector.url}/org/id/$amlsRegistrationNumber/variation")
-          , eqTo(subscriptionRequest), any())(any(), any(), any(), any())
-      }.thenReturn(Future.successful(amendmentResponse))
+    "successfully submit variation" in new TestSetup {
+
+      mocker.mockPost(
+        url = url"${amlsConnector.url}/org/id/$amlsRegistrationNumber/variation",
+        requestBody = subscriptionRequest,
+        response = amendmentResponse)
 
       whenReady(amlsConnector.variation(subscriptionRequest, amlsRegistrationNumber, accountTypeId)) {
         _ mustBe amendmentResponse
@@ -201,22 +216,23 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   }
 
   "renewal" must {
-    "successfully submit renewal" in {
-      when {
-        amlsConnector.http.POST[SubscriptionRequest, AmendVariationRenewalResponse](
-          eqTo(s"${amlsConnector.url}/org/id/$amlsRegistrationNumber/renewal"), eqTo(subscriptionRequest), any())(any(), any(), any(), any())
-      } thenReturn Future.successful(renewalResponse)
+    "successfully submit renewal" in new TestSetup {
+      mocker.mockPost(
+        url = url"${amlsConnector.url}/org/id/$amlsRegistrationNumber/renewal",
+        requestBody = subscriptionRequest,
+        response = renewalResponse)
 
       whenReady(amlsConnector.renewal(subscriptionRequest, amlsRegistrationNumber, accountTypeId)) {
         _ mustBe renewalResponse
       }
     }
 
-    "successfully submit renewalAmendment" in {
-      when {
-        amlsConnector.http.POST[SubscriptionRequest, AmendVariationRenewalResponse](
-          eqTo(s"${amlsConnector.url}/org/id/$amlsRegistrationNumber/renewalAmendment"), eqTo(subscriptionRequest), any())(any(), any(), any(), any())
-      } thenReturn Future.successful(renewalResponse)
+    "successfully submit renewalAmendment" in new TestSetup {
+
+      mocker.mockPost(
+        url = url"${amlsConnector.url}/org/id/$amlsRegistrationNumber/renewalAmendment",
+        requestBody = subscriptionRequest,
+        response = renewalResponse)
 
       whenReady(amlsConnector.renewalAmendment(subscriptionRequest, amlsRegistrationNumber, accountTypeId)) {
         _ mustBe renewalResponse
@@ -224,14 +240,15 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     }
 
     "withdraw" must {
-      "successfully withdraw the application" in {
-        val postUrl = s"${amlsConnector.url}/${accountTypeId._1}/${accountTypeId._2}/$amlsRegistrationNumber/withdrawal"
+      "successfully withdraw the application" in new TestSetup {
+        val postUrl = url"${amlsConnector.url}/${accountTypeId._1}/${accountTypeId._2}/$amlsRegistrationNumber/withdrawal"
         val request = WithdrawSubscriptionRequest(amlsRegistrationNumber, LocalDate.now(), WithdrawalReason.OutOfScope)
         val response = WithdrawSubscriptionResponse(LocalDateTime.now().toString)
 
-        when {
-          amlsConnector.http.POST[WithdrawSubscriptionRequest, WithdrawSubscriptionResponse](eqTo(postUrl), eqTo(request), any())(any(), any(), any(), any())
-        } thenReturn Future.successful(response)
+        mocker.mockPost(
+          url = postUrl,
+          requestBody = request,
+          response = response)
 
         whenReady(amlsConnector.withdraw(amlsRegistrationNumber, request, accountTypeId)) {
           _ mustBe response
@@ -240,14 +257,15 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     }
 
     "deregister" must {
-      "successfully deregister the application" in {
-        val postUrl = s"${amlsConnector.url}/${accountTypeId._1}/${accountTypeId._2}/$amlsRegistrationNumber/deregistration"
+      "successfully deregister the application" in new TestSetup {
+        val postUrl = url"${amlsConnector.url}/${accountTypeId._1}/${accountTypeId._2}/$amlsRegistrationNumber/deregistration"
         val request = DeRegisterSubscriptionRequest(amlsRegistrationNumber, LocalDate.now(), DeregistrationReason.OutOfScope)
         val response = DeRegisterSubscriptionResponse("some date")
 
-        when {
-          amlsConnector.http.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](eqTo(postUrl), eqTo(request), any())(any(), any(), any(), any())
-        } thenReturn Future.successful(response)
+        mocker.mockPost(
+          url = postUrl,
+          requestBody = request,
+          response = response)
 
         whenReady(amlsConnector.deregister(amlsRegistrationNumber, request, accountTypeId)) {
           _ mustBe response
@@ -257,13 +275,15 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   }
 
   "savePayment" must {
-    "provide a paymentId and report the status of the response" in {
+    "provide a paymentId and report the status of the response" in new TestSetup {
 
-      val id = "fcguhio"
+      val id: String = "fcguhio"
+      val postUrl: URL = url"${amlsConnector.paymentUrl}/$accountType/$accountId/$amlsRegistrationNumber/$safeId"
 
-      when {
-        amlsConnector.http.POSTString[HttpResponse](any(), eqTo(id), any())(any(), any(), any())
-      } thenReturn Future.successful(HttpResponse(CREATED, ""))
+      mocker.mockPost(
+        url = postUrl,
+        requestBody = id,
+        response = HttpResponse(status = CREATED, body = ""))
 
       whenReady(amlsConnector.savePayment(id, amlsRegistrationNumber, safeId, accountTypeId)) {
         _.status mustBe CREATED
@@ -273,14 +293,16 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   }
 
   "createBacsPayment" must {
-    "send a request to AMLS to create a BACS payment" in {
+    "send a request to AMLS to create a BACS payment" in new TestSetup {
       val request = createBacsPaymentGen.sample.get
-      val payment = paymentGen.sample.get
-      val postUrl = s"${amlsConnector.paymentUrl}/${accountTypeId._1}/${accountTypeId._2}/bacs"
+      val payment: Payment = paymentGen.sample.get
+      val postUrl = url"${amlsConnector.paymentUrl}/$accountType/$accountId/bacs"
 
-      when {
-        amlsConnector.http.POST[CreateBacsPaymentRequest, Payment](eqTo(postUrl), eqTo(request), any())(any(), any(), any(), any())
-      } thenReturn Future.successful(payment)
+
+      mocker.mockPost(
+        url = postUrl,
+        requestBody = request,
+        response = payment)
 
       whenReady(amlsConnector.createBacsPayment(accountTypeId, request)) { result =>
         result mustBe payment
@@ -290,13 +312,13 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   }
 
   "getPaymentByPaymentReference" must {
-    "retrieve a payment given the payment reference" in {
-      val paymentRef = paymentRefGen.sample.get
-      val payment = paymentGen.sample.get.copy(reference = paymentRef)
+    "retrieve a payment given the payment reference" in new TestSetup {
+      val paymentRef: String = paymentRefGen.sample.get
+      val payment: Payment = paymentGen.sample.get.copy(reference = paymentRef)
 
-      when {
-        amlsConnector.http.GET[Payment](any(), any(), any())(any(), any(), any())
-      } thenReturn Future.successful(payment)
+      mocker.mockGet[Option[Payment]](
+        url = url"${amlsConnector.paymentUrl}/$accountType/$accountId/payref/$paymentRef",
+        response = Some(payment))
 
       whenReady(amlsConnector.getPaymentByPaymentReference(paymentRef, accountTypeId)) {
         case Some(result) => result mustBe payment
@@ -304,12 +326,13 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       }
     }
 
-    "return None when the payment record is not found" in {
+    "return None when the payment record is not found" in new TestSetup {
       val paymentRef = paymentRefGen.sample.get
 
-      when {
-        amlsConnector.http.GET[Payment](any(), any(), any())(any(), any(), any())
-      } thenReturn Future.failed(new NotFoundException("Payment was not found"))
+      mocker.mockGet[Option[Payment]](
+        url = url"${amlsConnector.paymentUrl}/$accountType/$accountId/payref/$paymentRef",
+        response = None
+      )
 
       whenReady(amlsConnector.getPaymentByPaymentReference(paymentRef, accountTypeId)) {
         case Some(_) => fail("None should be returned")
@@ -319,13 +342,13 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   }
 
   "getPaymentByAmlsReference" must {
-    "retrieve a payment given an AMLS reference number" in {
+    "retrieve a payment given an AMLS reference number" in new TestSetup {
       val amlsRef = amlsRefNoGen.sample.get
       val payment = paymentGen.sample.get.copy(amlsRefNo = amlsRef)
 
-      when {
-        amlsConnector.http.GET[Payment](any(), any(), any())(any(), any(), any())
-      } thenReturn Future.successful(payment)
+      mocker.mockGet[Option[Payment]](
+        url = url"${amlsConnector.paymentUrl}/$accountType/$accountId/amlsref/$amlsRef",
+        response = Some(payment))
 
       whenReady(amlsConnector.getPaymentByAmlsReference(amlsRef, accountTypeId)) {
         case Some(result) => result mustBe payment
@@ -333,12 +356,13 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       }
     }
 
-    "return None when the payment record is not found" in {
+    "return None when the payment record is not found" in new TestSetup {
       val amlsRef = amlsRefNoGen.sample.get
 
-      when {
-        amlsConnector.http.GET[Payment](any(), any(), any())(any(), any(), any())
-      } thenReturn Future.failed(new NotFoundException("Payment was not found"))
+      mocker.mockGet[Option[Payment]](
+        url = url"${amlsConnector.paymentUrl}/$accountType/$accountId/amlsref/$amlsRef",
+        response = None
+      )
 
       whenReady(amlsConnector.getPaymentByAmlsReference(amlsRef, accountTypeId)) {
         case Some(_) => fail("None should be returned")
@@ -348,38 +372,41 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   }
 
   "updateBacsStatus" must {
-    "send the isBacs flag to the middle tier" in {
+    "send the isBacs flag to the middle tier" in new TestSetup {
       val paymentRef = paymentRefGen.sample.get
       val bacsRequest = UpdateBacsRequest(true)
       val result = HttpResponse(OK, "")
 
-      when {
-        amlsConnector.http.PUT[UpdateBacsRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-      } thenReturn Future.successful(result)
+      mocker.mockPut(
+        url = url"${amlsConnector.paymentUrl}/${accountTypeId._1}/${accountTypeId._2}/$paymentRef/bacs",
+        requestBody = bacsRequest,
+        response = result)
 
       whenReady(amlsConnector.updateBacsStatus(accountTypeId, paymentRef, bacsRequest)) { r => r mustBe result }
     }
   }
 
   "amlsConnector" must {
-    "refesh the payment status" in {
+    "refesh the payment status" in new TestSetup {
       val result = paymentStatusResultGen.sample.get
+      val paymentReference = result.amlsRef
 
-      when {
-        amlsConnector.http.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](any(), any(), any())(any(), any(), any(), any())
-      } thenReturn Future.successful(result)
+      mocker.mockPut(
+        url = url"${amlsConnector.paymentUrl}/$accountType/$accountId/refreshstatus",
+        requestBody = RefreshPaymentStatusRequest(paymentReference),
+        response = result)
 
-      whenReady(amlsConnector.refreshPaymentStatus(result.amlsRef, accountTypeId)) { r => r mustBe result }
+      whenReady(amlsConnector.refreshPaymentStatus(paymentReference, accountTypeId)) { r => r mustBe result }
     }
   }
 
   "registrationDetails" must {
-    "retrieve the registration details given a safe ID" in {
+    "retrieve the registration details given a safe ID" in new TestSetup {
       val safeId = "SAFE_ID"
 
-      when {
-        amlsConnector.http.GET[RegistrationDetails](any(), any(), any())(any(), any(), any())
-      } thenReturn Future.successful(RegistrationDetails("Test Company", isIndividual = false))
+      mocker.mockGet(
+        url = url"${amlsConnector.registrationUrl}/${accountTypeId._1}/${accountTypeId._2}/details/$safeId",
+        response = RegistrationDetails("Test Company", isIndividual = false))
 
       whenReady(amlsConnector.registrationDetails(accountTypeId, safeId)) { result =>
         result.companyName mustBe "Test Company"

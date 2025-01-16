@@ -25,13 +25,15 @@ import models.registrationdetails.RegistrationDetails
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse}
 import models.{AmendVariationRenewalResponse, _}
 import play.api.Logging
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{Json, OWrites, Writes}
+import play.api.libs.ws.BodyWritable
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmlsConnector @Inject()(val http: HttpClient,
+class AmlsConnector @Inject()(val httpClient: HttpClientV2,
                               val appConfig: ApplicationConfig) extends Logging {
 
   private[connectors] val url: String = appConfig.subscriptionUrl
@@ -44,12 +46,20 @@ class AmlsConnector @Inject()(val http: HttpClient,
                (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[SubscriptionRequest], resW: Writes[SubscriptionResponse]): Future[SubscriptionResponse] = {
 
     val (accountType, accountId) = accountTypeId
-    val postUrl = s"$url/$accountType/$accountId/$safeId"
+    val postUrl = url"$url/$accountType/$accountId/$safeId"
     val prefix = "[AmlsConnector][subscribe]"
     // $COVERAGE-OFF$
     logger.debug(s"$prefix - Request Body: ${Json.toJson(subscriptionRequest)}")
     // $COVERAGE-ON$
-    http.POST[SubscriptionRequest, SubscriptionResponse](postUrl, subscriptionRequest) map {
+
+    import uk.gov.hmrc.http.HttpReads.Implicits._
+
+
+    httpClient
+      .post(postUrl)
+      .withBody(Json.toJson(subscriptionRequest))
+      .execute[SubscriptionResponse]
+      .map {
       response =>
         // $COVERAGE-OFF$
         logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
@@ -63,13 +73,16 @@ class AmlsConnector @Inject()(val http: HttpClient,
 
     val (accountType, accountId) = accountTypeId
 
-    val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/status"
+    val getUrl = url"$url/$accountType/$accountId/$amlsRegistrationNumber/status"
     val prefix = "[AmlsConnector][status]"
     // $COVERAGE-OFF$
     logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
     // $COVERAGE-ON$
 
-    http.GET[ReadStatusResponse](getUrl) map {
+    httpClient
+      .get(getUrl)
+      .execute[ReadStatusResponse]
+      .map {
       response =>
         // $COVERAGE-OFF$
         logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
@@ -83,13 +96,16 @@ class AmlsConnector @Inject()(val http: HttpClient,
 
     val (accountType, accountId) = accountTypeId
 
-    val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber"
+    val getUrl = url"$url/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[AmlsConnector][view]"
     // $COVERAGE-OFF$
     logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
     // $COVERAGE-ON$
 
-    http.GET[ViewResponse](getUrl) map {
+    httpClient
+      .get(getUrl)
+    .execute[ViewResponse]
+    .map {
       response =>
         // $COVERAGE-OFF$
         logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
@@ -104,12 +120,16 @@ class AmlsConnector @Inject()(val http: HttpClient,
 
     val (accountType, accountId) = accountTypeId
 
-    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/update"
+    val postUrl = url"$url/$accountType/$accountId/$amlsRegistrationNumber/update"
     val prefix = "[AmlsConnector][update]"
     // $COVERAGE-OFF$
     logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
     // $COVERAGE-ON$
-    http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
+    httpClient
+      .post(postUrl)
+      .withBody(Json.toJson(updateRequest))
+      .execute[AmendVariationRenewalResponse]
+      .map {
       response =>
         // $COVERAGE-OFF$
         logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
@@ -123,12 +143,16 @@ class AmlsConnector @Inject()(val http: HttpClient,
 
     val (accountType, accountId) = accountTypeId
 
-    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/variation"
+    val postUrl = url"$url/$accountType/$accountId/$amlsRegistrationNumber/variation"
     val prefix = "[AmlsConnector][variation]"
     // $COVERAGE-OFF$
     logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
     // $COVERAGE-ON$
-    http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
+    httpClient
+      .post(postUrl)
+      .withBody(Json.toJson(updateRequest))
+      .execute[AmendVariationRenewalResponse]
+      .map {
       response =>
         // $COVERAGE-OFF$
         logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
@@ -142,14 +166,18 @@ class AmlsConnector @Inject()(val http: HttpClient,
 
     val (accountType, accountId) = accountTypeId
 
-    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/renewal"
+    val postUrl = url"$url/$accountType/$accountId/$amlsRegistrationNumber/renewal"
     // $COVERAGE-OFF$
     val log = (msg: String) => logger.debug(s"[AmlsConnector][renewal] $msg")
 
     log(s"Request body: ${Json.toJson(subscriptionRequest)}")
     // $COVERAGE-ON$
 
-    http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
+    httpClient
+      .post(postUrl)
+      .withBody(Json.toJson(subscriptionRequest))
+      .execute[AmendVariationRenewalResponse]
+      .map { response =>
       // $COVERAGE-OFF$
       log(s"Response body: ${Json.toJson(response)}")
       // $COVERAGE-ON$
@@ -162,14 +190,19 @@ class AmlsConnector @Inject()(val http: HttpClient,
 
     val (accountType, accountId) = accountTypeId
 
-    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/renewalAmendment"
+    val postUrl = url"$url/$accountType/$accountId/$amlsRegistrationNumber/renewalAmendment"
     // $COVERAGE-OFF$
     val log = (msg: String) => logger.debug(s"[AmlsConnector][renewalAmendment] $msg")
 
     log(s"Request body: ${Json.toJson(subscriptionRequest)}")
     // $COVERAGE-ON$
 
-    http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
+
+    httpClient
+      .post(postUrl)
+      .withBody(Json.toJson(subscriptionRequest))
+      .execute[AmendVariationRenewalResponse]
+      .map { response =>
       // $COVERAGE-OFF$
       log(s"Response body: ${Json.toJson(response)}")
       // $COVERAGE-ON$
@@ -181,9 +214,12 @@ class AmlsConnector @Inject()(val http: HttpClient,
               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[WithdrawSubscriptionResponse] = {
 
     val (accountType, accountId) = accountTypeId
-    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/withdrawal"
+    val postUrl = url"$url/$accountType/$accountId/$amlsRegistrationNumber/withdrawal"
 
-    http.POST[WithdrawSubscriptionRequest, WithdrawSubscriptionResponse](postUrl, request)
+    httpClient
+      .post(postUrl)
+      .withBody(Json.toJson(request))
+      .execute[WithdrawSubscriptionResponse]
   }
 
   def deregister(
@@ -195,81 +231,94 @@ class AmlsConnector @Inject()(val http: HttpClient,
   ): Future[DeRegisterSubscriptionResponse] = {
 
     val (accountType, accountId) = accountTypeId
-    val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/deregistration"
+    val postUrl = url"$url/$accountType/$accountId/$amlsRegistrationNumber/deregistration"
 
-    http.POST[DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse](postUrl, request)
+    httpClient
+      .post(postUrl)
+      .withBody(Json.toJson(request))
+      .execute[DeRegisterSubscriptionResponse]
   }
 
   def savePayment(paymentId: String, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val (accountType, accountId) = accountTypeId
-    val postUrl = s"$paymentUrl/$accountType/$accountId/$amlsRefNo/$safeId"
+    val postUrl = url"$paymentUrl/$accountType/$accountId/$amlsRefNo/$safeId"
 
     // $COVERAGE-OFF$
     logger.debug(s"[AmlsConnector][savePayment]: Request to $postUrl with paymentId $paymentId")
     // $COVERAGE-ON$
 
-    http.POSTString[HttpResponse](postUrl, paymentId)
+    httpClient
+      .post(postUrl)
+      .withBody(paymentId)
+      .execute[HttpResponse]
   }
 
   def getPaymentByPaymentReference(paymentReference: String, accountTypeId: (String, String))
                                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] = {
 
     val (accountType, accountId) = accountTypeId
-    val getUrl = s"$paymentUrl/$accountType/$accountId/payref/$paymentReference"
+    val getUrl = url"$paymentUrl/$accountType/$accountId/payref/$paymentReference"
 
     // $COVERAGE-OFF$
     logger.debug(s"[AmlsConnector][getPaymentByPaymentReference]: Request to $getUrl with $paymentReference")
     // $COVERAGE-ON$
 
-    http.GET[Payment](getUrl) map { result =>
-      Some(result)
-    } recover {
-      case _: NotFoundException => None
-    }
+    httpClient
+      .get(getUrl)
+      .execute[Option[Payment]]
   }
 
   def getPaymentByAmlsReference(amlsRef: String, accountTypeId: (String, String))
                                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] = {
 
     val (accountType, accountId) = accountTypeId
-    val getUrl = s"$paymentUrl/$accountType/$accountId/amlsref/$amlsRef"
+    val getUrl = url"$paymentUrl/$accountType/$accountId/amlsref/$amlsRef"
 
     // $COVERAGE-OFF$
     logger.debug(s"[AmlsConnector][getPaymentByAmlsReference]: Request to $getUrl with $amlsRef")
     // $COVERAGE-ON$
 
-    http.GET[Payment](getUrl) map { result =>
-      Some(result)
-    } recover {
-      case _: NotFoundException => None
-    }
+    httpClient
+      .get(getUrl)
+      .execute[Option[Payment]]
   }
 
   def refreshPaymentStatus(paymentReference: String, accountTypeId: (String, String))
                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[PaymentStatusResult] = {
 
     val (accountType, accountId) = accountTypeId
-    val putUrl = s"$paymentUrl/$accountType/$accountId/refreshstatus"
+    val putUrl = url"$paymentUrl/$accountType/$accountId/refreshstatus"
     // $COVERAGE-OFF$
     logger.debug(s"[AmlsConnector][refreshPaymentStatus]: Request to $putUrl with $paymentReference")
     // $COVERAGE-ON$
-    http.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](putUrl, RefreshPaymentStatusRequest(paymentReference))
+    httpClient
+      .put(putUrl)
+      .withBody(Json.toJson(RefreshPaymentStatusRequest(paymentReference)))
+      .execute[PaymentStatusResult]
   }
 
   def registrationDetails(accountTypeId: (String, String), safeId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[RegistrationDetails] = {
-    val getUrl = s"$registrationUrl/${accountTypeId._1}/${accountTypeId._2}/details/$safeId"
-    http.GET[RegistrationDetails](getUrl)
+    val getUrl = url"$registrationUrl/${accountTypeId._1}/${accountTypeId._2}/details/$safeId"
+    httpClient
+      .get(getUrl)
+      .execute[RegistrationDetails]
   }
 
   def updateBacsStatus(accountTypeId: (String, String), ref: String, request: UpdateBacsRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[HttpResponse] = {
-    val putUrl = s"$paymentUrl/${accountTypeId._1}/${accountTypeId._2}/$ref/bacs"
-    http.PUT[UpdateBacsRequest, HttpResponse](putUrl, request)
+    val putUrl = url"$paymentUrl/${accountTypeId._1}/${accountTypeId._2}/$ref/bacs"
+    httpClient
+      .put(putUrl)
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
   }
 
   def createBacsPayment(accountTypeId: (String, String), request: CreateBacsPaymentRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Payment] = {
-    val postUrl = s"$paymentUrl/${accountTypeId._1}/${accountTypeId._2}/bacs"
-    http.POST[CreateBacsPaymentRequest, Payment](postUrl, request)
+    val postUrl = url"$paymentUrl/${accountTypeId._1}/${accountTypeId._2}/bacs"
+    httpClient
+      .post(postUrl)
+      .withBody(Json.toJson(request))
+      .execute[Payment]
   }
 }
