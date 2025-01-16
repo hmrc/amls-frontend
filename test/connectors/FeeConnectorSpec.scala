@@ -25,7 +25,10 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, StringContextOps}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import utils.HttpClientMocker
 
 import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -34,18 +37,19 @@ import scala.concurrent.Future
 class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with AmlsReferenceNumberGenerator {
 
   trait Fixture {
+
+    val mocker = new HttpClientMocker()
+    private val configuration: Configuration = Configuration.load(Environment.simple())
+    private val config = new ApplicationConfig(configuration, new ServicesConfig(configuration))
+
     val connector = new FeeConnector(
-      http = mock[HttpClient],
-      appConfig = mock[ApplicationConfig])
+      http = mocker.httpClient,
+      appConfig =config)
 
     val safeId = "SAFEID"
     val accountTypeId: (String, String) = ("org", "id")
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
-
-    when {
-      connector.feePaymentUrl
-    } thenReturn "/amls/feePaymentUrl"
   }
 
 
@@ -65,9 +69,7 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with
 
     "successfully receive feeResponse" in new Fixture {
 
-      when {
-        connector.http.GET[FeeResponse](any(), any(), any())(any(),any(), any())
-      } thenReturn Future.successful(feeResponse)
+      mocker.mockGet(url"http://sialala/", feeResponse)
 
       whenReady(connector.feeResponse(amlsRegistrationNumber, accountTypeId)){
         _ mustBe feeResponse

@@ -43,10 +43,21 @@ class HttpClientMocker extends MockFactory {
     mockExecute(Future.failed(response))
   }
 
+  def mockDelete[Res: HttpReads](url: URL, response: Res): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
+    (httpClient.delete(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
+    mockExecute(Future.successful(response))
+  }
+
   def mockPostJson[B : Writes, Res: HttpReads](url: URL, requestBody: B, response: Res): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
     (httpClient.post(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
     mockWithBody(Json.toJson(requestBody))
     mockExecute(Future.successful(response))
+  }
+
+  def mockPostJson[B : Writes, Res: HttpReads](url: URL, requestBody: B, response: Exception): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
+    (httpClient.post(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
+    mockWithBody(Json.toJson(requestBody))
+    mockExecute(Future.failed(response))
   }
 
   def mockPostString[Res: HttpReads](url: URL, requestBody: String, response: Res): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {

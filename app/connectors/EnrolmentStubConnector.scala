@@ -17,20 +17,21 @@
 package connectors
 
 import config.ApplicationConfig
+
 import javax.inject.Inject
 import models.enrolment.GovernmentGatewayEnrolment
-import uk.gov.hmrc.http.{HeaderCarrier}
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, StringContextOps}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.client.HttpClientV2
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-class EnrolmentStubConnector @Inject()(http: HttpClient, config: ApplicationConfig) {
+class EnrolmentStubConnector @Inject()(http: HttpClientV2, config: ApplicationConfig) {
 
   lazy val baseUrl = config.enrolmentStubsUrl
 
-  def enrolments(groupId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext) = {
-    val requestUrl = s"$baseUrl/auth/oid/$groupId/enrolments"
-    http.GET[Seq[GovernmentGatewayEnrolment]](requestUrl)
+  def enrolments(groupId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Seq[GovernmentGatewayEnrolment]] = {
+    val requestUrl = url"$baseUrl/auth/oid/$groupId/enrolments"
+    http.get(requestUrl).execute[Seq[GovernmentGatewayEnrolment]]
   }
 }

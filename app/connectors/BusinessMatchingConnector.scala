@@ -20,7 +20,8 @@ import config.ApplicationConfig
 import play.api.Logging
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, StringContextOps, UpstreamErrorResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -61,35 +62,13 @@ object BusinessMatchingReviewDetails {
   implicit val formats: OFormat[BusinessMatchingReviewDetails] = Json.format[BusinessMatchingReviewDetails]
 }
 
-class BusinessMatchingConnector @Inject()(val http: HttpClient,
+class BusinessMatchingConnector @Inject()(val http: HttpClientV2,
                                           val applicationConfig: ApplicationConfig) extends Logging {
 
   val serviceName = "amls"
 
   def getReviewDetails(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[BusinessMatchingReviewDetails]] = {
-
-    val url = s"${applicationConfig.businessMatchingUrl}/fetch-review-details/$serviceName"
-    val logPrefix = "[BusinessMatchingConnector][getReviewDetails]"
-
-    // $COVERAGE-OFF$
-
-    logger.debug(s"$logPrefix Fetching $url..")
-    // $COVERAGE-ON$
-
-    http.GET[BusinessMatchingReviewDetails](url) map { result =>
-
-
-      // $COVERAGE-OFF$
-      logger.debug(s"$logPrefix Finished getting review details. Name: ${result.businessName}")
-      // $COVERAGE-ON$
-      Some(result)
-    } recoverWith {
-      case e : UpstreamErrorResponse if e.statusCode == 404 => Future.successful(None)
-      case ex =>
-        // $COVERAGE-OFF$
-        logger.warn(s"$logPrefix Failed to fetch review details", ex)
-        // $COVERAGE-ON$
-        Future.failed(ex)
-    }
+    val url = url"${applicationConfig.businessMatchingUrl}/fetch-review-details/$serviceName"
+    http.get(url).execute[Option[BusinessMatchingReviewDetails]]
   }
 }

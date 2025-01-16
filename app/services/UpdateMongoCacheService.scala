@@ -37,13 +37,14 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.libs.json.Format
 import services.cache.Cache
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: DataCacheConnector, val applicationConfig: ApplicationConfig) {
+class UpdateMongoCacheService @Inject()(http: HttpClientV2, val cacheConnector: DataCacheConnector, val applicationConfig: ApplicationConfig) {
 
   def update(credId: String, response: UpdateMongoCacheResponse)
             (implicit ex: ExecutionContext): Future[Any] = {
@@ -76,8 +77,8 @@ class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: Da
   }
 
   def getMongoCacheData(fileName: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Option[UpdateMongoCacheResponse]] = {
-    val requestUrl = s"${applicationConfig.mongoCacheUpdateUrl}$fileName"
-    http.GET[UpdateMongoCacheResponse](requestUrl)
+    val requestUrl = url"${applicationConfig.mongoCacheUpdateUrl}$fileName"
+    http.get(requestUrl).execute[UpdateMongoCacheResponse]
       .map { r =>
         Some(r.copy(dataImport = Some(DataImport(fileName)))) }
       .recover {
