@@ -145,7 +145,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
     "successfully subscribe" in new TestSetup {
 
-      mocker.mockPost(
+      mocker.mockPostJson(
         url = url"${amlsConnector.url}/org/id/$safeId",
         requestBody = subscriptionRequest,
         response = subscriptionResponse)
@@ -190,7 +190,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   "update" must {
 
     "successfully submit amendment" in new TestSetup {
-      mocker.mockPost(
+      mocker.mockPostJson(
         url = url"${amlsConnector.url}/org/id/$amlsRegistrationNumber/update",
         requestBody = subscriptionRequest,
         response = amendmentResponse)
@@ -204,7 +204,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   "variation" must {
     "successfully submit variation" in new TestSetup {
 
-      mocker.mockPost(
+      mocker.mockPostJson(
         url = url"${amlsConnector.url}/org/id/$amlsRegistrationNumber/variation",
         requestBody = subscriptionRequest,
         response = amendmentResponse)
@@ -217,7 +217,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
   "renewal" must {
     "successfully submit renewal" in new TestSetup {
-      mocker.mockPost(
+      mocker.mockPostJson(
         url = url"${amlsConnector.url}/org/id/$amlsRegistrationNumber/renewal",
         requestBody = subscriptionRequest,
         response = renewalResponse)
@@ -229,7 +229,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
     "successfully submit renewalAmendment" in new TestSetup {
 
-      mocker.mockPost(
+      mocker.mockPostJson(
         url = url"${amlsConnector.url}/org/id/$amlsRegistrationNumber/renewalAmendment",
         requestBody = subscriptionRequest,
         response = renewalResponse)
@@ -245,7 +245,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         val request = WithdrawSubscriptionRequest(amlsRegistrationNumber, LocalDate.now(), WithdrawalReason.OutOfScope)
         val response = WithdrawSubscriptionResponse(LocalDateTime.now().toString)
 
-        mocker.mockPost(
+        mocker.mockPostJson(
           url = postUrl,
           requestBody = request,
           response = response)
@@ -262,7 +262,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         val request = DeRegisterSubscriptionRequest(amlsRegistrationNumber, LocalDate.now(), DeregistrationReason.OutOfScope)
         val response = DeRegisterSubscriptionResponse("some date")
 
-        mocker.mockPost(
+        mocker.mockPostJson(
           url = postUrl,
           requestBody = request,
           response = response)
@@ -280,7 +280,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       val id: String = "fcguhio"
       val postUrl: URL = url"${amlsConnector.paymentUrl}/$accountType/$accountId/$amlsRegistrationNumber/$safeId"
 
-      mocker.mockPost(
+      mocker.mockPostString(
         url = postUrl,
         requestBody = id,
         response = HttpResponse(status = CREATED, body = ""))
@@ -299,7 +299,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       val postUrl = url"${amlsConnector.paymentUrl}/$accountType/$accountId/bacs"
 
 
-      mocker.mockPost(
+      mocker.mockPostJson(
         url = postUrl,
         requestBody = request,
         response = payment)
