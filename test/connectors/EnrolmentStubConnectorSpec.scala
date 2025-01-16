@@ -34,7 +34,7 @@ class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
     val mocker = new HttpClientMocker()
     private val configuration: Configuration = Configuration.load(Environment.simple())
     private val config = new ApplicationConfig(configuration, new ServicesConfig(configuration))
-    val baseUrl = "htttp://sialala"
+    val baseUrl = "http://localhost:8941"
     val connector = new EnrolmentStubConnector(mocker.httpClient, config)
     val groupId: String = stringOfLengthGen(10).sample.get
   }

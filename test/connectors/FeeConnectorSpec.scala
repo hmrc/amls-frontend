@@ -20,19 +20,16 @@ import config.ApplicationConfig
 import generators.AmlsReferenceNumberGenerator
 import models.ResponseType.SubscriptionResponseType
 import models._
-import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.HttpClientMocker
 
 import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with AmlsReferenceNumberGenerator {
 
@@ -69,7 +66,7 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with
 
     "successfully receive feeResponse" in new Fixture {
 
-      mocker.mockGet(url"http://sialala/", feeResponse)
+      mocker.mockGet(url"http://localhost:8940/amls/payment/org/id/$amlsRegistrationNumber", feeResponse)
 
       whenReady(connector.feeResponse(amlsRegistrationNumber, accountTypeId)){
         _ mustBe feeResponse
