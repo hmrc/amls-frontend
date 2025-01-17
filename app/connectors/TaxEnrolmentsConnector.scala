@@ -26,13 +26,14 @@ import models.enrolment.{AmlsEnrolmentKey, EnrolmentKey, ErrorResponse, TaxEnrol
 import play.api.Logging
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: ApplicationConfig, audit: AuditConnector) extends Logging {
+class TaxEnrolmentsConnector @Inject()(http: HttpClientV2, val appConfig: ApplicationConfig, audit: AuditConnector) extends Logging {
 
   lazy val baseUrl = if (appConfig.enrolmentStubsEnabled) {
     s"${appConfig.enrolmentStubsUrl}/tax-enrolments"
@@ -57,9 +58,9 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: Applicat
     // $COVERAGE-ON$
       groupId match {
         case Some(groupId) =>
-          val url = s"$baseUrl/groups/$groupId/enrolments/${enrolKey.key}"
+          val url = url"$baseUrl/groups/$groupId/enrolments/${enrolKey.key}"
 
-          http.POST[TaxEnrolment, HttpResponse](url, enrolment) map { response =>
+          http.post(url).withBody(Json.toJson(enrolment)).execute[HttpResponse] map { response =>
             audit.sendEvent(ESEnrolEvent(enrolment, response, enrolKey))
             response
           } recoverWith {
@@ -99,9 +100,9 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: Applicat
     // $COVERAGE-ON$
       groupId match {
         case Some(groupId) =>
-          val url = s"$baseUrl/groups/$groupId/enrolments/$enrolKey"
+          val url = url"$baseUrl/groups/$groupId/enrolments/$enrolKey"
 
-          http.DELETE(url) map { response =>
+          http.delete(url).execute[HttpResponse].map { response =>
             audit.sendEvent(ESDeEnrolEvent(response, enrolKey))
             response
           }
@@ -114,9 +115,9 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: Applicat
                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
-    val url = s"$baseUrl/enrolments/$enrolKey"
+    val url = url"$baseUrl/enrolments/$enrolKey"
 
-    http.DELETE(url) map { response =>
+    http.delete(url).execute[HttpResponse].map { response =>
       audit.sendEvent(ESRemoveKnownFactsEvent(response, enrolKey))
       response
     }

@@ -23,14 +23,15 @@ import config.ApplicationConfig
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
 import play.api.Logging
 import play.api.libs.json.{JsSuccess, Json}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.audit.DefaultAuditConnector
 import utils.HttpResponseHelper
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class PayApiConnector @Inject()(
-                                 val http: HttpClient,
+                                 http: HttpClientV2,
                                  val auditConnector: DefaultAuditConnector,
                                  val applicationConfig: ApplicationConfig) extends HttpResponseHelper with Logging {
 
@@ -39,13 +40,13 @@ class PayApiConnector @Inject()(
   private val logWarn = (msg: String) => logger.warn(s"[PayApiConnector] $msg")
   // $COVERAGE-ON$
 
-  def createPayment(request: CreatePaymentRequest)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
+  def createPayment(request: CreatePaymentRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
 
     val bodyParser = JsonParsed[CreatePaymentResponse]
     // $COVERAGE-OFF$
     logDebug(s"Creating payment: ${Json.toJson(request)}")
     // $COVERAGE-ON$
-    http.POST[CreatePaymentRequest, HttpResponse](s"${applicationConfig.payBaseUrl}/amls/journey/start", request) map {
+    http.post(url"${applicationConfig.payBaseUrl}/amls/journey/start").withBody(Json.toJson(request)).execute[HttpResponse].map {
       case response & bodyParser(JsSuccess(body: CreatePaymentResponse, _)) =>
         auditConnector.sendExtendedEvent(CreatePaymentEvent(request, body))
         body.some

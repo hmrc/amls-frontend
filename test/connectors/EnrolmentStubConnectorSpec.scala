@@ -19,13 +19,10 @@ package connectors
 import config.ApplicationConfig
 import generators.BaseGenerator
 import models.enrolment.{EnrolmentIdentifier, GovernmentGatewayEnrolment}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.HttpClient
-import utils.AmlsSpec
-
-import scala.concurrent.Future
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.http.StringContextOps
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import utils.{AmlsSpec, HttpClientMocker}
 
 class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
 
@@ -34,37 +31,18 @@ class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
     val enrolments: Seq[GovernmentGatewayEnrolment] = Seq(GovernmentGatewayEnrolment("HMRC-MLR-ORG",
       List(EnrolmentIdentifier("MLRRefNumber", "AV23456789")), ""))
 
-    val http: HttpClient = mock[HttpClient]
-    val config: ApplicationConfig = mock[ApplicationConfig]
-    val connector = new EnrolmentStubConnector(http, config)
+    val mocker = new HttpClientMocker()
+    private val configuration: Configuration = Configuration.load(Environment.simple())
+    private val config = new ApplicationConfig(configuration, new ServicesConfig(configuration))
+    val baseUrl = "http://localhost:8941"
+    val connector = new EnrolmentStubConnector(mocker.httpClient, config)
     val groupId: String = stringOfLengthGen(10).sample.get
-
-    when(config.enrolmentStubsUrl) thenReturn "http://stubs"
   }
 
   "The Enrolment Stub Connector" must {
     "get the enrolments from the stubs service" in new TestFixture {
-      when {
-        http.GET[Seq[GovernmentGatewayEnrolment]](any(), any(), any())(any(), any(), any())
-      } thenReturn Future.successful(enrolments)
-
-      val result: Seq[GovernmentGatewayEnrolment] = await(connector.enrolments(groupId))
-
-      result mustBe enrolments
-
-      verify(http).GET[Seq[GovernmentGatewayEnrolment]](any(), any(), any())(any(), any(), any())
-    }
-
-    "get the enrolments from the stubs service for new auth" in new TestFixture {
-      when {
-        http.GET[Seq[GovernmentGatewayEnrolment]](any(), any(), any())(any(), any(), any())
-      } thenReturn Future.successful(enrolments)
-
-      val result: Seq[GovernmentGatewayEnrolment] = await(connector.enrolments(groupId))
-
-      result mustBe enrolments
-
-      verify(http).GET[Seq[GovernmentGatewayEnrolment]](any(), any(), any())(any(), any(), any())
+      mocker.mockGet(url"$baseUrl/auth/oid/$groupId/enrolments", enrolments)
+      connector.enrolments(groupId).futureValue mustBe enrolments
     }
   }
 }

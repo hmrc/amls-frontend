@@ -19,6 +19,7 @@ package services
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
+import models._
 import models.amp.Amp
 import models.asp.Service.Accountancy
 import models.asp.{Asp, OtherBusinessTaxMattersNo, ServicesOfBusiness}
@@ -38,16 +39,15 @@ import models.moneyservicebusiness._
 import models.responsiblepeople.ResponsiblePerson
 import models.supervision.ProfessionalBodies._
 import models.supervision.{ProfessionalBodyYes => SupervisionProfessionalBodyYes, _}
-import models.tcsp._
-import models.tcsp.TcspTypes._
 import models.tcsp.ProvidedServices.{PhonecallHandling, Other => PSOther}
+import models.tcsp.TcspTypes._
+import models.tcsp._
 import models.tradingpremises.TradingPremises
-import models.{DataImport, _}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.verify
 import play.api.libs.json.{JsObject, Json}
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.client.HttpClientV2
 import utils.{AmlsSpec, DependencyMocks}
 
 import java.time.LocalDate
@@ -59,7 +59,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
 
   trait Fixture extends DependencyMocks {
 
-    val http: HttpClient = mock[HttpClient]
+    val http: HttpClientV2 = mock[HttpClientV2]
     val updateMongoCacheService = new UpdateMongoCacheService(http, mockCacheConnector, appConfig)
 
     val credId = "12341234"

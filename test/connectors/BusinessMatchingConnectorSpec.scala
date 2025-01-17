@@ -16,15 +16,14 @@
 
 package connectors
 
-import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito._
+import config.ApplicationConfig
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
-import utils.AmlsSpec
-
-import scala.concurrent.Future
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import utils.{AmlsSpec, HttpClientMocker}
 
 class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
@@ -58,7 +57,10 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
     lazy val hc: HeaderCarrier = app.injector.instanceOf[HeaderCarrier]
 
-    val testBusinessMatchingConnector = new BusinessMatchingConnector(mock[HttpClient], appConfig)
+    val mocker = new HttpClientMocker()
+    private val configuration: Configuration = Configuration.load(Environment.simple())
+    private val config = new ApplicationConfig(configuration, new ServicesConfig(configuration))
+    val testBusinessMatchingConnector = new BusinessMatchingConnector(mocker.httpClient, config)
 
     val address: BusinessMatchingAddress = BusinessMatchingAddress("1 Test Street", Some("Test Town"), None, None, None, "UK")
 
@@ -84,8 +86,7 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
     "get the review details" in new Fixture {
 
-      when(testBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any(), any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(validResponseDetail))
+      mocker.mockGet[Option[BusinessMatchingReviewDetails]](url"http://localhost:9923/business-customer/fetch-review-details/amls", Some(validResponseDetail))
 
       whenReady(testBusinessMatchingConnector.getReviewDetails) { result =>
         result mustBe Some(validResponseDetail)
@@ -94,8 +95,8 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
     }
 
     "return None when business matching returns 404" in new Fixture {
-      when(testBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any(), any(), any())(any(), any(), any()))
-        .thenReturn(Future.failed(UpstreamErrorResponse("The review details were not found", 404, 404)))
+
+      mocker.mockGet[Option[BusinessMatchingReviewDetails]](url"http://localhost:9923/business-customer/fetch-review-details/amls", None)
 
       whenReady(testBusinessMatchingConnector.getReviewDetails) { result =>
         result mustBe None
@@ -105,9 +106,7 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
     "bubble the exception when any other exception is thrown" in new Fixture {
       val ex = new Exception("Some other exception")
 
-      when {
-        testBusinessMatchingConnector.http.GET[BusinessMatchingReviewDetails](any(), any(), any())(any(), any(), any())
-      } thenReturn Future.failed(ex)
+      mocker.mockGet(url"http://localhost:9923/business-customer/fetch-review-details/amls", ex)
 
       intercept[Exception] {
         await(testBusinessMatchingConnector.getReviewDetails)

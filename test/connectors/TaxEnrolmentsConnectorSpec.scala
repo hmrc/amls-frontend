@@ -21,17 +21,17 @@ import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsExcep
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.enrolment.{AmlsEnrolmentKey, ErrorResponse, TaxEnrolment}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.verify
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, UpstreamErrorResponse}
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.AmlsSpec
-
-import scala.concurrent.Future
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import utils.{AmlsSpec, HttpClientMocker}
 
 class TaxEnrolmentsConnectorSpec extends AmlsSpec
   with ScalaFutures
@@ -41,26 +41,23 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
 
   implicit override val patienceConfig: PatienceConfig = PatienceConfig(timeout = Span(2, Seconds), interval = Span(20, Millis))
 
-  trait Fixture {
+  trait Fixture {fixture =>
+    val baseUrl = "http://localhost:3001"
 
-    val http: HttpClient = mock[HttpClient]
-    val appConfig: ApplicationConfig = mock[ApplicationConfig]
+    def enrolmentStubsEnabled = false
+    private val configuration: Configuration = Configuration.load(Environment.simple())
+    val appConfig = new ApplicationConfig(configuration, new ServicesConfig(configuration)){
+      override def enrolmentStubsEnabled: Boolean = fixture.enrolmentStubsEnabled
+      override def enrolmentStoreUrl: String = baseUrl
+    }
+
+    val mocker = new HttpClientMocker()
     val auditConnector: AuditConnector = mock[AuditConnector]
     val groupIdentfier: String = stringOfLengthGen(10).sample.get
     implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
-    val connector = new TaxEnrolmentsConnector(http, appConfig, auditConnector)
-    val baseUrl = "http://localhost:3001"
-    val serviceStub = "tax-enrolments"
+    val connector = new TaxEnrolmentsConnector(mocker.httpClient, appConfig, auditConnector)
     val enrolKey: AmlsEnrolmentKey = AmlsEnrolmentKey(amlsRegistrationNumber)
-
-    when {
-      appConfig.enrolmentStoreUrl
-    } thenReturn baseUrl
-
-    when {
-      appConfig.enrolmentStubsUrl
-    } thenReturn serviceStub
 
     val enrolment: TaxEnrolment = TaxEnrolment("123456789", postcodeGen.sample.get)
 
@@ -70,10 +67,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
   "configuration" when {
     "stubbed" must {
       "return stubs base url" in new Fixture {
-        when {
-          appConfig.enrolmentStubsEnabled
-        } thenReturn true
-
+        override def enrolmentStubsEnabled = true
         connector.baseUrl mustBe s"${appConfig.enrolmentStubsUrl}/tax-enrolments"
       }
     }
@@ -89,15 +83,11 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
     "called" must {
       "call the ES8 enrolment store endpoint to enrol the user" in new Fixture {
 
-        val endpointUrl = s"$baseUrl/${serviceStub}/groups/$groupIdentfier/enrolments/${enrolKey.key}"
-
-        when {
-          http.POST[TaxEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        } thenReturn Future.successful(HttpResponse(OK, ""))
-
-        whenReady(connector.enrol(enrolKey, enrolment, Some(groupIdentfier))) { _ =>
-          verify(http).POST[TaxEnrolment, HttpResponse](eqTo(endpointUrl), eqTo(enrolment), any())(any(), any(), any(), any())
-          verify(auditConnector).sendEvent(any())(any(), any())
+        val endpointUrl = url"$baseUrl/tax-enrolments/groups/$groupIdentfier/enrolments/${enrolKey.key}"
+        val response: HttpResponse = HttpResponse(OK, "")
+        mocker.mockPostJson(endpointUrl, enrolment, response)
+        connector.enrol(enrolKey, enrolment, Some(groupIdentfier)).futureValue mustBe response
+        verify(auditConnector).sendEvent(any())(any(), any())
         }
       }
 
@@ -108,9 +98,10 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
       }
 
       "throws a DuplicateEnrolmentException when the enrolment has already been created" in new Fixture {
-        when {
-          http.POST[TaxEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        } thenReturn Future.failed(UpstreamErrorResponse(jsonError("ERROR_INVALID_IDENTIFIERS", "The enrolment identifiers provided were invalid"), BAD_REQUEST, BAD_REQUEST))
+
+        val endpointUrl = url"$baseUrl/tax-enrolments/groups/$groupIdentfier/enrolments/${enrolKey.key}"
+        val response: UpstreamErrorResponse = UpstreamErrorResponse(jsonError("ERROR_INVALID_IDENTIFIERS", "The enrolment identifiers provided were invalid"), BAD_REQUEST, BAD_REQUEST)
+        mocker.mockPostJson(endpointUrl, enrolment, response)
 
         intercept[DuplicateEnrolmentException] {
           await(connector.enrol(enrolKey, enrolment, Some(groupIdentfier)))
@@ -118,30 +109,25 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
       }
 
       "throws a InvalidEnrolmentCredentialsException when the enrolment has the wrong type of role" in new Fixture {
-        when {
-          http.POST[TaxEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        } thenReturn Future.failed(UpstreamErrorResponse(jsonError("INVALID_CREDENTIAL_ID", "Invalid credential ID"), FORBIDDEN, FORBIDDEN))
+
+        val endpointUrl = url"$baseUrl/tax-enrolments/groups/$groupIdentfier/enrolments/${enrolKey.key}"
+        val response: UpstreamErrorResponse = UpstreamErrorResponse(jsonError("INVALID_CREDENTIAL_ID", "Invalid credential ID"), FORBIDDEN, FORBIDDEN)
+        mocker.mockPostJson(endpointUrl, enrolment, response)
 
         intercept[InvalidEnrolmentCredentialsException] {
           await(connector.enrol(enrolKey, enrolment, Some(groupIdentfier)))
         }
       }
-    }
   }
 
   "deEnrol" when {
     "called" must {
       "call the ES9 API endpoint" in new Fixture {
-        val endpointUrl = s"$baseUrl/${serviceStub}/groups/$groupIdentfier/enrolments/${enrolKey.key}"
-
-        when {
-          http.DELETE[HttpResponse](any(), any())(any(), any(), any())
-        } thenReturn Future.successful(HttpResponse(NO_CONTENT, ""))
-
-        whenReady(connector.deEnrol(amlsRegistrationNumber, Some(groupIdentfier))) { _ =>
-          verify(http).DELETE[HttpResponse](eqTo(endpointUrl), any())(any(), any(), any())
-          verify(auditConnector).sendEvent(any())(any(), any())
-        }
+        val endpointUrl = url"$baseUrl/tax-enrolments/groups/$groupIdentfier/enrolments/${enrolKey.key}"
+        val response: HttpResponse = HttpResponse(NO_CONTENT, "")
+        mocker.mockDelete(endpointUrl, response)
+        connector.deEnrol(amlsRegistrationNumber, Some(groupIdentfier)).futureValue mustBe response
+        verify(auditConnector).sendEvent(any())(any(), any())
       }
 
       "throw an exception when there is no group identifier" in new Fixture {
@@ -157,19 +143,13 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
   "removeKnownFacts" when {
     "called" must {
       "call the ES7 API endpoint" in new Fixture {
+        val endpointUrl = url"$baseUrl/tax-enrolments/enrolments/${enrolKey.key}"
+        val response: HttpResponse = HttpResponse(NO_CONTENT, "")
+        mocker.mockDelete(endpointUrl, response)
 
-        val endpointUrl = s"$baseUrl/${serviceStub}/enrolments/${enrolKey.key}"
-
-        when {
-          http.DELETE[HttpResponse](any(), any())(any(), any(), any())
-        } thenReturn Future.successful(HttpResponse(NO_CONTENT, ""))
-
-        whenReady(connector.removeKnownFacts(amlsRegistrationNumber)) { _ =>
-          verify(http).DELETE[HttpResponse](eqTo(endpointUrl), any())(any(), any(), any())
-          verify(auditConnector).sendEvent(any())(any(), any())
-        }
+        connector.removeKnownFacts(amlsRegistrationNumber).futureValue mustBe response
+        verify(auditConnector).sendEvent(any())(any(), any())
       }
     }
   }
-
 }
