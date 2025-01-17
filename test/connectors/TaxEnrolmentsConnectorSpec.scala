@@ -49,7 +49,6 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
     val appConfig = new ApplicationConfig(configuration, new ServicesConfig(configuration)){
       override def enrolmentStubsEnabled: Boolean = fixture.enrolmentStubsEnabled
       override def enrolmentStoreUrl: String = baseUrl
-//      override def enrolmentStubsUrl: String = serviceStub
     }
 
     val mocker = new HttpClientMocker()
@@ -58,7 +57,6 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
     implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
     val connector = new TaxEnrolmentsConnector(mocker.httpClient, appConfig, auditConnector)
-//    val serviceStub = "tax-enrolments"
     val enrolKey: AmlsEnrolmentKey = AmlsEnrolmentKey(amlsRegistrationNumber)
 
     val enrolment: TaxEnrolment = TaxEnrolment("123456789", postcodeGen.sample.get)
