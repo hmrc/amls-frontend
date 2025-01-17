@@ -17,23 +17,23 @@
 package connectors
 
 import config.ApplicationConfig
+
 import javax.inject.Inject
 import play.api.Configuration
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.ExecutionContext
 
-class TestOnlyStubConnector @Inject()(val http: HttpClient,
+class TestOnlyStubConnector @Inject()(val http: HttpClientV2,
                                       applicationConfig: ApplicationConfig,
                                       val configuration: Configuration) extends ServicesConfig(configuration) {
 
   lazy val baseUrl = applicationConfig.testOnlyStubsUrl
 
   def clearState()(implicit hc: HeaderCarrier, ex: ExecutionContext) = {
-    val requestUrl = s"$baseUrl/clearstate"
-    http.DELETE[HttpResponse](requestUrl)
+    val requestUrl = url"$baseUrl/clearstate"
+    http.delete(requestUrl).execute[HttpResponse]
   }
 }

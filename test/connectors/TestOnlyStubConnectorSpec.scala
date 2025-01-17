@@ -24,9 +24,8 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Configuration
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.HttpClient
-import utils.AmlsSpec
+import uk.gov.hmrc.http.{HttpClient, HttpResponse, StringContextOps}
+import utils.{AmlsSpec, HttpClientMocker}
 
 import scala.concurrent.Future
 
@@ -37,21 +36,17 @@ class TestOnlyStubConnectorSpec extends AmlsSpec
 
   // scalastyle:off magic.number
   trait Fixture {
-    val http: HttpClient = mock[HttpClient]
-    val config: ApplicationConfig = mock[ApplicationConfig]
-    val connector = new TestOnlyStubConnector(http, mock[ApplicationConfig],  mock[Configuration])
+
+    val mocker = new HttpClientMocker
+    val connector = new TestOnlyStubConnector(mocker.httpClient, appConfig, app.injector.instanceOf[Configuration])
   }
 
   "The TestOnly Stub Connector" must {
     "clear the state from the stubs service" in new Fixture {
 
-      when {
-        http.DELETE[HttpResponse](any(), any())(any(), any(), any())
-      } thenReturn Future.successful(HttpResponse(NO_CONTENT, ""))
-
-      whenReady(connector.clearState()) { _ =>
-        verify(http).DELETE[HttpResponse](any(), any())(any(), any(), any())
-      }
+      private val response: HttpResponse = HttpResponse(NO_CONTENT, "")
+      mocker.mockDelete(url"http://localhost:8941/anti-money-laundering/test-only/clearstate", response)
+      connector.clearState().futureValue mustBe response
     }
   }
 }
