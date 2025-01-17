@@ -99,8 +99,8 @@ class AmlsConnector @Inject()(val httpClient: HttpClientV2,
 
     httpClient
       .get(getUrl)
-    .execute[ViewResponse]
-    .map {
+      .execute[ViewResponse]
+      .map {
       response =>
         // $COVERAGE-OFF$
         logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
