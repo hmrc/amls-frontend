@@ -30,10 +30,11 @@ class TestOnlyStubConnector @Inject()(val http: HttpClientV2,
                                       applicationConfig: ApplicationConfig,
                                       val configuration: Configuration) extends ServicesConfig(configuration) {
 
-  lazy val baseUrl = applicationConfig.testOnlyStubsUrl
+  val baseUrl = applicationConfig.amlsStubBaseUrl
 
   def clearState()(implicit hc: HeaderCarrier, ex: ExecutionContext) = {
-    val requestUrl = url"$baseUrl/clearstate"
+    val requestUrl = url"$baseUrl/test-only/clearstate"
     http.delete(requestUrl).execute[HttpResponse]
+
   }
 }

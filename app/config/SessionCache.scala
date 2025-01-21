@@ -39,8 +39,6 @@ trait SessionCache {
 
   private val noSession = Future.failed[String](NoSessionException)
 
-  val legacyRawReads: HttpReads[HttpResponse] =
-    throwOnFailure(readEitherOf(readRaw))
 
   private def cacheId(implicit hc: HeaderCarrier): Future[String] =
     hc.sessionId.fold(noSession)(c => Future.successful(c.value))

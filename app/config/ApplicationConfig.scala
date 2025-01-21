@@ -60,7 +60,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   def businessCustomerUrl = getConfigString("business-customer.url")
 
-  lazy val mongoCacheUpdateUrl = baseUrl("amls-stub") + getConfigString("amls-stub.mongo-cache-url")
 
   def amlsUrl = baseUrl("amls")
 
@@ -95,7 +94,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   def encryptionKey = servicesConfig.getString("json.encryption.key")
 
-  val testOnlyStubsUrl = baseUrl("test-only") + getConfigString("test-only.get-base-url")
+  val amlsStubBaseUrl = baseUrl("amls-stub")
 
   lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
 

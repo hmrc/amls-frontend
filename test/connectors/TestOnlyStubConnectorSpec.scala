@@ -16,36 +16,28 @@
 
 package connectors
 
-import config.ApplicationConfig
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Configuration
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HttpClient, HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.{HttpResponse, StringContextOps}
 import utils.{AmlsSpec, HttpClientMocker}
-
-import scala.concurrent.Future
 
 class TestOnlyStubConnectorSpec extends AmlsSpec
   with Matchers
   with ScalaFutures
   with MockitoSugar {
 
-  // scalastyle:off magic.number
   trait Fixture {
-
     val mocker = new HttpClientMocker
     val connector = new TestOnlyStubConnector(mocker.httpClient, appConfig, app.injector.instanceOf[Configuration])
   }
 
   "The TestOnly Stub Connector" must {
     "clear the state from the stubs service" in new Fixture {
-
       private val response: HttpResponse = HttpResponse(NO_CONTENT, "")
-      mocker.mockDelete(url"http://localhost:8941/anti-money-laundering/test-only/clearstate", response)
+      mocker.mockDelete(url"http://localhost:8941/test-only/clearstate", response)
       connector.clearState().futureValue mustBe response
     }
   }
