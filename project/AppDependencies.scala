@@ -19,7 +19,7 @@ private object AppDependencies {
     "uk.gov.hmrc"           %% s"play-frontend-hmrc-$playV"            % "11.8.0",
     "uk.gov.hmrc"           %% s"play-conditional-form-mapping-$playV" % "3.2.0",
     // OTHER
-    "com.vladsch.flexmark"   % "flexmark-all"                          % flexmarkVersion,
+    "com.vladsch.flexmark"   % "flexmark"                             % flexmarkVersion exclude("org.apache.pdfbox", "pdfbox"),
     "com.beachape"          %% "enumeratum-play"                       % "1.8.2",
     "org.typelevel"         %% "cats-core"                             % "2.12.0",
     "commons-codec"          % "commons-codec"                         % "1.17.2"
