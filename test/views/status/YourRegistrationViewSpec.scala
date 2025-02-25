@@ -269,7 +269,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
           feeInformation = Some(fee_information(ReadyForRenewal(renewalDate))))
 
         doc.getElementById("registration-info").html() must include("Your registration with HMRC will expire on " + DateHelper.formatDate(renewalDate.get) + " unless you renew.")
-        doc.getElementById("start-renewal").html() must include("Start your renewal")
+        doc.getElementById("start-renewal").html() must include("Extend your supervision")
         doc.getElementById("start-renewal").nextElementSibling().html() must include("for business Name")
         doc.getElementById("start-renewal").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get.url)
       }
@@ -285,9 +285,9 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
           registrationStatus = registration_status(Some(amlsRegistrationNumber), RenewalSubmitted(renewalDate), endDate = renewalDate),
           feeInformation = Some(fee_information(RenewalSubmitted(renewalDate))))
 
-        doc.getElementById("renewal-pending-description-1").text() must be("You have submitted your renewal. HMRC will review your renewal after we have received payment.")
+        doc.getElementById("renewal-pending-description-1").text() must be("You have applied to extend your supervision. HMRC will review your application after we have received payment.")
         doc.getElementById("renewal-pending-description-2").text() must be("We’ll email you when we have made a decision.")
-        doc.getElementById("registration-status").html() must include("Supervised. Renewal submitted.")
+        doc.getElementById("registration-status").html() must include("Application to extend supervision submitted.")
         doc.getElementById("registration-status").html() must include(s"Registration number $amlsRegistrationNumber.")
         doc.getElementById("fees").getElementsMatchingOwnText("How to pay your fees").attr("href") must be("how-to-pay")
       }

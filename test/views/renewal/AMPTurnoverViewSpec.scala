@@ -37,7 +37,7 @@ class AMPTurnoverViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = amp_turnover(fp().fill(Second), true)
 
-      doc.title must startWith("How much of your turnover for the last 12 months came from sales of art for €10,000 or more? - Renewal - Manage your anti-money laundering supervision - GOV.UK")
+      doc.title must startWith("How much of your turnover for the last 12 months came from sales of art for €10,000 or more? - Extend your supervision - Manage your anti-money laundering supervision - GOV.UK")
     }
 
     "have correct headings" in new ViewFixture {
