@@ -41,9 +41,7 @@ class ApplicationSubmitViewSpec extends AmlsViewSpec with Matchers {
 
     "show ready to submit message" when {
       "renewal is complete and can submit" in new ViewFixture {
-
         override def view = applicationSubmit(true, readyForRenewal, true)
-        println(doc.html)
         doc.html must include(messages("renewal.progress.ready.to.submit.intro"))
       }
     }
@@ -51,16 +49,13 @@ class ApplicationSubmitViewSpec extends AmlsViewSpec with Matchers {
     "show section must be completed message" when {
       "renewal is complete and sections are incomplete" in new ViewFixture {
         override def view = applicationSubmit(false, readyForRenewal, true)
-        println(doc.html)
         doc.html must include(messages("renewal.progress.complete.sections.incomplete"))
       }
     }
 
     "show have not completed your renewal message" when {
       "renewal section is not complete" in new ViewFixture {
-
         override def view = applicationSubmit(false, readyForRenewal, false)
-        println(doc.html)
         doc.html must include(messages("renewal.progress.submit.intro"))
       }
     }
