@@ -39,6 +39,16 @@
             case(true, true) => messages("renewal.progress.ready.to.submit.intro")
             case(false, _) => messages("renewal.progress.submit.intro")
         }}
+      <ul class="govuk-list govuk-list--bullet">
+        <li> @{(renewalSectionCompleted, canSubmit) match {
+            case (true, true) => messages("renewal.progress.ready.to.submit.intro.bl1")
+            case _ => null
+            }}</li>
+        <li> @{(renewalSectionCompleted, canSubmit) match {
+            case (true, true) => messages("renewal.progress.ready.to.submit.intro.bl2")
+            case _ => null
+            }}</li>
+      </ul>
     </p>
 
     @if(renewalSectionCompleted){

@@ -40,7 +40,7 @@ class HowCashPaymentsReceivedViewSpec extends AmlsViewSpec {
 
       def view = receivedView(fp().fill(howReceived), true)
 
-      doc.title must startWith("How did you receive cash payments from customers you have not met in person?" + " - " + "Renewal")
+      doc.title must startWith("How did you receive cash payments from customers you have not met in person?" + " - " + "Extend your supervision")
     }
 
     "have correct headings" in new ViewFixture {
@@ -48,7 +48,7 @@ class HowCashPaymentsReceivedViewSpec extends AmlsViewSpec {
       def view = receivedView(fp().fill(howReceived), true)
 
       heading.text() must be("How did you receive cash payments from customers you have not met in person?")
-      subHeading.text() must include("Renewal")
+      subHeading.text() must include("Extend your supervision")
     }
 
     behave like pageWithErrors(

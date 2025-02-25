@@ -312,7 +312,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
           val result = controller.post("renewal")(newRequest)
 
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include("Select who is declaring this renewal")
+          contentAsString(result) must include("Select who is submitting this declaration")
         }
       }
 

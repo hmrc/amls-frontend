@@ -39,7 +39,7 @@ class CashPaymentsCustomersNotMetViewSpec extends AmlsViewSpec{
 
       def view = cash_payments_customers_not_met(fp().fill(cashPaymentsCustomersNotMet), true)
 
-      doc.title must startWith("Recent cash payments of over €10,000" + " - " + "Renewal")
+      doc.title must startWith("Recent cash payments of over €10,000" + " - " + "Extend your supervision")
     }
 
     "have correct headings" in new ViewFixture {
@@ -47,7 +47,7 @@ class CashPaymentsCustomersNotMetViewSpec extends AmlsViewSpec{
       def view = cash_payments_customers_not_met(fp().fill(cashPaymentsCustomersNotMet), true)
 
       heading.text() must be("Recent cash payments of over €10,000")
-      subHeading.text() must include("Renewal")
+      subHeading.text() must include("Extend your supervision")
     }
 
     behave like pageWithErrors(
