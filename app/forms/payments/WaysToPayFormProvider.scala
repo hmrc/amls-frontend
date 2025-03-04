@@ -22,9 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class WaysToPayFormProvider @Inject()() extends Mappings {
+class WaysToPayFormProvider @Inject() () extends Mappings {
 
-  private val error = "payments.waystopay.error"
+  private val error            = "payments.waystopay.error"
   def apply(): Form[WaysToPay] = Form[WaysToPay](
     "waysToPay" -> enumerable[WaysToPay](error, error)
   )

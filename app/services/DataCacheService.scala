@@ -18,19 +18,18 @@ package services
 
 import connectors.DataCacheConnector
 import services.cache.Cache
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.NotFoundException
 
 private[services] trait DataCacheService {
 
   private[services] def cacheConnector: DataCacheConnector
 
-  def getCache(credId: String)
-              (implicit ec: ExecutionContext): Future[Cache] =
+  def getCache(credId: String)(implicit ec: ExecutionContext): Future[Cache] =
     cacheConnector.fetchAll(credId) flatMap {
       case Some(cache) =>
         Future.successful(cache)
-      case None =>
+      case None        =>
         Future.failed {
           new NotFoundException("No Cache found for user")
         }

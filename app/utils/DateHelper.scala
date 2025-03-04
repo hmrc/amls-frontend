@@ -25,15 +25,13 @@ object DateHelper {
 
   implicit def localDateOrdering: Ordering[LocalDate] = Ordering.fromLessThan(_ isBefore _)
 
-  def isNotFutureDate: LocalDate => Boolean = {
-    date: LocalDate => !date.isAfter(LocalDate.now())
+  def isNotFutureDate: LocalDate => Boolean = { date: LocalDate =>
+    !date.isAfter(LocalDate.now())
   }
 
-  def formatDate(date: LocalDate): String = {
+  def formatDate(date: LocalDate): String =
     formatter.format(date)
-  }
 
-  def formatDate(date: LocalDateTime): String = {
+  def formatDate(date: LocalDateTime): String =
     formatter.format(date)
-  }
 }

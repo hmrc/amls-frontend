@@ -26,14 +26,14 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import javax.inject.Inject
 import scala.jdk.CollectionConverters._
 
-class ProductsFormProvider @Inject()() extends Mappings {
+class ProductsFormProvider @Inject() () extends Mappings {
 
   private val checkboxError = "error.required.hvd.business.sell.atleast"
 
-  val length = 255 //TODO This looks way too long
+  val length                  = 255 // TODO This looks way too long
   def apply(): Form[Products] = Form[Products](
     mapping(
-      "products" -> seq(enumerable[ItemType](checkboxError, checkboxError)(Products.enumerable))
+      "products"     -> seq(enumerable[ItemType](checkboxError, checkboxError)(Products.enumerable))
         .verifying(nonEmptySeq(checkboxError)),
       "otherDetails" -> mandatoryIf(
         _.values.asJavaCollection.contains(Other("").toString),
@@ -47,14 +47,16 @@ class ProductsFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  private def apply(products: Seq[ItemType], maybeDetails: Option[String]): Products = (products.contains(Other("")), maybeDetails) match {
-    case (true, Some(detail)) =>
-      val modifiedItemTypes = products.map(itemType => if (itemType == Other("")) Other(detail) else itemType)
-      Products(modifiedItemTypes.toSet)
-    case (false, Some(_)) => throw new IllegalArgumentException("Cannot have product details without Other HVD product")
-    case (true, None) => throw new IllegalArgumentException("Cannot have Other HVD product without product details")
-    case (false, None) => Products(products.toSet)
-  }
+  private def apply(products: Seq[ItemType], maybeDetails: Option[String]): Products =
+    (products.contains(Other("")), maybeDetails) match {
+      case (true, Some(detail)) =>
+        val modifiedItemTypes = products.map(itemType => if (itemType == Other("")) Other(detail) else itemType)
+        Products(modifiedItemTypes.toSet)
+      case (false, Some(_))     =>
+        throw new IllegalArgumentException("Cannot have product details without Other HVD product")
+      case (true, None)         => throw new IllegalArgumentException("Cannot have Other HVD product without product details")
+      case (false, None)        => Products(products.toSet)
+    }
 
   private def unapply(obj: Products): Option[(Seq[ItemType], Option[String])] = {
     val objTypes = obj.items.toSeq.map { item =>
@@ -63,7 +65,7 @@ class ProductsFormProvider @Inject()() extends Mappings {
 
     val maybeName = obj.items.find(_.isInstanceOf[Other]).flatMap {
       case Other(details) => Some(details)
-      case _ => None
+      case _              => None
     }
 
     Some((objTypes, maybeName))

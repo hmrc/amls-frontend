@@ -23,14 +23,16 @@ import play.api.data.FormError
 
 class BankAccountTypeFormProviderSpec extends FieldBehaviours {
 
-  val form = new BankAccountTypeFormProvider()()
+  val form      = new BankAccountTypeFormProvider()()
   val fieldName = "bankAccountType"
-  val errorKey = "error.bankdetails.accounttype"
+  val errorKey  = "error.bankdetails.accounttype"
 
   "BankAccountTypeFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, fieldName, Gen.oneOf[String](Seq(PersonalAccount, BelongsToOtherBusiness, BelongsToBusiness).map(_.toString))
+      form,
+      fieldName,
+      Gen.oneOf[String](Seq(PersonalAccount, BelongsToOtherBusiness, BelongsToBusiness).map(_.toString))
     )
 
     behave like mandatoryField(form, fieldName, FormError(fieldName, errorKey))
@@ -40,7 +42,7 @@ class BankAccountTypeFormProviderSpec extends FieldBehaviours {
       forAll(Gen.alphaNumStr) { invalidAnswer =>
         val result = form.bind(Map(fieldName -> invalidAnswer))
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(fieldName, errorKey))
       }
     }

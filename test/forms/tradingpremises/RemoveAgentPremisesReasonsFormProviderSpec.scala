@@ -26,11 +26,11 @@ import play.api.data.{Form, FormError}
 
 class RemoveAgentPremisesReasonsFormProviderSpec extends StringFieldBehaviours with Constraints {
 
-  val formProvider = new RemoveAgentPremisesReasonsFormProvider()
+  val formProvider                   = new RemoveAgentPremisesReasonsFormProvider()
   val form: Form[AgentRemovalReason] = formProvider()
 
   val radioFieldName = "removalReason"
-  val radioErrorKey = "tradingpremises.remove_reasons.missing"
+  val radioErrorKey  = "tradingpremises.remove_reasons.missing"
 
   val textFieldName = "removalReasonOther"
 
@@ -39,17 +39,20 @@ class RemoveAgentPremisesReasonsFormProviderSpec extends StringFieldBehaviours w
     s"$radioFieldName is validated" must {
 
       behave like fieldThatBindsValidData(
-        form, radioFieldName, Gen.oneOf[String](AgentRemovalReason.all.filterNot(_ == Other).map(_.toString))
+        form,
+        radioFieldName,
+        Gen.oneOf[String](AgentRemovalReason.all.filterNot(_ == Other).map(_.toString))
       )
 
       s"only bind Other when $textFieldName is populated with valid data" in {
 
         forAll(stringsShorterThan(formProvider.length).suchThat(_.nonEmpty)) { other =>
-
-          val result = form.bind(Map(
-            radioFieldName -> Other.toString,
-            textFieldName -> other
-          ))
+          val result = form.bind(
+            Map(
+              radioFieldName -> Other.toString,
+              textFieldName  -> other
+            )
+          )
 
           result.value shouldBe Some(AgentRemovalReason(Rules.toSchemaReason(Other.value), Some(other)))
           assert(result.errors.isEmpty)
@@ -63,7 +66,7 @@ class RemoveAgentPremisesReasonsFormProviderSpec extends StringFieldBehaviours w
         forAll(Gen.alphaNumStr) { invalidAnswer =>
           val result = form.bind(Map(radioFieldName -> invalidAnswer))
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(radioFieldName, radioErrorKey))
         }
       }
@@ -73,24 +76,28 @@ class RemoveAgentPremisesReasonsFormProviderSpec extends StringFieldBehaviours w
 
       "fail to bind if Other is selected and field is empty" in {
 
-        val result = form.bind(Map(
-          radioFieldName -> Other.toString,
-          textFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            radioFieldName -> Other.toString,
+            textFieldName  -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(textFieldName, "tradingpremises.remove_reasons.agent.other.missing"))
       }
 
       s"fail to bind if Other is selected and field exceeds ${formProvider.length}" in {
 
         forAll(stringsLongerThan(formProvider.length).suchThat(_.nonEmpty)) { invalid =>
-          val result = form.bind(Map(
-            radioFieldName -> Other.toString,
-            textFieldName -> invalid
-          ))
+          val result = form.bind(
+            Map(
+              radioFieldName -> Other.toString,
+              textFieldName  -> invalid
+            )
+          )
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(textFieldName, "error.invalid.maxlength.255", Seq(formProvider.length)))
         }
       }
@@ -98,12 +105,14 @@ class RemoveAgentPremisesReasonsFormProviderSpec extends StringFieldBehaviours w
       "fail to bind if regex is violated" in {
 
         forAll(invalidCharForNames.suchThat(_.nonEmpty)) { invalid =>
-          val result = form.bind(Map(
-            radioFieldName -> Other.toString,
-            textFieldName -> invalid
-          ))
+          val result = form.bind(
+            Map(
+              radioFieldName -> Other.toString,
+              textFieldName  -> invalid
+            )
+          )
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(textFieldName, "err.text.validation", Seq(basicPunctuationRegex)))
         }
       }

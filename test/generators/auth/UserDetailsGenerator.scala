@@ -24,10 +24,10 @@ import org.scalacheck.Gen
 trait UserDetailsGenerator extends BaseGenerator {
 
   val userDetailsGen: Gen[UserDetails] = for {
-    name <- stringOfLengthGen(10)
-    group <- stringOfLengthGen(20)
+    name           <- stringOfLengthGen(10)
+    group          <- stringOfLengthGen(20)
     credentialRole <- Gen.oneOf(CredentialRole.User, CredentialRole.Assistant)
-    groupId <- numSequence(9)
+    groupId        <- numSequence(9)
   } yield UserDetails(name, None, group, Some(credentialRole), Some(groupId))
 
 }

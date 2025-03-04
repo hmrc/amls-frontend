@@ -21,9 +21,8 @@ import play.api.libs.functional.syntax._
 
 sealed trait IsKnownByOtherNames
 
-case class IsKnownByOtherNamesYes(otherfirstnames: String,
-                                  othermiddlenames: Option[String],
-                                  otherlastnames: String) extends IsKnownByOtherNames
+case class IsKnownByOtherNamesYes(otherfirstnames: String, othermiddlenames: Option[String], otherlastnames: String)
+    extends IsKnownByOtherNames
 
 case object IsKnownByOtherNamesNo extends IsKnownByOtherNames
 
@@ -31,21 +30,23 @@ object IsKnownByOtherNames {
 
   implicit val jsonReads: Reads[IsKnownByOtherNames] =
     (__ \ "isKnownByOtherNames").read[Boolean] flatMap {
-      case true => (
-        (__ \ "otherfirstnames").read[String] and
-          (__ \ "othermiddlenames").readNullable[String] and
-          (__ \ "otherlastnames").read[String]
-        ) (IsKnownByOtherNamesYes.apply _)
+      case true  =>
+        (
+          (__ \ "otherfirstnames").read[String] and
+            (__ \ "othermiddlenames").readNullable[String] and
+            (__ \ "otherlastnames").read[String]
+        )(IsKnownByOtherNamesYes.apply _)
       case false => Reads(_ => JsSuccess(IsKnownByOtherNamesNo))
     }
 
   implicit val jsonWrites: Writes[IsKnownByOtherNames] = Writes[IsKnownByOtherNames] {
-    case a : IsKnownByOtherNamesYes => Json.obj(
-      "isKnownByOtherNames" -> true,
-      "otherfirstnames" -> a.otherfirstnames,
-      "othermiddlenames" -> a.othermiddlenames,
-      "otherlastnames" -> a.otherlastnames
-    )
-    case IsKnownByOtherNamesNo => Json.obj("isKnownByOtherNames" -> false)
+    case a: IsKnownByOtherNamesYes =>
+      Json.obj(
+        "isKnownByOtherNames" -> true,
+        "otherfirstnames"     -> a.otherfirstnames,
+        "othermiddlenames"    -> a.othermiddlenames,
+        "otherlastnames"      -> a.otherlastnames
+      )
+    case IsKnownByOtherNamesNo     => Json.obj("isKnownByOtherNames" -> false)
   }
 }

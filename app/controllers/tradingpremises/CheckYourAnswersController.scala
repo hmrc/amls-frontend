@@ -34,39 +34,44 @@ import views.html.tradingpremises.CheckYourAnswersView
 import scala.concurrent.Future
 
 @Singleton
-class CheckYourAnswersController @Inject()(val authAction: AuthAction,
-                                           val ds: CommonPlayDependencies,
-                                           val dataCacheConnector: DataCacheConnector,
-                                           val cc: MessagesControllerComponents,
-                                           cyaHelper: CheckYourAnswersHelper,
-                                           view: CheckYourAnswersView,
-                                           implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class CheckYourAnswersController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val dataCacheConnector: DataCacheConnector,
+  val cc: MessagesControllerComponents,
+  cyaHelper: CheckYourAnswersHelper,
+  view: CheckYourAnswersView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
-  def get(index: Int): Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        cache: Cache <- OptionT(dataCacheConnector.fetchAll(request.credId))
-        tp <- OptionT.fromOption[Future](getData[TradingPremises](cache, index))
-        bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
-      } yield {
-        val hasOneService = bm.activities.fold(false)(_.businessActivities.size == 1)
-        val hasOneMsbService = bm.msbServices.fold(false)(_.msbServices.size == 1)
+  def get(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      cache: Cache <- OptionT(dataCacheConnector.fetchAll(request.credId))
+      tp           <- OptionT.fromOption[Future](getData[TradingPremises](cache, index))
+      bm           <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+    } yield {
+      val hasOneService    = bm.activities.fold(false)(_.businessActivities.size == 1)
+      val hasOneMsbService = bm.msbServices.fold(false)(_.msbServices.size == 1)
 
-        val summaryList = cyaHelper.createSummaryList(
-          tp, index, ControllerHelper.isMSBSelected(Some(bm)), hasOneService, hasOneMsbService
-        )
+      val summaryList = cyaHelper.createSummaryList(
+        tp,
+        index,
+        ControllerHelper.isMSBSelected(Some(bm)),
+        hasOneService,
+        hasOneMsbService
+      )
 
-        Ok(view(summaryList, index))
-      }).getOrElse(NotFound(notFoundView))
+      Ok(view(summaryList, index))
+    }).getOrElse(NotFound(notFoundView))
   }
 
-  def post(index: Int): Action[AnyContent] = authAction.async {
-    implicit request =>
-      updateDataStrict[TradingPremises](request.credId, index){ tp =>
-        tp.copy(hasAccepted = true)
-      } flatMap { _ =>
-         Future.successful(Redirect(controllers.tradingpremises.routes.YourTradingPremisesController.get()))
-        }
-      }
+  def post(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    updateDataStrict[TradingPremises](request.credId, index) { tp =>
+      tp.copy(hasAccepted = true)
+    } flatMap { _ =>
+      Future.successful(Redirect(controllers.tradingpremises.routes.YourTradingPremisesController.get()))
+    }
+  }
 
 }

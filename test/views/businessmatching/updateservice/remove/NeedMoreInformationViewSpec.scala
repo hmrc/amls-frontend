@@ -25,7 +25,7 @@ import views.html.businessmatching.updateservice.remove.NeedMoreInformationView
 
 class NeedMoreInformationViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val informationView = app.injector.instanceOf[NeedMoreInformationView]
+  lazy val informationView                                       = app.injector.instanceOf[NeedMoreInformationView]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
@@ -36,7 +36,11 @@ class NeedMoreInformationViewSpec extends AmlsViewSpec with Matchers {
   "The NeedMoreInformationView view" must {
 
     "have the correct title" in new ViewFixture {
-      doc.title must startWith(messages("businessmatching.updateservice.updateotherinformation.title") + " - " + messages("summary.updateservice"))
+      doc.title must startWith(
+        messages("businessmatching.updateservice.updateotherinformation.title") + " - " + messages(
+          "summary.updateservice"
+        )
+      )
     }
 
     "have correct heading" in new ViewFixture {
@@ -57,7 +61,9 @@ class NeedMoreInformationViewSpec extends AmlsViewSpec with Matchers {
 
       doc.body().text() must include(messages("businessmatching.updateservice.updateotherinformation.information.0"))
       doc.body().text() must include(messages("businessmatching.updateservice.updateotherinformation.information.2"))
-      doc.body().text() must include(messages("businessmatching.updateservice.updateotherinformation.information.3.multiple.services"))
+      doc.body().text() must include(
+        messages("businessmatching.updateservice.updateotherinformation.information.3.multiple.services")
+      )
     }
 
     "have the correct button" in new ViewFixture {

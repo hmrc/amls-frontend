@@ -23,13 +23,14 @@ import play.api.data.Form
 class TaxMattersFormProviderSpec extends BooleanFieldBehaviours[TaxMatters] {
 
   override val form: Form[TaxMatters] = new TaxMattersFormProvider()()
-  override val fieldName: String = "manageYourTaxAffairs"
-  override val errorMessage: String = "error.required.ba.tax.matters"
+  override val fieldName: String      = "manageYourTaxAffairs"
+  override val errorMessage: String   = "error.required.ba.tax.matters"
 
   "AccountantIsUKAddressFormProvider" must {
 
     behave like booleanFieldWithModel(
-      TaxMatters(true), TaxMatters(false)
+      TaxMatters(true),
+      TaxMatters(false)
     )
   }
 }

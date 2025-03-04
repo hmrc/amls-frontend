@@ -35,8 +35,9 @@ import scala.concurrent.Future
 class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[BranchesOrAgentsView]
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[BranchesOrAgentsView]
     val controller = new BranchesOrAgentsController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
@@ -44,7 +45,8 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
       mockAutoComplete,
       mockMcc,
       formProvider = inject[BranchesOrAgentsFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   "BranchesOrAgentsHasCountriesController" must {
@@ -54,7 +56,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
       when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Future.successful(None))
 
-      val result = controller.get()(request)
+      val result   = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustEqual OK
@@ -66,16 +68,18 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
     "show a prefilled form when store contains data" in new Fixture {
 
       val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(BranchesOrAgents(
-          BranchesOrAgentsHasCountries(true),
-          Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB"))))
-        ))
+        branchesOrAgents = Some(
+          BranchesOrAgents(
+            BranchesOrAgentsHasCountries(true),
+            Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB"))))
+          )
+        )
       )
 
       when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Future.successful(Some(model)))
 
-      val result = controller.get()(request)
+      val result   = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustEqual OK
@@ -92,9 +96,9 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
       )
 
       val newRequest = FakeRequest(POST, routes.BranchesOrAgentsController.post().url)
-      .withFormUrlEncodedBody(
-        "hasCountries" -> "false"
-      )
+        .withFormUrlEncodedBody(
+          "hasCountries" -> "false"
+        )
 
       when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Future.successful(Some(model)))
@@ -111,9 +115,9 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
     "return a redirect to the 'Which Countries' page when the user has selected 'yes' from options" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.BranchesOrAgentsController.post().url)
-      .withFormUrlEncodedBody(
-        "hasCountries" -> "true"
-      )
+        .withFormUrlEncodedBody(
+          "hasCountries" -> "true"
+        )
 
       when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Future.successful(None))
@@ -135,14 +139,14 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
       )
 
       val newRequest = FakeRequest(POST, routes.BranchesOrAgentsController.post().url)
-      .withFormUrlEncodedBody(
-        "hasCountries" -> "false"
-      )
+        .withFormUrlEncodedBody(
+          "hasCountries" -> "false"
+        )
 
       when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Future.successful(Some(model)))
 
-      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key),any())(any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any()))
         .thenReturn(Future.successful(Cache.empty))
 
       val result = controller.post(edit = true)(newRequest)
@@ -159,14 +163,14 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
       )
 
       val newRequest = FakeRequest(POST, routes.BranchesOrAgentsController.post().url)
-      .withFormUrlEncodedBody(
-        "hasCountries" -> "true"
-      )
+        .withFormUrlEncodedBody(
+          "hasCountries" -> "true"
+        )
 
       when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Future.successful(Some(model)))
 
-      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key),any())(any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any()))
         .thenReturn(Future.successful(Cache.empty))
 
       val result = controller.post(edit = true)(newRequest)

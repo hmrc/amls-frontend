@@ -45,11 +45,10 @@ class TradingAddressFormProviderSpec extends AddressFieldBehaviours with Constra
       "bind when valid data is submitted" in {
 
         forAll(tradingNameGen) { name =>
-
           val formData = addressLinesData += (tradingNameField -> name)
-          val result = bindForm(formData)(tradingNameField)
+          val result   = bindForm(formData)(tradingNameField)
 
-          result.value shouldBe Some(name)
+          result.value  shouldBe Some(name)
           result.errors shouldBe Nil
         }
       }
@@ -63,9 +62,8 @@ class TradingAddressFormProviderSpec extends AddressFieldBehaviours with Constra
       s"not bind strings longer than ${formProvider.tradingNameLength} characters" in {
 
         forAll(Gen.alphaStr.suchThat(_.length > formProvider.tradingNameLength)) { string =>
-
           val formData: MutableMap[String, String] = addressLinesData += (tradingNameField -> string)
-          val newForm = bindForm(formData)
+          val newForm                              = bindForm(formData)
 
           newForm(tradingNameField).errors shouldEqual Seq(
             FormError(tradingNameField, "error.invalid.tp.trading.name", Seq(formProvider.tradingNameLength))
@@ -76,10 +74,9 @@ class TradingAddressFormProviderSpec extends AddressFieldBehaviours with Constra
       "not bind strings that violate regex" in {
 
         forAll(tradingNameGen, invalidCharForNames.suchThat(_.nonEmpty)) { (line, invalidChar) =>
-
-          val invalidLine = line.dropRight(1) + invalidChar
+          val invalidLine                          = line.dropRight(1) + invalidChar
           val formData: MutableMap[String, String] = addressLinesData += (tradingNameField -> invalidLine)
-          val newForm = bindForm(formData)
+          val newForm                              = bindForm(formData)
 
           newForm(tradingNameField).errors shouldEqual Seq(
             FormError(tradingNameField, "error.invalid.char.tp.agent.company.details", Seq(basicPunctuationRegex))

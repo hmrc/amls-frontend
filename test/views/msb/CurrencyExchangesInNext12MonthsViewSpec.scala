@@ -28,7 +28,7 @@ import views.html.msb.CurrencyExchangesInNext12MonthsView
 class CurrencyExchangesInNext12MonthsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val exchangesView = inject[CurrencyExchangesInNext12MonthsView]
-  lazy val fp = inject[CurrencyExchangesInNext12MonthsFormProvider]
+  lazy val fp            = inject[CurrencyExchangesInNext12MonthsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,24 +42,27 @@ class CurrencyExchangesInNext12MonthsViewSpec extends AmlsViewSpec with Matchers
 
       def view = exchangesView(fp().fill(CETransactionsInNext12Months("1")), true)
 
-      doc.title must be(messages("msb.ce.transactions.expected.in.12.months.title") +
-        " - " + messages("summary.msb") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("msb.ce.transactions.expected.in.12.months.title") +
+          " - " + messages("summary.msb") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = exchangesView(fp().fill(CETransactionsInNext12Months("1")), true)
 
-      heading.html must include(messages("msb.ce.transactions.expected.in.12.months.title"))
+      heading.html    must include(messages("msb.ce.transactions.expected.in.12.months.title"))
       subHeading.html must include(messages("summary.msb"))
 
     }
 
     behave like pageWithErrors(
       exchangesView(fp().withError("ceTransaction", "error.required.msb.ce.transactions.in.12months"), false),
-      "ceTransaction", "error.required.msb.ce.transactions.in.12months"
+      "ceTransaction",
+      "error.required.msb.ce.transactions.in.12months"
     )
 
     behave like pageWithBackLink(exchangesView(fp(), false))

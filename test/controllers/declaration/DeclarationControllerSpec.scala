@@ -42,14 +42,15 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
-    val mockSectionsProvider = mock[SectionsProvider]
-    lazy val view = app.injector.instanceOf[DeclareView]
+    val request                        = addToken(authRequest)
+    val mockSectionsProvider           = mock[SectionsProvider]
+    lazy val view                      = app.injector.instanceOf[DeclareView]
     val renewalService: RenewalService = mock[RenewalService]
     when(renewalService.isRenewalFlow(any(), any(), any())(any(), any())).thenReturn(Future.successful(false))
 
-    val declarationController = new DeclarationController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+    val declarationController          = new DeclarationController(
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mockStatusService,
       cc = mockMcc,
@@ -57,26 +58,32 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       renewalService = renewalService,
       view = view
     )
-    val response = SubscriptionResponse(
+    val response                       = SubscriptionResponse(
       etmpFormBundleNumber = "",
-      amlsRefNo = "", Some(SubscriptionFees(
-        registrationFee = 0,
-        fpFee = None,
-        fpFeeRate = None,
-        approvalCheckFee = None,
-        approvalCheckFeeRate = None,
-        premiseFee = 0,
-        premiseFeeRate = None,
-        totalFees = 0,
-        paymentReference = "")
+      amlsRefNo = "",
+      Some(
+        SubscriptionFees(
+          registrationFee = 0,
+          fpFee = None,
+          fpFeeRate = None,
+          approvalCheckFee = None,
+          approvalCheckFeeRate = None,
+          premiseFee = 0,
+          premiseFeeRate = None,
+          totalFees = 0,
+          paymentReference = ""
+        )
       )
     )
-    val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None,
-      None, false)
-    val notCompletedReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None,
-      None, false)
-    val addPerson = AddPerson("firstName", Some("middleName"), "lastName",
-      RoleWithinBusinessRelease7(Set(models.declaration.release7.InternalAccountant)))
+    val pendingReadStatusResponse      = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
+    val notCompletedReadStatusResponse =
+      ReadStatusResponse(LocalDateTime.now(), "NotCompleted", None, None, None, None, false)
+    val addPerson                      = AddPerson(
+      "firstName",
+      Some("middleName"),
+      "lastName",
+      RoleWithinBusinessRelease7(Set(models.declaration.release7.InternalAccountant))
+    )
 
     val completeRenewal = Renewal(
       Some(InvolvedInOtherYes("test")),
@@ -86,7 +93,12 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       Some(CustomersOutsideIsUK(true)),
       Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
       Some(PercentageOfCashPaymentOver15000.First),
-      Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other")))))),
+      Some(
+        CashPayments(
+          CashPaymentsCustomerNotMet(true),
+          Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+        )
+      ),
       Some(TotalThroughput("01")),
       Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
       Some(TransactionsInLast12Months("1500")),
@@ -114,8 +126,8 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
-        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any())).thenReturn(Future.successful(None))
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())(any()))
+          .thenReturn(Future.successful(None))
 
         mockApplicationStatus(NotCompleted)
 
@@ -130,8 +142,8 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
-        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any())).thenReturn(Future.successful(Some(addPerson)))
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())(any()))
+          .thenReturn(Future.successful(Some(addPerson)))
 
         mockApplicationStatus(NotCompleted)
 
@@ -149,8 +161,8 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
-        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any())).thenReturn(Future.successful(Some(addPerson)))
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())(any()))
+          .thenReturn(Future.successful(Some(addPerson)))
 
         mockApplicationStatus(ReadyForRenewal(Some(LocalDate.now())))
 
@@ -168,8 +180,8 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
-        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any())).thenReturn(Future.successful(Some(addPerson)))
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())(any()))
+          .thenReturn(Future.successful(Some(addPerson)))
 
         mockApplicationStatus(SubmissionReadyForReview)
 
@@ -187,8 +199,8 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
-        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any())).thenReturn(Future.successful(Some(addPerson)))
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())(any()))
+          .thenReturn(Future.successful(Some(addPerson)))
 
         mockApplicationStatus(NotCompleted)
 
@@ -214,8 +226,8 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(incompleteSections))
 
-        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any())).thenReturn(Future.successful(None))
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())(any()))
+          .thenReturn(Future.successful(None))
 
         mockApplicationStatus(NotCompleted)
 
@@ -239,8 +251,8 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
-        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any())).thenReturn(Future.successful(Some(addPerson)))
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())(any()))
+          .thenReturn(Future.successful(Some(addPerson)))
 
         val result = declarationController.getWithAmendment()(request)
         status(result) must be(OK)
@@ -257,8 +269,8 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
-        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any())).thenReturn(Future.successful(None))
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())(any()))
+          .thenReturn(Future.successful(None))
 
         mockApplicationStatus(NotCompleted)
 
@@ -273,8 +285,8 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
 
-        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any())).thenReturn(Future.successful(None))
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())(any()))
+          .thenReturn(Future.successful(None))
 
         mockApplicationStatus(SubmissionReadyForReview)
 
@@ -296,8 +308,8 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           mockSectionsProvider.taskRows(any[String])(any(), any())
         }.thenReturn(Future.successful(incompleteSections))
 
-        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any())).thenReturn(Future.successful(None))
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())(any()))
+          .thenReturn(Future.successful(None))
 
         mockApplicationStatus(NotCompleted)
 

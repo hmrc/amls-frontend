@@ -43,26 +43,35 @@ class InvolvedInOtherDetailsControllerSpec extends AmlsSpec with MockitoSugar wi
     val request = addToken(authRequest)
 
     lazy val mockRenewalService = mock[RenewalService]
-    lazy val view = inject[InvolvedInOtherDetailsView]
-    val controller = new InvolvedInOtherDetailsController(SuccessfulAuthAction, commonDependencies, mockMcc, inject[InvolvedInOtherDetailsFormProvider],
-      view, mockRenewalService, inject[AmlsErrorHandler])
+    lazy val view               = inject[InvolvedInOtherDetailsView]
+    val controller              = new InvolvedInOtherDetailsController(
+      SuccessfulAuthAction,
+      commonDependencies,
+      mockMcc,
+      inject[InvolvedInOtherDetailsFormProvider],
+      view,
+      mockRenewalService,
+      inject[AmlsErrorHandler]
+    )
   }
 
   "InvolvedInOtherDetailsController" must {
     "display the 'What other activities has your business been involved in page'" in new Fixture {
-      when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherYes(""))))))
+      when(mockRenewalService.getRenewal(any()))
+        .thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherYes(""))))))
 
       val result = controller.get()(request)
 
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("renewal.involvedinother.details.title"))
     }
 
     "display the involved in other with pre populated data" in new Fixture {
-      when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherYes("Selling software packages"))))))
+      when(mockRenewalService.getRenewal(any()))
+        .thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherYes("Selling software packages"))))))
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include("Selling software packages")
     }
 
@@ -89,13 +98,16 @@ class InvolvedInOtherDetailsControllerSpec extends AmlsSpec with MockitoSugar wi
         .withFormUrlEncodedBody("details" -> "trading")
 
       val businessAndOtherActivities: BusinessAndOtherActivities =
-        BusinessAndOtherActivities(Set(AccountancyServices, EstateAgentBusinessService, MoneyServiceBusiness), InvolvedInOtherYes("trading"))
+        BusinessAndOtherActivities(
+          Set(AccountancyServices, EstateAgentBusinessService, MoneyServiceBusiness),
+          InvolvedInOtherYes("trading")
+        )
 
       when(mockRenewalService.updateOtherBusinessActivities(any(), any()))
         .thenReturn(Future.successful(Some(businessAndOtherActivities)))
 
       val result = controller.post()(postRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.BusinessTurnoverController.get().url))
     }
 
@@ -108,7 +120,9 @@ class InvolvedInOtherDetailsControllerSpec extends AmlsSpec with MockitoSugar wi
         status(result) mustBe BAD_REQUEST
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("a[href=#details]").html() must include(messages("error.required.renewal.ba.involved.in.other.text"))
+        document.select("a[href=#details]").html() must include(
+          messages("error.required.renewal.ba.involved.in.other.text")
+        )
       }
 
       "empty details are given" in new Fixture {
@@ -119,7 +133,9 @@ class InvolvedInOtherDetailsControllerSpec extends AmlsSpec with MockitoSugar wi
         status(result) mustBe BAD_REQUEST
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("a[href=#details]").html() must include(messages("error.required.renewal.ba.involved.in.other.text"))
+        document.select("a[href=#details]").html() must include(
+          messages("error.required.renewal.ba.involved.in.other.text")
+        )
       }
 
       "too many details are given" in new Fixture {
@@ -138,7 +154,9 @@ class InvolvedInOtherDetailsControllerSpec extends AmlsSpec with MockitoSugar wi
         status(result) mustBe BAD_REQUEST
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("a[href=#details]").html() must include(messages("error.invalid.maxlength.255.renewal.ba.involved.in.other"))
+        document.select("a[href=#details]").html() must include(
+          messages("error.invalid.maxlength.255.renewal.ba.involved.in.other")
+        )
       }
     }
   }

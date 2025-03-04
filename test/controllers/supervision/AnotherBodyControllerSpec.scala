@@ -33,8 +33,8 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
-    lazy val view = inject[AnotherBodyView]
+    val request    = addToken(authRequest)
+    lazy val view  = inject[AnotherBodyView]
     val controller = new AnotherBodyController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
@@ -42,7 +42,8 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       cc = mockMcc,
       formProvider = inject[AnotherBodyFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
   }
 
   "AnotherBodyControllerController" must {
@@ -52,18 +53,25 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       mockCacheFetch[Supervision](None)
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("supervision.another_body.title"))
     }
 
-
     "on get display the Another Body page with pre populated data" in new Fixture {
       val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24)))
-      //scalastyle:off magic.number
-      val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) //scalastyle:off magic.number
+      // scalastyle:off magic.number
+      val end   = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) // scalastyle:off magic.number
 
-      mockCacheFetch[Supervision](Some(Supervision(
-        Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))), None, None, Some(ProfessionalBodyYes("details")))))
+      mockCacheFetch[Supervision](
+        Some(
+          Supervision(
+            Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))),
+            None,
+            None,
+            Some(ProfessionalBodyYes("details"))
+          )
+        )
+      )
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -76,12 +84,16 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "on get display the Another Body page with empty form when there is no data" in new Fixture {
 
-      mockCacheFetch[Supervision](Some(Supervision(
-        Some(AnotherBodyNo),
-        None,
-        None,
-        Some(ProfessionalBodyYes("details"))
-      )))
+      mockCacheFetch[Supervision](
+        Some(
+          Supervision(
+            Some(AnotherBodyNo),
+            None,
+            None,
+            Some(ProfessionalBodyYes("details"))
+          )
+        )
+      )
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -96,7 +108,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     "on post with valid data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.AnotherBodyController.post().url)
-      .withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
+        .withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
 
       mockCacheSave[Supervision]
 
@@ -104,14 +116,14 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       val result = controller.post()(newRequest)
 
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SupervisionStartController.get().url))
     }
 
     "on post with valid data for AnotherBodyYes" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.AnotherBodyController.post().url)
-      .withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
+        .withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
 
       mockCacheFetch[Supervision](None)
 
@@ -121,34 +133,38 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       val result = controller.post(true)(newRequest)
 
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SupervisionStartController.get().url))
     }
 
     "on post with valid data for AnotherBodyYes" when {
       "redirect to next question when supervision is incomplete" in new Fixture {
-        val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) //scalastyle:off magic.number
-        val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) //scalastyle:off magic.number
+        val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) // scalastyle:off magic.number
+        val end   = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) // scalastyle:off magic.number
 
         val newRequest = FakeRequest(POST, routes.AnotherBodyController.post().url)
-        .withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
+          .withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
 
         mockCacheFetch[Supervision](None)
 
         mockCacheSave[Supervision]
 
-        mockCacheFetch[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))))))
+        mockCacheFetch[Supervision](
+          Some(
+            Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))))
+          )
+        )
 
         val result = controller.post(true)(newRequest)
 
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SupervisionStartController.get().url))
       }
 
       "redirect to summary when supervision is complete" in new Fixture with SupervisionValues {
 
         val newRequest = FakeRequest(POST, routes.AnotherBodyController.post().url)
-        .withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
+          .withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
 
         mockCacheFetch[Supervision](None)
 
@@ -158,7 +174,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
         val result = controller.post(true)(newRequest)
 
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get().url))
       }
     }
@@ -166,7 +182,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     "on post with invalid data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.AnotherBodyController.post().url)
-      .withFormUrlEncodedBody("" -> "")
+        .withFormUrlEncodedBody("" -> "")
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -177,9 +193,9 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     "on post with valid data in edit mode for AnotherBodyNo" in new Fixture with SupervisionValues {
 
       val newRequest = FakeRequest(POST, routes.AnotherBodyController.post().url)
-      .withFormUrlEncodedBody(
-        "anotherBody" -> "false"
-      )
+        .withFormUrlEncodedBody(
+          "anotherBody" -> "false"
+        )
 
       mockCacheFetch[Supervision](None)
 
@@ -188,16 +204,16 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       mockCacheFetch[Supervision](Some(completeModel.copy(anotherBody = Some(AnotherBodyNo))))
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
     }
 
     "on post with valid data for AnotherBodyNo" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.AnotherBodyController.post().url)
-      .withFormUrlEncodedBody(
-        "anotherBody" -> "false"
-      )
+        .withFormUrlEncodedBody(
+          "anotherBody" -> "false"
+        )
 
       mockCacheFetch[Supervision](None)
 
@@ -206,10 +222,8 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       mockCacheFetch[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyNo))))
 
       val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.supervision.routes.ProfessionalBodyMemberController.get().url))
     }
   }
 }
-
-

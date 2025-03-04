@@ -29,49 +29,54 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class NewHomeAddressNonUKController @Inject()(authAction: AuthAction,
-                                              val dataCacheConnector: DataCacheConnector,
-                                              val autoCompleteService: AutoCompleteService,
-                                              val ds: CommonPlayDependencies,
-                                              val cc: MessagesControllerComponents,
-                                              formProvider: NewHomeAddressNonUKFormProvider,
-                                              view: NewHomeAddressNonUKView,
-                                              implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with AddressHelper {
+class NewHomeAddressNonUKController @Inject() (
+  authAction: AuthAction,
+  val dataCacheConnector: DataCacheConnector,
+  val autoCompleteService: AutoCompleteService,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: NewHomeAddressNonUKFormProvider,
+  view: NewHomeAddressNonUKView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with AddressHelper {
 
-  def get(index: Int): Action[AnyContent] = authAction.async {
-    implicit request =>
-      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
-        responsiblePerson.fold(NotFound(notFoundView)) { person =>
-          person.personName match {
-            case Some(name) =>
-              Ok(view(formProvider(), index, name.titleName, autoCompleteService.formOptionsExcludeUK))
-            case _ => NotFound(notFoundView)
-          }
+  def get(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+      responsiblePerson.fold(NotFound(notFoundView)) { person =>
+        person.personName match {
+          case Some(name) =>
+            Ok(view(formProvider(), index, name.titleName, autoCompleteService.formOptionsExcludeUK))
+          case _          => NotFound(notFoundView)
         }
       }
+    }
   }
 
   def post(index: Int): Action[AnyContent] =
-    authAction.async {
-      implicit request =>
-        formProvider().bindFromRequest().fold(
+    authAction.async { implicit request =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
           formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(view(formWithErrors, index, ControllerHelper.rpTitleName(rp), autoCompleteService.formOptionsExcludeUK))
+              BadRequest(
+                view(formWithErrors, index, ControllerHelper.rpTitleName(rp), autoCompleteService.formOptionsExcludeUK)
+              )
             },
           data =>
             for {
               moveDate <- dataCacheConnector.fetch[NewHomeDateOfChange](request.credId, NewHomeDateOfChange.key)
-              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                rp.addressHistory(convertToCurrentAddress(data, moveDate, rp))
-              }
-              _ <- dataCacheConnector.save[NewHomeDateOfChange](request.credId, NewHomeDateOfChange.key, NewHomeDateOfChange(None))
-              _ <- dataCacheConnector.removeByKey(request.credId, NewHomeAddress.key)
-            } yield {
-              Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
-            }
-        ).recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+              _        <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                            rp.addressHistory(convertToCurrentAddress(data, moveDate, rp))
+                          }
+              _        <- dataCacheConnector
+                            .save[NewHomeDateOfChange](request.credId, NewHomeDateOfChange.key, NewHomeDateOfChange(None))
+              _        <- dataCacheConnector.removeByKey(request.credId, NewHomeAddress.key)
+            } yield Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
+        )
+        .recoverWith { case _: IndexOutOfBoundsException =>
+          Future.successful(NotFound(notFoundView))
         }
     }
 }

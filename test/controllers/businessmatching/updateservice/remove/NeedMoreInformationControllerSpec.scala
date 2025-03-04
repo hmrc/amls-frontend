@@ -29,10 +29,11 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
   trait Fixture extends DependencyMocks {
     self =>
 
-    val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[NeedMoreInformationView]
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[NeedMoreInformationView]
     val controller = new NeedMoreInformationController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[RemoveBusinessTypeFlowModel],
       cc = mockMcc,
@@ -40,17 +41,21 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
     )
   }
 
-
   "NeedToUpdateController (Remove)" when {
 
     "get is called" must {
 
       "return OK with NeedMoreInformationView" in new Fixture {
-        mockCacheFetch(Some(RemoveBusinessTypeFlowModel(Some(Set(AccountancyServices)))), Some(RemoveBusinessTypeFlowModel.key))
+        mockCacheFetch(
+          Some(RemoveBusinessTypeFlowModel(Some(Set(AccountancyServices)))),
+          Some(RemoveBusinessTypeFlowModel.key)
+        )
 
         val result = controller.get()(request)
-        status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(messages("businessmatching.updateservice.updateotherinformation.title"))
+        status(result)                               must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(
+          messages("businessmatching.updateservice.updateotherinformation.title")
+        )
       }
     }
 

@@ -31,21 +31,19 @@ import org.scalatest.matchers.must.Matchers
 import play.api.test.{FakeRequest, Injecting}
 import views.html.businessactivities.TransactionTypesView
 
-class TransactionTypesControllerSpec extends AmlsSpec
-  with Matchers
-  with BusinessActivitiesGenerator
-  with Injecting {
+class TransactionTypesControllerSpec extends AmlsSpec with Matchers with BusinessActivitiesGenerator with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
-    lazy val view = inject[TransactionTypesView]
-    val request = addToken(authRequest)
+    lazy val view  = inject[TransactionTypesView]
+    val request    = addToken(authRequest)
     val controller = new TransactionTypesController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockCacheConnector,
       mockMcc,
       inject[TransactionTypesFormProvider],
-      view = view)
+      view = view
+    )
 
     mockCacheSave[BusinessActivities]
     mockCacheFetch(Some(BusinessActivities()))
@@ -88,10 +86,14 @@ class TransactionTypesControllerSpec extends AmlsSpec
         val result = controller.post()(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.businessactivities.routes.IdentifySuspiciousActivityController.get().url)
+        redirectLocation(result) mustBe Some(
+          controllers.businessactivities.routes.IdentifySuspiciousActivityController.get().url
+        )
 
         val captor = ArgumentCaptor.forClass(classOf[BusinessActivities])
-        verify(mockCacheConnector).save[BusinessActivities](any(), eqTo(BusinessActivities.key), captor.capture())(any())
+        verify(mockCacheConnector).save[BusinessActivities](any(), eqTo(BusinessActivities.key), captor.capture())(
+          any()
+        )
 
         captor.getValue.transactionRecordTypes mustBe
           Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("example software"))))

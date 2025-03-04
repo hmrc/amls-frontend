@@ -31,43 +31,46 @@ import views.html.msb.SendMoneyToOtherCountryView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                  authAction: AuthAction,
-                                                  val ds: CommonPlayDependencies,
-                                                  val statusService: StatusService,
-                                                  val cc: MessagesControllerComponents,
-                                                  formProvider: SendMoneyToOtherCountryFormProvider,
-                                                  view: SendMoneyToOtherCountryView) extends AmlsBaseController(ds, cc) {
+class SendMoneyToOtherCountryController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val statusService: StatusService,
+  val cc: MessagesControllerComponents,
+  formProvider: SendMoneyToOtherCountryFormProvider,
+  view: SendMoneyToOtherCountryView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map { response =>
-        val form = (for {
-          msb <- response
-          money <- msb.sendMoneyToOtherCountry
-        } yield formProvider().fill(money)).getOrElse(formProvider())
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map { response =>
+      val form = (for {
+        msb   <- response
+        money <- msb.sendMoneyToOtherCountry
+      } yield formProvider().fill(money)).getOrElse(formProvider())
 
-        Ok(view(form, edit))
-      }
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           dataCacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
             val result = for {
-              cache <- maybeCache
-              msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
-              bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+              cache    <- maybeCache
+              msb      <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+              bm       <- cache.getEntry[BusinessMatching](BusinessMatching.key)
               services <- bm.msbServices
-              register <- cache.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
-            } yield {
+              register <-
+                cache.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
+            } yield
               if (data.money) {
-                dataCacheConnector.save(request.credId, MoneyServiceBusiness.key, msb.sendMoneyToOtherCountry(data)) map {
-                  _ => Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
+                dataCacheConnector
+                  .save(request.credId, MoneyServiceBusiness.key, msb.sendMoneyToOtherCountry(data)) map { _ =>
+                  Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
                 }
               } else {
                 val newModel = msb
@@ -75,46 +78,51 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
                   .sendTheLargestAmountsOfMoney(None)
                   .mostTransactions(None)
 
-                dataCacheConnector.save(request.credId, MoneyServiceBusiness.key, newModel) map {
-                  _ =>
-                    if (edit) {
-                      Redirect(routes.SummaryController.get)
-                    } else {
-                      routing(services.msbServices, register, newModel, edit)
-                    }
+                dataCacheConnector.save(request.credId, MoneyServiceBusiness.key, newModel) map { _ =>
+                  if (edit) {
+                    Redirect(routes.SummaryController.get)
+                  } else {
+                    routing(services.msbServices, register, newModel, edit)
+                  }
                 }
               }
-            }
             result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
           }
       )
-    }
   }
 
-  private def shouldAnswerCurrencyExchangeQuestion(services: Set[BusinessMatchingMsbService],
-                                                    register: ServiceChangeRegister,
-                                                    msb: MoneyServiceBusiness): Boolean = {
-
+  private def shouldAnswerCurrencyExchangeQuestion(
+    services: Set[BusinessMatchingMsbService],
+    register: ServiceChangeRegister,
+    msb: MoneyServiceBusiness
+  ): Boolean =
     currencyExchangeAddedPostSubmission(services, register) ||
-            (services.contains(CurrencyExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty)
-  }
+      (services.contains(CurrencyExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty)
 
-  private def shouldAnswerForeignExchangeQuestion(services: Set[BusinessMatchingMsbService],
-                                                   register: ServiceChangeRegister,
-                                                   msb: MoneyServiceBusiness): Boolean = {
-
+  private def shouldAnswerForeignExchangeQuestion(
+    services: Set[BusinessMatchingMsbService],
+    register: ServiceChangeRegister,
+    msb: MoneyServiceBusiness
+  ): Boolean =
     foreignExchangeAddedPostSubmission(services, register) ||
-            (services.contains(ForeignExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty)
-  }
+      (services.contains(ForeignExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty)
 
-  private def routing(services: Set[BusinessMatchingMsbService], register: ServiceChangeRegister, msb: MoneyServiceBusiness, edit: Boolean) = {
+  private def routing(
+    services: Set[BusinessMatchingMsbService],
+    register: ServiceChangeRegister,
+    msb: MoneyServiceBusiness,
+    edit: Boolean
+  ) = {
 
-    val (ceQuestion, fxQuestion) = (shouldAnswerCurrencyExchangeQuestion(services, register, msb), shouldAnswerForeignExchangeQuestion(services, register, msb))
+    val (ceQuestion, fxQuestion) = (
+      shouldAnswerCurrencyExchangeQuestion(services, register, msb),
+      shouldAnswerForeignExchangeQuestion(services, register, msb)
+    )
 
     (ceQuestion, fxQuestion) match {
-      case (true, _ ) => Redirect(routes.CurrencyExchangesInNext12MonthsController.get(edit))
+      case (true, _) => Redirect(routes.CurrencyExchangesInNext12MonthsController.get(edit))
       case (_, true) => Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
-      case _ =>Redirect(routes.SummaryController.get)
+      case _         => Redirect(routes.SummaryController.get)
     }
   }
 }

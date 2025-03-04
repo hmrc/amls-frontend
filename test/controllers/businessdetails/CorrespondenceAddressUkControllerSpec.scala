@@ -45,9 +45,10 @@ import scala.concurrent.Future
 class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[CorrespondenceAddressUKView]
-    val controller = new CorrespondenceAddressUkController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[CorrespondenceAddressUKView]
+    val controller = new CorrespondenceAddressUkController(
       dataConnector = mock[DataCacheConnector],
       auditConnector = mock[AuditConnector],
       autoCompleteService = mock[AutoCompleteService],
@@ -55,7 +56,8 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[CorrespondenceAddressUKFormProvider],
-      view = view)
+      view = view
+    )
 
     when {
       controller.autoCompleteService.formOptions
@@ -75,8 +77,22 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
       "data exists in the keystore" in new Fixture {
 
-        val correspondenceAddress = CorrespondenceAddress(Some(CorrespondenceAddressUk("Name Test", "Test", "Test", Some("Test"), Some("test"), None, "POSTCODE")), None)
-        val businessDetails = BusinessDetails(None, None, None, None, None, None,None, None, Some(CorrespondenceAddressIsUk(true)), Some(correspondenceAddress))
+        val correspondenceAddress = CorrespondenceAddress(
+          Some(CorrespondenceAddressUk("Name Test", "Test", "Test", Some("Test"), Some("test"), None, "POSTCODE")),
+          None
+        )
+        val businessDetails       = BusinessDetails(
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(CorrespondenceAddressIsUk(true)),
+          Some(correspondenceAddress)
+        )
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(businessDetails)))
@@ -86,13 +102,13 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
         val page = Jsoup.parse(contentAsString(result))
 
-        page.getElementById("yourName").`val` must be("Name Test")
+        page.getElementById("yourName").`val`     must be("Name Test")
         page.getElementById("businessName").`val` must be("Test")
         page.getElementById("addressLine1").`val` must be("Test")
         page.getElementById("addressLine2").`val` must be("Test")
         page.getElementById("addressLine3").`val` must be("test")
         page.getElementById("addressLine4").`val` must be("")
-        page.getElementById("postCode").`val` must be("POSTCODE")
+        page.getElementById("postCode").`val`     must be("POSTCODE")
       }
 
       "no data exists in the keystore" in new Fixture {
@@ -101,7 +117,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
           .thenReturn(Future.successful(None))
 
         val result = controller.get(false)(request)
-        status(result) must be(OK)
+        status(result)                             must be(OK)
         Jsoup.parse(contentAsString(result)).title must include(messages("businessdetails.correspondenceaddress.title"))
 
       }
@@ -113,29 +129,44 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
       "a valid form request is sent in the body" in new Fixture {
 
-        val address = CorrespondenceAddressUk("Test", "Test", "old line 1", Some("old line 2"), Some("old line 3"), None, "AA1 1AA")
+        val address =
+          CorrespondenceAddressUk("Test", "Test", "old line 1", Some("old line 2"), Some("old line 3"), None, "AA1 1AA")
 
-        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(true)), Some(CorrespondenceAddress(Some(address), None)))))
+        val fetchResult = Future.successful(
+          Some(
+            BusinessDetails(
+              None,
+              None,
+              None,
+              None,
+              None,
+              None,
+              None,
+              None,
+              Some(CorrespondenceAddressIsUk(true)),
+              Some(CorrespondenceAddress(Some(address), None))
+            )
+          )
+        )
 
         val newRequest = FakeRequest(POST, routes.CorrespondenceAddressUkController.post().url).withFormUrlEncodedBody(
-          "yourName" -> "Name",
+          "yourName"     -> "Name",
           "businessName" -> "Business Name",
           "isUK"         -> "true",
           "addressLine1" -> "Add Line 1",
           "addressLine2" -> "Add Line 2",
           "addressLine3" -> "",
           "addressLine4" -> "",
-          "postCode" -> "AA1 1AA"
+          "postCode"     -> "AA1 1AA"
         )
 
-        when(controller.dataConnector.fetch[BusinessDetails](any(), any())
-          (any())).thenReturn(fetchResult)
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any())).thenReturn(fetchResult)
 
-        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())
-          (any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())(any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
         val captor = ArgumentCaptor.forClass(classOf[DataEvent])
@@ -151,29 +182,45 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
       "a valid form request is sent in the body when editing" in new Fixture {
 
-        val address = CorrespondenceAddressUk("Test", "Test", "old line 1", Some("old line 2"), Some("old line 3"), None, "AA1 1AA")
+        val address =
+          CorrespondenceAddressUk("Test", "Test", "old line 1", Some("old line 2"), Some("old line 3"), None, "AA1 1AA")
 
-        val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(true)), Some(CorrespondenceAddress(Some(address), None)))))
-
-        val newRequest = FakeRequest(POST, routes.CorrespondenceAddressUkController.post(true).url).withFormUrlEncodedBody(
-          "yourName" -> "Name",
-          "businessName" -> "Business Name",
-          "isUK"         -> "true",
-          "addressLine1" -> "Add Line 1",
-          "addressLine2" -> "Add Line 2",
-          "addressLine3" -> "",
-          "addressLine4" -> "",
-          "postCode" -> "AA1 1AA"
+        val fetchResult = Future.successful(
+          Some(
+            BusinessDetails(
+              None,
+              None,
+              None,
+              None,
+              None,
+              None,
+              None,
+              None,
+              Some(CorrespondenceAddressIsUk(true)),
+              Some(CorrespondenceAddress(Some(address), None))
+            )
+          )
         )
 
-        when(controller.dataConnector.fetch[BusinessDetails](any(), any())
-          (any())).thenReturn(fetchResult)
+        val newRequest =
+          FakeRequest(POST, routes.CorrespondenceAddressUkController.post(true).url).withFormUrlEncodedBody(
+            "yourName"     -> "Name",
+            "businessName" -> "Business Name",
+            "isUK"         -> "true",
+            "addressLine1" -> "Add Line 1",
+            "addressLine2" -> "Add Line 2",
+            "addressLine3" -> "",
+            "addressLine4" -> "",
+            "postCode"     -> "AA1 1AA"
+          )
 
-        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())
-          (any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any())).thenReturn(fetchResult)
+
+        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())(any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(edit = true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
         val captor = ArgumentCaptor.forClass(classOf[DataEvent])
@@ -196,43 +243,41 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
         val fetchResult = Future.successful(None)
 
         val newRequest = FakeRequest(POST, routes.CorrespondenceAddressUkController.post().url).withFormUrlEncodedBody(
-          "yourName" -> "Name",
+          "yourName"     -> "Name",
           "businessName" -> "Business Name",
           "isUK"         -> "true",
           "addressLine1" -> "Add Line 1 & 3",
           "addressLine2" -> "Add Line 2 *",
           "addressLine3" -> "$$$",
           "addressLine4" -> "##",
-          "postCode" -> "AA1 1AA"
+          "postCode"     -> "AA1 1AA"
         )
 
-        when(controller.dataConnector.fetch[BusinessDetails](any(), any())
-          (any())).thenReturn(fetchResult)
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any())).thenReturn(fetchResult)
 
-        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())
-          (any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())(any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(BAD_REQUEST)
 
-        val document: Document  = Jsoup.parse(contentAsString(result))
-        val errorCount = 4
+        val document: Document          = Jsoup.parse(contentAsString(result))
+        val errorCount                  = 4
         val elementsWithError: Elements = document.select(".govuk-error-summary__list li")
         elementsWithError.size() must be(errorCount)
 
-        elementsWithError.asScala.map(_.text()) must contain allOf(
-          messages("error.text.validation.address.line1"),
-          messages("error.text.validation.address.line2"),
-          messages("error.text.validation.address.line3"),
-          messages("error.text.validation.address.line4"))
+        elementsWithError.asScala.map(_.text()) must contain allOf (messages("error.text.validation.address.line1"),
+        messages("error.text.validation.address.line2"),
+        messages("error.text.validation.address.line3"),
+        messages("error.text.validation.address.line4"))
       }
 
       "an invalid form request is sent in the body" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.CorrespondenceAddressUkController.post().url).withFormUrlEncodedBody(
-          "yourName" -> "Name",
+          "yourName"     -> "Name",
           "businessName" -> "Business Name",
-          "invalid" -> "AA1 1AA"
+          "invalid"      -> "AA1 1AA"
         )
 
         val result = controller.post(false)(newRequest)

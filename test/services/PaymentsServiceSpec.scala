@@ -36,11 +36,11 @@ import scala.concurrent.Future
 
 class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerator {
 
-  //noinspection ScalaStyle
+  // noinspection ScalaStyle
   trait Fixture {
     self =>
 
-    val mockAmlsConnector = mock[AmlsConnector]
+    val mockAmlsConnector  = mock[AmlsConnector]
     val testPaymentService = new PaymentsService(
       mockAmlsConnector,
       mock[PayApiConnector],
@@ -49,7 +49,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
     )
 
     val paymentRefNo = "XA000000000000"
-    val safeId = amlsRefNoGen.sample.get
+    val safeId       = amlsRefNoGen.sample.get
 
     val accountTypeId = ("accountType", "accountId")
 
@@ -92,14 +92,15 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
     "updateBacsStatus is called" must {
       "use the connector to update the bacs status" in new Fixture {
         val paymentRef = paymentRefGen.sample.get
-        val request = UpdateBacsRequest(true)
+        val request    = UpdateBacsRequest(true)
 
         when {
           testPaymentService.amlsConnector.updateBacsStatus(any(), any(), any())(any(), any())
         } thenReturn Future.successful(HttpResponse(OK, ""))
 
         whenReady(testPaymentService.updateBacsStatus(accountTypeId, paymentRef, request)) { _ =>
-          verify(testPaymentService.amlsConnector).updateBacsStatus(any(), eqTo(paymentRef), eqTo(request))(any(), any())
+          verify(testPaymentService.amlsConnector)
+            .updateBacsStatus(any(), eqTo(paymentRef), eqTo(request))(any(), any())
         }
 
       }
@@ -108,7 +109,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
     "createBacs payment is called" must {
       "use the connector to create a new bacs payment" in new Fixture {
         val request: CreateBacsPaymentRequest = createBacsPaymentGen.sample.get
-        val payment: Payment = paymentGen.sample.get
+        val payment: Payment                  = paymentGen.sample.get
 
         when {
           testPaymentService.amlsConnector.createBacsPayment(any(), eqTo(request))(any(), any())
@@ -129,8 +130,10 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
             testPaymentService.paymentsConnector.createPayment(any())(any(), any())
           } thenReturn Future.successful(None)
 
-          //noinspection ScalaStyle
-          whenReady(testPaymentService.paymentsUrlOrDefault("ref", 100, "http://return.com", "ref-no", "safeid", accountTypeId)) { result =>
+          // noinspection ScalaStyle
+          whenReady(
+            testPaymentService.paymentsUrlOrDefault("ref", 100, "http://return.com", "ref-no", "safeid", accountTypeId)
+          ) { result =>
             result mustBe NextUrl(appConfig.paymentsUrl)
           }
 
@@ -151,7 +154,15 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
             mockAmlsConnector.savePayment(any(), any(), any(), any())(any(), any())
           } thenReturn Future.successful(HttpResponse(CREATED, ""))
 
-          whenReady(testPaymentService.requestPaymentsUrl(testFeeResponseAmendVariation, "http://return.com", "XAML0000000001", safeId, accountTypeId)) { result =>
+          whenReady(
+            testPaymentService.requestPaymentsUrl(
+              testFeeResponseAmendVariation,
+              "http://return.com",
+              "XAML0000000001",
+              safeId,
+              accountTypeId
+            )
+          ) { result =>
             result mustBe NextUrl("http://return.com")
           }
         }
@@ -165,7 +176,15 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
             mockAmlsConnector.savePayment(any(), any(), any(), any())(any(), any())
           } thenReturn Future.successful(HttpResponse(CREATED, ""))
 
-          whenReady(testPaymentService.requestPaymentsUrl(testFeeResponseSubscription, "http://return.com", "XAML0000000001", safeId, accountTypeId)) { result =>
+          whenReady(
+            testPaymentService.requestPaymentsUrl(
+              testFeeResponseSubscription,
+              "http://return.com",
+              "XAML0000000001",
+              safeId,
+              accountTypeId
+            )
+          ) { result =>
             result mustBe NextUrl("http://return.com")
           }
         }
@@ -173,8 +192,15 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
 
       "return default payments url" in new Fixture {
 
-        whenReady(testPaymentService.requestPaymentsUrl(
-          testFeeResponseAmendVariation.copy(difference = None, paymentReference = None), "http://return.com", "XAML0000000001", safeId, accountTypeId)) { result =>
+        whenReady(
+          testPaymentService.requestPaymentsUrl(
+            testFeeResponseAmendVariation.copy(difference = None, paymentReference = None),
+            "http://return.com",
+            "XAML0000000001",
+            safeId,
+            accountTypeId
+          )
+        ) { result =>
           result mustBe NextUrl(appConfig.paymentsUrl)
         }
       }

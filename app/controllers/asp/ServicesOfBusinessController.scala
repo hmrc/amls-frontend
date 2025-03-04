@@ -30,40 +30,40 @@ import views.html.asp.ServicesOfBusinessView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                             val statusService: StatusService,
-                                             authAction: AuthAction,
-                                             val ds: CommonPlayDependencies,
-                                             val serviceFlow: ServiceFlow,
-                                             val cc: MessagesControllerComponents,
-                                             formProvider: ServicesOfBusinessFormProvider,
-                                             view: ServicesOfBusinessView) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+class ServicesOfBusinessController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val statusService: StatusService,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val serviceFlow: ServiceFlow,
+  val cc: MessagesControllerComponents,
+  formProvider: ServicesOfBusinessFormProvider,
+  view: ServicesOfBusinessView
+) extends AmlsBaseController(ds, cc)
+    with DateOfChangeHelper {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[Asp](request.credId, Asp.key) map {
-        response =>
-          val form = (for {
-            business <- response
-            setOfServices <- business.services
-          } yield formProvider().fill(setOfServices)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[Asp](request.credId, Asp.key) map { response =>
+      val form = (for {
+        business      <- response
+        setOfServices <- business.services
+      } yield formProvider().fill(setOfServices)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithError =>
-          Future.successful(BadRequest(view(formWithError, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithError => Future.successful(BadRequest(view(formWithError, edit))),
         data =>
           for {
             businessServices <- dataCacheConnector.fetch[Asp](request.credId, Asp.key)
-            _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
-              businessServices.services(data))
-            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-            isNewActivity <- serviceFlow.isNewActivity(request.credId, AccountancyServices)
-          } yield {
+            _                <- dataCacheConnector.save[Asp](request.credId, Asp.key, businessServices.services(data))
+            status           <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+            isNewActivity    <- serviceFlow.isNewActivity(request.credId, AccountancyServices)
+          } yield
             if (!isNewActivity && redirectToDateOfChange[ServicesOfBusiness](status, businessServices.services, data)) {
               Redirect(routes.ServicesOfBusinessDateOfChangeController.get)
             } else {
@@ -73,8 +73,6 @@ class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheCo
                 Redirect(routes.OtherBusinessTaxMattersController.get(edit))
               }
             }
-          }
       )
   }
 }
-

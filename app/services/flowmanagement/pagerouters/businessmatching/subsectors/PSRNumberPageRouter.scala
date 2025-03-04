@@ -28,11 +28,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class PSRNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
 
-  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)
-                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Result] = {
     val call = model.psrNumber map {
       case BusinessAppliedForPSRNumberYes(_) => routes.SummaryController.get()
-      case _ => routes.NoPsrController.get
+      case _                                 => routes.NoPsrController.get
     }
 
     call.fold(error(PsrNumberPageId))(Redirect)
@@ -41,16 +43,20 @@ class PSRNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
 
 class PSRNumberPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[ChangeSubSectorFlowModel] {
 
-  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean, includeCompanyNotRegistered: Boolean)
-                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+  override def getRoute(
+    credId: String,
+    model: ChangeSubSectorFlowModel,
+    edit: Boolean,
+    includeCompanyNotRegistered: Boolean
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     val call = model.psrNumber map {
       case BusinessAppliedForPSRNumberYes(_) =>
         if (includeCompanyNotRegistered) {
           routes.CheckCompanyController.get()
-        }else{
+        } else {
           routes.SummaryController.get()
         }
-      case _ => routes.NoPsrController.get
+      case _                                 => routes.NoPsrController.get
     }
 
     call.fold(error(PsrNumberPageId))(Redirect)

@@ -31,9 +31,12 @@ import views.html.tcsp.CheckYourAnswersView
 
 import scala.jdk.CollectionConverters._
 
-class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks with AmlsReferenceNumberGenerator {
+class CheckYourAnswersViewSpec
+    extends AmlsSummaryViewSpec
+    with TableDrivenPropertyChecks
+    with AmlsReferenceNumberGenerator {
 
-  lazy val summary = inject[CheckYourAnswersView]
+  lazy val summary   = inject[CheckYourAnswersView]
   lazy val cyaHelper = inject[CheckYourAnswersHelper]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
@@ -48,10 +51,10 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
       def view = summary(cyaHelper.getSummaryList(Tcsp()))
 
       val title = messages("title.cya") + " - " + messages("summary.tcsp") + " - " +
-                  messages("title.amls") + " - " + messages("title.gov")
+        messages("title.amls") + " - " + messages("title.gov")
 
-      doc.title must be(title)
-      heading.html must be(messages("title.cya"))
+      doc.title       must be(title)
+      heading.html    must be(messages("title.cya"))
       subHeading.html must include(messages("summary.tcsp"))
     }
 
@@ -59,12 +62,33 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
       val list = cyaHelper.getSummaryList(
         Tcsp(
-          Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, RegisteredOfficeEtc, CompanyDirectorEtc, CompanyFormationAgent))),
+          Some(
+            TcspTypes(
+              Set(
+                NomineeShareholdersProvider,
+                TrusteeProvider,
+                RegisteredOfficeEtc,
+                CompanyDirectorEtc,
+                CompanyFormationAgent
+              )
+            )
+          ),
           Some(OnlyOffTheShelfCompsSoldYes),
           Some(ComplexCorpStructureCreationNo),
-          Some(ProvidedServices(Set(
-            PhonecallHandling, EmailHandling, EmailServer, SelfCollectMailboxes, MailForwarding, Receptionist, ConferenceRooms, Other("sfasfasef")
-          ))),
+          Some(
+            ProvidedServices(
+              Set(
+                PhonecallHandling,
+                EmailHandling,
+                EmailServer,
+                SelfCollectMailboxes,
+                MailForwarding,
+                Receptionist,
+                ConferenceRooms,
+                Other("sfasfasef")
+              )
+            )
+          ),
           Some(true),
           Some(ServicesOfAnotherTCSPYes(Some(amlsRegistrationNumber)))
         )
@@ -72,21 +96,24 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
       def view = summary(list)
 
-      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
-        doc.getElementsByClass("govuk-summary-list__value").asScala
-      ).foreach { case (key, value) =>
+      doc
+        .getElementsByClass("govuk-summary-list__key")
+        .asScala
+        .zip(
+          doc.getElementsByClass("govuk-summary-list__value").asScala
+        )
+        .foreach { case (key, value) =>
+          val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
 
-        val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
+          maybeRow.key.content.asHtml.body must include(key.text())
 
-        maybeRow.key.content.asHtml.body must include(key.text())
+          val valueText = maybeRow.value.content.asHtml.body match {
+            case str if str.startsWith("<") => Jsoup.parse(str).text()
+            case str                        => str
+          }
 
-        val valueText = maybeRow.value.content.asHtml.body match {
-          case str if str.startsWith("<") => Jsoup.parse(str).text()
-          case str => str
+          valueText must include(value.text())
         }
-
-        valueText must include(value.text())
-      }
     }
 
   }

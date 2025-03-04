@@ -27,15 +27,15 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class FeeHelper  @Inject()(val feeResponseService: FeeResponseService,
-                           val enrolmentService: AuthEnrolmentsService) extends Logging {
+class FeeHelper @Inject() (val feeResponseService: FeeResponseService, val enrolmentService: AuthEnrolmentsService)
+    extends Logging {
 
-
-  def retrieveFeeResponse(amlsRegistrationNumber: Option[String],
-                                  accountTypeId: (String, String),
-                                  groupIdentifier: Option[String],
-                                  prefix: String)
-                                 (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[FeeResponse]] = {
+  def retrieveFeeResponse(
+    amlsRegistrationNumber: Option[String],
+    accountTypeId: (String, String),
+    groupIdentifier: Option[String],
+    prefix: String
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[FeeResponse]] = {
 
     // $COVERAGE-OFF$
     logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")

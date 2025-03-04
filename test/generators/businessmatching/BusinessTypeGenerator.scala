@@ -23,6 +23,7 @@ import org.scalacheck.Gen
 
 trait BusinessTypeGenerator extends BaseGenerator {
 
-  val businessTypeGen: Gen[BusinessType] = Gen.oneOf(SoleProprietor, LimitedCompany, Partnership, LPrLLP, UnincorporatedBody)
+  val businessTypeGen: Gen[BusinessType] =
+    Gen.oneOf(SoleProprietor, LimitedCompany, Partnership, LPrLLP, UnincorporatedBody)
 
 }

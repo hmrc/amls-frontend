@@ -18,9 +18,11 @@ package models.responsiblepeople
 
 import play.api.libs.json.{Json, OFormat}
 
-case class ResponsiblePersonAddressHistory(currentAddress: Option[ResponsiblePersonCurrentAddress] = None,
-                                           additionalAddress: Option[ResponsiblePersonAddress] = None,
-                                           additionalExtraAddress: Option[ResponsiblePersonAddress] = None) {
+case class ResponsiblePersonAddressHistory(
+  currentAddress: Option[ResponsiblePersonCurrentAddress] = None,
+  additionalAddress: Option[ResponsiblePersonAddress] = None,
+  additionalExtraAddress: Option[ResponsiblePersonAddress] = None
+) {
 
   def currentAddress(add: ResponsiblePersonCurrentAddress): ResponsiblePersonAddressHistory =
     this.copy(currentAddress = Some(add))
@@ -40,21 +42,20 @@ object ResponsiblePersonAddressHistory {
 
   implicit val format: OFormat[ResponsiblePersonAddressHistory] = Json.format[ResponsiblePersonAddressHistory]
 
-  def default(): ResponsiblePersonCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressUK("", None, None, None, ""), None)
+  def default(): ResponsiblePersonCurrentAddress =
+    ResponsiblePersonCurrentAddress(PersonAddressUK("", None, None, None, ""), None)
 
-  def isRPAddressInUK(address: Option[ResponsiblePersonAddress]): Boolean = {
+  def isRPAddressInUK(address: Option[ResponsiblePersonAddress]): Boolean =
     address match {
-      case Some(ResponsiblePersonAddress(PersonAddressUK(_,_,_,_,_), _)) => true
-      case Some(ResponsiblePersonAddress(PersonAddressNonUK(_,_,_,_,_), _)) => false
-      case None => false
+      case Some(ResponsiblePersonAddress(PersonAddressUK(_, _, _, _, _), _))    => true
+      case Some(ResponsiblePersonAddress(PersonAddressNonUK(_, _, _, _, _), _)) => false
+      case None                                                                 => false
     }
-  }
 
-  def isRPCurrentAddressInUK(address: Option[ResponsiblePersonCurrentAddress]): Boolean = {
+  def isRPCurrentAddressInUK(address: Option[ResponsiblePersonCurrentAddress]): Boolean =
     address match {
-      case Some(ResponsiblePersonCurrentAddress(PersonAddressUK(_,_,_,_,_), _, _)) => true
-      case Some(ResponsiblePersonCurrentAddress(PersonAddressNonUK(_,_,_,_,_), _, _)) => false
-      case None => false
+      case Some(ResponsiblePersonCurrentAddress(PersonAddressUK(_, _, _, _, _), _, _))    => true
+      case Some(ResponsiblePersonCurrentAddress(PersonAddressNonUK(_, _, _, _, _), _, _)) => false
+      case None                                                                           => false
     }
-  }
 }

@@ -24,13 +24,10 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HttpResponse, StringContextOps}
 import utils.{AmlsSpec, HttpClientMocker}
 
-class TestOnlyStubConnectorSpec extends AmlsSpec
-  with Matchers
-  with ScalaFutures
-  with MockitoSugar {
+class TestOnlyStubConnectorSpec extends AmlsSpec with Matchers with ScalaFutures with MockitoSugar {
 
   trait Fixture {
-    val mocker = new HttpClientMocker
+    val mocker    = new HttpClientMocker
     val connector = new TestOnlyStubConnector(mocker.httpClient, appConfig, app.injector.instanceOf[Configuration])
   }
 

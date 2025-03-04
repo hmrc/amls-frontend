@@ -25,13 +25,15 @@ class SelectActivitiesFormProviderSpec extends FieldBehaviours {
 
   val form = new SelectActivitiesFormProvider()()
 
-  val field = "businessActivities"
+  val field    = "businessActivities"
   val errorMsg = "error.required.bm.register.service"
 
   "PercentageFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, field, Gen.oneOf(BusinessActivities.all.map(_.toString))
+      form,
+      field,
+      Gen.oneOf(BusinessActivities.all.map(_.toString))
     )
 
     behave like mandatoryField(form, field, FormError(field, errorMsg))
@@ -42,10 +44,9 @@ class SelectActivitiesFormProviderSpec extends FieldBehaviours {
 
         val result = form.bind(Map(field -> "foo"))
 
-        result.value shouldBe None
+        result.value        shouldBe None
         result.error(field) shouldBe Some(FormError(field, errorMsg))
       }
     }
   }
 }
-

@@ -38,9 +38,8 @@ class PositionsSpec extends PlaySpec with MockitoSugar {
 
   "Positions" must {
 
-    val model = Positions(
-      Set(BeneficialOwner, Other("some other role")),
-      Some(PositionStartDate(LocalDate.of(1970, 1, 1))))
+    val model =
+      Positions(Set(BeneficialOwner, Other("some other role")), Some(PositionStartDate(LocalDate.of(1970, 1, 1))))
 
     val json = Json.toJson(model)
 
@@ -57,19 +56,19 @@ class PositionsSpec extends PlaySpec with MockitoSugar {
 
     "update successfully" when {
 
-      val positionsWithDate = Positions(Set(InternalAccountant), Some(PositionStartDate(LocalDate.now())))
+      val positionsWithDate    = Positions(Set(InternalAccountant), Some(PositionStartDate(LocalDate.now())))
       val positionsWithoutDate = Positions(Set(InternalAccountant), None)
-      val newPositions = Set(NominatedOfficer, Director ).asInstanceOf[Set[PositionWithinBusiness]]
-      val newStartDate = PositionStartDate(LocalDate.now().minusMonths(20))
+      val newPositions         = Set(NominatedOfficer, Director).asInstanceOf[Set[PositionWithinBusiness]]
+      val newStartDate         = PositionStartDate(LocalDate.now().minusMonths(20))
 
-      "provided with a new set of positions" in  {
+      "provided with a new set of positions" in {
         val updated = Positions.update(positionsWithoutDate, newPositions)
-        updated mustBe Positions(Set(NominatedOfficer, Director ), None)
+        updated mustBe Positions(Set(NominatedOfficer, Director), None)
       }
 
-      "provided with a new set of positions with a pre-existing date" in  {
+      "provided with a new set of positions with a pre-existing date" in {
         val updated = Positions.update(positionsWithDate, newPositions)
-        updated mustBe Positions(Set(NominatedOfficer, Director ), positionsWithDate.startDate)
+        updated mustBe Positions(Set(NominatedOfficer, Director), positionsWithDate.startDate)
       }
 
       "provided with a new start date" in {

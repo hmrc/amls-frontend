@@ -31,7 +31,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an `Yes` value" in {
 
-      val json = Json.obj("businessFranchise" -> true, "franchiseName" ->"test test")
+      val json = Json.obj("businessFranchise" -> true, "franchiseName" -> "test test")
 
       Json.fromJson[BusinessFranchise](json) must
         be(JsSuccess(BusinessFranchiseYes("test test"), JsPath \ "franchiseName"))
@@ -51,10 +51,12 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
         be(Json.obj("businessFranchise" -> false))
 
       Json.toJson(BusinessFranchiseYes("test test").asInstanceOf[BusinessFranchise]) must
-        be(Json.obj(
-          "businessFranchise" -> true,
-          "franchiseName" -> "test test"
-        ))
+        be(
+          Json.obj(
+            "businessFranchise" -> true,
+            "franchiseName"     -> "test test"
+          )
+        )
     }
   }
 

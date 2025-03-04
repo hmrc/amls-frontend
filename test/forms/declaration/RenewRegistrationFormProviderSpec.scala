@@ -23,8 +23,8 @@ import play.api.data.Form
 class RenewRegistrationFormProviderSpec extends BooleanFieldBehaviours[RenewRegistration] {
 
   override val form: Form[RenewRegistration] = new RenewRegistrationFormProvider()()
-  override val fieldName: String = "renewRegistration"
-  override val errorMessage: String = "error.required.declaration.renew.registration"
+  override val fieldName: String             = "renewRegistration"
+  override val errorMessage: String          = "error.required.declaration.renew.registration"
 
   "RenewRegistrationFormProvider" must {
 

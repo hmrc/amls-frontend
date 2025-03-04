@@ -26,5 +26,5 @@ object AgentPartnership {
   implicit val mongoKey: MongoKey[AgentPartnership] = new MongoKey[AgentPartnership] {
     override def apply(): String = "agent-partnership"
   }
-  implicit val format: OFormat[AgentPartnership] = Json.format[AgentPartnership]
+  implicit val format: OFormat[AgentPartnership]    = Json.format[AgentPartnership]
 }

@@ -33,15 +33,14 @@ class CorrespondenceAddressUKFormProviderSpec extends AddressFieldBehaviours {
 
   override val regexString: String = formProvider.addressTypeRegex
 
-  val yourNameField = "yourName"
+  val yourNameField     = "yourName"
   val businessNameField = "businessName"
 
-  val yourNameGen: Gen[String] = validAddressLineGen(formProvider.nameMaxLength).suchThat(_.nonEmpty)
+  val yourNameGen: Gen[String]     = validAddressLineGen(formProvider.nameMaxLength).suchThat(_.nonEmpty)
   val businessNameGen: Gen[String] = validAddressLineGen(formProvider.businessNameMaxLength).suchThat(_.nonEmpty)
 
-  val extraDataForYourName: MutableMap[String, String] = addressLinesData += (businessNameField -> "Big Corp Inc")
-  val extraDataForBusinessName: MutableMap[String, String] = addressLinesData += (yourNameField -> "John Doe")
-
+  val extraDataForYourName: MutableMap[String, String]     = addressLinesData += (businessNameField -> "Big Corp Inc")
+  val extraDataForBusinessName: MutableMap[String, String] = addressLinesData += (yourNameField     -> "John Doe")
 
   "CorrespondenceAddressUKFormProvider" when {
 
@@ -50,11 +49,10 @@ class CorrespondenceAddressUKFormProviderSpec extends AddressFieldBehaviours {
       "bind when valid data is submitted" in {
 
         forAll(yourNameGen) { name =>
-
           val formData = extraDataForYourName += (yourNameField -> name)
-          val result = bindForm(formData)(yourNameField)
+          val result   = bindForm(formData)(yourNameField)
 
-          result.value shouldBe Some(name)
+          result.value  shouldBe Some(name)
           result.errors shouldBe Nil
         }
       }
@@ -68,23 +66,25 @@ class CorrespondenceAddressUKFormProviderSpec extends AddressFieldBehaviours {
       s"not bind strings longer than ${formProvider.nameMaxLength} characters" in {
 
         forAll(Gen.alphaStr.suchThat(_.length > formProvider.nameMaxLength)) { string =>
-
           val formData: MutableMap[String, String] = extraDataForYourName += (yourNameField -> string)
-          val newForm = bindForm(formData)
+          val newForm                              = bindForm(formData)
 
-          newForm(yourNameField).errors shouldEqual Seq(FormError(yourNameField, "error.invalid.yourname", Seq(formProvider.nameMaxLength)))
+          newForm(yourNameField).errors shouldEqual Seq(
+            FormError(yourNameField, "error.invalid.yourname", Seq(formProvider.nameMaxLength))
+          )
         }
       }
 
       "not bind strings that violate regex" in {
 
         forAll(yourNameGen, invalidCharForNames.suchThat(_.nonEmpty)) { (line, invalidChar) =>
-
-          val invalidLine = line.dropRight(1) + invalidChar
+          val invalidLine                          = line.dropRight(1) + invalidChar
           val formData: MutableMap[String, String] = extraDataForYourName += (yourNameField -> invalidLine)
-          val newForm = bindForm(formData)
+          val newForm                              = bindForm(formData)
 
-          newForm(yourNameField).errors shouldEqual Seq(FormError(yourNameField, "error.invalid.yourname.validation", Seq(formProvider.regex)))
+          newForm(yourNameField).errors shouldEqual Seq(
+            FormError(yourNameField, "error.invalid.yourname.validation", Seq(formProvider.regex))
+          )
         }
       }
     }
@@ -94,10 +94,9 @@ class CorrespondenceAddressUKFormProviderSpec extends AddressFieldBehaviours {
       "bind when valid data is submitted" in {
 
         forAll(businessNameGen) { name =>
-
           val formData = extraDataForBusinessName += (businessNameField -> name)
-          val result = bindForm(formData)(businessNameField)
-          result.value shouldBe Some(name)
+          val result   = bindForm(formData)(businessNameField)
+          result.value  shouldBe Some(name)
           result.errors shouldBe Nil
         }
       }
@@ -111,9 +110,8 @@ class CorrespondenceAddressUKFormProviderSpec extends AddressFieldBehaviours {
       s"not bind strings longer than ${formProvider.businessNameMaxLength} characters" in {
 
         forAll(Gen.alphaStr.suchThat(_.length > formProvider.businessNameMaxLength)) { string =>
-
           val formData: MutableMap[String, String] = extraDataForBusinessName += (businessNameField -> string)
-          val newForm = bindForm(formData)
+          val newForm                              = bindForm(formData)
 
           newForm(businessNameField).errors shouldEqual Seq(
             FormError(businessNameField, "error.invalid.name.of.business", Seq(formProvider.businessNameMaxLength))
@@ -124,10 +122,9 @@ class CorrespondenceAddressUKFormProviderSpec extends AddressFieldBehaviours {
       "not bind strings that violate regex" in {
 
         forAll(businessNameGen, invalidCharForNames.suchThat(_.nonEmpty)) { (line, invalidChar) =>
-
-          val invalidLine = line.dropRight(1) + invalidChar
+          val invalidLine                          = line.dropRight(1) + invalidChar
           val formData: MutableMap[String, String] = extraDataForBusinessName += (businessNameField -> invalidLine)
-          val newForm = bindForm(formData)
+          val newForm                              = bindForm(formData)
 
           newForm(businessNameField).errors shouldEqual Seq(
             FormError(businessNameField, "error.invalid.name.of.business.validation", Seq(formProvider.regex))

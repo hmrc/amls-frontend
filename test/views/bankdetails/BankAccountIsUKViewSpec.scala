@@ -29,7 +29,7 @@ import views.html.bankdetails.BankAccountIsUKView
 class BankAccountIsUKViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val bankAccount = inject[BankAccountIsUKView]
-  lazy val fp = inject[BankAccountIsUKFormProvider]
+  lazy val fp          = inject[BankAccountIsUKFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,7 +42,9 @@ class BankAccountIsUKViewSpec extends AmlsViewSpec with Matchers {
 
       override def view: HtmlFormat.Appendable = bankAccount(fp().fill(BankAccountIsUk(true)), false, 0)
 
-      doc.title() must startWith(messages("bankdetails.bankaccount.accounttype") + " - " + messages("summary.bankdetails"))
+      doc.title() must startWith(
+        messages("bankdetails.bankaccount.accounttype") + " - " + messages("summary.bankdetails")
+      )
     }
   }
 

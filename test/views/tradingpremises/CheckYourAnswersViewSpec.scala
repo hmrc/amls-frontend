@@ -34,7 +34,7 @@ import scala.jdk.CollectionConverters._
 
 sealed trait TestHelper extends AmlsSummaryViewSpec {
 
-  val ytp = YourTradingPremises(
+  val ytp               = YourTradingPremises(
     "foo",
     Address(
       "1",
@@ -47,17 +47,14 @@ sealed trait TestHelper extends AmlsSummaryViewSpec {
     Some(LocalDate.of(1990, 2, 24))
   )
   val businessStructure = SoleProprietor
-  val agentName = AgentName(agentName = "Agent Name", agentDateOfBirth = Some(LocalDate.of(1990, 2, 24)))
-  val agentCompanyName = AgentCompanyDetails("Company Name", Some("12345678"))
-  val agentPartnership = AgentPartnership("Partner Name")
-  val wdbd = WhatDoesYourBusinessDo(
-    Set(
-      BillPaymentServices,
-      EstateAgentBusinessService,
-      MoneyServiceBusiness)
+  val agentName         = AgentName(agentName = "Agent Name", agentDateOfBirth = Some(LocalDate.of(1990, 2, 24)))
+  val agentCompanyName  = AgentCompanyDetails("Company Name", Some("12345678"))
+  val agentPartnership  = AgentPartnership("Partner Name")
+  val wdbd              = WhatDoesYourBusinessDo(
+    Set(BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness)
   )
-  val msbServices = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
-  val tradingPremises = TradingPremises(
+  val msbServices       = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
+  val tradingPremises   = TradingPremises(
     Some(RegisteringAgentPremises(true)),
     Some(ytp),
     Some(businessStructure),
@@ -72,7 +69,7 @@ sealed trait TestHelper extends AmlsSummaryViewSpec {
     Some(ActivityEndDate(LocalDate.of(1999, 1, 1)))
   )
 
-  lazy val cyaView = inject[CheckYourAnswersView]
+  lazy val cyaView   = inject[CheckYourAnswersView]
   lazy val cyaHelper = inject[CheckYourAnswersHelper]
   trait ViewFixture extends Fixture {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView(FakeRequest())
@@ -84,32 +81,35 @@ class CheckYourAnswersViewSpec extends TestHelper with TableDrivenPropertyChecks
   "The summary details page" must {
     "load summary details page when it is an msb" in new ViewFixture {
 
-      val isMsb = true
+      val isMsb       = true
       val summaryList = cyaHelper.createSummaryList(tradingPremises, 1, isMsb, false, false)
-      def view = cyaView(summaryList, 1)
+      def view        = cyaView(summaryList, 1)
 
-      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
-        doc.getElementsByClass("govuk-summary-list__value").asScala
-      ).foreach { case (key, value) =>
+      doc
+        .getElementsByClass("govuk-summary-list__key")
+        .asScala
+        .zip(
+          doc.getElementsByClass("govuk-summary-list__value").asScala
+        )
+        .foreach { case (key, value) =>
+          val maybeRow = summaryList.rows.find(_.key.content.asHtml.body == key.text()).value
 
-        val maybeRow = summaryList.rows.find(_.key.content.asHtml.body == key.text()).value
+          maybeRow.key.content.asHtml.body must include(key.text())
 
-        maybeRow.key.content.asHtml.body must include(key.text())
+          val valueText = maybeRow.value.content.asHtml.body match {
+            case str if str.startsWith("<") => Jsoup.parse(str).text()
+            case str                        => str
+          }
 
-        val valueText = maybeRow.value.content.asHtml.body match {
-          case str if str.startsWith("<") => Jsoup.parse(str).text()
-          case str => str
+          valueText must include(value.text())
         }
-
-        valueText must include(value.text())
-      }
     }
 
     "load summary details page when it is not an msb" in new ViewFixture {
 
       val isNotMsb = false
-      val rows = cyaHelper.createSummaryList(tradingPremises, 1, isNotMsb, false, false)
-      def view = cyaView(rows, 1)
+      val rows     = cyaHelper.createSummaryList(tradingPremises, 1, isNotMsb, false, false)
+      def view     = cyaView(rows, 1)
 
       html mustNot include(messages("tradingpremises.summary.who-uses"))
     }
@@ -117,8 +117,8 @@ class CheckYourAnswersViewSpec extends TestHelper with TableDrivenPropertyChecks
     "show the edit link for business services if the business sector has multiple business services" in new ViewFixture {
 
       val isMsb = true
-      val rows = cyaHelper.createSummaryList(tradingPremises, 1, isMsb, false, false)
-      def view = cyaView(rows, 1)
+      val rows  = cyaHelper.createSummaryList(tradingPremises, 1, isMsb, false, false)
+      def view  = cyaView(rows, 1)
 
       doc.text() must include(messages("tradingpremises.whatdoesyourbusinessdo.title"))
       doc.text() must include(messages("button.edit"))
@@ -127,12 +127,21 @@ class CheckYourAnswersViewSpec extends TestHelper with TableDrivenPropertyChecks
 
     "not show the edit link for business services if the business sector has only one business service" in new ViewFixture {
 
-      val isMsb = true
+      val isMsb    = true
       val testData = WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))
-      val rows = cyaHelper.createSummaryList(tradingPremises.copy(whatDoesYourBusinessDoAtThisAddress = Some(testData)), 1, isMsb, true, false)
-      def view = cyaView(rows, 1)
+      val rows     = cyaHelper.createSummaryList(
+        tradingPremises.copy(whatDoesYourBusinessDoAtThisAddress = Some(testData)),
+        1,
+        isMsb,
+        true,
+        false
+      )
+      def view     = cyaView(rows, 1)
 
-      val maybeElement = doc.select(".govuk-summary-list__row").asScala.find(e => e.text().contains(messages("tradingpremises.whatdoesyourbusinessdo.title")))
+      val maybeElement    = doc
+        .select(".govuk-summary-list__row")
+        .asScala
+        .find(e => e.text().contains(messages("tradingpremises.whatdoesyourbusinessdo.title")))
       val servicesSection = maybeElement.get.toString
 
       servicesSection mustNot include(messages("button.edit"))

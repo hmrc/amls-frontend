@@ -34,13 +34,13 @@ class RevokedReasonSpec extends PlaySpec {
     }
 
     "write data successfully" in {
-      RevokedReason.jsonWrites.writes(RevokedMissingTrader) must be(JsString("01"))
-      RevokedReason.jsonWrites.writes(RevokedCeasedTrading) must be(JsString("02"))
-      RevokedReason.jsonWrites.writes(RevokedNonCompliant) must be(JsString("03"))
+      RevokedReason.jsonWrites.writes(RevokedMissingTrader)       must be(JsString("01"))
+      RevokedReason.jsonWrites.writes(RevokedCeasedTrading)       must be(JsString("02"))
+      RevokedReason.jsonWrites.writes(RevokedNonCompliant)        must be(JsString("03"))
       RevokedReason.jsonWrites.writes(RevokedFitAndProperFailure) must be(JsString("04"))
-      RevokedReason.jsonWrites.writes(RevokedFailedToPayCharges) must be(JsString("05"))
-      RevokedReason.jsonWrites.writes(RevokedFailedToRespond) must be(JsString("06"))
-      RevokedReason.jsonWrites.writes(RevokedOther) must be(JsString("99"))
+      RevokedReason.jsonWrites.writes(RevokedFailedToPayCharges)  must be(JsString("05"))
+      RevokedReason.jsonWrites.writes(RevokedFailedToRespond)     must be(JsString("06"))
+      RevokedReason.jsonWrites.writes(RevokedOther)               must be(JsString("99"))
     }
   }
 }

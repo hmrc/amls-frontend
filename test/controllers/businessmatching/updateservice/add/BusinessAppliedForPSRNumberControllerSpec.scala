@@ -36,11 +36,12 @@ import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.add.BusinessAppliedForPSRNumberView
 
-class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
-  with MockitoSugar
-  with ScalaFutures
-  with BusinessMatchingGenerator
-  with Injecting {
+class BusinessAppliedForPSRNumberControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with ScalaFutures
+    with BusinessMatchingGenerator
+    with Injecting {
 
   val emptyCache = Cache.empty
 
@@ -50,11 +51,12 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
     val request = addToken(authRequest)
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
+    val mockUpdateServiceHelper     = mock[AddBusinessTypeHelper]
 
-    lazy val view = inject[BusinessAppliedForPSRNumberView]
+    lazy val view  = inject[BusinessAppliedForPSRNumberView]
     val controller = new BusinessAppliedForPSRNumberController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel],
       cc = mockMcc,
@@ -74,21 +76,35 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
 
     "get is called" must {
       "return OK with the psr_number view if there is MSB and TM defined" in new Fixture {
-        mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness), subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))))
+        mockCacheFetch(
+          Some(
+            AddBusinessTypeFlowModel(
+              activity = Some(MoneyServiceBusiness),
+              subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+            )
+          )
+        )
 
         val result = controller.get()(request)
 
-        status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(messages("businessmatching.updateservice.psr.number.title"))
+        status(result)                               must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(
+          messages("businessmatching.updateservice.psr.number.title")
+        )
       }
 
       "return OK and display psr_number view with pre populated data if there is MSB and TM defined" in new Fixture {
         override val businessMatching = businessMatchingWithPsrGen.sample.get
 
-        mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
-          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123456")),
-          subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))))
-
+        mockCacheFetch(
+          Some(
+            AddBusinessTypeFlowModel(
+              activity = Some(MoneyServiceBusiness),
+              businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123456")),
+              subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+            )
+          )
+        )
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -99,7 +115,14 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
       }
 
       "redirect to RegistrationProgressController if there is no MSB with TM defined" in new Fixture {
-        mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(HighValueDealing), subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))))
+        mockCacheFetch(
+          Some(
+            AddBusinessTypeFlowModel(
+              activity = Some(HighValueDealing),
+              subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+            )
+          )
+        )
 
         val result = controller.get()(request)
 
@@ -121,10 +144,12 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
       "with a valid request and not in edit mode" must {
         "progress to the 'no psr' page" when {
           "no is selected" in new Fixture {
-            val flowModel = AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+            val flowModel = AddBusinessTypeFlowModel(
+              activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
               businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
-              hasChanged = true)
+              hasChanged = true
+            )
 
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), flowModel)
 
@@ -143,20 +168,25 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
 
         "progress to the 'fit and proper' page" when {
           "yes is selected and a PSR is supplied" in new Fixture {
-            mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key),
-              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
+            mockCacheUpdate[AddBusinessTypeFlowModel](
+              Some(AddBusinessTypeFlowModel.key),
+              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789")))
+            )
 
             val newRequest = FakeRequest(POST, routes.BusinessAppliedForPSRNumberController.post().url)
               .withFormUrlEncodedBody(
                 "appliedFor" -> "true",
-                "regNumber" -> "123789"
+                "regNumber"  -> "123789"
               )
 
             val result = controller.post(false)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify("internalId", PsrNumberPageId,
-              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
+            controller.router.verify(
+              "internalId",
+              PsrNumberPageId,
+              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789")))
+            )
 
           }
         }
@@ -165,8 +195,10 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
       "with a valid request and in edit mode" must {
         "progress to the 'no psr' page" when {
           "no is selected" in new Fixture {
-            mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key),
-              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)))
+            mockCacheUpdate[AddBusinessTypeFlowModel](
+              Some(AddBusinessTypeFlowModel.key),
+              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo))
+            )
 
             val newRequest = FakeRequest(POST, routes.BusinessAppliedForPSRNumberController.post(true).url)
               .withFormUrlEncodedBody(
@@ -176,28 +208,38 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(true)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify("internalId", PsrNumberPageId,
-              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)), true)
+            controller.router.verify(
+              "internalId",
+              PsrNumberPageId,
+              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)),
+              true
+            )
 
           }
         }
 
         "progress to the 'update services summary' page" when {
           "yes is selected and a PSR is supplied" in new Fixture {
-            mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key),
-              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
+            mockCacheUpdate[AddBusinessTypeFlowModel](
+              Some(AddBusinessTypeFlowModel.key),
+              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789")))
+            )
 
             val newRequest = FakeRequest(POST, routes.BusinessAppliedForPSRNumberController.post(true).url)
               .withFormUrlEncodedBody(
                 "appliedFor" -> "true",
-                "regNumber" -> "123789"
+                "regNumber"  -> "123789"
               )
 
             val result = controller.post(true)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify("internalId", PsrNumberPageId,
-              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))), true)
+            controller.router.verify(
+              "internalId",
+              PsrNumberPageId,
+              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))),
+              true
+            )
 
           }
         }
@@ -205,12 +247,11 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
 
       "with an invalid request (missing PSR)" must {
         "return an error" in new Fixture {
-          mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key),
-            AddBusinessTypeFlowModel())
+          mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
           val newRequest = FakeRequest(POST, routes.BusinessAppliedForPSRNumberController.post().url)
             .withFormUrlEncodedBody(
               "appliedFor" -> "true",
-              "regNumber" -> ""
+              "regNumber"  -> ""
             )
 
           val result = controller.post()(newRequest)
@@ -223,4 +264,3 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
     }
   }
 }
-

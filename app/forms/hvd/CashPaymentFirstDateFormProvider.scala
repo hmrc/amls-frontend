@@ -23,7 +23,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class CashPaymentFirstDateFormProvider @Inject()() extends Mappings {
+class CashPaymentFirstDateFormProvider @Inject() () extends Mappings {
 
   def apply(): Form[CashPaymentFirstDate] = Form[CashPaymentFirstDate](
     "paymentDate" -> localDate(
@@ -37,7 +37,8 @@ class CashPaymentFirstDateFormProvider @Inject()() extends Mappings {
       minDate(CashPaymentFirstDateFormProvider.minDate, "error.date.hvd.past"),
       maxDate(CashPaymentFirstDateFormProvider.maxDate, "error.date.hvd.future")
     ).transform[CashPaymentFirstDate](
-      CashPaymentFirstDate(_), _.paymentDate
+      CashPaymentFirstDate(_),
+      _.paymentDate
     )
   )
 

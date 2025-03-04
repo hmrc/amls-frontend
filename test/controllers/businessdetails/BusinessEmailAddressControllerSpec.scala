@@ -36,20 +36,22 @@ import scala.concurrent.Future
 class BusinessEmailAddressControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val userId = s"user-${UUID.randomUUID}"
-  val email = "test@test.com"
+  val email  = "test@test.com"
 
   val mockService = mock[BusinessEmailAddressService]
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[BusinessEmailAddressView]
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[BusinessEmailAddressView]
     val controller = new BusinessEmailAddressController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       service = mockService,
       formProvider = app.injector.instanceOf[BusinessEmailAddressFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   val emptyCache = Cache.empty
@@ -63,7 +65,7 @@ class BusinessEmailAddressControllerSpec extends AmlsSpec with MockitoSugar with
         when(mockService.getEmailAddress(any())).thenReturn(Future.successful(Some(email)))
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("businessdetails.contactingyou.email.title"))
       }
 
@@ -72,7 +74,7 @@ class BusinessEmailAddressControllerSpec extends AmlsSpec with MockitoSugar with
         when(mockService.getEmailAddress(any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("businessdetails.contactingyou.email.title"))
       }
 
@@ -88,10 +90,9 @@ class BusinessEmailAddressControllerSpec extends AmlsSpec with MockitoSugar with
         when(mockService.updateEmailAddress(any(), any())).thenReturn(Future.successful(Some(emptyCache)))
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.ContactingYouPhoneController.get().url))
       }
-
 
       "on post of incomplete data" in new Fixture {
 

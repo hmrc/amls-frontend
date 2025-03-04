@@ -20,41 +20,25 @@ import play.api.data.{Form, FormError}
 
 trait StringFieldBehaviours extends FieldBehaviours {
 
-    def fieldWithMaxLength(form: Form[_],
-                           fieldName: String,
-                           maxLength: Int,
-                           lengthError: FormError): Unit = {
-
+  def fieldWithMaxLength(form: Form[_], fieldName: String, maxLength: Int, lengthError: FormError): Unit =
     s"not bind strings longer than $maxLength characters" in {
 
-      forAll(stringsLongerThan(maxLength).suchThat(_.nonEmpty)) {
-        string =>
-          val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-          result.errors shouldEqual Seq(lengthError)
+      forAll(stringsLongerThan(maxLength).suchThat(_.nonEmpty)) { string =>
+        val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+        result.errors shouldEqual Seq(lengthError)
       }
     }
-  }
 
-  def fieldWithMinLength(form: Form[_],
-                         fieldName: String,
-                         minLength: Int,
-                         lengthError: FormError): Unit = {
-
+  def fieldWithMinLength(form: Form[_], fieldName: String, minLength: Int, lengthError: FormError): Unit =
     s"not bind strings shorter than $minLength characters" in {
 
-      forAll(stringsShorterThan(minLength).suchThat(_.nonEmpty)) {
-        string =>
-          val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-          result.errors shouldEqual Seq(lengthError)
+      forAll(stringsShorterThan(minLength).suchThat(_.nonEmpty)) { string =>
+        val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+        result.errors shouldEqual Seq(lengthError)
       }
     }
-  }
 
-  def numberFieldWithMaxLength(form: Form[_],
-                         fieldName: String,
-                         maxLength: Int,
-                         lengthError: FormError): Unit = {
-
+  def numberFieldWithMaxLength(form: Form[_], fieldName: String, maxLength: Int, lengthError: FormError): Unit =
     s"not bind number strings longer than $maxLength characters" in {
 
       forAll(numsLongerThan(maxLength).map(_.toString).suchThat(_.nonEmpty)) { string =>
@@ -62,13 +46,8 @@ trait StringFieldBehaviours extends FieldBehaviours {
         result.errors shouldEqual Seq(lengthError)
       }
     }
-  }
 
-  def numberFieldWithMinLength(form: Form[_],
-                         fieldName: String,
-                         minLength: Int,
-                         lengthError: FormError): Unit = {
-
+  def numberFieldWithMinLength(form: Form[_], fieldName: String, minLength: Int, lengthError: FormError): Unit =
     s"not bind number strings shorter than $minLength characters" in {
 
       forAll(numsShorterThan(minLength).map(_.toString)) { string =>
@@ -76,5 +55,4 @@ trait StringFieldBehaviours extends FieldBehaviours {
         result.errors shouldEqual Seq(lengthError)
       }
     }
-  }
 }

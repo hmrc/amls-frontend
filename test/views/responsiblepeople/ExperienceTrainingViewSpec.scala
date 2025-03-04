@@ -27,12 +27,12 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.ExperienceTrainingView
 
-class ExperienceTrainingViewSpec extends AmlsViewSpec with Matchers  {
+class ExperienceTrainingViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val trainingView = inject[ExperienceTrainingView]
-  lazy val fp = inject[ExperienceTrainingFormProvider]
+  lazy val fp           = inject[ExperienceTrainingFormProvider]
 
-  val name = "James Jones"
+  val name                                                                  = "James Jones"
   def businessMatching(activities: Set[BusinessActivity]): BusinessMatching =
     BusinessMatching(activities = Some(BusinessActivities(activities)))
 
@@ -55,10 +55,12 @@ class ExperienceTrainingViewSpec extends AmlsViewSpec with Matchers  {
         name
       )
 
-      doc.title must be(messages("responsiblepeople.experiencetraining.title") +
-        " - " + messages("summary.responsiblepeople") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("responsiblepeople.experiencetraining.title") +
+          " - " + messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct heading for single activity" in new ViewFixture {
@@ -72,7 +74,9 @@ class ExperienceTrainingViewSpec extends AmlsViewSpec with Matchers  {
         name
       )
 
-      heading.html() must be(messages("responsiblepeople.experiencetraining.heading", name, "an accountancy service provider"))
+      heading.html() must be(
+        messages("responsiblepeople.experiencetraining.heading", name, "an accountancy service provider")
+      )
     }
 
     "have correct heading for multiple activities" in new ViewFixture {
@@ -106,17 +110,27 @@ class ExperienceTrainingViewSpec extends AmlsViewSpec with Matchers  {
     behave like pageWithErrors(
       trainingView(
         fp(name).withError("experienceTraining", "error.required.rp.experiencetraining"),
-        businessMatching(Set.empty[BusinessActivity]), false, 0, None, name
+        businessMatching(Set.empty[BusinessActivity]),
+        false,
+        0,
+        None,
+        name
       ),
-      "experienceTraining", "error.required.rp.experiencetraining"
+      "experienceTraining",
+      "error.required.rp.experiencetraining"
     )
 
     behave like pageWithErrors(
       trainingView(
         fp(name).withError("experienceInformation", messages("error.rp.invalid.experiencetraining.information", name)),
-        businessMatching(Set.empty[BusinessActivity]), false, 0, None, name
+        businessMatching(Set.empty[BusinessActivity]),
+        false,
+        0,
+        None,
+        name
       ),
-      "experienceInformation", "error.rp.invalid.experiencetraining.information"
+      "experienceInformation",
+      "error.rp.invalid.experiencetraining.information"
     )
 
   }

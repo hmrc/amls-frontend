@@ -20,7 +20,6 @@ import org.scalatestplus.play.PlaySpec
 
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
-
 class NCARegisteredSpec extends PlaySpec {
 
   "JSON validation" must {

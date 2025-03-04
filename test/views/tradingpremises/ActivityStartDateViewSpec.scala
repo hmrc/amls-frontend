@@ -28,14 +28,14 @@ import views.html.tradingpremises.ActivityStartDateView
 class ActivityStartDateViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val activity_start_date = inject[ActivityStartDateView]
-  lazy val fp = inject[ActivityStartDateFormProvider]
+  lazy val fp                  = inject[ActivityStartDateFormProvider]
 
   implicit val request: Request[_] = FakeRequest()
 
   val addrLine1 = "Line 1"
   val addrLine2 = "Line 2"
-  val postcode = "PO5 1CD"
-  val address = Address(addrLine1, Some(addrLine2), None, None, postcode)
+  val postcode  = "PO5 1CD"
+  val address   = Address(addrLine1, Some(addrLine2), None, None, postcode)
 
   "ActivityStartDateView" must {
     "have correct title, heading and load UI with empty form" in new Fixture {
@@ -46,14 +46,14 @@ class ActivityStartDateViewSpec extends AmlsViewSpec with Matchers {
 
       def view = activity_start_date(fp(), 1, false, address)
 
-      doc.html must (include(addrLine1) and include(addrLine2) and include(postcode))
-      doc.title must be(pageTitle)
-      heading.html must be(messages("tradingpremises.startDate.title"))
+      doc.html        must (include(addrLine1) and include(addrLine2) and include(postcode))
+      doc.title       must be(pageTitle)
+      heading.html    must be(messages("tradingpremises.startDate.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
 
-      doc.getElementsContainingOwnText(messages("lbl.day")).hasText must be(true)
+      doc.getElementsContainingOwnText(messages("lbl.day")).hasText   must be(true)
       doc.getElementsContainingOwnText(messages("lbl.month")).hasText must be(true)
-      doc.getElementsContainingOwnText(messages("lbl.year")).hasText must be(true)
+      doc.getElementsContainingOwnText(messages("lbl.year")).hasText  must be(true)
 
       doc.getElementsContainingOwnText(messages("lbl.date.example")).hasText must be(true)
     }

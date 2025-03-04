@@ -22,9 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class RiskAssessmentFormProvider @Inject()() extends Mappings {
+class RiskAssessmentFormProvider @Inject() () extends Mappings {
 
-  private val errorMessage = "error.required.ba.option.risk.assessment"
+  private val errorMessage                   = "error.required.ba.option.risk.assessment"
   def apply(): Form[RiskAssessmentHasPolicy] = Form[RiskAssessmentHasPolicy](
     "hasPolicy" -> boolean(errorMessage, errorMessage)
       .transform[RiskAssessmentHasPolicy](RiskAssessmentHasPolicy.apply, _.hasPolicy)

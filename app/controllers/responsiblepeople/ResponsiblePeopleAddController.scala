@@ -23,30 +23,30 @@ import models.responsiblepeople.ResponsiblePerson
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import utils.{AuthAction, RepeatingSection}
 
-
-class ResponsiblePeopleAddController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                               authAction: AuthAction,
-                                               val ds: CommonPlayDependencies,
-                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class ResponsiblePeopleAddController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   def get(displayGuidance: Boolean = true, flow: Option[String] = None): Action[AnyContent] = authAction.async {
-    implicit request => {
+    implicit request =>
       addData[ResponsiblePerson](request.credId, ResponsiblePerson.default(None)).map { idx =>
         Redirect {
           flow match {
             case Some(_) => controllers.responsiblepeople.routes.WhatYouNeedController.get(idx, flow)
-            case _ => redirectDependingOnGuidance(displayGuidance, idx, flow)
+            case _       => redirectDependingOnGuidance(displayGuidance, idx, flow)
           }
         }
       }
-    }
   }
 
-  private def redirectDependingOnGuidance(displayGuidance: Boolean, idx: Int, flow: Option[String]): Call = {
+  private def redirectDependingOnGuidance(displayGuidance: Boolean, idx: Int, flow: Option[String]): Call =
     if (displayGuidance) {
       controllers.responsiblepeople.routes.WhoMustRegisterController.get(idx, flow)
     } else {
       controllers.responsiblepeople.routes.WhatYouNeedController.get(idx)
     }
-  }
 }

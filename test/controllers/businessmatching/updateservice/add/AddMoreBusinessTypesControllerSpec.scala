@@ -39,13 +39,14 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
   sealed trait Fixture extends DependencyMocks {
     self =>
 
-    val request = addToken(authRequest)
+    val request                     = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
-    lazy val view = inject[AddMoreActivitiesView]
+    val mockUpdateServiceHelper     = mock[AddBusinessTypeHelper]
+    lazy val view                   = inject[AddMoreActivitiesView]
 
     val controller = new AddMoreBusinessTypesController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel],
       cc = mockMcc,
@@ -54,8 +55,8 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
     )
 
     val BusinessActivitiesModel = BusinessActivities(Set(BillPaymentServices, TelephonePaymentService))
-    val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
-    val bmEmpty = Some(BusinessMatching())
+    val bm                      = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+    val bmEmpty                 = Some(BusinessMatching())
 
     mockCacheGetEntry[BusinessMatching](Some(bm), BusinessMatching.key)
 
@@ -71,8 +72,10 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
       "return OK with add_more_activities view" in new Fixture {
         val result = controller.get()(request)
 
-        status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(messages("businessmatching.updateservice.addmoreactivities.title"))
+        status(result)                               must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(
+          messages("businessmatching.updateservice.addmoreactivities.title")
+        )
       }
     }
 
@@ -83,13 +86,19 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
 
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
 
-            val result = controller.post()(FakeRequest(POST, routes.AddMoreBusinessTypesController.post().url)
-              .withFormUrlEncodedBody(
-              "addmoreactivities" -> "true"
-            ))
+            val result = controller.post()(
+              FakeRequest(POST, routes.AddMoreBusinessTypesController.post().url)
+                .withFormUrlEncodedBody(
+                  "addmoreactivities" -> "true"
+                )
+            )
 
             status(result) mustBe SEE_OTHER
-            controller.router.verify("internalId", AddMoreBusinessTypesPageId, AddBusinessTypeFlowModel(addMoreActivities = Some(true)))
+            controller.router.verify(
+              "internalId",
+              AddMoreBusinessTypesPageId,
+              AddBusinessTypeFlowModel(addMoreActivities = Some(true))
+            )
           }
         }
 
@@ -99,13 +108,16 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
               val flowModel = AddBusinessTypeFlowModel(Some(BillPaymentServices))
               mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), flowModel)
 
-              val result = controller.post()(FakeRequest(POST, routes.AddMoreBusinessTypesController.post().url)
-                .withFormUrlEncodedBody(
-                "addmoreactivities" -> "false"
-              ))
+              val result = controller.post()(
+                FakeRequest(POST, routes.AddMoreBusinessTypesController.post().url)
+                  .withFormUrlEncodedBody(
+                    "addmoreactivities" -> "false"
+                  )
+              )
 
               status(result) mustBe SEE_OTHER
-              controller.router.verify("internalId", AddMoreBusinessTypesPageId, flowModel.copy(addMoreActivities = Some(false)))
+              controller.router
+                .verify("internalId", AddMoreBusinessTypesPageId, flowModel.copy(addMoreActivities = Some(false)))
             }
           }
 
@@ -114,13 +126,16 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
               val flowModel = AddBusinessTypeFlowModel(Some(HighValueDealing))
               mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), flowModel)
 
-              val result = controller.post()(FakeRequest(POST, routes.AddMoreBusinessTypesController.post().url)
-                .withFormUrlEncodedBody(
-                "addmoreactivities" -> "false"
-              ))
+              val result = controller.post()(
+                FakeRequest(POST, routes.AddMoreBusinessTypesController.post().url)
+                  .withFormUrlEncodedBody(
+                    "addmoreactivities" -> "false"
+                  )
+              )
 
               status(result) mustBe SEE_OTHER
-              controller.router.verify("internalId", AddMoreBusinessTypesPageId, flowModel.copy(addMoreActivities = Some(false)))
+              controller.router
+                .verify("internalId", AddMoreBusinessTypesPageId, flowModel.copy(addMoreActivities = Some(false)))
             }
           }
         }

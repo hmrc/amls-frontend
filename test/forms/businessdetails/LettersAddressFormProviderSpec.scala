@@ -23,8 +23,8 @@ import play.api.data.Form
 class LettersAddressFormProviderSpec extends BooleanFieldBehaviours[LettersAddress] {
 
   override val form: Form[LettersAddress] = new LettersAddressFormProvider()()
-  override val fieldName: String = "lettersAddress"
-  override val errorMessage: String = "error.required.atb.lettersaddress"
+  override val fieldName: String          = "lettersAddress"
+  override val errorMessage: String       = "error.required.atb.lettersaddress"
 
   "LettersAddressFormProvider" must {
 

@@ -24,9 +24,9 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 sealed trait SalesChannel {
   import SalesChannel._
   def getMessage(implicit messages: Messages): String = this match {
-    case Retail => messages("hvd.how-will-you-sell-goods.channels.retail")
+    case Retail    => messages("hvd.how-will-you-sell-goods.channels.retail")
     case Wholesale => messages("hvd.how-will-you-sell-goods.channels.wholesale")
-    case Auction => messages("hvd.how-will-you-sell-goods.channels.auction")
+    case Auction   => messages("hvd.how-will-you-sell-goods.channels.auction")
   }
 }
 

@@ -29,15 +29,20 @@ import views.html.responsiblepeople.address.CurrentAddressUKView
 
 import scala.concurrent.Future
 
-class CurrentAddressUKController @Inject ()(val dataCacheConnector: DataCacheConnector,
-                                            implicit val auditConnector: AuditConnector,
-                                            statusService: StatusService,
-                                            authAction: AuthAction,
-                                            val ds: CommonPlayDependencies,
-                                            val cc: MessagesControllerComponents,
-                                            formProvider: CurrentAddressUKFormProvider,
-                                            view: CurrentAddressUKView,
-                                            implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper with DateOfChangeHelper {
+class CurrentAddressUKController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  implicit val auditConnector: AuditConnector,
+  statusService: StatusService,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: CurrentAddressUKFormProvider,
+  view: CurrentAddressUKView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection
+    with AddressHelper
+    with DateOfChangeHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
@@ -46,36 +51,48 @@ class CurrentAddressUKController @Inject ()(val dataCacheConnector: DataCacheCon
           (person.personName, person.addressHistory) match {
             case (Some(name), Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _))) =>
               Ok(view(formProvider().fill(currentAddress), edit, index, flow, name.titleName))
-            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
-            case _ => NotFound(notFoundView)
+            case (Some(name), _)                                                                 => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _                                                                               => NotFound(notFoundView)
           }
         }
       }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
-    authAction.async {
-      implicit request =>
-        formProvider().bindFromRequest().fold(
+    authAction.async { implicit request =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
           formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             },
-          data => {
+          data =>
             getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
               val currentAddressWithTime = (for {
-                rp <- responsiblePerson
+                rp             <- responsiblePerson
                 addressHistory <- rp.addressHistory
                 currentAddress <- addressHistory.currentAddress
-              } yield data.copy(timeAtAddress = currentAddress.timeAtAddress, dateOfChange = currentAddress.dateOfChange)).getOrElse(data)
+              } yield data.copy(
+                timeAtAddress = currentAddress.timeAtAddress,
+                dateOfChange = currentAddress.dateOfChange
+              )).getOrElse(data)
 
-              statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap {
-                status => updateCurrentAddressAndRedirect(request.credId, currentAddressWithTime, index, edit, flow, responsiblePerson, status)
+              statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap { status =>
+                updateCurrentAddressAndRedirect(
+                  request.credId,
+                  currentAddressWithTime,
+                  index,
+                  edit,
+                  flow,
+                  responsiblePerson,
+                  status
+                )
               }
             }
-          }
-        ).recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+        )
+        .recoverWith { case _: IndexOutOfBoundsException =>
+          Future.successful(NotFound(notFoundView))
         }
     }
 }

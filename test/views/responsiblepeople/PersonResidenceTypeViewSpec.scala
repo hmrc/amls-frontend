@@ -27,7 +27,7 @@ import views.html.responsiblepeople.PersonResidenceTypeView
 class PersonResidenceTypeViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val typeView = inject[PersonResidenceTypeView]
-  lazy val fp = inject[PersonResidentTypeFormProvider]
+  lazy val fp       = inject[PersonResidentTypeFormProvider]
 
   val name = "Firstname Lastname"
 
@@ -42,12 +42,12 @@ class PersonResidenceTypeViewSpec extends AmlsViewSpec with Matchers {
 
       def view = typeView(fp(), true, 1, None, name)
 
-      doc.title must startWith(messages("responsiblepeople.person.a.resident.title"))
-      heading.html must be(messages("responsiblepeople.person.a.resident.heading", name))
+      doc.title       must startWith(messages("responsiblepeople.person.a.resident.title"))
+      heading.html    must be(messages("responsiblepeople.person.a.resident.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "isUKResidence") must not be empty
-      doc.getElementsByAttributeValue("name", "nino") must not be empty
+      doc.getElementsByAttributeValue("name", "nino")          must not be empty
 
     }
 

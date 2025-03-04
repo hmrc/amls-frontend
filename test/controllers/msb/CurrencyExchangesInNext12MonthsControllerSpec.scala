@@ -37,16 +37,18 @@ class CurrencyExchangesInNext12MonthsControllerSpec extends AmlsSpec with Mockit
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
-    lazy val view = inject[CurrencyExchangesInNext12MonthsView]
+    val request    = addToken(authRequest)
+    lazy val view  = inject[CurrencyExchangesInNext12MonthsView]
     val controller = new CurrencyExchangesInNext12MonthsController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow,
       cc = mockMcc,
       formProvider = inject[CurrencyExchangesInNext12MonthsFormProvider],
-      view = view)
+      view = view
+    )
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, None)
@@ -57,9 +59,7 @@ class CurrencyExchangesInNext12MonthsControllerSpec extends AmlsSpec with Mockit
   val fullModel = WhichCurrencies(
     Seq("USD", "CHF", "EUR"),
     Some(UsesForeignCurrenciesYes),
-    Some(MoneySources(Some(BankMoneySource("Bank names")),
-    Some(WholesalerMoneySource("wholesaler names")),
-    Some(true)))
+    Some(MoneySources(Some(BankMoneySource("Bank names")), Some(WholesalerMoneySource("wholesaler names")), Some(true)))
   )
 
   "CurrencyExchangesInNext12MonthsController" must {
@@ -68,11 +68,11 @@ class CurrencyExchangesInNext12MonthsControllerSpec extends AmlsSpec with Mockit
 
       mockApplicationStatus(NotCompleted)
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("msb.ce.transactions.expected.in.12.months.title"))
     }
 
@@ -80,44 +80,46 @@ class CurrencyExchangesInNext12MonthsControllerSpec extends AmlsSpec with Mockit
 
       mockApplicationStatus(NotCompleted)
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(
-        ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963"))))))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any())).thenReturn(
+        Future.successful(
+          Some(MoneyServiceBusiness(ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963"))))
+        )
+      )
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include("12345678963")
     }
 
     "load the page when the application status is approved and the service has just been added" in new Fixture {
       mockApplicationStatus(NotCompleted)
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
 
       mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
       val result = controller.get()(request)
 
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("msb.ce.transactions.expected.in.12.months.title"))
     }
 
     "Show error message when user has not filled the mandatory fields" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.CurrencyExchangesInNext12MonthsController.post().url)
-      .withFormUrlEncodedBody(
-        "ceTransaction" -> ""
-      )
+        .withFormUrlEncodedBody(
+          "ceTransaction" -> ""
+        )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
+      status(result)          must be(BAD_REQUEST)
       contentAsString(result) must include(messages("error.required.msb.ce.transactions.in.12months"))
 
     }
@@ -125,36 +127,36 @@ class CurrencyExchangesInNext12MonthsControllerSpec extends AmlsSpec with Mockit
     "Show error message when user has entered data in the wrong format" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.CurrencyExchangesInNext12MonthsController.post().url)
-      .withFormUrlEncodedBody(
-        "ceTransaction" -> "asas"
-      )
+        .withFormUrlEncodedBody(
+          "ceTransaction" -> "asas"
+        )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
+      status(result)          must be(BAD_REQUEST)
       contentAsString(result) must include(messages("error.invalid.msb.ce.transactions.in.12months.number"))
 
     }
 
     "Successfully save data in mongoCache and navigate to Next page" in new Fixture {
       val newRequest = FakeRequest(POST, routes.CurrencyExchangesInNext12MonthsController.post().url)
-      .withFormUrlEncodedBody(
-        "ceTransaction" -> "12345678963"
-      )
+        .withFormUrlEncodedBody(
+          "ceTransaction" -> "12345678963"
+        )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.WhichCurrenciesController.get().url))
     }
 
@@ -167,22 +169,25 @@ class CurrencyExchangesInNext12MonthsControllerSpec extends AmlsSpec with Mockit
       val outgoingModel = incomingModel.copy(
         ceTransactionsInNext12Months = Some(
           CETransactionsInNext12Months("12345678963")
-        ), hasChanged = true
+        ),
+        hasChanged = true
       )
 
       val newRequest = FakeRequest(POST, routes.CurrencyExchangesInNext12MonthsController.post().url)
-      .withFormUrlEncodedBody(
-        "ceTransaction" -> "12345678963"
-      )
+        .withFormUrlEncodedBody(
+          "ceTransaction" -> "12345678963"
+        )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))
-        (any())).thenReturn(Future.successful(Some(incomingModel)))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Future.successful(Some(incomingModel)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(
+        controller.dataCacheConnector
+          .save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any())
+      ).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
@@ -193,22 +198,25 @@ class CurrencyExchangesInNext12MonthsControllerSpec extends AmlsSpec with Mockit
       val outgoingModel = incomingModel.copy(
         ceTransactionsInNext12Months = Some(
           CETransactionsInNext12Months("12345678963")
-        ), hasChanged = true
+        ),
+        hasChanged = true
       )
 
       val newRequest = FakeRequest(POST, routes.CurrencyExchangesInNext12MonthsController.post().url)
-      .withFormUrlEncodedBody(
-        "ceTransaction" -> "12345678963"
-      )
+        .withFormUrlEncodedBody(
+          "ceTransaction" -> "12345678963"
+        )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))
-        (any())).thenReturn(Future.successful(Some(incomingModel)))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Future.successful(Some(incomingModel)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(
+        controller.dataCacheConnector
+          .save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any())
+      ).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.WhichCurrenciesController.get(true).url))
     }
   }

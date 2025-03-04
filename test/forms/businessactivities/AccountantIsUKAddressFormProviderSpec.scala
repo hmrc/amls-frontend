@@ -23,13 +23,14 @@ import play.api.data.Form
 class AccountantIsUKAddressFormProviderSpec extends BooleanFieldBehaviours[WhoIsYourAccountantIsUk] {
 
   override val form: Form[WhoIsYourAccountantIsUk] = new AccountantIsUKAddressFormProvider()()
-  override val fieldName: String = "isUK"
-  override val errorMessage: String = "error.required.ba.advisor.isuk"
+  override val fieldName: String                   = "isUK"
+  override val errorMessage: String                = "error.required.ba.advisor.isuk"
 
   "AccountantIsUKAddressFormProvider" must {
 
     behave like booleanFieldWithModel(
-      WhoIsYourAccountantIsUk(true), WhoIsYourAccountantIsUk(false)
+      WhoIsYourAccountantIsUk(true),
+      WhoIsYourAccountantIsUk(false)
     )
   }
 }

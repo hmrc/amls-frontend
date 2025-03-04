@@ -24,9 +24,9 @@ import play.api.data.FormError
 
 class CompanyRegistrationNumberFormProviderSpec extends StringFieldBehaviours with Constraints {
 
-  val form = new CompanyRegistrationNumberFormProvider()()
+  val form            = new CompanyRegistrationNumberFormProvider()()
   val requiredMessage = "error.required.bm.registration.number"
-  val lengthMessage = s"error.invalid.bm.registration.number.length"
+  val lengthMessage   = s"error.invalid.bm.registration.number.length"
 
   ".value" must {
 
@@ -39,8 +39,11 @@ class CompanyRegistrationNumberFormProviderSpec extends StringFieldBehaviours wi
     } yield str.toUpperCase
 
     val invalidStringGen = for {
-      str <- companyRegNumberGen
-      char <- Gen.oneOf(Seq('!', '@', '£', '$', '%', '^', '&', '*', '(', ')', ',', '.', '#', '`', '~', '<', '>', '?', '|', '"', '/', '[', ']', '\\'))
+      str  <- companyRegNumberGen
+      char <- Gen.oneOf(
+                Seq('!', '@', '£', '$', '%', '^', '&', '*', '(', ')', ',', '.', '#', '`', '~', '<', '>', '?', '|', '"',
+                  '/', '[', ']', '\\')
+              )
     } yield s"${str.dropRight(1)}$char".toUpperCase()
 
     "bind valid data" in {
@@ -53,25 +56,29 @@ class CompanyRegistrationNumberFormProviderSpec extends StringFieldBehaviours wi
     s"not bind strings with invalid characters" in {
       forAll(invalidStringGen) { invalidString =>
         val result = form.bind(Map(fieldName -> invalidString)).apply(fieldName)
-        result.errors shouldEqual Seq(FormError(fieldName, Seq("error.invalid.bm.registration.number.allowed"), Seq("^[A-Z0-9]{8}$")))
+        result.errors shouldEqual Seq(
+          FormError(fieldName, Seq("error.invalid.bm.registration.number.allowed"), Seq("^[A-Z0-9]{8}$"))
+        )
       }
     }
 
     "contains whitespace" in {
 
       val validInputWithSpaces = "123 AB6 78"
-      val trimmedInput = "123AB678"
+      val trimmedInput         = "123AB678"
 
       val result = form.bind(Map(fieldName -> validInputWithSpaces))
 
-      result.value shouldBe Some(CompanyRegistrationNumber(trimmedInput))
+      result.value  shouldBe Some(CompanyRegistrationNumber(trimmedInput))
       result.errors shouldBe Seq.empty
     }
 
     "not bind submissions with lower case letters" in {
       forAll(companyRegNumberGen) { companyRegNum =>
         val result = form.bind(Map(fieldName -> companyRegNum.toLowerCase)).apply(fieldName)
-        result.errors shouldEqual Seq(FormError(fieldName, Seq("error.invalid.bm.registration.number.allowed"), Seq("^[A-Z0-9]{8}$")))
+        result.errors shouldEqual Seq(
+          FormError(fieldName, Seq("error.invalid.bm.registration.number.allowed"), Seq("^[A-Z0-9]{8}$"))
+        )
       }
     }
 

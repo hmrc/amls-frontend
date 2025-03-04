@@ -21,9 +21,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class HasBankAccountFormProvider @Inject()() extends Mappings {
+class HasBankAccountFormProvider @Inject() () extends Mappings {
 
-  private val errorKey = "bankdetails.hasbankaccount.validation"
+  private val errorKey       = "bankdetails.hasbankaccount.validation"
   def apply(): Form[Boolean] = Form[Boolean](
     "hasBankAccount" -> boolean(errorKey, errorKey)
   )

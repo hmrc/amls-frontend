@@ -21,8 +21,8 @@ import play.api.data.{Form, FormError}
 
 class MovedAddressFormProviderSpec extends BooleanFieldBehaviours[Boolean] {
 
-  override val form: Form[Boolean] = new MovedAddressFormProvider()()
-  override val fieldName: String = "movedAddress"
+  override val form: Form[Boolean]  = new MovedAddressFormProvider()()
+  override val fieldName: String    = "movedAddress"
   override val errorMessage: String = "error.required.rp.moved.address"
 
   val formError: FormError = FormError(fieldName, errorMessage)
@@ -33,12 +33,14 @@ class MovedAddressFormProviderSpec extends BooleanFieldBehaviours[Boolean] {
 
     s"fail to bind when $fieldName is empty" in {
 
-      val result = form.bind(Map(
-        fieldName -> ""
-      ))
+      val result = form.bind(
+        Map(
+          fieldName -> ""
+        )
+      )
 
-      result.value shouldBe None
-      result.errors shouldBe(Seq(formError))
+      result.value  shouldBe None
+      result.errors shouldBe (Seq(formError))
     }
   }
 }

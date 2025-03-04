@@ -21,7 +21,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class ServicesOfAnotherTCSPFormProvider @Inject()() extends BooleanFormProvider {
+class ServicesOfAnotherTCSPFormProvider @Inject() () extends BooleanFormProvider {
 
   private val errorMessage = "error.required.tcsp.services.another.tcsp"
 

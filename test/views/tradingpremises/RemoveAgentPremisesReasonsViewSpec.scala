@@ -29,7 +29,7 @@ class RemoveAgentPremisesReasonsViewSpec extends AmlsViewSpec {
   import models.tradingpremises.RemovalReasonConstants._
 
   lazy val remove_agent_premises_reasons = inject[RemoveAgentPremisesReasonsView]
-  lazy val fp = inject[RemoveAgentPremisesReasonsFormProvider]
+  lazy val fp                            = inject[RemoveAgentPremisesReasonsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -49,14 +49,16 @@ class RemoveAgentPremisesReasonsViewSpec extends AmlsViewSpec {
 
       def view = remove_agent_premises_reasons(fp().fill(AgentRemovalReason(Schema.MAJOR_COMPLIANCE_ISSUES)), 1, true)
 
-      heading.html must be(messages("tradingpremises.remove_reasons.agent.premises.title"))
+      heading.html    must be(messages("tradingpremises.remove_reasons.agent.premises.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
 
     }
 
     behave like pageWithErrors(
       remove_agent_premises_reasons(
-        fp().withError("removalReason", "tradingpremises.remove_reasons.missing"), 0, false
+        fp().withError("removalReason", "tradingpremises.remove_reasons.missing"),
+        0,
+        false
       ),
       "removalReason",
       "tradingpremises.remove_reasons.missing"
@@ -64,7 +66,9 @@ class RemoveAgentPremisesReasonsViewSpec extends AmlsViewSpec {
 
     behave like pageWithErrors(
       remove_agent_premises_reasons(
-        fp().withError("removalReasonOther", "tradingpremises.remove_reasons.agent.other.missing"), 0, false
+        fp().withError("removalReasonOther", "tradingpremises.remove_reasons.agent.other.missing"),
+        0,
+        false
       ),
       "removalReasonOther",
       "tradingpremises.remove_reasons.agent.other.missing"

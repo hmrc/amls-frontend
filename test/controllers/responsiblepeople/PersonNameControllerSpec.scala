@@ -35,16 +35,19 @@ import scala.concurrent.Future
 
 class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
-  val userId = s"user-${UUID.randomUUID()}"
+  val userId                 = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
-  val RecordId = 1
+  val RecordId               = 1
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[PersonNameView]
+    self =>
+    val request              = addToken(authRequest)
+    lazy val view            = inject[PersonNameView]
     val personNameController = new PersonNameController(
-      dataCacheConnector = mockDataCacheConnector ,
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
+      dataCacheConnector = mockDataCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
       view = view,
       formProvider = inject[PersonNameFormProvider],
       error = errorView
@@ -66,9 +69,9 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[name=firstName]").`val` must be("")
+        document.select("input[name=firstName]").`val`  must be("")
         document.select("input[name=middleName]").`val` must be("")
-        document.select("input[name=lastName]").`val` must be("")
+        document.select("input[name=lastName]").`val`   must be("")
       }
 
       "display the persons page with fields populated" in new Fixture {
@@ -81,17 +84,17 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
 
         val responsiblePeople = ResponsiblePerson(Some(addPerson))
 
-        when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = personNameController.get(RecordId)(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.select("input[name=firstName]").`val` must be("first")
+        document.select("input[name=firstName]").`val`  must be("first")
         document.select("input[name=middleName]").`val` must be("middle")
-        document.select("input[name=lastName]").`val` must be("last")
+        document.select("input[name=lastName]").`val`   must be("last")
       }
 
       "display Not Found" when {
@@ -112,11 +115,11 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
           "edit is false" in new Fixture {
 
             val requestWithParams = FakeRequest(POST, routes.PersonNameController.post(1, false).url)
-            .withFormUrlEncodedBody(
-              "firstName" -> "first",
-              "middleName" -> "middle",
-              "lastName" -> "last"
-            )
+              .withFormUrlEncodedBody(
+                "firstName"  -> "first",
+                "middleName" -> "middle",
+                "lastName"   -> "last"
+              )
 
             when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
@@ -125,7 +128,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
               .thenReturn(Future.successful(emptyCache))
 
             val result = personNameController.post(RecordId)(requestWithParams)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.LegalNameController.get(RecordId).url))
           }
         }
@@ -133,11 +136,11 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
           "edit is true" in new Fixture {
 
             val requestWithParams = FakeRequest(POST, routes.PersonNameController.post(1, false).url)
-            .withFormUrlEncodedBody(
-              "firstName" -> "first",
-              "middleName" -> "middle",
-              "lastName" -> "last"
-            )
+              .withFormUrlEncodedBody(
+                "firstName"  -> "first",
+                "middleName" -> "middle",
+                "lastName"   -> "last"
+              )
 
             when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
@@ -155,9 +158,9 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
         "return BAD_REQUEST" in new Fixture {
 
           val firstNameMissingInRequest = FakeRequest(POST, routes.PersonNameController.post(1, false).url)
-          .withFormUrlEncodedBody(
-            "lastName" -> "last"
-          )
+            .withFormUrlEncodedBody(
+              "lastName" -> "last"
+            )
 
           when(personNameController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
@@ -173,10 +176,10 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
         "return NOT_FOUND" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.PersonNameController.post(1, false).url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "first",
-            "lastName" -> "last"
-          )
+            .withFormUrlEncodedBody(
+              "firstName" -> "first",
+              "lastName"  -> "last"
+            )
 
           when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))

@@ -31,57 +31,56 @@ import views.html.msb.MoneySourcesView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class MoneySourcesController @Inject()(authAction: AuthAction,
-                                       val ds: CommonPlayDependencies,
-                                       implicit val dataCacheConnector: DataCacheConnector,
-                                       implicit val statusService: StatusService,
-                                       implicit val serviceFlow: ServiceFlow,
-                                       val cc: MessagesControllerComponents,
-                                       service: MoneySourcesService,
-                                       formProvider: MoneySourcesFormProvider,
-                                       view: MoneySourcesView,
-                                       implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
+class MoneySourcesController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val dataCacheConnector: DataCacheConnector,
+  implicit val statusService: StatusService,
+  implicit val serviceFlow: ServiceFlow,
+  val cc: MessagesControllerComponents,
+  service: MoneySourcesService,
+  formProvider: MoneySourcesFormProvider,
+  view: MoneySourcesView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
-        response =>
-          val form = (for {
-            msb <- response
-            currencies <- msb.whichCurrencies
-            moneySources <- currencies.moneySources
-          } yield moneySources).fold(formProvider())(formProvider().fill)
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map { response =>
+      val form = (for {
+        msb          <- response
+        currencies   <- msb.whichCurrencies
+        moneySources <- currencies.moneySources
+      } yield moneySources).fold(formProvider())(formProvider().fill)
+      Ok(view(form, edit))
     }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
-        data => {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
-            msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
-            _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key, updateMoneySources(msb, data))
+            msb        <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+            _          <- dataCacheConnector
+                            .save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key, updateMoneySources(msb, data))
             updatedMsb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
-            bm <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
+            bm         <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
           } yield service.redirectToNextPage(updatedMsb, bm, edit).getOrElse(NotFound(notFoundView))
-        }
       )
-    }
   }
 
-  private def updateMoneySources(oldMsb: Option[MoneyServiceBusiness], moneySources: MoneySources): Option[MoneyServiceBusiness] = {
+  private def updateMoneySources(
+    oldMsb: Option[MoneyServiceBusiness],
+    moneySources: MoneySources
+  ): Option[MoneyServiceBusiness] =
     oldMsb match {
-      case Some(msb) => {
+      case Some(msb) =>
         msb.whichCurrencies match {
           case Some(w) => Some(msb.whichCurrencies(w.moneySources(moneySources)))
-          case _ => None
+          case _       => None
         }
-      }
-      case _ => None
+      case _         => None
     }
-  }
 }

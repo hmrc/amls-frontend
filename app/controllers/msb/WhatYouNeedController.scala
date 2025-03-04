@@ -28,27 +28,25 @@ import views.html.msb.WhatYouNeedView
 
 import scala.concurrent.Future
 
-class WhatYouNeedController @Inject()(authAction: AuthAction,
-                                      val ds: CommonPlayDependencies,
-                                      val statusService: StatusService,
-                                      val dataCacheConnector: DataCacheConnector,
-                                      val cc: MessagesControllerComponents,
-                                      view: WhatYouNeedView) extends AmlsBaseController(ds, cc) {
+class WhatYouNeedController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val statusService: StatusService,
+  val dataCacheConnector: DataCacheConnector,
+  val cc: MessagesControllerComponents,
+  view: WhatYouNeedView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-      val call = routes.ExpectedThroughputController.get()
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    val call = routes.ExpectedThroughputController.get()
 
-      dataCacheConnector.fetchAll(request.credId) flatMap {
-        optionalCache =>
-          (for {
-            cache <- optionalCache
-            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-            bmMsbServices <- businessMatching.msbServices
-          } yield {
-            Future.successful(Ok(view(call, bmMsbServices)))
-          }) getOrElse Future.successful(Ok(view(call)))
-      }
+    dataCacheConnector.fetchAll(request.credId) flatMap { optionalCache =>
+      (for {
+        cache            <- optionalCache
+        businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+        bmMsbServices    <- businessMatching.msbServices
+      } yield Future.successful(Ok(view(call, bmMsbServices)))) getOrElse Future.successful(Ok(view(call)))
+    }
   }
 
   def post: Action[AnyContent] = authAction {

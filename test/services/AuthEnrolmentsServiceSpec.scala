@@ -27,28 +27,37 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
 import utils.AmlsSpec
 
-
 import scala.concurrent.Future
 
-class AuthEnrolmentsServiceSpec extends AmlsSpec
-  with ScalaFutures
-  with IntegrationPatience
-  with AmlsReferenceNumberGenerator
-  with BaseGenerator {
+class AuthEnrolmentsServiceSpec
+    extends AmlsSpec
+    with ScalaFutures
+    with IntegrationPatience
+    with AmlsReferenceNumberGenerator
+    with BaseGenerator {
 
   // scalastyle:off magic.number
   trait Fixture {
-    val enrolmentStore = mock[TaxEnrolmentsConnector]
+    val enrolmentStore         = mock[TaxEnrolmentsConnector]
     val enrolmentStubConnector = mock[EnrolmentStubConnector]
-    val config = mock[ApplicationConfig]
+    val config                 = mock[ApplicationConfig]
 
     val groupId = stringOfLengthGen(10).sample.get
 
     val service = new AuthEnrolmentsService(enrolmentStore, config, enrolmentStubConnector)
 
     val enrolmentsList = List[GovernmentGatewayEnrolment](
-      GovernmentGatewayEnrolment("HMCE-VATVAR-ORG", List[EnrolmentIdentifier](EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"),
-      GovernmentGatewayEnrolment("HMRC-MLR-ORG", List[EnrolmentIdentifier](EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"))
+      GovernmentGatewayEnrolment(
+        "HMCE-VATVAR-ORG",
+        List[EnrolmentIdentifier](EnrolmentIdentifier("VATRegNo", "000000000")),
+        "Activated"
+      ),
+      GovernmentGatewayEnrolment(
+        "HMRC-MLR-ORG",
+        List[EnrolmentIdentifier](EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)),
+        "Activated"
+      )
+    )
 
     when(config.enrolmentStubsEnabled) thenReturn false
   }
@@ -69,8 +78,8 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
 
     "return an AMLS registration number" in new Fixture {
 
-      whenReady(service.amlsRegistrationNumber(Some(amlsRegistrationNumber), Some(groupId))){
-        number => number.get mustEqual amlsRegistrationNumber
+      whenReady(service.amlsRegistrationNumber(Some(amlsRegistrationNumber), Some(groupId))) { number =>
+        number.get mustEqual amlsRegistrationNumber
       }
     }
 
@@ -84,7 +93,8 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
 
       whenReady(service.enrol(amlsRegistrationNumber, postcode, Some(groupId), "12345678")) { _ =>
         val enrolment = TaxEnrolment("12345678", postcode)
-        verify(enrolmentStore).enrol(eqTo(AmlsEnrolmentKey(amlsRegistrationNumber)), eqTo(enrolment), any())(any(), any())
+        verify(enrolmentStore)
+          .enrol(eqTo(AmlsEnrolmentKey(amlsRegistrationNumber)), eqTo(enrolment), any())(any(), any())
       }
     }
 

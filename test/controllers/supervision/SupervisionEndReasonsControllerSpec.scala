@@ -31,16 +31,18 @@ import java.time.LocalDate
 
 class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
-  trait Fixture extends DependencyMocks{
-    self => val request = addToken(authRequest)
-    lazy val view = inject[SupervisionEndReasonsView]
+  trait Fixture extends DependencyMocks {
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[SupervisionEndReasonsView]
     val controller = new SupervisionEndReasonsController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[SupervisionEndReasonsFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   "SupervisionEndReasonsController" must {
@@ -50,24 +52,27 @@ class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar wit
       mockCacheFetch[Supervision](None)
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("supervision.supervision_end_reasons.title"))
 
       val document = Jsoup.parse(contentAsString(result))
       document.select("textarea[name=endingReason]").`val` must be("")
     }
 
-
     "on get display the SupervisionEndReasons page with pre populated data" in new Fixture {
-      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) //scalastyle:off magic.number
-      val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) //scalastyle:off magic.number
+      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) // scalastyle:off magic.number
+      val end   = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) // scalastyle:off magic.number
 
-      mockCacheFetch[Supervision](Some(Supervision(
-        Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))),
-        None,
-        None,
-        Some(ProfessionalBodyYes("details"))
-      )))
+      mockCacheFetch[Supervision](
+        Some(
+          Supervision(
+            Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))),
+            None,
+            None,
+            Some(ProfessionalBodyYes("details"))
+          )
+        )
+      )
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -77,12 +82,16 @@ class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar wit
     }
 
     "on get display the SupervisionEndReasons page with empty form when there is no data" in new Fixture {
-      mockCacheFetch[Supervision](Some(Supervision(
-        Some(AnotherBodyNo),
-        None,
-        None,
-        Some(ProfessionalBodyYes("details"))
-      )))
+      mockCacheFetch[Supervision](
+        Some(
+          Supervision(
+            Some(AnotherBodyNo),
+            None,
+            None,
+            Some(ProfessionalBodyYes("details"))
+          )
+        )
+      )
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -92,56 +101,58 @@ class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar wit
     }
 
     "on post with valid data" in new Fixture {
-      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) //scalastyle:off magic.number
-      val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) //scalastyle:off magic.number
+      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) // scalastyle:off magic.number
+      val end   = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) // scalastyle:off magic.number
 
       val newRequest = FakeRequest(POST, routes.SupervisionEndReasonsController.post().url)
-      .withFormUrlEncodedBody(
-        "anotherBody" -> "true",
-        "endingReason" -> "Reason")
+        .withFormUrlEncodedBody("anotherBody" -> "true", "endingReason" -> "Reason")
 
       mockCacheFetch[Supervision](Some(Supervision(Some(AnotherBodyYes("Name", start, end)))))
 
       mockCacheSave[Supervision]
 
-      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end)))), Supervision.key)
+      mockCacheGetEntry[Supervision](
+        Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end)))),
+        Supervision.key
+      )
 
       val result = controller.post()(newRequest)
 
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.ProfessionalBodyMemberController.get().url))
     }
 
     "on post with valid data in edit mode if supervision is incomplete" in new Fixture {
-      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) //scalastyle:off magic.number
-      val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) //scalastyle:off magic.number
+      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) // scalastyle:off magic.number
+      val end   = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) // scalastyle:off magic.number
 
       val newRequest = FakeRequest(POST, routes.SupervisionEndReasonsController.post().url)
-      .withFormUrlEncodedBody(
-        "anotherBody" -> "true",
-        "endingReason" -> "Reason")
+        .withFormUrlEncodedBody("anotherBody" -> "true", "endingReason" -> "Reason")
 
       mockCacheFetch[Supervision](Some(Supervision(Some(AnotherBodyYes("Name", start, end)))))
 
       mockCacheSave[Supervision]
 
-      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))))), Supervision.key)
+      mockCacheGetEntry[Supervision](
+        Some(
+          Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))))
+        ),
+        Supervision.key
+      )
 
       val result = controller.post(true)(newRequest)
 
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.ProfessionalBodyMemberController.get().url))
     }
 
     "on post with valid data in edit mode if supervision is complete" in new Fixture with SupervisionValues {
 
-      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) //scalastyle:off magic.number
-      val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) //scalastyle:off magic.number
+      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) // scalastyle:off magic.number
+      val end   = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) // scalastyle:off magic.number
 
       val newRequest = FakeRequest(POST, routes.SupervisionEndReasonsController.post().url)
-      .withFormUrlEncodedBody(
-        "anotherBody" -> "true",
-        "endingReason" -> "Reason")
+        .withFormUrlEncodedBody("anotherBody" -> "true", "endingReason" -> "Reason")
 
       mockCacheFetch[Supervision](Some(Supervision(Some(AnotherBodyYes("Name", start, end)))))
 
@@ -151,11 +162,9 @@ class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar wit
 
       val result = controller.post(true)(newRequest)
 
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
   }
 }
-
-

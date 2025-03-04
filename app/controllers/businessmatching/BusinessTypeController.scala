@@ -28,25 +28,26 @@ import views.html.businessmatching._
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class BusinessTypeController @Inject()(authAction: AuthAction,
-                                       val ds: CommonPlayDependencies,
-                                       val cc: MessagesControllerComponents,
-                                       service: BusinessTypeService,
-                                       formProvider: BusinessTypeFormProvider,
-                                       view: BusinessTypeView) extends AmlsBaseController(ds, cc) {
+class BusinessTypeController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  service: BusinessTypeService,
+  formProvider: BusinessTypeFormProvider,
+  view: BusinessTypeView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      service.getBusinessType(request.credId) map { btOpt =>
-         btOpt.map(getResultByBusiness).getOrElse(Ok(view(formProvider())))
-      }
+  def get(): Action[AnyContent] = authAction.async { implicit request =>
+    service.getBusinessType(request.credId) map { btOpt =>
+      btOpt.map(getResultByBusiness).getOrElse(Ok(view(formProvider())))
+    }
   }
 
-  def post(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors))),
+  def post(): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         data =>
           service.updateBusinessType(request.credId, data).map {
             _.fold(Redirect(routes.RegisterServicesController.get()))(getResultByBusiness)
@@ -55,9 +56,8 @@ class BusinessTypeController @Inject()(authAction: AuthAction,
   }
 
   private def getResultByBusiness(businessType: BusinessType): Result = businessType match {
-    case UnincorporatedBody => Redirect(routes.TypeOfBusinessController.get())
+    case UnincorporatedBody      => Redirect(routes.TypeOfBusinessController.get())
     case LPrLLP | LimitedCompany => Redirect(routes.CompanyRegistrationNumberController.get())
-    case _ => Redirect(routes.RegisterServicesController.get())
+    case _                       => Redirect(routes.RegisterServicesController.get())
   }
 }
-

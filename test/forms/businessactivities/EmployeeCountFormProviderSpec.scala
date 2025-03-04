@@ -23,7 +23,7 @@ import play.api.data.{Form, FormError}
 class EmployeeCountFormProviderSpec extends StringFieldBehaviours {
 
   val formProvider: EmployeeCountFormProvider = new EmployeeCountFormProvider()
-  val form: Form[EmployeeCount] = formProvider()
+  val form: Form[EmployeeCount]               = formProvider()
 
   val fieldName = "employeeCount"
 
@@ -53,8 +53,12 @@ class EmployeeCountFormProviderSpec extends StringFieldBehaviours {
       forAll(alphaStringsShorterThan(formProvider.length).suchThat(_.nonEmpty)) { invalidStr =>
         val result = form.bind(Map(fieldName -> invalidStr))
 
-        result.value shouldBe None
-        result.error(fieldName).value shouldBe FormError(fieldName, "error.invalid.ba.employee.count", Seq(formProvider.regex))
+        result.value                  shouldBe None
+        result.error(fieldName).value shouldBe FormError(
+          fieldName,
+          "error.invalid.ba.employee.count",
+          Seq(formProvider.regex)
+        )
       }
     }
   }

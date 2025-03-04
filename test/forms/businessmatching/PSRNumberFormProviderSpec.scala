@@ -23,12 +23,15 @@ import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForP
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
-class PSRNumberFormProviderSpec extends BooleanFieldBehaviours[BusinessAppliedForPSRNumber] with BaseGenerator with Constraints {
+class PSRNumberFormProviderSpec
+    extends BooleanFieldBehaviours[BusinessAppliedForPSRNumber]
+    with BaseGenerator
+    with Constraints {
 
-  val formProvider: PSRNumberFormProvider = new PSRNumberFormProvider()
+  val formProvider: PSRNumberFormProvider              = new PSRNumberFormProvider()
   override val form: Form[BusinessAppliedForPSRNumber] = formProvider()
 
-  override val fieldName: String = "appliedFor"
+  override val fieldName: String    = "appliedFor"
   override val errorMessage: String = "error.required.msb.psr.options"
 
   val inputFieldName: String = "regNumber"
@@ -41,17 +44,16 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours[BusinessAppliedFo
 
         val boundForm = form.bind(Map(fieldName -> "false"))
 
-        boundForm.value shouldBe Some(BusinessAppliedForPSRNumberNo)
+        boundForm.value  shouldBe Some(BusinessAppliedForPSRNumberNo)
         boundForm.errors shouldBe Nil
       }
 
       "'Yes' is submitted and a PSR number is given" in {
 
         forAll(numSequence(formProvider.min)) { psrNum =>
-
           val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> psrNum))
 
-          boundForm.value shouldBe Some(BusinessAppliedForPSRNumberYes(psrNum))
+          boundForm.value  shouldBe Some(BusinessAppliedForPSRNumberYes(psrNum))
           boundForm.errors shouldBe Nil
         }
       }
@@ -105,25 +107,28 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours[BusinessAppliedFo
 
         "has white spaces" in {
 
-          val passString = " 1 2 34 5 6 "
+          val passString            = " 1 2 34 5 6 "
           val passStringTransformed = "123456"
 
-          val result = form.bind(Map(
-            fieldName -> "true",
-            inputFieldName -> passString
-          ))
+          val result = form.bind(
+            Map(
+              fieldName      -> "true",
+              inputFieldName -> passString
+            )
+          )
 
-          result.value shouldBe Some(BusinessAppliedForPSRNumberYes(passStringTransformed))
+          result.value  shouldBe Some(BusinessAppliedForPSRNumberYes(passStringTransformed))
           result.errors shouldBe empty
         }
 
         "is invalid" in {
 
-          forAll(numSequence(formProvider.max).suchThat(_.length == formProvider.max), Gen.alphaChar) { (psrNum, char) =>
-            val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> s"${psrNum.dropRight(1)}$char"))
-            boundForm.errors.headOption shouldBe Some(
-              FormError(inputFieldName, "error.max.msb.psr.number.format", Seq(numbersOnlyRegex))
-            )
+          forAll(numSequence(formProvider.max).suchThat(_.length == formProvider.max), Gen.alphaChar) {
+            (psrNum, char) =>
+              val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> s"${psrNum.dropRight(1)}$char"))
+              boundForm.errors.headOption shouldBe Some(
+                FormError(inputFieldName, "error.max.msb.psr.number.format", Seq(numbersOnlyRegex))
+              )
           }
         }
       }

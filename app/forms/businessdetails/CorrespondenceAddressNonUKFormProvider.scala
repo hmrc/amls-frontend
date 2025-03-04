@@ -24,15 +24,18 @@ class CorrespondenceAddressNonUKFormProvider extends CorrespondenceAddressFormPr
 
   override val countryErrorKey: String = "error.required.atb.letters.address.not.uk"
 
-  override def toObject: (String, String, String, Option[String], Option[String], Option[String], String) => CorrespondenceAddressNonUk = {
+  override def toObject
+    : (String, String, String, Option[String], Option[String], Option[String], String) => CorrespondenceAddressNonUk = {
     case (yourName, businessName, line1, line2, line3, line4, country) =>
       CorrespondenceAddressNonUk(yourName, businessName, line1, line2, line3, line4, parseCountry(country))
   }
 
-  override def fromObject: CorrespondenceAddressNonUk => Option[(String, String, String, Option[String], Option[String], Option[String], String)] = {
+  override def fromObject: CorrespondenceAddressNonUk => Option[
+    (String, String, String, Option[String], Option[String], Option[String], String)
+  ] = {
     case CorrespondenceAddressNonUk(name, business, addressLine1, addressLine2, addressLine3, addressLine4, country) =>
       Some((name, business, addressLine1, addressLine2, addressLine3, addressLine4, country.code))
-    case _ => None
+    case _                                                                                                           => None
   }
 
   def apply(): Form[CorrespondenceAddressNonUk] = createForm(false)

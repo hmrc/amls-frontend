@@ -24,14 +24,19 @@ import java.time.LocalDate
 
 class LocalDateFormatterSpec extends AnyWordSpec with Matchers {
 
-  val oneInvalidKey = "oneInvalidKey"
+  val oneInvalidKey      = "oneInvalidKey"
   val multipleInvalidKey = "multipleInvalidKey"
-  val oneRequiredKey = "oneRequiredKey"
-  val twoRequiredKey = "twoRequiredKey"
-  val allRequiredKey = "allRequiredKey"
-  val realDateKey = "realDateKey"
-  val formatter = new LocalDateFormatter(
-    oneInvalidKey, multipleInvalidKey, oneRequiredKey, twoRequiredKey, allRequiredKey, realDateKey
+  val oneRequiredKey     = "oneRequiredKey"
+  val twoRequiredKey     = "twoRequiredKey"
+  val allRequiredKey     = "allRequiredKey"
+  val realDateKey        = "realDateKey"
+  val formatter          = new LocalDateFormatter(
+    oneInvalidKey,
+    multipleInvalidKey,
+    oneRequiredKey,
+    twoRequiredKey,
+    allRequiredKey,
+    realDateKey
   )
 
   ".validateDayMonthYear" should {
@@ -60,19 +65,22 @@ class LocalDateFormatterSpec extends AnyWordSpec with Matchers {
       "the month and year are invalid" in {
         formatter.validateDayMonthYear("date", Some("11"), Some("20"), Some("0")) shouldBe Seq(
           FormError("date.month", multipleInvalidKey, Seq("month", "year")),
-          FormError("date.year", multipleInvalidKey, Seq("month", "year")))
+          FormError("date.year", multipleInvalidKey, Seq("month", "year"))
+        )
       }
 
       "the day and year are invalid" in {
         formatter.validateDayMonthYear("date", Some("50"), Some("11"), Some("0")) shouldBe Seq(
           FormError("date.day", multipleInvalidKey, Seq("day", "year")),
-          FormError("date.year", multipleInvalidKey, Seq("day", "year")))
+          FormError("date.year", multipleInvalidKey, Seq("day", "year"))
+        )
       }
 
       "the day and month are invalid" in {
         formatter.validateDayMonthYear("date", Some("5.6"), Some("9.9"), Some("2000")) shouldBe Seq(
           FormError("date.day", multipleInvalidKey, Seq("day", "month")),
-          FormError("date.month", multipleInvalidKey, Seq("day", "month")))
+          FormError("date.month", multipleInvalidKey, Seq("day", "month"))
+        )
       }
 
       "all three fields are invalid" in {
@@ -98,19 +106,22 @@ class LocalDateFormatterSpec extends AnyWordSpec with Matchers {
       "the month and year are empty" in {
         formatter.validateDayMonthYear("date", Some("11"), None, None) shouldBe Seq(
           FormError("date.month", twoRequiredKey, Seq("month", "year")),
-          FormError("date.year", twoRequiredKey, Seq("month", "year")))
+          FormError("date.year", twoRequiredKey, Seq("month", "year"))
+        )
       }
 
       "the day and year are empty" in {
         formatter.validateDayMonthYear("date", None, Some("11"), None) shouldBe Seq(
           FormError("date.day", twoRequiredKey, Seq("day", "year")),
-          FormError("date.year", twoRequiredKey, Seq("day", "year")))
+          FormError("date.year", twoRequiredKey, Seq("day", "year"))
+        )
       }
 
       "the day and month are empty" in {
         formatter.validateDayMonthYear("date", None, None, Some("2000")) shouldBe Seq(
           FormError("date.day", twoRequiredKey, Seq("day", "month")),
-          FormError("date.month", twoRequiredKey, Seq("day", "month")))
+          FormError("date.month", twoRequiredKey, Seq("day", "month"))
+        )
       }
 
       "all three fields are empty" in {
@@ -153,9 +164,9 @@ class LocalDateFormatterSpec extends AnyWordSpec with Matchers {
 
     "return form data from a LocalDate" in {
       formatter.unbind("date", LocalDate.parse("2000-11-11")) shouldBe Map(
-        "date.day" -> "11",
+        "date.day"   -> "11",
         "date.month" -> "11",
-        "date.year" -> "2000"
+        "date.year"  -> "2000"
       )
     }
   }

@@ -29,14 +29,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NoPSRPageRouter @Inject()(val statusService: StatusService,
-                                val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
+class NoPSRPageRouter @Inject() (val statusService: StatusService, val businessMatchingService: BusinessMatchingService)
+    extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+  override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Result] =
     Future.successful(Redirect(routes.RegistrationProgressController.get()))
-  }
 }
-
-
-

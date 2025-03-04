@@ -27,51 +27,52 @@ import views.html.supervision.PenalisedByProfessionalView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class PenalisedByProfessionalController @Inject()(
-                                                   val dataCacheConnector: DataCacheConnector,
-                                                   val authAction: AuthAction,
-                                                   val ds: CommonPlayDependencies,
-                                                   val cc: MessagesControllerComponents,
-                                                   formProvider: PenalisedByProfessionalFormProvider,
-                                                   view: PenalisedByProfessionalView) extends AmlsBaseController(ds, cc) {
+class PenalisedByProfessionalController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: PenalisedByProfessionalFormProvider,
+  view: PenalisedByProfessionalView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
-        response =>
-          val form = (for {
-            supervision <- response
-            professionalBody <- supervision.professionalBody
-          } yield formProvider().fill(professionalBody)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map { response =>
+      val form = (for {
+        supervision      <- response
+        professionalBody <- supervision.professionalBody
+      } yield formProvider().fill(professionalBody)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
-        data => {
-          for {
-            supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
-            existingAnswer = supervision.flatMap(_.professionalBody)
-            answerEqualsExisting = existingAnswer.exists(_.getClass == data.getClass)
-          } yield {
-            if(answerEqualsExisting) {
-              Future.successful(Redirect(routes.SummaryController.get()))
-            } else {
-              dataCacheConnector.save[Supervision](
-                request.credId, Supervision.key, supervision.professionalBody(data)
-              ) map { _ =>
-                (data, edit) match {
-                  case (ProfessionalBodyYes(_), _) => Redirect(routes.PenaltyDetailsController.get(edit))
-                  case _ => Redirect(routes.SummaryController.get())
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
+          {
+            for {
+              supervision         <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
+              existingAnswer       = supervision.flatMap(_.professionalBody)
+              answerEqualsExisting = existingAnswer.exists(_.getClass == data.getClass)
+            } yield
+              if (answerEqualsExisting) {
+                Future.successful(Redirect(routes.SummaryController.get()))
+              } else {
+                dataCacheConnector.save[Supervision](
+                  request.credId,
+                  Supervision.key,
+                  supervision.professionalBody(data)
+                ) map { _ =>
+                  (data, edit) match {
+                    case (ProfessionalBodyYes(_), _) => Redirect(routes.PenaltyDetailsController.get(edit))
+                    case _                           => Redirect(routes.SummaryController.get())
+                  }
                 }
               }
-            }
-          }
-        }.flatten
+          }.flatten
       )
   }
 }

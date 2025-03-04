@@ -32,103 +32,103 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object DeclarationHelper extends Logging{
+object DeclarationHelper extends Logging {
 
-  def currentPartnersNames(responsiblePeople: Seq[ResponsiblePerson]): Seq[String] = {
+  def currentPartnersNames(responsiblePeople: Seq[ResponsiblePerson]): Seq[String] =
     nonDeletedResponsiblePeopleWithPositions(responsiblePeople).collect {
       case p if p.positions.get.positions.contains(Partner) => p.personName.get.fullName
     }
-  }
 
-  def numberOfPartners(responsiblePeople: Seq[ResponsiblePerson]): Int = {
-
-    nonDeletedResponsiblePeopleWithPositions(responsiblePeople).collect({
+  def numberOfPartners(responsiblePeople: Seq[ResponsiblePerson]): Int =
+    nonDeletedResponsiblePeopleWithPositions(responsiblePeople).collect {
       case p if p.positions.get.positions.contains(Partner) => p
-    }).size
-  }
+    }.size
 
-  def nonPartners(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] = {
-    nonDeletedResponsiblePeopleWithPositions(responsiblePeople).collect({
+  def nonPartners(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
+    nonDeletedResponsiblePeopleWithPositions(responsiblePeople).collect {
       case p if !p.positions.get.positions.contains(Partner) => p
-    })
-  }
+    }
 
-  private def nonDeletedResponsiblePeopleWithPositions(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] = {
+  private def nonDeletedResponsiblePeopleWithPositions(
+    responsiblePeople: Seq[ResponsiblePerson]
+  ): Seq[ResponsiblePerson] =
     responsiblePeople.collect {
       case p if p.positions.isDefined & p.status.isEmpty => p
     }
-  }
 
-  def routeDependingOnNominatedOfficer(hasNominatedOfficer: Boolean, status: SubmissionStatus): Call = {
+  def routeDependingOnNominatedOfficer(hasNominatedOfficer: Boolean, status: SubmissionStatus): Call =
     if (hasNominatedOfficer) {
       declaration.routes.WhoIsRegisteringController.get
     } else {
       routeWithoutNominatedOfficer(status)
     }
-  }
 
-  private def routeWithoutNominatedOfficer(status: SubmissionStatus): Call = {
+  private def routeWithoutNominatedOfficer(status: SubmissionStatus): Call =
     status match {
       case SubmissionReady | NotCompleted | SubmissionReadyForReview | ReadyForRenewal(_) =>
         declaration.routes.WhoIsTheBusinessNominatedOfficerController.get
-      case _ => declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
+      case _                                                                              => declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
     }
-  }
 
-  def statusSubtitle(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
-                    (implicit statusService: StatusService, hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[String] = {
+  def statusSubtitle(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)(implicit
+    statusService: StatusService,
+    hc: HeaderCarrier,
+    ec: ExecutionContext,
+    messages: Messages
+  ): Future[String] =
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
-      case SubmissionReady => "submit.registration"
+      case SubmissionReady                                       => "submit.registration"
       case SubmissionReadyForReview | SubmissionDecisionApproved => "submit.amendment.application"
-      case ReadyForRenewal(_) | RenewalSubmitted(_) => "submit.renewal.application"
-      case _ => throw new Exception("Incorrect status - Page not permitted for this status")
+      case ReadyForRenewal(_) | RenewalSubmitted(_)              => "submit.renewal.application"
+      case _                                                     => throw new Exception("Incorrect status - Page not permitted for this status")
     }
-  }
 
-  def statusEndDate(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
-                    (implicit statusService: StatusService, hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Option[LocalDate]] = {
+  def statusEndDate(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)(implicit
+    statusService: StatusService,
+    hc: HeaderCarrier,
+    ec: ExecutionContext,
+    messages: Messages
+  ): Future[Option[LocalDate]] =
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case ReadyForRenewal(endDate) => endDate
-      case _ => None
+      case _                        => None
     }
-  }
 
-  def promptRenewal(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
-                   (implicit statusService: StatusService,
-                    renewalService: RenewalService,
-                    hc: HeaderCarrier ,
-                    ec: ExecutionContext,
-                    messages: Messages
-                   ): Future[Boolean] = {
-    for{
-      status <- statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId)
+  def promptRenewal(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)(implicit
+    statusService: StatusService,
+    renewalService: RenewalService,
+    hc: HeaderCarrier,
+    ec: ExecutionContext,
+    messages: Messages
+  ): Future[Boolean] =
+    for {
+      status   <- statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId)
       inWindow <- inRenewalWindow(status)
       complete <- renewalComplete(renewalService, cacheId)
     } yield (inWindow, complete) match {
       case (true, false) => true
-      case _ => false
+      case _             => false
     }
-  }
 
-  private def inRenewalWindow(status: SubmissionStatus): Future[Boolean] = {
+  private def inRenewalWindow(status: SubmissionStatus): Future[Boolean] =
     status match {
       case ReadyForRenewal(_) => Future.successful(true)
-      case _ => Future.successful(false)
+      case _                  => Future.successful(false)
     }
-  }
 
-  def renewalComplete(renewalService: RenewalService, credId: String)
-                             (implicit ec: ExecutionContext): Future[Boolean] = {
+  def renewalComplete(renewalService: RenewalService, credId: String)(implicit ec: ExecutionContext): Future[Boolean] =
     renewalService.getRenewal(credId) flatMap {
       case Some(renewal) =>
         renewalService.isRenewalComplete(renewal, credId)
-      case _ => Future.successful(false)
+      case _             => Future.successful(false)
     }
-  }
 
-  def sectionsComplete(cacheId: String, sectionsProvider: SectionsProvider, isRenewal: Boolean)
-                      (implicit ec: ExecutionContext, messages: Messages): Future[Boolean] = {
-    val taskRows: Future[Seq[TaskRow]] = if(isRenewal) sectionsProvider.taskRowsForRenewal(cacheId) else sectionsProvider.taskRows(cacheId)
+  def sectionsComplete(cacheId: String, sectionsProvider: SectionsProvider, isRenewal: Boolean)(implicit
+    ec: ExecutionContext,
+    messages: Messages
+  ): Future[Boolean] = {
+    val taskRows: Future[Seq[TaskRow]] =
+      if (isRenewal) sectionsProvider.taskRowsForRenewal(cacheId) else sectionsProvider.taskRows(cacheId)
     taskRows map areComplete
   }
 
@@ -136,17 +136,19 @@ object DeclarationHelper extends Logging{
     row.status == Completed || row.status == Updated
   }
 
-  def getSubheadingBasedOnStatus(credId: String, amlsRefNumber: Option[String], accountTypeId: (String, String), statusService: StatusService, renewalService: RenewalService)
-                                (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): OptionT[Future, String] = {
+  def getSubheadingBasedOnStatus(
+    credId: String,
+    amlsRefNumber: Option[String],
+    accountTypeId: (String, String),
+    statusService: StatusService,
+    renewalService: RenewalService
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): OptionT[Future, String] =
     for {
       renewalComplete <- OptionT.liftF(DeclarationHelper.renewalComplete(renewalService, credId))
-      status <- OptionT.liftF(statusService.getStatus(amlsRefNumber, accountTypeId, credId))
-    } yield {
-      status match {
-        case ReadyForRenewal(_) if renewalComplete => "submit.renewal.application"
-        case SubmissionReady => "submit.registration"
-        case _ => "submit.amendment.application"
-      }
+      status          <- OptionT.liftF(statusService.getStatus(amlsRefNumber, accountTypeId, credId))
+    } yield status match {
+      case ReadyForRenewal(_) if renewalComplete => "submit.renewal.application"
+      case SubmissionReady                       => "submit.registration"
+      case _                                     => "submit.amendment.application"
     }
-  }
 }

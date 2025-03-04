@@ -45,11 +45,11 @@ class DeregistrationCheckYourAnswersControllerSpec extends AmlsSpec with Injecti
 
     val request = addToken(authRequest)
 
-    val amlsConnector: AmlsConnector = mock[AmlsConnector]
+    val amlsConnector: AmlsConnector                 = mock[AmlsConnector]
     val authEnrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
-    val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
+    val dataCacheConnector: DataCacheConnector       = mock[DataCacheConnector]
 
-    lazy val view = inject[DeregistrationCheckYourAnswersView]
+    lazy val view       = inject[DeregistrationCheckYourAnswersView]
     lazy val controller = new DeregistrationCheckYourAnswersController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
@@ -73,7 +73,7 @@ class DeregistrationCheckYourAnswersControllerSpec extends AmlsSpec with Injecti
     content must include("Your registration")
 
     val document: Document = Jsoup.parse(content)
-    document.select("h1").text mustBe "Check your answers" //verify correct the view is loaded
+    document.select("h1").text mustBe "Check your answers" // verify correct the view is loaded
   }
 
   "when submitting it deregisters and navigates to the landing page" in new TestFixture {
@@ -96,12 +96,14 @@ class DeregistrationCheckYourAnswersControllerSpec extends AmlsSpec with Injecti
     status(result) must be(SEE_OTHER)
     redirectLocation(result).value mustBe controllers.deregister.routes.DeregistrationConfirmationController.get.url
 
-    val captor: ArgumentCaptor[DeRegisterSubscriptionRequest] = ArgumentCaptor.forClass(classOf[DeRegisterSubscriptionRequest])
+    val captor: ArgumentCaptor[DeRegisterSubscriptionRequest] =
+      ArgumentCaptor.forClass(classOf[DeRegisterSubscriptionRequest])
 
     verify(amlsConnector).deregister(
       amlsRegistrationNumber = eqTo(amlsRegistrationNumber),
       request = captor.capture(),
-      accountTypeId = any())(any(), any())
+      accountTypeId = any()
+    )(any(), any())
 
     captor.getValue.deregistrationReason mustBe DeregistrationReason.OutOfScope
 

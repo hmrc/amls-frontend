@@ -21,9 +21,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class BankAccountNameFormProvider @Inject()() extends Mappings {
+class BankAccountNameFormProvider @Inject() () extends Mappings {
 
-  val length = 40
+  val length                = 40
   def apply(): Form[String] = Form[String](
     "accountName" -> text("error.bankdetails.accountname").verifying(
       firstError(

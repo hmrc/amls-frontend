@@ -23,8 +23,6 @@ class HowCashPaymentsReceivedSpec extends AmlsSpec {
   val model = HowCashPaymentsReceived(PaymentMethods(courier = true, direct = true, other = Some("foo")))
 
   "HowCashPaymentsReceived" must {
-    "round trip through Json" ignore {
-
-    }
+    "round trip through Json" ignore {}
   }
 }

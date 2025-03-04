@@ -18,4 +18,4 @@ package models.notifications
 
 import java.time.LocalDate
 
-case class EndDateDetails(endDate:LocalDate, referenceNumber: Option[String])
+case class EndDateDetails(endDate: LocalDate, referenceNumber: Option[String])

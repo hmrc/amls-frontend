@@ -25,27 +25,33 @@ import utils.DateHelper
 
 import javax.inject.Inject
 
-class CheckYourAnswersHelper @Inject()() {
+class CheckYourAnswersHelper @Inject() () {
 
-  def createSummaryList(tradingPremises: TradingPremises, index: Int, isMsb: Boolean, hasOneService: Boolean, hasOneMsbService: Boolean)(implicit messages: Messages): SummaryList = {
+  def createSummaryList(
+    tradingPremises: TradingPremises,
+    index: Int,
+    isMsb: Boolean,
+    hasOneService: Boolean,
+    hasOneMsbService: Boolean
+  )(implicit messages: Messages): SummaryList = {
 
     val rows: Seq[SummaryListRow] =
-    Seq(
-      businessStructureRow(tradingPremises, index),
-      agentCompanyDetailsRow(tradingPremises, index)
-    ).flatten ++
-      agentPersonalDetailsRows(tradingPremises, index).getOrElse(Nil) ++
       Seq(
-        agentPartnershipRow(tradingPremises, index),
-        companyRegistrationNumberRow(tradingPremises, index)
+        businessStructureRow(tradingPremises, index),
+        agentCompanyDetailsRow(tradingPremises, index)
       ).flatten ++
-      tradingPremises.yourTradingPremises.fold(Seq.empty[SummaryListRow])(
-        yta => tradingPremisesRows(yta, index).getOrElse(Seq.empty[SummaryListRow])
-      ) ++
-      Seq(
-        businessActivitiesRow(tradingPremises, index, hasOneService),
-        msbServicesRow(tradingPremises, index, hasOneMsbService)
-      ).flatten
+        agentPersonalDetailsRows(tradingPremises, index).getOrElse(Nil) ++
+        Seq(
+          agentPartnershipRow(tradingPremises, index),
+          companyRegistrationNumberRow(tradingPremises, index)
+        ).flatten ++
+        tradingPremises.yourTradingPremises.fold(Seq.empty[SummaryListRow])(yta =>
+          tradingPremisesRows(yta, index).getOrElse(Seq.empty[SummaryListRow])
+        ) ++
+        Seq(
+          businessActivitiesRow(tradingPremises, index, hasOneService),
+          msbServicesRow(tradingPremises, index, hasOneMsbService)
+        ).flatten
 
     if (isMsb) {
       SummaryList(Seq(agentPremisesRow(tradingPremises, index)).flatten ++ rows)
@@ -54,7 +60,9 @@ class CheckYourAnswersHelper @Inject()() {
     }
   }
 
-  private def agentPremisesRow(tradingPremises: TradingPremises, index: Int)(implicit messages: Messages): Option[SummaryListRow] = {
+  private def agentPremisesRow(tradingPremises: TradingPremises, index: Int)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     tradingPremises.registeringAgentPremises.map { agentPremises =>
       row(
         "tradingpremises.agent.premises.title",
@@ -66,9 +74,10 @@ class CheckYourAnswersHelper @Inject()() {
         )
       )
     }
-  }
 
-  private def businessStructureRow(tradingPremises: TradingPremises, index: Int)(implicit messages: Messages): Option[SummaryListRow] = {
+  private def businessStructureRow(tradingPremises: TradingPremises, index: Int)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     tradingPremises.businessStructure.map { structure =>
       row(
         "tradingpremises.businessStructure.title",
@@ -80,9 +89,10 @@ class CheckYourAnswersHelper @Inject()() {
         )
       )
     }
-  }
 
-  private def agentCompanyDetailsRow(tradingPremises: TradingPremises, index: Int)(implicit messages: Messages): Option[SummaryListRow] = {
+  private def agentCompanyDetailsRow(tradingPremises: TradingPremises, index: Int)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     tradingPremises.agentCompanyDetails.map { details =>
       row(
         "tradingpremises.youragent.company.name",
@@ -91,13 +101,13 @@ class CheckYourAnswersHelper @Inject()() {
           controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).url,
           "tradingpremises.checkYourAnswers.change.agentCompDtls",
           "tradingpremisesagentcompanyname-edit"
-
         )
       )
     }
-  }
 
-  private def agentPersonalDetailsRows(tradingPremises: TradingPremises, index: Int)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def agentPersonalDetailsRows(tradingPremises: TradingPremises, index: Int)(implicit
+    messages: Messages
+  ): Option[Seq[SummaryListRow]] =
     tradingPremises.agentName.map { name =>
       Seq(
         row(
@@ -123,9 +133,10 @@ class CheckYourAnswersHelper @Inject()() {
         )
       )
     }
-  }
 
-  private def agentPartnershipRow(tradingPremises: TradingPremises, index: Int)(implicit messages: Messages): Option[SummaryListRow] = {
+  private def agentPartnershipRow(tradingPremises: TradingPremises, index: Int)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     tradingPremises.agentPartnership.map { partnership =>
       row(
         "tradingpremises.agentpartnership.title",
@@ -137,77 +148,71 @@ class CheckYourAnswersHelper @Inject()() {
         )
       )
     }
-  }
 
-  private def companyRegistrationNumberRow(tradingPremises: TradingPremises, index: Int)(implicit messages: Messages) = {
+  private def companyRegistrationNumberRow(tradingPremises: TradingPremises, index: Int)(implicit messages: Messages) =
     for {
-      details <- tradingPremises.agentCompanyDetails
+      details   <- tradingPremises.agentCompanyDetails
       regNumber <- details.companyRegistrationNumber
-    } yield {
-      row(
-        "tradingpremises.youragent.crn",
-        regNumber,
-        editAction(
-          controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).url,
-          "tradingpremises.checkYourAnswers.change.agentCompDtls",
-          "tradingpremisesyouragentcrn-edit"
-        )
+    } yield row(
+      "tradingpremises.youragent.crn",
+      regNumber,
+      editAction(
+        controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).url,
+        "tradingpremises.checkYourAnswers.change.agentCompDtls",
+        "tradingpremisesyouragentcrn-edit"
       )
-    }
-  }
+    )
 
-  private def tradingPremisesRows(yta: YourTradingPremises, index: Int)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
-
+  private def tradingPremisesRows(yta: YourTradingPremises, index: Int)(implicit
+    messages: Messages
+  ): Option[Seq[SummaryListRow]] =
     for {
-      startDate <- yta.startDate
+      startDate     <- yta.startDate
       isResidential <- yta.isResidential
-      name = yta.tradingName
-      address = yta.tradingPremisesAddress
-    } yield {
-      Seq(
-
-        SummaryListRow(
-          Key(Text(messages("tradingpremises.yourtradingpremises.title"))),
-          nameAndAddressToLines(name, address),
-          actions = editAction(
-            controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).url,
-            "tradingpremises.checkYourAnswers.change.tradingPremDtls",
-            "tradingpremisesdetails-edit"
-          )
-        ),
-        row(
-          "tradingpremises.startDate.title",
-          DateHelper.formatDate(startDate),
-          editAction(
-            controllers.tradingpremises.routes.ActivityStartDateController.get(index, true).url,
-            "tradingpremises.checkYourAnswers.change.tradingPremFrom",
-            "tradingprmisedsummarystartdate-edit"
-          )
-        ),
-
-        row(
-          "tradingpremises.isResidential.title",
-          booleanToLabel(isResidential),
-          editAction(
-            controllers.tradingpremises.routes.IsResidentialController.get(index, true).url,
-            "tradingpremises.checkYourAnswers.change.resAddr",
-            "tradingpremisessummaryresidential-edit"
-          )
+      name           = yta.tradingName
+      address        = yta.tradingPremisesAddress
+    } yield Seq(
+      SummaryListRow(
+        Key(Text(messages("tradingpremises.yourtradingpremises.title"))),
+        nameAndAddressToLines(name, address),
+        actions = editAction(
+          controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).url,
+          "tradingpremises.checkYourAnswers.change.tradingPremDtls",
+          "tradingpremisesdetails-edit"
+        )
+      ),
+      row(
+        "tradingpremises.startDate.title",
+        DateHelper.formatDate(startDate),
+        editAction(
+          controllers.tradingpremises.routes.ActivityStartDateController.get(index, true).url,
+          "tradingpremises.checkYourAnswers.change.tradingPremFrom",
+          "tradingprmisedsummarystartdate-edit"
+        )
+      ),
+      row(
+        "tradingpremises.isResidential.title",
+        booleanToLabel(isResidential),
+        editAction(
+          controllers.tradingpremises.routes.IsResidentialController.get(index, true).url,
+          "tradingpremises.checkYourAnswers.change.resAddr",
+          "tradingpremisessummaryresidential-edit"
         )
       )
-    }
-  }
+    )
 
-  private def businessActivitiesRow(tradingPremises: TradingPremises, index: Int, hasOneService: Boolean)(implicit messages: Messages): Option[SummaryListRow] = {
+  private def businessActivitiesRow(tradingPremises: TradingPremises, index: Int, hasOneService: Boolean)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     tradingPremises.whatDoesYourBusinessDoAtThisAddress.map { ba =>
-
       val message: Value = ba.activities.toList match {
-        case activity :: Nil => Value(Text(messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}")))
-        case activities =>
+        case activity :: Nil =>
+          Value(Text(messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}")))
+        case activities      =>
           toBulletList(activities.sortBy(_.toString).map(_.value), "businessmatching.registerservices.servicename.lbl")
       }
 
-      val changeLinkOpt: Option[Actions] = if(hasOneService) {
+      val changeLinkOpt: Option[Actions] = if (hasOneService) {
         None
       } else {
         editAction(
@@ -223,13 +228,13 @@ class CheckYourAnswersHelper @Inject()() {
         actions = changeLinkOpt
       )
     }
-  }
-  private def msbServicesRow(tradingPremises: TradingPremises, index: Int, hasOneMsbService: Boolean)(implicit messages: Messages): Option[SummaryListRow] = {
+  private def msbServicesRow(tradingPremises: TradingPremises, index: Int, hasOneMsbService: Boolean)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     tradingPremises.msbServices.map { msb =>
-
       val message: Value = msb.services.toList match {
         case service :: Nil => Value(Text(messages(s"msb.services.list.lbl.${service.value}")))
-        case services =>
+        case services       =>
           toBulletList(services.sortBy(_.toString).map(_.value), "msb.services.list.lbl")
       }
 
@@ -249,7 +254,6 @@ class CheckYourAnswersHelper @Inject()() {
         actions = changeLinkOpt
       )
     }
-  }
 
   private def booleanToLabel(bool: Boolean)(implicit messages: Messages): String = if (bool) {
     messages("lbl.yes")
@@ -257,24 +261,26 @@ class CheckYourAnswersHelper @Inject()() {
     messages("lbl.no")
   }
 
-  private def row(title: String, label: String, actions: Option[Actions])(implicit messages: Messages): SummaryListRow = {
+  private def row(title: String, label: String, actions: Option[Actions])(implicit messages: Messages): SummaryListRow =
     SummaryListRow(
       Key(Text(messages(title))),
       Value(Text(label)),
       actions = actions
     )
-  }
 
-  private def editAction(route: String, hiddenText: String, id: String)(implicit messages: Messages): Option[Actions] = {
-    Some(Actions(
-      items = Seq(ActionItem(
-        route,
-        Text(messages("button.edit")),
-        visuallyHiddenText = Some(messages(hiddenText)),
-        attributes = Map("id" -> id)
-      ))
-    ))
-  }
+  private def editAction(route: String, hiddenText: String, id: String)(implicit messages: Messages): Option[Actions] =
+    Some(
+      Actions(
+        items = Seq(
+          ActionItem(
+            route,
+            Text(messages("button.edit")),
+            visuallyHiddenText = Some(messages(hiddenText)),
+            attributes = Map("id" -> id)
+          )
+        )
+      )
+    )
 
   private def toBulletList[A](coll: Seq[A], messagePrefix: String)(implicit messages: Messages): Value = Value(
     HtmlContent(
@@ -288,7 +294,7 @@ class CheckYourAnswersHelper @Inject()() {
     )
   )
 
-  private def nameAndAddressToLines(name: String, address: Address): Value = {
+  private def nameAndAddressToLines(name: String, address: Address): Value =
     Value(
       HtmlContent(
         Html(
@@ -301,5 +307,4 @@ class CheckYourAnswersHelper @Inject()() {
         )
       )
     )
-  }
 }

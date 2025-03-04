@@ -24,41 +24,48 @@ import services.cache.Cache
 import utils.StatusConstants
 
 case class BankDetails(
-                        bankAccountType: Option[BankAccountType] = None,
-                        accountName: Option[String] = None,
-                        bankAccount: Option[BankAccount] = None,
-                        hasChanged: Boolean = false,
-                        refreshedFromServer: Boolean = false,
-                        status: Option[String] = None,
-                        hasAccepted: Boolean = false
-                      ) {
+  bankAccountType: Option[BankAccountType] = None,
+  accountName: Option[String] = None,
+  bankAccount: Option[BankAccount] = None,
+  hasChanged: Boolean = false,
+  refreshedFromServer: Boolean = false,
+  status: Option[String] = None,
+  hasAccepted: Boolean = false
+) {
 
-  def bankAccountType(v: Option[BankAccountType]): BankDetails = {
+  def bankAccountType(v: Option[BankAccountType]): BankDetails =
     v match {
-      case None => this.copy(bankAccountType = None, hasChanged = hasChanged || this.bankAccountType.isDefined,
-        hasAccepted = hasAccepted && this.bankAccountType.isEmpty)
-      case _ =>
-        this.copy(bankAccountType = v, hasChanged = hasChanged || !this.bankAccountType.equals(v),
-          hasAccepted = hasAccepted && this.bankAccountType.equals(v))
+      case None =>
+        this.copy(
+          bankAccountType = None,
+          hasChanged = hasChanged || this.bankAccountType.isDefined,
+          hasAccepted = hasAccepted && this.bankAccountType.isEmpty
+        )
+      case _    =>
+        this.copy(
+          bankAccountType = v,
+          hasChanged = hasChanged || !this.bankAccountType.equals(v),
+          hasAccepted = hasAccepted && this.bankAccountType.equals(v)
+        )
     }
-  }
 
-  def bankAccount(value: Option[BankAccount]): BankDetails = {
-    this.copy(bankAccount = value, hasChanged = hasChanged || (this.bankAccount != value),
-      hasAccepted = hasAccepted && this.bankAccount == value)
-  }
+  def bankAccount(value: Option[BankAccount]): BankDetails =
+    this.copy(
+      bankAccount = value,
+      hasChanged = hasChanged || (this.bankAccount != value),
+      hasAccepted = hasAccepted && this.bankAccount == value
+    )
 
-  def isBankAccountComplete(ba: BankAccount) = {
+  def isBankAccountComplete(ba: BankAccount) =
     ba.isComplete
-  }
 
   def isComplete: Boolean = this match {
-    case details if details.status.contains(StatusConstants.Deleted) => true
-    case BankDetails(None, None, None, false, false, None, false) => true
-    case BankDetails(Some(NoBankAccountUsed), _, None, _, _, _, accepted) => accepted
+    case details if details.status.contains(StatusConstants.Deleted)                           => true
+    case BankDetails(None, None, None, false, false, None, false)                              => true
+    case BankDetails(Some(NoBankAccountUsed), _, None, _, _, _, accepted)                      => accepted
     case BankDetails(Some(_), Some(_), Some(a), _, _, _, accepted) if isBankAccountComplete(a) => accepted
-    case BankDetails(None, _, None, _, _, _, accepted) => accepted
-    case _ => false
+    case BankDetails(None, _, None, _, _, _, accepted)                                         => accepted
+    case _                                                                                     => false
   }
 }
 
@@ -70,17 +77,16 @@ object BankDetails {
 
   def anyChanged(newModel: Seq[BankDetails]): Boolean = newModel exists { x => x.hasChanged }
 
-  def getBankAccountDescription(bankDetails:BankDetails)(implicit messages: Messages):String  = {
+  def getBankAccountDescription(bankDetails: BankDetails)(implicit messages: Messages): String =
     (bankDetails.bankAccountType, bankDetails.bankAccount) match {
-      case (Some(baType), Some(BankAccount(Some(BankAccountIsUk(true)), _, _))) =>
-          messages("bankdetails.accounttype.uk.lbl." + baType.getBankAccountTypeID)
+      case (Some(baType), Some(BankAccount(Some(BankAccountIsUk(true)), _, _)))  =>
+        messages("bankdetails.accounttype.uk.lbl." + baType.getBankAccountTypeID)
       case (Some(baType), Some(BankAccount(Some(BankAccountIsUk(false)), _, _))) =>
-          messages("bankdetails.accounttype.nonuk.lbl." + baType.getBankAccountTypeID)
-      case (Some(baType), _) =>
-          messages("bankdetails.accounttype.lbl." + baType.getBankAccountTypeID)
-      case _ => ""
+        messages("bankdetails.accounttype.nonuk.lbl." + baType.getBankAccountTypeID)
+      case (Some(baType), _)                                                     =>
+        messages("bankdetails.accounttype.lbl." + baType.getBankAccountTypeID)
+      case _                                                                     => ""
     }
-  }
 
   def taskRow(implicit cache: Cache, messages: Messages) = {
 
@@ -94,7 +100,7 @@ object BankDetails {
     )
 
     cache.getEntry[Seq[BankDetails]](key).fold(notStarted) {
-      case model if model.isEmpty =>
+      case model if model.isEmpty                                         =>
         TaskRow(
           messageKey,
           controllers.bankdetails.routes.YourBankAccountsController.get().url,
@@ -102,7 +108,7 @@ object BankDetails {
           Completed,
           TaskRow.completedTag
         )
-      case bds@model if model.forall(_.isComplete) && anyChanged(model) =>
+      case bds @ model if model.forall(_.isComplete) && anyChanged(model) =>
         TaskRow(
           messageKey,
           controllers.bankdetails.routes.YourBankAccountsController.get().url,
@@ -111,8 +117,8 @@ object BankDetails {
           TaskRow.updatedTag
         )
       case bds @ model if model forall {
-        _.isComplete
-      } =>
+            _.isComplete
+          } =>
         TaskRow(
           messageKey,
           controllers.bankdetails.routes.YourBankAccountsController.get().url,
@@ -120,7 +126,7 @@ object BankDetails {
           Completed,
           TaskRow.completedTag
         )
-      case bds @ _ =>
+      case bds @ _                                                        =>
         TaskRow(
           messageKey,
           controllers.bankdetails.routes.YourBankAccountsController.get().url,
@@ -139,25 +145,26 @@ object BankDetails {
 
   implicit val reads: Reads[BankDetails] = {
 
-    def accountNameReader: Reads[Option[String]] = {
+    def accountNameReader: Reads[Option[String]] =
       (__ \ "accountName").readNullable[String] flatMap {
-        case x@Some(_) => constant(x)
-        case _ => (__ \ "bankAccount" \ "accountName").readNullable[String] orElse constant(None)
+        case x @ Some(_) => constant(x)
+        case _           => (__ \ "bankAccount" \ "accountName").readNullable[String] orElse constant(None)
       }
-    }
 
     (
       ((__ \ "bankAccountType").readNullable[BankAccountType] orElse __.read(Reads.optionNoError[BankAccountType])) ~
         accountNameReader ~
-        ((__ \ "bankAccount").read[BankAccount].map[Option[BankAccount]](Some(_)) orElse __.read(Reads.optionNoError[BankAccount]).map{
+        ((__ \ "bankAccount")
+          .read[BankAccount]
+          .map[Option[BankAccount]](Some(_)) orElse __.read(Reads.optionNoError[BankAccount]).map {
           case Some(BankAccount(None, None, None)) => None
-          case x => x
+          case x                                   => x
         }) ~
         (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) ~
         (__ \ "refreshedFromServer").readNullable[Boolean].map(_.getOrElse(false)) ~
         (__ \ "status").readNullable[String] ~
         (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
-      ) (BankDetails.apply _)
+    )(BankDetails.apply _)
   }
 
   implicit val writes: Writes[BankDetails] = Json.writes[BankDetails]
@@ -166,20 +173,21 @@ object BankDetails {
     details.getOrElse(BankDetails())
 
   object Filters {
-    val deletedFilter = (bd: BankDetails) => bd.status.contains(StatusConstants.Deleted)
-    val completeFilter = (bd: BankDetails) => bd.isComplete
+    val deletedFilter       = (bd: BankDetails) => bd.status.contains(StatusConstants.Deleted)
+    val completeFilter      = (bd: BankDetails) => bd.isComplete
     val noBankAccountFilter = (bd: BankDetails) => bd.bankAccountType.contains(NoBankAccountUsed)
 
     val emptyModelFilter: BankDetails => Boolean = {
       case BankDetails(None, None, None, _, _, _, _) => true
-      case _ => false
+      case _                                         => false
     }
 
-    val visibleAccountsFilter = (bd: BankDetails) => !deletedFilter(bd) && !noBankAccountFilter(bd) && !emptyModelFilter(bd)
+    val visibleAccountsFilter = (bd: BankDetails) =>
+      !deletedFilter(bd) && !noBankAccountFilter(bd) && !emptyModelFilter(bd)
 
     implicit class ZippedSyntax(zipped: Seq[(BankDetails, Int)]) {
-      def visibleAccounts = zipped filter { case (bd, _) => visibleAccountsFilter(bd) }
-      def completeAccounts = zipped filter { case (bd, _) => completeFilter(bd) }
+      def visibleAccounts    = zipped filter { case (bd, _) => visibleAccountsFilter(bd) }
+      def completeAccounts   = zipped filter { case (bd, _) => completeFilter(bd) }
       def incompleteAccounts = zipped filterNot { case (bd, _) => completeFilter(bd) }
     }
   }

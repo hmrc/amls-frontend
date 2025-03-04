@@ -29,8 +29,8 @@ import java.time.LocalDate
 
 class ActivityStartDateViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val date = inject[ActivityStartDateView]
-  lazy val formProvider = inject[ActivityStartDateFormProvider]
+  lazy val date                             = inject[ActivityStartDateView]
+  lazy val formProvider                     = inject[ActivityStartDateFormProvider]
   implicit val requestWithToken: Request[_] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -42,7 +42,9 @@ class ActivityStartDateViewSpec extends AmlsViewSpec with Matchers {
 
       def view = date(formWithData, true)
 
-      doc.title must startWith(messages("businessdetails.activity.start.date.title") + " - " + messages("summary.businessdetails"))
+      doc.title must startWith(
+        messages("businessdetails.activity.start.date.title") + " - " + messages("summary.businessdetails")
+      )
     }
 
     "have correct headings" in new ViewFixture {
@@ -51,7 +53,7 @@ class ActivityStartDateViewSpec extends AmlsViewSpec with Matchers {
 
       def view = date(formWithData, true)
 
-      heading.html must be(messages("businessdetails.activity.start.date.title"))
+      heading.html    must be(messages("businessdetails.activity.start.date.title"))
       subHeading.html must include(messages("summary.businessdetails"))
 
     }
@@ -60,9 +62,9 @@ class ActivityStartDateViewSpec extends AmlsViewSpec with Matchers {
 
       val formWithInvalidData: Form[ActivityStartDate] = formProvider().bind(
         Map(
-          "value.day" -> "2",
+          "value.day"   -> "2",
           "value.month" -> "4",
-          "value.year" -> "x",
+          "value.year"  -> "x"
         )
       )
 

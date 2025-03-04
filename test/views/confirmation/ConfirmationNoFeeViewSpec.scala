@@ -28,9 +28,9 @@ import views.html.confirmation.ConfirmationNoFeeView
 class ConfirmationNoFeeViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val confirmation_no_fee = inject[ConfirmationNoFeeView]
+    lazy val confirmation_no_fee                                   = inject[ConfirmationNoFeeView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
-    implicit val config: ApplicationConfig = app.injector.instanceOf[ApplicationConfig]
+    implicit val config: ApplicationConfig                         = app.injector.instanceOf[ApplicationConfig]
 
     val businessName = "Test Business Ltd"
 
@@ -62,7 +62,7 @@ class ConfirmationNoFeeViewSpec extends AmlsViewSpec with Matchers {
 
     "show the correct content" in new ViewFixture {
 
-      val paragraphs = doc.getElementsByTag("p").text
+      val paragraphs   = doc.getElementsByTag("p").text
       val listElements = doc.getElementsByTag("li").text
 
       paragraphs must include(messages("confirmation.no.fee"))

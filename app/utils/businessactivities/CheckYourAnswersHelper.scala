@@ -25,10 +25,11 @@ import utils.CheckYourAnswersHelperFunctions
 
 import javax.inject.Inject
 
-class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions {
+class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunctions {
 
-  def createSummaryList(businessActivities: BusinessActivities,
-                        needsAccountancyQuestions: Boolean)(implicit messages: Messages): SummaryList = {
+  def createSummaryList(businessActivities: BusinessActivities, needsAccountancyQuestions: Boolean)(implicit
+    messages: Messages
+  ): SummaryList = {
 
     val rows =
       involvedInOthersRows(businessActivities).getOrElse(Nil) ++
@@ -52,7 +53,9 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
       SummaryList(rows)
     }
   }
-  private def involvedInOthersRows(businessActivities: BusinessActivities)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def involvedInOthersRows(
+    businessActivities: BusinessActivities
+  )(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
 
     val yesNoEditAction = editAction(
       controllers.businessactivities.routes.InvolvedInOtherController.get(true).url,
@@ -61,33 +64,36 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
     )
 
     businessActivities.involvedInOther.map {
-      case InvolvedInOtherNo => Seq(
-        row(
-          "businessactivities.confirm-activities.title",
-          booleanToLabel(false),
-          yesNoEditAction
-        )
-      )
-      case InvolvedInOtherYes(details) => Seq(
-        row(
-          "businessactivities.confirm-activities.title",
-          booleanToLabel(true),
-          yesNoEditAction
-        ),
-        row(
-          "businessactivities.confirm-activities.lbl.details",
-          details,
-          editAction(
-            controllers.businessactivities.routes.InvolvedInOtherController.get(true).url,
-            "businessactivities.checkYourAnswers.change.descOthrActs",
-            "involvedinotherdetails-edit"
+      case InvolvedInOtherNo           =>
+        Seq(
+          row(
+            "businessactivities.confirm-activities.title",
+            booleanToLabel(false),
+            yesNoEditAction
           )
         )
-      )
+      case InvolvedInOtherYes(details) =>
+        Seq(
+          row(
+            "businessactivities.confirm-activities.title",
+            booleanToLabel(true),
+            yesNoEditAction
+          ),
+          row(
+            "businessactivities.confirm-activities.lbl.details",
+            details,
+            editAction(
+              controllers.businessactivities.routes.InvolvedInOtherController.get(true).url,
+              "businessactivities.checkYourAnswers.change.descOthrActs",
+              "involvedinotherdetails-edit"
+            )
+          )
+        )
     }
   }
-  private def expectedBusinessTurnoverRow(businessActivities: BusinessActivities)(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def expectedBusinessTurnoverRow(
+    businessActivities: BusinessActivities
+  )(implicit messages: Messages): Option[SummaryListRow] =
     businessActivities.expectedBusinessTurnover.map { ebt =>
       row(
         "businessactivities.business-turnover.title",
@@ -99,10 +105,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def expectedAMLSTurnoverRow(businessActivities: BusinessActivities)(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def expectedAMLSTurnoverRow(
+    businessActivities: BusinessActivities
+  )(implicit messages: Messages): Option[SummaryListRow] =
     businessActivities.expectedAMLSTurnover.map { et =>
       row(
         "businessactivities.turnover.heading",
@@ -114,11 +120,12 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def businessFranchiseRows(businessActivities: BusinessActivities)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def businessFranchiseRows(
+    businessActivities: BusinessActivities
+  )(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
 
-    def yesNoRow(bool: Boolean): SummaryListRow = {
+    def yesNoRow(bool: Boolean): SummaryListRow =
       row(
         "businessactivities.businessfranchise.title",
         booleanToLabel(bool),
@@ -128,56 +135,58 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           "businessfranchise-edit"
         )
       )
-    }
 
     businessActivities.businessFranchise.map {
-      case BusinessFranchiseNo => Seq(yesNoRow(false))
-      case BusinessFranchiseYes(name) => Seq(
-        yesNoRow(true),
-        row(
-          "businessactivities.businessfranchise.lbl.franchisename",
-          name,
-          editAction(
-            controllers.businessactivities.routes.BusinessFranchiseController.get(true).url,
-            "businessactivities.checkYourAnswers.change.franchisorName",
-            "businessfranchisename-edit"
+      case BusinessFranchiseNo        => Seq(yesNoRow(false))
+      case BusinessFranchiseYes(name) =>
+        Seq(
+          yesNoRow(true),
+          row(
+            "businessactivities.businessfranchise.lbl.franchisename",
+            name,
+            editAction(
+              controllers.businessactivities.routes.BusinessFranchiseController.get(true).url,
+              "businessactivities.checkYourAnswers.change.franchisorName",
+              "businessfranchisename-edit"
+            )
           )
         )
-      )
     }
   }
 
-  private def howManyEmployeesRows(businessActivities: BusinessActivities)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
-
+  private def howManyEmployeesRows(
+    businessActivities: BusinessActivities
+  )(implicit messages: Messages): Option[Seq[SummaryListRow]] =
     businessActivities.howManyEmployees.map { hme =>
       (hme.employeeCount, hme.employeeCountAMLSSupervision) match {
-        case (Some(employeeCount), Some(amlsCount)) => Seq(
-          row(
-            "businessactivities.employees.line2.cya",
-            amlsCount,
-            editAction(
-              controllers.businessactivities.routes.EmployeeCountAMLSSupervisionController.get(true).url,
-              "businessactivities.checkYourAnswers.change.pplAmtOnActs",
-              "employeescountline2-edit"
-            )
-          ),
-          row(
-            "businessactivities.employees.line1.cya",
-            employeeCount,
-            editAction(
-              controllers.businessactivities.routes.HowManyEmployeesController.get(true).url,
-              "businessactivities.checkYourAnswers.change.pplInBus",
-              "employeescountline1-edit"
+        case (Some(employeeCount), Some(amlsCount)) =>
+          Seq(
+            row(
+              "businessactivities.employees.line2.cya",
+              amlsCount,
+              editAction(
+                controllers.businessactivities.routes.EmployeeCountAMLSSupervisionController.get(true).url,
+                "businessactivities.checkYourAnswers.change.pplAmtOnActs",
+                "employeescountline2-edit"
+              )
+            ),
+            row(
+              "businessactivities.employees.line1.cya",
+              employeeCount,
+              editAction(
+                controllers.businessactivities.routes.HowManyEmployeesController.get(true).url,
+                "businessactivities.checkYourAnswers.change.pplInBus",
+                "employeescountline1-edit"
+              )
             )
           )
-        )
-        case _ => Nil
+        case _                                      => Nil
       }
     }
-  }
 
-  private def transactionRecordRow(businessActivities: BusinessActivities)(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def transactionRecordRow(
+    businessActivities: BusinessActivities
+  )(implicit messages: Messages): Option[SummaryListRow] =
     businessActivities.transactionRecord.map { record =>
       row(
         "businessactivities.keep.customer.records.title",
@@ -189,12 +198,13 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def transactionRecordTypesRows(businessActivities: BusinessActivities)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def transactionRecordTypesRows(
+    businessActivities: BusinessActivities
+  )(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
 
-    def softwareRow(types: TransactionTypes): Option[SummaryListRow] = types.types.find(_.isInstanceOf[DigitalSoftware]) map {
-      case DigitalSoftware(name) =>
+    def softwareRow(types: TransactionTypes): Option[SummaryListRow] =
+      types.types.find(_.isInstanceOf[DigitalSoftware]) map { case DigitalSoftware(name) =>
         row(
           "businessactivities.name.software.pkg.lbl",
           name,
@@ -204,13 +214,13 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             "software-edit"
           )
         )
-    }
+      }
 
     businessActivities.transactionRecordTypes.map { transactionTypes =>
-
       Seq(
         getValueForRow[TransactionType](
-          transactionTypes.types, x => messages(s"businessactivities.transactiontype.lbl.${x.value}")
+          transactionTypes.types,
+          x => messages(s"businessactivities.transactiontype.lbl.${x.value}")
         ).map { value =>
           SummaryListRow(
             Key(Text(messages("businessactivities.do.keep.records"))),
@@ -227,8 +237,9 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
     }
   }
 
-  private def identifySuspiciousActivityRow(businessActivities: BusinessActivities)(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def identifySuspiciousActivityRow(
+    businessActivities: BusinessActivities
+  )(implicit messages: Messages): Option[SummaryListRow] =
     businessActivities.identifySuspiciousActivity.map { suspiciousActivity =>
       row(
         "businessactivities.identify-suspicious-activity.title",
@@ -240,10 +251,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def ncaRegisteredRow(businessActivities: BusinessActivities)(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def ncaRegisteredRow(
+    businessActivities: BusinessActivities
+  )(implicit messages: Messages): Option[SummaryListRow] =
     businessActivities.ncaRegistered.map { answer =>
       row(
         "businessactivities.ncaRegistered.title",
@@ -255,12 +266,12 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def riskAssessmentPolicyRows(businessActivities: BusinessActivities)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
-
+  private def riskAssessmentPolicyRows(
+    businessActivities: BusinessActivities
+  )(implicit messages: Messages): Option[Seq[SummaryListRow]] =
     businessActivities.riskAssessmentPolicy map {
-      case RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), _) =>
+      case RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), _)                         =>
         Seq(
           row(
             "businessactivities.riskassessment.policy.title",
@@ -286,7 +297,8 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             )
           ),
           getValueForRow[RiskAssessmentType](
-            types, x => messages(s"businessactivities.RiskAssessmentType.lbl.${x.value}")
+            types,
+            x => messages(s"businessactivities.RiskAssessmentType.lbl.${x.value}")
           ).map { value =>
             SummaryListRow(
               Key(Text(messages("businessactivities.document.riskassessment.policy.title"))),
@@ -300,11 +312,12 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           }
         ).flatten
     }
-  }
 
-  private def accountancyRows(activities: BusinessActivities)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def accountancyRows(
+    activities: BusinessActivities
+  )(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
 
-    def booleanRow(hasAccountant: Boolean): SummaryListRow = {
+    def booleanRow(hasAccountant: Boolean): SummaryListRow =
       row(
         "businessactivities.accountantForAMLSRegulations.title",
         booleanToLabel(hasAccountant),
@@ -314,9 +327,8 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           "accountantforamlsregulations-edit"
         )
       )
-    }
 
-    def makeNameRow(name: WhoIsYourAccountantName) = {
+    def makeNameRow(name: WhoIsYourAccountantName) =
       SummaryListRow(
         Key(Text(messages("businessactivities.whoisyouraccountant.title"))),
         nameValues(name),
@@ -326,9 +338,8 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           "whoisyouraccountant-edit"
         )
       )
-    }
 
-    def makeIsUKRow(uk: WhoIsYourAccountantIsUk, name: WhoIsYourAccountantName) = {
+    def makeIsUKRow(uk: WhoIsYourAccountantIsUk, name: WhoIsYourAccountantName) =
       SummaryListRow(
         Key(Text(messages("businessactivities.whoisyouraccountant.location.header", name.accountantsName))),
         Value(Text(booleanToLabel(uk.isUk))),
@@ -338,9 +349,8 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           "accountantisuk-edit"
         )
       )
-    }
 
-    def makeAddressRow(address: AccountantsAddress, name: WhoIsYourAccountantName) = {
+    def makeAddressRow(address: AccountantsAddress, name: WhoIsYourAccountantName) =
       SummaryListRow(
         Key(Text(messages("businessactivities.whoisyouraccountant.address.header", name.accountantsName))),
         addressToLines(address.toLines),
@@ -354,9 +364,8 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           "accountantaddress-edit"
         )
       )
-    }
 
-    def makeTaxMattersRow(matters: TaxMatters, name: WhoIsYourAccountantName) = {
+    def makeTaxMattersRow(matters: TaxMatters, name: WhoIsYourAccountantName) =
       SummaryListRow(
         Key(Text(messages("businessactivities.tax.matters.summary.title", name.accountantsName))),
         Value(Text(booleanToLabel(matters.manageYourTaxAffairs))),
@@ -366,50 +375,47 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           "taxmatters-edit"
         )
       )
-    }
 
     def nameValues(names: WhoIsYourAccountantName): Value = {
-      val name = {
+      val name =
         (names.accountantsName, names.accountantsTradingName) match {
           case (name, Some(tradeName)) =>
             s"""<ul class="govuk-list"><li>Name: $name</li>""" +
-            s"""<li>Trading name: $tradeName</li></ul>"""
-          case (name, None) => name
+              s"""<li>Trading name: $tradeName</li></ul>"""
+          case (name, None)            => name
         }
-      }
       Value(HtmlContent(name))
     }
 
     activities.accountantForAMLSRegulations match {
-      case Some(AccountantForAMLSRegulations(true)) =>
+      case Some(AccountantForAMLSRegulations(true))  =>
         for {
           accountant <- activities.whoIsYourAccountant
-          name <- accountant.names
-          isUK <- accountant.isUk
-          address <- accountant.address
+          name       <- accountant.names
+          isUK       <- accountant.isUk
+          address    <- accountant.address
           taxMatters <- activities.taxMatters
-        } yield {
-          Seq(
-            booleanRow(true),
-            makeNameRow(name),
-            makeIsUKRow(isUK, name),
-            makeAddressRow(address, name),
-            makeTaxMattersRow(taxMatters, name)
-          )
-        }
+        } yield Seq(
+          booleanRow(true),
+          makeNameRow(name),
+          makeIsUKRow(isUK, name),
+          makeAddressRow(address, name),
+          makeTaxMattersRow(taxMatters, name)
+        )
       case Some(AccountantForAMLSRegulations(false)) =>
         Some(Seq(booleanRow(false)))
-      case _ => None
+      case _                                         => None
     }
   }
 
-  private def getValueForRow[A](types: Set[A], f: A => String)(implicit messages: Messages): Option[Value] = types match {
-    case types if types.size > 1 =>
-      Some(
-        toBulletList(types.map(f).toSeq)
-      )
-    case types if types.size == 1 =>
-      Some(Value(Text(messages(f(types.head)))))
-    case _ => None
-  }
+  private def getValueForRow[A](types: Set[A], f: A => String)(implicit messages: Messages): Option[Value] =
+    types match {
+      case types if types.size > 1  =>
+        Some(
+          toBulletList(types.map(f).toSeq)
+        )
+      case types if types.size == 1 =>
+        Some(Value(Text(messages(f(types.head)))))
+      case _                        => None
+    }
 }

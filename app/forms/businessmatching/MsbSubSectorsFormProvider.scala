@@ -23,11 +23,11 @@ import play.api.data.Forms.seq
 
 import javax.inject.Inject
 
-class MsbSubSectorsFormProvider @Inject()() extends Mappings {
+class MsbSubSectorsFormProvider @Inject() () extends Mappings {
 
   def apply(): Form[Seq[BusinessMatchingMsbService]] =
     Form(
-        "value" -> seq(enumerable[BusinessMatchingMsbService]("error.required.msb.services")).verifying(
+      "value" -> seq(enumerable[BusinessMatchingMsbService]("error.required.msb.services")).verifying(
         nonEmptySeq("error.required.msb.services")
       )
     )

@@ -39,9 +39,10 @@ import scala.concurrent.Future
 class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGenerator with Injecting {
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[AgentCompanyDetailsView]
-    val controller = new AgentCompanyDetailsController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[AgentCompanyDetailsView]
+    val controller = new AgentCompanyDetailsController(
       mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -49,7 +50,8 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
       cc = mockMcc,
       formProvider = inject[AgentCompanyDetailsFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
   }
 
   "AgentCompanyDetailsController" when {
@@ -70,7 +72,11 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
       "display saved content" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises(agentCompanyDetails = Some(AgentCompanyDetails("test", Some("12345678"))))))))
+          .thenReturn(
+            Future.successful(
+              Some(Seq(TradingPremises(agentCompanyDetails = Some(AgentCompanyDetails("test", Some("12345678"))))))
+            )
+          )
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -96,10 +102,10 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
           val newRequest = FakeRequest(POST, routes.AgentCompanyDetailsController.post(19).url)
-          .withFormUrlEncodedBody(
-            "agentCompanyName" -> "text",
-            "companyRegistrationNumber" -> "12345678"
-          )
+            .withFormUrlEncodedBody(
+              "agentCompanyName"          -> "text",
+              "companyRegistrationNumber" -> "12345678"
+            )
 
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(TradingPremises())))
@@ -116,10 +122,10 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
         "edit is false and given valid data" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.AgentCompanyDetailsController.post(1).url)
-          .withFormUrlEncodedBody(
-            "agentCompanyName" -> "text",
-            "companyRegistrationNumber" -> "12345678"
-          )
+            .withFormUrlEncodedBody(
+              "agentCompanyName"          -> "text",
+              "companyRegistrationNumber" -> "12345678"
+            )
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesGen.sample.get)))
 
@@ -130,17 +136,17 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1)(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.ConfirmAddressController.get(1).url))
         }
 
         "edit is true and given valid data" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.AgentCompanyDetailsController.post(1, true).url)
-          .withFormUrlEncodedBody(
-            "agentCompanyName" -> "text",
-            "companyRegistrationNumber" -> "12345678"
-          )
+            .withFormUrlEncodedBody(
+              "agentCompanyName"          -> "text",
+              "companyRegistrationNumber" -> "12345678"
+            )
 
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(TradingPremises())))
@@ -152,7 +158,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1, true)(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
         }
@@ -162,24 +168,24 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
         "given invalid data" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.AgentCompanyDetailsController.post(1).url)
-          .withFormUrlEncodedBody(
-            "agentCompanyName" -> "11111111111" * 40
-          )
+            .withFormUrlEncodedBody(
+              "agentCompanyName" -> "11111111111" * 40
+            )
 
           val result = controller.post(1)(newRequest)
-          status(result) must be(BAD_REQUEST)
+          status(result)          must be(BAD_REQUEST)
           contentAsString(result) must include(messages("error.invalid.tp.agent.company.details"))
 
         }
 
         "given missing mandatory field" in new Fixture {
           val newRequest = FakeRequest(POST, routes.AgentCompanyDetailsController.post(1).url)
-          .withFormUrlEncodedBody(
-            "agentCompanyName" -> " "
-          )
+            .withFormUrlEncodedBody(
+              "agentCompanyName" -> " "
+            )
 
           val result = controller.post(1)(newRequest)
-          status(result) must be(BAD_REQUEST)
+          status(result)          must be(BAD_REQUEST)
           contentAsString(result) must include(messages("error.required.tp.agent.company.details"))
         }
       }
@@ -187,7 +193,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
       "set the hasChanged flag to true" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.AgentCompanyDetailsController.post(1).url)
-        .withFormUrlEncodedBody("agentCompanyName" -> "text", "companyRegistrationNumber" -> "12345678")
+          .withFormUrlEncodedBody("agentCompanyName" -> "text", "companyRegistrationNumber" -> "12345678")
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
@@ -200,45 +206,47 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
 
         val result = controller.post(1)(newRequest)
 
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
 
         verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
           any(),
           any(),
-          meq(Seq(tradingPremisesWithHasChangedFalse.copy(
-            hasChanged = true,
-            agentName = None,
-            agentCompanyDetails = Some(AgentCompanyDetails("text", Some("12345678"))),
-            agentPartnership = None
-          ), TradingPremises())))(any())
+          meq(
+            Seq(
+              tradingPremisesWithHasChangedFalse.copy(
+                hasChanged = true,
+                agentName = None,
+                agentCompanyDetails = Some(AgentCompanyDetails("text", Some("12345678"))),
+                agentPartnership = None
+              ),
+              TradingPremises()
+            )
+          )
+        )(any())
       }
     }
   }
 
-  val address = Address("1", None,None,None,"asdfasdf")
-  val year =1990
-  val month = 2
-  val day = 24
-  val date = LocalDate.of(year, month, day)
+  val address = Address("1", None, None, None, "asdfasdf")
+  val year    = 1990
+  val month   = 2
+  val day     = 24
+  val date    = LocalDate.of(year, month, day)
 
-  val ytp = YourTradingPremises("tradingName1", address, Some(true), Some(date))
+  val ytp  = YourTradingPremises("tradingName1", address, Some(true), Some(date))
   val ytp1 = YourTradingPremises("tradingName2", address, Some(true), Some(date))
   val ytp2 = YourTradingPremises("tradingName3", address, Some(true), Some(date))
   val ytp3 = YourTradingPremises("tradingName3", address, Some(true), Some(date))
 
-
-  val businessStructure = SoleProprietor
-  val testAgentName = AgentName("test")
+  val businessStructure    = SoleProprietor
+  val testAgentName        = AgentName("test")
   val testAgentCompanyName = AgentCompanyDetails("test", Some("12345678"))
   val testAgentPartnership = AgentPartnership("test")
-  val wdbd = WhatDoesYourBusinessDo(
-    Set(
-      BillPaymentServices,
-      EstateAgentBusinessService,
-      MoneyServiceBusiness)
+  val wdbd                 = WhatDoesYourBusinessDo(
+    Set(BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness)
   )
-  val msbServices = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
+  val msbServices          = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
 
   val tradingPremisesWithHasChangedFalse = TradingPremises(
     Some(RegisteringAgentPremises(true)),

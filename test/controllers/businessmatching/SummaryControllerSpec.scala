@@ -40,17 +40,18 @@ import scala.concurrent.Future
 class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
   sealed trait Fixture extends DependencyMocks { self =>
-    val request = addToken(authRequest)
+    val request                     = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    lazy val cyaView = app.injector.instanceOf[CheckYourAnswersView]
-    val controller = new SummaryController (
+    lazy val cyaView                = app.injector.instanceOf[CheckYourAnswersView]
+    val controller                  = new SummaryController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
       cc = mockMcc,
       cyaHelper = app.injector.instanceOf[CheckYourAnswersHelper],
-      view = cyaView)
+      view = cyaView
+    )
 
     when {
       mockStatusService.isPreSubmission(any())
@@ -110,7 +111,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
       val result = controller.get()(request)
       status(result) must be(OK)
 
-      val doc = Jsoup.parse(contentAsString(result))
+      val doc     = Jsoup.parse(contentAsString(result))
       val editUrl = doc.getElementById("businessactivities-edit").attr("href")
 
       editUrl mustBe controllers.businessmatching.routes.RegisterServicesController.get().url
@@ -122,7 +123,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
       "redirect to RegistrationProgressController" which {
         "updates the hasAccepted flag on the model" in new Fixture {
 
-          val model = businessMatchingGen.sample.get.copy(hasAccepted = false)
+          val model       = businessMatchingGen.sample.get.copy(hasAccepted = false)
           val postRequest = requestWithUrlEncodedBody("" -> "")
 
           mockGetModel(Some(model))

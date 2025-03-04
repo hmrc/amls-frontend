@@ -55,12 +55,16 @@ class TradingPremisesSpec extends PlaySpec with Matchers with TradingPremisesGen
 
       "return false when your trading premises is empty" in {
 
-        val tp = Some(TradingPremises(
-          yourTradingPremises = Some(YourTradingPremises(
-            "name",
-            Address("Line 1", None, None, None, "AA11AA")
-          ))
-        ))
+        val tp = Some(
+          TradingPremises(
+            yourTradingPremises = Some(
+              YourTradingPremises(
+                "name",
+                Address("Line 1", None, None, None, "AA11AA")
+              )
+            )
+          )
+        )
 
         TradingPremises.addressSpecified(tp.yourTradingPremises) mustBe true
       }

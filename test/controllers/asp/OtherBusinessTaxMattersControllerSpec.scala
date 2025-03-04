@@ -41,7 +41,7 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
   trait Fixture extends DependencyMocks {
     self =>
     val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
-    lazy val view: OtherBusinessTaxMattersView = inject[OtherBusinessTaxMattersView]
+    lazy val view: OtherBusinessTaxMattersView   = inject[OtherBusinessTaxMattersView]
     mockCacheFetch[Asp](None)
 
     mockCacheSave[Asp]
@@ -55,24 +55,24 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
       view = view
     )
 
-    val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.OtherBusinessTaxMattersController.post().url)
-      .withFormUrlEncodedBody(
-      "otherBusinessTaxMatters" -> "true"
-    )
+    val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+      FakeRequest(POST, routes.OtherBusinessTaxMattersController.post().url)
+        .withFormUrlEncodedBody(
+          "otherBusinessTaxMatters" -> "true"
+        )
   }
-
 
   "OtherBusinessTaxMattersController" when {
     "get is called" must {
       "display the are you registered with HMRC to handle other business's tax matters page" in new Fixture {
         val result: Future[Result] = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("asp.other.business.tax.matters.title"))
       }
 
       "display the the Does your business use the services of another Trust or Company Service Provider page with pre populated data" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Asp](any(), any())
-          (any())).thenReturn(Future.successful(Some(Asp(otherBusinessTaxMatters = Some(OtherBusinessTaxMattersYes)))))
+        when(controller.dataCacheConnector.fetch[Asp](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Asp(otherBusinessTaxMatters = Some(OtherBusinessTaxMattersYes)))))
 
         val result: Future[Result] = controller.get()(request)
         status(result) must be(OK)
@@ -86,14 +86,15 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
       "on post with valid data" in new Fixture {
         val result: Future[Result] = controller.post()(newRequest)
 
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       }
 
       "on post with invalid boolean data" in new Fixture {
-        val newRequestInvalid: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.OtherBusinessTaxMattersController.post().url)
-          .withFormUrlEncodedBody("otherBusinessTaxMatters" -> "invalidBoolean")
-        val result: Future[Result] = controller.post()(newRequestInvalid)
+        val newRequestInvalid: FakeRequest[AnyContentAsFormUrlEncoded] =
+          FakeRequest(POST, routes.OtherBusinessTaxMattersController.post().url)
+            .withFormUrlEncodedBody("otherBusinessTaxMatters" -> "invalidBoolean")
+        val result: Future[Result]                                     = controller.post()(newRequestInvalid)
 
         status(result) must be(BAD_REQUEST)
         val document: Document = Jsoup.parse(contentAsString(result))
@@ -103,9 +104,10 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
       }
 
       "On post with missing boolean data" in new Fixture {
-        val newRequestInvalid: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.OtherBusinessTaxMattersController.post().url)
-          .withFormUrlEncodedBody("otherBusinessTaxMatters" -> "")
-        val result: Future[Result] = controller.post()(newRequestInvalid)
+        val newRequestInvalid: FakeRequest[AnyContentAsFormUrlEncoded] =
+          FakeRequest(POST, routes.OtherBusinessTaxMattersController.post().url)
+            .withFormUrlEncodedBody("otherBusinessTaxMatters" -> "")
+        val result: Future[Result]                                     = controller.post()(newRequestInvalid)
 
         status(result) must be(BAD_REQUEST)
 
@@ -116,14 +118,15 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
       }
 
       "on post with valid data in edit mode" in new Fixture {
-        val editRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.OtherBusinessTaxMattersController.post(true).url)
-          .withFormUrlEncodedBody(
-            "otherBusinessTaxMatters" -> "true"
-          )
+        val editRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+          FakeRequest(POST, routes.OtherBusinessTaxMattersController.post(true).url)
+            .withFormUrlEncodedBody(
+              "otherBusinessTaxMatters" -> "true"
+            )
 
         val result: Future[Result] = controller.post(true)(editRequest)
 
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       }
     }

@@ -39,33 +39,44 @@ import views.html.responsiblepeople.PositionWithinBusinessView
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with Injecting {
+class PositionWithinBusinessControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with ResponsiblePersonGenerator
+    with Injecting {
 
   trait Fixture {
     self =>
     val request = addToken(authRequest)
 
     val mockAuthConnector = authConnector
-    lazy val view = inject[PositionWithinBusinessView]
-    val controller = new PositionWithinBusinessController (
+    lazy val view         = inject[PositionWithinBusinessView]
+    val controller        = new PositionWithinBusinessController(
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
       formProvider = inject[PositionWithinBusinessFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
 
     object DefaultValues {
-      val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)
-      val hasNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), startDate)
+      val noNominatedOfficerPositions  = Positions(Set(BeneficialOwner, InternalAccountant), startDate)
+      val hasNominatedOfficerPositions =
+        Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), startDate)
     }
 
-    val responsiblePerson = ResponsiblePerson(
+    val responsiblePerson             = ResponsiblePerson(
       approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
       lineId = Some(1)
     )
-    val noNominatedOfficer = responsiblePerson.copy(positions = Some(DefaultValues.noNominatedOfficerPositions))
-    val hasNominatedOfficer = responsiblePerson.copy(positions = Some(DefaultValues.hasNominatedOfficerPositions))
-    val hasNominatedOfficerButDeleted = responsiblePerson.copy(positions = Some(DefaultValues.hasNominatedOfficerPositions), status = Some(StatusConstants.Deleted))
+    val noNominatedOfficer            = responsiblePerson.copy(positions = Some(DefaultValues.noNominatedOfficerPositions))
+    val hasNominatedOfficer           = responsiblePerson.copy(positions = Some(DefaultValues.hasNominatedOfficerPositions))
+    val hasNominatedOfficerButDeleted = responsiblePerson.copy(
+      positions = Some(DefaultValues.hasNominatedOfficerPositions),
+      status = Some(StatusConstants.Deleted)
+    )
 
   }
 
@@ -77,7 +88,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
   "PositionWithinBusinessController" when {
 
-    val pageTitle = messages("responsiblepeople.position_within_business.title", "firstname lastname") + " - " +
+    val pageTitle  = messages("responsiblepeople.position_within_business.title", "firstname lastname") + " - " +
       messages("summary.responsiblepeople") + " - " +
       messages("title.amls") + " - " + messages("title.gov")
     val personName = Some(PersonName("firstname", None, "lastname"))
@@ -85,9 +96,20 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
     "get is called" must {
 
       "display 'What is this person's role?' page" in new Fixture {
-        val mockCacheMap = mock[Cache]
-        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
-          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+        val mockCacheMap     = mock[Cache]
+        val reviewDtls       = ReviewDetails(
+          "BusinessName",
+          Some(BusinessType.SoleProprietor),
+          Address(
+            "line1",
+            Some("line2"),
+            Some("line3"),
+            Some("line4"),
+            Some("AA11 1AA"),
+            Country("United Kingdom", "GB")
+          ),
+          "ghghg"
+        )
         val businessMatching = BusinessMatching(Some(reviewDtls))
         when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -95,7 +117,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
           .thenReturn(Some(Seq(ResponsiblePerson(personName))))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
-        val result = controller.get(RecordId)(request)
+        val result           = controller.get(RecordId)(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
         document.title must include(pageTitle)
@@ -103,11 +125,22 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
       "Prepopulate form with a single saved data" in new Fixture {
 
-        val positions = Positions(Set(BeneficialOwner), startDate)
+        val positions         = Positions(Set(BeneficialOwner), startDate)
         val responsiblePeople = ResponsiblePerson(personName = personName, positions = Some(positions))
-        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
-        val businessMatching = BusinessMatching(Some(reviewDtls))
+        val reviewDtls        = ReviewDetails(
+          "BusinessName",
+          Some(BusinessType.LimitedCompany),
+          Address(
+            "line1",
+            Some("line2"),
+            Some("line3"),
+            Some("line4"),
+            Some("AA11 1AA"),
+            Country("United Kingdom", "GB")
+          ),
+          "ghghg"
+        )
+        val businessMatching  = BusinessMatching(Some(reviewDtls))
 
         val mockCacheMap = mock[Cache]
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any())).thenReturn(Some(Seq(responsiblePeople)))
@@ -124,17 +157,28 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
         PositionWithinBusiness.all map { pos =>
           val checkboxIsChecked = document.select(s"input[value=${pos.toString}]").hasAttr("checked")
-          if(pos == BeneficialOwner) checkboxIsChecked mustBe true else checkboxIsChecked mustBe false
+          if (pos == BeneficialOwner) checkboxIsChecked mustBe true else checkboxIsChecked mustBe false
         }
       }
 
       "Prepopulate form with multiple saved data" in new Fixture {
 
-        val positions = Positions(Set(BeneficialOwner, Director), startDate)
+        val positions         = Positions(Set(BeneficialOwner, Director), startDate)
         val responsiblePeople = ResponsiblePerson(personName = personName, positions = Some(positions))
 
-        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+        val reviewDtls       = ReviewDetails(
+          "BusinessName",
+          Some(BusinessType.LimitedCompany),
+          Address(
+            "line1",
+            Some("line2"),
+            Some("line3"),
+            Some("line4"),
+            Some("AA11 1AA"),
+            Country("United Kingdom", "GB")
+          ),
+          "ghghg"
+        )
         val businessMatching = BusinessMatching(Some(reviewDtls))
 
         val mockCacheMap = mock[Cache]
@@ -151,7 +195,8 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
         document.title must include(pageTitle)
         PositionWithinBusiness.all map { pos =>
           val checkboxIsChecked = document.select(s"input[value=${pos.toString}]").hasAttr("checked")
-          if (pos == BeneficialOwner || pos == Director) checkboxIsChecked mustBe true else checkboxIsChecked mustBe false
+          if (pos == BeneficialOwner || pos == Director) checkboxIsChecked mustBe true
+          else checkboxIsChecked mustBe false
         }
       }
     }
@@ -163,7 +208,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
         "positionWithinBusiness field is given an empty string" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.PositionWithinBusinessController.post(1).url)
-          .withFormUrlEncodedBody("positionWithinBusiness" -> "")
+            .withFormUrlEncodedBody("positionWithinBusiness" -> "")
 
           val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
 
@@ -176,16 +221,27 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(RecordId)(newRequest)
-          status(result) must be(BAD_REQUEST)
+          status(result)          must be(BAD_REQUEST)
           contentAsString(result) must include(messages("error.required.positionWithinBusiness"))
         }
 
         "positionWithinBusiness is given an invalid option" in new Fixture {
 
-          val newRequest = FakeRequest(POST, routes.PositionWithinBusinessController.post(1).url)
-          .withFormUrlEncodedBody("positionWithinBusiness" -> "foobar")
-          val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-            Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+          val newRequest       = FakeRequest(POST, routes.PositionWithinBusinessController.post(1).url)
+            .withFormUrlEncodedBody("positionWithinBusiness" -> "foobar")
+          val reviewDtls       = ReviewDetails(
+            "BusinessName",
+            Some(BusinessType.LimitedCompany),
+            Address(
+              "line1",
+              Some("line2"),
+              Some("line3"),
+              Some("line4"),
+              Some("AA11 1AA"),
+              Country("United Kingdom", "GB")
+            ),
+            "ghghg"
+          )
           val businessMatching = BusinessMatching(Some(reviewDtls))
 
           val mockCacheMap = mock[Cache]
@@ -197,7 +253,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(RecordId)(newRequest)
-          status(result) must be(BAD_REQUEST)
+          status(result)          must be(BAD_REQUEST)
           contentAsString(result) must include(messages("error.required.positionWithinBusiness"))
         }
       }
@@ -209,63 +265,76 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
           "Nominated Officer is selected" in new Fixture {
 
             val newRequest = FakeRequest(POST, routes.PositionWithinBusinessController.post(1).url)
-            .withFormUrlEncodedBody(
-              "positions[0]" -> NominatedOfficer.toString,
-            )
+              .withFormUrlEncodedBody(
+                "positions[0]" -> NominatedOfficer.toString
+              )
 
             when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
 
             val mockCacheMap = mock[Cache]
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+              .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(RecordId)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(RecordId).url))
+            status(result)           must be(SEE_OTHER)
+            redirectLocation(result) must be(
+              Some(controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(RecordId).url)
+            )
           }
 
           "Nominated Officer and another role is selected" in new Fixture {
 
-            val positions = Positions(Set(Director, NominatedOfficer), startDate)
+            val positions         = Positions(Set(Director, NominatedOfficer), startDate)
             val responsiblePeople = ResponsiblePerson(positions = Some(positions))
 
             val newRequest = FakeRequest(POST, routes.PositionWithinBusinessController.post(1).url)
-            .withFormUrlEncodedBody(
-              "positions[0]" -> SoleProprietor.toString,
-              "positions[1]" -> NominatedOfficer.toString,
-            )
+              .withFormUrlEncodedBody(
+                "positions[0]" -> SoleProprietor.toString,
+                "positions[1]" -> NominatedOfficer.toString
+              )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-              (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+              .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
             val mockCacheMap = mock[Cache]
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+              .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(RecordId)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(RecordId).url))
+            status(result)           must be(SEE_OTHER)
+            redirectLocation(result) must be(
+              Some(controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(RecordId).url)
+            )
           }
         }
       }
 
       "when edit is true" must {
 
-        "redirect to 'When did this person start their role in the business?'"  in new Fixture {
+        "redirect to 'When did this person start their role in the business?'" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.PositionWithinBusinessController.post(1).url)
-          .withFormUrlEncodedBody(
-            "positions[0]" -> NominatedOfficer.toString,
+            .withFormUrlEncodedBody(
+              "positions[0]" -> NominatedOfficer.toString
             )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-            (any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+            .thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
           val mockCacheMap = mock[Cache]
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(RecordId, true, Some(flowFromDeclaration))(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(RecordId, true, Some(flowFromDeclaration)).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(
+              controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController
+                .get(RecordId, true, Some(flowFromDeclaration))
+                .url
+            )
+          )
         }
       }
     }
@@ -288,9 +357,9 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
       }
 
       "there is no nominated officer" in new Fixture {
-        ResponsiblePerson.hasNominatedOfficer(Some(Seq(noNominatedOfficer.copy(
-          positions = Some(DefaultValues.noNominatedOfficerPositions))
-        ))) must be(false)
+        ResponsiblePerson.hasNominatedOfficer(
+          Some(Seq(noNominatedOfficer.copy(positions = Some(DefaultValues.noNominatedOfficerPositions))))
+        ) must be(false)
       }
     }
   }

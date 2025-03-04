@@ -51,27 +51,28 @@ object PercentageOfCashPaymentOver15000 extends Enumerable.Implicits {
       case "03" => Third
       case "04" => Fourth
       case "05" => Fifth
-      case _ =>
+      case _    =>
         play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 
   implicit val jsonWrites: Writes[PercentageOfCashPaymentOver15000] = Writes[PercentageOfCashPaymentOver15000] {
-    case First => Json.obj("percentage" -> "01")
+    case First  => Json.obj("percentage" -> "01")
     case Second => Json.obj("percentage" -> "02")
-    case Third => Json.obj("percentage" -> "03")
+    case Third  => Json.obj("percentage" -> "03")
     case Fourth => Json.obj("percentage" -> "04")
-    case Fifth => Json.obj("percentage" -> "05")
+    case Fifth  => Json.obj("percentage" -> "05")
   }
 
-  implicit def convert(model: PercentageOfCashPaymentOver15000): models.hvd.PercentageOfCashPaymentOver15000 = model match {
-    case PercentageOfCashPaymentOver15000.First => models.hvd.PercentageOfCashPaymentOver15000.First
-    case PercentageOfCashPaymentOver15000.Second => models.hvd.PercentageOfCashPaymentOver15000.Second
-    case PercentageOfCashPaymentOver15000.Third => models.hvd.PercentageOfCashPaymentOver15000.Third
-    case PercentageOfCashPaymentOver15000.Fourth => models.hvd.PercentageOfCashPaymentOver15000.Fourth
-    case PercentageOfCashPaymentOver15000.Fifth => models.hvd.PercentageOfCashPaymentOver15000.Fifth
-    case _ => throw new Exception("Invalid PercentageOfCashPaymentOver15000")
-  }
+  implicit def convert(model: PercentageOfCashPaymentOver15000): models.hvd.PercentageOfCashPaymentOver15000 =
+    model match {
+      case PercentageOfCashPaymentOver15000.First  => models.hvd.PercentageOfCashPaymentOver15000.First
+      case PercentageOfCashPaymentOver15000.Second => models.hvd.PercentageOfCashPaymentOver15000.Second
+      case PercentageOfCashPaymentOver15000.Third  => models.hvd.PercentageOfCashPaymentOver15000.Third
+      case PercentageOfCashPaymentOver15000.Fourth => models.hvd.PercentageOfCashPaymentOver15000.Fourth
+      case PercentageOfCashPaymentOver15000.Fifth  => models.hvd.PercentageOfCashPaymentOver15000.Fifth
+      case _                                       => throw new Exception("Invalid PercentageOfCashPaymentOver15000")
+    }
 
   val all: Seq[PercentageOfCashPaymentOver15000] = Seq(
     First,

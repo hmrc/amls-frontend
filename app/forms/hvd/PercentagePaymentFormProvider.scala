@@ -22,9 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class PercentagePaymentFormProvider @Inject()() extends Mappings {
+class PercentagePaymentFormProvider @Inject() () extends Mappings {
 
-  private val errorKey = "error.required.hvd.percentage"
+  private val errorKey                                = "error.required.hvd.percentage"
   def apply(): Form[PercentageOfCashPaymentOver15000] = Form(
     "percentage" -> enumerable(errorKey, errorKey)(PercentageOfCashPaymentOver15000.enumerable)
   )

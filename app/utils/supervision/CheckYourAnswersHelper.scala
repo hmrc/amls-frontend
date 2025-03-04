@@ -25,86 +25,84 @@ import utils.{CheckYourAnswersHelperFunctions, DateHelper}
 
 import javax.inject.Inject
 
-class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions {
+class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunctions {
 
-  def getSummaryList(model: Supervision)(implicit messages: Messages): SummaryList = {
-
+  def getSummaryList(model: Supervision)(implicit messages: Messages): SummaryList =
     SummaryList(
       anotherBodyRows(model).getOrElse(Seq.empty[SummaryListRow]) ++ Seq(
         professionalBodyMemberRow(model),
         professionalBodiesRow(model)
       ).flatten ++ penalisedRows(model).getOrElse(Seq.empty[SummaryListRow])
     )
-  }
 
-  private def anotherBodyRows(model: Supervision)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
-
+  private def anotherBodyRows(model: Supervision)(implicit messages: Messages): Option[Seq[SummaryListRow]] =
     model.anotherBody map {
-      case AnotherBodyNo => Seq(
-        row(
-          "supervision.another_body.title",
-          booleanToLabel(false),
-          editAction(
-            controllers.supervision.routes.AnotherBodyController.get(true).url,
-            "supervision.checkYourAnswers.change.registeredBefore",
-            "supervisionanotherbody-edit"
+      case AnotherBodyNo                                                                 =>
+        Seq(
+          row(
+            "supervision.another_body.title",
+            booleanToLabel(false),
+            editAction(
+              controllers.supervision.routes.AnotherBodyController.get(true).url,
+              "supervision.checkYourAnswers.change.registeredBefore",
+              "supervisionanotherbody-edit"
+            )
           )
         )
-      )
-      case AnotherBodyYes(supervisorName, Some(startDate), Some(endDate), Some(reasons)) => Seq(
-        row(
-          "supervision.another_body.title",
-          booleanToLabel(true),
-          editAction(
-            controllers.supervision.routes.AnotherBodyController.get(true).url,
-            "supervision.checkYourAnswers.change.registeredBefore",
-            "supervisionanotherbody-edit-name"
-          )
-        ),
-        row(
-          "supervision.another_body.lbl.supervisor",
-          supervisorName,
-          editAction(
-            controllers.supervision.routes.AnotherBodyController.get(true).url,
-            "supervision.checkYourAnswers.change.prevSupervisor",
-            "supervisionanotherbody-edit-previous-name"
-          )
-        ),
-        row(
-          "supervision.supervision_start.title",
-          DateHelper.formatDate(startDate.startDate),
-          editAction(
-            controllers.supervision.routes.SupervisionStartController.get(true).url,
-            "supervision.checkYourAnswers.change.whenLastStrt",
-            "supervisionanotherbody-edit-start-date"
-          )
-        ),
-        row(
-          "supervision.supervision_end.title",
-          DateHelper.formatDate(endDate.endDate),
-          editAction(
-            controllers.supervision.routes.SupervisionEndController.get(true).url,
-            "supervision.checkYourAnswers.change.whenLastEnd",
-            "supervisionanotherbody-edit-end-date"
-          )
-        ),
-        row(
-          "supervision.supervision_end_reasons.title",
-          reasons.endingReason,
-          editAction(
-            controllers.supervision.routes.SupervisionEndReasonsController.get(true).url,
-            "supervision.checkYourAnswers.change.whyLastEnd",
-            "supervisionanotherbody-edit-ending-reason"
+      case AnotherBodyYes(supervisorName, Some(startDate), Some(endDate), Some(reasons)) =>
+        Seq(
+          row(
+            "supervision.another_body.title",
+            booleanToLabel(true),
+            editAction(
+              controllers.supervision.routes.AnotherBodyController.get(true).url,
+              "supervision.checkYourAnswers.change.registeredBefore",
+              "supervisionanotherbody-edit-name"
+            )
+          ),
+          row(
+            "supervision.another_body.lbl.supervisor",
+            supervisorName,
+            editAction(
+              controllers.supervision.routes.AnotherBodyController.get(true).url,
+              "supervision.checkYourAnswers.change.prevSupervisor",
+              "supervisionanotherbody-edit-previous-name"
+            )
+          ),
+          row(
+            "supervision.supervision_start.title",
+            DateHelper.formatDate(startDate.startDate),
+            editAction(
+              controllers.supervision.routes.SupervisionStartController.get(true).url,
+              "supervision.checkYourAnswers.change.whenLastStrt",
+              "supervisionanotherbody-edit-start-date"
+            )
+          ),
+          row(
+            "supervision.supervision_end.title",
+            DateHelper.formatDate(endDate.endDate),
+            editAction(
+              controllers.supervision.routes.SupervisionEndController.get(true).url,
+              "supervision.checkYourAnswers.change.whenLastEnd",
+              "supervisionanotherbody-edit-end-date"
+            )
+          ),
+          row(
+            "supervision.supervision_end_reasons.title",
+            reasons.endingReason,
+            editAction(
+              controllers.supervision.routes.SupervisionEndReasonsController.get(true).url,
+              "supervision.checkYourAnswers.change.whyLastEnd",
+              "supervisionanotherbody-edit-ending-reason"
+            )
           )
         )
-      )
     }
-  }
 
   private def professionalBodyMemberRow(model: Supervision)(implicit messages: Messages): Option[SummaryListRow] = {
     val answerOpt = model.professionalBodyMember.map {
       case ProfessionalBodyMemberYes => booleanToLabel(true)
-      case ProfessionalBodyMemberNo => booleanToLabel(false)
+      case ProfessionalBodyMemberNo  => booleanToLabel(false)
     }
 
     answerOpt map { answer =>
@@ -124,7 +122,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
     val answerOpt = model.professionalBodies.map {
       case ProfessionalBodies(businessTypes) if businessTypes.size == 1 =>
         Value(Text(businessTypes.map(_.getMessage()).mkString))
-      case ProfessionalBodies(businessTypes) if businessTypes.size > 1 =>
+      case ProfessionalBodies(businessTypes) if businessTypes.size > 1  =>
         toBulletList(businessTypes.map(_.getMessage()).toSeq.sorted)
     }
 
@@ -141,39 +139,40 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
     }
   }
 
-  private def penalisedRows(model: Supervision)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def penalisedRows(model: Supervision)(implicit messages: Messages): Option[Seq[SummaryListRow]] =
     model.professionalBody.map {
-      case ProfessionalBodyNo => Seq(
-        row(
-          "supervision.penalisedbyprofessional.title",
-          booleanToLabel(false),
-          editAction(
-            controllers.supervision.routes.PenalisedByProfessionalController.get(true).url,
-            "supervision.checkYourAnswers.change.penaltyDtls",
-            "penalisedbyprofessional-edit"
+      case ProfessionalBodyNo           =>
+        Seq(
+          row(
+            "supervision.penalisedbyprofessional.title",
+            booleanToLabel(false),
+            editAction(
+              controllers.supervision.routes.PenalisedByProfessionalController.get(true).url,
+              "supervision.checkYourAnswers.change.penaltyDtls",
+              "penalisedbyprofessional-edit"
+            )
           )
         )
-      )
-      case ProfessionalBodyYes(details) => Seq(
-        row(
-          "supervision.penalisedbyprofessional.heading1",
-          booleanToLabel(true),
-          editAction(
-            controllers.supervision.routes.PenalisedByProfessionalController.get(true).url,
-            "supervision.checkYourAnswers.change.penaltyDtls",
-            "penalisedbyprofessional-edit"
-          )
-        ),
-        row(
-          "supervision.penaltydetails.title",
-          details,
-          editAction(
-            controllers.supervision.routes.PenaltyDetailsController.get(true).url,
-            "supervision.checkYourAnswers.change.penaltyDtlsDesc",
-            "penaltydetails-edit"
+      case ProfessionalBodyYes(details) =>
+        Seq(
+          row(
+            "supervision.penalisedbyprofessional.heading1",
+            booleanToLabel(true),
+            editAction(
+              controllers.supervision.routes.PenalisedByProfessionalController.get(true).url,
+              "supervision.checkYourAnswers.change.penaltyDtls",
+              "penalisedbyprofessional-edit"
+            )
+          ),
+          row(
+            "supervision.penaltydetails.title",
+            details,
+            editAction(
+              controllers.supervision.routes.PenaltyDetailsController.get(true).url,
+              "supervision.checkYourAnswers.change.penaltyDtlsDesc",
+              "penaltydetails-edit"
+            )
           )
         )
-      )
     }
-  }
 }

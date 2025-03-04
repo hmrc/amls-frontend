@@ -30,18 +30,28 @@ import java.time.LocalDateTime.now
 
 class NotificationTemplateGeneratorSpec extends AmlsViewSpec {
 
-  val versionOneMsg: V1M0 = app.injector.instanceOf[V1M0]
-  val versionTwoMsg: V2M0 = app.injector.instanceOf[V2M0]
+  val versionOneMsg: V1M0   = app.injector.instanceOf[V1M0]
+  val versionTwoMsg: V2M0   = app.injector.instanceOf[V2M0]
   val versionThreeMsg: V3M0 = app.injector.instanceOf[V3M0]
-  val versionFourMsg: V4M0 = app.injector.instanceOf[V4M0]
-  val versionFiveMsg: V5M0 = app.injector.instanceOf[V5M0]
-  val versionSixMsg: V6M0 = app.injector.instanceOf[V6M0]
+  val versionFourMsg: V4M0  = app.injector.instanceOf[V4M0]
+  val versionFiveMsg: V5M0  = app.injector.instanceOf[V5M0]
+  val versionSixMsg: V6M0   = app.injector.instanceOf[V6M0]
 
-  val templateGenerator = new NotificationTemplateGenerator(versionOneMsg, versionTwoMsg, versionThreeMsg, versionFourMsg, versionFiveMsg, versionSixMsg, commonDependencies)
+  val templateGenerator = new NotificationTemplateGenerator(
+    versionOneMsg,
+    versionTwoMsg,
+    versionThreeMsg,
+    versionFourMsg,
+    versionFiveMsg,
+    versionSixMsg,
+    commonDependencies
+  )
 
   "known template versions to versioned views" must {
     "not contain more than versioned view per template version" in {
-      templateGenerator.templateMsgVersionsToVersionedViews.groupMap(_._2)(_._1).filterNot(_._2.sizeIs == 1) must have size 0
+      templateGenerator.templateMsgVersionsToVersionedViews
+        .groupMap(_._2)(_._1)
+        .filterNot(_._2.sizeIs == 1) must have size 0
     }
   }
 
@@ -49,8 +59,14 @@ class NotificationTemplateGeneratorSpec extends AmlsViewSpec {
     "throw runtime exception" when {
       "when no versioned view exists for a given template version" in {
         the[RuntimeException] thrownBy templateGenerator
-          .contactTypeToView(MindedToReject, ("XDML00000567890", "safeId"), "business name", mindedToRejectNotificationDetails,
-            SubmissionDecisionRejected, "T1000")(FakeRequest()) must have message "Notification version T1000 not found"
+          .contactTypeToView(
+            MindedToReject,
+            ("XDML00000567890", "safeId"),
+            "business name",
+            mindedToRejectNotificationDetails,
+            SubmissionDecisionRejected,
+            "T1000"
+          )(FakeRequest()) must have message "Notification version T1000 not found"
       }
     }
 
@@ -62,9 +78,14 @@ class NotificationTemplateGeneratorSpec extends AmlsViewSpec {
       "notification rows are provided & is not previous registration" in {
         val table = templateGenerator
           .toTable(
-            Seq((mindedToRejectNotificationRow, 0), (payForManualChargeNotificationRow, 1), (renewalReminderNotificationRow, 2)),
+            Seq(
+              (mindedToRejectNotificationRow, 0),
+              (payForManualChargeNotificationRow, 1),
+              (renewalReminderNotificationRow, 2)
+            ),
             "id",
-            isPrevRegistration = false)
+            isPrevRegistration = false
+          )
 
         table must haveNumRows(3)
         table must haveTableHeaders(expectedNotificationHeadersWithIDSuffix("currentMessages"))
@@ -73,12 +94,17 @@ class NotificationTemplateGeneratorSpec extends AmlsViewSpec {
       "notification rows are provided & is previous registration" in {
         val table = templateGenerator
           .toTable(
-            Seq((mindedToRejectNotificationRow, 0), (payForManualChargeNotificationRow, 1), (renewalReminderNotificationRow, 2)),
+            Seq(
+              (mindedToRejectNotificationRow, 0),
+              (payForManualChargeNotificationRow, 1),
+              (renewalReminderNotificationRow, 2)
+            ),
             "id",
-            isPrevRegistration = true)
+            isPrevRegistration = true
+          )
 
         table must haveNumRows(3)
-        table must haveTableHeaders( expectedNotificationHeadersWithIDSuffix("previousMessages"))
+        table must haveTableHeaders(expectedNotificationHeadersWithIDSuffix("previousMessages"))
       }
     }
 
@@ -95,20 +121,49 @@ class NotificationTemplateGeneratorSpec extends AmlsViewSpec {
     NotificationDetails(Some(MindedToReject), Some(Status(Some(Rejected), None)), None, false, now)
 
   private val mindedToRejectNotificationRow =
-    NotificationRow(Some(Status(Some(Rejected), None)), Some(MindedToReject), None, false, now, false, "XDML00000567890", "v6m0", IDType("id"))
+    NotificationRow(
+      Some(Status(Some(Rejected), None)),
+      Some(MindedToReject),
+      None,
+      false,
+      now,
+      false,
+      "XDML00000567890",
+      "v6m0",
+      IDType("id")
+    )
 
   private val payForManualChargeNotificationRow =
-    NotificationRow(Some(Status(Some(Rejected), None)), Some(ReminderToPayForManualCharges), None, false, now, false, "XDML00000567890", "v6m0", IDType("id"))
+    NotificationRow(
+      Some(Status(Some(Rejected), None)),
+      Some(ReminderToPayForManualCharges),
+      None,
+      false,
+      now,
+      false,
+      "XDML00000567890",
+      "v6m0",
+      IDType("id")
+    )
 
   private val renewalReminderNotificationRow =
-    NotificationRow(Some(Status(Some(Rejected), None)), Some(RenewalReminder), None, false, now, false, "XDML00000567890", "v6m0", IDType("id"))
+    NotificationRow(
+      Some(Status(Some(Rejected), None)),
+      Some(RenewalReminder),
+      None,
+      false,
+      now,
+      false,
+      "XDML00000567890",
+      "v6m0",
+      IDType("id")
+    )
 
-  private def expectedNotificationHeadersWithIDSuffix(suffix: String): Seq[HeadCell] = {
+  private def expectedNotificationHeadersWithIDSuffix(suffix: String): Seq[HeadCell] =
     Seq(
       HeadCell(content = Text("Subject"), attributes = Map("id" -> s"subject-$suffix")),
       HeadCell(content = Text("Category"), attributes = Map("id" -> s"category-$suffix")),
       HeadCell(content = Text("Date"), attributes = Map("id" -> s"date-$suffix"))
     )
-  }
 
 }

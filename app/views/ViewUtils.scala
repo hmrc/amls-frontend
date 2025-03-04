@@ -24,15 +24,13 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
 object ViewUtils {
 
-
-  def errorTitlePrefix(content: Html)(implicit messages: Messages): String = {
+  def errorTitlePrefix(content: Html)(implicit messages: Messages): String =
     if (content.toString().contains("govuk-error-summary")) messages("error.browser.title.prefix").concat(" ") else ""
-  }
 
   def asTaskListItem(taskRow: TaskRow)(implicit messages: Messages): TaskListItem = {
 
     val (title, status) = taskRow.status match {
-      case Completed =>
+      case Completed  =>
         (
           messages("status.progress.edit", sectionName(taskRow.msgKey)),
           TaskListItemStatus(None, Text(messages("status.complete")))
@@ -42,12 +40,12 @@ object ViewUtils {
           messages("status.progress.add", sectionName(taskRow.msgKey)),
           TaskListItemStatus(Some(TaskRow.notStartedTag))
         )
-      case Started =>
+      case Started    =>
         (
           messages("status.progress.add", sectionName(taskRow.msgKey)),
           TaskListItemStatus(Some(TaskRow.incompleteTag))
         )
-      case _ =>
+      case _          =>
         (
           messages("status.progress.manage", sectionName(taskRow.msgKey)),
           TaskListItemStatus(None, Text(messages("status.complete")))
@@ -61,7 +59,7 @@ object ViewUtils {
 
     val isCompletedOrUpdated = taskRow.status == Updated || taskRow.status == Completed
 
-    val title = if(isCompletedOrUpdated) {
+    val title = if (isCompletedOrUpdated) {
       messages("status.progress.manage", sectionName(taskRow.msgKey))
     } else {
       messages("status.progress.add", sectionName(taskRow.msgKey))

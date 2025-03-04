@@ -32,108 +32,121 @@ import views.html.tradingpremises.MSBServicesView
 
 import scala.concurrent.Future
 
-class MSBServicesController @Inject ()(val dataCacheConnector: DataCacheConnector,
-                                       val authAction: AuthAction,
-                                       val ds: CommonPlayDependencies,
-                                       val statusService: StatusService,
-                                       val cc: MessagesControllerComponents,
-                                       formProvider: MSBServicesFormProvider,
-                                       view: MSBServicesView,
-                                       implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper {
+class MSBServicesController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val statusService: StatusService,
+  val cc: MessagesControllerComponents,
+  formProvider: MSBServicesFormProvider,
+  view: MSBServicesView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection
+    with DateOfChangeHelper {
 
   def get(index: Int, edit: Boolean = false, changed: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      dataCacheConnector.fetchAll(request.credId).map {
-        optionalCache =>
-          (for {
-            cache <- optionalCache
-            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-            msbServices <- businessMatching.msbServices flatMap {
-              _.msbServices match {
-                case set if set.isEmpty => None
-                case set => Some(set)
-              }
+      dataCacheConnector.fetchAll(request.credId).map { optionalCache =>
+        (for {
+          cache            <- optionalCache
+          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          msbServices      <- businessMatching.msbServices flatMap {
+                                _.msbServices match {
+                                  case set if set.isEmpty => None
+                                  case set                => Some(set)
+                                }
+                              }
+        } yield (for {
+          tp <- getData[TradingPremises](cache, index)
+        } yield {
+
+          val checkboxes = getFormValues(
+            TradingPremisesMsbServices.convertServices(msbServices).toSeq
+          )
+
+          if (msbServices.size == 1) {
+            updateDataStrict[TradingPremises](request.credId, index) { utp =>
+              Some(utp.msbServices(Some(TradingPremisesMsbServices(msbServices))))
             }
-          } yield {
+            Redirect(routes.CheckYourAnswersController.get(index))
+          } else {
             (for {
-              tp <- getData[TradingPremises](cache, index)
-            } yield {
-
-              val checkboxes = getFormValues(
-                TradingPremisesMsbServices.convertServices(msbServices).toSeq
-              )
-
-              if (msbServices.size == 1) {
-                updateDataStrict[TradingPremises](request.credId, index) { utp =>
-                  Some(utp.msbServices(Some(TradingPremisesMsbServices(msbServices))))
-                }
-                Redirect(routes.CheckYourAnswersController.get(index))
-              } else {
-                (for {
-                  tps <- tp.msbServices
-                } yield {
-                  Ok(view(formProvider().fill(tps), index, edit, changed, checkboxes))
-                }) getOrElse Ok(view(formProvider(), index, edit, changed, checkboxes))
-              }
-            }) getOrElse NotFound(notFoundView)
-          }) getOrElse NotFound(notFoundView)
+              tps <- tp.msbServices
+            } yield Ok(view(formProvider().fill(tps), index, edit, changed, checkboxes))) getOrElse Ok(
+              view(formProvider(), index, edit, changed, checkboxes)
+            )
+          }
+        }) getOrElse NotFound(notFoundView)) getOrElse NotFound(notFoundView)
       }
   }
 
-  private def redirectBasedOnStatus(status: SubmissionStatus,
-                                    tradingPremises: Option[TradingPremises],
-                                    data:TradingPremisesMsbServices,
-                                    edit: Boolean,
-                                    changed:Boolean,
-                                    index:Int) = {
-    if (this.redirectToDateOfChange(tradingPremises, data, changed, status)
-      && edit && tradingPremises.lineId.isDefined) {
+  private def redirectBasedOnStatus(
+    status: SubmissionStatus,
+    tradingPremises: Option[TradingPremises],
+    data: TradingPremisesMsbServices,
+    edit: Boolean,
+    changed: Boolean,
+    index: Int
+  ) =
+    if (
+      this.redirectToDateOfChange(tradingPremises, data, changed, status)
+      && edit && tradingPremises.lineId.isDefined
+    ) {
       Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
     } else {
       Redirect(routes.CheckYourAnswersController.get(index))
     }
-  }
 
   def post(index: Int, edit: Boolean = false, changed: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithError => {
-          for {
-            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-          } yield {
-            val checkboxes = businessMatching.msbServices match {
-              case Some(msb) => getFormValues(
-                TradingPremisesMsbServices.convertServices(msb.msbServices).toSeq
-              )
-              case None => getFormValues(Seq.empty[TradingPremisesMsbService])
-            }
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithError =>
+            {
+              for {
+                businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
+              } yield {
+                val checkboxes = businessMatching.msbServices match {
+                  case Some(msb) =>
+                    getFormValues(
+                      TradingPremisesMsbServices.convertServices(msb.msbServices).toSeq
+                    )
+                  case None      => getFormValues(Seq.empty[TradingPremisesMsbService])
+                }
 
-            BadRequest(view(formWithError, index, edit, changed, checkboxes))
-          }
-        }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        },
-        data => {
-          for {
-            tradingPremises <- getData[TradingPremises](request.credId, index)
-            _ <- updateDataStrict[TradingPremises](request.credId, index) { tp =>
-              tp.msbServices(Some(data))
+                BadRequest(view(formWithError, index, edit, changed, checkboxes))
+              }
+            }.recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
+            },
+          data =>
+            {
+              for {
+                tradingPremises <- getData[TradingPremises](request.credId, index)
+                _               <- updateDataStrict[TradingPremises](request.credId, index) { tp =>
+                                     tp.msbServices(Some(data))
+                                   }
+                status          <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+              } yield redirectBasedOnStatus(status, tradingPremises, data, edit, changed, index)
+            }.recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
             }
-            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-          } yield redirectBasedOnStatus(status, tradingPremises, data, edit, changed, index)
-        }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
-      )
+        )
   }
 
-  private def getFormValues(activities: Seq[TradingPremisesMsbService]): Seq[CheckboxItem] = {
+  private def getFormValues(activities: Seq[TradingPremisesMsbService]): Seq[CheckboxItem] =
     TradingPremisesMsbService.all.diff(activities) match {
       case seq if seq.isEmpty => TradingPremisesMsbService.formValues(None)
-      case seq => TradingPremisesMsbService.formValues(Some(seq))
+      case seq                => TradingPremisesMsbService.formValues(Some(seq))
     }
-  }
 
-  private def redirectToDateOfChange(tradingPremises: Option[TradingPremises], msbServices: TradingPremisesMsbServices, force: Boolean, status: SubmissionStatus) =
+  private def redirectToDateOfChange(
+    tradingPremises: Option[TradingPremises],
+    msbServices: TradingPremisesMsbServices,
+    force: Boolean,
+    status: SubmissionStatus
+  ) =
     !tradingPremises.get.msbServices.contains(msbServices) && isEligibleForDateOfChange(status) || force
 }

@@ -43,34 +43,50 @@ class DeregistrationReasonSpec extends PlaySpec with Matchers with MockitoSugar 
           be(JsSuccess(DeregistrationReason.ChangeOfLegalEntity, JsPath))
       }
       "HVDPolicyOfNotAcceptingHighValueCashPayments" in {
-        Json.fromJson[DeregistrationReason](Json.obj("deregistrationReason" -> "HVD - policy of not accepting high value cash payments")) must
+        Json.fromJson[DeregistrationReason](
+          Json.obj("deregistrationReason" -> "HVD - policy of not accepting high value cash payments")
+        ) must
           be(JsSuccess(DeregistrationReason.HVDPolicyOfNotAcceptingHighValueCashPayments, JsPath))
       }
     }
 
     "validate given an enum value and string" in {
-      Json.fromJson[DeregistrationReason](Json.obj("deregistrationReason" -> "Other, please specify", "specifyOtherReason" -> "reason")) must
+      Json.fromJson[DeregistrationReason](
+        Json.obj("deregistrationReason" -> "Other, please specify", "specifyOtherReason" -> "reason")
+      ) must
         be(JsSuccess(DeregistrationReason.Other("reason"), JsPath \ "specifyOtherReason"))
     }
 
     "write the correct value" when {
       "OutOfScope" in {
-        Json.toJson(DeregistrationReason.OutOfScope.asInstanceOf[DeregistrationReason]) must be(Json.obj("deregistrationReason" -> "Out of scope"))
+        Json.toJson(DeregistrationReason.OutOfScope.asInstanceOf[DeregistrationReason]) must be(
+          Json.obj("deregistrationReason" -> "Out of scope")
+        )
       }
       "NotTradingInOwnRight" in {
-        Json.toJson(DeregistrationReason.NotTradingInOwnRight.asInstanceOf[DeregistrationReason]) must be(Json.obj("deregistrationReason" -> "Not trading in own right"))
+        Json.toJson(DeregistrationReason.NotTradingInOwnRight.asInstanceOf[DeregistrationReason]) must be(
+          Json.obj("deregistrationReason" -> "Not trading in own right")
+        )
       }
       "UnderAnotherSupervisor" in {
-        Json.toJson(DeregistrationReason.UnderAnotherSupervisor.asInstanceOf[DeregistrationReason]) must be(Json.obj("deregistrationReason" -> "Under another supervisor"))
+        Json.toJson(DeregistrationReason.UnderAnotherSupervisor.asInstanceOf[DeregistrationReason]) must be(
+          Json.obj("deregistrationReason" -> "Under another supervisor")
+        )
       }
       "ChangeOfLegalEntity" in {
-        Json.toJson(DeregistrationReason.ChangeOfLegalEntity.asInstanceOf[DeregistrationReason]) must be(Json.obj("deregistrationReason" -> "Change of Legal Entity"))
+        Json.toJson(DeregistrationReason.ChangeOfLegalEntity.asInstanceOf[DeregistrationReason]) must be(
+          Json.obj("deregistrationReason" -> "Change of Legal Entity")
+        )
       }
       "HVDPolicyOfNotAcceptingHighValueCashPayments" in {
-        Json.toJson(DeregistrationReason.HVDPolicyOfNotAcceptingHighValueCashPayments.asInstanceOf[DeregistrationReason]) must be(Json.obj("deregistrationReason" -> "HVD - policy of not accepting high value cash payments"))
+        Json.toJson(
+          DeregistrationReason.HVDPolicyOfNotAcceptingHighValueCashPayments.asInstanceOf[DeregistrationReason]
+        ) must be(Json.obj("deregistrationReason" -> "HVD - policy of not accepting high value cash payments"))
       }
       "Other" in {
-        Json.toJson(DeregistrationReason.Other("reason").asInstanceOf[DeregistrationReason]) must be(Json.obj("deregistrationReason" -> "Other, please specify", "specifyOtherReason" -> "reason"))
+        Json.toJson(DeregistrationReason.Other("reason").asInstanceOf[DeregistrationReason]) must be(
+          Json.obj("deregistrationReason" -> "Other, please specify", "specifyOtherReason" -> "reason")
+        )
       }
     }
 

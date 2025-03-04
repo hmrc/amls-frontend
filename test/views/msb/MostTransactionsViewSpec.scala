@@ -29,7 +29,7 @@ import views.html.msb.MostTransactionsView
 class MostTransactionsViewSpec extends AmlsViewSpec with Matchers with AutoCompleteServiceMocks {
 
   lazy val most_transactions = inject[MostTransactionsView]
-  lazy val fp = inject[MostTransactionsFormProvider]
+  lazy val fp                = inject[MostTransactionsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -43,17 +43,19 @@ class MostTransactionsViewSpec extends AmlsViewSpec with Matchers with AutoCompl
 
       def view = most_transactions(fp().fill(MostTransactions(Seq.empty[Country])), true, mockAutoComplete.formOptions)
 
-      doc.title must be(messages("msb.most.transactions.title") +
-        " - " + messages("summary.msb") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("msb.most.transactions.title") +
+          " - " + messages("summary.msb") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = most_transactions(fp().fill(MostTransactions(Seq.empty[Country])), true, mockAutoComplete.formOptions)
 
-      heading.html must be(messages("msb.most.transactions.title"))
+      heading.html    must be(messages("msb.most.transactions.title"))
       subHeading.html must include(messages("summary.msb"))
     }
 

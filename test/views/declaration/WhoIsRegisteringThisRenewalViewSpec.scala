@@ -26,10 +26,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.declaration.WhoIsRegisteringThisRenewalView
 
-class WhoIsRegisteringThisRenewalViewSpec extends AmlsViewSpec with Matchers  {
+class WhoIsRegisteringThisRenewalViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val renewalView = inject[WhoIsRegisteringThisRenewalView]
-  lazy val fp = inject[WhoIsRegisteringFormProvider]
+  lazy val fp          = inject[WhoIsRegisteringFormProvider]
   lazy val renewalForm = fp("renewal")
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
@@ -44,7 +44,7 @@ class WhoIsRegisteringThisRenewalViewSpec extends AmlsViewSpec with Matchers  {
       def view = renewalView(renewalForm.fill(WhoIsRegistering("PersonName")), Seq(ResponsiblePerson()))
 
       doc.title mustBe s"${messages("declaration.renewal.who.is.registering.title")} - ${messages("title.amls")} - ${messages("title.gov")}"
-      heading.html must be(messages("declaration.renewal.who.is.registering.heading"))
+      heading.html    must be(messages("declaration.renewal.who.is.registering.heading"))
       subHeading.html must include(messages("summary.submit.renewal"))
 
       doc.getElementsContainingOwnText(messages("declaration.renewal.who.is.registering.text")).hasText must be(true)
@@ -57,7 +57,8 @@ class WhoIsRegisteringThisRenewalViewSpec extends AmlsViewSpec with Matchers  {
         renewalForm.withError("person", "error.required.declaration.who.is.declaring.this.renewal"),
         Seq(ResponsiblePerson())
       ),
-      "person", "error.required.declaration.who.is.declaring.this.renewal"
+      "person",
+      "error.required.declaration.who.is.declaring.this.renewal"
     )
 
     behave like pageWithBackLink(renewalView(renewalForm, Seq(ResponsiblePerson())))

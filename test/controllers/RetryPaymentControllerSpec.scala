@@ -40,15 +40,16 @@ import java.time.LocalDateTime
 import scala.concurrent.Future
 
 // scalastyle:off magic.number
-class RetryPaymentControllerSpec extends AmlsSpec
-  with AmlsReferenceNumberGenerator
-  with PaymentGenerator
-  with SubscriptionResponseGenerator {
+class RetryPaymentControllerSpec
+    extends AmlsSpec
+    with AmlsReferenceNumberGenerator
+    with PaymentGenerator
+    with SubscriptionResponseGenerator {
 
   trait Fixture {
     self =>
-    val baseUrl = "http://localhost"
-    val request = addToken(authRequest)
+    val baseUrl    = "http://localhost"
+    val request    = addToken(authRequest)
     val controller = new RetryPaymentController(
       SuccessfulAuthAction,
       statusService = mock[StatusService],
@@ -56,12 +57,13 @@ class RetryPaymentControllerSpec extends AmlsSpec
       amlsConnector = mock[AmlsConnector],
       paymentsService = mock[PaymentsService],
       ds = commonDependencies,
-      cc = mockMcc)
+      cc = mockMcc
+    )
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
 
-    protected val mockCacheMap = mock[Cache]
-    val companyNameFromCache = "My Test Company Name From Cache"
+    protected val mockCacheMap      = mock[Cache]
+    val companyNameFromCache        = "My Test Company Name From Cache"
     val companyNameFromRegistration = "My Test Company Name From Registration"
 
     setupBusinessMatching(companyNameFromCache)
@@ -106,7 +108,8 @@ class RetryPaymentControllerSpec extends AmlsSpec
 
     val applicationConfig = app.injector.instanceOf[ApplicationConfig]
 
-    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
+    def paymentsReturnLocation(ref: String) =
+      ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
 
     def setupBusinessMatching(companyName: String) = {
 
@@ -138,14 +141,16 @@ class RetryPaymentControllerSpec extends AmlsSpec
   "ConfirmationController" must {
 
     "allow a payment to be retried" in new Fixture {
-      val amountInPence = 8765
-      val postData = "paymentRef" -> paymentReferenceNumber
-      val payment = paymentGen.sample.get
+      val amountInPence   = 8765
+      val postData        = "paymentRef" -> paymentReferenceNumber
+      val payment         = paymentGen.sample.get
       val paymentResponse = paymentResponseGen.sample.get
 
       when {
         controller.amlsConnector.getPaymentByPaymentReference(eqTo(paymentReferenceNumber), any())(any(), any())
-      } thenReturn Future.successful(Some(payment.copy(reference = paymentReferenceNumber, amountInPence = amountInPence)))
+      } thenReturn Future.successful(
+        Some(payment.copy(reference = paymentReferenceNumber, amountInPence = amountInPence))
+      )
 
       when {
         controller.paymentsService.paymentsUrlOrDefault(any(), any(), any(), any(), any(), any())(any(), any())
@@ -154,7 +159,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
       val result = controller.retryPayment()(requestWithUrlEncodedBody(postData))
 
       val expectedUrl: Option[String] = Some(paymentResponse.nextUrl.value)
-      val actualUrl: Option[String] = redirectLocation(result)
+      val actualUrl: Option[String]   = redirectLocation(result)
 
       status(result) mustBe SEE_OTHER
       actualUrl mustEqual expectedUrl

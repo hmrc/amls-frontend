@@ -27,46 +27,50 @@ import views.html.responsiblepeople.ApprovalCheckView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class ApprovalCheckController @Inject()(
-                                         val dataCacheConnector: DataCacheConnector,
-                                         authAction: AuthAction,
-                                         val ds: CommonPlayDependencies,
-                                         val cc: MessagesControllerComponents,
-                                         formProvider: ApprovalCheckFormProvider,
-                                         view: ApprovalCheckView,
-                                         implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class ApprovalCheckController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: ApprovalCheckFormProvider,
+  view: ApprovalCheckView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           (person.personName, person.approvalFlags.hasAlreadyPaidApprovalCheck) match {
-            case (Some(name), Some(hasPaid)) => Ok(view(formProvider().fill(hasPaid), edit, index, flow, name.titleName))
-            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
-            case _ => NotFound(notFoundView)
+            case (Some(name), Some(hasPaid)) =>
+              Ok(view(formProvider().fill(hasPaid), edit, index, flow, name.titleName))
+            case (Some(name), _)             => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _                           => NotFound(notFoundView)
           }
         }
       }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
-    authAction.async {
-      implicit request =>
-        formProvider().bindFromRequest().fold(
+    authAction.async { implicit request =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
           formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             },
-          data => {
-            for {
-              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPaidApprovalCheck = Some(data)))
-              }
-            } yield
-              Redirect(routes.DetailedAnswersController.get(index, flow))
-          } recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-          }
+          data =>
+            {
+              for {
+                _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                       rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPaidApprovalCheck = Some(data)))
+                     }
+              } yield Redirect(routes.DetailedAnswersController.get(index, flow))
+            } recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
+            }
         )
     }
 }

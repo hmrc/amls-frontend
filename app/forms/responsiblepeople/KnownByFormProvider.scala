@@ -24,16 +24,16 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class KnownByFormProvider @Inject()() extends Mappings {
+class KnownByFormProvider @Inject() () extends Mappings {
 
   private val booleanFieldName = "hasOtherNames"
-  private val booleanError = "error.required.rp.hasOtherNames"
+  private val booleanError     = "error.required.rp.hasOtherNames"
 
-  val length = 140
+  val length                 = 140
   def apply(): Form[KnownBy] = Form[KnownBy](
     mapping(
       booleanFieldName -> boolean(booleanError, booleanError),
-      "otherNames" -> mandatoryIfTrue(
+      "otherNames"     -> mandatoryIfTrue(
         booleanFieldName,
         text("error.required.rp.otherNames").verifying(
           firstError(
@@ -45,10 +45,11 @@ class KnownByFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  private def apply(hasOtherNames: Boolean, otherNames: Option[String]): KnownBy = KnownBy(Some(hasOtherNames), otherNames)
+  private def apply(hasOtherNames: Boolean, otherNames: Option[String]): KnownBy =
+    KnownBy(Some(hasOtherNames), otherNames)
 
   private def unapply(obj: KnownBy): Option[(Boolean, Option[String])] = (obj.hasOtherNames, obj.otherNames) match {
     case (Some(bool), str) => Some((bool, str))
-    case _ => None
+    case _                 => None
   }
 }

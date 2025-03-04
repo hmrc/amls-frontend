@@ -26,15 +26,16 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import javax.inject.Inject
 import scala.jdk.CollectionConverters._
 
-class WithdrawalReasonFormProvider @Inject()() extends Mappings {
+class WithdrawalReasonFormProvider @Inject() () extends Mappings {
 
   private def error = "error.required.withdrawal.reason"
-  val length = 40
+  val length        = 40
 
-  def apply(): Form[WithdrawalReason] = Form[WithdrawalReason](
+  def apply(): Form[WithdrawalReason]                                                        = Form[WithdrawalReason](
     mapping(
-      "withdrawalReason" -> enumerable[WithdrawalReason](error, error),
-      "specifyOtherReason" -> mandatoryIf(_.values.asJavaCollection.contains(Other("").toString),
+      "withdrawalReason"   -> enumerable[WithdrawalReason](error, error),
+      "specifyOtherReason" -> mandatoryIf(
+        _.values.asJavaCollection.contains(Other("").toString),
         text("error.required.withdrawal.reason.input").verifying(
           firstError(
             maxLength(length, "error.required.withdrawal.reason.length"),
@@ -44,14 +45,16 @@ class WithdrawalReasonFormProvider @Inject()() extends Mappings {
       )
     )(apply)(unapply)
   )
-  private def apply(reason: WithdrawalReason, otherReason: Option[String]): WithdrawalReason = (reason, otherReason) match {
-    case (_: WithdrawalReason.Other, Some(reason)) => Other(reason)
-    case (_: WithdrawalReason.Other, None) => throw new IllegalArgumentException("Description is required when Other is selected")
-    case (reason, _) => reason
-  }
+  private def apply(reason: WithdrawalReason, otherReason: Option[String]): WithdrawalReason =
+    (reason, otherReason) match {
+      case (_: WithdrawalReason.Other, Some(reason)) => Other(reason)
+      case (_: WithdrawalReason.Other, None)         =>
+        throw new IllegalArgumentException("Description is required when Other is selected")
+      case (reason, _)                               => reason
+    }
 
   private def unapply(obj: WithdrawalReason): Option[(WithdrawalReason, Option[String])] = obj match {
     case Other(otherReason) => Some((Other(""), Some(otherReason)))
-    case reason => Some((reason, None))
+    case reason             => Some((reason, None))
   }
 }

@@ -45,12 +45,11 @@ class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
         be(Json.obj("otherBusinessTaxMatters" -> true))
     }
 
-
-    }
-    val model: Asp = Asp(otherBusinessTaxMatters = Some(OtherBusinessTaxMattersYes))
-    val test: Option[String] = model.otherBusinessTaxMatters.map {
-      case OtherBusinessTaxMattersNo => "lbl.no"
-      case OtherBusinessTaxMattersYes => "lbl.yes"
+  }
+  val model: Asp           = Asp(otherBusinessTaxMatters = Some(OtherBusinessTaxMattersYes))
+  val test: Option[String] = model.otherBusinessTaxMatters.map {
+    case OtherBusinessTaxMattersNo  => "lbl.no"
+    case OtherBusinessTaxMattersYes => "lbl.yes"
   }
 
 }

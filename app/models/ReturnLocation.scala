@@ -30,7 +30,8 @@ object ReturnLocation {
   def apply(call: Call)(implicit appConfig: ApplicationConfig) =
     new ReturnLocation(call.url, publicRedirectUrl(call.url))
 
-  private def publicRedirectUrl(url: String)(implicit appConfig: ApplicationConfig) = s"${appConfig.frontendBaseUrl}$url"
+  private def publicRedirectUrl(url: String)(implicit appConfig: ApplicationConfig) =
+    s"${appConfig.frontendBaseUrl}$url"
 
   implicit val locationWrites: Writes[ReturnLocation] = new Writes[ReturnLocation] {
     override def writes(o: ReturnLocation) = JsString(o.absoluteUrl)

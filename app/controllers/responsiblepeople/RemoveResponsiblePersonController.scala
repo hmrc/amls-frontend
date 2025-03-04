@@ -30,82 +30,94 @@ import views.html.responsiblepeople.RemoveResponsiblePersonView
 import java.time.format.DateTimeFormatter.ofPattern
 import scala.concurrent.Future
 
-class RemoveResponsiblePersonController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                  authAction: AuthAction,
-                                                  val ds: CommonPlayDependencies,
-                                                  val statusService: StatusService,
-                                                  val cc: MessagesControllerComponents,
-                                                  formProvider: RemoveResponsiblePersonFormProvider,
-                                                  view: RemoveResponsiblePersonView,
-                                                  implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class RemoveResponsiblePersonController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val statusService: StatusService,
+  val cc: MessagesControllerComponents,
+  formProvider: RemoveResponsiblePersonFormProvider,
+  view: RemoveResponsiblePersonView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
-  def get(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction.async {
-    implicit request =>
-      for {
-        rp <- getData[ResponsiblePerson](request.credId, index)
-        status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-      } yield rp match {
-        case Some(person) if person.lineId.isDefined && !person.isComplete =>
-          Redirect(routes.WhatYouNeedController.get(index, flow))
-        case Some(person) if person.personName.isDefined =>
-          Ok(view(
+  def get(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction.async { implicit request =>
+    for {
+      rp     <- getData[ResponsiblePerson](request.credId, index)
+      status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+    } yield rp match {
+      case Some(person) if person.lineId.isDefined && !person.isComplete =>
+        Redirect(routes.WhatYouNeedController.get(index, flow))
+      case Some(person) if person.personName.isDefined                   =>
+        Ok(
+          view(
             formProvider(),
             index = index,
             personName = person.personName.get.fullName,
             showDateField = showRemovalDateField(status, rp.get.lineId.isDefined),
             flow = flow
-          ))
-        case _ => NotFound(notFoundView)
-      }
+          )
+        )
+      case _                                                             => NotFound(notFoundView)
+    }
   }
 
-  def remove(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction.async {
-    implicit request =>
+  def remove(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction.async { implicit request =>
+    def removeWithoutDate(): Future[Result] = removeDataStrict[ResponsiblePerson](request.credId, index) map { _ =>
+      Redirect(routes.YourResponsiblePeopleController.get())
+    }
 
-      def removeWithoutDate(): Future[Result] = removeDataStrict[ResponsiblePerson](request.credId, index) map { _ =>
-        Redirect(routes.YourResponsiblePeopleController.get())
-      }
-
-      statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap { status =>
-        getData[ResponsiblePerson](request.credId, index) flatMap { personData =>
-          (status, personData) match {
-            case (NotCompleted, _) => removeWithoutDate()
-            case (SubmissionReady, _) => removeWithoutDate()
-            case (SubmissionReadyForReview, None) => removeWithoutDate()
-            case (SubmissionReadyForReview, Some(person)) if person.lineId.isDefined =>
-              updateDataStrict[ResponsiblePerson](request.credId, index)(_.copy(status = Some(StatusConstants.Deleted), hasChanged = true)).map { _ =>
-                Redirect(routes.YourResponsiblePeopleController.get())
-              }
-            case (_, Some(person)) if person.lineId.isEmpty => removeWithoutDate()
-            case (_, Some(person)) =>
-              val name = person.personName.fold("")(_.titleName)
-              formProvider().bindFromRequest().fold(
-                formWithErrors => Future.successful(BadRequest(view(formWithErrors, index, name, showDateField = true, flow))),
+    statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap { status =>
+      getData[ResponsiblePerson](request.credId, index) flatMap { personData =>
+        (status, personData) match {
+          case (NotCompleted, _)                                                   => removeWithoutDate()
+          case (SubmissionReady, _)                                                => removeWithoutDate()
+          case (SubmissionReadyForReview, None)                                    => removeWithoutDate()
+          case (SubmissionReadyForReview, Some(person)) if person.lineId.isDefined =>
+            updateDataStrict[ResponsiblePerson](request.credId, index)(
+              _.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
+            ).map { _ =>
+              Redirect(routes.YourResponsiblePeopleController.get())
+            }
+          case (_, Some(person)) if person.lineId.isEmpty                          => removeWithoutDate()
+          case (_, Some(person))                                                   =>
+            val name = person.personName.fold("")(_.titleName)
+            formProvider()
+              .bindFromRequest()
+              .fold(
+                formWithErrors =>
+                  Future.successful(BadRequest(view(formWithErrors, index, name, showDateField = true, flow))),
                 data => {
                   val startDate = person.positions.flatMap(_.startDate.map(_.startDate))
                   data match {
-                    case Left(_) => removeWithoutDate()
+                    case Left(_)                                                    => removeWithoutDate()
                     case Right(value) if startDate.exists(_.isAfter(value.endDate)) =>
                       val formWithFutureError =
                         formProvider().withError(
-                          "endDate", messages("error.expected.rp.date.after.start", name, startDate.fold("")(strtDte => strtDte.format(ofPattern("dd-MM-yyyy"))))
+                          "endDate",
+                          messages(
+                            "error.expected.rp.date.after.start",
+                            name,
+                            startDate.fold("")(strtDte => strtDte.format(ofPattern("dd-MM-yyyy")))
+                          )
                         )
                       Future.successful(BadRequest(view(formWithFutureError, index, name, showDateField = true, flow)))
-                    case Right(value) => updateDataStrict[ResponsiblePerson](request.credId, index) {
-                      _.copy(status = Some(StatusConstants.Deleted), endDate = Some(value), hasChanged = true)
-                    }.map(_ => Redirect(routes.YourResponsiblePeopleController.get()))
+                    case Right(value)                                               =>
+                      updateDataStrict[ResponsiblePerson](request.credId, index) {
+                        _.copy(status = Some(StatusConstants.Deleted), endDate = Some(value), hasChanged = true)
+                      }.map(_ => Redirect(routes.YourResponsiblePeopleController.get()))
                   }
                 }
               )
-          }
         }
       }
-  }
-
-  private def showRemovalDateField(status: SubmissionStatus, lineIdExists: Boolean): Boolean = {
-    status match {
-      case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) if lineIdExists => true
-      case _ => false
     }
   }
+
+  private def showRemovalDateField(status: SubmissionStatus, lineIdExists: Boolean): Boolean =
+    status match {
+      case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) if lineIdExists => true
+      case _                                                                                     => false
+    }
 }

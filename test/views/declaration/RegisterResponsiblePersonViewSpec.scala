@@ -40,11 +40,11 @@ class RegisterResponsiblePersonViewSpec extends AmlsViewSpec with Matchers {
       doc.title must startWith(messages("declaration.register.responsible.person.title"))
     }
 
-    "Have the correct Headings" in new ViewFixture{
+    "Have the correct Headings" in new ViewFixture {
       def view = personView("subheading")
 
-      heading.html must be (messages("declaration.register.responsible.person.title"))
-      subHeading.html must include (messages("subheading"))
+      heading.html    must be(messages("declaration.register.responsible.person.title"))
+      subHeading.html must include(messages("subheading"))
     }
 
     "contain the expected content elements" in new ViewFixture {

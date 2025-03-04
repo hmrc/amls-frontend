@@ -56,14 +56,16 @@ object TcspTypes extends Enumerable.Implicits {
     CompanyFormationAgent
   )
 
-  def formValues(implicit messages: Messages): Seq[CheckboxItem] = all.zipWithIndex.map { case (sp, index) =>
-    CheckboxItem(
-      content = Text(messages(s"tcsp.service.provider.lbl.${sp.value}")),
-      value = sp.toString,
-      id = Some(s"serviceProviders_$index"),
-      name = Some(s"serviceProviders[$index]")
-    )
-  }.sortBy(_.content.asHtml.body)
+  def formValues(implicit messages: Messages): Seq[CheckboxItem] = all.zipWithIndex
+    .map { case (sp, index) =>
+      CheckboxItem(
+        content = Text(messages(s"tcsp.service.provider.lbl.${sp.value}")),
+        value = sp.toString,
+        id = Some(s"serviceProviders_$index"),
+        name = Some(s"serviceProviders[$index]")
+      )
+    }
+    .sortBy(_.content.asHtml.body)
 
   implicit val enumerable: Enumerable[ServiceProvider] = Enumerable(all.map(v => v.toString -> v): _*)
 
@@ -80,30 +82,27 @@ object TcspTypes extends Enumerable.Implicits {
         case "03" => Reads(_ => JsSuccess(RegisteredOfficeEtc)) map identity[ServiceProvider]
         case "04" => Reads(_ => JsSuccess(CompanyDirectorEtc)) map identity[ServiceProvider]
         case "05" => Reads(_ => JsSuccess(CompanyFormationAgent)) map identity[ServiceProvider]
-        case _ =>
+        case _    =>
           Reads(_ => JsError((JsPath \ "serviceProviders") -> JsonValidationError("error.invalid")))
       }.foldLeft[Reads[Set[ServiceProvider]]](
         Reads[Set[ServiceProvider]](_ => JsSuccess(Set.empty))
-      ) {
-        (result, data) =>
-          data flatMap { m =>
-            result.map { n =>
-              n + m
-            }
+      ) { (result, data) =>
+        data flatMap { m =>
+          result.map { n =>
+            n + m
           }
+        }
       } map TcspTypes.apply
     }
   }
 
-  implicit val jsonWrite: Writes[TcspTypes] = Writes[TcspTypes] {
-    case TcspTypes(services) =>
-      Json.obj(
-        "serviceProviders" -> (services map {
-          _.value
-        }).toSeq
-      ) ++ services.foldLeft[JsObject](Json.obj()) {
-        case (m, _) =>
-          m
-      }
+  implicit val jsonWrite: Writes[TcspTypes] = Writes[TcspTypes] { case TcspTypes(services) =>
+    Json.obj(
+      "serviceProviders" -> (services map {
+        _.value
+      }).toSeq
+    ) ++ services.foldLeft[JsObject](Json.obj()) { case (m, _) =>
+      m
+    }
   }
 }

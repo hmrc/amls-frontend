@@ -28,7 +28,7 @@ import views.html.tradingpremises.AgentPartnershipView
 class AgentPartnershipViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val agent_partnership = inject[AgentPartnershipView]
-  lazy val fp = inject[AgentPartnershipFormProvider]
+  lazy val fp                = inject[AgentPartnershipFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,8 +42,10 @@ class AgentPartnershipViewSpec extends AmlsViewSpec with Matchers {
 
       def view = agent_partnership(fp().fill(AgentPartnership("Valid Name")), 1, false)
 
-      doc.title() must startWith(messages("tradingpremises.agentpartnership.title") + " - " + messages("summary.tradingpremises"))
-      heading.html() must include(messages("tradingpremises.agentpartnership.title"))
+      doc.title()       must startWith(
+        messages("tradingpremises.agentpartnership.title") + " - " + messages("summary.tradingpremises")
+      )
+      heading.html()    must include(messages("tradingpremises.agentpartnership.title"))
       subHeading.html() must include(messages("summary.tradingpremises"))
 
       doc.getElementById(messages("agentPartnership")).tagName() must be("input")

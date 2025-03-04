@@ -23,9 +23,9 @@ import play.api.data.Forms.seq
 
 import javax.inject.Inject
 
-class ServiceProviderTypesFormProvider @Inject()() extends Mappings {
+class ServiceProviderTypesFormProvider @Inject() () extends Mappings {
 
-  val errorMessage = "error.required.tcsp.service.providers"
+  val errorMessage             = "error.required.tcsp.service.providers"
   def apply(): Form[TcspTypes] = Form(
     "serviceProviders" -> seq(enumerable[ServiceProvider](errorMessage, errorMessage)(TcspTypes.enumerable))
       .verifying(nonEmptySeq(errorMessage))

@@ -26,9 +26,11 @@ class OnlyOffTheShelfCompsSoldSpec extends PlaySpec with Matchers {
 
     "round trip through JSON" in {
 
-      Json.toJson[OnlyOffTheShelfCompsSold](OnlyOffTheShelfCompsSoldYes)
+      Json
+        .toJson[OnlyOffTheShelfCompsSold](OnlyOffTheShelfCompsSoldYes)
         .as[OnlyOffTheShelfCompsSold] mustBe OnlyOffTheShelfCompsSoldYes
-      Json.toJson[OnlyOffTheShelfCompsSold](OnlyOffTheShelfCompsSoldNo)
+      Json
+        .toJson[OnlyOffTheShelfCompsSold](OnlyOffTheShelfCompsSoldNo)
         .as[OnlyOffTheShelfCompsSold] mustBe OnlyOffTheShelfCompsSoldNo
     }
   }

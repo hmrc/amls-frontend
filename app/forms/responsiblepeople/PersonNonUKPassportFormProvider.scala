@@ -24,37 +24,38 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class PersonNonUKPassportFormProvider @Inject()() extends Mappings {
+class PersonNonUKPassportFormProvider @Inject() () extends Mappings {
 
   private val booleanFieldName = "nonUKPassport"
-  private val emptyError = "error.required.non.uk.passport"
+  private val emptyError       = "error.required.non.uk.passport"
 
   val length = 40
 
   def apply(): Form[NonUKPassport] = Form[NonUKPassport](
     mapping(
-      booleanFieldName -> boolean(emptyError, emptyError),
+      booleanFieldName      -> boolean(emptyError, emptyError),
       "nonUKPassportNumber" -> mandatoryIfTrue(
         booleanFieldName,
         textAllowWhitespace(s"$emptyError.number")
           .verifying(
-          firstError(
-            maxLength(length, "error.invalid.non.uk.passport.number.length.40"),
-            regexp(basicPunctuationRegex, "error.invalid.non.uk.passport.number")
+            firstError(
+              maxLength(length, "error.invalid.non.uk.passport.number.length.40"),
+              regexp(basicPunctuationRegex, "error.invalid.non.uk.passport.number")
+            )
           )
-        )
       )
     )(apply)(unapply)
   )
 
-  private def apply(nonUkPassport: Boolean, nonUkPassportNumber: Option[String]): NonUKPassport = (nonUkPassport, nonUkPassportNumber) match {
-    case (true, Some(number)) => NonUKPassportYes(number)
-    case (false, None) => NoPassport
-    case _ => throw new IllegalArgumentException(s"Invalid combination of answers")
-  }
+  private def apply(nonUkPassport: Boolean, nonUkPassportNumber: Option[String]): NonUKPassport =
+    (nonUkPassport, nonUkPassportNumber) match {
+      case (true, Some(number)) => NonUKPassportYes(number)
+      case (false, None)        => NoPassport
+      case _                    => throw new IllegalArgumentException(s"Invalid combination of answers")
+    }
 
   private def unapply(obj: NonUKPassport): Option[(Boolean, Option[String])] = obj match {
     case NonUKPassportYes(number) => Some((true, Some(number)))
-    case NoPassport => Some((false, None))
+    case NoPassport               => Some((false, None))
   }
 }

@@ -27,31 +27,43 @@ trait Mappings extends Formatters with Constraints {
   protected def text(errorKey: String = "error.required"): FieldMapping[String] =
     of(stringFormatter(errorKey))
 
-  protected def int(requiredKey: String = "error.required",
-                    wholeNumberKey: String = "error.wholeNumber",
-                    nonNumericKey: String = "error.nonNumeric"): FieldMapping[Int] =
+  protected def int(
+    requiredKey: String = "error.required",
+    wholeNumberKey: String = "error.wholeNumber",
+    nonNumericKey: String = "error.nonNumeric"
+  ): FieldMapping[Int] =
     of(intFormatter(requiredKey, wholeNumberKey, nonNumericKey))
 
-  protected def boolean(requiredKey: String = "error.required",
-                        invalidKey: String = "error.boolean"): FieldMapping[Boolean] =
+  protected def boolean(
+    requiredKey: String = "error.required",
+    invalidKey: String = "error.boolean"
+  ): FieldMapping[Boolean] =
     of(booleanFormatter(requiredKey, invalidKey))
 
-
-  protected def enumerable[A](requiredKey: String = "error.required",
-                              invalidKey: String = "error.invalid")(implicit ev: Enumerable[A]): FieldMapping[A] =
+  protected def enumerable[A](requiredKey: String = "error.required", invalidKey: String = "error.invalid")(implicit
+    ev: Enumerable[A]
+  ): FieldMapping[A] =
     of(enumerableFormatter[A](requiredKey, invalidKey))
 
-  protected def localDate(oneInvalidKey: String,
-                          multipleInvalidKey: String,
-                          allRequiredKey: String,
-                          twoRequiredKey: String,
-                          oneRequiredKey: String,
-                          realDateKey: String): FieldMapping[LocalDate] = of(new LocalDateFormatter(
-    oneInvalidKey, multipleInvalidKey, oneRequiredKey, twoRequiredKey, allRequiredKey, realDateKey
-  ))
+  protected def localDate(
+    oneInvalidKey: String,
+    multipleInvalidKey: String,
+    allRequiredKey: String,
+    twoRequiredKey: String,
+    oneRequiredKey: String,
+    realDateKey: String
+  ): FieldMapping[LocalDate] = of(
+    new LocalDateFormatter(
+      oneInvalidKey,
+      multipleInvalidKey,
+      oneRequiredKey,
+      twoRequiredKey,
+      allRequiredKey,
+      realDateKey
+    )
+  )
 
-  protected def textAllowWhitespace(errorKey: String = "error.required"): Mapping[String] = {
+  protected def textAllowWhitespace(errorKey: String = "error.required"): Mapping[String] =
     text(errorKey).transform[String](_.replace(" ", "").trim, x => x)
-  }
 
 }

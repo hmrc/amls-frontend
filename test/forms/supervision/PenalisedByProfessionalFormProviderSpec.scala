@@ -27,8 +27,8 @@ class PenalisedByProfessionalFormProviderSpec extends BooleanFieldBehaviours[Pro
   val formProvider: PenalisedByProfessionalFormProvider = new PenalisedByProfessionalFormProvider()
 
   override val form: Form[ProfessionalBody] = formProvider()
-  override val fieldName: String = "penalised"
-  override val errorMessage: String = "error.required.professionalbody.penalised.by.professional.body"
+  override val fieldName: String            = "penalised"
+  override val errorMessage: String         = "error.required.professionalbody.penalised.by.professional.body"
 
   "form" must {
 
@@ -37,4 +37,3 @@ class PenalisedByProfessionalFormProviderSpec extends BooleanFieldBehaviours[Pro
     behave like mandatoryField(form, fieldName, FormError(fieldName, errorMessage))
   }
 }
-

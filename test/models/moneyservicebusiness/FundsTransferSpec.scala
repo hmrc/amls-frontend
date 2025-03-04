@@ -24,7 +24,7 @@ class FundsTransferSpec extends PlaySpec {
 
     "round trip through JSON" in {
 
-      val trueModel = FundsTransfer(true)
+      val trueModel  = FundsTransfer(true)
       val falseModel = FundsTransfer(false)
 
       Json.toJson(trueModel).as[FundsTransfer] mustBe trueModel
@@ -32,4 +32,3 @@ class FundsTransferSpec extends PlaySpec {
     }
   }
 }
-

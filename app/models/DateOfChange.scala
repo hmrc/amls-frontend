@@ -29,7 +29,7 @@ object DateOfChange {
       DateOfChange(_)
     }
 
-  implicit val writes: Writes[DateOfChange] = Writes[DateOfChange] {
-    case DateOfChange(b) => Json.toJson(b)
+  implicit val writes: Writes[DateOfChange] = Writes[DateOfChange] { case DateOfChange(b) =>
+    Json.toJson(b)
   }
 }

@@ -21,27 +21,31 @@ import models.{SubscriptionFees, SubscriptionResponse}
 import org.scalacheck.Gen
 
 // scalastyle:off magic.number
-trait SubscriptionResponseGenerator extends BaseGenerator
-  with AmlsReferenceNumberGenerator
-  with PaymentGenerator {
+trait SubscriptionResponseGenerator extends BaseGenerator with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   val subscriptionFeesGen: Gen[SubscriptionFees] = for {
     paymentReference <- paymentRefGen
-    fees <- Gen.choose(100, 500)
-  } yield {
-    SubscriptionFees(paymentReference, BigDecimal(100), Some(115), Some(115), None, None, BigDecimal(130), Some(130), BigDecimal(fees))
-  }
+    fees             <- Gen.choose(100, 500)
+  } yield SubscriptionFees(
+    paymentReference,
+    BigDecimal(100),
+    Some(115),
+    Some(115),
+    None,
+    None,
+    BigDecimal(130),
+    Some(130),
+    BigDecimal(fees)
+  )
 
   def subscriptionResponseGen(hasFees: Boolean = false): Gen[SubscriptionResponse] = for {
-    regNo <- amlsRefNoGen
+    regNo            <- amlsRefNoGen
     formBundleNumber <- numSequence(10)
-    fees <- subscriptionFeesGen
-  } yield {
-    SubscriptionResponse(
-      formBundleNumber.toString,
-      regNo,
-      if (hasFees) Some(fees) else None
-    )
-  }
+    fees             <- subscriptionFeesGen
+  } yield SubscriptionResponse(
+    formBundleNumber.toString,
+    regNo,
+    if (hasFees) Some(fees) else None
+  )
 
 }

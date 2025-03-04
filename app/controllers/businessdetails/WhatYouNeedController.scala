@@ -24,14 +24,14 @@ import views.html.businessdetails.WhatYouNeedView
 
 import scala.concurrent.Future
 
-class WhatYouNeedController @Inject () (
-                                         val authAction: AuthAction,
-                                         val ds: CommonPlayDependencies,
-                                         val cc: MessagesControllerComponents,
-                                         what_you_need: WhatYouNeedView) extends AmlsBaseController(ds, cc) {
+class WhatYouNeedController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  what_you_need: WhatYouNeedView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-      Future.successful(Ok(what_you_need()))
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    Future.successful(Ok(what_you_need()))
   }
 }

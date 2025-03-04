@@ -22,8 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class IsResidentialFormProvider @Inject()() extends BooleanFormProvider {
+class IsResidentialFormProvider @Inject() () extends BooleanFormProvider {
   def apply(): Form[IsResidential] = createForm[IsResidential](
-    "isResidential", "tradingpremises.yourtradingpremises.isresidential.required"
+    "isResidential",
+    "tradingpremises.yourtradingpremises.isresidential.required"
   )(IsResidential.apply, _.isResidential)
 }

@@ -35,19 +35,20 @@ import views.html.businessactivities.NCARegisteredView
 
 import scala.concurrent.Future
 
-
 class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
-    self => val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
-    lazy val view: NCARegisteredView = inject[NCARegisteredView]
-    val controller = new NCARegisteredController (
+    self =>
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    lazy val view: NCARegisteredView             = inject[NCARegisteredView]
+    val controller                               = new NCARegisteredController(
       dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[NCARegisteredFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   val emptyCache: Cache = Cache.empty
@@ -64,14 +65,14 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
         status(result) must be(OK)
 
         val htmlValue: Document = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("ncaRegistered").hasAttr("checked") must be(false)
+        htmlValue.getElementById("ncaRegistered").hasAttr("checked")   must be(false)
         htmlValue.getElementById("ncaRegistered-2").hasAttr("checked") must be(false)
       }
 
       "load Yes when ncaRegistered from mongoCache returns True" in new Fixture {
 
         val ncaRegistered: Option[NCARegistered] = Some(NCARegistered(true))
-        val activities: BusinessActivities = BusinessActivities(ncaRegistered = ncaRegistered)
+        val activities: BusinessActivities       = BusinessActivities(ncaRegistered = ncaRegistered)
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(Some(activities)))
@@ -88,8 +89,9 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
       "successfully redirect to the page on selection of 'Yes' when edit mode is on" in new Fixture {
 
-        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.NCARegisteredController.post(false).url)
-          .withFormUrlEncodedBody("ncaRegistered" -> "true")
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+          FakeRequest(POST, routes.NCARegisteredController.post(false).url)
+            .withFormUrlEncodedBody("ncaRegistered" -> "true")
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(None))
@@ -98,12 +100,13 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
           .thenReturn(Future.successful(emptyCache))
 
         val result: Future[Result] = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get.url))
       }
 
       "successfully redirect to the page on selection of 'Yes' when edit mode is off" in new Fixture {
-        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test.FakeRequest(POST, routes.NCARegisteredController.post(false).url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test
+          .FakeRequest(POST, routes.NCARegisteredController.post(false).url)
           .withFormUrlEncodedBody("ncaRegistered" -> "true")
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
@@ -113,7 +116,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
           .thenReturn(Future.successful(emptyCache))
 
         val result: Future[Result] = controller.post(false)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessactivities.routes.RiskAssessmentController.get().url))
       }
 
@@ -121,10 +124,11 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
     "successfully redirect to the page on selection of Option 'No' when edit mode is on" in new Fixture {
 
-      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test.FakeRequest(POST, routes.NCARegisteredController.post(false).url)
+      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test
+        .FakeRequest(POST, routes.NCARegisteredController.post(false).url)
         .withFormUrlEncodedBody(
-        "ncaRegistered" -> "false"
-      )
+          "ncaRegistered" -> "false"
+        )
       when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
@@ -132,15 +136,16 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
         .thenReturn(Future.successful(emptyCache))
 
       val result: Future[Result] = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get.url))
     }
 
     "successfully redirect to the page on selection of Option 'No' when edit mode is off" in new Fixture {
-      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test.FakeRequest(POST, routes.NCARegisteredController.post(false).url)
+      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test
+        .FakeRequest(POST, routes.NCARegisteredController.post(false).url)
         .withFormUrlEncodedBody(
-        "ncaRegistered" -> "false"
-      )
+          "ncaRegistered" -> "false"
+        )
       when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
@@ -148,14 +153,14 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
         .thenReturn(Future.successful(emptyCache))
 
       val result: Future[Result] = controller.post(false)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.businessactivities.routes.RiskAssessmentController.get().url))
     }
 
-
     "on post invalid data show error" in new Fixture {
 
-      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test.FakeRequest(POST, routes.NCARegisteredController.post(false).url)
+      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test
+        .FakeRequest(POST, routes.NCARegisteredController.post(false).url)
         .withFormUrlEncodedBody("ncaRegistered" -> "foo")
       when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
         .thenReturn(Future.successful(None))
@@ -166,7 +171,8 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
     "on post empty data show error" in new Fixture {
 
-      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test.FakeRequest(POST, routes.NCARegisteredController.post(false).url)
+      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test
+        .FakeRequest(POST, routes.NCARegisteredController.post(false).url)
         .withFormUrlEncodedBody("ncaRegistered" -> "")
       when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
         .thenReturn(Future.successful(None))

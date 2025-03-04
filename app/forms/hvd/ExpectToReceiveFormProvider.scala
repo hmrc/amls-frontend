@@ -26,17 +26,17 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import javax.inject.Inject
 import scala.jdk.CollectionConverters._
 
-class ExpectToReceiveFormProvider @Inject()() extends Mappings {
+class ExpectToReceiveFormProvider @Inject() () extends Mappings {
 
   private val checkboxError = "error.required.hvd.choose.option"
 
-  val length = 255 //TODO This looks way too long
+  val length = 255 // TODO This looks way too long
 
   def apply(): Form[PaymentMethods] = Form[PaymentMethods](
     mapping(
       "paymentMethods" -> seq(enumerable[PaymentMethod](checkboxError, checkboxError)(PaymentMethods.enumerable))
         .verifying(nonEmptySeq(checkboxError)),
-      "details" -> mandatoryIf(
+      "details"        -> mandatoryIf(
         _.values.asJavaCollection.contains(Other("").toString),
         text("error.required.hvd.describe").verifying(
           firstError(
@@ -53,16 +53,17 @@ class ExpectToReceiveFormProvider @Inject()() extends Mappings {
       case (true, Some(detail)) =>
         val modifiedTransactions = paymentMethods.map(method => if (method == Other("")) Other(detail) else method)
         PaymentMethods(modifiedTransactions, Some(detail))
-      case (false, Some(_)) => throw new IllegalArgumentException("Cannot have method details without Other payment method")
-      case (true, None) => throw new IllegalArgumentException("Cannot have Other payment method without method details")
-      case (false, None) => PaymentMethods(paymentMethods, None)
-  }
+      case (false, Some(_))     =>
+        throw new IllegalArgumentException("Cannot have method details without Other payment method")
+      case (true, None)         => throw new IllegalArgumentException("Cannot have Other payment method without method details")
+      case (false, None)        => PaymentMethods(paymentMethods, None)
+    }
 
   private def unapply(obj: PaymentMethods): Option[(Seq[PaymentMethod], Option[String])] = {
 
-    val courier = if(obj.courier) Some(Courier) else None
-    val direct = if(obj.direct) Some(Direct) else None
-    val other = if(obj.other.isDefined) Some(Other("")) else None
+    val courier = if (obj.courier) Some(Courier) else None
+    val direct  = if (obj.direct) Some(Direct) else None
+    val other   = if (obj.other.isDefined) Some(Other("")) else None
 
     Some((Seq(courier, direct, other).flatten, obj.other))
   }

@@ -26,11 +26,11 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.RegisterServicesView
 
-class RegisterServicesViewSpec extends AmlsViewSpec with Matchers  {
+class RegisterServicesViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val formProvider = app.injector.instanceOf[RegisterBusinessActivitiesFormProvider]
-    lazy val register_services = app.injector.instanceOf[RegisterServicesView]
+    lazy val formProvider                                          = app.injector.instanceOf[RegisterBusinessActivitiesFormProvider]
+    lazy val register_services                                     = app.injector.instanceOf[RegisterServicesView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
@@ -42,8 +42,10 @@ class RegisterServicesViewSpec extends AmlsViewSpec with Matchers  {
 
         def view = register_services(filledForm, edit = true, Seq(AccountancyServices), isPreSubmission = true)
 
-        doc.title must startWith(messages("businessmatching.registerservices.title") + " - " + messages("summary.businessmatching"))
-        heading.html must be(messages("businessmatching.registerservices.title"))
+        doc.title       must startWith(
+          messages("businessmatching.registerservices.title") + " - " + messages("summary.businessmatching")
+        )
+        heading.html    must be(messages("businessmatching.registerservices.title"))
         subHeading.html must include(messages("summary.businessmatching"))
 
       }
@@ -54,8 +56,10 @@ class RegisterServicesViewSpec extends AmlsViewSpec with Matchers  {
 
         def view = register_services(filledForm, edit = true, Seq.empty, isPreSubmission = false)
 
-        doc.title must startWith(messages("businessmatching.registerservices.other.title") + " - " + messages("summary.businessmatching"))
-        heading.html must be(messages("businessmatching.registerservices.other.title"))
+        doc.title       must startWith(
+          messages("businessmatching.registerservices.other.title") + " - " + messages("summary.businessmatching")
+        )
+        heading.html    must be(messages("businessmatching.registerservices.other.title"))
         subHeading.html must include(messages("summary.businessmatching"))
 
       }
@@ -79,15 +83,15 @@ class RegisterServicesViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = register_services(filledForm, edit = true, Seq.empty, isPreSubmission = true)
 
-      doc.getElementsByClass("govuk-list govuk-error-summary__list")
-        .first.text() mustBe messages(messageKey)
+      doc.getElementsByClass("govuk-list govuk-error-summary__list").first.text() mustBe messages(messageKey)
 
-      doc.getElementById("value-error").text() mustBe(s"Error: ${messages(messageKey)}")
+      doc.getElementById("value-error").text() mustBe s"Error: ${messages(messageKey)}"
 
     }
 
     "hide the return to progress link" in new ViewFixture {
-      def view = register_services(formProvider(), edit = true, Seq.empty, isPreSubmission = true, showReturnLink = false)
+      def view =
+        register_services(formProvider(), edit = true, Seq.empty, isPreSubmission = true, showReturnLink = false)
 
       doc.body().text() must not include messages("link.return.registration.progress")
     }
@@ -111,14 +115,26 @@ class RegisterServicesViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = register_services(filledForm, edit = true, Seq.empty, isPreSubmission = false)
 
-      doc.html must include("They provide services like professional bookkeeping, accounts preparation and signing, and tax advice.")
-      doc.html must include("They facilitate and engage in the selling of art for €10,000 or more. Roles include things like art agents, art auctioneers, art dealers, and gallery owners.")
+      doc.html must include(
+        "They provide services like professional bookkeeping, accounts preparation and signing, and tax advice."
+      )
+      doc.html must include(
+        "They facilitate and engage in the selling of art for €10,000 or more. Roles include things like art agents, art auctioneers, art dealers, and gallery owners."
+      )
       doc.html must include("They handle payments for utility and other household bills on behalf of customers.")
-      doc.html must include("This includes estate agency activities, like sending out property details and arranging viewings. It also includes lettings when the monthly rent for a property is €10,000 or more.")
-      doc.html must include("They accept or make cash payments of €10,000 or more (or equivalent) in exchange for goods. This includes when a customer deposits cash directly into a bank account. Estate agents are not classed as high value dealers.")
+      doc.html must include(
+        "This includes estate agency activities, like sending out property details and arranging viewings. It also includes lettings when the monthly rent for a property is €10,000 or more."
+      )
+      doc.html must include(
+        "They accept or make cash payments of €10,000 or more (or equivalent) in exchange for goods. This includes when a customer deposits cash directly into a bank account. Estate agents are not classed as high value dealers."
+      )
       doc.html must include("They exchange currency, transmit money, or cash cheques for their customers.")
-      doc.html must include("They form companies, and supply services like providing a business or correspondence address. They also act, or arrange for another person to act, in a certain role. For example, a director in a company or a trustee of an express trust.")
-      doc.html must include("They act as a link between customers and suppliers. They handle payments made through devices like mobile phones, computers, and smart TVs.")
+      doc.html must include(
+        "They form companies, and supply services like providing a business or correspondence address. They also act, or arrange for another person to act, in a certain role. For example, a director in a company or a trustee of an express trust."
+      )
+      doc.html must include(
+        "They act as a link between customers and suppliers. They handle payments made through devices like mobile phones, computers, and smart TVs."
+      )
     }
   }
 }

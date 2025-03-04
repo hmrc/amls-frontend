@@ -36,50 +36,68 @@ import services.cache.Cache
 
 trait CacheValues {
 
-  def createEmptyTestCache(): Cache = {
+  def createEmptyTestCache(): Cache =
     Cache("empty-test-cache", Map.empty[String, JsValue])
-  }
 
-  def createTestCache(hasChanged: Boolean, includesResponse: Boolean, noTP: Boolean = false, noRP: Boolean = false, includeSubmissionStatus: Boolean = false,
-                      includeDataImport: Boolean = false): Cache = {
+  def createTestCache(
+    hasChanged: Boolean,
+    includesResponse: Boolean,
+    noTP: Boolean = false,
+    noRP: Boolean = false,
+    includeSubmissionStatus: Boolean = false,
+    includeDataImport: Boolean = false
+  ): Cache = {
 
     val data: Map[String, JsValue] = Map(
-      Asp.key -> Json.toJson(Asp(hasChanged = hasChanged)),
-      Amp.key -> Json.toJson(Amp(hasChanged = hasChanged)),
-      BusinessDetails.key -> Json.toJson(BusinessDetails(hasChanged = hasChanged)),
-      BankDetails.key -> Json.toJson(Seq(BankDetails(hasChanged = hasChanged))),
-      BusinessActivities.key -> Json.toJson(BusinessActivities(hasChanged = hasChanged)),
-      BusinessMatching.key -> Json.toJson(BusinessMatching(hasChanged = hasChanged)),
-      Eab.key -> Json.toJson(Eab(hasChanged = hasChanged)),
+      Asp.key                  -> Json.toJson(Asp(hasChanged = hasChanged)),
+      Amp.key                  -> Json.toJson(Amp(hasChanged = hasChanged)),
+      BusinessDetails.key      -> Json.toJson(BusinessDetails(hasChanged = hasChanged)),
+      BankDetails.key          -> Json.toJson(Seq(BankDetails(hasChanged = hasChanged))),
+      BusinessActivities.key   -> Json.toJson(BusinessActivities(hasChanged = hasChanged)),
+      BusinessMatching.key     -> Json.toJson(BusinessMatching(hasChanged = hasChanged)),
+      Eab.key                  -> Json.toJson(Eab(hasChanged = hasChanged)),
       MoneyServiceBusiness.key -> Json.toJson(MoneyServiceBusiness(hasChanged = hasChanged)),
-      Supervision.key -> Json.toJson(Supervision(hasChanged = hasChanged)),
-      Tcsp.key -> Json.toJson(Tcsp(hasChanged = hasChanged)),
-      Hvd.key -> Json.toJson(Hvd(hasChanged = hasChanged)),
-      Renewal.key -> Json.toJson(Renewal(hasChanged = hasChanged)),
+      Supervision.key          -> Json.toJson(Supervision(hasChanged = hasChanged)),
+      Tcsp.key                 -> Json.toJson(Tcsp(hasChanged = hasChanged)),
+      Hvd.key                  -> Json.toJson(Hvd(hasChanged = hasChanged)),
+      Renewal.key              -> Json.toJson(Renewal(hasChanged = hasChanged))
     )
 
-    val mapWithDataImport = if (includeDataImport) data + (DataImport.key -> Json.toJson(DataImport("test.json"))) else data
+    val mapWithDataImport =
+      if (includeDataImport) data + (DataImport.key -> Json.toJson(DataImport("test.json"))) else data
 
-    val mapWithSubmissionStatus = if (includeSubmissionStatus) mapWithDataImport + (SubmissionRequestStatus.key -> Json.toJson(SubmissionRequestStatus(true))) else mapWithDataImport
+    val mapWithSubmissionStatus =
+      if (includeSubmissionStatus)
+        mapWithDataImport + (SubmissionRequestStatus.key -> Json.toJson(SubmissionRequestStatus(true)))
+      else mapWithDataImport
 
-    val mapWithTradingPremises = if (!noTP) mapWithSubmissionStatus + (TradingPremises.key -> Json.toJson(Seq(TradingPremises(hasChanged = hasChanged)))) else mapWithSubmissionStatus
+    val mapWithTradingPremises =
+      if (!noTP)
+        mapWithSubmissionStatus + (TradingPremises.key -> Json.toJson(Seq(TradingPremises(hasChanged = hasChanged))))
+      else mapWithSubmissionStatus
 
-    val mapWithResponsiblePeople = if (!noRP) mapWithTradingPremises + (ResponsiblePerson.key -> Json.toJson(Seq(ResponsiblePerson(hasChanged = hasChanged)))) else mapWithTradingPremises
+    val mapWithResponsiblePeople =
+      if (!noRP)
+        mapWithTradingPremises + (ResponsiblePerson.key -> Json.toJson(Seq(ResponsiblePerson(hasChanged = hasChanged))))
+      else mapWithTradingPremises
 
     val mapWithSubscriptionResponse = if (includesResponse) {
       val testResponse = SubscriptionResponse(
         etmpFormBundleNumber = "TESTFORMBUNDLENUMBER",
-        amlsRefNo = "TESTAMLSREFNNO", subscriptionFees = Some(SubscriptionFees(
-          paymentReference = "TESTPAYMENTREF",
-          registrationFee = 100.45,
-          fpFee = None,
-          fpFeeRate = None,
-          approvalCheckFee = None,
-          approvalCheckFeeRate = None,
-          premiseFee = 123.78,
-          premiseFeeRate = None,
-          totalFees = 17623.76
-        ))
+        amlsRefNo = "TESTAMLSREFNNO",
+        subscriptionFees = Some(
+          SubscriptionFees(
+            paymentReference = "TESTPAYMENTREF",
+            registrationFee = 100.45,
+            fpFee = None,
+            fpFeeRate = None,
+            approvalCheckFee = None,
+            approvalCheckFeeRate = None,
+            premiseFee = 123.78,
+            premiseFeeRate = None,
+            totalFees = 17623.76
+          )
+        )
       )
 
       mapWithResponsiblePeople + (SubscriptionResponse.key -> Json.toJson(testResponse))

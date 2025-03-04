@@ -26,10 +26,15 @@ import views.html.notifications.v3m0.RejectionReasonsView
 class RejectionReasonsViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val rejection_reasons = app.injector.instanceOf[RejectionReasonsView]
+    lazy val rejection_reasons                                     = app.injector.instanceOf[RejectionReasonsView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
-    val notificationParams = NotificationParams(businessName = Some("Fake Name Ltd."), msgContent = "msgContent", safeId = Some("reference"), endDate = Some("endDate"))
+    val notificationParams = NotificationParams(
+      businessName = Some("Fake Name Ltd."),
+      msgContent = "msgContent",
+      safeId = Some("reference"),
+      endDate = Some("endDate")
+    )
   }
 
   "RejectionReasonsView" must {
@@ -38,17 +43,19 @@ class RejectionReasonsViewSpec extends AmlsViewSpec with Matchers {
 
       def view = rejection_reasons(notificationParams)
 
-      doc.title must be("Your application has been refused" +
-        " - " + "Your registration" +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        "Your application has been refused" +
+          " - " + "Your registration" +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = rejection_reasons(notificationParams)
 
-      heading.html must be("Your application has been refused")
+      heading.html    must be("Your application has been refused")
       subHeading.html must include("Your registration")
     }
 
@@ -56,14 +63,18 @@ class RejectionReasonsViewSpec extends AmlsViewSpec with Matchers {
 
       def view = rejection_reasons(notificationParams)
 
-      doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("reference") and include("endDate"))
+      doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("reference") and include(
+        "endDate"
+      ))
     }
 
     "have a back link" in new ViewFixture {
 
       def view = rejection_reasons(notificationParams)
 
-      doc.getElementById("return-to-messages").attr("href") mustBe controllers.routes.NotificationController.getMessages().url
+      doc.getElementById("return-to-messages").attr("href") mustBe controllers.routes.NotificationController
+        .getMessages()
+        .url
     }
   }
 }

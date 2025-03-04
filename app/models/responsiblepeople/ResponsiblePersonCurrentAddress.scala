@@ -19,10 +19,11 @@ package models.responsiblepeople
 import play.api.libs.json._
 import models.DateOfChange
 
-
-case class ResponsiblePersonCurrentAddress(personAddress: PersonAddress,
-                                           timeAtAddress: Option[TimeAtAddress],
-                                           dateOfChange: Option[DateOfChange] = None)
+case class ResponsiblePersonCurrentAddress(
+  personAddress: PersonAddress,
+  timeAtAddress: Option[TimeAtAddress],
+  dateOfChange: Option[DateOfChange] = None
+)
 
 object ResponsiblePersonCurrentAddress {
   implicit val format: OFormat[ResponsiblePersonCurrentAddress] = Json.format[ResponsiblePersonCurrentAddress]

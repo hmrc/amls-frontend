@@ -23,27 +23,28 @@ import play.api.data.Forms.mapping
 
 import javax.inject.Inject
 
-class BankAccountUKFormProvider @Inject()() extends Mappings {
+class BankAccountUKFormProvider @Inject() () extends Mappings {
 
   val sortcodeLength = 6
-  val sortcodeRegex = "^[0-9]{6}"
+  val sortcodeRegex  = "^[0-9]{6}"
 
   val accountNumberLength = 8
-  val accountNumberRegex = "^[0-9]{8}"
+  val accountNumberRegex  = "^[0-9]{8}"
 
   def apply(): Form[UKAccount] = Form[UKAccount](
     mapping(
-      "sortCode" -> text("error.invalid.bankdetails.sortcode")
+      "sortCode"      -> text("error.invalid.bankdetails.sortcode")
         .transform[String](
           _.replaceCharsAndSpaces("-"),
           _.formatToSortCode
-        ).verifying(
-        firstError(
-          minLength(sortcodeLength, "error.invalid.bankdetails.sortcode.length"),
-          maxLength(sortcodeLength, "error.invalid.bankdetails.sortcode.length"),
-          regexp(sortcodeRegex, "error.invalid.bankdetails.sortcode.characters")
         )
-      ),
+        .verifying(
+          firstError(
+            minLength(sortcodeLength, "error.invalid.bankdetails.sortcode.length"),
+            maxLength(sortcodeLength, "error.invalid.bankdetails.sortcode.length"),
+            regexp(sortcodeRegex, "error.invalid.bankdetails.sortcode.characters")
+          )
+        ),
       "accountNumber" ->
         text("error.bankdetails.accountnumber")
           .transform[String](_.removeWhitespace, x => x)
@@ -59,7 +60,7 @@ class BankAccountUKFormProvider @Inject()() extends Mappings {
 
   implicit class BankStringHelpers(s: String) {
 
-    def removeWhitespace: String = s.filterNot(_.isWhitespace)
+    def removeWhitespace: String                 = s.filterNot(_.isWhitespace)
     def replaceCharsAndSpaces(c: String): String = s.replace(c, "").removeWhitespace
 
     def formatToSortCode: String = s"${s.substring(0, 2)}-${s.substring(2, 4)}-${s.substring(4, 6)}"

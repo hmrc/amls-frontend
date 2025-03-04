@@ -35,10 +35,15 @@ import views.html.renewal.BusinessTurnoverView
 
 import scala.concurrent.Future
 
-class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach with Injecting {
+class BusinessTurnoverControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with ScalaFutures
+    with BeforeAndAfterEach
+    with Injecting {
 
   lazy val mockDataCacheConnector = mock[DataCacheConnector]
-  lazy val mockRenewalService = mock[RenewalService]
+  lazy val mockRenewalService     = mock[RenewalService]
 
   trait Fixture {
     self =>
@@ -48,11 +53,13 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
     val emptyCache = Cache.empty
 
-    lazy val view = inject[BusinessTurnoverView]
+    lazy val view  = inject[BusinessTurnoverView]
     val controller = new BusinessTurnoverController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      renewalService = mockRenewalService,
+      cc = mockMcc,
       formProvider = inject[BusinessTurnoverFormProvider],
       view = view
     )
@@ -74,7 +81,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
       "on get display the  Business Turnover page" in new Fixture {
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("renewal.business-turnover.title"))
       }
 
@@ -129,7 +136,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
         when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.renewal.routes.AMLSTurnoverController.get().url))
       }
 
@@ -145,7 +152,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
         when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
       }
     }

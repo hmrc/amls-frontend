@@ -37,20 +37,20 @@ import views.html.businessmatching.updateservice.remove.RemoveActivitiesView
 import java.time.LocalDate
 import scala.concurrent.Future
 
-
 class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks {
     self =>
 
-    val request = addToken(authRequest)
+    val request                     = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val mockRemoveBusinessTypeHelper = mock[RemoveBusinessTypeHelper]
-    lazy val view = app.injector.instanceOf[RemoveActivitiesView]
+    lazy val view                    = app.injector.instanceOf[RemoveActivitiesView]
 
     val controller = new RemoveBusinessTypesController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
       removeBusinessTypeHelper = mockRemoveBusinessTypeHelper,
@@ -62,15 +62,22 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
     when {
       controller.businessMatchingService.getModel(any())
-    } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
-      activities = Some(BusinessActivities(Set(BillPaymentServices)))
-    )))
+    } thenReturn OptionT.liftF[Future, BusinessMatching](
+      Future.successful(
+        BusinessMatching(
+          activities = Some(BusinessActivities(Set(BillPaymentServices)))
+        )
+      )
+    )
 
     when {
       controller.businessMatchingService.getSubmittedBusinessActivities(any())(any())
     } thenReturn OptionT.liftF[Future, Set[BusinessActivity]](Future.successful(Set(BillPaymentServices)))
 
-    mockCacheFetch[RemoveBusinessTypeFlowModel](Some(RemoveBusinessTypeFlowModel(Some(Set(BillPaymentServices)))), Some(RemoveBusinessTypeFlowModel.key))
+    mockCacheFetch[RemoveBusinessTypeFlowModel](
+      Some(RemoveBusinessTypeFlowModel(Some(Set(BillPaymentServices)))),
+      Some(RemoveBusinessTypeFlowModel.key)
+    )
   }
 
   "RemoveActivitiesController" when {
@@ -79,8 +86,10 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       "return OK with remove_activities view" in new Fixture {
 
         val result = controller.get()(request)
-        status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
+        status(result)                               must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(
+          messages("businessmatching.updateservice.removeactivities.title.multibusinesses")
+        )
       }
     }
 
@@ -101,9 +110,13 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         when {
           controller.businessMatchingService.getModel(any())
-        } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
-          activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
-        )))
+        } thenReturn OptionT.liftF[Future, BusinessMatching](
+          Future.successful(
+            BusinessMatching(
+              activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
+            )
+          )
+        )
 
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel()), Some(RemoveBusinessTypeFlowModel.key))
 
@@ -125,9 +138,13 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       "save the list of business activites to the data cache" in new Fixture {
         when {
           controller.businessMatchingService.getModel(any())
-        } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
-          activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
-        )))
+        } thenReturn OptionT.liftF[Future, BusinessMatching](
+          Future.successful(
+            BusinessMatching(
+              activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
+            )
+          )
+        )
 
         val today = LocalDate.now
 
@@ -147,17 +164,28 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         status(controller.post()(newRequest)) mustBe SEE_OTHER
 
-        controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, flowModel.copy(dateOfChange = None, activitiesToRemove = Some(Set(HighValueDealing))))
+        controller.router.verify(
+          "internalId",
+          WhatBusinessTypesToRemovePageId,
+          flowModel.copy(dateOfChange = None, activitiesToRemove = Some(Set(HighValueDealing)))
+        )
       }
 
       "wipe the date of change if its not required" in new Fixture {
         when {
           controller.businessMatchingService.getModel(any())
-        } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
-          activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
-        )))
+        } thenReturn OptionT.liftF[Future, BusinessMatching](
+          Future.successful(
+            BusinessMatching(
+              activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
+            )
+          )
+        )
 
-        mockCacheFetch(Some(RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
+        mockCacheFetch(
+          Some(RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(LocalDate.now)))),
+          Some(RemoveBusinessTypeFlowModel.key)
+        )
 
         when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any()))
           .thenReturn(OptionT.liftF[Future, Boolean](Future.successful(false)))
@@ -171,17 +199,33 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         status(controller.post()(newRequest)) mustBe SEE_OTHER
 
-        controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
+        controller.router.verify(
+          "internalId",
+          WhatBusinessTypesToRemovePageId,
+          RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)))
+        )
       }
 
       "wipe the date of change if the services to remove have been edited and changed" in new Fixture {
         when {
           controller.businessMatchingService.getModel(any())
-        } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
-          activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
-        )))
+        } thenReturn OptionT.liftF[Future, BusinessMatching](
+          Future.successful(
+            BusinessMatching(
+              activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
+            )
+          )
+        )
 
-        mockCacheFetch(Some(RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)), dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
+        mockCacheFetch(
+          Some(
+            RemoveBusinessTypeFlowModel(
+              activitiesToRemove = Some(Set(MoneyServiceBusiness)),
+              dateOfChange = Some(DateOfChange(LocalDate.now))
+            )
+          ),
+          Some(RemoveBusinessTypeFlowModel.key)
+        )
 
         when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any()))
           .thenReturn(OptionT.liftF[Future, Boolean](Future.successful(true)))
@@ -195,17 +239,33 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         status(controller.post()(newRequest)) mustBe SEE_OTHER
 
-        controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
+        controller.router.verify(
+          "internalId",
+          WhatBusinessTypesToRemovePageId,
+          RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)))
+        )
       }
 
       "leave the date of change if the services to remove have not been changed" in new Fixture {
         when {
           controller.businessMatchingService.getModel(any())
-        } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
-          activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
-        )))
+        } thenReturn OptionT.liftF[Future, BusinessMatching](
+          Future.successful(
+            BusinessMatching(
+              activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
+            )
+          )
+        )
 
-        mockCacheFetch(Some(RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)), dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
+        mockCacheFetch(
+          Some(
+            RemoveBusinessTypeFlowModel(
+              activitiesToRemove = Some(Set(HighValueDealing)),
+              dateOfChange = Some(DateOfChange(LocalDate.now))
+            )
+          ),
+          Some(RemoveBusinessTypeFlowModel.key)
+        )
 
         when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any()))
           .thenReturn(OptionT.liftF[Future, Boolean](Future.successful(true)))
@@ -219,33 +279,57 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         status(controller.post()(newRequest)) mustBe SEE_OTHER
 
-        controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)), dateOfChange = Some(DateOfChange(LocalDate.now))))
+        controller.router.verify(
+          "internalId",
+          WhatBusinessTypesToRemovePageId,
+          RemoveBusinessTypeFlowModel(
+            activitiesToRemove = Some(Set(HighValueDealing)),
+            dateOfChange = Some(DateOfChange(LocalDate.now))
+          )
+        )
       }
 
       "throw an error message when trying to select all business types the users has" in new Fixture {
         when {
           controller.businessMatchingService.getModel(any())
-        } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
-          activities = Some(BusinessActivities(Set(AccountancyServices,
-            BillPaymentServices,
-            EstateAgentBusinessService,
-            HighValueDealing,
-            MoneyServiceBusiness,
-            TrustAndCompanyServices,
-            TelephonePaymentService)))
-        )))
-
+        } thenReturn OptionT.liftF[Future, BusinessMatching](
+          Future.successful(
+            BusinessMatching(
+              activities = Some(
+                BusinessActivities(
+                  Set(
+                    AccountancyServices,
+                    BillPaymentServices,
+                    EstateAgentBusinessService,
+                    HighValueDealing,
+                    MoneyServiceBusiness,
+                    TrustAndCompanyServices,
+                    TelephonePaymentService
+                  )
+                )
+              )
+            )
+          )
+        )
 
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel()))
 
-        mockCacheSave[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel(Some(Set(AccountancyServices,
-          BillPaymentServices,
-          EstateAgentBusinessService,
-          HighValueDealing,
-          MoneyServiceBusiness,
-          TrustAndCompanyServices,
-          TelephonePaymentService))),
-          Some(RemoveBusinessTypeFlowModel.key))
+        mockCacheSave[RemoveBusinessTypeFlowModel](
+          RemoveBusinessTypeFlowModel(
+            Some(
+              Set(
+                AccountancyServices,
+                BillPaymentServices,
+                EstateAgentBusinessService,
+                HighValueDealing,
+                MoneyServiceBusiness,
+                TrustAndCompanyServices,
+                TelephonePaymentService
+              )
+            )
+          ),
+          Some(RemoveBusinessTypeFlowModel.key)
+        )
 
         val newRequest = FakeRequest(POST, routes.RemoveBusinessTypesController.post().url)
           .withFormUrlEncodedBody(

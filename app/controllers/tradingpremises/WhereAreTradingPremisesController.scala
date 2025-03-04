@@ -40,44 +40,51 @@ import views.html.tradingpremises.WhereAreTradingPremisesView
 
 import scala.concurrent.Future
 
-class WhereAreTradingPremisesController @Inject () (
-                                                     val dataCacheConnector: DataCacheConnector,
-                                                     val statusService: StatusService,
-                                                     val auditConnector: AuditConnector,
-                                                     val authAction: AuthAction,
-                                                     val ds: CommonPlayDependencies,
-                                                     val cc: MessagesControllerComponents,
-                                                     formProvider: TradingAddressFormProvider,
-                                                     dateChangeFormProvider: DateOfChangeFormProvider,
-                                                     view: WhereAreTradingPremisesView,
-                                                     dateChangeView: DateOfChangeView,
-                                                     implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper {
+class WhereAreTradingPremisesController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val statusService: StatusService,
+  val auditConnector: AuditConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: TradingAddressFormProvider,
+  dateChangeFormProvider: DateOfChangeFormProvider,
+  view: WhereAreTradingPremisesView,
+  dateChangeView: DateOfChangeView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection
+    with DateOfChangeHelper {
 
-  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      getData[TradingPremises](request.credId, index) map {
-        case Some(TradingPremises(_, Some(data), _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
-          Ok(view(formProvider().fill(data), edit, index))
-        case Some(_) =>
-          Ok(view(formProvider(), edit, index))
-        case _ =>
-          NotFound(notFoundView)
-      }
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    getData[TradingPremises](request.credId, index) map {
+      case Some(TradingPremises(_, Some(data), _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
+        Ok(view(formProvider().fill(data), edit, index))
+      case Some(_)                                                                     =>
+        Ok(view(formProvider(), edit, index))
+      case _                                                                           =>
+        NotFound(notFoundView)
+    }
   }
 
-  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit, index))),
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, index))),
         ytp => {
           val block = for {
             tradingPremises <- OptionT(getData[TradingPremises](request.credId, index))
-            _ <- OptionT.liftF(updateDataStrict[TradingPremises](request.credId, index)(updateTradingPremises(ytp, _)))
-            status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
-            _ <- OptionT.liftF(
-              sendAudits(ytp.tradingPremisesAddress, tradingPremises.yourTradingPremises.fold[Option[Address]](None)(_.tradingPremisesAddress.some), edit)
-            )
+            _               <- OptionT.liftF(updateDataStrict[TradingPremises](request.credId, index)(updateTradingPremises(ytp, _)))
+            status          <-
+              OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
+            _               <- OptionT.liftF(
+                                 sendAudits(
+                                   ytp.tradingPremisesAddress,
+                                   tradingPremises.yourTradingPremises.fold[Option[Address]](None)(_.tradingPremisesAddress.some),
+                                   edit
+                                 )
+                               )
           } yield redirectTo(index, edit, ytp, tradingPremises, status)
 
           block getOrElse NotFound(notFoundView)
@@ -85,30 +92,46 @@ class WhereAreTradingPremisesController @Inject () (
       )
   }
 
-  private def sendAudits(address: Address, oldAddress: Option[Address], edit: Boolean)
-                        (implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
+  private def sendAudits(address: Address, oldAddress: Option[Address], edit: Boolean)(implicit
+    hc: HeaderCarrier,
+    request: Request[_]
+  ): Future[AuditResult] =
     if (edit) {
       auditConnector.sendEvent(AddressModifiedEvent(address, oldAddress))
     } else {
       auditConnector.sendEvent(AddressCreatedEvent(address))
     }
-  }
 
   private def updateTradingPremises(ytp: YourTradingPremises, tp: TradingPremises) = {
 
     val updatedYtp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](Some(ytp))(x =>
-      Some(ytp.copy(startDate = x.startDate, isResidential = x.isResidential)))
+      Some(ytp.copy(startDate = x.startDate, isResidential = x.isResidential))
+    )
 
     TradingPremises(
       tp.registeringAgentPremises,
-      updatedYtp, tp.businessStructure, tp.agentName, tp.agentCompanyDetails,
-      tp.agentPartnership, tp.whatDoesYourBusinessDoAtThisAddress, tp.msbServices,
-      hasChanged = true, tp.lineId, tp.status, tp.endDate
+      updatedYtp,
+      tp.businessStructure,
+      tp.agentName,
+      tp.agentCompanyDetails,
+      tp.agentPartnership,
+      tp.whatDoesYourBusinessDoAtThisAddress,
+      tp.msbServices,
+      hasChanged = true,
+      tp.lineId,
+      tp.status,
+      tp.endDate
     )
 
   }
 
-  private def redirectTo(index: Int, edit: Boolean, ytp: YourTradingPremises, tp: TradingPremises, status: SubmissionStatus) = {
+  private def redirectTo(
+    index: Int,
+    edit: Boolean,
+    ytp: YourTradingPremises,
+    tp: TradingPremises,
+    status: SubmissionStatus
+  ) =
     if (redirectToDateOfChange(Some(tp), ytp) && edit && isEligibleForDateOfChange(status)) {
       Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
     } else {
@@ -118,58 +141,66 @@ class WhereAreTradingPremisesController @Inject () (
         Redirect(routes.ActivityStartDateController.get(index, edit))
       }
     }
+
+  def dateOfChange(index: Int): Action[AnyContent] = authAction { implicit request =>
+    Ok(
+      dateChangeView(
+        dateChangeFormProvider(),
+        "summary.tradingpremises",
+        controllers.tradingpremises.routes.WhereAreTradingPremisesController.saveDateOfChange(index)
+      )
+    )
   }
 
-  def dateOfChange(index: Int): Action[AnyContent] = authAction {
-    implicit request => Ok(dateChangeView(
-      dateChangeFormProvider(),
-      "summary.tradingpremises",
-      controllers.tradingpremises.routes.WhereAreTradingPremisesController.saveDateOfChange(index)
-    ))
-  }
-
-  def saveDateOfChange(index: Int): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dateChangeFormProvider().bindFromRequest().fold(
+  def saveDateOfChange(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    dateChangeFormProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(getDateView(formWithErrors, index))),
-        dateOfChange => {
+        dateOfChange =>
           getData[TradingPremises](request.credId, index).flatMap { tradingPremises =>
             tradingPremises.startDate match {
               case Some(date) if dateOfChange.dateOfChange.isAfter(date) =>
                 updateDataStrict[TradingPremises](request.credId, index) { tp =>
                   tp.yourTradingPremises.fold(tp) { ytp =>
                     tp.copy(
-                      yourTradingPremises = Some(ytp.copy(
-                        tradingNameChangeDate = Some(dateOfChange),
-                        tradingPremisesAddress = ytp.tradingPremisesAddress.copy(dateOfChange = Some(dateOfChange))
-                      )))
+                      yourTradingPremises = Some(
+                        ytp.copy(
+                          tradingNameChangeDate = Some(dateOfChange),
+                          tradingPremisesAddress = ytp.tradingPremisesAddress.copy(dateOfChange = Some(dateOfChange))
+                        )
+                      )
+                    )
                   }
                 } map { _ =>
                   Redirect(routes.CheckYourAnswersController.get(index))
                 }
-              case Some(date) =>
-                Future.successful(BadRequest(getDateView(
-                  dateChangeFormProvider().withError(
-                    "dateOfChange",
-                    messages(
-                      "error.expected.tp.dateofchange.after.startdate",
-                      DateHelper.formatDate(date)
+              case Some(date)                                            =>
+                Future.successful(
+                  BadRequest(
+                    getDateView(
+                      dateChangeFormProvider().withError(
+                        "dateOfChange",
+                        messages(
+                          "error.expected.tp.dateofchange.after.startdate",
+                          DateHelper.formatDate(date)
+                        )
+                      ),
+                      index
                     )
-                  ),
-                  index
-                )))
-              case None =>
+                  )
+                )
+              case None                                                  =>
                 Future.failed(new Exception("Could not retrieve start date"))
             }
           }
-        }
       )
   }
 
   private def redirectToDateOfChange(tradingPremises: Option[TradingPremises], premises: YourTradingPremises) =
     (
       for {
-        tp <- tradingPremises
+        tp  <- tradingPremises
         ytp <- tp.yourTradingPremises
       } yield (ytp.tradingName != premises.tradingName || ytp.tradingPremisesAddress != premises.tradingPremisesAddress) && tp.lineId.isDefined
     ).getOrElse(false)

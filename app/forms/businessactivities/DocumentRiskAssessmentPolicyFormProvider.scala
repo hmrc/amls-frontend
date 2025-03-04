@@ -23,11 +23,12 @@ import play.api.data.Forms.{mapping, seq}
 
 import javax.inject.Inject
 
-class DocumentRiskAssessmentPolicyFormProvider @Inject()() extends Mappings {
+class DocumentRiskAssessmentPolicyFormProvider @Inject() () extends Mappings {
   def apply(): Form[RiskAssessmentTypes] = Form[RiskAssessmentTypes](
     mapping(
-      "riskassessments" -> seq(enumerable[RiskAssessmentType](
-        "error.required.ba.risk.assessment.format")(RiskAssessmentType.enumerable))
+      "riskassessments" -> seq(
+        enumerable[RiskAssessmentType]("error.required.ba.risk.assessment.format")(RiskAssessmentType.enumerable)
+      )
         .verifying(
           nonEmptySeq("error.required.ba.risk.assessment.format")
         )

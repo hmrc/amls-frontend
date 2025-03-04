@@ -47,11 +47,12 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
     messages("businessactivities.registerservices.servicename.lbl." + BusinessMatchingActivities.getValue(service))
 
   trait Fixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val dataCacheConnector = mock[DataCacheConnector]
-    lazy val view = inject[ExperienceTrainingView]
-    val controller = new ExperienceTrainingController (
+    lazy val view          = inject[ExperienceTrainingView]
+    val controller         = new ExperienceTrainingController(
       dataCacheConnector = dataCacheConnector,
       recoverActivitiesService = mock[RecoverActivitiesService],
       authAction = SuccessfulAuthAction,
@@ -63,7 +64,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
     )
   }
 
-  val emptyCache: Cache = Cache.empty
+  val emptyCache: Cache   = Cache.empty
   val mockCacheMap: Cache = mock[Cache]
 
   "ExperienceTrainingController" must {
@@ -76,50 +77,70 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on get load the page with the business activities" in new Fixture {
 
-        when(controller.dataCacheConnector.fetchAll(any()))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
+      when(controller.dataCacheConnector.fetchAll(any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(
-            Seq(ResponsiblePerson(
-              personName = personName,
-              experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training"))
-          )))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())).thenReturn(
+        Future.successful(
+          Some(
+            Seq(
+              ResponsiblePerson(
+                personName = personName,
+                experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training"))
+              )
+            )
+          )
+        )
+      )
 
-        val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
-        when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-          .thenReturn(Some(businessActivities))
+      val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
+      when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+        .thenReturn(Some(businessActivities))
 
-        val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
+      val businessMatchingActivities =
+        BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-        val RecordId = 1
-        val result = controller.get(RecordId)(request)
-        status(result) must be(OK)
+      val RecordId = 1
+      val result   = controller.get(RecordId)(request)
+      status(result) must be(OK)
 
-        contentAsString(result) must include(getMessage(AccountancyServices))
-        contentAsString(result) must include(getMessage(BillPaymentServices))
-        contentAsString(result) must include(getMessage(EstateAgentBusinessService))
+      contentAsString(result) must include(getMessage(AccountancyServices))
+      contentAsString(result) must include(getMessage(BillPaymentServices))
+      contentAsString(result) must include(getMessage(EstateAgentBusinessService))
 
-        contentAsString(result) must include(messages("responsiblepeople.experiencetraining.title"))
-      }
+      contentAsString(result) must include(messages("responsiblepeople.experiencetraining.title"))
+    }
 
     "on get display the page with pre populated data for the Yes Option" in new Fixture {
 
       when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
+      val businessMatchingActivities =
+        BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-        (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName,experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())).thenReturn(
+        Future.successful(
+          Some(
+            Seq(
+              ResponsiblePerson(
+                personName = personName,
+                experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training"))
+              )
+            )
+          )
+        )
+      )
 
       val result = controller.get(RecordId)(request)
 
       status(result) must be(OK)
 
-      contentAsString(result) must include ("I do not remember when I did the training")
+      contentAsString(result) must include("I do not remember when I did the training")
     }
 
     "on get display the page with pre populated data with No Data for the information" in new Fixture {
@@ -127,86 +148,127 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
+      val businessMatchingActivities =
+        BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-        (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingNo))))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())).thenReturn(
+        Future.successful(
+          Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingNo))))
+        )
+      )
       val result = controller.get(RecordId)(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
 
-      contentAsString(result) must not include "I do not remember when I did the training"
-      document.select("input[name=experienceTraining][value=true]").hasAttr("checked") must be(false)
+      contentAsString(result)                                                           must not include "I do not remember when I did the training"
+      document.select("input[name=experienceTraining][value=true]").hasAttr("checked")  must be(false)
       document.select("input[name=experienceTraining][value=false]").hasAttr("checked") must be(true)
     }
 
     "on post with valid data and training selected yes" in new Fixture {
       val newRequest = FakeRequest(POST, routes.ExperienceTrainingController.post(1).url)
-      .withFormUrlEncodedBody(
-        "experienceTraining" -> "true",
-        "experienceInformation" -> "I do not remember when I did the training"
-      )
+        .withFormUrlEncodedBody(
+          "experienceTraining"    -> "true",
+          "experienceInformation" -> "I do not remember when I did the training"
+        )
 
       val mockCacheMap = mock[Cache]
 
       when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
+      val businessMatchingActivities =
+        BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-        (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())).thenReturn(
+        Future.successful(
+          Some(
+            Seq(
+              ResponsiblePerson(
+                personName = personName,
+                experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training"))
+              )
+            )
+          )
+        )
+      )
 
-      when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(RecordId)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.TrainingController.get(RecordId).url))
     }
 
     "on post with valid data and training selected no" in new Fixture {
       val newRequest = FakeRequest(POST, routes.ExperienceTrainingController.post(1).url)
-      .withFormUrlEncodedBody(
-        "experienceTraining" -> "false"
-      )
+        .withFormUrlEncodedBody(
+          "experienceTraining" -> "false"
+        )
 
       val mockCacheMap = mock[Cache]
 
       when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
+      val businessMatchingActivities =
+        BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-        (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())).thenReturn(
+        Future.successful(
+          Some(
+            Seq(
+              ResponsiblePerson(
+                personName = personName,
+                experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training"))
+              )
+            )
+          )
+        )
+      )
 
-      when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(RecordId)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.TrainingController.get(RecordId).url))
     }
 
     "on post with invalid data" in new Fixture {
-      val newRequest = FakeRequest(POST, routes.ExperienceTrainingController.post(1).url)
-      .withFormUrlEncodedBody(
-        "experienceTraining" -> "not a boolean value"
-      )
+      val newRequest   = FakeRequest(POST, routes.ExperienceTrainingController.post(1).url)
+        .withFormUrlEncodedBody(
+          "experienceTraining" -> "not a boolean value"
+        )
       val mockCacheMap = mock[Cache]
 
       when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
+      val businessMatchingActivities =
+        BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-        (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())).thenReturn(
+        Future.successful(
+          Some(
+            Seq(
+              ResponsiblePerson(
+                personName = personName,
+                experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training"))
+              )
+            )
+          )
+        )
+      )
 
       val result = controller.post(RecordId)(newRequest)
 
@@ -215,7 +277,6 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       document.title must be(s"Error: $pageTitle")
     }
 
-
     "on post with valid data in edit mode" in new Fixture {
 
       val mockCacheMap = mock[Cache]
@@ -223,24 +284,37 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
+      val businessMatchingActivities =
+        BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
       val newRequest = FakeRequest(POST, routes.ExperienceTrainingController.post(1).url)
-      .withFormUrlEncodedBody(
-        "experienceTraining" -> "true",
-        "experienceInformation" -> "I do not remember when I did the training"
+        .withFormUrlEncodedBody(
+          "experienceTraining"    -> "true",
+          "experienceInformation" -> "I do not remember when I did the training"
+        )
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())).thenReturn(
+        Future.successful(
+          Some(
+            Seq(
+              ResponsiblePerson(experienceTraining =
+                Some(ExperienceTrainingYes("I do not remember when I did the training"))
+              )
+            )
+          )
+        )
       )
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-        (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
-
-      when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(RecordId, true, Some(flowFromDeclaration))(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url))
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(
+        Some(routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url)
+      )
     }
   }
 }

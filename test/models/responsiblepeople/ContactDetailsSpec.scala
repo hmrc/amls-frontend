@@ -27,7 +27,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
     "Read the json and return the InKnownByOtherNamesYes domain object successfully" in {
 
       val json = Json.obj(
-        "phoneNumber" -> "07000000000",
+        "phoneNumber"  -> "07000000000",
         "emailAddress" -> "myname@example.com"
       )
 
@@ -40,7 +40,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
       val contactDetails = ContactDetails("07000000000", "myname@example.com")
 
       val json = Json.obj(
-        "phoneNumber" -> "07000000000",
+        "phoneNumber"  -> "07000000000",
         "emailAddress" -> "myname@example.com"
       )
 

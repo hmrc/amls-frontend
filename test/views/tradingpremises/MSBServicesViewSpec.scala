@@ -31,14 +31,17 @@ import views.html.tradingpremises.MSBServicesView
 class MSBServicesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val msb_services: MSBServicesView = inject[MSBServicesView]
-  lazy val fp: MSBServicesFormProvider = inject[MSBServicesFormProvider]
+  lazy val fp: MSBServicesFormProvider   = inject[MSBServicesFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   val filteredModels: Seq[TradingPremisesMsbService] = Seq(
-    ChequeCashingScrapMetal, ChequeCashingNotScrapMetal, CurrencyExchange, ForeignExchange
+    ChequeCashingScrapMetal,
+    ChequeCashingNotScrapMetal,
+    CurrencyExchange,
+    ForeignExchange
   )
-  val checkboxes: Seq[Aliases.CheckboxItem] = TradingPremisesMsbService.formValues(Some(filteredModels))
+  val checkboxes: Seq[Aliases.CheckboxItem]          = TradingPremisesMsbService.formValues(Some(filteredModels))
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
@@ -53,8 +56,8 @@ class MSBServicesViewSpec extends AmlsViewSpec with Matchers {
 
       def view = msb_services(fp(), 1, false, false, checkboxes)
 
-      doc.title must be(pageTitle)
-      heading.html must be(messages("tradingpremises.msb.services.title"))
+      doc.title       must be(pageTitle)
+      heading.html    must be(messages("tradingpremises.msb.services.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
 
       val checkbox = doc.select("input[type=checkbox]")

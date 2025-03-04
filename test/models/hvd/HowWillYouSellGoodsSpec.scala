@@ -21,7 +21,6 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 
-
 class HowWillYouSellGoodsSpec extends AnyWordSpec with Matchers {
 
   val fullData = HowWillYouSellGoods(Set(Wholesale, Retail, Auction))
@@ -29,7 +28,7 @@ class HowWillYouSellGoodsSpec extends AnyWordSpec with Matchers {
   "How will You Sell Goods" should {
     "Round trip through Json" in {
       val j = Json.toJson(fullData)
-      j.as[HowWillYouSellGoods] must be (fullData)
+      j.as[HowWillYouSellGoods] must be(fullData)
     }
   }
 }

@@ -41,22 +41,32 @@ class WithdrawalReasonSpec extends PlaySpec with Matchers with MockitoSugar {
     }
 
     "validate given an enum value and string" in {
-      Json.fromJson[WithdrawalReason](Json.obj("withdrawalReason" -> "Other, please specify", "specifyOtherReason" -> "reason")) must
+      Json.fromJson[WithdrawalReason](
+        Json.obj("withdrawalReason" -> "Other, please specify", "specifyOtherReason" -> "reason")
+      ) must
         be(JsSuccess(WithdrawalReason.Other("reason"), JsPath \ "specifyOtherReason"))
     }
 
     "write the correct value" when {
       "OutOfScope" in {
-        Json.toJson(WithdrawalReason.OutOfScope.asInstanceOf[WithdrawalReason]) must be(Json.obj("withdrawalReason" -> "Out of scope"))
+        Json.toJson(WithdrawalReason.OutOfScope.asInstanceOf[WithdrawalReason]) must be(
+          Json.obj("withdrawalReason" -> "Out of scope")
+        )
       }
       "NotTradingInOwnRight" in {
-        Json.toJson(WithdrawalReason.NotTradingInOwnRight.asInstanceOf[WithdrawalReason]) must be(Json.obj("withdrawalReason" -> "Not trading in own right"))
+        Json.toJson(WithdrawalReason.NotTradingInOwnRight.asInstanceOf[WithdrawalReason]) must be(
+          Json.obj("withdrawalReason" -> "Not trading in own right")
+        )
       }
       "UnderAnotherSupervisor" in {
-        Json.toJson(WithdrawalReason.UnderAnotherSupervisor.asInstanceOf[WithdrawalReason]) must be(Json.obj("withdrawalReason" -> "Under another supervisor"))
+        Json.toJson(WithdrawalReason.UnderAnotherSupervisor.asInstanceOf[WithdrawalReason]) must be(
+          Json.obj("withdrawalReason" -> "Under another supervisor")
+        )
       }
       "Other" in {
-        Json.toJson(WithdrawalReason.Other("reason").asInstanceOf[WithdrawalReason]) must be(Json.obj("withdrawalReason" -> "Other, please specify", "specifyOtherReason" -> "reason"))
+        Json.toJson(WithdrawalReason.Other("reason").asInstanceOf[WithdrawalReason]) must be(
+          Json.obj("withdrawalReason" -> "Other, please specify", "specifyOtherReason" -> "reason")
+        )
       }
     }
 

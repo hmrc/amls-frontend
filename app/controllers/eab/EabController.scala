@@ -31,61 +31,55 @@ import models.businessmatching.BusinessActivity.{EstateAgentBusinessService => E
 import services.businessmatching.ServiceFlow
 import utils.DateOfChangeHelper
 
-class EabController @Inject()(proxyCacheService  : ProxyCacheService,
-                              authAction         : AuthAction,
-                              val cacheConnector : DataCacheConnector,
-                              val ds: CommonPlayDependencies,
-                              val cc: MessagesControllerComponents,
-                              val serviceFlow: ServiceFlow) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+class EabController @Inject() (
+  proxyCacheService: ProxyCacheService,
+  authAction: AuthAction,
+  val cacheConnector: DataCacheConnector,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  val serviceFlow: ServiceFlow
+) extends AmlsBaseController(ds, cc)
+    with DateOfChangeHelper {
 
   def get(credId: String): Action[AnyContent] = Action.async {
-      proxyCacheService.getEab(credId).map {
-        _.map(Ok(_: JsValue)).getOrElse(NotFound)
-      }
+    proxyCacheService.getEab(credId).map {
+      _.map(Ok(_: JsValue)).getOrElse(NotFound)
+    }
   }
 
-  def set(credId: String): Action[JsValue] = Action.async(parse.json) {
-    implicit request => {
-      proxyCacheService.setEab(credId, request.body).map {
-        _ => {
-          Ok(Json.obj("_id" -> credId))
-        }
+  def set(credId: String): Action[JsValue] = Action.async(parse.json) { implicit request =>
+    proxyCacheService.setEab(credId, request.body).map { _ =>
+      Ok(Json.obj("_id" -> credId))
+    }
+  }
+
+  def requireDateOfChange(credId: String, submissionStatus: String) = Action.async(parse.json) { implicit request =>
+    def newEabServices: List[String] = Eab(
+      request.body.as[JsObject].value("data").as[JsObject]
+    ).services.getOrElse(List())
+
+    for {
+      currentEab    <- cacheConnector.fetch[Eab](credId, Eab.key)
+      isNewActivity <- serviceFlow.isNewActivity(credId, EAB)
+    } yield {
+
+      def currentServices: Option[List[String]] =
+        currentEab.getOrElse(Eab(Json.obj())).services
+
+      if (!isNewActivity & dateOfChangApplicable(submissionStatus, currentServices, newEabServices)) {
+        Ok(Json.obj("requireDateOfChange" -> true))
+      } else {
+        Ok(Json.obj("requireDateOfChange" -> false))
       }
     }
   }
 
-  def requireDateOfChange(credId: String,
-                          submissionStatus: String) = Action.async(parse.json) {
-
-    implicit request => {
-
-      def newEabServices: List[String] = Eab(
-        request.body.as[JsObject].value("data").as[JsObject]
-      ).services.getOrElse(List())
-
-      for {
-        currentEab    <- cacheConnector.fetch[Eab](credId, Eab.key)
-        isNewActivity <- serviceFlow.isNewActivity(credId, EAB)
-      } yield {
-
-        def currentServices: Option[List[String]] = {
-          currentEab.getOrElse(Eab(Json.obj())).services
-        }
-
-        if (!isNewActivity & dateOfChangApplicable(submissionStatus, currentServices, newEabServices)) {
-          Ok(Json.obj("requireDateOfChange" -> true))
-        } else {
-          Ok(Json.obj("requireDateOfChange" -> false))
-        }
-      }
-    }
-  }
-
-  def accept: Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        eab <- OptionT(cacheConnector.fetch[Eab](request.credId, Eab.key))
-        _ <- OptionT.liftF(cacheConnector.save[Eab](request.credId, Eab.key, eab.copy(hasAccepted = true)))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update EAB")
+  def accept: Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      eab <- OptionT(cacheConnector.fetch[Eab](request.credId, Eab.key))
+      _   <- OptionT.liftF(cacheConnector.save[Eab](request.credId, Eab.key, eab.copy(hasAccepted = true)))
+    } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError(
+      "Could not update EAB"
+    )
   }
 }

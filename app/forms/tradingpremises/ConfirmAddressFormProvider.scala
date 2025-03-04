@@ -22,9 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class ConfirmAddressFormProvider @Inject()() extends BooleanFormProvider {
+class ConfirmAddressFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[ConfirmAddress] = createForm[ConfirmAddress](
-    "confirmAddress", "error.required.tp.confirm.address"
+    "confirmAddress",
+    "error.required.tp.confirm.address"
   )(ConfirmAddress.apply, _.confirmAddress)
 }

@@ -23,13 +23,14 @@ import play.api.data.Form
 class BankAccountIsUKFormProviderSpec extends BooleanFieldBehaviours[BankAccountIsUk] {
 
   override val form: Form[BankAccountIsUk] = new BankAccountIsUKFormProvider()()
-  override val fieldName: String = "isUK"
-  override val errorMessage: String = "error.bankdetails.ukbankaccount"
+  override val fieldName: String           = "isUK"
+  override val errorMessage: String        = "error.bankdetails.ukbankaccount"
 
   "AccountantIsUKAddressFormProvider" must {
 
     behave like booleanFieldWithModel(
-      BankAccountIsUk(true), BankAccountIsUk(false)
+      BankAccountIsUk(true),
+      BankAccountIsUk(false)
     )
   }
 }

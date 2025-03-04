@@ -24,13 +24,29 @@ import play.api.libs.json.Json
 
 class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
 
-  val DefaultCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressUK("Line 1", Some("Line 2"), None, None, "AA111AA"), Some(ZeroToFiveMonths))
-  val DefaultAdditionalAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("Spain", "ES")), Some(SixToElevenMonths))
-  val DefaultAdditionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 1", Some("Line 2"), None, None, "NE1234"), Some(OneToThreeYears))
+  val DefaultCurrentAddress         = ResponsiblePersonCurrentAddress(
+    PersonAddressUK("Line 1", Some("Line 2"), None, None, "AA111AA"),
+    Some(ZeroToFiveMonths)
+  )
+  val DefaultAdditionalAddress      = ResponsiblePersonAddress(
+    PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("Spain", "ES")),
+    Some(SixToElevenMonths)
+  )
+  val DefaultAdditionalExtraAddress =
+    ResponsiblePersonAddress(PersonAddressUK("Line 1", Some("Line 2"), None, None, "NE1234"), Some(OneToThreeYears))
 
-  val NewCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("Spain", "ES")), Some(ZeroToFiveMonths))
-  val NewAdditionalAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("France", "FR")), Some(ZeroToFiveMonths))
-  val NewAdditionalExtraAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("Albania", "AL")), Some(SixToElevenMonths))
+  val NewCurrentAddress         = ResponsiblePersonCurrentAddress(
+    PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("Spain", "ES")),
+    Some(ZeroToFiveMonths)
+  )
+  val NewAdditionalAddress      = ResponsiblePersonAddress(
+    PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("France", "FR")),
+    Some(ZeroToFiveMonths)
+  )
+  val NewAdditionalExtraAddress = ResponsiblePersonAddress(
+    PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("Albania", "AL")),
+    Some(SixToElevenMonths)
+  )
 
   val DefaultAddressHistory = ResponsiblePersonAddressHistory(
     currentAddress = Some(DefaultCurrentAddress),
@@ -64,20 +80,20 @@ class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
     "validate complete json" must {
 
       val completeJson = Json.obj(
-        "currentAddress" -> Json.obj(
+        "currentAddress"         -> Json.obj(
           "personAddress" -> Json.obj(
-            "personAddressLine1" -> "Line 1",
-            "personAddressLine2" -> "Line 2",
+            "personAddressLine1"    -> "Line 1",
+            "personAddressLine2"    -> "Line 2",
             "personAddressPostCode" -> "AA111AA"
           ),
           "timeAtAddress" -> Json.obj(
             "timeAtAddress" -> "01"
           )
         ),
-        "additionalAddress" -> Json.obj(
+        "additionalAddress"      -> Json.obj(
           "personAddress" -> Json.obj(
-            "personAddressLine1" -> "Line 1",
-            "personAddressLine2" -> "Line 2",
+            "personAddressLine1"   -> "Line 1",
+            "personAddressLine2"   -> "Line 2",
             "personAddressCountry" -> "ES"
           ),
           "timeAtAddress" -> Json.obj(
@@ -86,14 +102,15 @@ class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
         ),
         "additionalExtraAddress" -> Json.obj(
           "personAddress" -> Json.obj(
-            "personAddressLine1" -> "Line 1",
-            "personAddressLine2" -> "Line 2",
+            "personAddressLine1"    -> "Line 1",
+            "personAddressLine2"    -> "Line 2",
             "personAddressPostCode" -> "NE1234"
           ),
           "timeAtAddress" -> Json.obj(
             "timeAtAddress" -> "03"
           )
-        ))
+        )
+      )
 
       "Serialise as expected" in {
         Json.toJson(DefaultAddressHistory) must be(completeJson)
@@ -164,26 +181,45 @@ class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
     val initial = ResponsiblePersonAddressHistory(
       Some(DefaultCurrentAddress),
       Some(DefaultAdditionalAddress),
-      Some(DefaultAdditionalExtraAddress))
+      Some(DefaultAdditionalExtraAddress)
+    )
 
     "Merged with add person" must {
       "return ResponsiblePeople with correct add person" in {
         val result = initial.currentAddress(NewCurrentAddress)
-        result must be (ResponsiblePersonAddressHistory(Some(NewCurrentAddress), Some(DefaultAdditionalAddress), Some(DefaultAdditionalExtraAddress)))
+        result must be(
+          ResponsiblePersonAddressHistory(
+            Some(NewCurrentAddress),
+            Some(DefaultAdditionalAddress),
+            Some(DefaultAdditionalExtraAddress)
+          )
+        )
       }
     }
 
     "Merged with DefaultPersonResidenceType" must {
       "return ResponsiblePeople with correct DefaultPersonResidenceType" in {
         val result = initial.additionalAddress(NewAdditionalAddress)
-        result must be (ResponsiblePersonAddressHistory(Some(DefaultCurrentAddress), Some(NewAdditionalAddress), Some(DefaultAdditionalExtraAddress)))
+        result must be(
+          ResponsiblePersonAddressHistory(
+            Some(DefaultCurrentAddress),
+            Some(NewAdditionalAddress),
+            Some(DefaultAdditionalExtraAddress)
+          )
+        )
       }
     }
 
     "Merged with DefaultPreviousHomeAddress" must {
       "return ResponsiblePeople with correct DefaultPreviousHomeAddress" in {
         val result = initial.additionalExtraAddress(NewAdditionalExtraAddress)
-        result must be (ResponsiblePersonAddressHistory(Some(DefaultCurrentAddress), Some(DefaultAdditionalAddress), Some(NewAdditionalExtraAddress)))
+        result must be(
+          ResponsiblePersonAddressHistory(
+            Some(DefaultCurrentAddress),
+            Some(DefaultAdditionalAddress),
+            Some(NewAdditionalExtraAddress)
+          )
+        )
       }
     }
   }

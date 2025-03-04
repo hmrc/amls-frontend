@@ -30,7 +30,7 @@ import scala.concurrent.Future
 class DocumentRiskAssessmentServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
   val mockCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap: Cache = mock[Cache]
+  val mockCacheMap: Cache                    = mock[Cache]
 
   val service = new DocumentRiskAssessmentService(mockCacheConnector)
 
@@ -47,7 +47,8 @@ class DocumentRiskAssessmentServiceSpec extends AmlsSpec with BeforeAndAfterEach
         "it is present in the Business Activities model" in {
 
           val riskAssessmentPolicy = RiskAssessmentPolicy(
-            RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased, Digital))
+            RiskAssessmentHasPolicy(true),
+            RiskAssessmentTypes(Set(PaperBased, Digital))
           )
 
           when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
@@ -79,8 +80,8 @@ class DocumentRiskAssessmentServiceSpec extends AmlsSpec with BeforeAndAfterEach
 
     "updateRiskAssessmentType is called" must {
 
-      val bm = BusinessMatching()
-      val ba = BusinessActivities()
+      val bm          = BusinessMatching()
+      val ba          = BusinessActivities()
       val updateModel = RiskAssessmentTypes(RiskAssessmentType.all.toSet)
 
       "save Business Activities model and return Business Matching object" in {
@@ -94,15 +95,21 @@ class DocumentRiskAssessmentServiceSpec extends AmlsSpec with BeforeAndAfterEach
         when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
           .thenReturn(Some(ba))
 
-        when(mockCacheConnector.save[BusinessActivities](
-          eqTo(credId), eqTo(BusinessActivities.key), eqTo(ba.riskAssessmentTypes(updateModel)))
-          (any())
+        when(
+          mockCacheConnector.save[BusinessActivities](
+            eqTo(credId),
+            eqTo(BusinessActivities.key),
+            eqTo(ba.riskAssessmentTypes(updateModel))
+          )(any())
         ).thenReturn(Future.successful(mockCacheMap))
 
         service.updateRiskAssessmentType(credId, updateModel).futureValue mustBe Some(bm)
 
         verify(mockCacheConnector).save[BusinessActivities](
-          eqTo(credId), eqTo(BusinessActivities.key), eqTo(ba.riskAssessmentTypes(updateModel)))(any())
+          eqTo(credId),
+          eqTo(BusinessActivities.key),
+          eqTo(ba.riskAssessmentTypes(updateModel))
+        )(any())
       }
 
       "not save Business Activities model" when {

@@ -25,10 +25,10 @@ import views.html.submission.DuplicateEnrolmentView
 class DuplicateEnrolmentViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val duplicateEnrolmentView = app.injector.instanceOf[DuplicateEnrolmentView]
+    lazy val duplicateEnrolmentView                                = app.injector.instanceOf[DuplicateEnrolmentView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
-    val url = "/foo"
-    def view = duplicateEnrolmentView(url)
+    val url                                                        = "/foo"
+    def view                                                       = duplicateEnrolmentView(url)
   }
 
   "DuplicateEnrolmentView" must {

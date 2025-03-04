@@ -21,8 +21,8 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class FitAndProperFormProvider @Inject()() extends Mappings {
+class FitAndProperFormProvider @Inject() () extends Mappings {
 
-  private val error = "error.required.rp.fit_and_proper"
+  private val error          = "error.required.rp.fit_and_proper"
   def apply(): Form[Boolean] = Form[Boolean]("hasAlreadyPassedFitAndProper" -> boolean(error, error))
 }

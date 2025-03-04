@@ -24,13 +24,15 @@ import play.api.data.{Form, FormError}
 class WaysToPayFormProviderSpec extends FieldBehaviours {
 
   val form: Form[WaysToPay] = new WaysToPayFormProvider()()
-  val fieldName: String = "waysToPay"
-  val errorMessage: String = "payments.waystopay.error"
+  val fieldName: String     = "waysToPay"
+  val errorMessage: String  = "payments.waystopay.error"
 
   "WaysToPayFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, fieldName, Gen.oneOf(WaysToPay.all.map(_.toString))
+      form,
+      fieldName,
+      Gen.oneOf(WaysToPay.all.map(_.toString))
     )
 
     "not bind when key is not present at all" in {

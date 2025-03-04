@@ -28,7 +28,7 @@ import views.html.responsiblepeople.NationalityView
 class NationalityViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val nationality = inject[NationalityView]
-  lazy val fp = inject[NationalityFormProvider]
+  lazy val fp          = inject[NationalityFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -48,17 +48,24 @@ class NationalityViewSpec extends AmlsViewSpec with Matchers {
 
       def view = nationality(fp(), true, 1, None, name, countries)
 
-      doc.title must be(messages("responsiblepeople.nationality.title") +
-        " - " + messages("summary.responsiblepeople") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
-      heading.html must be(messages("responsiblepeople.nationality.heading", "firstName lastName"))
+      doc.title       must be(
+        messages("responsiblepeople.nationality.title") +
+          " - " + messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
+      heading.html    must be(messages("responsiblepeople.nationality.heading", "firstName lastName"))
       subHeading.html must include(messages("summary.responsiblepeople"))
     }
 
     behave like pageWithErrors(
       nationality(
-        fp().withError("nationality", "error.required.nationality"), false, 1, None, name, countries
+        fp().withError("nationality", "error.required.nationality"),
+        false,
+        1,
+        None,
+        name,
+        countries
       ),
       "nationality",
       "error.required.nationality"
@@ -66,7 +73,12 @@ class NationalityViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       nationality(
-        fp().withError("country", "error.invalid.rp.nationality.country"), false, 1, None, name, countries
+        fp().withError("country", "error.invalid.rp.nationality.country"),
+        false,
+        1,
+        None,
+        name,
+        countries
       ),
       "location-autocomplete",
       "error.invalid.rp.nationality.country"

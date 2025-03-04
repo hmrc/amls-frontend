@@ -21,8 +21,8 @@ import play.api.data.{Form, FormError}
 
 class HasBankAccountFormProviderSpec extends BooleanFieldBehaviours[Boolean] {
 
-  override val form: Form[Boolean] = new HasBankAccountFormProvider()()
-  override val fieldName: String = "hasBankAccount"
+  override val form: Form[Boolean]  = new HasBankAccountFormProvider()()
+  override val fieldName: String    = "hasBankAccount"
   override val errorMessage: String = "bankdetails.hasbankaccount.validation"
 
   "HasBankAccountFormProvider" must {

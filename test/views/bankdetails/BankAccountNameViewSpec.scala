@@ -28,7 +28,7 @@ import views.html.bankdetails.BankAccountNameView
 class BankAccountNameViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val bankAccountName = inject[BankAccountNameView]
-  lazy val fp = inject[BankAccountNameFormProvider]
+  lazy val fp              = inject[BankAccountNameFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -36,12 +36,14 @@ class BankAccountNameViewSpec extends AmlsViewSpec with Matchers {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
-  "BankAccountNameView view " must{
+  "BankAccountNameView view " must {
     "have correct title" in new ViewFixture {
 
       override def view: HtmlFormat.Appendable = bankAccountName(fp().fill("foobar"), false, Some(0))
 
-      doc.title() must startWith(messages("bankdetails.bankaccount.accountname.title") + " - " + messages("summary.bankdetails"))
+      doc.title() must startWith(
+        messages("bankdetails.bankaccount.accountname.title") + " - " + messages("summary.bankdetails")
+      )
     }
   }
 

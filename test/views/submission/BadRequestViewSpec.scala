@@ -25,10 +25,10 @@ import views.html.submission.BadRequestView
 class BadRequestViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val badRequestView = app.injector.instanceOf[BadRequestView]
+    lazy val badRequestView                                        = app.injector.instanceOf[BadRequestView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
-    val url = "/foo"
-    def view = badRequestView(url)
+    val url                                                        = "/foo"
+    def view                                                       = badRequestView(url)
   }
   "BadRequestView" must {
     "display the correct title, heading and content" in new ViewFixture {

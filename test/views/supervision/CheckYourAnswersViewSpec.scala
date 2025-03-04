@@ -30,15 +30,15 @@ import views.html.supervision.CheckYourAnswersView
 import java.time.LocalDate
 import scala.jdk.CollectionConverters._
 
-class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks{
+class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    lazy val checkYourAnswersView = inject[CheckYourAnswersView]
-    lazy val cyaHelper = inject[CheckYourAnswersHelper]
+    lazy val checkYourAnswersView                                  = inject[CheckYourAnswersView]
+    lazy val cyaHelper                                             = inject[CheckYourAnswersHelper]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView(FakeRequest())
 
-    val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24)))  //scalastyle:off magic.number
-    val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24)))//scalastyle:off magic.number
+    val start  = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) // scalastyle:off magic.number
+    val end    = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) // scalastyle:off magic.number
     val reason = Some(SupervisionEndReasons("Ending reason"))
   }
 
@@ -52,67 +52,84 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
     "have correct headings" in new ViewFixture {
       def view = checkYourAnswersView(cyaHelper.getSummaryList(Supervision()))
 
-      heading.html must be(messages("title.cya"))
+      heading.html    must be(messages("title.cya"))
       subHeading.html must include(messages("summary.supervision"))
     }
 
     "include the provided data if there is another body provided" in new ViewFixture {
 
-      val list = cyaHelper.getSummaryList(Supervision(
-        Some(AnotherBodyYes("Company A", start, end, reason)),
-        Some(ProfessionalBodyMemberYes),
-        Some(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("anotherProfessionalBody")))),
-        Some(ProfessionalBodyYes("details")),
-        hasAccepted = true
-      ))
+      val list = cyaHelper.getSummaryList(
+        Supervision(
+          Some(AnotherBodyYes("Company A", start, end, reason)),
+          Some(ProfessionalBodyMemberYes),
+          Some(
+            ProfessionalBodies(
+              Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("anotherProfessionalBody"))
+            )
+          ),
+          Some(ProfessionalBodyYes("details")),
+          hasAccepted = true
+        )
+      )
 
       def view = checkYourAnswersView(list)
 
-      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
-        doc.getElementsByClass("govuk-summary-list__value").asScala
-      ).foreach { case (key, value) =>
+      doc
+        .getElementsByClass("govuk-summary-list__key")
+        .asScala
+        .zip(
+          doc.getElementsByClass("govuk-summary-list__value").asScala
+        )
+        .foreach { case (key, value) =>
+          val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
 
-        val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
+          maybeRow.key.content.asHtml.body must include(key.text())
 
-        maybeRow.key.content.asHtml.body must include(key.text())
+          val valueText = maybeRow.value.content.asHtml.body match {
+            case str if str.startsWith("<") => Jsoup.parse(str).text()
+            case str                        => str
+          }
 
-        val valueText = maybeRow.value.content.asHtml.body match {
-          case str if str.startsWith("<") => Jsoup.parse(str).text()
-          case str => str
+          valueText must include(value.text())
         }
-
-        valueText must include(value.text())
-      }
     }
 
     "include the provided data if there is no another body provided" in new ViewFixture {
 
-
-      val list = cyaHelper.getSummaryList(Supervision(
-        Some(AnotherBodyNo),
-        Some(ProfessionalBodyMemberYes),
-        Some(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("anotherProfessionalBody")))),
-        Some(ProfessionalBodyYes("details")),
-        hasAccepted = true
-      ))
+      val list = cyaHelper.getSummaryList(
+        Supervision(
+          Some(AnotherBodyNo),
+          Some(ProfessionalBodyMemberYes),
+          Some(
+            ProfessionalBodies(
+              Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("anotherProfessionalBody"))
+            )
+          ),
+          Some(ProfessionalBodyYes("details")),
+          hasAccepted = true
+        )
+      )
 
       def view = checkYourAnswersView(list)
 
-      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
-        doc.getElementsByClass("govuk-summary-list__value").asScala
-      ).foreach { case (key, value) =>
+      doc
+        .getElementsByClass("govuk-summary-list__key")
+        .asScala
+        .zip(
+          doc.getElementsByClass("govuk-summary-list__value").asScala
+        )
+        .foreach { case (key, value) =>
+          val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
 
-        val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
+          maybeRow.key.content.asHtml.body must include(key.text())
 
-        maybeRow.key.content.asHtml.body must include(key.text())
+          val valueText = maybeRow.value.content.asHtml.body match {
+            case str if str.startsWith("<") => Jsoup.parse(str).text()
+            case str                        => str
+          }
 
-        val valueText = maybeRow.value.content.asHtml.body match {
-          case str if str.startsWith("<") => Jsoup.parse(str).text()
-          case str => str
+          valueText must include(value.text())
         }
-
-        valueText must include(value.text())
-      }
     }
   }
 }

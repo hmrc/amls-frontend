@@ -34,14 +34,14 @@ import scala.concurrent.Future
 class BusinessNameSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture {
-    implicit val amlsConnector: AmlsConnector = mock[AmlsConnector]
+    implicit val amlsConnector: AmlsConnector       = mock[AmlsConnector]
     implicit val cacheConnector: DataCacheConnector = mock[DataCacheConnector]
-    implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
+    implicit val headerCarrier: HeaderCarrier       = HeaderCarrier()
     implicit val statusResponse: ReadStatusResponse = mock[ReadStatusResponse]
-    implicit val statusService: StatusService = mock[StatusService]
+    implicit val statusService: StatusService       = mock[StatusService]
 
-    val credId = "123456789"
-    val safeId = "X87FUDIKJJKJH87364"
+    val credId        = "123456789"
+    val safeId        = "X87FUDIKJJKJH87364"
     val accountTypeId = ("accountType", "accountId")
   }
 

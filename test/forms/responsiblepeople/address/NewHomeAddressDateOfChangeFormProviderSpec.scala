@@ -28,7 +28,7 @@ import scala.collection.mutable
 class NewHomeAddressDateOfChangeFormProviderSpec extends DateBehaviours {
 
   val formProvider: NewHomeAddressDateOfChangeFormProvider = new NewHomeAddressDateOfChangeFormProvider()
-  val form: Form[NewHomeDateOfChange] = formProvider()
+  val form: Form[NewHomeDateOfChange]                      = formProvider()
 
   val messages: Messages = Helpers.stubMessagesApi().preferred(FakeRequest())
 
@@ -42,11 +42,10 @@ class NewHomeAddressDateOfChangeFormProviderSpec extends DateBehaviours {
     "bind valid data" in {
 
       forAll(datesBetween(minDate, maxDate)) { date =>
-
         val data = Map(
-          s"$formField.day" -> date.getDayOfMonth.toString,
+          s"$formField.day"   -> date.getDayOfMonth.toString,
           s"$formField.month" -> date.getMonthValue.toString,
-          s"$formField.year" -> date.getYear.toString
+          s"$formField.year"  -> date.getYear.toString
         )
 
         val result = form.bind(data)
@@ -57,7 +56,7 @@ class NewHomeAddressDateOfChangeFormProviderSpec extends DateBehaviours {
 
     "fail to bind" when {
 
-      val fields = List("day", "month", "year")
+      val fields    = List("day", "month", "year")
       val fieldsTwo = List(
         ("day", "month"),
         ("day", "year"),
@@ -65,15 +64,13 @@ class NewHomeAddressDateOfChangeFormProviderSpec extends DateBehaviours {
       )
 
       fields foreach { field =>
-
         s"$field is blank" in {
 
           forAll(datesBetween(minDate, maxDate)) { date =>
-
             val data = mutable.Map(
-              s"$formField.day" -> date.getDayOfMonth.toString,
+              s"$formField.day"   -> date.getDayOfMonth.toString,
               s"$formField.month" -> date.getMonthValue.toString,
-              s"$formField.year" -> date.getYear.toString
+              s"$formField.year"  -> date.getYear.toString
             )
 
             data(s"$formField.$field") = ""
@@ -88,9 +85,9 @@ class NewHomeAddressDateOfChangeFormProviderSpec extends DateBehaviours {
 
         s"$field is in the incorrect format" in {
           val data = mutable.Map(
-            s"$formField.day" -> "11",
+            s"$formField.day"   -> "11",
             s"$formField.month" -> "11",
-            s"$formField.year" -> "2000"
+            s"$formField.year"  -> "2000"
           )
 
           data(s"$formField.$field") = "x"
@@ -104,15 +101,13 @@ class NewHomeAddressDateOfChangeFormProviderSpec extends DateBehaviours {
       }
 
       fieldsTwo foreach { fields =>
-
         s"${fields._1} and ${fields._2} are blank" in {
 
           forAll(datesBetween(minDate, maxDate)) { date =>
-
             val data = mutable.Map(
-              s"$formField.day" -> date.getDayOfMonth.toString,
+              s"$formField.day"   -> date.getDayOfMonth.toString,
               s"$formField.month" -> date.getMonthValue.toString,
-              s"$formField.year" -> date.getYear.toString
+              s"$formField.year"  -> date.getYear.toString
             )
 
             data(s"$formField.${fields._1}") = ""
@@ -121,16 +116,20 @@ class NewHomeAddressDateOfChangeFormProviderSpec extends DateBehaviours {
             val result = form.bind(data.toMap)
 
             result.errors.headOption shouldEqual Some(
-              FormError(s"$formField.${fields._1}", messages("new.home.error.required.date.two"), Seq(fields._1, fields._2))
+              FormError(
+                s"$formField.${fields._1}",
+                messages("new.home.error.required.date.two"),
+                Seq(fields._1, fields._2)
+              )
             )
           }
         }
 
         s"${fields._1} and ${fields._2} are in the incorrect format" in {
           val data = mutable.Map(
-            s"$formField.day" -> "11",
+            s"$formField.day"   -> "11",
             s"$formField.month" -> "11",
-            s"$formField.year" -> "2000"
+            s"$formField.year"  -> "2000"
           )
 
           data(s"$formField.${fields._1}") = "x"
@@ -139,7 +138,11 @@ class NewHomeAddressDateOfChangeFormProviderSpec extends DateBehaviours {
           val result = form.bind(data.toMap)
 
           result.errors.headOption shouldEqual Some(
-            FormError(s"$formField.${fields._1}", messages("new.home.error.invalid.date.multiple"), Seq(fields._1, fields._2))
+            FormError(
+              s"$formField.${fields._1}",
+              messages("new.home.error.invalid.date.multiple"),
+              Seq(fields._1, fields._2)
+            )
           )
         }
       }

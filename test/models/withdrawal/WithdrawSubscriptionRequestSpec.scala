@@ -28,15 +28,17 @@ class WithdrawSubscriptionRequestSpec extends PlaySpec with Matchers {
   "The withdrawal subscription request object" when {
     "serialised" must {
       "produce the correct JSON" in {
-        val date = LocalDate.now()
+        val date         = LocalDate.now()
         val expectedJson = Json.obj(
           "acknowledgementReference" -> "SomeRef",
-          "withdrawalDate" -> date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-          "withdrawalReason" -> "Other, please specify",
-          "specifyOtherReason" -> "reason"
+          "withdrawalDate"           -> date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+          "withdrawalReason"         -> "Other, please specify",
+          "specifyOtherReason"       -> "reason"
         )
 
-        Json.toJson(WithdrawSubscriptionRequest("SomeRef", date, WithdrawalReason.Other("reason"), None)) mustBe expectedJson
+        Json.toJson(
+          WithdrawSubscriptionRequest("SomeRef", date, WithdrawalReason.Other("reason"), None)
+        ) mustBe expectedJson
       }
     }
   }

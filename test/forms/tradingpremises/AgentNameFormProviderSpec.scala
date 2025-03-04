@@ -29,7 +29,7 @@ import scala.collection.mutable
 class AgentNameFormProviderSpec extends DateBehaviours with StringFieldBehaviours with Constraints {
 
   val formProvider: AgentNameFormProvider = new AgentNameFormProvider()
-  val form: Form[AgentName] = formProvider()
+  val form: Form[AgentName]               = formProvider()
 
   val messages: Messages = Helpers.stubMessagesApi().preferred(FakeRequest())
 
@@ -64,13 +64,16 @@ class AgentNameFormProviderSpec extends DateBehaviours with StringFieldBehaviour
 
       "fail to bind strings with special characters" in {
 
-        forAll(alphaStringsShorterThan(formProvider.length).suchThat(_.nonEmpty), invalidCharForNames) { (str, invalidStr) =>
-          val result = form.bind(Map(nameFieldName -> (str + invalidStr)))
+        forAll(alphaStringsShorterThan(formProvider.length).suchThat(_.nonEmpty), invalidCharForNames) {
+          (str, invalidStr) =>
+            val result = form.bind(Map(nameFieldName -> (str + invalidStr)))
 
-          result.value shouldBe None
-          result.error(nameFieldName).value shouldBe FormError(
-            nameFieldName, "error.char.tp.agent.name", Seq(basicPunctuationRegex)
-          )
+            result.value                      shouldBe None
+            result.error(nameFieldName).value shouldBe FormError(
+              nameFieldName,
+              "error.char.tp.agent.name",
+              Seq(basicPunctuationRegex)
+            )
         }
       }
     }
@@ -82,12 +85,11 @@ class AgentNameFormProviderSpec extends DateBehaviours with StringFieldBehaviour
       "bind valid data" in {
 
         forAll(datesBetween(minDate, maxDate)) { date =>
-
           val data = Map(
-            nameFieldName -> agentName,
-            s"$dateFieldName.day" -> date.getDayOfMonth.toString,
+            nameFieldName           -> agentName,
+            s"$dateFieldName.day"   -> date.getDayOfMonth.toString,
             s"$dateFieldName.month" -> date.getMonthValue.toString,
-            s"$dateFieldName.year" -> date.getYear.toString
+            s"$dateFieldName.year"  -> date.getYear.toString
           )
 
           val result = form.bind(data)
@@ -98,7 +100,7 @@ class AgentNameFormProviderSpec extends DateBehaviours with StringFieldBehaviour
 
       "fail to bind" when {
 
-        val fields = List("day", "month", "year")
+        val fields    = List("day", "month", "year")
         val fieldsTwo = List(
           ("day", "month"),
           ("day", "year"),
@@ -106,16 +108,14 @@ class AgentNameFormProviderSpec extends DateBehaviours with StringFieldBehaviour
         )
 
         fields foreach { field =>
-
           s"$field is blank" in {
 
             forAll(datesBetween(minDate, maxDate)) { date =>
-
               val data = mutable.Map(
-                nameFieldName -> agentName,
-                s"$dateFieldName.day" -> date.getDayOfMonth.toString,
+                nameFieldName           -> agentName,
+                s"$dateFieldName.day"   -> date.getDayOfMonth.toString,
                 s"$dateFieldName.month" -> date.getMonthValue.toString,
-                s"$dateFieldName.year" -> date.getYear.toString
+                s"$dateFieldName.year"  -> date.getYear.toString
               )
 
               data(s"$dateFieldName.$field") = ""
@@ -130,10 +130,10 @@ class AgentNameFormProviderSpec extends DateBehaviours with StringFieldBehaviour
 
           s"$field is in the incorrect format" in {
             val data = mutable.Map(
-              nameFieldName -> agentName,
-              s"$dateFieldName.day" -> "11",
+              nameFieldName           -> agentName,
+              s"$dateFieldName.day"   -> "11",
               s"$dateFieldName.month" -> "11",
-              s"$dateFieldName.year" -> "2000"
+              s"$dateFieldName.year"  -> "2000"
             )
 
             data(s"$dateFieldName.$field") = "x"
@@ -147,16 +147,14 @@ class AgentNameFormProviderSpec extends DateBehaviours with StringFieldBehaviour
         }
 
         fieldsTwo foreach { fields =>
-
           s"${fields._1} and ${fields._2} are blank" in {
 
             forAll(datesBetween(minDate, maxDate)) { date =>
-
               val data = mutable.Map(
-                nameFieldName -> agentName,
-                s"$dateFieldName.day" -> date.getDayOfMonth.toString,
+                nameFieldName           -> agentName,
+                s"$dateFieldName.day"   -> date.getDayOfMonth.toString,
                 s"$dateFieldName.month" -> date.getMonthValue.toString,
-                s"$dateFieldName.year" -> date.getYear.toString
+                s"$dateFieldName.year"  -> date.getYear.toString
               )
 
               data(s"$dateFieldName.${fields._1}") = ""
@@ -165,17 +163,21 @@ class AgentNameFormProviderSpec extends DateBehaviours with StringFieldBehaviour
               val result = form.bind(data.toMap)
 
               result.errors.headOption shouldEqual Some(
-                FormError(s"$dateFieldName.${fields._1}", messages("error.required.tp.agent.date.two"), Seq(fields._1, fields._2))
+                FormError(
+                  s"$dateFieldName.${fields._1}",
+                  messages("error.required.tp.agent.date.two"),
+                  Seq(fields._1, fields._2)
+                )
               )
             }
           }
 
           s"${fields._1} and ${fields._2} are in the incorrect format" in {
             val data = mutable.Map(
-              nameFieldName -> agentName,
-              s"$dateFieldName.day" -> "11",
+              nameFieldName           -> agentName,
+              s"$dateFieldName.day"   -> "11",
               s"$dateFieldName.month" -> "11",
-              s"$dateFieldName.year" -> "2000"
+              s"$dateFieldName.year"  -> "2000"
             )
 
             data(s"$dateFieldName.${fields._1}") = "x"
@@ -184,16 +186,22 @@ class AgentNameFormProviderSpec extends DateBehaviours with StringFieldBehaviour
             val result = form.bind(data.toMap)
 
             result.errors.headOption shouldEqual Some(
-              FormError(s"$dateFieldName.${fields._1}", messages("error.invalid.tp.agent.date.multiple"), Seq(fields._1, fields._2))
+              FormError(
+                s"$dateFieldName.${fields._1}",
+                messages("error.invalid.tp.agent.date.multiple"),
+                Seq(fields._1, fields._2)
+              )
             )
           }
         }
 
         "date fields are empty" in {
 
-          val result = form.bind(Map(
-            nameFieldName -> agentName
-          ))
+          val result = form.bind(
+            Map(
+              nameFieldName -> agentName
+            )
+          )
 
           result.errors should contain only FormError(dateFieldName, "error.required.tp.agent.date.all")
         }
@@ -201,12 +209,11 @@ class AgentNameFormProviderSpec extends DateBehaviours with StringFieldBehaviour
         s"date is greater than ${maxDate.getDayOfMonth}/${maxDate.getMonthValue}/${maxDate.getYear}" in {
 
           forAll(datesBetween(maxDate.plusDays(1), maxDate.plusYears(10))) { date =>
-
             val data = Map(
-              nameFieldName -> agentName,
-              s"$dateFieldName.day" -> date.getDayOfMonth.toString,
+              nameFieldName           -> agentName,
+              s"$dateFieldName.day"   -> date.getDayOfMonth.toString,
               s"$dateFieldName.month" -> date.getMonthValue.toString,
-              s"$dateFieldName.year" -> date.getYear.toString
+              s"$dateFieldName.year"  -> date.getYear.toString
             )
 
             val result = form.bind(data)

@@ -29,7 +29,7 @@ import scala.concurrent.Future
 class BusinessFranchiseServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[Cache]
+  val mockCacheMap       = mock[Cache]
 
   val service = new BusinessFranchiseService(mockCacheConnector)
 
@@ -77,24 +77,22 @@ class BusinessFranchiseServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
         "Business Activities is successfully retrieved from cache" in {
 
-          val franchise = BusinessFranchiseYes("name")
+          val franchise       = BusinessFranchiseYes("name")
           val modelWithUpdate = BusinessActivities().businessFranchise(franchise)
 
           when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
             .thenReturn(Future.successful(Some(BusinessActivities())))
 
           when(
-            mockCacheConnector.save[BusinessActivities](
-              eqTo(credId), eqTo(BusinessActivities.key), eqTo(modelWithUpdate))(any()
-            )
+            mockCacheConnector
+              .save[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key), eqTo(modelWithUpdate))(any())
           ) thenReturn Future.successful(mockCacheMap)
 
           service.updateBusinessFranchise(credId, franchise).futureValue mustBe mockCacheMap
 
           verify(mockCacheConnector).fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any())
-          verify(mockCacheConnector).save[BusinessActivities](
-            eqTo(credId), eqTo(BusinessActivities.key), eqTo(modelWithUpdate))(any()
-          )
+          verify(mockCacheConnector)
+            .save[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key), eqTo(modelWithUpdate))(any())
         }
       }
     }

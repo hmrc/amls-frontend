@@ -26,41 +26,44 @@ import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.businessactivities.AccountantNonUKAddressView
 
-
 class AccountantNonUKAddressViewSpec extends AmlsViewSpec with Matchers with AutoCompleteServiceMocks {
 
   lazy val address = inject[AccountantNonUKAddressView]
-  lazy val fp = inject[AccountantNonUKAddressFormProvider]
+  lazy val fp      = inject[AccountantNonUKAddressFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
-  val line1 = "addressLine1"
-  val line2 = "addressLine2"
-  val line3 = "addressLine3"
-  val line4 = "addressLine4"
+  val line1   = "addressLine1"
+  val line2   = "addressLine2"
+  val line3   = "addressLine3"
+  val line4   = "addressLine4"
   val country = "country"
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
-  val defaultName = WhoIsYourAccountantName("accountantName",Some("tradingName"))
-  val defaultIsUkTrue = WhoIsYourAccountantIsUk(true)
-  val defaultNonUkAddress = NonUkAccountantsAddress("line1",Some("line2"),None,None, Country("India", "IN"))
+  val defaultName         = WhoIsYourAccountantName("accountantName", Some("tradingName"))
+  val defaultIsUkTrue     = WhoIsYourAccountantIsUk(true)
+  val defaultNonUkAddress = NonUkAccountantsAddress("line1", Some("line2"), None, None, Country("India", "IN"))
 
   "who_is_your_accountant_non_uk_address view" must {
     "have correct title" in new ViewFixture {
 
-      def view = address(fp().fill(defaultNonUkAddress), true, defaultName.accountantsName, mockAutoComplete.formOptions)
+      def view =
+        address(fp().fill(defaultNonUkAddress), true, defaultName.accountantsName, mockAutoComplete.formOptions)
 
       doc.title must startWith(messages("businessactivities.whoisyouraccountant.address.title"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = address(fp().fill(defaultNonUkAddress), true, defaultName.accountantsName, mockAutoComplete.formOptions)
+      def view =
+        address(fp().fill(defaultNonUkAddress), true, defaultName.accountantsName, mockAutoComplete.formOptions)
 
-      heading.html must be(messages("businessactivities.whoisyouraccountant.address.header", defaultName.accountantsName))
+      heading.html    must be(
+        messages("businessactivities.whoisyouraccountant.address.header", defaultName.accountantsName)
+      )
       subHeading.html must include(messages("summary.businessactivities"))
 
     }
@@ -72,10 +75,9 @@ class AccountantNonUKAddressViewSpec extends AmlsViewSpec with Matchers with Aut
       (line4, "error.text.validation.address.line4"),
       (country, "error.invalid.country")
     ) foreach { case (field, error) =>
-
       behave like pageWithErrors(
         address(fp().withError(field, error), true, defaultName.accountantsName, mockAutoComplete.formOptions),
-        if(field == "country") "location-autocomplete" else field,
+        if (field == "country") "location-autocomplete" else field,
         error
       )
     }

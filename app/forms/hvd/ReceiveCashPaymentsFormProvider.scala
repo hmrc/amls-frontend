@@ -21,8 +21,8 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class ReceiveCashPaymentsFormProvider @Inject()() extends Mappings {
+class ReceiveCashPaymentsFormProvider @Inject() () extends Mappings {
 
-  private val errorKey = "error.required.hvd.receive.cash.payments"
+  private val errorKey       = "error.required.hvd.receive.cash.payments"
   def apply(): Form[Boolean] = Form[Boolean]("receivePayments" -> boolean(errorKey, errorKey))
 }

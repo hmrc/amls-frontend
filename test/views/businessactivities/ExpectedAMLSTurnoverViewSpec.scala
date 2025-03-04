@@ -27,7 +27,7 @@ import views.html.businessactivities.ExpectedAMLSTurnoverView
 
 class ExpectedAMLSTurnoverViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val turnover = inject[ExpectedAMLSTurnoverView]
+  lazy val turnover     = inject[ExpectedAMLSTurnoverView]
   lazy val formProvider = inject[ExpectedAMLSTurnoverFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
@@ -41,21 +41,25 @@ class ExpectedAMLSTurnoverViewSpec extends AmlsViewSpec with Matchers {
 
       def view = turnover(formProvider(), true, None, None)
 
-      doc.title must startWith(messages("businessactivities.turnover.title") + " - " + messages("summary.businessactivities"))
+      doc.title must startWith(
+        messages("businessactivities.turnover.title") + " - " + messages("summary.businessactivities")
+      )
     }
 
     "have correct heading when one or more services are selected" in new ViewFixture {
 
       def view = turnover(formProvider(), true, None, Some(List("accountancy service provider")))
 
-      heading.html must be(messages("businessactivities.turnover.heading"))
+      heading.html    must be(messages("businessactivities.turnover.heading"))
       subHeading.html must include(messages("summary.businessactivities"))
     }
 
     behave like pageWithErrors(
       turnover(
         formProvider().withError(FormError("expectedAMLSTurnover", "error.required.ba.turnover.from.mlr")),
-        true, None, None
+        true,
+        None,
+        None
       ),
       "expectedAMLSTurnover",
       "error.required.ba.turnover.from.mlr"

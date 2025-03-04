@@ -28,15 +28,16 @@ class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
 
   // scalastyle:off magic.number
   trait TestFixture {
-    val enrolments: Seq[GovernmentGatewayEnrolment] = Seq(GovernmentGatewayEnrolment("HMRC-MLR-ORG",
-      List(EnrolmentIdentifier("MLRRefNumber", "AV23456789")), ""))
+    val enrolments: Seq[GovernmentGatewayEnrolment] = Seq(
+      GovernmentGatewayEnrolment("HMRC-MLR-ORG", List(EnrolmentIdentifier("MLRRefNumber", "AV23456789")), "")
+    )
 
-    val mocker = new HttpClientMocker()
+    val mocker                               = new HttpClientMocker()
     private val configuration: Configuration = Configuration.load(Environment.simple())
-    private val config = new ApplicationConfig(configuration, new ServicesConfig(configuration))
-    val baseUrl = "http://localhost:8941"
-    val connector = new EnrolmentStubConnector(mocker.httpClient, config)
-    val groupId: String = stringOfLengthGen(10).sample.get
+    private val config                       = new ApplicationConfig(configuration, new ServicesConfig(configuration))
+    val baseUrl                              = "http://localhost:8941"
+    val connector                            = new EnrolmentStubConnector(mocker.httpClient, config)
+    val groupId: String                      = stringOfLengthGen(10).sample.get
   }
 
   "The Enrolment Stub Connector" must {

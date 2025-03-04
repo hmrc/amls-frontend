@@ -23,9 +23,8 @@ class ApprovalFlagsSpec extends PlaySpec {
   "ApprovalFlags" when {
     "all flags are defined" must {
       "be complete" in {
-        val approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true),
-          hasAlreadyPaidApprovalCheck = Some(false)
-        )
+        val approvalFlags =
+          ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(false))
 
         approvalFlags.isComplete() must be(true)
       }
@@ -33,9 +32,7 @@ class ApprovalFlagsSpec extends PlaySpec {
 
     "not all flags are defined" must {
       "no be complete" in {
-        val approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true),
-          hasAlreadyPaidApprovalCheck = None
-        )
+        val approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = None)
 
         approvalFlags.isComplete() must be(false)
       }
@@ -55,7 +52,8 @@ class ApprovalFlagsSpec extends PlaySpec {
             |}""".stripMargin
         )
 
-        val expected = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = Some(false))
+        val expected =
+          ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = Some(false))
         ApprovalFlags.format.reads(json) must be(
           JsSuccess(expected)
         )
@@ -65,10 +63,10 @@ class ApprovalFlagsSpec extends PlaySpec {
 
         val model = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = Some(false))
 
-        ApprovalFlags.format.writes(model) must be (
+        ApprovalFlags.format.writes(model) must be(
           Json.obj(
             "hasAlreadyPassedFitAndProper" -> false,
-            "hasAlreadyPaidApprovalCheck" -> false
+            "hasAlreadyPaidApprovalCheck"  -> false
           )
         )
       }
@@ -107,7 +105,7 @@ class ApprovalFlagsSpec extends PlaySpec {
       "write successfully" in {
         val expected = ApprovalFlags(hasAlreadyPaidApprovalCheck = Some(true))
 
-        ApprovalFlags.format.writes(expected) must be (
+        ApprovalFlags.format.writes(expected) must be(
           Json.obj(
             "hasAlreadyPaidApprovalCheck" -> true
           )
@@ -117,7 +115,7 @@ class ApprovalFlagsSpec extends PlaySpec {
       "write successfully using designated writer" in {
         val expected = ApprovalFlags(hasAlreadyPaidApprovalCheck = Some(true))
 
-        ApprovalFlags.writes.writes(expected) must be (
+        ApprovalFlags.writes.writes(expected) must be(
           Json.obj(
             "hasAlreadyPaidApprovalCheck" -> true
           )

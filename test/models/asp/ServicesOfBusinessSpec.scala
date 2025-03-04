@@ -32,16 +32,15 @@ class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate and read services and date of change values" in {
 
-      val json =  Json.obj("services" -> Seq("01","02","03","04","05"),
-        "dateOfChange" -> "2016-02-24")
+      val json = Json.obj("services" -> Seq("01", "02", "03", "04", "05"), "dateOfChange" -> "2016-02-24")
 
       Json.fromJson[ServicesOfBusiness](json) must
-        be(JsSuccess(ServicesOfBusiness(businessServices, Some(DateOfChange(LocalDate.of(2016,2,24)))), JsPath))
+        be(JsSuccess(ServicesOfBusiness(businessServices, Some(DateOfChange(LocalDate.of(2016, 2, 24)))), JsPath))
     }
 
     "successfully validate selected services value" in {
 
-      val json =  Json.obj("services" -> Seq("01","02","03","04","05"))
+      val json = Json.obj("services" -> Seq("01", "02", "03", "04", "05"))
 
       Json.fromJson[ServicesOfBusiness](json) must
         be(JsSuccess(ServicesOfBusiness(businessServices, None)))
@@ -55,7 +54,7 @@ class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate json write" in {
 
-      val json = Json.obj("services" -> Seq("04","05","03","02","01"))
+      val json = Json.obj("services" -> Seq("04", "05", "03", "02", "01"))
       Json.toJson(ServicesOfBusiness(businessServices)) must be(json)
     }
   }

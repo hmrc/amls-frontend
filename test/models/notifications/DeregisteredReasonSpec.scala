@@ -34,13 +34,13 @@ class DeregisteredReasonSpec extends PlaySpec {
     }
 
     "write data successfully" in {
-      DeregisteredReason.jsonWrites.writes(CeasedTrading) must be(JsString("01"))
-      DeregisteredReason.jsonWrites.writes(HVDNoCashPayment) must be(JsString("02"))
-      DeregisteredReason.jsonWrites.writes(OutOfScope) must be(JsString("03"))
-      DeregisteredReason.jsonWrites.writes(NotTrading) must be(JsString("04"))
+      DeregisteredReason.jsonWrites.writes(CeasedTrading)          must be(JsString("01"))
+      DeregisteredReason.jsonWrites.writes(HVDNoCashPayment)       must be(JsString("02"))
+      DeregisteredReason.jsonWrites.writes(OutOfScope)             must be(JsString("03"))
+      DeregisteredReason.jsonWrites.writes(NotTrading)             must be(JsString("04"))
       DeregisteredReason.jsonWrites.writes(UnderAnotherSupervisor) must be(JsString("05"))
-      DeregisteredReason.jsonWrites.writes(ChangeOfLegalEntity) must be(JsString("06"))
-      DeregisteredReason.jsonWrites.writes(Other) must be(JsString("99"))
+      DeregisteredReason.jsonWrites.writes(ChangeOfLegalEntity)    must be(JsString("06"))
+      DeregisteredReason.jsonWrites.writes(Other)                  must be(JsString("99"))
     }
   }
 }

@@ -34,7 +34,9 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
 
       "successfully validate given an `Yes` value" in {
 
-        Json.fromJson[ServicesOfAnotherTCSP](Json.obj("servicesOfAnotherTCSP" -> true, "mlrRefNumber" -> "12345678")) must
+        Json.fromJson[ServicesOfAnotherTCSP](
+          Json.obj("servicesOfAnotherTCSP" -> true, "mlrRefNumber" -> "12345678")
+        ) must
           be(JsSuccess(ServicesOfAnotherTCSPYes(Some("12345678")), JsPath \ "mlrRefNumber"))
       }
 
@@ -44,10 +46,12 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
           be(Json.obj("servicesOfAnotherTCSP" -> false))
 
         Json.toJson(ServicesOfAnotherTCSPYes(Some("12345678")).asInstanceOf[ServicesOfAnotherTCSP]) must
-          be(Json.obj(
-            "servicesOfAnotherTCSP" -> true,
-            "mlrRefNumber" -> "12345678"
-          ))
+          be(
+            Json.obj(
+              "servicesOfAnotherTCSP" -> true,
+              "mlrRefNumber"          -> "12345678"
+            )
+          )
       }
     }
   }

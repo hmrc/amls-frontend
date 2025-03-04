@@ -24,7 +24,7 @@ class RegisteredOfficeIsUKSpec extends PlaySpec with MockitoSugar {
   "RegisteredOfficeIsUK" must {
 
     "round trip through JSON" in {
-      val trueModel = RegisteredOfficeIsUK(true)
+      val trueModel  = RegisteredOfficeIsUK(true)
       val falseModel = RegisteredOfficeIsUK(false)
 
       Json.toJson(trueModel).as[RegisteredOfficeIsUK] mustBe trueModel

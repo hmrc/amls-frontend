@@ -22,22 +22,28 @@ import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import play.api.i18n.Messages
 import play.api.libs.json.{Json, OFormat}
 
-case class AddBusinessTypeFlowModel(activity: Option[BusinessActivity] = None,
-                                    addMoreActivities: Option[Boolean] = None,
-                                    hasChanged: Boolean = false,
-                                    hasAccepted: Boolean = false,
-                                    businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
-                                    subSectors: Option[BusinessMatchingMsbServices] = None) {
+case class AddBusinessTypeFlowModel(
+  activity: Option[BusinessActivity] = None,
+  addMoreActivities: Option[Boolean] = None,
+  hasChanged: Boolean = false,
+  hasAccepted: Boolean = false,
+  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
+  subSectors: Option[BusinessMatchingMsbServices] = None
+) {
 
   def activity(p: BusinessActivity): AddBusinessTypeFlowModel =
-    this.copy(activity = Some(p),
+    this.copy(
+      activity = Some(p),
       hasChanged = hasChanged || !this.activity.contains(p),
-      hasAccepted = hasAccepted && this.activity.contains(p))
+      hasAccepted = hasAccepted && this.activity.contains(p)
+    )
 
   def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): AddBusinessTypeFlowModel =
-    this.copy(businessAppliedForPSRNumber = Some(p),
+    this.copy(
+      businessAppliedForPSRNumber = Some(p),
       hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p),
-      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.contains(p))
+      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.contains(p)
+    )
 
   def msbServices(p: BusinessMatchingMsbServices): AddBusinessTypeFlowModel = {
     val businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] =
@@ -47,21 +53,23 @@ case class AddBusinessTypeFlowModel(activity: Option[BusinessActivity] = None,
         None
       }
 
-    this.copy(subSectors = Some(p),
+    this.copy(
+      subSectors = Some(p),
       businessAppliedForPSRNumber = businessAppliedForPSRNumber,
       hasChanged = hasChanged || !this.subSectors.contains(p),
-      hasAccepted = hasAccepted && this.subSectors.contains(p))
+      hasAccepted = hasAccepted && this.subSectors.contains(p)
+    )
   }
 
   def isComplete: Boolean = this match {
     case AddBusinessTypeFlowModel(Some(MoneyServiceBusiness), Some(_), _, true, Some(_), _) => true
-    case AddBusinessTypeFlowModel(Some(_), Some(_), _, true, _, _) => true
-    case _ => false
+    case AddBusinessTypeFlowModel(Some(_), Some(_), _, true, _, _)                          => true
+    case _                                                                                  => false
   }
 
   def informationRequired = this.activity.exists {
     case BillPaymentServices | TelephonePaymentService => false
-    case _ => true
+    case _                                             => true
   }
 
   def activityName(implicit messages: Messages) = this.activity map {
@@ -70,7 +78,7 @@ case class AddBusinessTypeFlowModel(activity: Option[BusinessActivity] = None,
 
   def isMsbTmDefined: Boolean = this.activity.exists {
     case MoneyServiceBusiness if this.subSectors.fold[Boolean](false)(_.msbServices.contains(TransmittingMoney)) => true
-    case _ => false
+    case _                                                                                                       => false
   }
 
 }

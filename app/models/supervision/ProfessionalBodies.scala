@@ -32,11 +32,12 @@ sealed trait BusinessType {
   def getMessage()(implicit messages: Messages): String = {
     val message = s"supervision.memberofprofessionalbody.lbl."
     this match {
-      case AccountantsEnglandandWales => messages(s"$message${this.value}")
-        .replace("Accountants of England", "Accountants in England")
-      case Other("") => messages(s"${message}14")
-      case Other(details) => details
-      case _ => messages(s"$message${this.value}")
+      case AccountantsEnglandandWales =>
+        messages(s"$message${this.value}")
+          .replace("Accountants of England", "Accountants in England")
+      case Other("")                  => messages(s"${message}14")
+      case Other(details)             => details
+      case _                          => messages(s"$message${this.value}")
     }
   }
 }
@@ -118,17 +119,17 @@ object ProfessionalBodies extends Enumerable.Implicits {
     Other("")
   )
 
-  def formValues(html: Html)(implicit messages: Messages): Seq[CheckboxItem] = all.zipWithIndex.map { case (businessType, index) =>
+  def formValues(html: Html)(implicit messages: Messages): Seq[CheckboxItem] = all.zipWithIndex.map {
+    case (businessType, index) =>
+      val conditional = if (businessType.value == Other("").value) Some(html) else None
 
-    val conditional = if(businessType.value == Other("").value) Some(html) else None
-
-    CheckboxItem(
-      content = Text(businessType.getMessage()),
-      value = businessType.toString,
-      id = Some(s"businessType_$index"),
-      name = Some(s"businessType[$index]"),
-      conditionalHtml = conditional
-    )
+      CheckboxItem(
+        content = Text(businessType.getMessage()),
+        value = businessType.toString,
+        id = Some(s"businessType_$index"),
+        name = Some(s"businessType[$index]"),
+        conditionalHtml = conditional
+      )
   }
 
   implicit val enumerable: Enumerable[BusinessType] = Enumerable(all.map(v => v.toString -> v): _*)
@@ -153,26 +154,25 @@ object ProfessionalBodies extends Enumerable.Implicits {
       case "13" => stringToReader(LawSociety)
       case "14" =>
         (JsPath \ "specifyOtherBusiness").read[String].map(Other.apply) map identity[BusinessType]
-      case _ =>
+      case _    =>
         Reads(_ => JsError((JsPath \ "businessType") -> play.api.libs.json.JsonValidationError("error.invalid")))
     }).foldLeft[Reads[Set[BusinessType]]](
       Reads[Set[BusinessType]](_ => JsSuccess(Set.empty))
-    ) {
-      (start, businessTypeReader) =>
-        businessTypeReader flatMap { businessType =>
-          start map { businessTypes =>
-            businessTypes + businessType
-          }
+    ) { (start, businessTypeReader) =>
+      businessTypeReader flatMap { businessType =>
+        start map { businessTypes =>
+          businessTypes + businessType
         }
+      }
     }
   } map ProfessionalBodies.apply
 
-  implicit val jsonWrites: Writes[ProfessionalBodies] = Writes[ProfessionalBodies]{ businessTypes =>
+  implicit val jsonWrites: Writes[ProfessionalBodies] = Writes[ProfessionalBodies] { businessTypes =>
     Json.obj(
       "businessType" -> (businessTypes.businessTypes map (_.value)).toSeq
     ) ++ businessTypes.businessTypes.foldLeft[JsObject](Json.obj()) {
       case (json, Other(name)) => json ++ Json.obj("specifyOtherBusiness" -> name)
-      case (json, _) => json
+      case (json, _)           => json
     }
   }
 

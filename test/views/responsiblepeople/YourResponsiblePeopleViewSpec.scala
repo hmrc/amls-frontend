@@ -26,30 +26,32 @@ import views.html.responsiblepeople.YourResponsiblePeopleView
 class YourResponsiblePeopleViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val peopleView = inject[YourResponsiblePeopleView]
+    lazy val peopleView                                            = inject[YourResponsiblePeopleView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
-  val completePersonName: Option[PersonName] = Some(PersonName("Katie", None, "Test"))
+  val completePersonName: Option[PersonName]   = Some(PersonName("Katie", None, "Test"))
   val incompletePersonName: Option[PersonName] = Some(PersonName("John", None, "Test"))
-  val completeRp1 = ResponsiblePerson(completePersonName)
-  val completeRp2 = ResponsiblePerson()
-  val incompleteRp1 = ResponsiblePerson(incompletePersonName)
-  val incompleteRp2 = ResponsiblePerson()
+  val completeRp1                              = ResponsiblePerson(completePersonName)
+  val completeRp2                              = ResponsiblePerson()
+  val incompleteRp1                            = ResponsiblePerson(incompletePersonName)
+  val incompleteRp2                            = ResponsiblePerson()
 
-  val completeRpSeq = Seq((completeRp1,0),(completeRp2,1))
-  val incompleteRpSeq = Seq((incompleteRp1,2),(incompleteRp2,3))
+  val completeRpSeq   = Seq((completeRp1, 0), (completeRp2, 1))
+  val incompleteRpSeq = Seq((incompleteRp1, 2), (incompleteRp2, 3))
 
   "YourResponsiblePeopleView" must {
     "have correct title, headings, form fields and bullet list of types of RP's to register displayed" in new ViewFixture {
 
-      def view = peopleView(Seq((ResponsiblePerson(),0)), Seq((ResponsiblePerson(),0)))
+      def view = peopleView(Seq((ResponsiblePerson(), 0)), Seq((ResponsiblePerson(), 0)))
 
-      doc.title must be(messages("responsiblepeople.whomustregister.title") +
-        " - " + messages("summary.responsiblepeople") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
-      heading.html must be(messages("responsiblepeople.whomustregister.title"))
+      doc.title       must be(
+        messages("responsiblepeople.whomustregister.title") +
+          " - " + messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
+      heading.html    must be(messages("responsiblepeople.whomustregister.title"))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("id", "addResponsiblePerson") must not be empty
@@ -85,21 +87,33 @@ class YourResponsiblePeopleViewSpec extends AmlsViewSpec with Matchers {
     "have an add a responsible person link with the correct text and going to the what you need page" in new ViewFixture {
       def view = peopleView(completeRpSeq, incompleteRpSeq)
 
-      doc.getElementById("addResponsiblePerson").text must be(messages("responsiblepeople.check_your_answers.add"))
-      doc.getElementById("addResponsiblePerson").attr("href") must be(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false).url)
+      doc.getElementById("addResponsiblePerson").text         must be(messages("responsiblepeople.check_your_answers.add"))
+      doc.getElementById("addResponsiblePerson").attr("href") must be(
+        controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false).url
+      )
     }
 
     "have an incomplete/complete sections with people names displayed and edit/remove links" in new ViewFixture {
       def view = peopleView(completeRpSeq, incompleteRpSeq)
 
-      doc.getElementById("complete-header").text must include(messages("responsiblepeople.check_your_answers.complete"))
-      doc.getElementById("detail-edit-0").attr("href") must be(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url)
-      doc.getElementById("detail-remove-0").attr("href") must be(controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(1).url)
+      doc.getElementById("complete-header").text         must include(messages("responsiblepeople.check_your_answers.complete"))
+      doc.getElementById("detail-edit-0").attr("href")   must be(
+        controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url
+      )
+      doc.getElementById("detail-remove-0").attr("href") must be(
+        controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(1).url
+      )
 
-      doc.getElementById("incomplete-header").text must include(messages("responsiblepeople.check_your_answers.incomplete"))
-      doc.getElementById("incomplete-detail-2").text must include("John Test")
-      doc.getElementById("detail-edit-2").attr("href") must be(controllers.responsiblepeople.routes.PersonNameController.get(3, false, None).url)
-      doc.getElementById("detail-remove-2").attr("href") must be(controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(3).url)
+      doc.getElementById("incomplete-header").text       must include(
+        messages("responsiblepeople.check_your_answers.incomplete")
+      )
+      doc.getElementById("incomplete-detail-2").text     must include("John Test")
+      doc.getElementById("detail-edit-2").attr("href")   must be(
+        controllers.responsiblepeople.routes.PersonNameController.get(3, false, None).url
+      )
+      doc.getElementById("detail-remove-2").attr("href") must be(
+        controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(3).url
+      )
     }
   }
 }

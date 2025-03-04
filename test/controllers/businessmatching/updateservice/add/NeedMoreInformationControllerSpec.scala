@@ -34,11 +34,11 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
   sealed trait Fixture extends DependencyMocks {
     self =>
 
-    val request = requestWithToken
+    val request                     = requestWithToken
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
-    lazy val view = app.injector.instanceOf[NewServiceInformationView]
-    val controller = new NeedMoreInformationController(
+    val mockUpdateServiceHelper     = mock[AddBusinessTypeHelper]
+    lazy val view                   = app.injector.instanceOf[NewServiceInformationView]
+    val controller                  = new NeedMoreInformationController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
@@ -58,8 +58,10 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
 
         mockCacheFetch(Some(ServiceChangeRegister(Some(Set(HighValueDealing)))), Some(ServiceChangeRegister.key))
         val result = controller.get()(request)
-        status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(messages("businessmatching.updateservice.newserviceinformation.title"))
+        status(result)                               must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(
+          messages("businessmatching.updateservice.newserviceinformation.title")
+        )
       }
     }
   }

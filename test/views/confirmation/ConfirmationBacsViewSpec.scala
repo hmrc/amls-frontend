@@ -27,9 +27,9 @@ import views.html.confirmation.ConfirmationBacsView
 class ConfirmationBacsViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val confirmationBacsView = inject[ConfirmationBacsView]
+    lazy val confirmationBacsView                                  = inject[ConfirmationBacsView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
-    implicit val config: ApplicationConfig = app.injector.instanceOf[ApplicationConfig]
+    implicit val config: ApplicationConfig                         = app.injector.instanceOf[ApplicationConfig]
 
     override def view = confirmationBacsView("businessName", "refNo")(requestWithToken, messages, config)
   }

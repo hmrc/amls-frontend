@@ -23,36 +23,33 @@ import play.api.libs.json._
 import java.time.LocalDate
 
 case class YourTradingPremises(
-                                tradingName: String,
-                                tradingPremisesAddress: Address,
-                                isResidential: Option[Boolean] = None,
-                                startDate: Option[LocalDate] = None,
-                                tradingNameChangeDate: Option[DateOfChange] = None
-                              )
+  tradingName: String,
+  tradingPremisesAddress: Address,
+  isResidential: Option[Boolean] = None,
+  startDate: Option[LocalDate] = None,
+  tradingNameChangeDate: Option[DateOfChange] = None
+)
 
 object YourTradingPremises {
 
-  implicit val reads: Reads[YourTradingPremises] = {
+  implicit val reads: Reads[YourTradingPremises] =
     (
       (__ \ "tradingName").read[String] and
         __.read[Address] and
         (__ \ "isResidential").readNullable[Boolean] and
         (__ \ "startDate").readNullable[LocalDate] and
         (__ \ "tradingNameChangeDate").readNullable[DateOfChange]
-      ) (YourTradingPremises.apply _)
-  }
+    )(YourTradingPremises.apply _)
 
-  implicit val writes: Writes[YourTradingPremises] = {
+  implicit val writes: Writes[YourTradingPremises] =
     (
       (__ \ "tradingName").write[String] and
         __.write[Address] and
         (__ \ "isResidential").writeNullable[Boolean] and
         (__ \ "startDate").writeNullable[LocalDate] and
         (__ \ "tradingNameChangeDate").writeNullable[DateOfChange]
-      ) (unlift(YourTradingPremises.unapply))
-  }
+    )(unlift(YourTradingPremises.unapply))
 
-  implicit def convert(data: YourTradingPremises): Option[TradingPremises] = {
+  implicit def convert(data: YourTradingPremises): Option[TradingPremises] =
     Some(TradingPremises(yourTradingPremises = Some(data)))
-  }
 }

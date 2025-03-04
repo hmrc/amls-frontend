@@ -31,7 +31,7 @@ import scala.jdk.CollectionConverters._
 
 class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks with Injecting {
 
-  lazy val summary = inject[CheckYourAnswersView]
+  lazy val summary   = inject[CheckYourAnswersView]
   lazy val cyaHelper = inject[CheckYourAnswersHelper]
 
   "summary view" must {
@@ -45,7 +45,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
     "have correct headings" in new Fixture {
       def view = summary(SummaryList(Nil))
 
-      heading.html must be(messages("title.cya"))
+      heading.html    must be(messages("title.cya"))
       subHeading.html must include(messages("summary.businessdetails"))
     }
 
@@ -68,7 +68,22 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
           Some(RegisteredOfficeUK("line1", Some("line2"), Some("line3"), Some("line4"), "AB12CD")),
           Some(true),
           Some(CorrespondenceAddressIsUk(true)),
-          Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("your name", "business name", "line1", Some("line2"), Some("line3"), Some("line4"), "AB12CD")), None)),
+          Some(
+            CorrespondenceAddress(
+              Some(
+                CorrespondenceAddressUk(
+                  "your name",
+                  "business name",
+                  "line1",
+                  Some("line2"),
+                  Some("line3"),
+                  Some("line4"),
+                  "AB12CD"
+                )
+              ),
+              None
+            )
+          ),
           hasChanged = false
         ),
         showRegisteredForMLR = true
@@ -76,21 +91,24 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
       def view = summary(list)
 
-      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
-        doc.getElementsByClass("govuk-summary-list__value").asScala
-      ).foreach { case (key, value) =>
+      doc
+        .getElementsByClass("govuk-summary-list__key")
+        .asScala
+        .zip(
+          doc.getElementsByClass("govuk-summary-list__value").asScala
+        )
+        .foreach { case (key, value) =>
+          val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
 
-        val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
+          maybeRow.key.content.asHtml.body must include(key.text())
 
-        maybeRow.key.content.asHtml.body must include(key.text())
+          val valueText = maybeRow.value.content.asHtml.body match {
+            case str if str.startsWith("<") => Jsoup.parse(str).text()
+            case str                        => str
+          }
 
-        val valueText = maybeRow.value.content.asHtml.body match {
-          case str if str.startsWith("<") => Jsoup.parse(str).text()
-          case str => str
+          valueText must include(value.text())
         }
-
-        valueText must include(value.text())
-      }
     }
   }
 }

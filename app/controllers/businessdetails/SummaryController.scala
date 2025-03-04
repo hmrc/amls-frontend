@@ -28,43 +28,37 @@ import utils.AuthAction
 import utils.businessdetails.CheckYourAnswersHelper
 import views.html.businessdetails.CheckYourAnswersView
 
+class SummaryController @Inject() (
+  val dataCache: DataCacheConnector,
+  val statusService: StatusService,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  cyaHelper: CheckYourAnswersHelper,
+  view: CheckYourAnswersView
+) extends AmlsBaseController(ds, cc) {
 
-class SummaryController @Inject () (
-                                     val dataCache: DataCacheConnector,
-                                     val statusService: StatusService,
-                                     val authAction: AuthAction,
-                                     val ds: CommonPlayDependencies,
-                                     val cc: MessagesControllerComponents,
-                                     cyaHelper: CheckYourAnswersHelper,
-                                     view: CheckYourAnswersView) extends AmlsBaseController(ds, cc) {
-
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-      for {
-        businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
-        status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-      } yield businessDetails match {
-        case Some(data) => {
-          val showRegisteredForMLR = status match {
-            case NotCompleted | SubmissionReady | SubmissionReadyForReview => true
-            case _ => false
-          }
-          val summaryListRows: SummaryList = cyaHelper.createSummaryList(data, showRegisteredForMLR)
-          Ok(view(summaryListRows))
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    for {
+      businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+      status          <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+    } yield businessDetails match {
+      case Some(data) =>
+        val showRegisteredForMLR         = status match {
+          case NotCompleted | SubmissionReady | SubmissionReadyForReview => true
+          case _                                                         => false
         }
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+        val summaryListRows: SummaryList = cyaHelper.createSummaryList(data, showRegisteredForMLR)
+        Ok(view(summaryListRows))
+      case _          => Redirect(controllers.routes.RegistrationProgressController.get())
+    }
   }
 
-  def post: Action[AnyContent] = authAction.async {
-    implicit request =>
-      for {
-        businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
-        _ <- dataCache.save[BusinessDetails](request.credId, BusinessDetails.key,
-          businessDetails.copy(hasAccepted = true)
-        )
-      } yield {
-        Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+  def post: Action[AnyContent] = authAction.async { implicit request =>
+    for {
+      businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+      _               <-
+        dataCache.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.copy(hasAccepted = true))
+    } yield Redirect(controllers.routes.RegistrationProgressController.get())
   }
 }

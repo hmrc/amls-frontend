@@ -25,32 +25,35 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class VATRegisteredFormProvider @Inject()() extends Mappings {
+class VATRegisteredFormProvider @Inject() () extends Mappings {
 
-  val length = 9
+  val length                       = 9
   def apply(): Form[VATRegistered] = Form[VATRegistered](
     mapping(
       "registeredForVAT" -> boolean("error.required.atb.registered.for.vat", "error.required.atb.registered.for.vat"),
-      "vrnNumber" -> mandatoryIfTrue("registeredForVAT", text("error.required.vat.number").transform[String](_.replace(" ","").trim, x => x)
-        .verifying(
-          firstError(
-            correctLength(length, "error.invalid.vat.number.length"),
-            regexp(vrnRegex, "error.invalid.vat.number")
+      "vrnNumber"        -> mandatoryIfTrue(
+        "registeredForVAT",
+        text("error.required.vat.number")
+          .transform[String](_.replace(" ", "").trim, x => x)
+          .verifying(
+            firstError(
+              correctLength(length, "error.invalid.vat.number.length"),
+              regexp(vrnRegex, "error.invalid.vat.number")
+            )
           )
-        )
       )
     )(apply)(unapply)
   )
 
   private def apply(b: Boolean, s: Option[String]): VATRegistered = (b, s) match {
-    case (false, _) => VATRegisteredNo
+    case (false, _)        => VATRegisteredNo
     case (true, Some(str)) => VATRegisteredYes(str)
-    case _ => throw new IllegalArgumentException("No VAT Number available to bind from form")
+    case _                 => throw new IllegalArgumentException("No VAT Number available to bind from form")
   }
 
   private def unapply(obj: VATRegistered): Option[(Boolean, Option[String])] = obj match {
-    case VATRegisteredNo => Some((false, None))
+    case VATRegisteredNo             => Some((false, None))
     case VATRegisteredYes(vatNumber) => Some((true, Some(vatNumber)))
-    case _ => None
+    case _                           => None
   }
 }

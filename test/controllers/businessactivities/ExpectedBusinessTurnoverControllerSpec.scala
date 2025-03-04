@@ -40,13 +40,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture {
-    self => val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
-    implicit val ec: ExecutionContext = inject[ExecutionContext]
+    self =>
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    implicit val ec: ExecutionContext            = inject[ExecutionContext]
 
     lazy val view: ExpectedBusinessTurnoverView = inject[ExpectedBusinessTurnoverView]
-    val controller = new ExpectedBusinessTurnoverController (
+    val controller                              = new ExpectedBusinessTurnoverController(
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = mock[StatusService],
       cc = mockMcc,
       formProvider = inject[ExpectedBusinessTurnoverFormProvider],
@@ -70,7 +72,7 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
         val result: Future[Result] = controller.get()(request)
         status(result) must be(OK)
 
-        val html: String = contentAsString(result)
+        val html: String       = contentAsString(result)
         val document: Document = Jsoup.parse(html)
 
         ExpectedBusinessTurnover.all.foreach { value =>
@@ -84,7 +86,9 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
           .thenReturn(Future.successful(NotCompleted))
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
-          .thenReturn(Future.successful(Some(BusinessActivities(expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First)))))
+          .thenReturn(
+            Future.successful(Some(BusinessActivities(expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First))))
+          )
 
         val result: Future[Result] = controller.get()(request)
         status(result) must be(OK)
@@ -99,9 +103,10 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.ExpectedBusinessTurnoverController.post().url).withFormUrlEncodedBody(
-            "expectedBusinessTurnover" -> ""
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.ExpectedBusinessTurnoverController.post().url).withFormUrlEncodedBody(
+              "expectedBusinessTurnover" -> ""
+            )
 
           val result: Future[Result] = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -111,9 +116,10 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
       "respond with SEE_OTHER" when {
         "edit is false and redirect to the ExpectedAMLSTurnoverController" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.ExpectedBusinessTurnoverController.post().url).withFormUrlEncodedBody(
-            "expectedBusinessTurnover" -> "zeroPlus"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.ExpectedBusinessTurnoverController.post().url).withFormUrlEncodedBody(
+              "expectedBusinessTurnover" -> "zeroPlus"
+            )
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
@@ -122,15 +128,18 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
             .thenReturn(Future.successful(emptyCache))
 
           val result: Future[Result] = controller.post(false)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get().url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get().url)
+          )
         }
 
         "edit is true and redirect to the SummaryController" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.ExpectedBusinessTurnoverController.post(true).url).withFormUrlEncodedBody(
-            "expectedBusinessTurnover" -> "zeroPlus"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.ExpectedBusinessTurnoverController.post(true).url).withFormUrlEncodedBody(
+              "expectedBusinessTurnover" -> "zeroPlus"
+            )
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
@@ -139,7 +148,7 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
             .thenReturn(Future.successful(emptyCache))
 
           val result: Future[Result] = controller.post(true)(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get.url))
         }
       }

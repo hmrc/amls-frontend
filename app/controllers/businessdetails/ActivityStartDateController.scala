@@ -30,65 +30,67 @@ import views.html.businessdetails.ActivityStartDateView
 
 import scala.concurrent.Future
 
-class ActivityStartDateController @Inject ()(val dataCache: DataCacheConnector,
-                                             val authAction: AuthAction,
-                                             val ds: CommonPlayDependencies,
-                                             val cc: MessagesControllerComponents,
-                                             formProvider: ActivityStartDateFormProvider,
-                                             activity_start_date: ActivityStartDateView,
-                                             implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
+class ActivityStartDateController @Inject() (
+  val dataCache: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: ActivityStartDateFormProvider,
+  activity_start_date: ActivityStartDateView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
-        response =>
-          val form: Form[ActivityStartDate] = (for {
-            businessDetails <- response
-            activityStartDate <- businessDetails.activityStartDate
-          } yield formProvider().fill(activityStartDate)).getOrElse(formProvider())
-          Ok(activity_start_date(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key) map { response =>
+      val form: Form[ActivityStartDate] = (for {
+        businessDetails   <- response
+        activityStartDate <- businessDetails.activityStartDate
+      } yield formProvider().fill(activityStartDate)).getOrElse(formProvider())
+      Ok(activity_start_date(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(activity_start_date(formWithErrors, edit))),
-        data => {
-          dataCache.fetchAll(request.credId) flatMap { maybeCache =>
-            val businessMatching = for {
-              cacheMap <- maybeCache
-              bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-            } yield bm
+        data =>
+          {
+            dataCache.fetchAll(request.credId) flatMap { maybeCache =>
+              val businessMatching = for {
+                cacheMap <- maybeCache
+                bm       <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+              } yield bm
 
-            val businessType = for {
-              bt <- ControllerHelper.getBusinessType(businessMatching)
-            } yield bt
+              val businessType = for {
+                bt <- ControllerHelper.getBusinessType(businessMatching)
+              } yield bt
 
-            val businessDetails = for {
-              cacheMap <- maybeCache
-              atb <- cacheMap.getEntry[BusinessDetails](BusinessDetails.key)
-            } yield atb
+              val businessDetails = for {
+                cacheMap <- maybeCache
+                atb      <- cacheMap.getEntry[BusinessDetails](BusinessDetails.key)
+              } yield atb
 
-            for {
-              _ <- dataCache.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.activityStartDate(data))
-            } yield getRouting(businessType, edit)
+              for {
+                _ <-
+                  dataCache
+                    .save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.activityStartDate(data))
+              } yield getRouting(businessType, edit)
 
+            }
+          } recoverWith { case _: IndexOutOfBoundsException =>
+            Future.successful(NotFound(notFoundView))
           }
-        } recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
       )
   }
 
-  private def getRouting(businessType: Option[BusinessType], edit: Boolean): Result = {
+  private def getRouting(businessType: Option[BusinessType], edit: Boolean): Result =
     (businessType, edit) match {
-      case (_, true) => Redirect(routes.SummaryController.get)
+      case (_, true)                                                                               => Redirect(routes.SummaryController.get)
       case (Some(UnincorporatedBody) | Some(LPrLLP) | Some(LimitedCompany) | Some(Partnership), _) =>
         Redirect(routes.VATRegisteredController.get(edit))
-      case (_, false) =>
+      case (_, false)                                                                              =>
         Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
     }
-  }
 }

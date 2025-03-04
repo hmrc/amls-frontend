@@ -47,16 +47,16 @@ class BusinessTypeSpec extends PlaySpec with MockitoSugar {
     "reading JSON" must {
       "convert from json to model" in {
 
-        Json.fromJson[BusinessType](JsString("Sole Trader")) must
+        Json.fromJson[BusinessType](JsString("Sole Trader"))         must
           be(JsSuccess(SoleProprietor))
 
-        Json.fromJson[BusinessType](JsString("Corporate Body")) must
+        Json.fromJson[BusinessType](JsString("Corporate Body"))      must
           be(JsSuccess(LimitedCompany))
 
-        Json.fromJson[BusinessType](JsString("Partnership")) must
+        Json.fromJson[BusinessType](JsString("Partnership"))         must
           be(JsSuccess(Partnership))
 
-        Json.fromJson[BusinessType](JsString("LLP")) must
+        Json.fromJson[BusinessType](JsString("LLP"))                 must
           be(JsSuccess(LPrLLP))
 
         Json.fromJson[BusinessType](JsString("Unincorporated Body")) must

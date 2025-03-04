@@ -27,27 +27,29 @@ import views.html.deregister.DeregistrationConfirmationView
 
 import javax.inject.Inject
 
-class DeregistrationConfirmationController @Inject()(
-                                                      authAction: AuthAction,
-                                                      ds: CommonPlayDependencies,
-                                                      statusService: StatusService,
-                                                      enrolmentService: AuthEnrolmentsService,
-                                                      cc: MessagesControllerComponents,
-                                                      view: DeregistrationConfirmationView)(implicit
-                                                                                            dataCacheConnector: DataCacheConnector,
-                                                                                            amlsConnector: AmlsConnector
-                                                    ) extends AmlsBaseController(ds, cc) {
+class DeregistrationConfirmationController @Inject() (
+  authAction: AuthAction,
+  ds: CommonPlayDependencies,
+  statusService: StatusService,
+  enrolmentService: AuthEnrolmentsService,
+  cc: MessagesControllerComponents,
+  view: DeregistrationConfirmationView
+)(implicit
+  dataCacheConnector: DataCacheConnector,
+  amlsConnector: AmlsConnector
+) extends AmlsBaseController(ds, cc) {
 
   def get: Action[AnyContent] = authAction.async { implicit request =>
-
     val okResult = for {
       amlsRefNumber <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-      status <- OptionT.liftF(statusService.getReadStatus(amlsRefNumber, request.accountTypeId))
-      businessName <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
-    } yield Ok(view(
-      businessName = businessName,
-      amlsRefNumber = amlsRefNumber
-    ))
+      status        <- OptionT.liftF(statusService.getReadStatus(amlsRefNumber, request.accountTypeId))
+      businessName  <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
+    } yield Ok(
+      view(
+        businessName = businessName,
+        amlsRefNumber = amlsRefNumber
+      )
+    )
 
     okResult getOrElse InternalServerError("Unable to get Deregistration confirmation")
   }

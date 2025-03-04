@@ -24,16 +24,18 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class PSRNumberFormProvider @Inject()() extends Mappings {
+class PSRNumberFormProvider @Inject() () extends Mappings {
 
   val min = 6
   val max = 7
 
   def apply(): Form[BusinessAppliedForPSRNumber] =
-      Form[BusinessAppliedForPSRNumber](
-        mapping(
-          "appliedFor" -> boolean("error.required.msb.psr.options", "error.required.msb.psr.options"),
-          "regNumber" -> mandatoryIfTrue("appliedFor", textAllowWhitespace("error.invalid.msb.psr.number")
+    Form[BusinessAppliedForPSRNumber](
+      mapping(
+        "appliedFor" -> boolean("error.required.msb.psr.options", "error.required.msb.psr.options"),
+        "regNumber"  -> mandatoryIfTrue(
+          "appliedFor",
+          textAllowWhitespace("error.invalid.msb.psr.number")
             .verifying(
               firstError(
                 minLength(min, "error.required.msb.psr.length"),
@@ -41,19 +43,19 @@ class PSRNumberFormProvider @Inject()() extends Mappings {
                 regexp("^[0-9]*$", "error.max.msb.psr.number.format")
               )
             )
-          )
-        )(apply)(unapply)
-      )
+        )
+      )(apply)(unapply)
+    )
 
   private def apply(b: Boolean, s: Option[String]): BusinessAppliedForPSRNumber = (b, s) match {
-    case (false, _) => BusinessAppliedForPSRNumberNo
+    case (false, _)        => BusinessAppliedForPSRNumberNo
     case (true, Some(str)) => BusinessAppliedForPSRNumberYes(str)
-    case _ => throw new IllegalArgumentException("No PSR Number available to bind from form")
+    case _                 => throw new IllegalArgumentException("No PSR Number available to bind from form")
   }
 
   private def unapply(obj: BusinessAppliedForPSRNumber): Option[(Boolean, Option[String])] = obj match {
-    case BusinessAppliedForPSRNumberNo => Some((false, None))
+    case BusinessAppliedForPSRNumberNo             => Some((false, None))
     case BusinessAppliedForPSRNumberYes(regNumber) => Some((true, Some(regNumber)))
-    case _ => None
+    case _                                         => None
   }
 }

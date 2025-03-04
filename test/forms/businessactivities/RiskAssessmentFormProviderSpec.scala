@@ -23,13 +23,14 @@ import play.api.data.Form
 class RiskAssessmentFormProviderSpec extends BooleanFieldBehaviours[RiskAssessmentHasPolicy] {
 
   override val form: Form[RiskAssessmentHasPolicy] = new RiskAssessmentFormProvider()()
-  override val fieldName: String = "hasPolicy"
-  override val errorMessage: String = "error.required.ba.option.risk.assessment"
+  override val fieldName: String                   = "hasPolicy"
+  override val errorMessage: String                = "error.required.ba.option.risk.assessment"
 
   "RiskAssessmentPolicyFormProvider" must {
 
     behave like booleanFieldWithModel(
-      RiskAssessmentHasPolicy(true), RiskAssessmentHasPolicy(false)
+      RiskAssessmentHasPolicy(true),
+      RiskAssessmentHasPolicy(false)
     )
   }
 }

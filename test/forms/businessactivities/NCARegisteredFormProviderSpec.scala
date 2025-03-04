@@ -23,13 +23,14 @@ import play.api.data.Form
 class NCARegisteredFormProviderSpec extends BooleanFieldBehaviours[NCARegistered] {
 
   override val form: Form[NCARegistered] = new NCARegisteredFormProvider()()
-  override val fieldName: String = "ncaRegistered"
-  override val errorMessage: String = "error.required.ba.select.nca"
+  override val fieldName: String         = "ncaRegistered"
+  override val errorMessage: String      = "error.required.ba.select.nca"
 
   "NCARegisteredFormProvider" must {
 
     behave like booleanFieldWithModel(
-      NCARegistered(true), NCARegistered(false)
+      NCARegistered(true),
+      NCARegistered(false)
     )
   }
 }

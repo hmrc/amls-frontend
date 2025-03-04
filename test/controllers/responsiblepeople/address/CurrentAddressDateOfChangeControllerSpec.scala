@@ -38,11 +38,12 @@ import scala.concurrent.Future
 class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val statusService = mock[StatusService]
-    lazy val view = inject[DateOfChangeView]
-    val controller = new CurrentAddressDateOfChangeController(
+    lazy val view     = inject[DateOfChangeView]
+    val controller    = new CurrentAddressDateOfChangeController(
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
@@ -54,15 +55,15 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
   }
 
   val emptyCache = Cache.empty
-  val cache = mock[Cache]
+  val cache      = mock[Cache]
 
   "CurrentAddressDateOfChangeController" must {
     "when get is called" must {
       "return view for Date of Change when given a valid request" in new Fixture {
         val responsiblePeople = ResponsiblePerson()
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controller.get(0, false)(request)
         status(result) must be(OK)
@@ -73,19 +74,20 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
       "RP is incomplete" must {
         "redirect to the how long at current address page" in new Fixture {
           val postRequest = FakeRequest(POST, routes.CurrentAddressDateOfChangeController.post(1).url)
-          .withFormUrlEncodedBody(
-            "dateOfChange.year" -> "2010",
-            "dateOfChange.month" -> "10",
-            "dateOfChange.day" -> "01"
-          )
+            .withFormUrlEncodedBody(
+              "dateOfChange.year"  -> "2010",
+              "dateOfChange.month" -> "10",
+              "dateOfChange.day"   -> "01"
+            )
 
-          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA11AA")
-          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+          val UKAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA11AA")
+          val currentAddress    = ResponsiblePersonCurrentAddress(UKAddress, Some(ZeroToFiveMonths))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePerson(
             addressHistory = Some(history),
             personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
-            positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(LocalDate.of(2009,1,1))))))
+            positions = Some(Positions(Set(BeneficialOwner), Some(PositionStartDate(LocalDate.of(2009, 1, 1)))))
+          )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -94,7 +96,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
 
           val result = controller.post(1, false)(postRequest)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(address.routes.TimeAtCurrentAddressController.get(1, false).url))
         }
       }
@@ -102,19 +104,20 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
       "RP is incomplete and date entered before RP start date" must {
         "redirect to the how long at current address page" in new Fixture {
           val postRequest = FakeRequest(POST, routes.CurrentAddressDateOfChangeController.post(1).url)
-          .withFormUrlEncodedBody(
-            "dateOfChange.year" -> "2010",
-            "dateOfChange.month" -> "10",
-            "dateOfChange.day" -> "01"
-          )
+            .withFormUrlEncodedBody(
+              "dateOfChange.year"  -> "2010",
+              "dateOfChange.month" -> "10",
+              "dateOfChange.day"   -> "01"
+            )
 
-          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA11AA")
-          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+          val UKAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA11AA")
+          val currentAddress    = ResponsiblePersonCurrentAddress(UKAddress, Some(ZeroToFiveMonths))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePerson(
             addressHistory = Some(history),
             personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
-            positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(LocalDate.of(2011,1,1))))))
+            positions = Some(Positions(Set(BeneficialOwner), Some(PositionStartDate(LocalDate.of(2011, 1, 1)))))
+          )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -123,7 +126,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
 
           val result = controller.post(1, false)(postRequest)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(address.routes.TimeAtCurrentAddressController.get(1, false).url))
         }
       }
@@ -131,11 +134,11 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
       "when RP is complete" must {
         "redirect to the detailed answers page" in new Fixture with ResponsiblePeopleValues {
           val postRequest = FakeRequest(POST, routes.CurrentAddressDateOfChangeController.post(1).url)
-          .withFormUrlEncodedBody(
-            "dateOfChange.year" -> "2010",
-            "dateOfChange.month" -> "10",
-            "dateOfChange.day" -> "01"
-          )
+            .withFormUrlEncodedBody(
+              "dateOfChange.year"  -> "2010",
+              "dateOfChange.month" -> "10",
+              "dateOfChange.day"   -> "01"
+            )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
@@ -146,8 +149,10 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
 
           val result = controller.post(1, false)(postRequest)
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url)
+          )
         }
       }
     }
@@ -155,15 +160,16 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
       "given invalid data" in new Fixture {
 
         val invalidPostRequest = FakeRequest(POST, routes.CurrentAddressDateOfChangeController.post(1).url)
-        .withFormUrlEncodedBody("invalid" -> "data")
+          .withFormUrlEncodedBody("invalid" -> "data")
 
-        val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA11AA")
-        val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus))
-        val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+        val UKAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA11AA")
+        val currentAddress    = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus))
+        val history           = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
         val responsiblePeople = ResponsiblePerson(
           addressHistory = Some(history),
           personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
-          positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(LocalDate.of(2009,1,1))))))
+          positions = Some(Positions(Set(BeneficialOwner), Some(PositionStartDate(LocalDate.of(2009, 1, 1)))))
+        )
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople))))

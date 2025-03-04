@@ -20,7 +20,7 @@ import javax.inject.Inject
 import models.autocomplete.{CountryDataProvider, NameValuePair}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 
-class AutoCompleteService @Inject()(data: CountryDataProvider) {
+class AutoCompleteService @Inject() (data: CountryDataProvider) {
   lazy val getCountries: Option[Seq[NameValuePair]] = data.fetch map { s =>
     s.sortWith(_.name < _.name)
   }
@@ -28,8 +28,8 @@ class AutoCompleteService @Inject()(data: CountryDataProvider) {
   lazy val formOptions: Seq[SelectItem] = getCountries match {
     case Some(value) =>
       Seq(SelectItem()) ++
-      value.map(pair => SelectItem(value = Some(pair.value), text = pair.name))
-    case None => throw new RuntimeException()
+        value.map(pair => SelectItem(value = Some(pair.value), text = pair.name))
+    case None        => throw new RuntimeException()
   }
 
   lazy val formOptionsExcludeUK: Seq[SelectItem] = getCountries match {
@@ -38,6 +38,6 @@ class AutoCompleteService @Inject()(data: CountryDataProvider) {
         value
           .filterNot(_.value == "GB")
           .map(pair => SelectItem(value = Some(pair.value), text = pair.name))
-    case None => throw new RuntimeException()
+    case None        => throw new RuntimeException()
   }
 }

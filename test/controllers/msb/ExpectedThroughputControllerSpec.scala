@@ -40,16 +40,18 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
-    lazy val view = inject[ExpectedThroughputView]
+    val request    = addToken(authRequest)
+    lazy val view  = inject[ExpectedThroughputView]
     val controller = new ExpectedThroughputController(
       dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow,
       cc = mockMcc,
       formProvider = inject[ExpectedThroughputFormProvider],
-      view = view)
+      view = view
+    )
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, None)
@@ -61,13 +63,13 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on get display the Throughput Expected In next 12 Months page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
 
       mockApplicationStatus(NotCompleted)
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("msb.throughput.title"))
     }
 
@@ -75,8 +77,8 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
 
       mockApplicationStatus(NotCompleted)
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(Some(First)))))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(Some(MoneyServiceBusiness(Some(First)))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -86,68 +88,68 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
     }
 
     "on get display the Throughput Expected In next 12 Months page when approved and the service has just been added" in new Fixture {
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
 
       mockApplicationStatus(SubmissionDecisionApproved)
 
       mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("msb.throughput.title"))
     }
 
     "on post with invalid data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.ExpectedThroughputController.post().url)
-      .withFormUrlEncodedBody(
-      )
+        .withFormUrlEncodedBody(
+        )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
+      status(result)          must be(BAD_REQUEST)
       contentAsString(result) must include(messages("error.required.msb.throughput"))
     }
 
     "on post with valid data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.ExpectedThroughputController.post().url)
-      .withFormUrlEncodedBody(
-        "throughput" -> First.toString
-      )
+        .withFormUrlEncodedBody(
+          "throughput" -> First.toString
+        )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.BranchesOrAgentsController.get().url))
     }
 
     "on post with valid data in edit mode" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.ExpectedThroughputController.post().url)
-      .withFormUrlEncodedBody(
-        "throughput" -> First.toString
-      )
+        .withFormUrlEncodedBody(
+          "throughput" -> First.toString
+        )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
   }

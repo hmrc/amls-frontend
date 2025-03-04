@@ -30,56 +30,58 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class BankAccountTypeController @Inject()(val authAction: AuthAction,
-                                          val ds: CommonPlayDependencies,
-                                          val dataCacheConnector: DataCacheConnector,
-                                          val statusService: StatusService,
-                                          val mcc: MessagesControllerComponents,
-                                          formProvider: BankAccountTypeFormProvider,
-                                          view: BankAccountTypesView,
-                                          implicit val error: views.html.ErrorView) extends BankDetailsController(ds, mcc) {
+class BankAccountTypeController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val dataCacheConnector: DataCacheConnector,
+  val statusService: StatusService,
+  val mcc: MessagesControllerComponents,
+  formProvider: BankAccountTypeFormProvider,
+  view: BankAccountTypesView,
+  implicit val error: views.html.ErrorView
+) extends BankDetailsController(ds, mcc) {
 
-  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
-      implicit request => {
-        for {
-          bankDetail <- getData[BankDetails](request.credId, index)
-          status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-        } yield bankDetail match {
-          case Some(details@BankDetails(Some(data), _, _, _, _, _, _)) if details.canEdit(status) =>
-            Ok(view(formProvider().fill(data), edit, index))
-          case Some(details) if details.canEdit(status) =>
-            Ok(view(formProvider(), edit, index))
-          case _ => NotFound(notFoundView)
-        }
-      }
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    for {
+      bankDetail <- getData[BankDetails](request.credId, index)
+      status     <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+    } yield bankDetail match {
+      case Some(details @ BankDetails(Some(data), _, _, _, _, _, _)) if details.canEdit(status) =>
+        Ok(view(formProvider().fill(data), edit, index))
+      case Some(details) if details.canEdit(status)                                             =>
+        Ok(view(formProvider(), edit, index))
+      case _                                                                                    => NotFound(notFoundView)
+    }
   }
 
   def post(index: Int, edit: Boolean = false, count: Int = 0): Action[AnyContent] = authAction.async {
-      implicit request => {
-        formProvider().bindFromRequest().fold(
-          formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, edit, index))),
-          data => {
-            for {
-              _ <- updateDataStrict[BankDetails](request.credId, index) { bd =>
-                data match {
-                  case NoBankAccountUsed => bd.bankAccountType(Some(data)).bankAccount(None)
-                  case _ => bd.bankAccountType(Some(data))
-                }
-              }
-            } yield router(data, edit, index)
-          }.recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-          }
+    implicit request =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, index))),
+          data =>
+            {
+              for {
+                _ <- updateDataStrict[BankDetails](request.credId, index) { bd =>
+                       data match {
+                         case NoBankAccountUsed => bd.bankAccountType(Some(data)).bankAccount(None)
+                         case _                 => bd.bankAccountType(Some(data))
+                       }
+                     }
+              } yield router(data, edit, index)
+            }.recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
+            }
         )
-      }
   }
 
-  private val router = (data: BankAccountType, edit: Boolean, index: Int) => data match {
-    case NoBankAccountUsed => Redirect(routes.SummaryController.get(index))
-    case PersonalAccount | BelongsToBusiness | BelongsToOtherBusiness if !edit =>
-      Redirect(routes.BankAccountIsUKController.get(index))
-    case _ => Redirect(routes.SummaryController.get(index))
-  }
+  private val router = (data: BankAccountType, edit: Boolean, index: Int) =>
+    data match {
+      case NoBankAccountUsed                                                     => Redirect(routes.SummaryController.get(index))
+      case PersonalAccount | BelongsToBusiness | BelongsToOtherBusiness if !edit =>
+        Redirect(routes.BankAccountIsUKController.get(index))
+      case _                                                                     => Redirect(routes.SummaryController.get(index))
+    }
 
 }

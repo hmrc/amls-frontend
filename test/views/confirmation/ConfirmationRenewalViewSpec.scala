@@ -27,9 +27,9 @@ import views.html.confirmation.ConfirmationRenewalView
 class ConfirmationRenewalViewSpec extends AmlsViewSpec with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
-    lazy val confirm_renewal = inject[ConfirmationRenewalView]
+    lazy val confirm_renewal                                       = inject[ConfirmationRenewalView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
-    implicit val config: ApplicationConfig = app.injector.instanceOf[ApplicationConfig]
+    implicit val config: ApplicationConfig                         = app.injector.instanceOf[ApplicationConfig]
 
     val continueHref = "http://google.co.uk"
 

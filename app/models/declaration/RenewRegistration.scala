@@ -29,7 +29,7 @@ object RenewRegistration {
 
   implicit val jsonReads: Reads[RenewRegistration] =
     (__ \ "renewRegistration").read[Boolean] flatMap {
-      case true =>  Reads(_ => JsSuccess(RenewRegistrationYes))
+      case true  => Reads(_ => JsSuccess(RenewRegistrationYes))
       case false => Reads(_ => JsSuccess(RenewRegistrationNo))
     }
 
@@ -38,5 +38,3 @@ object RenewRegistration {
     case RenewRegistrationNo  => Json.obj("renewRegistration" -> false)
   }
 }
-
-

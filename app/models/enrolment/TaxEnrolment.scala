@@ -24,8 +24,13 @@ object TaxEnrolment {
   implicit val format: OWrites[TaxEnrolment] = Json.writes[TaxEnrolment]
 
   def apply(userId: String, postCode: String): TaxEnrolment =
-    TaxEnrolment(userId, "AMLS Enrolment", "principal", Seq(
-      EnrolmentIdentifier("Postcode", postCode)
-    ))
+    TaxEnrolment(
+      userId,
+      "AMLS Enrolment",
+      "principal",
+      Seq(
+        EnrolmentIdentifier("Postcode", postCode)
+      )
+    )
 
 }

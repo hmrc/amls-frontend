@@ -39,50 +39,52 @@ import play.api.libs.json.{JsSuccess, Json}
 
 class CorrespondenceAddressNonUkSpec extends PlaySpec with MockitoSugar {
 
-  val defaultYourName = "Default Your Name"
+  val defaultYourName     = "Default Your Name"
   val defaultBusinessName = "Default Business Name"
   val defaultAddressLine1 = "Default Line 1"
   val defaultAddressLine2 = Some("Default Line 2")
   val defaultAddressLine3 = Some("Default Line 3")
   val defaultAddressLine4 = Some("Default Line 4")
-  val defaultPostcode = "AA1 1AA"
-  val defaultCountry = Country("Albania", "AL")
+  val defaultPostcode     = "AA1 1AA"
+  val defaultCountry      = Country("Albania", "AL")
 
-  val NewYourName = "New Your Name"
+  val NewYourName     = "New Your Name"
   val NewBusinessName = "New Business Name"
   val NewAddressLine1 = "New Line 1"
   val NewAddressLine2 = Some("New Line 2")
   val NewAddressLine3 = Some("New Line 3")
   val NewAddressLine4 = Some("New Line 4")
-  val NewPostcode = "AA1 1AA"
-  val NewCountry = "AB"
+  val NewPostcode     = "AA1 1AA"
+  val NewCountry      = "AB"
 
-  val defaultNonUKAddress = CorrespondenceAddressNonUk(defaultYourName,
+  val defaultNonUKAddress = CorrespondenceAddressNonUk(
+    defaultYourName,
     defaultBusinessName,
     defaultAddressLine1,
     defaultAddressLine2,
     defaultAddressLine3,
     defaultAddressLine4,
-    defaultCountry)
+    defaultCountry
+  )
 
   val defaultNonUKModel = Map(
-    "yourName" -> Seq(defaultYourName),
-    "businessName" -> Seq(defaultBusinessName),
+    "yourName"          -> Seq(defaultYourName),
+    "businessName"      -> Seq(defaultBusinessName),
     "addressLineNonUK1" -> Seq(defaultAddressLine1),
     "addressLineNonUK2" -> Seq("Default Line 2"),
     "addressLineNonUK3" -> Seq("Default Line 3"),
     "addressLineNonUK4" -> Seq("Default Line 4"),
-    "country" -> Seq(defaultCountry.code)
+    "country"           -> Seq(defaultCountry.code)
   )
 
   val defaultNonUKJson = Json.obj(
-    "yourName" -> defaultYourName,
-    "businessName" -> defaultBusinessName,
+    "yourName"                   -> defaultYourName,
+    "businessName"               -> defaultBusinessName,
     "correspondenceAddressLine1" -> defaultAddressLine1,
     "correspondenceAddressLine2" -> defaultAddressLine2,
     "correspondenceAddressLine3" -> defaultAddressLine3,
     "correspondenceAddressLine4" -> defaultAddressLine4,
-    "correspondenceCountry" -> defaultCountry
+    "correspondenceCountry"      -> defaultCountry
   )
 
   "JSON validation" must {

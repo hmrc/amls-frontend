@@ -25,45 +25,45 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.hvd.ExpectToReceiveView
 
-class ExpectToReceiveViewSpec extends AmlsViewSpec with Matchers  {
+class ExpectToReceiveViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val receiveView = inject[ExpectToReceiveView]
-  lazy val fp = inject[ExpectToReceiveFormProvider]
+  lazy val fp          = inject[ExpectToReceiveFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
-      implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
-    }
-
-    "ExpectToReceiveView" must {
-
-      "have correct title" in new ViewFixture {
-
-        def view = receiveView(fp().fill(PaymentMethods(true, true, None)), true)
-
-        doc.title must startWith (messages("hvd.expect.to.receive.title") + " - " + messages("summary.hvd"))
-      }
-
-      "have correct headings" in new ViewFixture {
-
-        def view = receiveView(fp().fill(PaymentMethods(true, true, None)), true)
-
-        heading.html must be (messages("hvd.expect.to.receive.title"))
-        subHeading.html must include (messages("summary.hvd"))
-
-      }
-
-      behave like pageWithErrors(
-        receiveView(fp().withError("paymentMethods", "error.required.hvd.choose.option"), false),
-        "paymentMethods",
-        "error.required.hvd.choose.option"
-      )
-
-      behave like pageWithErrors(
-        receiveView(fp().withError("details", "error.required.hvd.format"), false),
-        "details",
-        "error.required.hvd.format"
-      )
-    }
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
+
+  "ExpectToReceiveView" must {
+
+    "have correct title" in new ViewFixture {
+
+      def view = receiveView(fp().fill(PaymentMethods(true, true, None)), true)
+
+      doc.title must startWith(messages("hvd.expect.to.receive.title") + " - " + messages("summary.hvd"))
+    }
+
+    "have correct headings" in new ViewFixture {
+
+      def view = receiveView(fp().fill(PaymentMethods(true, true, None)), true)
+
+      heading.html    must be(messages("hvd.expect.to.receive.title"))
+      subHeading.html must include(messages("summary.hvd"))
+
+    }
+
+    behave like pageWithErrors(
+      receiveView(fp().withError("paymentMethods", "error.required.hvd.choose.option"), false),
+      "paymentMethods",
+      "error.required.hvd.choose.option"
+    )
+
+    behave like pageWithErrors(
+      receiveView(fp().withError("details", "error.required.hvd.format"), false),
+      "details",
+      "error.required.hvd.format"
+    )
+  }
+}

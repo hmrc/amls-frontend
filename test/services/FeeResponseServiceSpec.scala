@@ -68,13 +68,18 @@ class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {
       LocalDateTime.of(2018, 1, 1, 0, 0)
     )
 
-    def setupMockFeeConnector(amlsReference: String, feeResponse: Option[FeeResponse] = None, exception: Option[Throwable] = None) =
+    def setupMockFeeConnector(
+      amlsReference: String,
+      feeResponse: Option[FeeResponse] = None,
+      exception: Option[Throwable] = None
+    ) =
       (feeResponse, exception) match {
-      case (Some(fees), _) => when(mockFeeConnector.feeResponse(eqTo(amlsReference), any())(any(), any(), any()))
-        .thenReturn(Future.successful(fees))
-      case (_ , Some(e)) => when(mockFeeConnector.feeResponse(any(), any())(any(), any(), any())).
-        thenReturn(Future.failed(e))
-    }
+        case (Some(fees), _) =>
+          when(mockFeeConnector.feeResponse(eqTo(amlsReference), any())(any(), any(), any()))
+            .thenReturn(Future.successful(fees))
+        case (_, Some(e))    =>
+          when(mockFeeConnector.feeResponse(any(), any())(any(), any(), any())).thenReturn(Future.failed(e))
+      }
   }
 
   "FeeResponseService" must {
@@ -101,7 +106,8 @@ class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {
 
         setupMockFeeConnector(testAmlsReference, None, UpstreamErrorResponse("not found", 404, 404).some)
 
-        when(mockFeeConnector.feeResponse(any(), any())(any(), any(), any())).thenReturn(Future.failed(UpstreamErrorResponse("not found", 404, 404)))
+        when(mockFeeConnector.feeResponse(any(), any())(any(), any(), any()))
+          .thenReturn(Future.failed(UpstreamErrorResponse("not found", 404, 404)))
 
         whenReady(testFeeResponseService.getFeeResponse(testAmlsReference, accountTypeId)) { result =>
           result mustBe None

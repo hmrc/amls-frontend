@@ -23,7 +23,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class RemoveTradingPremisesFormProvider @Inject()() extends Mappings {
+class RemoveTradingPremisesFormProvider @Inject() () extends Mappings {
 
   def apply(): Form[ActivityEndDate] = Form[ActivityEndDate](
     "endDate" -> localDate(
@@ -37,7 +37,8 @@ class RemoveTradingPremisesFormProvider @Inject()() extends Mappings {
       minDate(RemoveTradingPremisesFormProvider.minDate, "error.invalid.year.post1900"),
       maxDate(RemoveTradingPremisesFormProvider.maxDate, "error.invalid.tp.date.future")
     ).transform[ActivityEndDate](
-      ActivityEndDate(_), _.endDate
+      ActivityEndDate(_),
+      _.endDate
     )
   )
 

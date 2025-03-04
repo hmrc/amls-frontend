@@ -18,15 +18,17 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class SubscriptionFees(paymentReference: String,
-                            registrationFee: BigDecimal,
-                            fpFee: Option[BigDecimal],
-                            fpFeeRate: Option[BigDecimal] = None,
-                            approvalCheckFee: Option[BigDecimal],
-                            approvalCheckFeeRate: Option[BigDecimal] = None,
-                            premiseFee: BigDecimal,
-                            premiseFeeRate: Option[BigDecimal] = None,
-                            totalFees: BigDecimal)
+case class SubscriptionFees(
+  paymentReference: String,
+  registrationFee: BigDecimal,
+  fpFee: Option[BigDecimal],
+  fpFeeRate: Option[BigDecimal] = None,
+  approvalCheckFee: Option[BigDecimal],
+  approvalCheckFeeRate: Option[BigDecimal] = None,
+  premiseFee: BigDecimal,
+  premiseFeeRate: Option[BigDecimal] = None,
+  totalFees: BigDecimal
+)
 
 object SubscriptionFees {
   implicit val format: OFormat[SubscriptionFees] = Json.format[SubscriptionFees]

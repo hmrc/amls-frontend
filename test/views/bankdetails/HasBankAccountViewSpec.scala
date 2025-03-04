@@ -27,7 +27,7 @@ import views.html.bankdetails.HasBankAccountView
 class HasBankAccountViewSpec extends AmlsViewSpec {
 
   lazy val hasBankAccount = inject[HasBankAccountView]
-  lazy val fp = inject[HasBankAccountFormProvider]
+  lazy val fp             = inject[HasBankAccountFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   trait ViewFixture extends Fixture {

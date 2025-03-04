@@ -26,16 +26,20 @@ class PenaltyDetailsFormProviderSpec extends FieldBehaviours with Constraints {
   val formProvider: PenaltyDetailsFormProvider = new PenaltyDetailsFormProvider()
 
   val form: Form[ProfessionalBodyYes] = formProvider()
-  val fieldName: String = "professionalBody"
+  val fieldName: String               = "professionalBody"
 
   "form" must {
 
     behave like fieldThatBindsValidData(
-      form, fieldName, stringsShorterThan(formProvider.length)
+      form,
+      fieldName,
+      stringsShorterThan(formProvider.length)
     )
 
     behave like mandatoryField(
-      form, fieldName, FormError(fieldName, "error.required.penaltydetails.info.about.penalty")
+      form,
+      fieldName,
+      FormError(fieldName, "error.required.penaltydetails.info.about.penalty")
     )
 
     "details are submitted but max length exceeded" in {
@@ -57,4 +61,3 @@ class PenaltyDetailsFormProviderSpec extends FieldBehaviours with Constraints {
     }
   }
 }
-

@@ -27,42 +27,44 @@ import views.html.businessactivities.NCARegisteredView
 
 import scala.concurrent.Future
 
-class NCARegisteredController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                         val authAction: AuthAction,
-                                         val ds: CommonPlayDependencies,
-                                         val cc: MessagesControllerComponents,
-                                         formProvider: NCARegisteredFormProvider,
-                                         view: NCARegisteredView) extends AmlsBaseController(ds, cc) {
+class NCARegisteredController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: NCARegisteredFormProvider,
+  view: NCARegisteredView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-        response =>
-          val form = (for {
-            businessActivities <- response
-            ncaRegistered <- businessActivities.ncaRegistered
-          } yield formProvider().fill(ncaRegistered)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { response =>
+      val form = (for {
+        businessActivities <- response
+        ncaRegistered      <- businessActivities.ncaRegistered
+      } yield formProvider().fill(ncaRegistered)).getOrElse(formProvider())
+      Ok(view(form, edit))
     }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivities.ncaRegistered(data)
-            )
-          } yield if (edit) {
-            Redirect(routes.SummaryController.get)
-          } else {
-            Redirect(routes.RiskAssessmentController.get())
-          }
+            _                  <- dataCacheConnector.save[BusinessActivities](
+                                    request.credId,
+                                    BusinessActivities.key,
+                                    businessActivities.ncaRegistered(data)
+                                  )
+          } yield
+            if (edit) {
+              Redirect(routes.SummaryController.get)
+            } else {
+              Redirect(routes.RiskAssessmentController.get())
+            }
       )
-    }
+  }
 }

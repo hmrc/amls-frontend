@@ -26,14 +26,26 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
 case class Products(items: Set[ItemType]) {
 
-
   def sorted: Seq[ItemType] = {
     import Products._
 
-    val sortedItemTypes = Seq(Alcohol, Antiques, Caravans, Cars, Clothing, Gold,
-      Jewellery, MobilePhones, OtherMotorVehicles, ScrapMetals, Tobacco)
+    val sortedItemTypes = Seq(
+      Alcohol,
+      Antiques,
+      Caravans,
+      Cars,
+      Clothing,
+      Gold,
+      Jewellery,
+      MobilePhones,
+      OtherMotorVehicles,
+      ScrapMetals,
+      Tobacco
+    )
 
-    def otherValue(items: Set[ItemType]): Option[ItemType] = items.collectFirst { case Other(itemType) => Other(itemType) }
+    def otherValue(items: Set[ItemType]): Option[ItemType] = items.collectFirst { case Other(itemType) =>
+      Other(itemType)
+    }
 
     val sortedListItems = sortedItemTypes intersect items.toSeq
     otherValue(items) map { other =>
@@ -50,8 +62,8 @@ sealed trait ItemType {
 
     this match {
       case Other("") => messages("hvd.products.option.12")
-      case Other(x) => x
-      case itemType => messages(s"hvd.products.option.${itemType.value}")
+      case Other(x)  => x
+      case itemType  => messages(s"hvd.products.option.${itemType.value}")
     }
   }
 }
@@ -122,18 +134,21 @@ object Products extends Enumerable.Implicits {
   )
 
   def formValues(html: Html)(implicit messages: Messages): Seq[CheckboxItem] = {
-    val allButOther = all.filterNot(_.value == Other("").value).zipWithIndex.map { case (itemType, index) =>
+    val allButOther = all
+      .filterNot(_.value == Other("").value)
+      .zipWithIndex
+      .map { case (itemType, index) =>
+        val conditional = if (itemType.value == Other("").value) Some(html) else None
 
-      val conditional = if (itemType.value == Other("").value) Some(html) else None
-
-      CheckboxItem(
-        content = Text(itemType.getMessage),
-        value = itemType.toString,
-        id = Some(s"products_$index"),
-        name = Some(s"products[$index]"),
-        conditionalHtml = conditional
-      )
-    }.sortBy(_.content.asHtml.body)
+        CheckboxItem(
+          content = Text(itemType.getMessage),
+          value = itemType.toString,
+          id = Some(s"products_$index"),
+          name = Some(s"products[$index]"),
+          conditionalHtml = conditional
+        )
+      }
+      .sortBy(_.content.asHtml.body)
 
     val otherCheckbox = CheckboxItem(
       content = Text(Other("").getMessage),
@@ -164,32 +179,29 @@ object Products extends Enumerable.Implicits {
         case "11" => Reads(_ => JsSuccess(Clothing)) map identity[ItemType]
         case "12" =>
           (JsPath \ "otherDetails").read[String].map(Other.apply _) map identity[ItemType]
-        case _ =>
+        case _    =>
           Reads(_ => JsError((JsPath \ "products") -> play.api.libs.json.JsonValidationError("error.invalid")))
       }.foldLeft[Reads[Set[ItemType]]](
         Reads[Set[ItemType]](_ => JsSuccess(Set.empty))
-      ) {
-        (result, data) =>
-          data flatMap { m =>
-            result.map { n =>
-              n + m
-            }
+      ) { (result, data) =>
+        data flatMap { m =>
+          result.map { n =>
+            n + m
           }
+        }
       }
     } map Products.apply
 
-  implicit val jsonWrite: Writes[Products] = Writes[Products] {
-    case Products(transactions) =>
-      Json.obj(
-        "products" -> (transactions map {
-          _.value
-        }).toSeq
-      ) ++ transactions.foldLeft[JsObject](Json.obj()) {
-        case (m, Other(name)) =>
-          m ++ Json.obj("otherDetails" -> name)
-        case (m, _) =>
-          m
-      }
+  implicit val jsonWrite: Writes[Products] = Writes[Products] { case Products(transactions) =>
+    Json.obj(
+      "products" -> (transactions map {
+        _.value
+      }).toSeq
+    ) ++ transactions.foldLeft[JsObject](Json.obj()) {
+      case (m, Other(name)) =>
+        m ++ Json.obj("otherDetails" -> name)
+      case (m, _)           =>
+        m
+    }
   }
 }
-

@@ -16,16 +16,18 @@
 
 package models.bankdetails
 
-
 import models.bankdetails.Account._
 import play.api.libs.json._
 
 case class BankAccount(isUk: Option[BankAccountIsUk], hasIban: Option[BankAccountHasIban], account: Option[Account]) {
 
-  def isUk(isUk: BankAccountIsUk): BankAccount = if(changedIsUk(isUk)) {
-    this.copy(isUk = Option(isUk),
-              hasIban = if (isUk.isUk) { None } else { hasIban },
-              account = None)
+  def isUk(isUk: BankAccountIsUk): BankAccount = if (changedIsUk(isUk)) {
+    this.copy(
+      isUk = Option(isUk),
+      hasIban = if (isUk.isUk) { None }
+      else { hasIban },
+      account = None
+    )
   } else {
     this.copy(isUk = Option(isUk))
   }
@@ -37,10 +39,10 @@ case class BankAccount(isUk: Option[BankAccountIsUk], hasIban: Option[BankAccoun
   }
 
   def isComplete: Boolean = this match {
-    case BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount(_, _))) => true
+    case BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount(_, _)))                                   => true
     case BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber(_))) => true
-    case BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some(NonUKIBANNumber(_))) => true
-    case _ => false
+    case BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some(NonUKIBANNumber(_)))     => true
+    case _                                                                                                       => false
   }
 
   def account(account: Account): BankAccount = this.copy(account = Option(account))
@@ -56,15 +58,14 @@ object BankAccount {
 
   import play.api.libs.functional.syntax._
 
-  implicit val jsonReads : Reads[BankAccount] = (
-      __.read(Reads.optionNoError[BankAccountIsUk]) and
+  implicit val jsonReads: Reads[BankAccount] = (
+    __.read(Reads.optionNoError[BankAccountIsUk]) and
       __.read(Reads.optionNoError[BankAccountHasIban]) and
       __.read(Reads.optionNoError[Account])
-    )(BankAccount.apply _)
+  )(BankAccount.apply _)
 
-
-  implicit val jsonWrites: Writes[BankAccount] = Writes {
-    model:BankAccount => Seq(
+  implicit val jsonWrites: Writes[BankAccount] = Writes { model: BankAccount =>
+    Seq(
       Json.toJson(model.isUk).asOpt[JsObject],
       Json.toJson(model.hasIban).asOpt[JsObject],
       Json.toJson(model.account).asOpt[JsObject]

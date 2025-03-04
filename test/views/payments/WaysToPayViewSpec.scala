@@ -27,8 +27,8 @@ import views.html.payments.WaysToPayView
 class WaysToPayViewSpec extends AmlsViewSpec {
 
   lazy val waysToPayView = inject[WaysToPayView]
-  lazy val formProvider = inject[WaysToPayFormProvider]
-  val secondaryHeading = "Submit application"
+  lazy val formProvider  = inject[WaysToPayFormProvider]
+  val secondaryHeading   = "Submit application"
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,12 +42,12 @@ class WaysToPayViewSpec extends AmlsViewSpec {
 
       def view = waysToPayView(formProvider(), secondaryHeading)
 
-      doc.title must startWith(messages("payments.waystopay.title"))
-      heading.html must be(messages("payments.waystopay.header"))
+      doc.title       must startWith(messages("payments.waystopay.title"))
+      heading.html    must be(messages("payments.waystopay.header"))
       subHeading.html must include(messages("submit.registration"))
-      doc.html must include(messages("payments.waystopay.info"))
-      doc.html must include(messages("payments.waystopay.info2"))
-      doc.html must include(messages("payments.waystopay.lead.time"))
+      doc.html        must include(messages("payments.waystopay.info"))
+      doc.html        must include(messages("payments.waystopay.info2"))
+      doc.html        must include(messages("payments.waystopay.lead.time"))
     }
 
     "display all fields" in new ViewFixture {

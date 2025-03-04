@@ -27,13 +27,13 @@ class WhatDoesYourBusinessDoFormProviderSpec extends CheckboxFieldBehaviours {
 
   ".value" must {
 
-    val fieldName = "value"
+    val fieldName   = "value"
     val requiredKey = "error.required.tp.activity.your.business.do"
 
     behave like checkboxFieldWithWrapper[BusinessActivity, WhatDoesYourBusinessDo](
       form,
       fieldName,
-      validValues  = BusinessActivities.all.toSeq,
+      validValues = BusinessActivities.all.toSeq,
       x => WhatDoesYourBusinessDo(Set(x)),
       x => WhatDoesYourBusinessDo(x.toSet),
       invalidError = FormError(s"$fieldName[0]", "error.invalid")

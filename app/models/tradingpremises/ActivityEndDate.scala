@@ -20,8 +20,8 @@ import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDate
 
-case class ActivityEndDate (endDate: LocalDate)
+case class ActivityEndDate(endDate: LocalDate)
 
 object ActivityEndDate {
-  implicit val format: OFormat[ActivityEndDate] =  Json.format[ActivityEndDate]
+  implicit val format: OFormat[ActivityEndDate] = Json.format[ActivityEndDate]
 }

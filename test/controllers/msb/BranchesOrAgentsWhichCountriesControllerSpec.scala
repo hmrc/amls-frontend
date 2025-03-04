@@ -36,34 +36,40 @@ import scala.concurrent.Future
 class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val mockService: BranchesOrAgentsWhichCountriesService = mock[BranchesOrAgentsWhichCountriesService]
-    lazy val view = inject[BranchesOrAgentsWhichCountriesView]
-    val controller = new BranchesOrAgentsWhichCountriesController(
+    lazy val view                                          = inject[BranchesOrAgentsWhichCountriesView]
+    val controller                                         = new BranchesOrAgentsWhichCountriesController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       mockAutoComplete,
       mockMcc,
       branchesOrAgentsWhichCountriesService = mockService,
       formProvider = inject[BranchesOrAgentsWhichCountriesFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   val modelBefore = MoneyServiceBusiness(
-    branchesOrAgents = Some(BranchesOrAgents(
-      BranchesOrAgentsHasCountries(true),
-      None
-    ))
+    branchesOrAgents = Some(
+      BranchesOrAgents(
+        BranchesOrAgentsHasCountries(true),
+        None
+      )
+    )
   )
 
   val branchesOrAgentsAfter = BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))
 
   val modelAfter = MoneyServiceBusiness(
-    branchesOrAgents = Some(BranchesOrAgents(
-      BranchesOrAgentsHasCountries(true),
-      Some(branchesOrAgentsAfter)
-    ))
+    branchesOrAgents = Some(
+      BranchesOrAgents(
+        BranchesOrAgentsHasCountries(true),
+        Some(branchesOrAgentsAfter)
+      )
+    )
   )
 
   "BranchesOrAgentsWhichCountriesController" must {
@@ -72,7 +78,7 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
 
       when(mockService.fetchBranchesOrAgents(any())).thenReturn(Future.successful(Some(branchesOrAgentsAfter)))
 
-      val result = controller.get()(request)
+      val result   = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustEqual OK
@@ -85,9 +91,9 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
         .thenReturn(Future.successful(Some(modelBefore)))
 
       val newRequest = FakeRequest(POST, routes.BranchesOrAgentsWhichCountriesController.post().url)
-      .withFormUrlEncodedBody(
-        "countries[0]" -> "GBasdadsdas"
-      )
+        .withFormUrlEncodedBody(
+          "countries[0]" -> "GBasdadsdas"
+        )
 
       val result = controller.post()(newRequest)
 
@@ -97,9 +103,9 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
     "return a redirect to the 'Linked Transactions' page on valid submission" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.BranchesOrAgentsWhichCountriesController.post().url)
-      .withFormUrlEncodedBody(
-        "countries[0]" -> "GB"
-      )
+        .withFormUrlEncodedBody(
+          "countries[0]" -> "GB"
+        )
       when(mockService.fetchAndSaveBranchesOrAgents(any(), any(), any())).thenReturn(
         Future.successful(Redirect(routes.IdentifyLinkedTransactionsController.get()))
       )
@@ -113,9 +119,9 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
     "return a redirect to the 'Linked Transactions' page when the user has filled the mandatory auto suggested country field" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.BranchesOrAgentsWhichCountriesController.post().url)
-      .withFormUrlEncodedBody(
-        "countries[0]" -> "GB"
-      )
+        .withFormUrlEncodedBody(
+          "countries[0]" -> "GB"
+        )
 
       when(mockService.fetchAndSaveBranchesOrAgents(any(), any(), any())).thenReturn(
         Future.successful(Redirect(routes.IdentifyLinkedTransactionsController.get()))
@@ -130,9 +136,9 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
     "return a redirect to the 'Summary page' page on valid submission when edit flag is set" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.BranchesOrAgentsWhichCountriesController.post().url)
-      .withFormUrlEncodedBody(
-        "countries[0]" -> "GB"
-      )
+        .withFormUrlEncodedBody(
+          "countries[0]" -> "GB"
+        )
 
       when(mockService.fetchAndSaveBranchesOrAgents(any(), any(), any())).thenReturn(
         Future.successful(Redirect(routes.SummaryController.get))

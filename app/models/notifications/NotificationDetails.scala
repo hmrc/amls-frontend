@@ -26,45 +26,46 @@ import utils.ContactTypeHelper
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDate, LocalDateTime}
 
-case class NotificationDetails(contactType: Option[ContactType],
-                               status: Option[Status],
-                               messageText: Option[String],
-                               variation: Boolean,
-                               receivedAt: LocalDateTime) {
+case class NotificationDetails(
+  contactType: Option[ContactType],
+  status: Option[Status],
+  messageText: Option[String],
+  variation: Boolean,
+  receivedAt: LocalDateTime
+) {
 
   val cType: ContactType = ContactTypeHelper.getContactType(status, contactType, variation)
 
   def subject(templateVersion: String): String =
     templateVersion match {
       case "v1m0" | "v2m0" | "v3m0" | "v4m0" => s"notifications.subject.$cType"
-      case "v5m0" => s"notifications.subject.v5.$cType"
-      case "v6m0" => s"notifications.subject.v6.$cType"
-      case _ => throw new Exception(s"Unknown template version $templateVersion")
+      case "v5m0"                            => s"notifications.subject.v5.$cType"
+      case "v6m0"                            => s"notifications.subject.v6.$cType"
+      case _                                 => throw new Exception(s"Unknown template version $templateVersion")
     }
 
-  def dateReceived: String = {
+  def dateReceived: String =
     receivedAt.format(DateTimeFormatter.ofPattern("d MMMM Y"))
-  }
 }
 
 object NotificationDetails {
-  val reads: Reads[NotificationDetails ] =
+  val reads: Reads[NotificationDetails] =
     (
       (JsPath \ "contactType").readNullable[ContactType] and
         (JsPath \ "status").readNullable[Status] and
         (JsPath \ "messageText").readNullable[String] and
         (JsPath \ "variation").read[Boolean] and
         (JsPath \ "receivedAt").read[LocalDateTime](localDateTimeReads)
-      )(NotificationDetails.apply _)
+    )(NotificationDetails.apply _)
 
-  val writes : OWrites[NotificationDetails ] =
+  val writes: OWrites[NotificationDetails] =
     (
       (JsPath \ "contactType").writeNullable[ContactType] and
         (JsPath \ "status").writeNullable[Status] and
         (JsPath \ "messageText").writeNullable[String] and
         (JsPath \ "variation").write[Boolean] and
         (JsPath \ "receivedAt").write[LocalDateTime](localDateTimeWrites)
-      )(unlift(NotificationDetails.unapply))
+    )(unlift(NotificationDetails.unapply))
 
   implicit val format: OFormat[NotificationDetails] = OFormat(reads, writes)
 
@@ -81,23 +82,21 @@ object NotificationDetails {
     pattern.findFirstMatchIn(input).fold(none[String])(m => m.group(1).some)
   }
 
-  def convertEndDateWithRefMessageText(inputString: String): Option[EndDateDetails] = {
+  def convertEndDateWithRefMessageText(inputString: String): Option[EndDateDetails] =
     for {
       date <- extractEndDate(inputString)
-      ref <- extractReference(inputString)
+      ref  <- extractReference(inputString)
     } yield EndDateDetails(date, ref.some)
-  }
 
   def convertEndDateMessageText(inputString: String): Option[EndDateDetails] =
     extractEndDate(inputString) map { date => EndDateDetails(date, None) }
 
-  def convertReminderMessageText(inputString: String): Option[ReminderDetails] = {
+  def convertReminderMessageText(inputString: String): Option[ReminderDetails] =
     inputString.split("\\|").toList match {
       case amount :: ref :: tail =>
         Some(ReminderDetails(Currency(splitByDash(amount).toDouble), splitByDash(ref)))
-      case _ => None
+      case _                     => None
     }
-  }
 
   def processGenericMessage(msg: String): String = {
     val pattern = """<!\[CDATA\[(.*)\]\]>""".r

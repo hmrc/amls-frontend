@@ -41,19 +41,20 @@ class YourTradingPremisesSpec extends AnyWordSpec with Matchers {
   "YourTradingPremises" must {
 
     val json = Json.obj(
-      "tradingName" -> "foo",
-      "addressLine1" -> "1",
-      "addressLine2" -> "2",
-      "addressDateOfChange" -> LocalDate.of(1997, 7, 1),
-      "postcode" -> "AA11 1AA",
-      "isResidential" -> true,
-      "startDate" -> LocalDate.of(1990, 2, 24),
-      "tradingNameChangeDate" -> LocalDate.of(2016,1,12)
+      "tradingName"           -> "foo",
+      "addressLine1"          -> "1",
+      "addressLine2"          -> "2",
+      "addressDateOfChange"   -> LocalDate.of(1997, 7, 1),
+      "postcode"              -> "AA11 1AA",
+      "isResidential"         -> true,
+      "startDate"             -> LocalDate.of(1990, 2, 24),
+      "tradingNameChangeDate" -> LocalDate.of(2016, 1, 12)
     )
 
     val jsonModel = model.copy(
       tradingNameChangeDate = Some(DateOfChange(LocalDate.of(2016, 1, 12))),
-      tradingPremisesAddress = model.tradingPremisesAddress.copy(dateOfChange = Some(DateOfChange(LocalDate.of(1997, 7, 1))))
+      tradingPremisesAddress =
+        model.tradingPremisesAddress.copy(dateOfChange = Some(DateOfChange(LocalDate.of(1997, 7, 1))))
     )
 
     "Correctly serialise from json" in {

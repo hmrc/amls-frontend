@@ -20,15 +20,14 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 
 import javax.inject.Inject
 
-class CurrencyAutocompleteService @Inject()() {
+class CurrencyAutocompleteService @Inject() () {
 
-  lazy val formOptions: Seq[SelectItem] = {
+  lazy val formOptions: Seq[SelectItem] =
     SelectItem(None, "") +:
-    models.currencies.map { currency =>
-      SelectItem(
-        value = Some(currency),
-        text = currency.toUpperCase
-      )
-    }
-  }
+      models.currencies.map { currency =>
+        SelectItem(
+          value = Some(currency),
+          text = currency.toUpperCase
+        )
+      }
 }

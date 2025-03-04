@@ -29,7 +29,7 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val what_you_need = inject[WhatYouNeedView]
 
-  val call = controllers.responsiblepeople.routes.PersonNameController.get(1)
+  val call                                                  = controllers.responsiblepeople.routes.PersonNameController.get(1)
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
@@ -44,14 +44,14 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       doc.title must startWith(messages("title.wyn"))
     }
 
-    "Have the correct Headings" in new ViewFixture{
+    "Have the correct Headings" in new ViewFixture {
       def view = what_you_need(call, None)
 
-      heading.html must be (messages("title.wyn"))
-      subHeading.html must include (messages("summary.responsiblepeople"))
+      heading.html    must be(messages("title.wyn"))
+      subHeading.html must include(messages("summary.responsiblepeople"))
     }
 
-    "contain the expected content elements" in new ViewFixture{
+    "contain the expected content elements" in new ViewFixture {
       def view = what_you_need(call, Some(BusinessActivities(Set(MoneyServiceBusiness))))
 
       html must include(messages("responsiblepeople.whatyouneed.requiredinfo"))
@@ -66,8 +66,12 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       html must include(messages("their position in the business and start date"))
       html must include(messages("if they’re a sole proprietor of another business"))
       html must include(messages("if they’re registered for Self Assessment"))
-      html must include(messages("their experience in the services you’re registering under the Money Laundering Regulations"))
-      html must include(messages("their experience and training in anti-money laundering and counter-terrorism funding"))
+      html must include(
+        messages("their experience in the services you’re registering under the Money Laundering Regulations")
+      )
+      html must include(
+        messages("their experience and training in anti-money laundering and counter-terrorism funding")
+      )
       html must include(messages("if they have passed the fit and proper test"))
       html must include(messages("previous name and the date their name changed"))
       html must include(messages("National Insurance number"))
@@ -78,10 +82,12 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       html must include(messages("Self Assessment Unique Taxpayer Reference (UTR) number"))
     }
 
-    "Contain approval check content for MSB or TCSP" in new ViewFixture{
+    "Contain approval check content for MSB or TCSP" in new ViewFixture {
       def view = what_you_need(call, Some(BusinessActivities(Set(MoneyServiceBusiness))))
 
-      html must include(messages("if HMRC has charged your business or another business to do an approval check on them"))
+      html must include(
+        messages("if HMRC has charged your business or another business to do an approval check on them")
+      )
     }
 
     behave like pageWithBackLink(what_you_need(call, None))

@@ -32,17 +32,17 @@ import scala.concurrent.Future
 class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[Cache]
+  val mockCacheMap       = mock[Cache]
 
   val service = new ConfirmRegisteredOfficeService(mockCacheConnector)
 
   val credId = "123456"
 
-  val line1 = "Address Line 1"
-  val line2 = "Address Line 2"
+  val line1    = "Address Line 1"
+  val line2    = "Address Line 2"
   val postcode = "AA1 2QQ"
-  val office = RegisteredOfficeUK(line1, Some(line2), postCode = postcode)
-  val address = Address(line1, Some(line2), None, None, Some(postcode), Country("United Kingdom", "UK"))
+  val office   = RegisteredOfficeUK(line1, Some(line2), postCode = postcode)
+  val address  = Address(line1, Some(line2), None, None, Some(postcode), Country("United Kingdom", "UK"))
 
   "ConfirmRegisteredOfficeService" when {
 
@@ -78,9 +78,15 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
       "return the address if it is present in the business matching" in {
 
         when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Future.successful(Some(BusinessMatching().reviewDetails(
-            ReviewDetails("Big Corp Inc.", None, address, "12798rg2e8yfg")
-          ))))
+          .thenReturn(
+            Future.successful(
+              Some(
+                BusinessMatching().reviewDetails(
+                  ReviewDetails("Big Corp Inc.", None, address, "12798rg2e8yfg")
+                )
+              )
+            )
+          )
 
         service.getAddress(credId).futureValue mustBe Some(address)
       }
@@ -113,18 +119,24 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching().reviewDetails(
-            ReviewDetails("Big Corp Inc.", None, address, "12798rg2e8yfg")
-          )))
+          .thenReturn(
+            Some(
+              BusinessMatching().reviewDetails(
+                ReviewDetails("Big Corp Inc.", None, address, "12798rg2e8yfg")
+              )
+            )
+          )
 
         when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))
           .thenReturn(Some(BusinessDetails()))
 
-        when(mockCacheConnector.save[BusinessDetails](
-          eqTo(credId),
-          eqTo(BusinessDetails.key),
-          eqTo(BusinessDetails().registeredOffice(office))
-        )(any()))
+        when(
+          mockCacheConnector.save[BusinessDetails](
+            eqTo(credId),
+            eqTo(BusinessDetails.key),
+            eqTo(BusinessDetails().registeredOffice(office))
+          )(any())
+        )
           .thenReturn(Future.successful(mockCacheMap))
 
         service.updateRegisteredOfficeAddress(credId, ConfirmRegisteredOffice(true)).futureValue mustBe Some(office)
@@ -144,9 +156,13 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching().reviewDetails(
-              ReviewDetails("Big Corp Inc.", None, address, "12798rg2e8yfg")
-            )))
+            .thenReturn(
+              Some(
+                BusinessMatching().reviewDetails(
+                  ReviewDetails("Big Corp Inc.", None, address, "12798rg2e8yfg")
+                )
+              )
+            )
 
           when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))
             .thenReturn(Some(BusinessDetails()))
@@ -160,9 +176,13 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
           when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching().reviewDetails(
-              ReviewDetails("Big Corp Inc.", None, address, "12798rg2e8yfg")
-            )))
+            .thenReturn(
+              Some(
+                BusinessMatching().reviewDetails(
+                  ReviewDetails("Big Corp Inc.", None, address, "12798rg2e8yfg")
+                )
+              )
+            )
 
           when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))
             .thenReturn(None)

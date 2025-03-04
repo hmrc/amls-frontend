@@ -28,24 +28,25 @@ import utils.AmlsSpec
 class AddressModifiedEventSpec extends AmlsSpec {
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/test-path")
-  implicit override val headerCarrier: HeaderCarrier = HeaderCarrier()
+  implicit override val headerCarrier: HeaderCarrier        = HeaderCarrier()
 
   "The AddressModifiedAuditEvent" must {
     "create the proper detail" when {
       "given a current address and an old address" in {
         val currentAddress = AuditAddress("Addr Line 1", "Addr Line 2".some, "Line 3".some, "Spain", "AA1 1AA".some)
-        val oldAddress = AuditAddress("Old addr Line 1", "Old addr Line 2".some, "Old line 3".some, "France", "NE1 1ET".some)
+        val oldAddress     =
+          AuditAddress("Old addr Line 1", "Old addr Line 2".some, "Old line 3".some, "France", "NE1 1ET".some)
 
         val expectedResult = headerCarrier.toAuditDetails() ++ Map(
-          "addressLine1" -> "Addr Line 1",
-          "addressLine2" -> "Addr Line 2",
-          "addressLine3" -> "Line 3",
-          "country" -> "Spain",
-          "postCode" -> "AA1 1AA",
-          "originalLine1" -> "Old addr Line 1",
-          "originalLine2" -> "Old addr Line 2",
-          "originalLine3" -> "Old line 3",
-          "originalCountry" -> "France",
+          "addressLine1"     -> "Addr Line 1",
+          "addressLine2"     -> "Addr Line 2",
+          "addressLine3"     -> "Line 3",
+          "country"          -> "Spain",
+          "postCode"         -> "AA1 1AA",
+          "originalLine1"    -> "Old addr Line 1",
+          "originalLine2"    -> "Old addr Line 2",
+          "originalLine3"    -> "Old line 3",
+          "originalCountry"  -> "France",
           "originalPostCode" -> "NE1 1ET"
         )
 
@@ -57,12 +58,12 @@ class AddressModifiedEventSpec extends AmlsSpec {
 
       "given a current address and an old address without the optional fields" in {
         val currentAddress = AuditAddress("Addr Line 1", None, None, "Spain", None)
-        val oldAddress = AuditAddress("Old addr Line 1", None, None, "France", None)
+        val oldAddress     = AuditAddress("Old addr Line 1", None, None, "France", None)
 
         val expectedResult = headerCarrier.toAuditDetails() ++ Map(
-          "addressLine1" -> "Addr Line 1",
-          "country" -> "Spain",
-          "originalLine1" -> "Old addr Line 1",
+          "addressLine1"    -> "Addr Line 1",
+          "country"         -> "Spain",
+          "originalLine1"   -> "Old addr Line 1",
           "originalCountry" -> "France"
         )
 

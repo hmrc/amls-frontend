@@ -24,7 +24,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 
 trait AutoCompleteServiceMocks extends MockitoSugar {
 
-  implicit val mockAutoComplete:AutoCompleteService = mock[AutoCompleteService]
+  implicit val mockAutoComplete: AutoCompleteService = mock[AutoCompleteService]
 
   val nonUKCountries: Seq[SelectItem] = Seq(
     SelectItem(Some("AF"), "Afghanistan"),
@@ -36,14 +36,16 @@ trait AutoCompleteServiceMocks extends MockitoSugar {
 
   when {
     mockAutoComplete.getCountries
-  } thenReturn Some(Seq(
-    NameValuePair("United Kingdom", "GB"),
-    NameValuePair("Afghanistan", "AF"),
-    NameValuePair("Åland Islands", "AX"),
-    NameValuePair("Albania", "AL"),
-    NameValuePair("Algeria", "DZ"),
-    NameValuePair("American Samoa", "AS")
-  ))
+  } thenReturn Some(
+    Seq(
+      NameValuePair("United Kingdom", "GB"),
+      NameValuePair("Afghanistan", "AF"),
+      NameValuePair("Åland Islands", "AX"),
+      NameValuePair("Albania", "AL"),
+      NameValuePair("Algeria", "DZ"),
+      NameValuePair("American Samoa", "AS")
+    )
+  )
 
   when {
     mockAutoComplete.formOptions

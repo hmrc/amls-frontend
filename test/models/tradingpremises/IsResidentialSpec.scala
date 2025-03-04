@@ -19,7 +19,6 @@ package models.tradingpremises
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
-
 class IsResidentialSpec extends PlaySpec {
 
   "Json validation" must {
@@ -27,7 +26,8 @@ class IsResidentialSpec extends PlaySpec {
     "Read and write successfully" in {
 
       IsResidential.format.reads(IsResidential.format.writes(IsResidential(true))) must be(
-        JsSuccess(IsResidential(true), JsPath))
+        JsSuccess(IsResidential(true), JsPath)
+      )
     }
 
     "write successfully" in {

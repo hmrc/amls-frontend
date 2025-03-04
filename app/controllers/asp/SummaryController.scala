@@ -27,29 +27,29 @@ import views.html.asp.SummaryView
 
 import javax.inject.Inject
 
-class SummaryController @Inject()(val dataCache: DataCacheConnector,
-                                  val serviceFlow: ServiceFlow,
-                                  val statusService: StatusService,
-                                  authAction: AuthAction,
-                                  val ds: CommonPlayDependencies,
-                                  val cc: MessagesControllerComponents,
-                                  view: SummaryView) extends AmlsBaseController(ds, cc) {
+class SummaryController @Inject() (
+  val dataCache: DataCacheConnector,
+  val serviceFlow: ServiceFlow,
+  val statusService: StatusService,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  view: SummaryView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCache.fetch[Asp](request.credId, Asp.key) map {
-        case Some(data) =>
-          Ok(view(data))
-        case _ =>
-          Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    dataCache.fetch[Asp](request.credId, Asp.key) map {
+      case Some(data) =>
+        Ok(view(data))
+      case _          =>
+        Redirect(controllers.routes.RegistrationProgressController.get())
+    }
   }
 
-  def post: Action[AnyContent] = authAction.async {
-    implicit request =>
-      for {
-        asp <- dataCache.fetch[Asp](request.credId, Asp.key)
-        _ <- dataCache.save[Asp](request.credId, Asp.key, asp.copy(hasAccepted = true))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())
+  def post: Action[AnyContent] = authAction.async { implicit request =>
+    for {
+      asp <- dataCache.fetch[Asp](request.credId, Asp.key)
+      _   <- dataCache.save[Asp](request.credId, Asp.key, asp.copy(hasAccepted = true))
+    } yield Redirect(controllers.routes.RegistrationProgressController.get())
   }
 }

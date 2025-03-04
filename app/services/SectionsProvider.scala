@@ -40,16 +40,14 @@ import services.cache.Cache
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector,
-                                 val config: ApplicationConfig)  extends Logging {
+class SectionsProvider @Inject() (protected val cacheConnector: DataCacheConnector, val config: ApplicationConfig)
+    extends Logging {
 
   def taskRows(cacheId: String)(implicit ec: ExecutionContext, messages: Messages): Future[Seq[TaskRow]] =
-    cacheConnector.fetchAll(cacheId) map {
-      optionCache =>
-        optionCache map {
-          cache =>
-            taskRows(cache)
-        } getOrElse Seq.empty
+    cacheConnector.fetchAll(cacheId) map { optionCache =>
+      optionCache map { cache =>
+        taskRows(cache)
+      } getOrElse Seq.empty
     }
 
   def taskRows(cache: Cache)(implicit messages: Messages): Seq[TaskRow] =
@@ -63,17 +61,18 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
 
   private def isTaskRowsForRenewal(taskRow: TaskRow): Boolean = taskRow.msgKey != BusinessMatching.messageKey
 
-  def taskRowsFromBusinessActivities(activities: Set[BusinessActivity],
-                                     msbServices: Option[BusinessMatchingMsbServices])
-                                    (implicit cache: Cache, messages: Messages): Seq[TaskRow] = {
+  def taskRowsFromBusinessActivities(
+    activities: Set[BusinessActivity],
+    msbServices: Option[BusinessMatchingMsbServices]
+  )(implicit cache: Cache, messages: Messages): Seq[TaskRow] = {
 
-    val asp = if (activities.contains(AccountancyServices)) Seq(Asp.taskRow) else Seq.empty
-    val tcsp = if (activities.contains(TrustAndCompanyServices)) Seq(Tcsp.taskRow) else Seq.empty
+    val asp         = if (activities.contains(AccountancyServices)) Seq(Asp.taskRow) else Seq.empty
+    val tcsp        = if (activities.contains(TrustAndCompanyServices)) Seq(Tcsp.taskRow) else Seq.empty
     val supervision = if (asp.nonEmpty || tcsp.nonEmpty) Seq(Supervision.taskRow) else Seq.empty
-    val amp = if (activities.contains(ArtMarketParticipant)) Seq(Amp.taskRow(config)) else Seq.empty
-    val eab = if (activities.contains(EstateAgentBusinessService)) Seq(Eab.taskRow(config)) else Seq.empty
-    val hvd = if (activities.contains(HighValueDealing)) Seq(Hvd.taskRow) else Seq.empty
-    val msb = if (activities.contains(MoneyServiceBusiness) && msbServices.isDefined) Seq(Msb.taskRow) else Seq.empty
+    val amp         = if (activities.contains(ArtMarketParticipant)) Seq(Amp.taskRow(config)) else Seq.empty
+    val eab         = if (activities.contains(EstateAgentBusinessService)) Seq(Eab.taskRow(config)) else Seq.empty
+    val hvd         = if (activities.contains(HighValueDealing)) Seq(Hvd.taskRow) else Seq.empty
+    val msb         = if (activities.contains(MoneyServiceBusiness) && msbServices.isDefined) Seq(Msb.taskRow) else Seq.empty
 
     asp ++ tcsp ++ supervision ++ amp ++ eab ++ hvd ++ msb
   }

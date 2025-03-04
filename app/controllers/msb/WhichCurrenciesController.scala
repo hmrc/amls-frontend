@@ -30,57 +30,56 @@ import views.html.msb.WhichCurrenciesView
 
 import scala.concurrent.Future
 
-class WhichCurrenciesController @Inject() (authAction: AuthAction,
-                                           val ds: CommonPlayDependencies,
-                                           implicit val dataCacheConnector: DataCacheConnector,
-                                           implicit val statusService: StatusService,
-                                           implicit val serviceFlow: ServiceFlow,
-                                           val cc: MessagesControllerComponents,
-                                           autocompleteService: CurrencyAutocompleteService,
-                                           formProvider: WhichCurrenciesFormProvider,
-                                           view: WhichCurrenciesView) extends AmlsBaseController(ds, cc) {
+class WhichCurrenciesController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val dataCacheConnector: DataCacheConnector,
+  implicit val statusService: StatusService,
+  implicit val serviceFlow: ServiceFlow,
+  val cc: MessagesControllerComponents,
+  autocompleteService: CurrencyAutocompleteService,
+  formProvider: WhichCurrenciesFormProvider,
+  view: WhichCurrenciesView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
-        response =>
-          val form = (for {
-            msb <- response
-            currencies <- msb.whichCurrencies
-          } yield currencies).fold(formProvider())(formProvider().fill)
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map { response =>
+      val form = (for {
+        msb        <- response
+        currencies <- msb.whichCurrencies
+      } yield currencies).fold(formProvider())(formProvider().fill)
 
-          Ok(view(form, edit, autocompleteService.formOptions))
-      }
+      Ok(view(form, edit, autocompleteService.formOptions))
     }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit, autocompleteService.formOptions))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, autocompleteService.formOptions))),
         data =>
           for {
             msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
-            _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
-              updateCurrencies(msb, data))
+            _   <- dataCacheConnector
+                     .save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key, updateCurrencies(msb, data))
           } yield edit match {
             case true => Redirect(routes.SummaryController.get)
-            case _ => Redirect(routes.UsesForeignCurrenciesController.get())
+            case _    => Redirect(routes.UsesForeignCurrenciesController.get())
           }
       )
-    }
   }
 
-  def updateCurrencies(oldMsb: Option[MoneyServiceBusiness], newWhichCurrencies: WhichCurrencies): Option[MoneyServiceBusiness] = {
+  def updateCurrencies(
+    oldMsb: Option[MoneyServiceBusiness],
+    newWhichCurrencies: WhichCurrencies
+  ): Option[MoneyServiceBusiness] =
     oldMsb match {
-      case Some(msb) => {
-       msb.whichCurrencies match {
+      case Some(msb) =>
+        msb.whichCurrencies match {
           case Some(w) => Some(msb.whichCurrencies(w.currencies(newWhichCurrencies.currencies)))
-          case _ => Some(msb.whichCurrencies(WhichCurrencies(newWhichCurrencies.currencies)))
+          case _       => Some(msb.whichCurrencies(WhichCurrencies(newWhichCurrencies.currencies)))
         }
-      }
-      case _ => None
+      case _         => None
     }
-  }
 }

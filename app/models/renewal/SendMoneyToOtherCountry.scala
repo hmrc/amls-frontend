@@ -22,15 +22,11 @@ case class SendMoneyToOtherCountry(money: Boolean)
 
 object SendMoneyToOtherCountry {
 
-  implicit val format: OFormat[SendMoneyToOtherCountry] =  Json.format[SendMoneyToOtherCountry]
+  implicit val format: OFormat[SendMoneyToOtherCountry] = Json.format[SendMoneyToOtherCountry]
 
-  def convert(model: SendMoneyToOtherCountry): models.moneyservicebusiness.SendMoneyToOtherCountry = {
+  def convert(model: SendMoneyToOtherCountry): models.moneyservicebusiness.SendMoneyToOtherCountry =
     model match {
       case SendMoneyToOtherCountry(true) => models.moneyservicebusiness.SendMoneyToOtherCountry(true)
-      case _ => models.moneyservicebusiness.SendMoneyToOtherCountry(false)
+      case _                             => models.moneyservicebusiness.SendMoneyToOtherCountry(false)
     }
-  }
 }
-
-
-

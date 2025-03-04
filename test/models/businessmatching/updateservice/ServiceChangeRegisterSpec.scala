@@ -17,7 +17,7 @@
 package models.businessmatching.updateservice
 
 import models.businessmatching.BusinessActivity._
-import models.businessmatching.BusinessMatchingMsbService.{TransmittingMoney, CurrencyExchange}
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, TransmittingMoney}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
@@ -44,7 +44,8 @@ class ServiceChangeRegisterSpec extends PlaySpec {
 
       Json.fromJson[ServiceChangeRegister](json).get mustBe ServiceChangeRegister(
         Some(Set(AccountancyServices, BillPaymentServices)),
-        Some(Set(CurrencyExchange)))
+        Some(Set(CurrencyExchange))
+      )
     }
   }
 

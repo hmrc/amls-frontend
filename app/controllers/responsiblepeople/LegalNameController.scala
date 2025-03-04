@@ -28,15 +28,17 @@ import views.html.responsiblepeople.LegalNameView
 
 import scala.concurrent.Future
 
-
 @Singleton
-class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                    authAction: AuthAction,
-                                    val ds: CommonPlayDependencies,
-                                    val cc: MessagesControllerComponents,
-                                    formProvider: LegalNameFormProvider,
-                                    view: LegalNameView,
-                                    implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class LegalNameController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: LegalNameFormProvider,
+  view: LegalNameView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
@@ -45,43 +47,45 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
           (person.personName, person.legalName) match {
             case (Some(name), Some(previousName)) if previousName.hasPreviousName.isDefined =>
               Ok(view(formProvider().fill(previousName.hasPreviousName.get), edit, index, flow, name.titleName))
-            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
-            case _ => NotFound(notFoundView)
+            case (Some(name), _)                                                            => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _                                                                          => NotFound(notFoundView)
           }
         }
       }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithError =>
-          getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(view(formWithError, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          },
-        data => {
-          for {
-            _ <- {
-              if (data) {
-                updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                  rp.hasPreviousName(data)
+    implicit request =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithError =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
+              BadRequest(view(formWithError, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            },
+          data =>
+            {
+              for {
+                _ <- {
+                  if (data) {
+                    updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                      rp.hasPreviousName(data)
+                    }
+                  } else {
+                    updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                      rp.legalName(PreviousName(Some(false), None, None, None)).copy(legalNameChangeDate = None)
+                    }
+                  }
                 }
-              } else {
-                updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                  rp.legalName(PreviousName(Some(false), None, None, None)).copy(legalNameChangeDate = None)
-                }
+              } yield (edit, data) match {
+                case (true, true)  => Redirect(routes.LegalNameInputController.get(index, edit, flow))
+                case (true, false) => Redirect(routes.DetailedAnswersController.get(index, flow))
+                case (false, true) => Redirect(routes.LegalNameInputController.get(index, edit, flow))
+                case _             => Redirect(routes.KnownByController.get(index, edit, flow))
               }
+            }.recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
             }
-          } yield (edit, data) match {
-            case (true, true) => Redirect(routes.LegalNameInputController.get(index, edit, flow))
-            case (true, false) => Redirect(routes.DetailedAnswersController.get(index, flow))
-            case (false, true) => Redirect(routes.LegalNameInputController.get(index, edit, flow))
-            case _ => Redirect(routes.KnownByController.get(index, edit, flow))
-          }
-        }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
-      )
-    }
+        )
   }
 }

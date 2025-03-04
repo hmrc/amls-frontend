@@ -19,7 +19,7 @@ package models.declaration
 import play.api.libs.json.{Json, OFormat}
 
 case class WhoIsRegistering(person: String) {
-  val indexValue = """([0-9]+)$""".r.findFirstIn(person) map {_.toInt}
+  val indexValue = """([0-9]+)$""".r.findFirstIn(person) map { _.toInt }
 }
 
 object WhoIsRegistering {

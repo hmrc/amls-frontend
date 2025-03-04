@@ -30,15 +30,17 @@ import views.html.businessactivities.TransactionTypesView
 
 import scala.concurrent.Future
 
-class TransactionTypesController @Inject()(val authAction: AuthAction,
-                                           val ds: CommonPlayDependencies,
-                                           val cacheConnector: DataCacheConnector,
-                                           val cc: MessagesControllerComponents,
-                                           formProvider: TransactionTypesFormProvider,
-                                           view: TransactionTypesView) extends AmlsBaseController(ds, cc) {
+class TransactionTypesController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cacheConnector: DataCacheConnector,
+  val cc: MessagesControllerComponents,
+  formProvider: TransactionTypesFormProvider,
+  view: TransactionTypesView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    {
       def form(ba: BusinessActivities): Form[TransactionTypes] =
         ba.transactionRecordTypes.fold(formProvider())(formProvider().fill)
 
@@ -48,23 +50,28 @@ class TransactionTypesController @Inject()(val authAction: AuthAction,
     } getOrElse InternalServerError("Cannot fetch business activities")
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      lazy val redirect = Redirect(if(edit) {
-        routes.SummaryController.get
-      } else {
-        routes.IdentifySuspiciousActivityController.get()
-      })
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    lazy val redirect = Redirect(if (edit) {
+      routes.SummaryController.get
+    } else {
+      routes.IdentifySuspiciousActivityController.get()
+    })
 
-      formProvider().bindFromRequest().fold(
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
-        data => {
-          for {
-            bm <- OptionT(cacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key))
-            _ <- OptionT.liftF(cacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, bm.transactionRecordTypes(data)))
-          } yield redirect
-        } getOrElse InternalServerError("Unable to update Business Activities Transaction Types")
+        data =>
+          {
+            for {
+              bm <- OptionT(cacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key))
+              _  <-
+                OptionT.liftF(
+                  cacheConnector
+                    .save[BusinessActivities](request.credId, BusinessActivities.key, bm.transactionRecordTypes(data))
+                )
+            } yield redirect
+          } getOrElse InternalServerError("Unable to update Business Activities Transaction Types")
       )
-    }
   }
 }

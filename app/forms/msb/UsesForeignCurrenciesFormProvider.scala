@@ -22,9 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class UsesForeignCurrenciesFormProvider @Inject()() extends BooleanFormProvider {
+class UsesForeignCurrenciesFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[UsesForeignCurrencies] = createForm[UsesForeignCurrencies](
-    "usesForeignCurrencies", "error.required.msb.wc.foreignCurrencies"
+    "usesForeignCurrencies",
+    "error.required.msb.wc.foreignCurrencies"
   )(UsesForeignCurrencies.fromBoolean, _.value)
 }

@@ -32,9 +32,9 @@ class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
+    val request            = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
-    val statusService = mockStatusService
+    val statusService      = mockStatusService
 
     lazy val app = new GuiceApplicationBuilder()
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
@@ -51,7 +51,7 @@ class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar
 
   "RegisterResponsiblePersonController" when {
 
-    "status is ReadyForRenewal" must {
+    "status is ReadyForRenewal"            must {
       "respond with OK and show the correct subtitle" in new Fixture {
 
         mockApplicationStatus(ReadyForRenewal(None))
@@ -73,7 +73,7 @@ class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar
         contentAsString(result) must include(Messages("submit.amendment.application"))
       }
     }
-    "status is SubmissionReadyForReview" must {
+    "status is SubmissionReadyForReview"   must {
       "respond with OK and show the correct subtitle" in new Fixture {
 
         mockApplicationStatus(SubmissionReadyForReview)

@@ -24,7 +24,7 @@ trait CountryGenerator extends BaseGenerator {
   private val nameLength = 10
 
   val countryGen: Gen[Country] = for {
-    name <- stringOfLengthGen(nameLength)
+    name     <- stringOfLengthGen(nameLength)
     charCode <- stringOfLengthGen(3)
   } yield Country(name, charCode.toUpperCase)
 

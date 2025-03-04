@@ -25,8 +25,10 @@ class TradingPremisesMsbServicesSpec extends AmlsSpec {
   "MsbServices" must {
 
     "round trip through Json correctly" in {
-      val data = TradingPremisesMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, ForeignExchange))
-      val js = Json.toJson(data)
+      val data = TradingPremisesMsbServices(
+        Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, ForeignExchange)
+      )
+      val js   = Json.toJson(data)
 
       js.as[TradingPremisesMsbServices] mustEqual data
     }

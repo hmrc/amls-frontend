@@ -26,7 +26,7 @@ class BusinessStructureFormProviderSpec extends RadioFieldBehaviours {
 
   ".agentsBusinessStructure" must {
 
-    val fieldName = "agentsBusinessStructure"
+    val fieldName   = "agentsBusinessStructure"
     val requiredKey = "error.required.tp.select.business.structure"
 
     behave like radioField[BusinessStructure](

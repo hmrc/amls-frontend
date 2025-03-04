@@ -29,7 +29,7 @@ object RejectedReason {
   case object OtherFailed extends RejectedReason
   case object OtherRefused extends RejectedReason
 
-  implicit def reason(reason:String) : RejectedReason = {
+  implicit def reason(reason: String): RejectedReason =
     reason match {
       case "01" => NonCompliant
       case "02" => FailedToRespond
@@ -38,14 +38,13 @@ object RejectedReason {
       case "98" => OtherFailed
       case "99" => OtherRefused
     }
-  }
 
   implicit val jsonWrites: Writes[RejectedReason] = Writes[RejectedReason] {
-    case NonCompliant => JsString("01")
-    case FailedToRespond => JsString("02")
-    case FailedToPayCharges => JsString("03")
+    case NonCompliant        => JsString("01")
+    case FailedToRespond     => JsString("02")
+    case FailedToPayCharges  => JsString("03")
     case FitAndProperFailure => JsString("04")
-    case OtherFailed => JsString("98")
-    case OtherRefused => JsString("99")
+    case OtherFailed         => JsString("98")
+    case OtherRefused        => JsString("99")
   }
 }

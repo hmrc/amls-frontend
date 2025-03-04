@@ -36,35 +36,40 @@ import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
 import scala.concurrent.ExecutionContext
 
-
-trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with Matchers with AuthorisedFixture with AppendedClues{
+trait AmlsSpec
+    extends PlaySpec
+    with GuiceOneAppPerSuite
+    with MockitoSugar
+    with ScalaFutures
+    with Matchers
+    with AuthorisedFixture
+    with AppendedClues {
 
   import play.api.test.CSRFTokenHelper._
 
-  override def fakeApplication(): Application = {
+  override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .configure(
         "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
       )
       .build()
-  }
 
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = CSRFRequest(FakeRequest()).withCSRFToken
-  val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
-  implicit val messages: Messages = messagesApi.preferred(requestWithToken)
-  implicit val lang: Lang = Lang.defaultLang
-  implicit val appConfig: ApplicationConfig = app.injector.instanceOf[ApplicationConfig]
+  val messagesApi: MessagesApi                                   = app.injector.instanceOf[MessagesApi]
+  implicit val messages: Messages                                = messagesApi.preferred(requestWithToken)
+  implicit val lang: Lang                                        = Lang.defaultLang
+  implicit val appConfig: ApplicationConfig                      = app.injector.instanceOf[ApplicationConfig]
 
   val commonDependencies = new CommonPlayDependencies(appConfig, messagesApi)
 
   implicit val messagesProvider: MessagesProvider = MessagesImpl(lang, messagesApi)
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-  implicit val mat: Materializer = mock[Materializer]
+  implicit val ec: ExecutionContext               = app.injector.instanceOf[ExecutionContext]
+  implicit val mat: Materializer                  = mock[Materializer]
 
   lazy val mockMcc: MessagesControllerComponents = app.injector.instanceOf[MessagesControllerComponents]
 
   // ================================== Encryption/Decryption ==================================
-  val applicationCrypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
+  val applicationCrypto: ApplicationCrypto                        = app.injector.instanceOf[ApplicationCrypto]
   implicit val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
   // ===========================================================================================
 
@@ -77,7 +82,7 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
 
     val csrfConfig = app.injector.instanceOf[CSRFConfigProvider].get
     val csrfFilter = app.injector.instanceOf[CSRFFilter]
-    val token = csrfFilter.tokenProvider.generateToken
+    val token      = csrfFilter.tokenProvider.generateToken
 
     CSRFRequest(fakeRequest.withHeaders((csrfConfig.headerName, token))).withCSRFToken
   }
@@ -87,10 +92,13 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
 
     val csrfConfig = app.injector.instanceOf[CSRFConfigProvider].get
     val csrfFilter = app.injector.instanceOf[CSRFFilter]
-    val token = csrfFilter.tokenProvider.generateToken
+    val token      = csrfFilter.tokenProvider.generateToken
 
-    fakeRequest.withSession(SessionKeys.sessionId -> "fakesessionid")
-      .withHeaders((csrfConfig.headerName, token)).withFormUrlEncodedBody(data: _*).withCSRFToken
+    fakeRequest
+      .withSession(SessionKeys.sessionId -> "fakesessionid")
+      .withHeaders((csrfConfig.headerName, token))
+      .withFormUrlEncodedBody(data: _*)
+      .withCSRFToken
   }
 
   def requestWithUrlEncodedBody(data: (String, String)*) = addTokenWithUrlEncodedBody(authRequest)(data: _*)
@@ -100,10 +108,13 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
 
     val csrfConfig = app.injector.instanceOf[CSRFConfigProvider].get
     val csrfFilter = app.injector.instanceOf[CSRFFilter]
-    val token = csrfFilter.tokenProvider.generateToken
+    val token      = csrfFilter.tokenProvider.generateToken
 
-    fakeRequest.withSession(SessionKeys.sessionId -> "fakesessionid")
-      .withHeaders((csrfConfig.headerName, token)).withHeaders(data: _*).withCSRFToken
+    fakeRequest
+      .withSession(SessionKeys.sessionId -> "fakesessionid")
+      .withHeaders((csrfConfig.headerName, token))
+      .withHeaders(data: _*)
+      .withCSRFToken
   }
 
   def requestWithHeaders(data: (String, String)*) = addTokenWithHeaders(authRequest)(data: _*)
@@ -113,7 +124,7 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
 
     val csrfConfig = app.injector.instanceOf[CSRFConfigProvider].get
     val csrfFilter = app.injector.instanceOf[CSRFFilter]
-    val token = csrfFilter.tokenProvider.generateToken
+    val token      = csrfFilter.tokenProvider.generateToken
 
     CSRFRequest(fakeRequest.withSession(sessionParameter).withHeaders((csrfConfig.headerName, token))).withCSRFToken
   }

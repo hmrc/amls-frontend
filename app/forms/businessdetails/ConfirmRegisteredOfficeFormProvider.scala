@@ -22,7 +22,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class ConfirmRegisteredOfficeFormProvider @Inject()() extends BooleanFormProvider {
+class ConfirmRegisteredOfficeFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[ConfirmRegisteredOffice] = createForm[ConfirmRegisteredOffice](
     "isRegOfficeOrMainPlaceOfBusiness",

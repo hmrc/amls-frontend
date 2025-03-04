@@ -24,25 +24,35 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BranchesOrAgentsWhichCountriesService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) {
+class BranchesOrAgentsWhichCountriesService @Inject() (val dataCacheConnector: DataCacheConnector)(implicit
+  ec: ExecutionContext
+) {
 
-  def fetchBranchesOrAgents(credId: String): Future[Option[BranchesOrAgentsWhichCountries]] = {
+  def fetchBranchesOrAgents(credId: String): Future[Option[BranchesOrAgentsWhichCountries]] =
     dataCacheConnector.fetch[MoneyServiceBusiness](credId, MoneyServiceBusiness.key).map { optMsb =>
       for {
-        msb <- optMsb
-        boa <- msb.branchesOrAgents
+        msb      <- optMsb
+        boa      <- msb.branchesOrAgents
         branches <- boa.branches
       } yield branches
     }
-  }
 
-  def fetchAndSaveBranchesOrAgents(credId: String, data: BranchesOrAgentsWhichCountries, redirect: Result): Future[Result] = {
+  def fetchAndSaveBranchesOrAgents(
+    credId: String,
+    data: BranchesOrAgentsWhichCountries,
+    redirect: Result
+  ): Future[Result] =
     for {
       msb <- dataCacheConnector.fetch[MoneyServiceBusiness](credId, MoneyServiceBusiness.key)
-      _ <- dataCacheConnector.save[MoneyServiceBusiness](credId, MoneyServiceBusiness.key,
-        msb.branchesOrAgents(BranchesOrAgents.update(msb.branchesOrAgents.getOrElse(BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)), data)))
-    } yield {
-      redirect
-    }
-  }
+      _   <- dataCacheConnector.save[MoneyServiceBusiness](
+               credId,
+               MoneyServiceBusiness.key,
+               msb.branchesOrAgents(
+                 BranchesOrAgents.update(
+                   msb.branchesOrAgents.getOrElse(BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)),
+                   data
+                 )
+               )
+             )
+    } yield redirect
 }

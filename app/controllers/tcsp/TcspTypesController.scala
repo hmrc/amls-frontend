@@ -28,56 +28,68 @@ import views.html.tcsp.ServiceProviderTypesView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class TcspTypesController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                    val authAction: AuthAction,
-                                    val ds: CommonPlayDependencies,
-                                    val cc: MessagesControllerComponents,
-                                    formProvider: ServiceProviderTypesFormProvider,
-                                    view: ServiceProviderTypesView) extends AmlsBaseController(ds, cc) {
+class TcspTypesController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: ServiceProviderTypesFormProvider,
+  view: ServiceProviderTypesView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-
-      dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key) map {
-        response =>
-          val form = (for {
-            tcsp <- response
-            tcspTypes <- tcsp.tcspTypes
-          } yield formProvider().fill(tcspTypes)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key) map { response =>
+      val form = (for {
+        tcsp      <- response
+        tcspTypes <- tcsp.tcspTypes
+      } yield formProvider().fill(tcspTypes)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false) = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data => {
-          val companyFormOrRegisteredOffice = (data.serviceProviders.contains(CompanyFormationAgent), data.serviceProviders.contains(RegisteredOfficeEtc))
+          val companyFormOrRegisteredOffice =
+            (data.serviceProviders.contains(CompanyFormationAgent), data.serviceProviders.contains(RegisteredOfficeEtc))
 
           val result = for {
-            tcsp <- dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key)
-            cache <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key,
-              {
-                companyFormOrRegisteredOffice match {
-                  case (false, false) => tcsp.tcspTypes(data).copy(onlyOffTheShelfCompsSold = None, complexCorpStructureCreation = None, providedServices = None)
-                  case (false, true) => tcsp.tcspTypes(data).copy(onlyOffTheShelfCompsSold = None, complexCorpStructureCreation = None)
-                  case (true, false) => tcsp.tcspTypes(data).copy(providedServices = None)
-                  case (true, true) => tcsp.tcspTypes(data)
-                }
-              })
+            tcsp  <- dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key)
+            cache <- dataCacheConnector.save[Tcsp](
+                       request.credId,
+                       Tcsp.key,
+                       companyFormOrRegisteredOffice match {
+                         case (false, false) =>
+                           tcsp
+                             .tcspTypes(data)
+                             .copy(
+                               onlyOffTheShelfCompsSold = None,
+                               complexCorpStructureCreation = None,
+                               providedServices = None
+                             )
+                         case (false, true)  =>
+                           tcsp
+                             .tcspTypes(data)
+                             .copy(onlyOffTheShelfCompsSold = None, complexCorpStructureCreation = None)
+                         case (true, false)  => tcsp.tcspTypes(data).copy(providedServices = None)
+                         case (true, true)   => tcsp.tcspTypes(data)
+                       }
+                     )
           } yield cache
 
           result map { _ =>
             companyFormOrRegisteredOffice match {
-              case (true, _) => Redirect(routes.OnlyOffTheShelfCompsSoldController.get(edit))
+              case (true, _)     => Redirect(routes.OnlyOffTheShelfCompsSoldController.get(edit))
               case (false, true) => Redirect(routes.ProvidedServicesController.get(edit))
-              case _ => if (edit) {
-                Redirect(routes.SummaryController.get())
-              } else {
-                Redirect(routes.ServicesOfAnotherTCSPController.get())
-              }
+              case _             =>
+                if (edit) {
+                  Redirect(routes.SummaryController.get())
+                } else {
+                  Redirect(routes.ServicesOfAnotherTCSPController.get())
+                }
             }
           }
         }

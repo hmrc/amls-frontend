@@ -23,13 +23,14 @@ import play.api.data.Form
 class ExciseGoodsFormProviderSpec extends BooleanFieldBehaviours[ExciseGoods] {
 
   override val form: Form[ExciseGoods] = new ExciseGoodsFormProvider()()
-  override val fieldName: String = "exciseGoods"
-  override val errorMessage: String = "error.required.hvd.excise.goods"
+  override val fieldName: String       = "exciseGoods"
+  override val errorMessage: String    = "error.required.hvd.excise.goods"
 
   "ExciseGoodsFormProvider" must {
 
     behave like booleanFieldWithModel(
-      ExciseGoods(true), ExciseGoods(false)
+      ExciseGoods(true),
+      ExciseGoods(false)
     )
   }
 }

@@ -26,13 +26,14 @@ import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 class TradingPremisesService {
 
   def updateTradingPremises(
-                             indices: Seq[Int],
-                             tradingPremises: Seq[TradingPremises],
-                             activity: BusinessActivity,
-                             msbServicesInput: Option[BusinessMatchingMsbServices],
-                             remove: Boolean): Seq[TradingPremises] = {
+    indices: Seq[Int],
+    tradingPremises: Seq[TradingPremises],
+    activity: BusinessActivity,
+    msbServicesInput: Option[BusinessMatchingMsbServices],
+    remove: Boolean
+  ): Seq[TradingPremises] = {
 
-    val updatedTradingPremises: Seq[TradingPremises] = {
+    val updatedTradingPremises: Seq[TradingPremises] =
       patchTradingPremisesBusinessActivities(tradingPremises) { (wdybd, index) =>
         wdybd.copy(
           if (indices contains index) {
@@ -44,13 +45,14 @@ class TradingPremisesService {
           }
         )
       }
-    }
 
-    if(msbServicesInput.isDefined) {
+    if (msbServicesInput.isDefined) {
       patchTradingPremisesMsbSubServices(updatedTradingPremises, msbServicesInput.get) { (tpservices, index) =>
         tpservices.copy(
           if (indices contains index) {
-            tpservices.services ++ tradingpremises.TradingPremisesMsbServices.convertServices(msbServicesInput.get.msbServices)
+            tpservices.services ++ tradingpremises.TradingPremisesMsbServices.convertServices(
+              msbServicesInput.get.msbServices
+            )
           } else {
             tpservices.services
           }
@@ -62,26 +64,28 @@ class TradingPremisesService {
   }
 
   def removeBusinessActivitiesFromTradingPremises(
-                                                   tradingPremises: Seq[TradingPremises],
-                                                   existingActivities: Set[BusinessActivity],
-                                                   removeActivities: Set[BusinessActivity]): Seq[TradingPremises] =
+    tradingPremises: Seq[TradingPremises],
+    existingActivities: Set[BusinessActivity],
+    removeActivities: Set[BusinessActivity]
+  ): Seq[TradingPremises] =
     patchTradingPremisesBusinessActivities(tradingPremises) { (wdybd, index) =>
-      wdybd.copy({
+      wdybd.copy {
         wdybd.activities diff removeActivities match {
           case remainingActivities if remainingActivities.nonEmpty => remainingActivities
-          case _ => Set(existingActivities.head)
+          case _                                                   => Set(existingActivities.head)
         }
-      })
+      }
     } map { tp =>
-      if(removeActivities contains MoneyServiceBusiness) {
+      if (removeActivities contains MoneyServiceBusiness) {
         tp.copy(msbServices = None)
       } else {
         tp
       }
     }
 
-  private def patchTradingPremisesBusinessActivities(tradingPremises: Seq[TradingPremises])
-                                                    (fn: (WhatDoesYourBusinessDo, Int) => WhatDoesYourBusinessDo): Seq[TradingPremises] = {
+  private def patchTradingPremisesBusinessActivities(tradingPremises: Seq[TradingPremises])(
+    fn: (WhatDoesYourBusinessDo, Int) => WhatDoesYourBusinessDo
+  ): Seq[TradingPremises] =
     tradingPremises.zipWithIndex map { case (tp, index) =>
       val premise: TradingPremises = tp.whatDoesYourBusinessDoAtThisAddress {
         tp.whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set.empty)) { wdybd =>
@@ -90,25 +94,29 @@ class TradingPremisesService {
       }
       premise.copy(hasAccepted = true)
     }
-  }
 
-  private def patchTradingPremisesMsbSubServices(tradingPremises: Seq[TradingPremises], newMsbServices: models.businessmatching.BusinessMatchingMsbServices)
-                                          (fn: (models.tradingpremises.TradingPremisesMsbServices, Int) => models.tradingpremises.TradingPremisesMsbServices): Seq[TradingPremises] = {
+  private def patchTradingPremisesMsbSubServices(
+    tradingPremises: Seq[TradingPremises],
+    newMsbServices: models.businessmatching.BusinessMatchingMsbServices
+  )(
+    fn: (models.tradingpremises.TradingPremisesMsbServices, Int) => models.tradingpremises.TradingPremisesMsbServices
+  ): Seq[TradingPremises] =
     tradingPremises.zipWithIndex map { case (tp, index) =>
       tp match {
-        case t if t.whatDoesYourBusinessDoAtThisAddress.isDefined => {
+        case t if t.whatDoesYourBusinessDoAtThisAddress.isDefined =>
           t.whatDoesYourBusinessDoAtThisAddress match {
             case Some(x) if x.activities.contains(MoneyServiceBusiness) =>
-              val services = tp.msbServices.fold(tradingpremises.TradingPremisesMsbServices(tradingpremises.TradingPremisesMsbServices.convertServices(newMsbServices.msbServices))) { tpservices =>
+              val services = tp.msbServices.fold(
+                tradingpremises.TradingPremisesMsbServices(
+                  tradingpremises.TradingPremisesMsbServices.convertServices(newMsbServices.msbServices)
+                )
+              ) { tpservices =>
                 fn(tpservices, index)
               }
               tp.msbServices(Some(services)).copy(hasAccepted = true)
-            case _ => tp
+            case _                                                      => tp
           }
-        }
-        case _ => tp
+        case _                                                    => tp
       }
     }
-  }
 }
-

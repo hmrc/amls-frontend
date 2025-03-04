@@ -23,23 +23,22 @@ case class CustomersOutsideUK(countries: Option[Seq[Country]])
 
 sealed trait CustomersOutsideUK0 {
 
-  val jsonR: Reads[CustomersOutsideUK] = {
+  val jsonR: Reads[CustomersOutsideUK] =
     implicitly
-  }
 
   val jsonW = Writes[CustomersOutsideUK] { customer =>
     val countries = customer.countries.fold[Seq[String]](Seq.empty)(customer => customer.map(country => country.code))
     Json.obj(
-        "countries" -> countries
-      )
-    }
+      "countries" -> countries
+    )
+  }
 }
 
 object CustomersOutsideUK {
 
   private object Cache extends CustomersOutsideUK0
 
-  implicit val jsonR: Reads[CustomersOutsideUK] = Cache.jsonR
+  implicit val jsonR: Reads[CustomersOutsideUK]  = Cache.jsonR
   implicit val jsonW: Writes[CustomersOutsideUK] = Cache.jsonW
 
   implicit def convert(model: CustomersOutsideUK): businessactivities.CustomersOutsideUK =

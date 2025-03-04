@@ -37,7 +37,7 @@ class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
     "route to the 'Check your answers' page" when {
       Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal) foreach { s =>
         s"$s has been chosen" in new Fixture {
-          val model = ChangeSubSectorFlowModel(Some(Set(s)))
+          val model  = ChangeSubSectorFlowModel(Some(Set(s)))
           val result = router.getRoute("internalId", model)
 
           redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
@@ -47,7 +47,7 @@ class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
 
     "route to the 'PSR number' page" when {
       "TransmittingMoney has been chosen" in new Fixture {
-        val model = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
+        val model  = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
         val result = router.getRoute("internalId", model)
 
         redirectLocation(result) mustBe Some(routes.PSRNumberController.get().url)
@@ -67,7 +67,7 @@ class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
     "route to the 'Check your answers' page" when {
       Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal) foreach { s =>
         s"$s has been chosen" in new NotRegisteredFixture {
-          val model = ChangeSubSectorFlowModel(Some(Set(s)))
+          val model  = ChangeSubSectorFlowModel(Some(Set(s)))
           val result = router.getRoute("internalId", model)
 
           redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
@@ -78,7 +78,7 @@ class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
     "route to the 'Check Company' page" when {
       Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal) foreach { s =>
         s"$s has been chosen and includeCompanyNotRegistered is true" in new NotRegisteredFixture {
-          val model = ChangeSubSectorFlowModel(Some(Set(s)))
+          val model  = ChangeSubSectorFlowModel(Some(Set(s)))
           val result = router.getRoute("internalId", model, includeCompanyNotRegistered = true)
 
           redirectLocation(result) mustBe Some(routes.CheckCompanyController.get().url)
@@ -88,7 +88,7 @@ class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
 
     "route to the 'PSR number' page" when {
       "TransmittingMoney has been chosen" in new NotRegisteredFixture {
-        val model = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
+        val model  = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
         val result = router.getRoute("internalId", model)
 
         redirectLocation(result) mustBe Some(routes.PSRNumberController.get().url)

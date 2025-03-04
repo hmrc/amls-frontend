@@ -27,7 +27,7 @@ import views.html.supervision.SupervisionStartView
 class SupervisionStartViewSpec extends AmlsViewSpec with Matchers with Injecting {
 
   lazy val supervision_start = inject[SupervisionStartView]
-  lazy val fp = inject[SupervisionStartFormProvider]
+  lazy val fp                = inject[SupervisionStartFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -41,8 +41,8 @@ class SupervisionStartViewSpec extends AmlsViewSpec with Matchers with Injecting
 
       def view = supervision_start(fp(), edit = false)
 
-      doc.title must startWith(messages("supervision.supervision_start.title"))
-      heading.html must be(messages("supervision.supervision_start.title"))
+      doc.title       must startWith(messages("supervision.supervision_start.title"))
+      heading.html    must be(messages("supervision.supervision_start.title"))
       subHeading.html must include(messages("summary.supervision"))
     }
 

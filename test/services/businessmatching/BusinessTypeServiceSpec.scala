@@ -32,8 +32,11 @@ import utils.AmlsSpec
 
 import scala.concurrent.Future
 
-class BusinessTypeServiceSpec extends AmlsSpec
-  with ScalaCheckPropertyChecks with BeforeAndAfterEach with IntegrationPatience {
+class BusinessTypeServiceSpec
+    extends AmlsSpec
+    with ScalaCheckPropertyChecks
+    with BeforeAndAfterEach
+    with IntegrationPatience {
 
   val mockCacheConnector = mock[DataCacheConnector]
 
@@ -52,13 +55,21 @@ class BusinessTypeServiceSpec extends AmlsSpec
         "it is set in the cache" in {
 
           forAll(Gen.oneOf(BusinessType.all)) { businessType =>
-
-            val bm = BusinessMatching().reviewDetails(ReviewDetails(
-              "Big Corp",
-              Some(businessType),
-              Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
-              "wdvhibsd9vh823fwdj"
-            ))
+            val bm = BusinessMatching().reviewDetails(
+              ReviewDetails(
+                "Big Corp",
+                Some(businessType),
+                Address(
+                  "line1",
+                  Some("line2"),
+                  Some("line3"),
+                  Some("line4"),
+                  Some("AA11 1AA"),
+                  Country("United Kingdom", "GB")
+                ),
+                "wdvhibsd9vh823fwdj"
+              )
+            )
             when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
               .thenReturn(Future.successful(Some(bm)))
 
@@ -71,12 +82,21 @@ class BusinessTypeServiceSpec extends AmlsSpec
 
         "business type is not in cache" in {
 
-          val bm = BusinessMatching().reviewDetails(ReviewDetails(
-            "Big Corp",
-            None,
-            Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
-            "wdvhibsd9vh823fwdj"
-          ))
+          val bm = BusinessMatching().reviewDetails(
+            ReviewDetails(
+              "Big Corp",
+              None,
+              Address(
+                "line1",
+                Some("line2"),
+                Some("line3"),
+                Some("line4"),
+                Some("AA11 1AA"),
+                Country("United Kingdom", "GB")
+              ),
+              "wdvhibsd9vh823fwdj"
+            )
+          )
           when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
             .thenReturn(Future.successful(Some(bm)))
 
@@ -110,7 +130,14 @@ class BusinessTypeServiceSpec extends AmlsSpec
         val reviewDetails = ReviewDetails(
           "Big Corp",
           None,
-          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+          Address(
+            "line1",
+            Some("line2"),
+            Some("line3"),
+            Some("line4"),
+            Some("AA11 1AA"),
+            Country("United Kingdom", "GB")
+          ),
           "wdvhibsd9vh823fwdj"
         )
 
@@ -126,8 +153,8 @@ class BusinessTypeServiceSpec extends AmlsSpec
 
         service.updateBusinessType(credId, LPrLLP).futureValue mustBe Some(LPrLLP)
 
-        verify(mockCacheConnector).save[BusinessMatching](
-          eqTo(credId), eqTo(BusinessMatching.key), eqTo(newModel))(any()
+        verify(mockCacheConnector).save[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key), eqTo(newModel))(
+          any()
         )
       }
 

@@ -21,8 +21,8 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class LegalNameFormProvider @Inject()() extends BooleanFormProvider {
+class LegalNameFormProvider @Inject() () extends BooleanFormProvider {
 
-  private val error = "error.required.rp.hasPreviousName"
+  private val error          = "error.required.rp.hasPreviousName"
   def apply(): Form[Boolean] = Form[Boolean]("hasPreviousName" -> boolean(error, error))
 }

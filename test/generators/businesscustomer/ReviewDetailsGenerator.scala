@@ -22,17 +22,18 @@ import models.businesscustomer.ReviewDetails
 import org.scalacheck.Gen
 
 //noinspection ScalaStyle
-trait ReviewDetailsGenerator extends BaseGenerator
-  with AddressGenerator
-  with CountryGenerator
-  with BusinessTypeGenerator {
+trait ReviewDetailsGenerator
+    extends BaseGenerator
+    with AddressGenerator
+    with CountryGenerator
+    with BusinessTypeGenerator {
 
   val reviewDetailsGen: Gen[ReviewDetails] = for {
     businessName <- stringOfLengthGen(20)
-    bType <- businessTypeGen
-    address <- addressGen
-    safeId <- safeIdGen
-    utr <- numSequence(8)
+    bType        <- businessTypeGen
+    address      <- addressGen
+    safeId       <- safeIdGen
+    utr          <- numSequence(8)
   } yield ReviewDetails(businessName, Some(bType), address, safeId, Some(utr))
 
 }

@@ -23,13 +23,14 @@ import play.api.data.Form
 class AccountantForAMLSRegulationsFormProviderSpec extends BooleanFieldBehaviours[AccountantForAMLSRegulations] {
 
   override val form: Form[AccountantForAMLSRegulations] = new AccountantForAMLSRegulationsFormProvider()()
-  override val fieldName: String = "accountantForAMLSRegulations"
-  override val errorMessage: String = "error.required.ba.business.use.accountant"
+  override val fieldName: String                        = "accountantForAMLSRegulations"
+  override val errorMessage: String                     = "error.required.ba.business.use.accountant"
 
   "AccountantForAMLSRegulationsFormProvider" must {
 
     behave like booleanFieldWithModel(
-      AccountantForAMLSRegulations(true), AccountantForAMLSRegulations(false)
+      AccountantForAMLSRegulations(true),
+      AccountantForAMLSRegulations(false)
     )
   }
 }

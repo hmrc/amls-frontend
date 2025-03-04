@@ -39,20 +39,19 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
 
-    val cache = mock[DataCacheConnector]
-    lazy val view = inject[ComplexCorpStructureCreationView]
+    val cache           = mock[DataCacheConnector]
+    lazy val view       = inject[ComplexCorpStructureCreationView]
     lazy val controller = new ComplexCorpStructureCreationController(
       SuccessfulAuthAction,
       commonDependencies,
       cache,
       cc = mockMcc,
       formProvider = inject[ComplexCorpStructureCreationFormProvider],
-      view = view)
+      view = view
+    )
 
     val tcsp = Tcsp(
-      Some(TcspTypes(Set(
-        NomineeShareholdersProvider,
-        TrusteeProvider))),
+      Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider))),
       None,
       None,
       Some(ProvidedServices(Set(PhonecallHandling, Other("other service")))),
@@ -75,9 +74,9 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
         "given invalid data" in new TestFixture {
 
           val newRequest = FakeRequest(POST, routes.ComplexCorpStructureCreationController.post().url)
-          .withFormUrlEncodedBody(
-            "complexCorpStructureCreation" -> "invalid"
-          )
+            .withFormUrlEncodedBody(
+              "complexCorpStructureCreation" -> "invalid"
+            )
 
           val result = controller.post(true)(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -104,9 +103,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
           "redirects to SummaryController" in new TestFixture {
 
             val expected = Tcsp(
-              tcspTypes = Some(TcspTypes(Set(
-                NomineeShareholdersProvider,
-                TrusteeProvider))),
+              tcspTypes = Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider))),
               onlyOffTheShelfCompsSold = None,
               complexCorpStructureCreation = Some(ComplexCorpStructureCreationYes),
               providedServices = Some(ProvidedServices(Set(PhonecallHandling, Other("other service")))),
@@ -116,8 +113,10 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
               hasChanged = true
             )
 
-            val result = controller.post(true)(FakeRequest(POST, routes.ComplexCorpStructureCreationController.post(true).url)
-            .withFormUrlEncodedBody("complexCorpStructureCreation" -> "true"))
+            val result = controller.post(true)(
+              FakeRequest(POST, routes.ComplexCorpStructureCreationController.post(true).url)
+                .withFormUrlEncodedBody("complexCorpStructureCreation" -> "true")
+            )
 
             status(result) mustBe SEE_OTHER
             verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any())
@@ -130,9 +129,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
             "redirects to ProvidedServicesController" in new TestFixture {
 
               val regOfficeTcsp = Tcsp(
-                Some(TcspTypes(Set(
-                  RegisteredOfficeEtc,
-                  TrusteeProvider))),
+                Some(TcspTypes(Set(RegisteredOfficeEtc, TrusteeProvider))),
                 None,
                 None,
                 Some(ProvidedServices(Set(PhonecallHandling, Other("other service")))),
@@ -145,9 +142,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
                 .thenReturn(Future.successful(Some(regOfficeTcsp)))
 
               val expected = Tcsp(
-                tcspTypes = Some(TcspTypes(Set(
-                  RegisteredOfficeEtc,
-                  TrusteeProvider))),
+                tcspTypes = Some(TcspTypes(Set(RegisteredOfficeEtc, TrusteeProvider))),
                 onlyOffTheShelfCompsSold = None,
                 complexCorpStructureCreation = Some(ComplexCorpStructureCreationNo),
                 providedServices = Some(ProvidedServices(Set(PhonecallHandling, Other("other service")))),
@@ -157,8 +152,10 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
                 hasChanged = true
               )
 
-              val result = controller.post(false)(FakeRequest(POST, routes.ComplexCorpStructureCreationController.post().url)
-              .withFormUrlEncodedBody("complexCorpStructureCreation" -> "false"))
+              val result = controller.post(false)(
+                FakeRequest(POST, routes.ComplexCorpStructureCreationController.post().url)
+                  .withFormUrlEncodedBody("complexCorpStructureCreation" -> "false")
+              )
               status(result) mustBe SEE_OTHER
               verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.ProvidedServicesController.get().url)
@@ -169,9 +166,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
             "redirects to ServicesOfAnotherTCSPController" in new TestFixture {
 
               val expected = Tcsp(
-                tcspTypes = Some(TcspTypes(Set(
-                  NomineeShareholdersProvider,
-                  TrusteeProvider))),
+                tcspTypes = Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider))),
                 onlyOffTheShelfCompsSold = None,
                 complexCorpStructureCreation = Some(ComplexCorpStructureCreationNo),
                 providedServices = Some(ProvidedServices(Set(PhonecallHandling, Other("other service")))),
@@ -181,8 +176,10 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
                 hasChanged = true
               )
 
-              val result = controller.post(false)(FakeRequest(POST, routes.ComplexCorpStructureCreationController.post().url)
-              .withFormUrlEncodedBody("complexCorpStructureCreation" -> "false"))
+              val result = controller.post(false)(
+                FakeRequest(POST, routes.ComplexCorpStructureCreationController.post().url)
+                  .withFormUrlEncodedBody("complexCorpStructureCreation" -> "false")
+              )
               status(result) mustBe SEE_OTHER
               verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.ServicesOfAnotherTCSPController.get().url)

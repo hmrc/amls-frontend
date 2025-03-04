@@ -28,18 +28,25 @@ class WithdrawalConfirmationViewSpec extends AmlsViewSpec {
 
   "render view" in new Fixture {
 
-    val deregistrationConfirmationView = inject[WithdrawalConfirmationView]
+    val deregistrationConfirmationView                    = inject[WithdrawalConfirmationView]
     implicit val request: Request[AnyContentAsEmpty.type] = addTokenForView()
-    def view: Html = deregistrationConfirmationView("Acme Production LTD", "XBML00000567890", WithdrawalReason.OutOfScope)
+    def view: Html                                        =
+      deregistrationConfirmationView("Acme Production LTD", "XBML00000567890", WithdrawalReason.OutOfScope)
 
     val content: String = doc.text()
     content must include("Application withdrawn")
     content must include("Acme Production LTD")
     content must include("Your reference number")
     content must include("XBML00000567890")
-    content must include("You have withdrawn your application for registration with HMRC under the Anti-Money Laundering Supervision.")
-    content must include("Your given reason for doing so is: Business is out of scope as no longer carrying out activities covered by the Money Laundering Regulations.")
-    content must include("If your business carries out any activities covered by the Money Laundering regulations, you will need to be registered with an appropriate supervisory body.")
+    content must include(
+      "You have withdrawn your application for registration with HMRC under the Anti-Money Laundering Supervision."
+    )
+    content must include(
+      "Your given reason for doing so is: Business is out of scope as no longer carrying out activities covered by the Money Laundering Regulations."
+    )
+    content must include(
+      "If your business carries out any activities covered by the Money Laundering regulations, you will need to be registered with an appropriate supervisory body."
+    )
     content must include("You can register for supervision from your registration page.")
     content must include("Print this page")
 

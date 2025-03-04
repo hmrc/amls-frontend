@@ -28,68 +28,73 @@ import views.html.responsiblepeople.SoleProprietorView
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
-
 @Singleton
-class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                          authAction: AuthAction,
-                                                          val ds: CommonPlayDependencies,
-                                                          val statusService: StatusService,
-                                                          val cc: MessagesControllerComponents,
-                                                          formProvider: SoleProprietorFormProvider,
-                                                          view: SoleProprietorView,
-                                                          implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class SoleProprietorOfAnotherBusinessController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val statusService: StatusService,
+  val cc: MessagesControllerComponents,
+  formProvider: SoleProprietorFormProvider,
+  view: SoleProprietorView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
-    implicit request => {
+    implicit request =>
       getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           (person.personName, person.soleProprietorOfAnotherBusiness, person.lineId, person.vatRegistered) match {
             case (Some(name), Some(soleProprietor), _, _) =>
               Ok(view(formProvider().fill(soleProprietor), edit, index, flow, name.titleName))
-            case (Some(name), _, None, _) =>
+            case (Some(name), _, None, _)                 =>
               Ok(view(formProvider(), edit, index, flow, name.titleName))
-            case (Some(_), _, _, Some(_)) =>
+            case (Some(_), _, _, Some(_))                 =>
               Redirect(routes.VATRegisteredController.get(index, edit, flow))
-            case (Some(_), _, _, None) =>
+            case (Some(_), _, _, None)                    =>
               Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
-            case _ => NotFound(notFoundView)
+            case _                                        => NotFound(notFoundView)
           }
         }
       }
-    }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors => getData[ResponsiblePerson](request.credId, index) flatMap { rp =>
-          Future.successful(BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp))))
-        },
-        data => {
-          for {
-            _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-              rp.copy(soleProprietorOfAnotherBusiness = Some(data), vatRegistered = getVatRegData(rp, data))
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            getData[ResponsiblePerson](request.credId, index) flatMap { rp =>
+              Future.successful(BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp))))
+            },
+          data =>
+            {
+              for {
+                _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                       rp.copy(soleProprietorOfAnotherBusiness = Some(data), vatRegistered = getVatRegData(rp, data))
+                     }
+              } yield
+                if (data.soleProprietorOfAnotherBusiness equals true) {
+                  Redirect(routes.VATRegisteredController.get(index, edit, flow))
+                } else {
+                  if (edit) {
+                    Redirect(routes.DetailedAnswersController.get(index, flow))
+                  } else {
+                    Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
+                  }
+                }
+            }.recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
             }
-          } yield if(data.soleProprietorOfAnotherBusiness equals true) {
-            Redirect(routes.VATRegisteredController.get(index, edit, flow))
-          } else {
-            if (edit) {
-              Redirect(routes.DetailedAnswersController.get(index, flow))
-            } else {
-              Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
-            }
-          }
-        }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
-      )
+        )
   }
 
-  def getVatRegData(rp: ResponsiblePerson, data: SoleProprietorOfAnotherBusiness): Option[VATRegistered] = {
+  def getVatRegData(rp: ResponsiblePerson, data: SoleProprietorOfAnotherBusiness): Option[VATRegistered] =
     if (data.soleProprietorOfAnotherBusiness) {
       rp.vatRegistered
     } else {
       None
     }
-  }
 }

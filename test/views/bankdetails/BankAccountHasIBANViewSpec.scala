@@ -30,7 +30,7 @@ import views.html.bankdetails.BankAccountHasIBANView
 class BankAccountHasIBANViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val bankAccountHasIban: BankAccountHasIBANView = inject[BankAccountHasIBANView]
-  lazy val fp: BankAccountHasIBANFormProvider = inject[BankAccountHasIBANFormProvider]
+  lazy val fp: BankAccountHasIBANFormProvider         = inject[BankAccountHasIBANFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   trait ViewFixture extends Fixture {

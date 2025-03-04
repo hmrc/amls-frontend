@@ -21,7 +21,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class MovedAddressFormProvider @Inject()() extends Mappings {
+class MovedAddressFormProvider @Inject() () extends Mappings {
 
   private val error = "error.required.rp.moved.address"
 

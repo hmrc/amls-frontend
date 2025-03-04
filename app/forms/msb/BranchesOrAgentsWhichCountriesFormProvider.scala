@@ -22,13 +22,14 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class BranchesOrAgentsWhichCountriesFormProvider @Inject()() extends CountryListMappings {
+class BranchesOrAgentsWhichCountriesFormProvider @Inject() () extends CountryListMappings {
 
   private val emptyErrorKey = "error.invalid.countries.msb.branchesOrAgents.country"
 
   def apply(): Form[BranchesOrAgentsWhichCountries] = Form[BranchesOrAgentsWhichCountries](
     "countries" -> countryListMapping[BranchesOrAgentsWhichCountries](emptyErrorKey)(
-      x => BranchesOrAgentsWhichCountries(x.flatten.distinct), _.branches.distinct.map(Some(_))
+      x => BranchesOrAgentsWhichCountries(x.flatten.distinct),
+      _.branches.distinct.map(Some(_))
     )
   )
 

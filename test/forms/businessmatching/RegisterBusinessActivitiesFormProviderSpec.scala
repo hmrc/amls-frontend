@@ -26,13 +26,13 @@ class RegisterBusinessActivitiesFormProviderSpec extends CheckboxFieldBehaviours
 
   ".value" must {
 
-    val fieldName = "value"
+    val fieldName   = "value"
     val requiredKey = "error.required.bm.register.service"
 
     behave like checkboxField[BusinessActivity](
       form,
       fieldName,
-      validValues  = BusinessActivities.all.toSeq,
+      validValues = BusinessActivities.all.toSeq,
       invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 

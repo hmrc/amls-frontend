@@ -29,42 +29,46 @@ import views.html.DateOfChangeView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class ServicesOfBusinessDateOfChangeController @Inject()(val authAction: AuthAction,
-                                                         val ds: CommonPlayDependencies,
-                                                         val cc: MessagesControllerComponents,
-                                                         service: ServicesOfBusinessDateOfChangeService,
-                                                         formProvider: DateOfChangeFormProvider,
-                                                         view: DateOfChangeView) extends AmlsBaseController(ds, cc) {
+class ServicesOfBusinessDateOfChangeController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  service: ServicesOfBusinessDateOfChangeService,
+  formProvider: DateOfChangeFormProvider,
+  view: DateOfChangeView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction {
-    implicit request => Ok(getView(formProvider()))
+  def get: Action[AnyContent] = authAction { implicit request =>
+    Ok(getView(formProvider()))
   }
 
-
-  def post: Action[AnyContent] = authAction.async {
-    implicit request =>
-
-      formProvider().bindFromRequest().fold(
+  def post: Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(getView(formWithErrors))),
-        dateOfChange => {
+        dateOfChange =>
           service.getModelWithDate(request.credId).flatMap {
             case (asp, Some(activityStartDate)) if !dateOfChange.dateOfChange.isBefore(activityStartDate.startDate) =>
               service.updateAsp(asp, dateOfChange, request.credId) map { _ =>
                 Redirect(routes.SummaryController.get)
               }
-            case (_, Some(activityStartDate)) =>
-              Future.successful(BadRequest(getView(
-                formProvider().withError(
-                  "dateOfChange",
-                  messages(
-                    "error.expected.dateofchange.date.after.activitystartdate",
-                    DateHelper.formatDate(activityStartDate.startDate)
+            case (_, Some(activityStartDate))                                                                       =>
+              Future.successful(
+                BadRequest(
+                  getView(
+                    formProvider().withError(
+                      "dateOfChange",
+                      messages(
+                        "error.expected.dateofchange.date.after.activitystartdate",
+                        DateHelper.formatDate(activityStartDate.startDate)
+                      )
+                    )
                   )
                 )
-              )))
-            case (_, None) => Future.failed(new Exception("Could not retrieve start date"))
+              )
+            case (_, None)                                                                                          => Future.failed(new Exception("Could not retrieve start date"))
           }
-        }
       )
   }
 
@@ -74,4 +78,3 @@ class ServicesOfBusinessDateOfChangeController @Inject()(val authAction: AuthAct
     routes.ServicesOfBusinessDateOfChangeController.post
   )
 }
-

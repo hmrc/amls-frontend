@@ -96,11 +96,11 @@ class LocationGraphTransformerSpec extends PlaySpec with MockitoSugar {
   "Prune unsupported country codes from the Json" when {
     "the Json is read and transformed" in {
       val allowList = Set("AD", "AE")
-      val loader = mock[LocationGraphJsonLoader]
+      val loader    = mock[LocationGraphJsonLoader]
       when(loader.load) thenReturn Json.parse(json).asOpt[JsObject]
 
       val transformer = new LocationGraphTransformer(loader)
-      val result = transformer.transform(allowList)
+      val result      = transformer.transform(allowList)
 
       (result.get \ "territory:AE-AZ").toOption mustBe None
       (result.get \ "territory:AF").toOption mustBe None

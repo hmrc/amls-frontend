@@ -42,19 +42,27 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       doc.title must startWith(messages("title.wyn"))
     }
 
-    "Have the correct Headings" in new ViewFixture{
+    "Have the correct Headings" in new ViewFixture {
       def view = need(Some(BusinessActivities(Set(AccountancyServices))))
 
-      heading.html must be (messages("title.wyn"))
-      subHeading.html must include (messages("summary.businessactivities"))
+      heading.html    must be(messages("title.wyn"))
+      subHeading.html must include(messages("summary.businessactivities"))
     }
 
-    "contain the expected content elements when not ASP" in new ViewFixture{
+    "contain the expected content elements when not ASP" in new ViewFixture {
       def view = need(Some(BusinessActivities(Set(MoneyServiceBusiness))))
 
-      html must include(messages("about any business activities that are not covered by the Money Laundering Regulations"))
-      html must include(messages("the net profit you expect in the next 12 months, if you also carry out activities not covered by the regulations"))
-      html must include(messages("the net profit you expect in the next 12 months from the services you’re registering"))
+      html must include(
+        messages("about any business activities that are not covered by the Money Laundering Regulations")
+      )
+      html must include(
+        messages(
+          "the net profit you expect in the next 12 months, if you also carry out activities not covered by the regulations"
+        )
+      )
+      html must include(
+        messages("the net profit you expect in the next 12 months from the services you’re registering")
+      )
       html must include(messages("the franchisor’s name, if your business is a franchise"))
       html must include(messages("how many people work on activities covered by the Money Laundering Regulations"))
       html must include(messages("how many people work for the business"))
@@ -65,12 +73,20 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       html must include(messages("about your professional adviser for Money Laundering Regulations, if you have one"))
     }
 
-    "contain the expected content elements when ASP" in new ViewFixture{
+    "contain the expected content elements when ASP" in new ViewFixture {
       def view = need(Some(BusinessActivities(Set(AccountancyServices))))
 
-      html must include(messages("about any business activities that are not covered by the Money Laundering Regulations"))
-      html must include(messages("the net profit you expect in the next 12 months, if you also carry out activities not covered by the regulations"))
-      html must include(messages("the net profit you expect in the next 12 months from the services you’re registering"))
+      html must include(
+        messages("about any business activities that are not covered by the Money Laundering Regulations")
+      )
+      html must include(
+        messages(
+          "the net profit you expect in the next 12 months, if you also carry out activities not covered by the regulations"
+        )
+      )
+      html must include(
+        messages("the net profit you expect in the next 12 months from the services you’re registering")
+      )
       html must include(messages("the franchisor’s name, if your business is a franchise"))
       html must include(messages("how many people work on activities covered by the Money Laundering Regulations"))
       html must include(messages("how many people work for the business"))

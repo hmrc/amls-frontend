@@ -23,7 +23,7 @@ import play.api.data.FormError
 class ContactDetailsFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val formProvider = new ContactDetailsFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   val phoneFormField = "phoneNumber"
   val emailFormField = "emailAddress"
@@ -33,10 +33,16 @@ class ContactDetailsFormProviderSpec extends StringFieldBehaviours with Constrai
     s"$phoneFormField is populated" must {
 
       behave like fieldThatBindsValidData(
-        form, phoneFormField, numStringOfLength(formProvider.phoneLength).suchThat(_.nonEmpty)
+        form,
+        phoneFormField,
+        numStringOfLength(formProvider.phoneLength).suchThat(_.nonEmpty)
       )
 
-      behave like mandatoryField(form, phoneFormField, FormError(phoneFormField, "error.required.rp.contact.phone.number"))
+      behave like mandatoryField(
+        form,
+        phoneFormField,
+        FormError(phoneFormField, "error.required.rp.contact.phone.number")
+      )
 
       behave like fieldWithMaxLength(
         form,
@@ -48,14 +54,17 @@ class ContactDetailsFormProviderSpec extends StringFieldBehaviours with Constrai
       "fail to bind when regex is violated" in {
 
         forAll(alphaStringsShorterThan(formProvider.phoneLength).suchThat(_.nonEmpty)) { str =>
+          val result = form.bind(
+            Map(
+              phoneFormField -> str,
+              emailFormField -> "fake.email@gmail.com"
+            )
+          )
 
-          val result = form.bind(Map(
-            phoneFormField -> str,
-            emailFormField -> "fake.email@gmail.com"
-          ))
-
-          result.value shouldBe None
-          result.errors shouldBe Seq(FormError(phoneFormField, "error.invalid.rp.contact.phone.number", Seq("^[0-9 ()+\u2010\u002d]{1,24}$")))
+          result.value  shouldBe None
+          result.errors shouldBe Seq(
+            FormError(phoneFormField, "error.invalid.rp.contact.phone.number", Seq("^[0-9 ()+\u2010\u002d]{1,24}$"))
+          )
         }
       }
     }
@@ -63,7 +72,9 @@ class ContactDetailsFormProviderSpec extends StringFieldBehaviours with Constrai
     s"$emailFormField is populated" must {
 
       behave like fieldThatBindsValidData(
-        form, emailFormField, emailGen
+        form,
+        emailFormField,
+        emailGen
       )
 
       behave like mandatoryField(form, emailFormField, FormError(emailFormField, "error.required.rp.contact.email"))
@@ -78,13 +89,14 @@ class ContactDetailsFormProviderSpec extends StringFieldBehaviours with Constrai
       "fail to bind when regex is violated" in {
 
         forAll(emailGen) { email =>
+          val result = form.bind(
+            Map(
+              emailFormField -> (email + "§"),
+              phoneFormField -> "07123456789"
+            )
+          )
 
-          val result = form.bind(Map(
-            emailFormField -> (email + "§"),
-            phoneFormField -> "07123456789"
-          ))
-
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(emailFormField, "error.invalid.rp.contact.email", Seq(emailRegex)))
         }
       }

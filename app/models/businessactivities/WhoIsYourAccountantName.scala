@@ -16,11 +16,11 @@
 
 package models.businessactivities
 
-case class WhoIsYourAccountantName( accountantsName: String,
-                                    accountantsTradingName: Option[String]) {
+case class WhoIsYourAccountantName(accountantsName: String, accountantsTradingName: Option[String]) {
 
-  def name(newName: String) : WhoIsYourAccountantName = this.copy(accountantsName = newName)
-  def tradingName(newTradingName: String) : WhoIsYourAccountantName = this.copy(accountantsTradingName = Some(newTradingName))
+  def name(newName: String): WhoIsYourAccountantName               = this.copy(accountantsName = newName)
+  def tradingName(newTradingName: String): WhoIsYourAccountantName =
+    this.copy(accountantsTradingName = Some(newTradingName))
 }
 
 object WhoIsYourAccountantName {
@@ -29,13 +29,12 @@ object WhoIsYourAccountantName {
 
   val key = "who-is-your-accountant"
 
-  implicit val jsonWrites : Writes[WhoIsYourAccountantName] = Writes[WhoIsYourAccountantName] { data:WhoIsYourAccountantName =>
-    Json.obj("accountantsName" -> data.accountantsName,
-      "accountantsTradingName" -> data.accountantsTradingName
-    )
+  implicit val jsonWrites: Writes[WhoIsYourAccountantName] = Writes[WhoIsYourAccountantName] {
+    data: WhoIsYourAccountantName =>
+      Json.obj("accountantsName" -> data.accountantsName, "accountantsTradingName" -> data.accountantsTradingName)
   }
 
-  implicit val jsonReads : Reads[WhoIsYourAccountantName] = {
+  implicit val jsonReads: Reads[WhoIsYourAccountantName] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Reads._
     import play.api.libs.json._
@@ -43,6 +42,3 @@ object WhoIsYourAccountantName {
       (__ \ "accountantsTradingName").readNullable[String])(WhoIsYourAccountantName.apply _)
   }
 }
-
-
-

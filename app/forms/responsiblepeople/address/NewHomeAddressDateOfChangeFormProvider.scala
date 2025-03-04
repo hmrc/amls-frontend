@@ -24,7 +24,7 @@ import play.api.data.Forms.mapping
 
 import javax.inject.Inject
 
-class NewHomeAddressDateOfChangeFormProvider @Inject()() extends Mappings {
+class NewHomeAddressDateOfChangeFormProvider @Inject() () extends Mappings {
 
   def apply(): Form[NewHomeDateOfChange] = Form[NewHomeDateOfChange](
     mapping(

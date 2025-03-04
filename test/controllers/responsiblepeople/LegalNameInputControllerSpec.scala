@@ -29,9 +29,9 @@ import views.html.responsiblepeople.LegalNameInputView
 class LegalNameInputControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
 
   trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
-    val request = addToken(authRequest)
-    val RecordId = 1
-    lazy val view = inject[LegalNameInputView]
+    val request    = addToken(authRequest)
+    val RecordId   = 1
+    lazy val view  = inject[LegalNameInputView]
     val controller = new LegalNameInputController(
       mockCacheConnector,
       SuccessfulAuthAction,
@@ -39,7 +39,8 @@ class LegalNameInputControllerSpec extends AmlsSpec with ScalaFutures with Injec
       mockMcc,
       formProvider = inject[LegalNameInputFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
   }
 
   "The LegalNameInputController" when {
@@ -60,18 +61,16 @@ class LegalNameInputControllerSpec extends AmlsSpec with ScalaFutures with Injec
 
         val responsiblePeople = ResponsiblePerson(personName = Some(addPerson), legalName = Some(previousPerson))
 
-
         mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePeople)), Some(ResponsiblePerson.key))
-
 
         val result = controller.get(RecordId)(request)
 
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[name=firstName]").`val` must be("first")
+        document.select("input[name=firstName]").`val`  must be("first")
         document.select("input[name=middleName]").`val` must be("middle")
-        document.select("input[name=lastName]").`val` must be("last")
+        document.select("input[name=lastName]").`val`   must be("last")
       }
 
       "prepopulate the view with data" in new TestFixture {
@@ -93,16 +92,15 @@ class LegalNameInputControllerSpec extends AmlsSpec with ScalaFutures with Injec
 
         mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePeople)), Some(ResponsiblePerson.key))
 
-
         val result = controller.get(RecordId)(request)
 
         status(result) mustBe OK
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.select("input[name=firstName]").`val` must be("John")
+        document.select("input[name=firstName]").`val`  must be("John")
         document.select("input[name=middleName]").`val` must be("Michael")
-        document.select("input[name=lastName]").`val` must be("Smith")
+        document.select("input[name=lastName]").`val`   must be("Smith")
       }
 
     }
@@ -113,17 +111,17 @@ class LegalNameInputControllerSpec extends AmlsSpec with ScalaFutures with Injec
           "edit is false" in new TestFixture {
 
             val requestWithParams = FakeRequest(POST, routes.LegalNameInputController.post(1).url)
-            .withFormUrlEncodedBody(
-              "firstName" -> "first",
-              "middleName" -> "middle",
-              "lastName" -> "last"
-            )
+              .withFormUrlEncodedBody(
+                "firstName"  -> "first",
+                "middleName" -> "middle",
+                "lastName"   -> "last"
+              )
 
             mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[PreviousName]
 
             val result = controller.post(RecordId)(requestWithParams)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.LegalNameChangeDateController.get(RecordId).url))
           }
         }
@@ -132,11 +130,11 @@ class LegalNameInputControllerSpec extends AmlsSpec with ScalaFutures with Injec
           "edit is true" in new TestFixture {
 
             val requestWithParams = FakeRequest(POST, routes.LegalNameInputController.post(1).url)
-            .withFormUrlEncodedBody(
-              "firstName" -> "first",
-              "middleName" -> "middle",
-              "lastName" -> "last"
-            )
+              .withFormUrlEncodedBody(
+                "firstName"  -> "first",
+                "middleName" -> "middle",
+                "lastName"   -> "last"
+              )
 
             mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[PreviousName]
@@ -151,10 +149,10 @@ class LegalNameInputControllerSpec extends AmlsSpec with ScalaFutures with Injec
         "return BAD_REQUEST" in new TestFixture {
 
           val NameMissingInRequest = FakeRequest(POST, routes.LegalNameInputController.post(1).url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "",
-            "lastName" -> "foo"
-          )
+            .withFormUrlEncodedBody(
+              "firstName" -> "",
+              "lastName"  -> "foo"
+            )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[PreviousName]
@@ -170,10 +168,10 @@ class LegalNameInputControllerSpec extends AmlsSpec with ScalaFutures with Injec
         "return NOT_FOUND" in new TestFixture {
 
           val requestWithParams = FakeRequest(POST, routes.LegalNameInputController.post(1).url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "first",
-            "lastName" -> "last"
-          )
+            .withFormUrlEncodedBody(
+              "firstName" -> "first",
+              "lastName"  -> "last"
+            )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[PreviousName]

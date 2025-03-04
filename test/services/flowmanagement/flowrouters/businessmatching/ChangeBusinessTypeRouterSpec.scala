@@ -42,51 +42,59 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
 
     when {
       mockBusinessMatchingService.getModel(any())
-    } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
-      activities = Some(BusinessActivities(Set(BillPaymentServices, MoneyServiceBusiness)))
-    )))
+    } thenReturn OptionT.liftF[Future, BusinessMatching](
+      Future.successful(
+        BusinessMatching(
+          activities = Some(BusinessActivities(Set(BillPaymentServices, MoneyServiceBusiness)))
+        )
+      )
+    )
   }
 
   "getRoute" must {
 
-    //what do you want to do (3 options - option 1)
+    // what do you want to do (3 options - option 1)
     "return the 'Business Types selection' page (SelectBusinessTypeController)" when {
       "the user is on the 'What do you want to do' page (ChangeServicesPageId) and " +
         "ChangeBusinessType is Add" in new Fixture {
 
-        val result = router.getRoute("internalId", ChangeBusinessTypesPageId, Add)
+          val result = router.getRoute("internalId", ChangeBusinessTypesPageId, Add)
 
-        redirectLocation(result) mustBe Some(addRoutes.SelectBusinessTypeController.get().url)
+          redirectLocation(result) mustBe Some(addRoutes.SelectBusinessTypeController.get().url)
 
-      }
+        }
     }
 
-    //what do you want to do (3 options - option 2)
+    // what do you want to do (3 options - option 2)
     "return the 'What do you want to remove' page (RemoveBusinessTypesController)" when {
       "the user is on the 'What do you want to do' page (ChangeServicesPageId)" +
         " and selects Remove and has more than one Business Type" in new Fixture {
 
-        val result = await(router.getRoute("internalId", ChangeBusinessTypesPageId, Remove))
+          val result = await(router.getRoute("internalId", ChangeBusinessTypesPageId, Remove))
 
-        result mustBe Redirect(removeRoutes.RemoveBusinessTypesController.get())
-      }
+          result mustBe Redirect(removeRoutes.RemoveBusinessTypesController.get())
+        }
     }
 
-    //what do you want to do (3 options - option 3)
+    // what do you want to do (3 options - option 3)
     "return the 'unable to remove' page (UnableToRemoveBusinessTypesController)" when {
       "the user is on the 'What do you want to do' page (ChangeServicesPageId)" +
         " and selects Remove and has only one Business Type" in new Fixture {
 
-        when {
-          mockBusinessMatchingService.getModel(any())
-        } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
-          activities = Some(BusinessActivities(Set(BillPaymentServices)))
-        )))
+          when {
+            mockBusinessMatchingService.getModel(any())
+          } thenReturn OptionT.liftF[Future, BusinessMatching](
+            Future.successful(
+              BusinessMatching(
+                activities = Some(BusinessActivities(Set(BillPaymentServices)))
+              )
+            )
+          )
 
-        val result = router.getRoute("internalId", ChangeBusinessTypesPageId, Remove)
+          val result = router.getRoute("internalId", ChangeBusinessTypesPageId, Remove)
 
-        redirectLocation(result) mustBe Some(removeRoutes.UnableToRemoveBusinessTypesController.get().url)
-      }
+          redirectLocation(result) mustBe Some(removeRoutes.UnableToRemoveBusinessTypesController.get().url)
+        }
     }
   }
 }

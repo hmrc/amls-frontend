@@ -29,7 +29,7 @@ import views.html.msb.BranchesOrAgentsWhichCountriesView
 class BranchesOrAgentsWhichCountriesViewSpec extends AmlsViewSpec with Matchers with AutoCompleteServiceMocks {
 
   lazy val countriesView = inject[BranchesOrAgentsWhichCountriesView]
-  lazy val fp = inject[BranchesOrAgentsWhichCountriesFormProvider]
+  lazy val fp            = inject[BranchesOrAgentsWhichCountriesFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,22 +42,28 @@ class BranchesOrAgentsWhichCountriesViewSpec extends AmlsViewSpec with Matchers 
     "have correct title" in new ViewFixture {
 
       def view = countriesView(
-        fp().fill(BranchesOrAgentsWhichCountries(Seq.empty[Country])), edit = true, mockAutoComplete.formOptions
+        fp().fill(BranchesOrAgentsWhichCountries(Seq.empty[Country])),
+        edit = true,
+        mockAutoComplete.formOptions
       )
 
-      doc.title must be(messages("msb.branchesoragents.countries.title") +
-        " - " + messages("summary.msb") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("msb.branchesoragents.countries.title") +
+          " - " + messages("summary.msb") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = countriesView(
-        fp().fill(BranchesOrAgentsWhichCountries(Seq.empty[Country])), edit = true, mockAutoComplete.formOptions
+        fp().fill(BranchesOrAgentsWhichCountries(Seq.empty[Country])),
+        edit = true,
+        mockAutoComplete.formOptions
       )
 
-      heading.html must be(messages("msb.branchesoragents.countries.title"))
+      heading.html    must be(messages("msb.branchesoragents.countries.title"))
       subHeading.html must include(messages("summary.msb"))
 
     }

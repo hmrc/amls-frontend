@@ -24,9 +24,9 @@ import play.api.data.{Form, FormError}
 class WhoIsYourAccountantNameFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val formProvider: WhoIsYourAccountantNameFormProvider = new WhoIsYourAccountantNameFormProvider()
-  val form: Form[WhoIsYourAccountantName] = formProvider()
+  val form: Form[WhoIsYourAccountantName]               = formProvider()
 
-  val fieldName = "name"
+  val fieldName       = "name"
   val secondFieldName = "tradingName"
 
   "WhoIsYourAccountantNameFormProvider" when {
@@ -54,11 +54,16 @@ class WhoIsYourAccountantNameFormProviderSpec extends StringFieldBehaviours with
 
       "fail to bind invalid strings" in {
 
-        forAll(stringsShorterThan(formProvider.nameLength).suchThat(_.nonEmpty), invalidCharForNames) { (name, invalidChar) =>
-          val result = form.bind(Map(fieldName -> (name + invalidChar)))
+        forAll(stringsShorterThan(formProvider.nameLength).suchThat(_.nonEmpty), invalidCharForNames) {
+          (name, invalidChar) =>
+            val result = form.bind(Map(fieldName -> (name + invalidChar)))
 
-          result.value shouldBe None
-          result.error(fieldName).value shouldBe FormError(fieldName, "error.punctuation.ba.advisor.name", Seq(basicPunctuationRegex))
+            result.value                  shouldBe None
+            result.error(fieldName).value shouldBe FormError(
+              fieldName,
+              "error.punctuation.ba.advisor.name",
+              Seq(basicPunctuationRegex)
+            )
         }
       }
     }
@@ -80,13 +85,16 @@ class WhoIsYourAccountantNameFormProviderSpec extends StringFieldBehaviours with
 
       "fail to bind invalid strings" in {
 
-        forAll(stringsShorterThan(formProvider.tradingNameLength).suchThat(_.nonEmpty), invalidCharForNames) { (name, invalidChar) =>
-          val result = form.bind(Map(secondFieldName -> (name + invalidChar)))
+        forAll(stringsShorterThan(formProvider.tradingNameLength).suchThat(_.nonEmpty), invalidCharForNames) {
+          (name, invalidChar) =>
+            val result = form.bind(Map(secondFieldName -> (name + invalidChar)))
 
-          result.value shouldBe None
-          result.error(secondFieldName).value shouldBe FormError(
-            secondFieldName, "error.punctuation.ba.advisor.tradingname", Seq(basicPunctuationRegex)
-          )
+            result.value                        shouldBe None
+            result.error(secondFieldName).value shouldBe FormError(
+              secondFieldName,
+              "error.punctuation.ba.advisor.tradingname",
+              Seq(basicPunctuationRegex)
+            )
         }
       }
     }

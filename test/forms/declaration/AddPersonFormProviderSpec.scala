@@ -24,20 +24,19 @@ import play.api.data.FormError
 class AddPersonFormProviderSpec extends CheckboxFieldBehaviours with StringFieldBehaviours with Constraints {
 
   val formProvider = new AddPersonFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   "AddPersonFormProvider" when {
 
     def validNameGen = stringsShorterThan(formProvider.nameLength).suchThat(_.nonEmpty)
 
     val nameFields = Seq(
-      ("first"),
-      ("middle"),
-      ("last"),
+      "first",
+      "middle",
+      "last"
     )
 
     nameFields.foreach { x =>
-
       val fieldName = x + "Name"
 
       s"$fieldName is evaluated" must {
@@ -46,7 +45,9 @@ class AddPersonFormProviderSpec extends CheckboxFieldBehaviours with StringField
 
         if (x != "middle") {
           behave like mandatoryField(
-            form, fieldName, FormError(fieldName, s"error.required.declaration.${x}_name")
+            form,
+            fieldName,
+            FormError(fieldName, s"error.required.declaration.${x}_name")
           )
         }
 
@@ -63,14 +64,15 @@ class AddPersonFormProviderSpec extends CheckboxFieldBehaviours with StringField
             (nameFields.filterNot(_ == x).map { x =>
               x + "Name" -> x
             } ++ Seq(
-              fieldName -> "☧",
+              fieldName      -> "☧",
               "positions[0]" -> Partner.toString
-            )
-              ).toMap
+            )).toMap
           )
 
-          result.value shouldBe None
-          result.errors shouldBe Seq(FormError(fieldName, s"error.invalid.${fieldName.toLowerCase}.validation", Seq(nameRegex)))
+          result.value  shouldBe None
+          result.errors shouldBe Seq(
+            FormError(fieldName, s"error.invalid.${fieldName.toLowerCase}.validation", Seq(nameRegex))
+          )
         }
       }
     }

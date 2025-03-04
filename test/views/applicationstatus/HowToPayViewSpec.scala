@@ -25,8 +25,8 @@ import views.html.applicationstatus.HowToPayView
 
 class HowToPayViewSpec extends AmlsViewSpec with Matchers {
 
-  implicit lazy val config: ApplicationConfig = inject[ApplicationConfig]
-  lazy val howToPay = app.injector.instanceOf[HowToPayView]
+  implicit lazy val config: ApplicationConfig                    = inject[ApplicationConfig]
+  lazy val howToPay                                              = app.injector.instanceOf[HowToPayView]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -37,14 +37,14 @@ class HowToPayViewSpec extends AmlsViewSpec with Matchers {
       doc.title must startWith(messages("howtopay.title"))
     }
 
-    "Have the correct Headings" in new ViewFixture{
+    "Have the correct Headings" in new ViewFixture {
       def view = howToPay(Some("ref"))
 
-      heading.html must be (messages("howtopay.title"))
-      subHeading.html must include (messages("summary.status"))
+      heading.html    must be(messages("howtopay.title"))
+      subHeading.html must include(messages("summary.status"))
     }
 
-    "contain the expected content elements where there is a payment reference" in new ViewFixture{
+    "contain the expected content elements where there is a payment reference" in new ViewFixture {
       def view = howToPay(Some("ref"))
 
       html must include(messages("howtopay.title2"))
@@ -84,7 +84,7 @@ class HowToPayViewSpec extends AmlsViewSpec with Matchers {
       )
     }
 
-    "contain the expected content elements where there is not a payment reference" in new ViewFixture{
+    "contain the expected content elements where there is not a payment reference" in new ViewFixture {
       def view = howToPay(None)
 
       html must include(messages("howtopay.title2"))
@@ -108,7 +108,7 @@ class HowToPayViewSpec extends AmlsViewSpec with Matchers {
       html must include(messages("howtopay.para.6"))
       html must include(messages("howtopay.para.6.link"))
 
-      doc.getElementById("your-messages-no-ref").attr("href")must be(
+      doc.getElementById("your-messages-no-ref").attr("href") must be(
         controllers.routes.NotificationController.getMessages().url
       )
 

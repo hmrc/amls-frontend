@@ -32,7 +32,7 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an `Yes` value" in {
 
-      val json = Json.obj("registeredForVAT" -> true, "vrnNumber" ->"12345678")
+      val json = Json.obj("registeredForVAT" -> true, "vrnNumber" -> "12345678")
 
       Json.fromJson[VATRegistered](json) must
         be(JsSuccess(VATRegisteredYes("12345678"), JsPath \ "vrnNumber"))
@@ -52,10 +52,12 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
         be(Json.obj("registeredForVAT" -> false))
 
       Json.toJson(VATRegisteredYes("12345678").asInstanceOf[VATRegistered]) must
-        be(Json.obj(
-          "registeredForVAT" -> true,
-          "vrnNumber" -> "12345678"
-        ))
+        be(
+          Json.obj(
+            "registeredForVAT" -> true,
+            "vrnNumber"        -> "12345678"
+          )
+        )
     }
   }
 

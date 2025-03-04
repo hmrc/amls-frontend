@@ -24,48 +24,57 @@ import play.api.data.{Form, FormError}
 class TransactionsInLast12MonthsFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val fp: TransactionsInLast12MonthsFormProvider = new TransactionsInLast12MonthsFormProvider()
-  val form: Form[TransactionsInLast12Months] = fp()
-  val fieldName = "txnAmount"
-  val baseError = "error.required.msb.transactions.in.12months"
+  val form: Form[TransactionsInLast12Months]     = fp()
+  val fieldName                                  = "txnAmount"
+  val baseError                                  = "error.required.msb.transactions.in.12months"
 
   "TransactionsInLast12MonthsFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, fieldName, numStringOfLength(fp.length).suchThat(_.nonEmpty)
+      form,
+      fieldName,
+      numStringOfLength(fp.length).suchThat(_.nonEmpty)
     )
 
     behave like mandatoryField(form, fieldName, FormError(fieldName, baseError))
 
-    behave like fieldWithMaxLength(form, fieldName, fp.length, FormError(fieldName, s"$baseError.length", Seq(fp.length)))
+    behave like fieldWithMaxLength(
+      form,
+      fieldName,
+      fp.length,
+      FormError(fieldName, s"$baseError.length", Seq(fp.length))
+    )
 
     "bind a single digit value" in {
       val result = form.bind(Map(fieldName -> "1"))
       result.hasErrors shouldBe false
-      result.value shouldBe Some(TransactionsInLast12Months("1"))
+      result.value     shouldBe Some(TransactionsInLast12Months("1"))
     }
 
     "strip spaces from input" in {
       val result = form.bind(Map(fieldName -> "  5 "))
       result.hasErrors shouldBe false
-      result.value shouldBe Some(TransactionsInLast12Months("5"))
+      result.value     shouldBe Some(TransactionsInLast12Months("5"))
     }
 
     "strip commas from input" in {
       val result = form.bind(Map(fieldName -> "1,000"))
       result.hasErrors shouldBe false
-      result.value shouldBe Some(TransactionsInLast12Months("1000"))
+      result.value     shouldBe Some(TransactionsInLast12Months("1000"))
     }
 
     "strip spaces and commas from input" in {
       val result = form.bind(Map(fieldName -> " 12,345,678,901 "))
       result.hasErrors shouldBe false
-      result.value shouldBe Some(TransactionsInLast12Months("12345678901"))
+      result.value     shouldBe Some(TransactionsInLast12Months("12345678901"))
     }
 
     "fail to bind non-numbers" in {
 
       forAll(alphaStringsShorterThan(fp.length).suchThat(_.nonEmpty)) { str =>
-        form.bind(Map(fieldName -> str)).errors shouldBe Seq(FormError(fieldName, s"$baseError.format", Seq(transactionsRegex)))
+        form.bind(Map(fieldName -> str)).errors shouldBe Seq(
+          FormError(fieldName, s"$baseError.format", Seq(transactionsRegex))
+        )
       }
     }
   }

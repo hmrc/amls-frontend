@@ -47,16 +47,17 @@ import java.time.{LocalDate, LocalDateTime}
 import scala.concurrent.Future
 
 // scalastyle:off magic.number
-class PaymentConfirmationControllerSpec extends AmlsSpec
-  with AmlsReferenceNumberGenerator
-  with PaymentGenerator
-  with SubscriptionResponseGenerator
-  with Injecting {
+class PaymentConfirmationControllerSpec
+    extends AmlsSpec
+    with AmlsReferenceNumberGenerator
+    with PaymentGenerator
+    with SubscriptionResponseGenerator
+    with Injecting {
 
   trait Fixture {
     self =>
-    val baseUrl = "http://localhost"
-    val request = addToken(authRequest(uri = baseUrl))
+    val baseUrl    = "http://localhost"
+    val request    = addToken(authRequest(uri = baseUrl))
     lazy val view1 = inject[PaymentConfirmationRenewalView]
     lazy val view2 = inject[PaymentConfirmationAmendVariationView]
     lazy val view3 = inject[PaymentConfirmationTransitionalRenewalView]
@@ -77,14 +78,15 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
       paymentConfirmationAmendVariationView = view2,
       paymentConfirmationTransitionalRenewalView = view3,
       paymentConfirmationView = view4,
-      paymentFailureView = view5)
+      paymentFailureView = view5
+    )
 
     val amlsRegistrationNumber = "amlsRefNumber"
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
 
-    protected val mockCacheMap = mock[Cache]
-    val companyNameFromCache = "My Test Company Name From Cache"
+    protected val mockCacheMap      = mock[Cache]
+    val companyNameFromCache        = "My Test Company Name From Cache"
     val companyNameFromRegistration = "My Test Company Name From Registration"
 
     setupBusinessMatching(companyNameFromCache)
@@ -137,7 +139,8 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
     val applicationConfig = inject[ApplicationConfig]
 
-    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
+    def paymentsReturnLocation(ref: String) =
+      ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
 
     def setupBusinessMatching(companyName: String) = {
 
@@ -197,7 +200,6 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
           controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         } thenReturn Future.successful(None)
 
-
         val businessDetailsYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes(Some("123456"))))
 
         when {
@@ -229,11 +231,11 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.title must include(messages("confirmation.payment.amendvariation.title"))
+        doc.title                             must include(messages("confirmation.payment.amendvariation.title"))
         doc.getElementsByTag("h1").first.text mustBe messages("confirmation.payment.amendvariation.lede")
         doc.select(".govuk-panel__body").text must include(paymentReferenceNumber)
         doc.select(".govuk-panel__body").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
+        contentAsString(result)               must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'approved'" in new Fixture {
@@ -250,11 +252,11 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.title must include(messages("confirmation.payment.amendvariation.title"))
+        doc.title                             must include(messages("confirmation.payment.amendvariation.title"))
         doc.getElementsByTag("h1").first.text mustBe messages("confirmation.payment.amendvariation.lede")
         doc.select(".govuk-panel__body").text must include(paymentReferenceNumber)
         doc.select(".govuk-panel__body").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
+        contentAsString(result)               must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'Renewal Submitted'" in new Fixture {
@@ -271,11 +273,11 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.title must include(messages("confirmation.payment.amendvariation.title"))
+        doc.title                             must include(messages("confirmation.payment.amendvariation.title"))
         doc.getElementsByTag("h1").first.text mustBe messages("confirmation.payment.amendvariation.lede")
         doc.select(".govuk-panel__body").text must include(paymentReferenceNumber)
         doc.select(".govuk-panel__body").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
+        contentAsString(result)               must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'ready for renewal'" in new Fixture {
@@ -292,11 +294,11 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.title must include(messages("confirmation.payment.renewal.title"))
+        doc.title                             must include(messages("confirmation.payment.renewal.title"))
         doc.getElementsByTag("h1").first.text mustBe messages("confirmation.payment.renewal.lede")
         doc.select(".govuk-panel__body").text must include(paymentReferenceNumber)
         doc.select(".govuk-panel__body").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
+        contentAsString(result)               must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'ready for renewal' and user has done only variation" in new Fixture {
@@ -313,11 +315,11 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.title must include(messages("confirmation.payment.amendvariation.title"))
+        doc.title                             must include(messages("confirmation.payment.amendvariation.title"))
         doc.getElementsByTag("h1").first.text mustBe messages("confirmation.payment.amendvariation.lede")
         doc.select(".govuk-panel__body").text must include(paymentReferenceNumber)
         doc.select(".govuk-panel__body").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
+        contentAsString(result)               must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the payment failed" in new Fixture {
@@ -328,7 +330,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
           controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         } thenReturn Future.successful(None)
 
-        val payment = paymentGen.sample.get.copy(status = Failed)
+        val payment       = paymentGen.sample.get.copy(status = Failed)
         val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
 
         when {
@@ -341,7 +343,8 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         status(result) mustBe OK
 
-        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference), eqTo(("accType", "id")))(any(), any())
+        verify(controller.amlsConnector)
+          .refreshPaymentStatus(eqTo(payment.reference), eqTo(("accType", "id")))(any(), any())
         contentAsString(result) must include(messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(messages("confirmation.payment.failed.reason.failure"))
       }
@@ -354,7 +357,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
           controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         } thenReturn Future.successful(None)
 
-        val payment = paymentGen.sample.get.copy(status = Cancelled)
+        val payment       = paymentGen.sample.get.copy(status = Cancelled)
         val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
 
         when {
@@ -362,11 +365,12 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         } thenReturn Future.successful(paymentStatus)
 
         val cancelledRequest = addToken(FakeRequest("GET", s"$baseUrl?paymentStatus=Cancelled"))
-        val result = controller.paymentConfirmation(payment.reference)(cancelledRequest)
+        val result           = controller.paymentConfirmation(payment.reference)(cancelledRequest)
 
         status(result) mustBe OK
 
-        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference), eqTo(("accType", "id")))(any(), any())
+        verify(controller.amlsConnector)
+          .refreshPaymentStatus(eqTo(payment.reference), eqTo(("accType", "id")))(any(), any())
         contentAsString(result) must include(messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(messages("confirmation.payment.failed.reason.cancelled"))
       }
@@ -378,7 +382,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
           controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         } thenReturn Future.successful(None)
 
-        val payment = paymentGen.sample.get.copy(status = Created)
+        val payment       = paymentGen.sample.get.copy(status = Created)
         val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
 
         when {
@@ -390,11 +394,12 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         } thenReturn Future.successful(Some(payment))
 
         val cancelledRequest = addToken(FakeRequest("GET", s"$baseUrl?paymentStatus=Cancelled"))
-        val result = controller.paymentConfirmation(payment.reference)(cancelledRequest)
+        val result           = controller.paymentConfirmation(payment.reference)(cancelledRequest)
 
         status(result) mustBe OK
 
-        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference), eqTo(("accType", "id")))(any(), any())
+        verify(controller.amlsConnector)
+          .refreshPaymentStatus(eqTo(payment.reference), eqTo(("accType", "id")))(any(), any())
         contentAsString(result) must include(messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(messages("confirmation.payment.failed.reason.cancelled"))
       }

@@ -20,9 +20,11 @@ import models.{moneyservicebusiness => msb}
 import play.api.libs.json._
 import utils.MappingUtils.constant
 
-case class WhichCurrencies(currencies: Seq[String],
-                           usesForeignCurrencies: Option[UsesForeignCurrencies] = None,
-                           moneySources: Option[MoneySources] = None) {
+case class WhichCurrencies(
+  currencies: Seq[String],
+  usesForeignCurrencies: Option[UsesForeignCurrencies] = None,
+  moneySources: Option[MoneySources] = None
+) {
 
   def currencies(p: Seq[String]): WhichCurrencies =
     this.copy(currencies = p)
@@ -38,10 +40,12 @@ object WhichCurrencies {
 
   def oldUsesForeignCurrenciesReader: Reads[Option[UsesForeignCurrencies]] =
     (__ \ "usesForeignCurrencies").readNullable[Boolean] map { ed =>
-      ed.fold[Option[UsesForeignCurrencies]](None) { e => e match {
-        case true => Some(UsesForeignCurrenciesYes)
-        case false => Some(UsesForeignCurrenciesNo)
-      }}
+      ed.fold[Option[UsesForeignCurrencies]](None) { e =>
+        e match {
+          case true  => Some(UsesForeignCurrenciesYes)
+          case false => Some(UsesForeignCurrenciesNo)
+        }
+      }
     }
 
   def oldMoneySourcesReader: Reads[Option[MoneySources]] = {
@@ -49,23 +53,27 @@ object WhichCurrencies {
     import play.api.libs.json._
 
     val bankMoney = ((__ \ "bankMoneySource").readNullable[String] and
-      (__ \ "bankNames").readNullable[String])((a, b) => (a, b) match {
-      case (Some("Yes"), Some(names)) => Some(BankMoneySource(names))
-      case _ => None
-    })
+      (__ \ "bankNames").readNullable[String])((a, b) =>
+      (a, b) match {
+        case (Some("Yes"), Some(names)) => Some(BankMoneySource(names))
+        case _                          => None
+      }
+    )
 
     val wholeSalerMoney = ((__ \ "wholesalerMoneySource").readNullable[String] and
-      (__ \ "wholesalerNames").readNullable[String])((a, b) => (a, b) match {
-      case (Some("Yes"), Some(names)) => Some(WholesalerMoneySource(names))
-      case _ => None
-    })
+      (__ \ "wholesalerNames").readNullable[String])((a, b) =>
+      (a, b) match {
+        case (Some("Yes"), Some(names)) => Some(WholesalerMoneySource(names))
+        case _                          => None
+      }
+    )
 
     val customerMoney = (__ \ "customerMoneySource").readNullable[String] map {
       case Some("Yes") => true
-      case _ => false
+      case _           => false
     }
 
-    (bankMoney and wholeSalerMoney and customerMoney) ((a, b, c) => Some(MoneySources(a, b, Some(c))))
+    (bankMoney and wholeSalerMoney and customerMoney)((a, b, c) => Some(MoneySources(a, b, Some(c))))
   }
 
   implicit val jsonReads: Reads[WhichCurrencies] = {
@@ -76,49 +84,44 @@ object WhichCurrencies {
     ((__ \ "currencies").read[Seq[String]] and
       ((__ \ "usesForeignCurrencies").read(Reads.optionNoError[UsesForeignCurrencies]) flatMap {
         case None => oldUsesForeignCurrenciesReader
-        case x => constant(x)
+        case x    => constant(x)
       }) and
       ((__ \ "moneySources").readNullable[MoneySources]
         flatMap {
-        case None => oldMoneySourcesReader
-        case x => constant(x)
-      }
-        )) (WhichCurrencies.apply _)
+          case None => oldMoneySourcesReader
+          case x    => constant(x)
+        }))(WhichCurrencies.apply _)
   }
 
-  implicit val jsonWrites: Writes[WhichCurrencies] = Writes {
-    case wc: WhichCurrencies => {
-      Json.obj("currencies" -> wc.currencies,
-        "usesForeignCurrencies" -> wc.usesForeignCurrencies) ++
-        Json.obj("moneySources" -> wc.moneySources)
-    }
+  implicit val jsonWrites: Writes[WhichCurrencies] = Writes { case wc: WhichCurrencies =>
+    Json.obj("currencies" -> wc.currencies, "usesForeignCurrencies" -> wc.usesForeignCurrencies) ++
+      Json.obj("moneySources" -> wc.moneySources)
   }
 
-  implicit def convert(model: WhichCurrencies): msb.WhichCurrencies = {
-    msb.WhichCurrencies(currencies = model.currencies,
+  implicit def convert(model: WhichCurrencies): msb.WhichCurrencies =
+    msb.WhichCurrencies(
+      currencies = model.currencies,
       usesForeignCurrencies = model.usesForeignCurrencies match {
-      case Some(UsesForeignCurrenciesYes) => Some(msb.UsesForeignCurrenciesYes)
-      case Some(UsesForeignCurrenciesNo) => Some(msb.UsesForeignCurrenciesNo)
-      case None => None
-    }, model.moneySources match {
-      case Some(ms) => {
-        val bms = ms.bankMoneySource.fold[Option[msb.BankMoneySource]](None) {
-          b => Some(msb.BankMoneySource(b.bankNames))
-        }
+        case Some(UsesForeignCurrenciesYes) => Some(msb.UsesForeignCurrenciesYes)
+        case Some(UsesForeignCurrenciesNo)  => Some(msb.UsesForeignCurrenciesNo)
+        case None                           => None
+      },
+      model.moneySources match {
+        case Some(ms) =>
+          val bms = ms.bankMoneySource.fold[Option[msb.BankMoneySource]](None) { b =>
+            Some(msb.BankMoneySource(b.bankNames))
+          }
 
-        val wms = ms.wholesalerMoneySource.fold[Option[msb.WholesalerMoneySource]](None) {
-          b => Some(msb.WholesalerMoneySource(b.wholesalerNames))
-        }
+          val wms = ms.wholesalerMoneySource.fold[Option[msb.WholesalerMoneySource]](None) { b =>
+            Some(msb.WholesalerMoneySource(b.wholesalerNames))
+          }
 
-        val cms = ms.customerMoneySource.fold[Option[Boolean]](None) {
-          b => Some(b)
-        }
+          val cms = ms.customerMoneySource.fold[Option[Boolean]](None) { b =>
+            Some(b)
+          }
 
-        Some(msb.MoneySources(bms, wms, cms))
+          Some(msb.MoneySources(bms, wms, cms))
+        case _        => None
       }
-      case _ => None
-    }
-
     )
-  }
 }

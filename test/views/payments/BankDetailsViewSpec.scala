@@ -25,9 +25,9 @@ import views.html.payments.BankDetailsView
 
 class BankDetailsViewSpec extends AmlsViewSpec with PaymentGenerator {
 
-  lazy val bankDetailsView = inject[BankDetailsView]
+  lazy val bankDetailsView                                  = inject[BankDetailsView]
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-  val secondaryHeading = "Submit application"
+  val secondaryHeading                                      = "Submit application"
   trait ViewFixture extends Fixture {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
@@ -38,9 +38,9 @@ class BankDetailsViewSpec extends AmlsViewSpec with PaymentGenerator {
 
       def view = bankDetailsView(true, 0, paymentReferenceNumber, secondaryHeading)
 
-      doc.title must startWith(messages("payments.bankdetails.title"))
-      heading.html must be(messages("payments.bankdetails.header"))
-      subHeading.html must include(messages("submit.registration"))
+      doc.title                                                               must startWith(messages("payments.bankdetails.title"))
+      heading.html                                                            must be(messages("payments.bankdetails.header"))
+      subHeading.html                                                         must include(messages("submit.registration"))
       doc.getElementsContainingOwnText(messages("payments.bankdetails.hint")) must not be empty
     }
 
@@ -48,9 +48,9 @@ class BankDetailsViewSpec extends AmlsViewSpec with PaymentGenerator {
 
       def view = bankDetailsView(true, 0, paymentReferenceNumber, secondaryHeading)
 
-      doc.title must startWith(messages("payments.bankdetails.title"))
-      heading.html must be(messages("payments.bankdetails.header"))
-      subHeading.html must include("Submit application")
+      doc.title                                                               must startWith(messages("payments.bankdetails.title"))
+      heading.html                                                            must be(messages("payments.bankdetails.header"))
+      subHeading.html                                                         must include("Submit application")
       doc.getElementsContainingOwnText(messages("payments.bankdetails.hint")) must not be empty
     }
 
@@ -60,10 +60,18 @@ class BankDetailsViewSpec extends AmlsViewSpec with PaymentGenerator {
 
         def view = bankDetailsView(false, 100, paymentReferenceNumber, secondaryHeading)
 
-        doc.getElementsByClass("govuk-summary-list__key").text() must include(messages("payments.bankdetails.bics.name"))
-        doc.getElementsByClass("govuk-summary-list__value").text() must include(messages("payments.bankdetails.bics.value"))
-        doc.getElementsByClass("govuk-summary-list__key").text() must include(messages("payments.bankdetails.iban.name"))
-        doc.getElementsByClass("govuk-summary-list__value").text() must include(messages("payments.bankdetails.iban.value"))
+        doc.getElementsByClass("govuk-summary-list__key").text()   must include(
+          messages("payments.bankdetails.bics.name")
+        )
+        doc.getElementsByClass("govuk-summary-list__value").text() must include(
+          messages("payments.bankdetails.bics.value")
+        )
+        doc.getElementsByClass("govuk-summary-list__key").text()   must include(
+          messages("payments.bankdetails.iban.name")
+        )
+        doc.getElementsByClass("govuk-summary-list__value").text() must include(
+          messages("payments.bankdetails.iban.value")
+        )
         doc.getElementById("bank-details-print").html() mustBe messages("link.print")
         doc.getElementsByClass("govuk-summary-list__value").text() must include("£100.00")
 
@@ -76,10 +84,18 @@ class BankDetailsViewSpec extends AmlsViewSpec with PaymentGenerator {
 
         def view = bankDetailsView(true, 100, paymentReferenceNumber, secondaryHeading)
 
-        doc.getElementsByClass("govuk-summary-list__key").text() must include(messages("payments.bankdetails.sortcode.name"))
-        doc.getElementsByClass("govuk-summary-list__value").text() must include(messages("payments.bankdetails.sortcode.value"))
-        doc.getElementsByClass("govuk-summary-list__key").text() must include(messages("payments.bankdetails.accountnumber.name"))
-        doc.getElementsByClass("govuk-summary-list__value").text() must include(messages("payments.bankdetails.accountnumber.value"))
+        doc.getElementsByClass("govuk-summary-list__key").text()   must include(
+          messages("payments.bankdetails.sortcode.name")
+        )
+        doc.getElementsByClass("govuk-summary-list__value").text() must include(
+          messages("payments.bankdetails.sortcode.value")
+        )
+        doc.getElementsByClass("govuk-summary-list__key").text()   must include(
+          messages("payments.bankdetails.accountnumber.name")
+        )
+        doc.getElementsByClass("govuk-summary-list__value").text() must include(
+          messages("payments.bankdetails.accountnumber.value")
+        )
         doc.getElementById("bank-details-print").html() mustBe messages("link.print")
         doc.getElementsByClass("govuk-summary-list__value").text() must include("£100.00")
       }

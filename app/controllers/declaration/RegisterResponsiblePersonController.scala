@@ -26,20 +26,20 @@ import utils.AuthAction
 import views.html.declaration.RegisterResponsiblePersonView
 
 @Singleton
-class RegisterResponsiblePersonController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                    authAction: AuthAction,
-                                                    val ds: CommonPlayDependencies,
-                                                    val statusService: StatusService,
-                                                    val cc: MessagesControllerComponents,
-                                                    view: RegisterResponsiblePersonView) extends AmlsBaseController(ds, cc) {
+class RegisterResponsiblePersonController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val statusService: StatusService,
+  val cc: MessagesControllerComponents,
+  view: RegisterResponsiblePersonView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
-        case ReadyForRenewal(_) |
-             SubmissionDecisionApproved |
-             SubmissionReadyForReview => Ok(view("submit.amendment.application"))
-        case _ => Ok(view("submit.registration"))
-      }
+  def get(): Action[AnyContent] = authAction.async { implicit request =>
+    statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
+      case ReadyForRenewal(_) | SubmissionDecisionApproved | SubmissionReadyForReview =>
+        Ok(view("submit.amendment.application"))
+      case _                                                                          => Ok(view("submit.registration"))
+    }
   }
 }

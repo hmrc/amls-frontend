@@ -28,187 +28,198 @@ import views.html.notifications.YourMessagesView
 
 import java.time.LocalDateTime
 
-class YourMessagesViewSpec extends AmlsViewSpec with Matchers  {
+class YourMessagesViewSpec extends AmlsViewSpec with Matchers {
 
-    lazy val your_messages = app.injector.instanceOf[YourMessagesView]
-    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
+  lazy val your_messages                                         = app.injector.instanceOf[YourMessagesView]
+  implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
-    val businessName = "Fake Name Ltd."
-    val headingWithBusinessName = "Messages for Fake Name Ltd."
+  val businessName            = "Fake Name Ltd."
+  val headingWithBusinessName = "Messages for Fake Name Ltd."
 
-    trait ViewFixture extends Fixture {
+  trait ViewFixture extends Fixture {
 
-        val emptyNotifications: Seq[(NotificationRow, Int)] = Seq()
-        val notifications: Seq[(NotificationRow, Int)] =
-            Seq(
-            (NotificationRow(
-                Some(Status(Some(Approved), None)),
-                Some(RenewalApproval),
-                Some("123456789"),
-                false,
-                LocalDateTime.of(2018, 4, 1, 0, 0),
-                false,
-                "XAML00000123456",
-                "v1m0",
-                IDType("123")
-            ), 0),
-            (NotificationRow(
-                Some(Status(Some(Approved), None)),
-                Some(RenewalApproval),
-                Some("123456789"),
-                false,
-                LocalDateTime.of(2018, 3, 1, 0, 0),
-                false,
-                "XAML00000123456",
-                "v1m0",
-                IDType("123")
-            ), 1),
-            (NotificationRow(
-                Some(Status(Some(Rejected), None)),
-                Some(RenewalApproval),
-                Some("123456789"),
-                false,
-                LocalDateTime.of(2018, 2, 1, 0, 0),
-                false,
-                "XAML00000123456",
-                "v1m0",
-                IDType("123")
-            ), 2)
+    val emptyNotifications: Seq[(NotificationRow, Int)] = Seq()
+    val notifications: Seq[(NotificationRow, Int)]      =
+      Seq(
+        (
+          NotificationRow(
+            Some(Status(Some(Approved), None)),
+            Some(RenewalApproval),
+            Some("123456789"),
+            false,
+            LocalDateTime.of(2018, 4, 1, 0, 0),
+            false,
+            "XAML00000123456",
+            "v1m0",
+            IDType("123")
+          ),
+          0
+        ),
+        (
+          NotificationRow(
+            Some(Status(Some(Approved), None)),
+            Some(RenewalApproval),
+            Some("123456789"),
+            false,
+            LocalDateTime.of(2018, 3, 1, 0, 0),
+            false,
+            "XAML00000123456",
+            "v1m0",
+            IDType("123")
+          ),
+          1
+        ),
+        (
+          NotificationRow(
+            Some(Status(Some(Rejected), None)),
+            Some(RenewalApproval),
+            Some("123456789"),
+            false,
+            LocalDateTime.of(2018, 2, 1, 0, 0),
+            false,
+            "XAML00000123456",
+            "v1m0",
+            IDType("123")
+          ),
+          2
         )
+      )
 
-        val currentNotificationsTable = Table(
-            notifications.map { case (row, index) =>
-                row.asTableRows("current-application-notifications", index)
-            }
-        )
+    val currentNotificationsTable = Table(
+      notifications.map { case (row, index) =>
+        row.asTableRows("current-application-notifications", index)
+      }
+    )
 
-        val previousNotificationsTable = Table(
-            notifications.map { case (row, index) =>
-                row.asTableRows("previous-application-notifications", index)
-            }
-        )
+    val previousNotificationsTable = Table(
+      notifications.map { case (row, index) =>
+        row.asTableRows("previous-application-notifications", index)
+      }
+    )
 
-        def view = your_messages(businessName, Table(), None)
+    def view = your_messages(businessName, Table(), None)
+  }
+
+  trait CurrentNotificationsOnlyViewFixture extends ViewFixture {
+    override def view = your_messages(businessName, currentNotificationsTable, None)
+  }
+
+  trait CurrentNotificationsAndPreviousNotificationsViewFixture extends ViewFixture {
+    override def view = your_messages(businessName, currentNotificationsTable, Some(previousNotificationsTable))
+  }
+
+  "YourMessagesView" must {
+
+    "have correct title" in new ViewFixture {
+      doc.title must be(
+        messages("notifications.header") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
-    trait CurrentNotificationsOnlyViewFixture extends ViewFixture {
-        override def view = your_messages(businessName, currentNotificationsTable, None)
+    "have correct headings" in new ViewFixture {
+      heading.html must be(headingWithBusinessName)
     }
 
-    trait CurrentNotificationsAndPreviousNotificationsViewFixture extends ViewFixture {
-        override def view = your_messages(businessName, currentNotificationsTable, Some(previousNotificationsTable))
+    behave like pageWithBackLink(your_messages(businessName, Table(), None))
+
+    "have the correct caption" in new ViewFixture {
+      doc.getElementById("your-registration").text() mustEqual messages("summary.status")
     }
 
-    "YourMessagesView" must {
+    "have a first notification table" in new CurrentNotificationsOnlyViewFixture {
+      Option(doc.getElementById("current-application-notifications")).isDefined mustEqual true
+    }
 
-        "have correct title" in new ViewFixture {
-            doc.title must be(messages("notifications.header") +
-              " - " + messages("title.amls") +
-              " - " + messages("title.gov"))
+    "have a row for each of the current notifications in the first notification table" in new CurrentNotificationsOnlyViewFixture {
+      doc.getElementById("current-application-notifications").getElementsByTag("tr").size() mustEqual 3
+    }
+
+    "when current notifications is a Seq containing notifications" must {
+
+      "for a row in a notification table" must {
+
+        "display the subject of the notification" in new CurrentNotificationsOnlyViewFixture {
+          val tableRows = doc.getElementById("current-application-notifications").getElementsByTag("tr")
+          notifications.indices foreach { i =>
+            tableRows.get(i).text must include(messages(notifications(i)._1.subject))
+          }
         }
 
-        "have correct headings" in new ViewFixture {
-            heading.html must be(headingWithBusinessName)
+        "display the type of the notification" in new CurrentNotificationsOnlyViewFixture {
+          val tableRows = doc.getElementById("current-application-notifications").getElementsByTag("tr")
+          notifications.indices foreach { i =>
+            tableRows.get(i).text must include(messages(notifications(i)._1.notificationType))
+          }
         }
 
-        behave like pageWithBackLink(your_messages(businessName, Table(), None))
+        "display the date of the notification" in new CurrentNotificationsOnlyViewFixture {
+          val tableRows = doc.getElementById("current-application-notifications").getElementsByTag("tr")
+          notifications.indices foreach { i =>
+            tableRows.get(i).text must include(notifications(i)._1.dateReceived)
+          }
+        }
+      }
+    }
 
-        "have the correct caption" in new ViewFixture {
-            doc.getElementById("your-registration").text() mustEqual messages("summary.status")
+    "when previous notifications is an empty Seq" must {
+
+      "have one table with class notifications" in new CurrentNotificationsOnlyViewFixture {
+        doc.getElementsByTag("table").size() mustEqual 1
+        Option(doc.getElementById("previous-application-notifications")).isDefined mustEqual false
+      }
+
+      "not have previous registration title" in new ViewFixture {
+        Option(doc.getElementById("previous-reg-title")).isDefined mustEqual false
+      }
+    }
+
+    "when previous notifications is a Seq containing notifications" must {
+
+      "have a panel displaying previous registration title" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
+        doc.getElementById("previous-reg-title").text mustEqual messages("notifications.previousReg")
+      }
+
+      "have two tables with class notifications" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
+        doc.getElementsByTag("table").size() mustEqual 2
+      }
+
+      "have a second notification table" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
+        Option(doc.getElementById("previous-application-notifications")).isDefined mustEqual true
+      }
+
+      "have a row for each of the previous notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
+        doc.getElementById("previous-application-notifications").getElementsByTag("tr").size() mustEqual 3
+      }
+
+      "for a row in a notification table" must {
+
+        "display the subject of the notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
+          val tableRows = doc.getElementById("previous-application-notifications").getElementsByTag("tr")
+          notifications.indices foreach { i =>
+            tableRows.get(i).text must include(messages(notifications(i)._1.subject))
+          }
         }
 
-        "have a first notification table" in new CurrentNotificationsOnlyViewFixture {
-            Option(doc.getElementById("current-application-notifications")).isDefined mustEqual true
+        "display the type of the notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
+          val tableRows = doc.getElementById("previous-application-notifications").getElementsByTag("tr")
+          notifications.indices foreach { i =>
+            tableRows.get(i).text must include(messages(notifications(i)._1.notificationType))
+          }
         }
 
-        "have a row for each of the current notifications in the first notification table" in new CurrentNotificationsOnlyViewFixture {
-            doc.getElementById("current-application-notifications").getElementsByTag("tr").size() mustEqual 3
+        "display the date of the notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
+          val tableRows = doc.getElementById("previous-application-notifications").getElementsByTag("tr")
+          notifications.indices foreach { i =>
+            tableRows.get(i).text must include(notifications(i)._1.dateReceived)
+          }
         }
 
-        "when current notifications is a Seq containing notifications" must {
-
-            "for a row in a notification table" must {
-
-                "display the subject of the notification" in new CurrentNotificationsOnlyViewFixture {
-                    val tableRows = doc.getElementById("current-application-notifications").getElementsByTag("tr")
-                    notifications.indices foreach { i =>
-                        tableRows.get(i).text must include(messages(notifications(i)._1.subject))
-                    }
-                }
-
-                "display the type of the notification" in new CurrentNotificationsOnlyViewFixture {
-                    val tableRows = doc.getElementById("current-application-notifications").getElementsByTag("tr")
-                    notifications.indices foreach { i =>
-                        tableRows.get(i).text must include(messages(notifications(i)._1.notificationType))
-                    }
-                }
-
-                "display the date of the notification" in new CurrentNotificationsOnlyViewFixture {
-                    val tableRows = doc.getElementById("current-application-notifications").getElementsByTag("tr")
-                    notifications.indices foreach { i =>
-                        tableRows.get(i).text must include(notifications(i)._1.dateReceived)
-                    }
-                }
-            }
-        }
-
-        "when previous notifications is an empty Seq" must {
-
-            "have one table with class notifications" in new CurrentNotificationsOnlyViewFixture {
-                doc.getElementsByTag("table").size() mustEqual 1
-                Option(doc.getElementById("previous-application-notifications")).isDefined mustEqual false
-            }
-
-            "not have previous registration title" in new ViewFixture {
-                Option(doc.getElementById("previous-reg-title")).isDefined mustEqual false
-            }
-        }
-
-        "when previous notifications is a Seq containing notifications" must {
-
-            "have a panel displaying previous registration title" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
-                doc.getElementById("previous-reg-title").text mustEqual messages("notifications.previousReg")
-            }
-
-            "have two tables with class notifications" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
-                doc.getElementsByTag("table").size() mustEqual 2
-            }
-
-            "have a second notification table" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
-                Option(doc.getElementById("previous-application-notifications")).isDefined mustEqual true
-            }
-
-            "have a row for each of the previous notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
-                doc.getElementById("previous-application-notifications").getElementsByTag("tr").size() mustEqual 3
-            }
-
-            "for a row in a notification table" must {
-
-                "display the subject of the notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
-                    val tableRows = doc.getElementById("previous-application-notifications").getElementsByTag("tr")
-                    notifications.indices foreach { i =>
-                        tableRows.get(i).text must include(messages(notifications(i)._1.subject))
-                    }
-                }
-
-                "display the type of the notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
-                    val tableRows = doc.getElementById("previous-application-notifications").getElementsByTag("tr")
-                    notifications.indices foreach { i =>
-                        tableRows.get(i).text must include(messages(notifications(i)._1.notificationType))
-                    }
-                }
-
-                "display the date of the notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
-                    val tableRows = doc.getElementById("previous-application-notifications").getElementsByTag("tr")
-                    notifications.indices foreach { i =>
-                        tableRows.get(i).text must include(notifications(i)._1.dateReceived)
-                    }
-                }
-
-            }
-
-        }
+      }
 
     }
+
+  }
 
 }

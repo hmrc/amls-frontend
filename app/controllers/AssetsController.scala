@@ -23,26 +23,30 @@ import play.api.http.HttpErrorHandler
 import play.api.mvc.Result
 
 @Singleton
-class AssetsController @Inject()(errorHandler: HttpErrorHandler,
-                                 env: Environment,
-                                 transformer: LocationGraphTransformer,
-                                 meta: AssetsMetadata) extends AssetsBuilder(errorHandler, meta) {
+class AssetsController @Inject() (
+  errorHandler: HttpErrorHandler,
+  env: Environment,
+  transformer: LocationGraphTransformer,
+  meta: AssetsMetadata
+) extends AssetsBuilder(errorHandler, meta) {
 
   lazy val countriesJson = transformer
-    .transform(models.countries.map(_.code).toSet ++ Set(
-      "ENG",
-      "GBN",
-      "NIR",
-      "SCT",
-      "WLS",
-      "Deutschland",
-      "UK",
-      "U.K"
-    ))
+    .transform(
+      models.countries.map(_.code).toSet ++ Set(
+        "ENG",
+        "GBN",
+        "NIR",
+        "SCT",
+        "WLS",
+        "Deutschland",
+        "UK",
+        "U.K"
+      )
+    )
 
   def countries = Action {
-      countriesJson.fold[Result](InternalServerError) { j =>
-        Ok(j.toString()).as("application/json")
-      }
+    countriesJson.fold[Result](InternalServerError) { j =>
+      Ok(j.toString()).as("application/json")
+    }
   }
 }

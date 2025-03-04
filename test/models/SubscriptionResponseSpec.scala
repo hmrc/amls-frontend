@@ -38,8 +38,11 @@ class SubscriptionResponseSpec extends PlaySpec {
           |"totalFees":445,
           |"paymentReference":"XT000000000000"}""".stripMargin
 
-      val response = SubscriptionResponse("bundle", "XDML00000000000",
-        Some(SubscriptionFees("XT000000000000", 0, Some(100), Some(100), Some(150), Some(150), 345, Some(115), 445)))
+      val response = SubscriptionResponse(
+        "bundle",
+        "XDML00000000000",
+        Some(SubscriptionFees("XT000000000000", 0, Some(100), Some(100), Some(150), Some(150), 345, Some(115), 445))
+      )
 
       SubscriptionResponse.reads.reads(Json.parse(previousJson)) must be(JsSuccess(response))
 
@@ -60,8 +63,11 @@ class SubscriptionResponseSpec extends PlaySpec {
           |"paymentReference":"XT000000000000"
           |}}""".stripMargin
 
-      val response = SubscriptionResponse("bundle", "XDML00000000000",
-        Some(SubscriptionFees("XT000000000000", 0, Some(100), Some(100), None, None, 345, Some(115), 445)))
+      val response = SubscriptionResponse(
+        "bundle",
+        "XDML00000000000",
+        Some(SubscriptionFees("XT000000000000", 0, Some(100), Some(100), None, None, 345, Some(115), 445))
+      )
 
       SubscriptionResponse.reads.reads(Json.parse(previousJson)) must be(JsSuccess(response))
 
@@ -74,8 +80,7 @@ class SubscriptionResponseSpec extends PlaySpec {
           |"amlsRefNo":"XDML00000000000",
           |"previouslySubmitted":true}""".stripMargin
 
-      val response = SubscriptionResponse("bundle", "XDML00000000000",
-        None, Some(true))
+      val response = SubscriptionResponse("bundle", "XDML00000000000", None, Some(true))
 
       SubscriptionResponse.reads.reads(Json.parse(previousJson)) must be(JsSuccess(response))
 

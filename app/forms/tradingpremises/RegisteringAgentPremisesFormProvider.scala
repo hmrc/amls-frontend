@@ -22,8 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class RegisteringAgentPremisesFormProvider @Inject()() extends BooleanFormProvider {
+class RegisteringAgentPremisesFormProvider @Inject() () extends BooleanFormProvider {
   def apply(): Form[RegisteringAgentPremises] = createForm[RegisteringAgentPremises](
-    "agentPremises", "error.required.tp.agent.premises"
+    "agentPremises",
+    "error.required.tp.agent.premises"
   )(RegisteringAgentPremises.apply, _.agentPremises)
 }

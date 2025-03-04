@@ -38,7 +38,9 @@ class AMLSTurnoverFormProviderSpec extends FieldBehaviours {
       val form = fp()
 
       behave like fieldThatBindsValidData(
-        form, field, Gen.oneOf(BusinessTurnover.all.map(_.toString))
+        form,
+        field,
+        Gen.oneOf(BusinessTurnover.all.map(_.toString))
       )
 
       behave like mandatoryField(form, field, FormError(field, "error.required.renewal.ba.turnover.from.mlr"))
@@ -49,7 +51,7 @@ class AMLSTurnoverFormProviderSpec extends FieldBehaviours {
 
           val result = form.bind(Map(field -> "foo"))
 
-          result.value shouldBe None
+          result.value        shouldBe None
           result.error(field) shouldBe Some(FormError(field, "error.invalid"))
         }
       }
@@ -62,11 +64,15 @@ class AMLSTurnoverFormProviderSpec extends FieldBehaviours {
       val form = fp(Some(service))
 
       behave like fieldThatBindsValidData(
-        form, field, Gen.oneOf(BusinessTurnover.all.map(_.toString))
+        form,
+        field,
+        Gen.oneOf(BusinessTurnover.all.map(_.toString))
       )
 
       behave like mandatoryField(
-        form, field, FormError(field, messages("error.required.renewal.ba.turnover.from.mlr.single.service", service))
+        form,
+        field,
+        FormError(field, messages("error.required.renewal.ba.turnover.from.mlr.single.service", service))
       )
 
       "fail to bind" when {
@@ -75,7 +81,7 @@ class AMLSTurnoverFormProviderSpec extends FieldBehaviours {
 
           val result = form.bind(Map(field -> "foo"))
 
-          result.value shouldBe None
+          result.value        shouldBe None
           result.error(field) shouldBe Some(FormError(field, "error.invalid"))
         }
       }

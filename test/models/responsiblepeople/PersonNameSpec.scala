@@ -36,7 +36,7 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
 
     "fullName" must {
       "return a correctly formatted name" in {
-        fullModel.fullName must be("first middle last")
+        fullModel.fullName                         must be("first middle last")
         PersonName("first", None, "last").fullName must be("first last")
       }
     }

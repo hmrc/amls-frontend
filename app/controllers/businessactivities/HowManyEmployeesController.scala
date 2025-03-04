@@ -27,33 +27,32 @@ import views.html.businessactivities.BusinessEmployeesCountView
 
 import scala.concurrent.Future
 
-class HowManyEmployeesController @Inject()(val authAction: AuthAction,
-                                           val ds: CommonPlayDependencies,
-                                           val cc: MessagesControllerComponents,
-                                           service: HowManyEmployeesService,
-                                           formProvider: EmployeeCountFormProvider,
-                                           view: BusinessEmployeesCountView) extends AmlsBaseController(ds, cc) {
+class HowManyEmployeesController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  service: HowManyEmployeesService,
+  formProvider: EmployeeCountFormProvider,
+  view: BusinessEmployeesCountView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      service.getEmployeeCount(request.credId) map { countOpt =>
-        val form = countOpt.fold(formProvider())(count => formProvider().fill(EmployeeCount(count)))
-        Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    service.getEmployeeCount(request.credId) map { countOpt =>
+      val form = countOpt.fold(formProvider())(count => formProvider().fill(EmployeeCount(count)))
+      Ok(view(form, edit))
     }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           service.updateEmployeeCount(request.credId, data) map { _ =>
             redirect(edit)
           }
       )
-    }
   }
 
   private def redirect(edit: Boolean): Result = if (edit) {

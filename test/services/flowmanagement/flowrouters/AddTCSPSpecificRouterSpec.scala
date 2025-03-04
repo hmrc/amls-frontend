@@ -38,13 +38,14 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
     val router = new AddBusinessTypeRouter(
       businessMatchingService = mockBusinessMatchingService,
       addMoreActivitiesPageRouter = new AddMoreBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
-      businessAppliedForPSRNumberPageRouter = new BusinessAppliedForPsrNumberPageRouter(mockStatusService, mockBusinessMatchingService),
+      businessAppliedForPSRNumberPageRouter =
+        new BusinessAppliedForPsrNumberPageRouter(mockStatusService, mockBusinessMatchingService),
       newServicesInformationPageRouter = new NeedMoreInformationPageRouter(),
       noPSRPageRouter = new NoPSRPageRouter(mockStatusService, mockBusinessMatchingService),
       selectActivitiesPageRouter = new SelectBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
       subServicesPageRouter = new SubSectorsPageRouter(mockStatusService, mockBusinessMatchingService),
-      updateServicesSummaryPageRouter = new AddBusinessTypeSummaryPageRouter(mockStatusService, mockBusinessMatchingService)
-
+      updateServicesSummaryPageRouter =
+        new AddBusinessTypeSummaryPageRouter(mockStatusService, mockBusinessMatchingService)
     )
   }
 
@@ -65,8 +66,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
     "return the 'update_services_summary' page (AddBusinessTypeSummaryController)" when {
       "editing the 'Business types' page (SelectActivitiesPageId)" when {
         "selection is TCSP" in new Fixture {
-          val model = AddBusinessTypeFlowModel(
-            activity = Some(TrustAndCompanyServices))
+          val model  = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices))
           val result = await(router.getRoute("internalId", SelectBusinessTypesPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())

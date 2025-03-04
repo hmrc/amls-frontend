@@ -29,7 +29,7 @@ import views.html.tradingpremises.ConfirmAddressView
 class ConfirmAddressViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val confirm_address = inject[ConfirmAddressView]
-  lazy val fp = inject[ConfirmAddressFormProvider]
+  lazy val fp              = inject[ConfirmAddressFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   trait ViewFixture extends Fixture {
@@ -37,7 +37,8 @@ class ConfirmAddressViewSpec extends AmlsViewSpec with Matchers {
   }
 
   "ConfirmAddressView" must {
-    val address = Address("#11", Some("some building"), Some("Some street"), Some("city"), None, Country("United Kingdom","UK"))
+    val address =
+      Address("#11", Some("some building"), Some("Some street"), Some("city"), None, Country("United Kingdom", "UK"))
     "have correct title, heading and load UI with empty form" in new ViewFixture {
 
       val pageTitle = messages("tradingpremises.confirmaddress.title") + " - " +
@@ -46,8 +47,8 @@ class ConfirmAddressViewSpec extends AmlsViewSpec with Matchers {
 
       def view = confirm_address(fp(), address, 1)
 
-      doc.title must be(pageTitle)
-      heading.html must be(messages("tradingpremises.confirmaddress.title"))
+      doc.title       must be(pageTitle)
+      heading.html    must be(messages("tradingpremises.confirmaddress.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
 
       doc.getElementsMatchingOwnText("#11").text mustBe "#11 some building Some street city United Kingdom"
@@ -56,7 +57,9 @@ class ConfirmAddressViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       confirm_address(
-        fp().withError("confirmAddress", "error.required.tp.confirm.address"), address, 1
+        fp().withError("confirmAddress", "error.required.tp.confirm.address"),
+        address,
+        1
       ),
       "confirmAddress",
       "error.required.tp.confirm.address"

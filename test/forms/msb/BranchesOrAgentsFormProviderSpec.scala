@@ -22,13 +22,14 @@ import play.api.data.Form
 
 class BranchesOrAgentsFormProviderSpec extends BooleanFieldBehaviours[BranchesOrAgentsHasCountries] {
   override val form: Form[BranchesOrAgentsHasCountries] = new BranchesOrAgentsFormProvider()()
-  override val fieldName: String = "hasCountries"
-  override val errorMessage: String = "error.required.hasCountries.msb.branchesOrAgents"
+  override val fieldName: String                        = "hasCountries"
+  override val errorMessage: String                     = "error.required.hasCountries.msb.branchesOrAgents"
 
   "BranchesOrAgentsFormProvider" must {
 
     behave like booleanFieldWithModel(
-      BranchesOrAgentsHasCountries(true), BranchesOrAgentsHasCountries(false)
+      BranchesOrAgentsHasCountries(true),
+      BranchesOrAgentsHasCountries(false)
     )
   }
 }

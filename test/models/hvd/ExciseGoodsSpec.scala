@@ -27,7 +27,9 @@ class ExciseGoodsSpec extends PlaySpec {
 
       "successfully read and write json data" in {
 
-        ExciseGoods.format.reads(ExciseGoods.format.writes(ExciseGoods(true))) must be(JsSuccess(ExciseGoods(true), JsPath))
+        ExciseGoods.format.reads(ExciseGoods.format.writes(ExciseGoods(true))) must be(
+          JsSuccess(ExciseGoods(true), JsPath)
+        )
 
       }
     }

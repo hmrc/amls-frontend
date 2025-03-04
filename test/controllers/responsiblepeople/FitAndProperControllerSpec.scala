@@ -50,9 +50,10 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     )
 
     def setupCache(
-                    approvalFlags: ApprovalFlags,
-                    personName: Option[PersonName] = None,
-                    activities: Option[BusinessActivities]): Unit = {
+      approvalFlags: ApprovalFlags,
+      personName: Option[PersonName] = None,
+      activities: Option[BusinessActivities]
+    ): Unit = {
 
       mockCacheFetch[Seq[ResponsiblePerson]](
         item = Some(
@@ -67,16 +68,26 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       )
 
       when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-        .thenReturn(Some(Seq(ResponsiblePerson(
-          personName = personName,
-          approvalFlags = approvalFlags
-        ))))
+        .thenReturn(
+          Some(
+            Seq(
+              ResponsiblePerson(
+                personName = personName,
+                approvalFlags = approvalFlags
+              )
+            )
+          )
+        )
 
       when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-        .thenReturn(Some(BusinessMatching(
-          activities = activities,
-          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-        )))
+        .thenReturn(
+          Some(
+            BusinessMatching(
+              activities = activities,
+              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+            )
+          )
+        )
 
       when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -95,17 +106,21 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         "the index is out of bounds" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.FitAndProperController.post(1).url)
-          .withFormUrlEncodedBody(
-            "hasAlreadyPassedFitAndProper" -> "true"
-          )
+            .withFormUrlEncodedBody(
+              "hasAlreadyPassedFitAndProper" -> "true"
+            )
 
-          setupCache(testFitAndProper, Some(
-                        PersonName(
-                          firstName = "firstName",
-                          middleName = None,
-                          lastName = "lastName"
-                        )
-                      ), Some(BusinessActivities(Set(HighValueDealing))))
+          setupCache(
+            testFitAndProper,
+            Some(
+              PersonName(
+                firstName = "firstName",
+                middleName = None,
+                lastName = "lastName"
+              )
+            ),
+            Some(BusinessActivities(Set(HighValueDealing)))
+          )
 
           val result = controller.post(99)(newRequest)
           status(result) must be(NOT_FOUND)
@@ -115,9 +130,9 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         "given invalid data" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.FitAndProperController.post(1).url)
-          .withFormUrlEncodedBody(
-            "hasAlreadyPassedFitAndProper" -> "invalid"
-          )
+            .withFormUrlEncodedBody(
+              "hasAlreadyPassedFitAndProper" -> "invalid"
+            )
 
           setupCache(
             testFitAndProper,
@@ -133,9 +148,9 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         "given valid data and edit = false, and redirect to the DetailedAnswersController" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.FitAndProperController.post(1).url)
-          .withFormUrlEncodedBody(
-            "hasAlreadyPassedFitAndProper" -> "true"
-          )
+            .withFormUrlEncodedBody(
+              "hasAlreadyPassedFitAndProper" -> "true"
+            )
 
           setupCache(
             testFitAndProper,
@@ -143,17 +158,19 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           )
 
           val result = controller.post(1)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url)
+          )
         }
 
         "routes correctly" when {
           "given edit = true" when {
             "given fit and proper true, and redirect to the DetailedAnswersController" in new Fixture {
               val newRequest = FakeRequest(POST, routes.FitAndProperController.post(1).url)
-              .withFormUrlEncodedBody(
-                "hasAlreadyPassedFitAndProper" -> "true"
-              )
+                .withFormUrlEncodedBody(
+                  "hasAlreadyPassedFitAndProper" -> "true"
+                )
 
               setupCache(
                 testFitAndProper,
@@ -161,49 +178,65 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
               )
 
               val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
+              status(result)           must be(SEE_OTHER)
+              redirectLocation(result) must be(
+                Some(
+                  controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url
+                )
+              )
             }
 
             "given fit and proper false" when {
               "given some business matching" when {
                 "given TrustAndCompanyServices, and redirect to the DetailedAnswersController" in new Fixture {
                   val newRequest = FakeRequest(POST, routes.FitAndProperController.post(1).url)
-                  .withFormUrlEncodedBody(
-                    "hasAlreadyPassedFitAndProper" -> "false"
-                  )
+                    .withFormUrlEncodedBody(
+                      "hasAlreadyPassedFitAndProper" -> "false"
+                    )
 
                   setupCache(
                     testFitAndProper,
-                    activities = Some(BusinessActivities(Set(TrustAndCompanyServices,HighValueDealing)))
+                    activities = Some(BusinessActivities(Set(TrustAndCompanyServices, HighValueDealing)))
                   )
 
                   val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
-                  status(result) must be(SEE_OTHER)
-                  redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
+                  status(result)           must be(SEE_OTHER)
+                  redirectLocation(result) must be(
+                    Some(
+                      controllers.responsiblepeople.routes.DetailedAnswersController
+                        .get(1, Some(flowFromDeclaration))
+                        .url
+                    )
+                  )
                 }
 
                 "given MoneyServiceBusiness, and redirect to the DetailedAnswersController" in new Fixture {
                   val newRequest = FakeRequest(POST, routes.FitAndProperController.post(1).url)
-                  .withFormUrlEncodedBody(
-                    "hasAlreadyPassedFitAndProper" -> "false"
-                  )
+                    .withFormUrlEncodedBody(
+                      "hasAlreadyPassedFitAndProper" -> "false"
+                    )
 
                   setupCache(
                     testFitAndProper,
-                    activities = Some(BusinessActivities(Set(MoneyServiceBusiness,HighValueDealing)))
+                    activities = Some(BusinessActivities(Set(MoneyServiceBusiness, HighValueDealing)))
                   )
 
                   val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
-                  status(result) must be(SEE_OTHER)
-                  redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
+                  status(result)           must be(SEE_OTHER)
+                  redirectLocation(result) must be(
+                    Some(
+                      controllers.responsiblepeople.routes.DetailedAnswersController
+                        .get(1, Some(flowFromDeclaration))
+                        .url
+                    )
+                  )
                 }
 
                 "given NOT TrustAndCompanyServices or MoneyServiceBusiness, and redirect to the ApprovalCheckController" in new Fixture {
                   val newRequest = FakeRequest(POST, routes.FitAndProperController.post(1).url)
-                  .withFormUrlEncodedBody(
-                    "hasAlreadyPassedFitAndProper" -> "false"
-                  )
+                    .withFormUrlEncodedBody(
+                      "hasAlreadyPassedFitAndProper" -> "false"
+                    )
 
                   setupCache(
                     testFitAndProper,
@@ -211,8 +244,14 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
                   )
 
                   val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
-                  status(result) must be(SEE_OTHER)
-                  redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ApprovalCheckController.get(1, false, Some(flowFromDeclaration)).url))
+                  status(result)           must be(SEE_OTHER)
+                  redirectLocation(result) must be(
+                    Some(
+                      controllers.responsiblepeople.routes.ApprovalCheckController
+                        .get(1, false, Some(flowFromDeclaration))
+                        .url
+                    )
+                  )
                 }
               }
             }
@@ -221,9 +260,9 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           "given edit = false" when {
             "given fit and proper true, and redirect to the DetailedAnswersController" in new Fixture {
               val newRequest = FakeRequest(POST, routes.FitAndProperController.post(1).url)
-              .withFormUrlEncodedBody(
-                "hasAlreadyPassedFitAndProper" -> "true"
-              )
+                .withFormUrlEncodedBody(
+                  "hasAlreadyPassedFitAndProper" -> "true"
+                )
 
               setupCache(
                 testFitAndProper,
@@ -231,49 +270,65 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
               )
 
               val result = controller.post(1, false, Some(flowFromDeclaration))(newRequest)
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
+              status(result)           must be(SEE_OTHER)
+              redirectLocation(result) must be(
+                Some(
+                  controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url
+                )
+              )
             }
 
             "given fit and proper false" when {
               "given some business matching" when {
                 "given TrustAndCompanyServices, and redirect to the DetailedAnswersController" in new Fixture {
                   val newRequest = FakeRequest(POST, routes.FitAndProperController.post(1).url)
-                  .withFormUrlEncodedBody(
-                    "hasAlreadyPassedFitAndProper" -> "false"
-                  )
+                    .withFormUrlEncodedBody(
+                      "hasAlreadyPassedFitAndProper" -> "false"
+                    )
 
                   setupCache(
                     testFitAndProper,
-                    activities = Some(BusinessActivities(Set(TrustAndCompanyServices,HighValueDealing)))
+                    activities = Some(BusinessActivities(Set(TrustAndCompanyServices, HighValueDealing)))
                   )
 
                   val result = controller.post(1, false, Some(flowFromDeclaration))(newRequest)
-                  status(result) must be(SEE_OTHER)
-                  redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
+                  status(result)           must be(SEE_OTHER)
+                  redirectLocation(result) must be(
+                    Some(
+                      controllers.responsiblepeople.routes.DetailedAnswersController
+                        .get(1, Some(flowFromDeclaration))
+                        .url
+                    )
+                  )
                 }
 
                 "given MoneyServiceBusiness, and redirect to the DetailedAnswersController" in new Fixture {
                   val newRequest = FakeRequest(POST, routes.FitAndProperController.post(1).url)
-                  .withFormUrlEncodedBody(
-                    "hasAlreadyPassedFitAndProper" -> "false"
-                  )
+                    .withFormUrlEncodedBody(
+                      "hasAlreadyPassedFitAndProper" -> "false"
+                    )
 
                   setupCache(
                     testFitAndProper,
-                    activities = Some(BusinessActivities(Set(MoneyServiceBusiness,HighValueDealing)))
+                    activities = Some(BusinessActivities(Set(MoneyServiceBusiness, HighValueDealing)))
                   )
 
                   val result = controller.post(1, false, Some(flowFromDeclaration))(newRequest)
-                  status(result) must be(SEE_OTHER)
-                  redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
+                  status(result)           must be(SEE_OTHER)
+                  redirectLocation(result) must be(
+                    Some(
+                      controllers.responsiblepeople.routes.DetailedAnswersController
+                        .get(1, Some(flowFromDeclaration))
+                        .url
+                    )
+                  )
                 }
 
                 "given NOT TrustAndCompanyServices or MoneyServiceBusiness, and redirect to the ApprovalCheckController" in new Fixture {
                   val newRequest = FakeRequest(POST, routes.FitAndProperController.post(1).url)
-                  .withFormUrlEncodedBody(
-                    "hasAlreadyPassedFitAndProper" -> "false"
-                  )
+                    .withFormUrlEncodedBody(
+                      "hasAlreadyPassedFitAndProper" -> "false"
+                    )
 
                   setupCache(
                     testFitAndProper,
@@ -281,8 +336,14 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
                   )
 
                   val result = controller.post(1, false, Some(flowFromDeclaration))(newRequest)
-                  status(result) must be(SEE_OTHER)
-                  redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ApprovalCheckController.get(1, false, Some(flowFromDeclaration)).url))
+                  status(result)           must be(SEE_OTHER)
+                  redirectLocation(result) must be(
+                    Some(
+                      controllers.responsiblepeople.routes.ApprovalCheckController
+                        .get(1, false, Some(flowFromDeclaration))
+                        .url
+                    )
+                  )
                 }
               }
             }

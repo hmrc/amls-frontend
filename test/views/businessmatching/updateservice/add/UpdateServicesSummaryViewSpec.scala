@@ -44,8 +44,9 @@ class UpdateServicesSummaryViewSpec extends UpdateServicesSummaryFixtures {
 
   "for which business type you wish to register" must {
     "have a question title" in new ViewFixture {
-      val addBusinessTypeFlowModel: AddBusinessTypeFlowModel  = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
-      def view = update_services_summary(addBusinessTypeFlowModel)
+      val addBusinessTypeFlowModel: AddBusinessTypeFlowModel =
+        AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
+      def view                                               = update_services_summary(addBusinessTypeFlowModel)
 
       doc.body().text must include(messages("businessmatching.updateservice.selectactivities.title"))
     }
@@ -56,56 +57,76 @@ class UpdateServicesSummaryViewSpec extends UpdateServicesSummaryFixtures {
 
     "for all business types" must {
       "show AccountancyServices if present" in new ViewFixture {
-        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
+        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel =
+          AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
 
         def view = update_services_summary(addBusinessTypeFlowModel)
 
-        doc.getElementsByClass("govuk-summary-list__value").first.text mustBe messages("businessmatching.registerservices.servicename.lbl.01")
+        doc.getElementsByClass("govuk-summary-list__value").first.text mustBe messages(
+          "businessmatching.registerservices.servicename.lbl.01"
+        )
       }
 
       "show BillPaymentServices if present" in new ViewFixture {
-        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(BillPaymentServices))
+        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel =
+          AddBusinessTypeFlowModel(activity = Some(BillPaymentServices))
 
         def view = update_services_summary(addBusinessTypeFlowModel)
 
-        doc.getElementsByClass("govuk-summary-list__value").first.text mustBe (messages("businessmatching.registerservices.servicename.lbl.03"))
+        doc.getElementsByClass("govuk-summary-list__value").first.text mustBe (messages(
+          "businessmatching.registerservices.servicename.lbl.03"
+        ))
       }
 
       "show EstateAgentBusinessService if present" in new ViewFixture {
-        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(EstateAgentBusinessService))
+        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel =
+          AddBusinessTypeFlowModel(activity = Some(EstateAgentBusinessService))
 
         def view = update_services_summary(addBusinessTypeFlowModel)
 
-        doc.getElementsByClass("govuk-summary-list__value").first.text mustBe (messages("businessmatching.registerservices.servicename.lbl.04"))
+        doc.getElementsByClass("govuk-summary-list__value").first.text mustBe (messages(
+          "businessmatching.registerservices.servicename.lbl.04"
+        ))
       }
 
       "show HighValueDealing if present" in new ViewFixture {
-        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
+        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel =
+          AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
 
         def view = update_services_summary(addBusinessTypeFlowModel)
 
-        doc.getElementsByClass("govuk-summary-list__value").first.text mustBe (messages("businessmatching.registerservices.servicename.lbl.05"))
+        doc.getElementsByClass("govuk-summary-list__value").first.text mustBe (messages(
+          "businessmatching.registerservices.servicename.lbl.05"
+        ))
       }
 
       "show MoneyServiceBusiness if present" in new MSBAllViewFixture {
 
-        doc.getElementsByClass("govuk-summary-list__value").first.text mustBe (messages("businessmatching.registerservices.servicename.lbl.06"))
+        doc.getElementsByClass("govuk-summary-list__value").first.text mustBe (messages(
+          "businessmatching.registerservices.servicename.lbl.06"
+        ))
       }
 
       "show TrustAndCompanyServices if present" in new ViewFixture {
-        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices))
+        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel =
+          AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices))
 
         def view = update_services_summary(addBusinessTypeFlowModel)
 
-        doc.getElementsByClass("govuk-summary-list__value").first.text mustBe (messages("businessmatching.registerservices.servicename.lbl.07"))
+        doc.getElementsByClass("govuk-summary-list__value").first.text mustBe (messages(
+          "businessmatching.registerservices.servicename.lbl.07"
+        ))
       }
 
       "show TelephonePaymentService if present" in new ViewFixture {
-        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(TelephonePaymentService))
+        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel =
+          AddBusinessTypeFlowModel(activity = Some(TelephonePaymentService))
 
         def view = update_services_summary(addBusinessTypeFlowModel)
 
-        doc.getElementsByClass("govuk-summary-list__value").first.text mustBe (messages("businessmatching.registerservices.servicename.lbl.08"))
+        doc.getElementsByClass("govuk-summary-list__value").first.text mustBe (messages(
+          "businessmatching.registerservices.servicename.lbl.08"
+        ))
       }
     }
   }
@@ -122,45 +143,65 @@ class UpdateServicesSummaryViewSpec extends UpdateServicesSummaryFixtures {
 
       "for all msb services" must {
         "show msb service TransmittingMoney" in new MSBAllViewFixture {
-          doc.getElementsByClass("govuk-summary-list__value").get(1).text must include(messages("businessmatching.services.list.lbl.01"))
+          doc.getElementsByClass("govuk-summary-list__value").get(1).text must include(
+            messages("businessmatching.services.list.lbl.01")
+          )
         }
 
         "show msb service CurrencyExchange" in new MSBAllViewFixture {
-          doc.getElementsByClass("govuk-summary-list__value").get(1).text must include(messages("businessmatching.services.list.lbl.02"))
+          doc.getElementsByClass("govuk-summary-list__value").get(1).text must include(
+            messages("businessmatching.services.list.lbl.02")
+          )
         }
 
         "show msb service ChequeCashingNotScrapMetal" in new MSBAllViewFixture {
-          doc.getElementsByClass("govuk-summary-list__value").get(1).text must include(messages("businessmatching.services.list.lbl.03"))
+          doc.getElementsByClass("govuk-summary-list__value").get(1).text must include(
+            messages("businessmatching.services.list.lbl.03")
+          )
         }
 
         "show msb service ChequeCashingScrapMetal" in new MSBAllViewFixture {
-          doc.getElementsByClass("govuk-summary-list__value").get(1).text must include(messages("businessmatching.services.list.lbl.04"))
+          doc.getElementsByClass("govuk-summary-list__value").get(1).text must include(
+            messages("businessmatching.services.list.lbl.04")
+          )
         }
 
         "show msb service ForeignExchange" in new MSBAllViewFixture {
-          doc.getElementsByClass("govuk-summary-list__value").get(1).text must include(messages("businessmatching.services.list.lbl.05"))
+          doc.getElementsByClass("govuk-summary-list__value").get(1).text must include(
+            messages("businessmatching.services.list.lbl.05")
+          )
         }
       }
 
       "for single msb" must {
         "show msb service TransmittingMoney" in new MSBSingleViewFixture {
-          doc.getElementsByClass("govuk-summary-list__value").get(1).text must include(messages("businessmatching.services.list.lbl.01"))
+          doc.getElementsByClass("govuk-summary-list__value").get(1).text must include(
+            messages("businessmatching.services.list.lbl.01")
+          )
         }
 
         "show msb service CurrencyExchange" in new MSBSingleViewFixture {
-          doc.getElementsByClass("govuk-summary-list__value").get(1).text must not include(messages("businessmatching.services.list.lbl.02"))
+          doc.getElementsByClass("govuk-summary-list__value").get(1).text must not include (messages(
+            "businessmatching.services.list.lbl.02"
+          ))
         }
 
         "show msb service ChequeCashingNotScrapMetal" in new MSBSingleViewFixture {
-          doc.getElementsByClass("govuk-summary-list__value").get(1).text must not include(messages("businessmatching.services.list.lbl.03"))
+          doc.getElementsByClass("govuk-summary-list__value").get(1).text must not include (messages(
+            "businessmatching.services.list.lbl.03"
+          ))
         }
 
         "show msb service ChequeCashingScrapMetal" in new MSBSingleViewFixture {
-          doc.getElementsByClass("govuk-summary-list__value").get(1).text must not include(messages("businessmatching.services.list.lbl.04"))
+          doc.getElementsByClass("govuk-summary-list__value").get(1).text must not include (messages(
+            "businessmatching.services.list.lbl.04"
+          ))
         }
 
         "show msb service ForeignExchange" in new MSBSingleViewFixture {
-          doc.getElementsByClass("govuk-summary-list__value").get(1).text must not include(messages("businessmatching.services.list.lbl.05"))
+          doc.getElementsByClass("govuk-summary-list__value").get(1).text must not include (messages(
+            "businessmatching.services.list.lbl.05"
+          ))
         }
       }
     }
@@ -193,7 +234,7 @@ class UpdateServicesSummaryViewSpec extends UpdateServicesSummaryFixtures {
   }
 
   "if not msb" in new SimpleFlowModelViewFixture {
-    doc.body().text must not include(messages("businessmatching.services.title"))
+    doc.body().text must not include (messages("businessmatching.services.title"))
   }
 
   "The page have a submit button with correct text" in new MSBAllViewFixture {

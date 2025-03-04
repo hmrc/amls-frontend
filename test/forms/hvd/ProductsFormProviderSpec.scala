@@ -24,10 +24,10 @@ import play.api.data.{Form, FormError}
 
 class ProductsFormProviderSpec extends CheckboxFieldBehaviours with StringFieldBehaviours with Constraints {
 
-  val formProvider = new ProductsFormProvider()
+  val formProvider         = new ProductsFormProvider()
   val form: Form[Products] = formProvider()
 
-  val checkboxFieldName = "products"
+  val checkboxFieldName    = "products"
   val checkboxErrorMessage = "error.required.hvd.business.sell.atleast"
 
   val textFieldName = "otherDetails"
@@ -50,35 +50,44 @@ class ProductsFormProviderSpec extends CheckboxFieldBehaviours with StringFieldB
       "bind when Other is selected" in {
 
         forAll(stringOfLengthGen(formProvider.length)) { otherDetails =>
-          val result = form.bind(Map(
-            checkboxFieldName -> Other("").toString,
-            textFieldName -> otherDetails
-          )).apply(textFieldName)
+          val result = form
+            .bind(
+              Map(
+                checkboxFieldName -> Other("").toString,
+                textFieldName     -> otherDetails
+              )
+            )
+            .apply(textFieldName)
           result.value.value shouldBe otherDetails
         }
       }
 
       "be mandatory if Other is selected" in {
 
-        val result = form.bind(Map(
-          checkboxFieldName -> Other("").toString,
-          textFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            checkboxFieldName -> Other("").toString,
+            textFieldName     -> ""
+          )
+        )
 
-        result.value shouldBe None
-        result.error(textFieldName) shouldBe Some(FormError(textFieldName, "error.required.hvd.business.sell.other.details"))
+        result.value                shouldBe None
+        result.error(textFieldName) shouldBe Some(
+          FormError(textFieldName, "error.required.hvd.business.sell.other.details")
+        )
       }
 
       s"not bind strings that are longer that ${formProvider.length}" in {
 
         forAll(stringsLongerThan(formProvider.length).suchThat(_.nonEmpty)) { longString =>
+          val result = form.bind(
+            Map(
+              checkboxFieldName -> Other("").toString,
+              textFieldName     -> longString
+            )
+          )
 
-          val result = form.bind(Map(
-            checkboxFieldName -> Other("").toString,
-            textFieldName -> longString
-          ))
-
-          result.value shouldBe None
+          result.value                shouldBe None
           result.error(textFieldName) shouldBe Some(
             FormError(textFieldName, "error.invalid.hvd.business.sell.other.details", Seq(formProvider.length))
           )
@@ -87,17 +96,19 @@ class ProductsFormProviderSpec extends CheckboxFieldBehaviours with StringFieldB
 
       "not bind invalid strings" in {
 
-        forAll(stringsShorterThan(formProvider.length - 1).suchThat(_.nonEmpty), invalidCharForNames) { (detail, invalid) =>
+        forAll(stringsShorterThan(formProvider.length - 1).suchThat(_.nonEmpty), invalidCharForNames) {
+          (detail, invalid) =>
+            val result = form.bind(
+              Map(
+                checkboxFieldName -> Other("").toString,
+                textFieldName     -> (detail + invalid)
+              )
+            )
 
-          val result = form.bind(Map(
-            checkboxFieldName -> Other("").toString,
-            textFieldName -> (detail + invalid)
-          ))
-
-          result.value shouldBe None
-          result.error(textFieldName) shouldBe Some(
-            FormError(textFieldName, "error.invalid.hvd.business.sell.other.format", Seq(basicPunctuationRegex))
-          )
+            result.value                shouldBe None
+            result.error(textFieldName) shouldBe Some(
+              FormError(textFieldName, "error.invalid.hvd.business.sell.other.format", Seq(basicPunctuationRegex))
+            )
         }
       }
     }

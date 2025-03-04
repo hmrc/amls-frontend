@@ -32,7 +32,7 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given an `Yes` value" in {
 
-      val json = Json.obj("penalised" -> true, "professionalBody" ->"details")
+      val json = Json.obj("penalised" -> true, "professionalBody" -> "details")
 
       Json.fromJson[ProfessionalBody](json) must
         be(JsSuccess(ProfessionalBodyYes("details"), JsPath \ "professionalBody"))
@@ -52,12 +52,13 @@ class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
         be(Json.obj("penalised" -> false))
 
       Json.toJson(ProfessionalBodyYes("details").asInstanceOf[ProfessionalBody]) must
-        be(Json.obj(
-          "penalised" -> true,
-          "professionalBody" -> "details"
-        ))
+        be(
+          Json.obj(
+            "penalised"        -> true,
+            "professionalBody" -> "details"
+          )
+        )
     }
   }
-
 
 }

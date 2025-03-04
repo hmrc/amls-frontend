@@ -23,7 +23,7 @@ import play.api.libs.json.{Reads, Writes}
 sealed trait PersonAddress {
 
   def toLines: Seq[String] = this match {
-    case a: PersonAddressUK =>
+    case a: PersonAddressUK    =>
       Seq(
         Some(a.addressLine1),
         a.addressLine2,
@@ -42,36 +42,38 @@ sealed trait PersonAddress {
   }
 
   def isUK()(implicit provider: MessagesProvider): String = this match {
-    case _: PersonAddressUK => Messages("lbl.yes")
+    case _: PersonAddressUK    => Messages("lbl.yes")
     case _: PersonAddressNonUK => Messages("lbl.no")
   }
 
   def isComplete = this match {
-    case PersonAddressUK(al1, _, _, _, ap) if al1.nonEmpty & ap.nonEmpty => true
+    case PersonAddressUK(al1, _, _, _, ap) if al1.nonEmpty & ap.nonEmpty                         => true
     case PersonAddressNonUK(al1, _, _, _, c) if al1.nonEmpty & c.name.nonEmpty & c.code.nonEmpty => true
-    case _ => false
+    case _                                                                                       => false
   }
 
   def isEmpty = this match {
-    case PersonAddressUK("", _, _, _, "") => true
+    case PersonAddressUK("", _, _, _, "")                 => true
     case PersonAddressNonUK("", _, _, _, Country("", "")) => true
-    case _ => false
+    case _                                                => false
   }
 }
 
 case class PersonAddressUK(
-                      addressLine1: String,
-                      addressLine2: Option[String],
-                      addressLine3: Option[String],
-                      addressLine4: Option[String],
-                      postCode: String) extends PersonAddress
+  addressLine1: String,
+  addressLine2: Option[String],
+  addressLine3: Option[String],
+  addressLine4: Option[String],
+  postCode: String
+) extends PersonAddress
 
 case class PersonAddressNonUK(
-                         addressLineNonUK1: String,
-                         addressLineNonUK2: Option[String],
-                         addressLineNonUK3: Option[String],
-                         addressLineNonUK4: Option[String],
-                         country: Country) extends PersonAddress
+  addressLineNonUK1: String,
+  addressLineNonUK2: Option[String],
+  addressLineNonUK3: Option[String],
+  addressLineNonUK4: Option[String],
+  country: Country
+) extends PersonAddress
 
 object PersonAddress {
 
@@ -80,15 +82,13 @@ object PersonAddress {
     import play.api.libs.json.Reads._
     import play.api.libs.json._
     (__ \ "personAddressPostCode").read[String] andKeep (
-      (
-        (__ \ "personAddressLine1").read[String] and
+      ((__ \ "personAddressLine1").read[String] and
         (__ \ "personAddressLine2").readNullable[String] and
         (__ \ "personAddressLine3").readNullable[String] and
         (__ \ "personAddressLine4").readNullable[String] and
         (__ \ "personAddressPostCode").read[String])(PersonAddressUK.apply _) map identity[PersonAddress]
-      ) orElse
-      (
-        (__ \ "personAddressLine1").read[String] and
+    ) orElse
+      ((__ \ "personAddressLine1").read[String] and
         (__ \ "personAddressLine2").readNullable[String] and
         (__ \ "personAddressLine3").readNullable[String] and
         (__ \ "personAddressLine4").readNullable[String] and
@@ -100,22 +100,22 @@ object PersonAddress {
     import play.api.libs.json.Writes._
     import play.api.libs.json._
     Writes[PersonAddress] {
-      case a: PersonAddressUK =>
+      case a: PersonAddressUK    =>
         (
-            (__ \ "personAddressLine1").write[String] and
+          (__ \ "personAddressLine1").write[String] and
             (__ \ "personAddressLine2").writeNullable[String] and
             (__ \ "personAddressLine3").writeNullable[String] and
             (__ \ "personAddressLine4").writeNullable[String] and
             (__ \ "personAddressPostCode").write[String]
-          )(unlift(PersonAddressUK.unapply)).writes(a)
+        )(unlift(PersonAddressUK.unapply)).writes(a)
       case a: PersonAddressNonUK =>
         (
-            (__ \ "personAddressLine1").write[String] and
+          (__ \ "personAddressLine1").write[String] and
             (__ \ "personAddressLine2").writeNullable[String] and
             (__ \ "personAddressLine3").writeNullable[String] and
             (__ \ "personAddressLine4").writeNullable[String] and
             (__ \ "personAddressCountry").write[Country]
-          )(unlift(PersonAddressNonUK.unapply)).writes(a)
+        )(unlift(PersonAddressNonUK.unapply)).writes(a)
     }
   }
 }

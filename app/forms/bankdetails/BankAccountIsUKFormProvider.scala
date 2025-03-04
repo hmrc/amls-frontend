@@ -22,9 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class BankAccountIsUKFormProvider @Inject()() extends BooleanFormProvider {
+class BankAccountIsUKFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[BankAccountIsUk] = createForm[BankAccountIsUk](
-    "isUK", "error.bankdetails.ukbankaccount"
+    "isUK",
+    "error.bankdetails.ukbankaccount"
   )(BankAccountIsUk.apply, _.isUk)
 }

@@ -24,8 +24,8 @@ import play.api.data.Form
 class NewHomeAddressFormProviderSpec extends BooleanFieldBehaviours[NewHomeAddress] {
 
   override val form: Form[NewHomeAddress] = new NewHomeAddressFormProvider()()
-  override val fieldName: String = "isUK"
-  override val errorMessage: String = "error.required.uk.or.overseas.address.new.home"
+  override val fieldName: String          = "isUK"
+  override val errorMessage: String       = "error.required.uk.or.overseas.address.new.home"
 
   "NewHomeAddressFormProvider" must {
 

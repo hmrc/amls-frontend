@@ -33,8 +33,9 @@ class CreatePaymentResponseSpec extends PlaySpec with Matchers {
           | }
         """.stripMargin
 
-      //noinspection ScalaStyle
-      val model = CreatePaymentResponse(nextUrl = NextUrl("https://tax.service.gov.uk/pay/1234567890"), journeyId = "1234567890")
+      // noinspection ScalaStyle
+      val model =
+        CreatePaymentResponse(nextUrl = NextUrl("https://tax.service.gov.uk/pay/1234567890"), journeyId = "1234567890")
 
       Json.toJson(model) mustBe Json.parse(expectedJson)
     }

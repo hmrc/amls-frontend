@@ -25,7 +25,7 @@ import views.html.submission.DuplicateSubmissionView
 class DuplicateSubmissionViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val duplicateSubmissionView = app.injector.instanceOf[DuplicateSubmissionView]
+    lazy val duplicateSubmissionView                               = app.injector.instanceOf[DuplicateSubmissionView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val url = "/foo"

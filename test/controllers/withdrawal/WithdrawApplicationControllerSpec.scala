@@ -38,13 +38,13 @@ class WithdrawApplicationControllerSpec extends AmlsSpec {
   trait TestFixture extends AuthorisedFixture {
     self =>
 
-    val request = addToken(authRequest)
-    val amlsConnector = mock[AmlsConnector]
+    val request        = addToken(authRequest)
+    val amlsConnector  = mock[AmlsConnector]
     val cacheConnector = mock[DataCacheConnector]
-    val statusService = mock[StatusService]
-    val enrolments = mock[AuthEnrolmentsService]
-    lazy val view = app.injector.instanceOf[WithdrawApplicationView]
-    val controller = new WithdrawApplicationController(
+    val statusService  = mock[StatusService]
+    val enrolments     = mock[AuthEnrolmentsService]
+    lazy val view      = app.injector.instanceOf[WithdrawApplicationView]
+    val controller     = new WithdrawApplicationController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       amlsConnector,
@@ -52,14 +52,15 @@ class WithdrawApplicationControllerSpec extends AmlsSpec {
       enrolments,
       statusService,
       cc = mockMcc,
-      view = view)
+      view = view
+    )
 
     val applicationReference = "SUIYD3274890384"
-    val safeId = "X87FUDIKJJKJH87364"
-    val businessName = "Business Name from registration details"
-    val reviewDetails = mock[ReviewDetails]
+    val safeId               = "X87FUDIKJJKJH87364"
+    val businessName         = "Business Name from registration details"
+    val reviewDetails        = mock[ReviewDetails]
 
-    //noinspection ScalaStyle
+    // noinspection ScalaStyle
     val processingDate = LocalDateTime.of(2002, 1, 1, 12, 0, 0)
     val statusResponse = ReadStatusResponse(processingDate, "", None, None, None, None, renewalConFlag = false)
 
@@ -81,8 +82,6 @@ class WithdrawApplicationControllerSpec extends AmlsSpec {
       controller.statusService.getSafeIdFromReadStatus(any(), any(), any())(any(), any())
     } thenReturn Future.successful(Some(safeId))
   }
-
-
 
   "The WithdrawApplication controller" when {
     "the get method is called" must {

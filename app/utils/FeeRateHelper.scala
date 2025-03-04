@@ -18,7 +18,6 @@ package utils
 
 object FeeRateHelper {
 
-  def fetch(rate: Option[BigDecimal]): BigDecimal = {
+  def fetch(rate: Option[BigDecimal]): BigDecimal =
     rate.getOrElse(0.0)
-  }
 }

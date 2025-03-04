@@ -32,7 +32,8 @@ object NotificationResponse {
     js.validate[String].map[LocalDateTime](dtString => LocalDateTime.parse(dtString, dateTimeFormatter))
   }
 
-  implicit val localDateTimeWrite: Writes[LocalDateTime] = (dateTime: LocalDateTime) => JsString(dateTimeFormatter.format(dateTime.atOffset(UTC)))
+  implicit val localDateTimeWrite: Writes[LocalDateTime] = (dateTime: LocalDateTime) =>
+    JsString(dateTimeFormatter.format(dateTime.atOffset(UTC)))
 
   implicit val format: OFormat[NotificationResponse] = Json.format[NotificationResponse]
 }

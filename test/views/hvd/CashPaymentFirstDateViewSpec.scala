@@ -28,10 +28,10 @@ import views.html.hvd.CashPaymentFirstDateView
 
 import java.time.LocalDate
 
-class CashPaymentFirstDateViewSpec extends AmlsViewSpec with Matchers  {
+class CashPaymentFirstDateViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val dateView = app.injector.instanceOf[CashPaymentFirstDateView]
-  lazy val fp = app.injector.instanceOf[CashPaymentFirstDateFormProvider]
+  lazy val fp       = app.injector.instanceOf[CashPaymentFirstDateFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -43,16 +43,16 @@ class CashPaymentFirstDateViewSpec extends AmlsViewSpec with Matchers  {
 
     "have correct title" in new ViewFixture {
 
-      def view = dateView(fp().fill(CashPaymentFirstDate(LocalDate.of(2016,3,20))), true)
+      def view = dateView(fp().fill(CashPaymentFirstDate(LocalDate.of(2016, 3, 20))), true)
 
       doc.title must startWith(Messages("hvd.cash.payment.date.title") + " - " + Messages("summary.hvd"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = dateView(fp().fill(CashPaymentFirstDate(LocalDate.of(2016,3,24))), true)
+      def view = dateView(fp().fill(CashPaymentFirstDate(LocalDate.of(2016, 3, 24))), true)
 
-      heading.html must be(Messages("hvd.cash.payment.date.title"))
+      heading.html    must be(Messages("hvd.cash.payment.date.title"))
       subHeading.html must include(Messages("summary.hvd"))
 
     }

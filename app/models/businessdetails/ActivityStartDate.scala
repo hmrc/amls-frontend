@@ -19,8 +19,8 @@ package models.businessdetails
 import java.time.LocalDate
 import play.api.libs.json.{Json, OFormat}
 
-case class ActivityStartDate (startDate: LocalDate)
+case class ActivityStartDate(startDate: LocalDate)
 
 object ActivityStartDate {
-  implicit val format: OFormat[ActivityStartDate] =  Json.format[ActivityStartDate]
+  implicit val format: OFormat[ActivityStartDate] = Json.format[ActivityStartDate]
 }

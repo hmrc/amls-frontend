@@ -30,11 +30,11 @@ case class AgentRemovalReason(removalReason: String, removalReasonOther: Option[
   def reasonToObj: AgentRemovalReasonAnswer = removalReason match {
     case Schema.MAJOR_COMPLIANCE_ISSUES => MajorComplianceIssues
     case Schema.MINOR_COMPLIANCE_ISSUES => MinorComplianceIssues
-    case Schema.LACK_OF_PROFIT => LackOfProfit
-    case Schema.CEASED_TRADING => CeasedTrading
-    case Schema.REQUESTED_BY_AGENT => RequestedByAgent
-    case Schema.OTHER => Other
-    case _ => throw new IllegalArgumentException("Invalid reason")
+    case Schema.LACK_OF_PROFIT          => LackOfProfit
+    case Schema.CEASED_TRADING          => CeasedTrading
+    case Schema.REQUESTED_BY_AGENT      => RequestedByAgent
+    case Schema.OTHER                   => Other
+    case _                              => throw new IllegalArgumentException("Invalid reason")
   }
 }
 
@@ -74,8 +74,7 @@ object AgentRemovalReason extends Enumerable.Implicits {
   implicit val enumerable: Enumerable[AgentRemovalReasonAnswer] = Enumerable(all.map(v => v.toString -> v): _*)
 
   def formItems(conditionalHtml: Html)(implicit messages: Messages): Seq[RadioItem] = all.map { answer =>
-
-    if(answer == Other) {
+    if (answer == Other) {
       RadioItem(
         content = Text(messages(s"tradingpremises.remove_reasons.agent.premises.lbl.${answer.value}")),
         id = Some(answer.toString),
@@ -99,44 +98,42 @@ object RemovalReasonConstants {
   object Form {
     val MAJOR_COMPLIANCE_ISSUES = "01"
     val MINOR_COMPLIANCE_ISSUES = "02"
-    val LACK_OF_PROFIT = "03"
-    val CEASED_TRADING = "04"
-    val REQUESTED_BY_AGENT = "05"
-    val OTHER = "06"
+    val LACK_OF_PROFIT          = "03"
+    val CEASED_TRADING          = "04"
+    val REQUESTED_BY_AGENT      = "05"
+    val OTHER                   = "06"
   }
 
   object Schema {
     val MAJOR_COMPLIANCE_ISSUES = "Serious compliance failures"
     val MINOR_COMPLIANCE_ISSUES = "Minor compliance failures"
-    val LACK_OF_PROFIT = "Lack of activity"
-    val CEASED_TRADING = "Agent ceased trading"
-    val REQUESTED_BY_AGENT = "Requested by agent"
-    val OTHER = "Other"
+    val LACK_OF_PROFIT          = "Lack of activity"
+    val CEASED_TRADING          = "Agent ceased trading"
+    val REQUESTED_BY_AGENT      = "Requested by agent"
+    val OTHER                   = "Other"
   }
 
   object Rules {
 
-    def toSchemaReason(reason: String): String = {
+    def toSchemaReason(reason: String): String =
       reason match {
         case Form.MAJOR_COMPLIANCE_ISSUES => Schema.MAJOR_COMPLIANCE_ISSUES
         case Form.MINOR_COMPLIANCE_ISSUES => Schema.MINOR_COMPLIANCE_ISSUES
-        case Form.LACK_OF_PROFIT => Schema.LACK_OF_PROFIT
-        case Form.CEASED_TRADING => Schema.CEASED_TRADING
-        case Form.REQUESTED_BY_AGENT => Schema.REQUESTED_BY_AGENT
-        case Form.OTHER => Schema.OTHER
+        case Form.LACK_OF_PROFIT          => Schema.LACK_OF_PROFIT
+        case Form.CEASED_TRADING          => Schema.CEASED_TRADING
+        case Form.REQUESTED_BY_AGENT      => Schema.REQUESTED_BY_AGENT
+        case Form.OTHER                   => Schema.OTHER
       }
-    }
 
-    def fromSchemaReason(reason: String): String = {
+    def fromSchemaReason(reason: String): String =
       reason match {
         case Schema.MAJOR_COMPLIANCE_ISSUES => Form.MAJOR_COMPLIANCE_ISSUES
         case Schema.MINOR_COMPLIANCE_ISSUES => Form.MINOR_COMPLIANCE_ISSUES
-        case Schema.LACK_OF_PROFIT => Form.LACK_OF_PROFIT
-        case Schema.CEASED_TRADING => Form.CEASED_TRADING
-        case Schema.REQUESTED_BY_AGENT => Form.REQUESTED_BY_AGENT
-        case Schema.OTHER => Form.OTHER
+        case Schema.LACK_OF_PROFIT          => Form.LACK_OF_PROFIT
+        case Schema.CEASED_TRADING          => Form.CEASED_TRADING
+        case Schema.REQUESTED_BY_AGENT      => Form.REQUESTED_BY_AGENT
+        case Schema.OTHER                   => Form.OTHER
       }
-    }
 
   }
 

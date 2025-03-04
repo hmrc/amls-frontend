@@ -27,43 +27,43 @@ import views.html.businessactivities.ExpectedAMLSTurnoverView
 
 import scala.concurrent.Future
 
-class ExpectedAMLSTurnoverController @Inject()(val authAction: AuthAction,
-                                               val ds: CommonPlayDependencies,
-                                               implicit val statusService: StatusService,
-                                               val cc: MessagesControllerComponents,
-                                               service: ExpectedAMLSTurnoverService,
-                                               formProvider: ExpectedAMLSTurnoverFormProvider,
-                                               view: ExpectedAMLSTurnoverView) extends AmlsBaseController(ds, cc) {
+class ExpectedAMLSTurnoverController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val statusService: StatusService,
+  val cc: MessagesControllerComponents,
+  service: ExpectedAMLSTurnoverService,
+  formProvider: ExpectedAMLSTurnoverFormProvider,
+  view: ExpectedAMLSTurnoverView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      service.getBusinessMatchingExpectedTurnover(request.credId) map {
-        case Some((bm, Some(turnover))) =>
-          Ok(view(formProvider().fill(turnover), edit, bm, bm.alphabeticalBusinessActivitiesLowerCase()))
-        case Some((bm, _)) =>
-          Ok(view(formProvider(), edit, bm, bm.alphabeticalBusinessActivitiesLowerCase()))
-        case _ =>
-          Ok(view(formProvider(), edit, None, None))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    service.getBusinessMatchingExpectedTurnover(request.credId) map {
+      case Some((bm, Some(turnover))) =>
+        Ok(view(formProvider().fill(turnover), edit, bm, bm.alphabeticalBusinessActivitiesLowerCase()))
+      case Some((bm, _))              =>
+        Ok(view(formProvider(), edit, bm, bm.alphabeticalBusinessActivitiesLowerCase()))
+      case _                          =>
+        Ok(view(formProvider(), edit, None, None))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      service.getBusinessMatching(request.credId) flatMap { bm =>
-        formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    service.getBusinessMatching(request.credId) flatMap { bm =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
           formWithErrors =>
             Future.successful(BadRequest(view(formWithErrors, edit, bm, bm.alphabeticalBusinessActivitiesLowerCase()))),
-          data =>
-            service.updateBusinessActivities(request.credId, data).map(_ => redirectLogic(edit))
+          data => service.updateBusinessActivities(request.credId, data).map(_ => redirectLogic(edit))
         )
-      }
+    }
   }
 
-  private def redirectLogic(edit: Boolean): Result = {
+  private def redirectLogic(edit: Boolean): Result =
     if (edit) {
       Redirect(routes.SummaryController.get)
     } else {
       Redirect(routes.BusinessFranchiseController.get())
     }
-  }
 }

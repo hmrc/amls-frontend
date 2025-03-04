@@ -22,13 +22,14 @@ import play.api.data.Form
 
 class UsesForeignCurrenciesFormProviderSpec extends BooleanFieldBehaviours[UsesForeignCurrencies] {
   override val form: Form[UsesForeignCurrencies] = new UsesForeignCurrenciesFormProvider()()
-  override val fieldName: String = "usesForeignCurrencies"
-  override val errorMessage: String = "error.required.msb.wc.foreignCurrencies"
+  override val fieldName: String                 = "usesForeignCurrencies"
+  override val errorMessage: String              = "error.required.msb.wc.foreignCurrencies"
 
   "UsesForeignCurrenciesFormProvider" must {
 
     behave like booleanFieldWithModel(
-      UsesForeignCurrenciesYes, UsesForeignCurrenciesNo
+      UsesForeignCurrenciesYes,
+      UsesForeignCurrenciesNo
     )
   }
 }

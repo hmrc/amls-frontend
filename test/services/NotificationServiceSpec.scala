@@ -44,7 +44,8 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with ScalaCheck
 
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[AmlsNotificationConnector].to(amlsNotificationConnector))
-      .bindings(bind[MessagesApi].to(messagesApi)).build()
+      .bindings(bind[MessagesApi].to(messagesApi))
+      .build()
 
     val service = injector.instanceOf[NotificationService]
 
@@ -60,7 +61,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with ScalaCheck
       _id = IDType("132456")
     )
 
-    val accountTypeId = ("org","id")
+    val accountTypeId = ("org", "id")
 
     val dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC)
 
@@ -71,36 +72,43 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with ScalaCheck
       testNotifications.copy(contactType = Some(RejectionReasons), receivedAt = LocalDateTime.of(2001, 12, 1, 1, 3)),
       testNotifications,
       testNotifications.copy(contactType = Some(RevocationReasons), receivedAt = LocalDateTime.of(1998, 12, 1, 1, 3)),
-      testNotifications.copy(contactType = Some(AutoExpiryOfRegistration), receivedAt = LocalDateTime.of(2017, 11, 1, 1, 3)),
-      testNotifications.copy(contactType = Some(ReminderToPayForApplication), receivedAt = LocalDateTime.of(2012, 12, 1, 1, 3)),
-      testNotifications.copy(contactType = Some(ReminderToPayForVariation), receivedAt = LocalDateTime.of(2017, 12, 1, 3, 3)),
-      testNotifications.copy(contactType = Some(ReminderToPayForRenewal), receivedAt = LocalDateTime.of(2017, 12, 3, 1, 3)),
-      testNotifications.copy(contactType = Some(ReminderToPayForManualCharges), receivedAt = LocalDateTime.of(2007, 12, 1, 1, 3)),
+      testNotifications
+        .copy(contactType = Some(AutoExpiryOfRegistration), receivedAt = LocalDateTime.of(2017, 11, 1, 1, 3)),
+      testNotifications
+        .copy(contactType = Some(ReminderToPayForApplication), receivedAt = LocalDateTime.of(2012, 12, 1, 1, 3)),
+      testNotifications
+        .copy(contactType = Some(ReminderToPayForVariation), receivedAt = LocalDateTime.of(2017, 12, 1, 3, 3)),
+      testNotifications
+        .copy(contactType = Some(ReminderToPayForRenewal), receivedAt = LocalDateTime.of(2017, 12, 3, 1, 3)),
+      testNotifications
+        .copy(contactType = Some(ReminderToPayForManualCharges), receivedAt = LocalDateTime.of(2007, 12, 1, 1, 3)),
       testNotifications.copy(contactType = Some(RenewalReminder), receivedAt = LocalDateTime.of(1991, 12, 1, 1, 3)),
       testNotifications.copy(contactType = Some(MindedToReject), receivedAt = LocalDateTime.of(1971, 12, 1, 1, 3)),
       testNotifications.copy(contactType = Some(MindedToRevoke), receivedAt = LocalDateTime.of(2017, 10, 1, 1, 3)),
-      testNotifications.copy(contactType = Some(NoLongerMindedToReject), receivedAt = LocalDateTime.of(2003, 12, 1, 1, 3)),
-      testNotifications.copy(contactType = Some(NoLongerMindedToRevoke), receivedAt = LocalDateTime.of(2002, 12, 1, 1, 3)),
+      testNotifications
+        .copy(contactType = Some(NoLongerMindedToReject), receivedAt = LocalDateTime.of(2003, 12, 1, 1, 3)),
+      testNotifications
+        .copy(contactType = Some(NoLongerMindedToRevoke), receivedAt = LocalDateTime.of(2002, 12, 1, 1, 3)),
       testNotifications.copy(contactType = Some(Others), receivedAt = LocalDateTime.of(2017, 12, 1, 1, 3))
     )
 
   }
 
   val messageWithAmountRefNumberAndStatus = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
-  val messageWithDateAndRefNumber = "parameter1-31/07/2018|parameter2-ABC1234"
-  val messageWithDate = "parameter1-31/07/2018"
+  val messageWithDateAndRefNumber         = "parameter1-31/07/2018|parameter2-ABC1234"
+  val messageWithDate                     = "parameter1-31/07/2018"
 
   val contactTypes = List[(ContactType, Option[String])](
     (ApplicationApproval, Some(messageWithDateAndRefNumber)),
     (RenewalApproval, Some(messageWithDate)),
     (RejectionReasons, Some(messageWithDateAndRefNumber)),
     (RevocationReasons, Some(messageWithDateAndRefNumber)),
-    (AutoExpiryOfRegistration,Some(messageWithDate)),
-    (ReminderToPayForApplication,Some(messageWithAmountRefNumberAndStatus)),
-    (ReminderToPayForRenewal,Some(messageWithAmountRefNumberAndStatus)),
-    (ReminderToPayForVariation,Some(messageWithAmountRefNumberAndStatus)),
-    (ReminderToPayForManualCharges,Some(messageWithAmountRefNumberAndStatus)),
-    (RenewalReminder,Some(messageWithDate)),
+    (AutoExpiryOfRegistration, Some(messageWithDate)),
+    (ReminderToPayForApplication, Some(messageWithAmountRefNumberAndStatus)),
+    (ReminderToPayForRenewal, Some(messageWithAmountRefNumberAndStatus)),
+    (ReminderToPayForVariation, Some(messageWithAmountRefNumberAndStatus)),
+    (ReminderToPayForManualCharges, Some(messageWithAmountRefNumberAndStatus)),
+    (RenewalReminder, Some(messageWithDate)),
     (MindedToRevoke, Some(messageWithDateAndRefNumber)),
     (MindedToReject, Some(messageWithDateAndRefNumber)),
     (NoLongerMindedToReject, Some(messageWithDateAndRefNumber)),
@@ -108,9 +116,10 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with ScalaCheck
     (RegistrationVariationApproval, Some(messageWithDateAndRefNumber)),
     (ApplicationAutorejectionForFailureToPay, Some(messageWithDateAndRefNumber)),
     (DeRegistrationEffectiveDateChange, Some(messageWithDate)),
-    (Others,Some(messageWithDateAndRefNumber)),
+    (Others, Some(messageWithDateAndRefNumber)),
     (NoSubject, Some(messageWithDate)),
-    (NoSubject, None))
+    (NoSubject, None)
+  )
 
   "The Notification Service" must {
     "get all notifications in order" in new Fixture {
@@ -124,16 +133,23 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with ScalaCheck
 
     "return content of the notification for every type of notification" in new Fixture {
 
-      for(cType <- contactTypes) {
+      for (cType <- contactTypes) {
         when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(
-            messageText = cType._2,
-            contactType = Some(ApplicationApproval),
-            status = None,
-            variation = false,
-            receivedAt = LocalDateTime.of(2017, 12, 3, 1, 3)))))
+          .thenReturn(
+            Future.successful(
+              Some(
+                NotificationDetails(
+                  messageText = cType._2,
+                  contactType = Some(ApplicationApproval),
+                  status = None,
+                  variation = false,
+                  receivedAt = LocalDateTime.of(2017, 12, 3, 1, 3)
+                )
+              )
+            )
+          )
 
-        val result = await(service.getMessageDetails("", "", cType._1,"v1m0", accountTypeId))
+        val result = await(service.getMessageDetails("", "", cType._1, "v1m0", accountTypeId))
         result mustBe defined
         result.value.messageText mustBe defined
       }

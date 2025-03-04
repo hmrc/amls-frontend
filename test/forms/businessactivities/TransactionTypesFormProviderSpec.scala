@@ -26,10 +26,10 @@ import play.api.data.{Form, FormError}
 class TransactionTypesFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val formProvider: TransactionTypesFormProvider = new TransactionTypesFormProvider()
-  val form: Form[TransactionTypes] = formProvider()
+  val form: Form[TransactionTypes]               = formProvider()
 
   val checkboxField = "types"
-  val textField = "software"
+  val textField     = "software"
 
   "TransactionTypesFormProvider" when {
 
@@ -37,7 +37,11 @@ class TransactionTypesFormProviderSpec extends StringFieldBehaviours with Constr
 
       behave like fieldThatBindsValidData(form, checkboxField, Gen.oneOf(TransactionTypes.all.map(_.toString)))
 
-      behave like mandatoryField(form, checkboxField, FormError(checkboxField, "error.required.ba.atleast.one.transaction.record"))
+      behave like mandatoryField(
+        form,
+        checkboxField,
+        FormError(checkboxField, "error.required.ba.atleast.one.transaction.record")
+      )
     }
 
     "software is submitted" must {
@@ -45,36 +49,42 @@ class TransactionTypesFormProviderSpec extends StringFieldBehaviours with Constr
       "bind valid strings" in {
 
         forAll(stringOfLengthGen(formProvider.length)) { software =>
-          val result = form.bind(Map(
-            checkboxField -> DigitalOther.toString,
-            textField -> software
-          )).apply(textField)
+          val result = form
+            .bind(
+              Map(
+                checkboxField -> DigitalOther.toString,
+                textField     -> software
+              )
+            )
+            .apply(textField)
           result.value.value shouldBe software
         }
       }
 
       "be mandatory if Digital Software is selected" in {
 
+        val result = form.bind(
+          Map(
+            "types[3]" -> DigitalOther.toString,
+            textField  -> ""
+          )
+        )
 
-        val result = form.bind(Map(
-          "types[3]" -> DigitalOther.toString,
-          textField -> ""
-        ))
-
-        result.value shouldBe None
+        result.value            shouldBe None
         result.error(textField) shouldBe Some(FormError(textField, "error.required.ba.software.package.name"))
       }
 
       s"not bind strings that are longer that ${formProvider.length}" in {
 
         forAll(stringsLongerThan(formProvider.length).suchThat(_.nonEmpty)) { longString =>
+          val result = form.bind(
+            Map(
+              "types[3]" -> DigitalOther.toString,
+              textField  -> longString
+            )
+          )
 
-          val result = form.bind(Map(
-            "types[3]" -> DigitalOther.toString,
-            textField -> longString
-          ))
-
-          result.value shouldBe None
+          result.value            shouldBe None
           result.error(textField) shouldBe Some(
             FormError(textField, "error.max.length.ba.software.package.name", Seq(formProvider.length))
           )
@@ -83,17 +93,19 @@ class TransactionTypesFormProviderSpec extends StringFieldBehaviours with Constr
 
       "not bind invalid strings" in {
 
-        forAll(stringsShorterThan(formProvider.length).suchThat(_.nonEmpty), invalidCharForNames) { (software, invalidChar) =>
+        forAll(stringsShorterThan(formProvider.length).suchThat(_.nonEmpty), invalidCharForNames) {
+          (software, invalidChar) =>
+            val result = form.bind(
+              Map(
+                "types[3]" -> DigitalOther.toString,
+                textField  -> (software + invalidChar)
+              )
+            )
 
-          val result = form.bind(Map(
-            "types[3]" -> DigitalOther.toString,
-            textField -> (software + invalidChar)
-          ))
-
-          result.value shouldBe None
-          result.error(textField) shouldBe Some(
-            FormError(textField, "error.invalid.characters.ba.software.package.name", Seq(basicPunctuationRegex))
-          )
+            result.value            shouldBe None
+            result.error(textField) shouldBe Some(
+              FormError(textField, "error.invalid.characters.ba.software.package.name", Seq(basicPunctuationRegex))
+            )
         }
       }
     }

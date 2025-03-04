@@ -25,9 +25,9 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessactivities.AccountantForAMLSRegulationsView
 
-class AccountantForAMLSRegulationsViewSpec extends AmlsViewSpec with Matchers  {
+class AccountantForAMLSRegulationsViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val accountant: AccountantForAMLSRegulationsView = inject[AccountantForAMLSRegulationsView]
+  lazy val accountant: AccountantForAMLSRegulationsView           = inject[AccountantForAMLSRegulationsView]
   lazy val formProvider: AccountantForAMLSRegulationsFormProvider = inject[AccountantForAMLSRegulationsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
@@ -41,14 +41,18 @@ class AccountantForAMLSRegulationsViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = accountant(formProvider().fill(AccountantForAMLSRegulations(true)), true)
 
-      doc.title must startWith(messages("businessactivities.accountantForAMLSRegulations.title") + " - " + messages("summary.businessactivities"))
+      doc.title must startWith(
+        messages("businessactivities.accountantForAMLSRegulations.title") + " - " + messages(
+          "summary.businessactivities"
+        )
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = accountant(formProvider().fill(AccountantForAMLSRegulations(false)), true)
 
-      heading.html must be(messages("businessactivities.accountantForAMLSRegulations.title"))
+      heading.html    must be(messages("businessactivities.accountantForAMLSRegulations.title"))
       subHeading.html must include(messages("summary.businessactivities"))
     }
 

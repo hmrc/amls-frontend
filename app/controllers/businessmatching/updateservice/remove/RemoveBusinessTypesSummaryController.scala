@@ -30,24 +30,28 @@ import views.html.businessmatching.updateservice.remove.RemoveActivitiesSummaryV
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class RemoveBusinessTypesSummaryController @Inject()(authAction: AuthAction,
-                                                     val ds: CommonPlayDependencies,
-                                                     val dataCacheConnector: DataCacheConnector,
-                                                     val helper: RemoveBusinessTypeHelper,
-                                                     val router: Router[RemoveBusinessTypeFlowModel],
-                                                     val cc: MessagesControllerComponents,
-                                                     view: RemoveActivitiesSummaryView) extends AmlsBaseController(ds, cc) {
+class RemoveBusinessTypesSummaryController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val dataCacheConnector: DataCacheConnector,
+  val helper: RemoveBusinessTypeHelper,
+  val router: Router[RemoveBusinessTypeFlowModel],
+  val cc: MessagesControllerComponents,
+  view: RemoveActivitiesSummaryView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request => {
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    {
       for {
-        flow <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key))
+        flow <- OptionT(
+                  dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key)
+                )
       } yield Ok(view(flow))
     } getOrElse InternalServerError("Unable to get the flow model")
   }
 
-  def post: Action[AnyContent] = authAction.async {
-    implicit request => {
+  def post: Action[AnyContent] = authAction.async { implicit request =>
+    {
       for {
         model <- updateSubscription(request.credId)
         route <- OptionT.liftF(router.getRoute(request.credId, RemoveBusinessTypesSummaryPageId, model))
@@ -57,9 +61,9 @@ class RemoveBusinessTypesSummaryController @Inject()(authAction: AuthAction,
 
   private def updateSubscription(credId: String): OptionT[Future, RemoveBusinessTypeFlowModel] = for {
     model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](credId, RemoveBusinessTypeFlowModel.key))
-    _ <- helper.removeFitAndProper(credId, model)
-    _ <- helper.removeBusinessMatchingBusinessTypes(credId, model)
-    _ <- helper.removeTradingPremisesBusinessTypes(credId, model)
-    _ <- helper.removeSectionData(credId, model)
+    _     <- helper.removeFitAndProper(credId, model)
+    _     <- helper.removeBusinessMatchingBusinessTypes(credId, model)
+    _     <- helper.removeTradingPremisesBusinessTypes(credId, model)
+    _     <- helper.removeSectionData(credId, model)
   } yield model
 }

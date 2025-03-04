@@ -29,10 +29,14 @@ class IdentifySuspiciousActivitySpec extends PlaySpec {
       Json.toJson(IdentifySuspiciousActivity(false)) must be(Json.obj("hasWrittenGuidance" -> false))
     }
     "read Json correctly when given true value" in {
-      Json.fromJson[IdentifySuspiciousActivity](Json.obj("hasWrittenGuidance" -> true)) must be(JsSuccess(IdentifySuspiciousActivity(true), JsPath))
+      Json.fromJson[IdentifySuspiciousActivity](Json.obj("hasWrittenGuidance" -> true)) must be(
+        JsSuccess(IdentifySuspiciousActivity(true), JsPath)
+      )
     }
     "read Json correctly when given false value" in {
-      Json.fromJson[IdentifySuspiciousActivity](Json.obj("hasWrittenGuidance" -> false)) must be(JsSuccess(IdentifySuspiciousActivity(false), JsPath))
+      Json.fromJson[IdentifySuspiciousActivity](Json.obj("hasWrittenGuidance" -> false)) must be(
+        JsSuccess(IdentifySuspiciousActivity(false), JsPath)
+      )
     }
   }
 }

@@ -30,7 +30,7 @@ import java.time.LocalDate
 
 class TradingPremisesSpec extends AmlsSpec {
 
-  val ytp = YourTradingPremises(
+  val ytp               = YourTradingPremises(
     "foo",
     Address(
       "1",
@@ -43,17 +43,14 @@ class TradingPremisesSpec extends AmlsSpec {
     Some(LocalDate.of(1990, 2, 24))
   )
   val businessStructure = SoleProprietor
-  val agentName = AgentName("test")
-  val agentCompanyName = AgentCompanyDetails("test", Some("12345678"))
-  val agentPartnership = AgentPartnership("test")
-  val wdbd = WhatDoesYourBusinessDo(
-    Set(
-      BillPaymentServices,
-      EstateAgentBusinessService,
-      MoneyServiceBusiness)
+  val agentName         = AgentName("test")
+  val agentCompanyName  = AgentCompanyDetails("test", Some("12345678"))
+  val agentPartnership  = AgentPartnership("test")
+  val wdbd              = WhatDoesYourBusinessDo(
+    Set(BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness)
   )
-  val msbServices = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
-  val completeModel = TradingPremises(
+  val msbServices       = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
+  val completeModel     = TradingPremises(
     Some(RegisteringAgentPremises(true)),
     Some(ytp),
     Some(businessStructure),
@@ -69,76 +66,87 @@ class TradingPremisesSpec extends AmlsSpec {
     hasAccepted = true
   )
 
-  val incompleteModel = TradingPremises(Some(RegisteringAgentPremises(true)),
-    Some(ytp), Some(businessStructure), Some(agentName), None, None, None, None)
+  val incompleteModel = TradingPremises(
+    Some(RegisteringAgentPremises(true)),
+    Some(ytp),
+    Some(businessStructure),
+    Some(agentName),
+    None,
+    None,
+    None,
+    None
+  )
 
-  val completeJson = Json.obj("registeringAgentPremises" -> Json.obj("agentPremises" -> true),
-    "yourTradingPremises" -> Json.obj("tradingName" -> "foo",
-      "addressLine1" -> "1",
-      "addressLine2" -> "2",
-      "postcode" -> "asdfasdf",
+  val completeJson = Json.obj(
+    "registeringAgentPremises"            -> Json.obj("agentPremises" -> true),
+    "yourTradingPremises"                 -> Json.obj(
+      "tradingName"   -> "foo",
+      "addressLine1"  -> "1",
+      "addressLine2"  -> "2",
+      "postcode"      -> "asdfasdf",
       "isResidential" -> true,
-      "startDate" -> "1990-02-24"),
-    "businessStructure" -> Json.obj("agentsBusinessStructure" -> "01"),
-    "agentName" -> Json.obj("agentName" -> "test"),
-    "agentCompanyDetails" -> Json.obj("agentCompanyName" -> "test", "companyRegistrationNumber" -> "12345678"),
-    "agentPartnership" -> Json.obj("agentPartnership" -> "test"),
+      "startDate"     -> "1990-02-24"
+    ),
+    "businessStructure"                   -> Json.obj("agentsBusinessStructure" -> "01"),
+    "agentName"                           -> Json.obj("agentName" -> "test"),
+    "agentCompanyDetails"                 -> Json.obj("agentCompanyName" -> "test", "companyRegistrationNumber" -> "12345678"),
+    "agentPartnership"                    -> Json.obj("agentPartnership" -> "test"),
     "whatDoesYourBusinessDoAtThisAddress" -> Json.obj("activities" -> Json.arr("02", "03", "05")),
-    "msbServices" -> Json.obj("msbServices" -> Json.arr("01", "02")),
-    "hasChanged" -> false,
-    "lineId" -> 123456,
-    "status" -> "Added",
-    "endDate" -> Json.obj("endDate" -> "1999-01-01"),
-    "hasAccepted" -> true
+    "msbServices"                         -> Json.obj("msbServices" -> Json.arr("01", "02")),
+    "hasChanged"                          -> false,
+    "lineId"                              -> 123456,
+    "status"                              -> "Added",
+    "endDate"                             -> Json.obj("endDate" -> "1999-01-01"),
+    "hasAccepted"                         -> true
   )
 
   "TradingPremises" must {
 
     "return a TP model reflecting the provided data" when {
       "given 'your agent' data" in {
-        val tp = TradingPremises(None, None, None)
+        val tp    = TradingPremises(None, None, None)
         val newTP = tp.businessStructure(LimitedLiabilityPartnership)
         newTP must be(tp.copy(businessStructure = Some(LimitedLiabilityPartnership), hasChanged = true))
       }
 
       "given 'agent name' data" in {
-        val tp = TradingPremises(None, None, None)
+        val tp    = TradingPremises(None, None, None)
         val newTP = tp.agentName(agentName)
         newTP must be(tp.copy(agentName = Some(agentName), hasChanged = true))
       }
 
       "given 'agent company name' data" in {
-        val tp = TradingPremises(None, None, None)
+        val tp    = TradingPremises(None, None, None)
         val newTP = tp.agentCompanyDetails(agentCompanyName)
         newTP must be(tp.copy(agentCompanyDetails = Some(agentCompanyName), hasChanged = true))
       }
 
       "given 'agent partnership' data" in {
-        val tp = TradingPremises(None, None, None)
+        val tp    = TradingPremises(None, None, None)
         val newTP = tp.agentPartnership(agentPartnership)
         newTP must be(tp.copy(agentPartnership = Some(agentPartnership), hasChanged = true))
       }
 
       "given 'your trading premises' data" in {
-        val tp = TradingPremises(None, None, None)
+        val tp    = TradingPremises(None, None, None)
         val newTP = tp.yourTradingPremises(Some(ytp))
         newTP must be(tp.copy(yourTradingPremises = Some(ytp), hasChanged = true))
       }
 
       "given 'what does your business do' data" in {
-        val tp = TradingPremises(None, None, None)
+        val tp    = TradingPremises(None, None, None)
         val newTP = tp.whatDoesYourBusinessDoAtThisAddress(wdbd)
         newTP must be(tp.copy(whatDoesYourBusinessDoAtThisAddress = Some(wdbd), hasChanged = true))
       }
 
       "given 'agent premises' data" in {
-        val tp = TradingPremises()
+        val tp    = TradingPremises()
         val newTP = tp.registeringAgentPremises(RegisteringAgentPremises(true))
         newTP must be(tp.copy(registeringAgentPremises = Some(RegisteringAgentPremises(true)), hasChanged = true))
       }
 
       "given 'msb' data" in {
-        val tp = TradingPremises(None, None, None)
+        val tp    = TradingPremises(None, None, None)
         val newTP = tp.msbServices(Some(msbServices))
         newTP must be(tp.copy(msbServices = Some(msbServices), hasChanged = true))
       }
@@ -154,7 +162,7 @@ class TradingPremisesSpec extends AmlsSpec {
     }
 
     "Deserialise as expected" in {
-      completeJson.as[TradingPremises] must be(completeModel)
+      completeJson.as[TradingPremises]             must be(completeModel)
       TradingPremises.writes.writes(completeModel) must be(completeJson)
     }
 
@@ -165,10 +173,12 @@ class TradingPremisesSpec extends AmlsSpec {
         }
 
         "trading premises specify MSB and has sub-sectors" in {
-          completeModel.copy(
-            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))),
-            msbServices = Some(TradingPremisesMsbServices(Set(TransmittingMoney)))
-          ).isComplete mustBe true
+          completeModel
+            .copy(
+              whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))),
+              msbServices = Some(TradingPremisesMsbServices(Set(TransmittingMoney)))
+            )
+            .isComplete mustBe true
         }
       }
 
@@ -184,10 +194,12 @@ class TradingPremisesSpec extends AmlsSpec {
         }
 
         "trading premises specifies MSB but has no sub-sectors" in {
-          completeModel.copy(
-            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))),
-            msbServices = Some(TradingPremisesMsbServices(Set.empty))
-          ).isComplete mustBe false
+          completeModel
+            .copy(
+              whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))),
+              msbServices = Some(TradingPremisesMsbServices(Set.empty))
+            )
+            .isComplete mustBe false
         }
       }
 
@@ -206,17 +218,21 @@ class TradingPremisesSpec extends AmlsSpec {
         val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-          .thenReturn(Some(Seq(
-            TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true),
-            TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true)
-          )))
+          .thenReturn(
+            Some(
+              Seq(
+                TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true),
+                TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true)
+              )
+            )
+          )
 
         val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
 
         taskRow.hasChanged must be(true)
-        taskRow.status must be(NotStarted)
-        taskRow.href must be(controllers.tradingpremises.routes.TradingPremisesAddController.get(true).url)
-        taskRow.tag must be(TaskRow.notStartedTag)
+        taskRow.status     must be(NotStarted)
+        taskRow.href       must be(controllers.tradingpremises.routes.TradingPremisesAddController.get(true).url)
+        taskRow.tag        must be(TaskRow.notStartedTag)
       }
     }
 
@@ -225,18 +241,22 @@ class TradingPremisesSpec extends AmlsSpec {
         val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-          .thenReturn(Some(Seq(
-            completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
-            completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
-            TradingPremises(Some(RegisteringAgentPremises(true)), None, hasAccepted = true)
-          )))
+          .thenReturn(
+            Some(
+              Seq(
+                completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
+                completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
+                TradingPremises(Some(RegisteringAgentPremises(true)), None, hasAccepted = true)
+              )
+            )
+          )
 
         val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
 
         taskRow.hasChanged must be(true)
-        taskRow.status must be(Started)
-        taskRow.href must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
-        taskRow.tag must be(TaskRow.incompleteTag)
+        taskRow.status     must be(Started)
+        taskRow.href       must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
+        taskRow.tag        must be(TaskRow.incompleteTag)
       }
     }
 
@@ -245,16 +265,21 @@ class TradingPremisesSpec extends AmlsSpec {
         val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-          .thenReturn(Some(Seq(
-            completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
-            completeModel.copy(hasChanged = true))))
+          .thenReturn(
+            Some(
+              Seq(
+                completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
+                completeModel.copy(hasChanged = true)
+              )
+            )
+          )
 
         val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
 
         taskRow.hasChanged must be(true)
-        taskRow.status must be(Updated)
-        taskRow.href must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
-        taskRow.tag must be(TaskRow.updatedTag)
+        taskRow.status     must be(Updated)
+        taskRow.href       must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
+        taskRow.tag        must be(TaskRow.updatedTag)
       }
     }
 
@@ -267,9 +292,9 @@ class TradingPremisesSpec extends AmlsSpec {
         val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
 
         taskRow.hasChanged must be(false)
-        taskRow.status must be(Completed)
-        taskRow.href must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
-        taskRow.tag must be(TaskRow.completedTag)
+        taskRow.status     must be(Completed)
+        taskRow.href       must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
+        taskRow.tag        must be(TaskRow.completedTag)
       }
     }
 
@@ -278,17 +303,21 @@ class TradingPremisesSpec extends AmlsSpec {
         val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-          .thenReturn(Some(Seq(
-            completeModel.copy(status = Some(StatusConstants.Updated), hasChanged = true, hasAccepted = true),
-            completeModel.copy(status = Some(StatusConstants.Updated), hasChanged = true, hasAccepted = true))
-          ))
+          .thenReturn(
+            Some(
+              Seq(
+                completeModel.copy(status = Some(StatusConstants.Updated), hasChanged = true, hasAccepted = true),
+                completeModel.copy(status = Some(StatusConstants.Updated), hasChanged = true, hasAccepted = true)
+              )
+            )
+          )
 
         val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
 
         taskRow.hasChanged must be(true)
-        taskRow.status must be(Updated)
-        taskRow.href must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
-        taskRow.tag must be(TaskRow.updatedTag)
+        taskRow.status     must be(Updated)
+        taskRow.href       must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
+        taskRow.tag        must be(TaskRow.updatedTag)
       }
     }
   }
@@ -344,19 +373,18 @@ class TradingPremisesSpec extends AmlsSpec {
         val mockCacheMap = mock[Cache]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
-          .thenReturn(Some(Seq(
-            completeModel,
-            TradingPremises(hasAccepted = true),
-            incompleteModel)))
+          .thenReturn(Some(Seq(completeModel, TradingPremises(hasAccepted = true), incompleteModel)))
 
-        TradingPremises.taskRow(mockCacheMap, messages).href must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
+        TradingPremises.taskRow(mockCacheMap, messages).href must be(
+          controllers.tradingpremises.routes.YourTradingPremisesController.get().url
+        )
       }
     }
 
   }
 
   "anyChanged" must {
-    val originalBankDetails = Seq(TradingPremises(None, None))
+    val originalBankDetails        = Seq(TradingPremises(None, None))
     val originalBankDetailsChanged = Seq(TradingPremises(None, None, hasChanged = true))
 
     "return false" when {
@@ -376,10 +404,11 @@ class TradingPremisesSpec extends AmlsSpec {
   "TradingPremises.filter" must {
     "filter out any TradingPremises() instances which have the 'Deleted' status" in {
 
-      val completeModelDeletedStatus = completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true)
-      val emptyTradingPremises = TradingPremises()
-      val tradingPremisesSeq: Seq[TradingPremises] = Seq(completeModel, completeModelDeletedStatus, completeModel, emptyTradingPremises)
-
+      val completeModelDeletedStatus               =
+        completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true)
+      val emptyTradingPremises                     = TradingPremises()
+      val tradingPremisesSeq: Seq[TradingPremises] =
+        Seq(completeModel, completeModelDeletedStatus, completeModel, emptyTradingPremises)
 
       val result = TradingPremises.filter(tradingPremisesSeq)
 

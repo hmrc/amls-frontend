@@ -30,7 +30,12 @@ class RenewalSpec extends AmlsSpec {
     Some(CustomersOutsideIsUK(false)),
     Some(CustomersOutsideUK(Option(Nil))),
     Some(PercentageOfCashPaymentOver15000.First),
-    Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other")))))),
+    Some(
+      CashPayments(
+        CashPaymentsCustomerNotMet(true),
+        Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+      )
+    ),
     Some(TotalThroughput("01")),
     Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
     Some(TransactionsInLast12Months("1500")),
@@ -44,18 +49,20 @@ class RenewalSpec extends AmlsSpec {
   "The Renewal model" must {
     "succesfully validate if model is complete" when {
       "json is complete" in {
-        val completeRenewal = Renewal(customersOutsideIsUK = Some(CustomersOutsideIsUK(true)),
-          customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))))
+        val completeRenewal = Renewal(
+          customersOutsideIsUK = Some(CustomersOutsideIsUK(true)),
+          customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))
+        )
 
         val json = Json.obj(
           "customersOutsideIsUK" -> Json.obj(
             "isOutside" -> true
           ),
-          "customersOutsideUK" -> Json.obj(
+          "customersOutsideUK"   -> Json.obj(
             "countries" -> Seq("GB")
           ),
-          "hasChanged" -> false,
-          "hasAccepted" -> true
+          "hasChanged"           -> false,
+          "hasAccepted"          -> true
         )
 
         json.as[Renewal] must be(completeRenewal)
@@ -64,14 +71,17 @@ class RenewalSpec extends AmlsSpec {
 
     "succesfully validate json" when {
       "CustomersOutsideIsUK is false" in {
-        val renewal = Renewal(customersOutsideIsUK = Some(CustomersOutsideIsUK(false)), customersOutsideUK = Some(CustomersOutsideUK(None)))
+        val renewal = Renewal(
+          customersOutsideIsUK = Some(CustomersOutsideIsUK(false)),
+          customersOutsideUK = Some(CustomersOutsideUK(None))
+        )
 
         val json = Json.obj(
           "customersOutsideUK" -> Json.obj(
             "isOutside" -> false
           ),
-          "hasChanged" -> false,
-          "hasAccepted" -> true
+          "hasChanged"         -> false,
+          "hasAccepted"        -> true
         )
 
         json.as[Renewal] must be(renewal)
@@ -80,7 +90,7 @@ class RenewalSpec extends AmlsSpec {
 
     "serialize to and from JSON" in {
 
-     val completeRenewal = Renewal(
+      val completeRenewal = Renewal(
         Some(InvolvedInOtherYes("test")),
         Some(BusinessTurnover.First),
         Some(AMLSTurnover.First),
@@ -88,7 +98,12 @@ class RenewalSpec extends AmlsSpec {
         Some(CustomersOutsideIsUK(false)),
         Some(CustomersOutsideUK(None)),
         Some(PercentageOfCashPaymentOver15000.First),
-        Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
+        Some(
+          CashPayments(
+            CashPaymentsCustomerNotMet(true),
+            Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+          )
+        ),
         Some(TotalThroughput("01")),
         Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
         Some(TransactionsInLast12Months("1500")),
@@ -175,10 +190,12 @@ class RenewalSpec extends AmlsSpec {
 
             completeRenewal.hvdRule mustBe true
 
-            completeRenewal.copy(
-              receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(false), None)),
-              customersOutsideIsUK = Some(CustomersOutsideIsUK(false))
-            ).hvdRule mustBe true
+            completeRenewal
+              .copy(
+                receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(false), None)),
+                customersOutsideIsUK = Some(CustomersOutsideIsUK(false))
+              )
+              .hvdRule mustBe true
           }
         }
 
@@ -191,18 +208,25 @@ class RenewalSpec extends AmlsSpec {
 
           "receiveCashPayments is true with no method of receipt" in {
 
-            completeRenewal.copy(
-              receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), None))
-            ).hvdRule mustBe false
+            completeRenewal
+              .copy(
+                receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), None))
+              )
+              .hvdRule mustBe false
           }
 
           "receiveCashPayments is false with a method of receipt" in {
 
-            completeRenewal.copy(
-              receiveCashPayments = Some(CashPayments(
-                CashPaymentsCustomerNotMet(false), Some(HowCashPaymentsReceived(PaymentMethods(true, true, None)))
-              ))
-            ).hvdRule mustBe false
+            completeRenewal
+              .copy(
+                receiveCashPayments = Some(
+                  CashPayments(
+                    CashPaymentsCustomerNotMet(false),
+                    Some(HowCashPaymentsReceived(PaymentMethods(true, true, None)))
+                  )
+                )
+              )
+              .hvdRule mustBe false
           }
 
           "receiveCashPayments is empty" in {
@@ -212,10 +236,12 @@ class RenewalSpec extends AmlsSpec {
 
           "customersOutsideIsUK is true with no list of countries" in {
 
-            completeRenewal.copy(
-              customersOutsideIsUK = Some(CustomersOutsideIsUK(true)),
-              customersOutsideUK = None
-            ).hvdRule mustBe false
+            completeRenewal
+              .copy(
+                customersOutsideIsUK = Some(CustomersOutsideIsUK(true)),
+                customersOutsideUK = None
+              )
+              .hvdRule mustBe false
           }
 
           "customersOutsideIsUK is empty" in {
@@ -260,15 +286,19 @@ class RenewalSpec extends AmlsSpec {
 
           "all money transmission questions are populated for No path" in {
 
-            completeRenewal.copy(
-              sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
-              mostTransactions = None
-            ).moneyTransmitterRule mustBe true
+            completeRenewal
+              .copy(
+                sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+                mostTransactions = None
+              )
+              .moneyTransmitterRule mustBe true
 
-            completeRenewal.copy(
-              sendMoneyToOtherCountry = None,
-              mostTransactions = None
-            ).moneyTransmitterRule mustBe true
+            completeRenewal
+              .copy(
+                sendMoneyToOtherCountry = None,
+                mostTransactions = None
+              )
+              .moneyTransmitterRule mustBe true
           }
         }
 
@@ -308,10 +338,10 @@ class RenewalSpec extends AmlsSpec {
       val json = Json.obj(
         "receiveCashPayments" -> Json.obj(
           "receivePayments" -> false,
-          "paymentMethods" -> Json.obj()
+          "paymentMethods"  -> Json.obj()
         ),
-        "hasChanged" -> false,
-        "hasAccepted" -> true
+        "hasChanged"          -> false,
+        "hasAccepted"         -> true
       )
 
       json.as[Renewal] must be(renewal)

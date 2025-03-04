@@ -27,7 +27,7 @@ import views.html.tcsp.ComplexCorpStructureCreationView
 class ComplexCorpStructureCreationViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val complex_corp_structure_creation = inject[ComplexCorpStructureCreationView]
-  lazy val fp = inject[ComplexCorpStructureCreationFormProvider]
+  lazy val fp                              = inject[ComplexCorpStructureCreationFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -43,16 +43,18 @@ class ComplexCorpStructureCreationViewSpec extends AmlsViewSpec with Matchers {
       val title = messages("tcsp.create.complex.corporate.structures.lbl") + " - " + messages("summary.tcsp") + " - " +
         messages("title.amls") + " - " + messages("title.gov")
 
-      doc.title must be(title)
-      heading.html must be(messages("tcsp.create.complex.corporate.structures.lbl"))
+      doc.title       must be(title)
+      heading.html    must be(messages("tcsp.create.complex.corporate.structures.lbl"))
       subHeading.html must include(messages("summary.tcsp"))
     }
 
     behave like pageWithErrors(
       complex_corp_structure_creation(
-        fp().withError("complexCorpStructureCreation", "error.required.tcsp.complex.corporate.structures"), true
+        fp().withError("complexCorpStructureCreation", "error.required.tcsp.complex.corporate.structures"),
+        true
       ),
-      "complexCorpStructureCreation", "error.required.tcsp.complex.corporate.structures"
+      "complexCorpStructureCreation",
+      "error.required.tcsp.complex.corporate.structures"
     )
 
     behave like pageWithBackLink(complex_corp_structure_creation(fp(), true))

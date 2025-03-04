@@ -30,32 +30,33 @@ case object BusinessUseAnIPSPNo extends BusinessUseAnIPSP
 
 object BusinessUseAnIPSP {
 
-  def formValues(conditionalHtml: Html*)(implicit messages: Messages): Seq[RadioItem] = {
+  def formValues(conditionalHtml: Html*)(implicit messages: Messages): Seq[RadioItem] =
     HmrcYesNoRadioItems().map { input =>
-      if(input.value.contains("true")) {
+      if (input.value.contains("true")) {
         input.copy(conditionalHtml = Some(Html(conditionalHtml.mkString)))
       } else {
         input
       }
     }
-  }
 
   implicit val jsonReads: Reads[BusinessUseAnIPSP] = {
     import play.api.libs.functional.syntax._
     (__ \ "useAnIPSP").read[Boolean] flatMap {
-      case true => ((__ \ "name").read[String] and
-        (__ \ "referenceNumber").read[String]) (BusinessUseAnIPSPYes.apply _)
+      case true  =>
+        ((__ \ "name").read[String] and
+          (__ \ "referenceNumber").read[String])(BusinessUseAnIPSPYes.apply _)
       case false => Reads(_ => JsSuccess(BusinessUseAnIPSPNo))
     }
   }
 
   implicit val jsonWrites: Writes[BusinessUseAnIPSP] = Writes[BusinessUseAnIPSP] {
-    case BusinessUseAnIPSPYes(name ,referenceNumber) => Json.obj(
-                                          "useAnIPSP" -> true,
-                                           "name" -> name,
-                                           "referenceNumber" -> referenceNumber
-                                        )
-    case BusinessUseAnIPSPNo => Json.obj("useAnIPSP" -> false)
+    case BusinessUseAnIPSPYes(name, referenceNumber) =>
+      Json.obj(
+        "useAnIPSP"       -> true,
+        "name"            -> name,
+        "referenceNumber" -> referenceNumber
+      )
+    case BusinessUseAnIPSPNo                         => Json.obj("useAnIPSP" -> false)
   }
 
 }

@@ -27,39 +27,43 @@ import views.html.msb.FundsTransferView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class FundsTransferController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                         authAction: AuthAction,
-                                         val ds: CommonPlayDependencies,
-                                         val cc: MessagesControllerComponents,
-                                         formProvider: FundsTransferFormProvider,
-                                         view: FundsTransferView) extends AmlsBaseController(ds, cc) {
+class FundsTransferController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: FundsTransferFormProvider,
+  view: FundsTransferView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
-        response =>
-          val form = (for {
-            moneyServiceBusiness <- response
-            fundsTransfer <- moneyServiceBusiness.fundsTransfer
-          } yield formProvider().fill(fundsTransfer)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map { response =>
+      val form = (for {
+        moneyServiceBusiness <- response
+        fundsTransfer        <- moneyServiceBusiness.fundsTransfer
+      } yield formProvider().fill(fundsTransfer)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           for {
-            moneyServiceBusiness <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
-            _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
-              moneyServiceBusiness.fundsTransfer(data))
+            moneyServiceBusiness <-
+              dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+            _                    <- dataCacheConnector.save[MoneyServiceBusiness](
+                                      request.credId,
+                                      MoneyServiceBusiness.key,
+                                      moneyServiceBusiness.fundsTransfer(data)
+                                    )
           } yield edit match {
             case true if moneyServiceBusiness.transactionsInNext12Months.isDefined =>
               Redirect(routes.SummaryController.get)
-            case _ => Redirect(routes.TransactionsInNext12MonthsController.get(edit))
+            case _                                                                 => Redirect(routes.TransactionsInNext12MonthsController.get(edit))
           }
       )
   }

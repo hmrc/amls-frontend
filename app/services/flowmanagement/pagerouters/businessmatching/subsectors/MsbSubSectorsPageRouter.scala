@@ -28,12 +28,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class MsbSubSectorsPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
 
-  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)
-                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Result] = {
     val result = model.subSectors map {
       case sectors if sectors.contains(TransmittingMoney) =>
         routes.PSRNumberController.get(edit)
-      case _ => routes.SummaryController.get()
+      case _                                              => routes.SummaryController.get()
     }
 
     result.fold(error(SubSectorsPageId))(Redirect)
@@ -42,15 +44,19 @@ class MsbSubSectorsPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
 
 class MsbSubSectorsPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[ChangeSubSectorFlowModel] {
 
-  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean, includeCompanyNotRegistered: Boolean)
-                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+  override def getRoute(
+    credId: String,
+    model: ChangeSubSectorFlowModel,
+    edit: Boolean,
+    includeCompanyNotRegistered: Boolean
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     val result = model.subSectors map {
       case sectors if sectors.contains(TransmittingMoney) =>
         routes.PSRNumberController.get(edit)
-      case _ =>
-        if(includeCompanyNotRegistered){
+      case _                                              =>
+        if (includeCompanyNotRegistered) {
           routes.CheckCompanyController.get()
-        }else {
+        } else {
           routes.SummaryController.get()
         }
     }

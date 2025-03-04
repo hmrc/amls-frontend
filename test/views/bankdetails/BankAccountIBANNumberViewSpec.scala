@@ -28,7 +28,7 @@ import views.html.bankdetails.BankAccountIBANNumberView
 class BankAccountIBANNumberViewSpec extends AmlsViewSpec {
 
   lazy val iban = inject[BankAccountIBANNumberView]
-  lazy val fp = inject[BankAccountIBANNumberFormProvider]
+  lazy val fp   = inject[BankAccountIBANNumberFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -36,12 +36,14 @@ class BankAccountIBANNumberViewSpec extends AmlsViewSpec {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
-  "BankAccountIBANNumberView view " must{
+  "BankAccountIBANNumberView view " must {
     "have correct title" in new ViewFixture {
 
       override def view: HtmlFormat.Appendable = iban(fp().fill(NonUKIBANNumber("123")), false, 0)
 
-      doc.title() must startWith(messages("bankdetails.bankaccount.iban.title") + " - " + messages("summary.bankdetails"))
+      doc.title() must startWith(
+        messages("bankdetails.bankaccount.iban.title") + " - " + messages("summary.bankdetails")
+      )
     }
   }
 

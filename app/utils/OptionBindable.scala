@@ -20,18 +20,16 @@ import play.api.mvc.PathBindable
 
 // $COVERAGE-OFF$
 object Binders {
-  implicit def optionBindable[T : PathBindable]: PathBindable[Option[T]] = new PathBindable[Option[T]] {
+  implicit def optionBindable[T: PathBindable]: PathBindable[Option[T]] = new PathBindable[Option[T]] {
     override def bind(key: String, value: String): Either[String, Option[T]] =
-      implicitly[PathBindable[T]].
-       bind(key, value).
-        fold(
+      implicitly[PathBindable[T]]
+        .bind(key, value)
+        .fold(
           left => Left(left),
           right => Right(Some(right))
-      )
+        )
 
     override def unbind(key: String, value: Option[T]): String = value map (_.toString) getOrElse ""
   }
 
 }
-
-

@@ -25,8 +25,8 @@ import views.html.businessmatching.ConfirmPostcodeView
 
 class ConfirmPostcodeViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val confirm_postcode = inject[ConfirmPostcodeView]
-  lazy val fp = inject[ConfirmPostcodeFormProvider]
+  lazy val confirm_postcode                                      = inject[ConfirmPostcodeView]
+  lazy val fp                                                    = inject[ConfirmPostcodeFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -36,15 +36,18 @@ class ConfirmPostcodeViewSpec extends AmlsViewSpec with Matchers {
 
       def view = confirm_postcode(fp())
 
-      doc.title must startWith(messages("businessmatching.confirm.postcode.title") + " - " + messages("summary.businessmatching"))
-      heading.html must include(messages("businessmatching.confirm.postcode.title"))
-      subHeading.html must include(messages("summary.businessmatching"))
+      doc.title                                must startWith(
+        messages("businessmatching.confirm.postcode.title") + " - " + messages("summary.businessmatching")
+      )
+      heading.html                             must include(messages("businessmatching.confirm.postcode.title"))
+      subHeading.html                          must include(messages("summary.businessmatching"))
       doc.select(s"input[id=postCode]").size() must be(1)
     }
 
     behave like pageWithErrors(
       confirm_postcode(fp().withError("postCode", "error.invalid.postcode")),
-      "postCode", "error.invalid.postcode"
+      "postCode",
+      "error.invalid.postcode"
     )
   }
 }

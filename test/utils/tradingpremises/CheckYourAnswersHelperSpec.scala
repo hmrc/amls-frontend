@@ -32,7 +32,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
   lazy val cyaHelper: CheckYourAnswersHelper = app.injector.instanceOf[CheckYourAnswersHelper]
 
   val agentPremisesRowIndex = 0
-  val index = 1
+  val index                 = 1
 
   val ytp = YourTradingPremises(
     "foo",
@@ -50,11 +50,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
     hasChanged = true
   )
 
-  val agentName = "John Doe"
-  val agentCompanyName = "Agent Company Name"
+  val agentName             = "John Doe"
+  val agentCompanyName      = "Agent Company Name"
   val agentCompanyRegNumber = "98765432"
-  val agentPartnershipName = "Agent Partner"
-  val agentDob = LocalDate.of(1995,12,12)
+  val agentPartnershipName  = "Agent Partner"
+  val agentDob              = LocalDate.of(1995, 12, 12)
 
   val nonAgent: TradingPremises = tp.copy(
     registeringAgentPremises = Some(RegisteringAgentPremises(false)),
@@ -91,7 +91,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
   val agentUnincorporatedBody: TradingPremises = agentSoleProprietor.copy(
     businessStructure = Some(UnincorporatedBody),
-    agentName = None,
+    agentName = None
   )
 
   private def getRows(premises: TradingPremises): Seq[SummaryListRow] =
@@ -105,13 +105,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
     agentIncorporatedBody
   )
 
-  private def nameAndAddressToLines(name: String, address: Address) = {
+  private def nameAndAddressToLines(name: String, address: Address) =
     "<ul class=\"govuk-list\">" +
       s"<li>$name</li>" +
       address.toLines.map { line =>
         s"""<li>$line<li>"""
       }.mkString + "</ul>"
-  }
 
   private def booleanToLabel(bool: Boolean)(implicit messages: Messages): String = if (bool) {
     messages("lbl.yes")
@@ -175,7 +174,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
       }
 
       answersList.foreach { tp =>
-
         val businessType = tp.businessStructure.getOrElse(fail("No Business Structure present")).toString
 
         s"display true for Agents that are $businessType" in new RowFixture {
@@ -195,7 +193,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
     "Business Structure row is rendered" must {
 
       answersList.foreach { tp =>
-
         val structure = tp.businessStructure.getOrElse(fail("Business Structure not present"))
 
         s"show the correct value for ${structure.toString}" in new RowFixture {
@@ -260,7 +257,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
     "Agent Company Name row is rendered" must {
 
       Seq(agentIncorporatedBody, agentLimitedLiabilityPartnership) foreach { tp =>
-
         val structure = tp.businessStructure.getOrElse(fail("Business Structure not present"))
 
         s"render when business type is ${structure.toString}" in new RowFixture {
@@ -295,7 +291,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
     "Trading Premises Name and Address row is rendered" must {
 
       answersList foreach { tp =>
-
         val structure = tp.businessStructure.getOrElse(fail("Business Structure not present"))
 
         s"render when business type is ${structure.toString}" in new RowFixture {
@@ -303,12 +298,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
           val nameAddressIndex: Int = structure match {
             case SoleProprietor | LimitedLiabilityPartnership | IncorporatedBody => 4
-            case Partnership => 3
-            case UnincorporatedBody => 2
+            case Partnership                                                     => 3
+            case UnincorporatedBody                                              => 2
           }
 
-          val tpName = tp.yourTradingPremises.map(_.tradingName).getOrElse(fail("Cannot get Trading Name"))
-          val tpAddress = tp.yourTradingPremises.map(_.tradingPremisesAddress).getOrElse(fail("Cannot get Trading Address"))
+          val tpName    = tp.yourTradingPremises.map(_.tradingName).getOrElse(fail("Cannot get Trading Name"))
+          val tpAddress =
+            tp.yourTradingPremises.map(_.tradingPremisesAddress).getOrElse(fail("Cannot get Trading Address"))
 
           assertRowMatches(
             nameAddressIndex,
@@ -324,7 +320,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
     "Trading Premises Start Date row is rendered" must {
 
       answersList foreach { tp =>
-
         val structure = tp.businessStructure.getOrElse(fail("Business Structure not present"))
 
         s"render when business type is ${structure.toString}" in new RowFixture {
@@ -332,8 +327,8 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
           val dateIndex: Int = structure match {
             case SoleProprietor | LimitedLiabilityPartnership | IncorporatedBody => 5
-            case Partnership => 4
-            case UnincorporatedBody => 3
+            case Partnership                                                     => 4
+            case UnincorporatedBody                                              => 3
           }
 
           val tpDate = tp.yourTradingPremises.flatMap(_.startDate).getOrElse(fail("Cannot get Trading Start Date"))
@@ -352,7 +347,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
     "Is Residential row is rendered" must {
 
       answersList foreach { tp =>
-
         val structure = tp.businessStructure.getOrElse(fail("Business Structure not present"))
 
         s"render when business type is ${structure.toString}" in new RowFixture {
@@ -360,11 +354,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
           val dateIndex: Int = structure match {
             case SoleProprietor | LimitedLiabilityPartnership | IncorporatedBody => 6
-            case Partnership => 5
-            case UnincorporatedBody => 4
+            case Partnership                                                     => 5
+            case UnincorporatedBody                                              => 4
           }
 
-          val tpIsResidential = tp.yourTradingPremises.flatMap(_.isResidential).getOrElse(fail("Cannot get Is Residential"))
+          val tpIsResidential =
+            tp.yourTradingPremises.flatMap(_.isResidential).getOrElse(fail("Cannot get Is Residential"))
 
           assertRowMatches(
             dateIndex,
@@ -380,7 +375,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
     "Services row is rendered" must {
 
       answersList foreach { tp =>
-
         val structure = tp.businessStructure.getOrElse(fail("Business Structure not present"))
 
         s"render with multiple services when business type is ${structure.toString}" in new RowFixture {
@@ -388,16 +382,20 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
           val servicesIndex: Int = structure match {
             case SoleProprietor | LimitedLiabilityPartnership | IncorporatedBody => 7
-            case Partnership => 6
-            case UnincorporatedBody => 5
+            case Partnership                                                     => 6
+            case UnincorporatedBody                                              => 5
           }
 
-          val tpServices = tp.whatDoesYourBusinessDoAtThisAddress.map(_.activities).getOrElse(fail("Cannot get Services")).toList
+          val tpServices =
+            tp.whatDoesYourBusinessDoAtThisAddress.map(_.activities).getOrElse(fail("Cannot get Services")).toList
 
           assertRowMatches(
             servicesIndex,
             "tradingpremises.whatdoesyourbusinessdo.title",
-            toBulletList(tpServices.sortBy(_.toString).map(_.value), "businessmatching.registerservices.servicename.lbl"),
+            toBulletList(
+              tpServices.sortBy(_.toString).map(_.value),
+              "businessmatching.registerservices.servicename.lbl"
+            ),
             controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true).url,
             "tradingpremisedsummaryservices-edit"
           )
@@ -408,18 +406,20 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
           val ba = singleBusinessTypeGen.sample.getOrElse(fail("Cannot generate business activity"))
 
           override val summaryListRows: Seq[SummaryListRow] =
-            cyaHelper.createSummaryList(
-              tp.copy(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(ba)))),
-              index,
-              true,
-              true,
-              false
-            ).rows
+            cyaHelper
+              .createSummaryList(
+                tp.copy(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(ba)))),
+                index,
+                true,
+                true,
+                false
+              )
+              .rows
 
           val servicesIndex: Int = structure match {
             case SoleProprietor | LimitedLiabilityPartnership | IncorporatedBody => 7
-            case Partnership => 6
-            case UnincorporatedBody => 5
+            case Partnership                                                     => 6
+            case UnincorporatedBody                                              => 5
           }
 
           assertRowMatchesNoChangeLink(
@@ -434,7 +434,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
     "MSB Services row is rendered" must {
 
       answersList foreach { tp =>
-
         val structure = tp.businessStructure.getOrElse(fail("Business Structure not present"))
 
         s"render with multiple MSB services when business type is ${structure.toString}" in new RowFixture {
@@ -442,8 +441,8 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
           val msbIndex: Int = structure match {
             case SoleProprietor | LimitedLiabilityPartnership | IncorporatedBody => 8
-            case Partnership => 7
-            case UnincorporatedBody => 6
+            case Partnership                                                     => 7
+            case UnincorporatedBody                                              => 6
           }
 
           val tpServices = tp.msbServices.map(_.services).getOrElse(fail("Cannot get Services")).toList
@@ -462,18 +461,20 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
           val msb = tpSubSectorGen.sample.flatMap(_.services.headOption).getOrElse(fail("Cannot generate msb"))
 
           override val summaryListRows: Seq[SummaryListRow] =
-            cyaHelper.createSummaryList(
-              tp.copy(msbServices = Some(TradingPremisesMsbServices(Set(msb)))),
-              index,
-              true,
-              false,
-              true
-            ).rows
+            cyaHelper
+              .createSummaryList(
+                tp.copy(msbServices = Some(TradingPremisesMsbServices(Set(msb)))),
+                index,
+                true,
+                false,
+                true
+              )
+              .rows
 
           val msbIndex: Int = structure match {
             case SoleProprietor | LimitedLiabilityPartnership | IncorporatedBody => 8
-            case Partnership => 7
-            case UnincorporatedBody => 6
+            case Partnership                                                     => 7
+            case UnincorporatedBody                                              => 6
           }
 
           assertRowMatchesNoChangeLink(

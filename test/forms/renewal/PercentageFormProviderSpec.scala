@@ -30,7 +30,9 @@ class PercentageFormProviderSpec extends FieldBehaviours {
   "PercentageFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, field, Gen.oneOf(PercentageOfCashPaymentOver15000.all.map(_.toString))
+      form,
+      field,
+      Gen.oneOf(PercentageOfCashPaymentOver15000.all.map(_.toString))
     )
 
     behave like mandatoryField(form, field, FormError(field, "error.required.renewal.hvd.percentage"))
@@ -41,7 +43,7 @@ class PercentageFormProviderSpec extends FieldBehaviours {
 
         val result = form.bind(Map(field -> "foo"))
 
-        result.value shouldBe None
+        result.value        shouldBe None
         result.error(field) shouldBe Some(FormError(field, "error.invalid"))
       }
     }

@@ -28,7 +28,7 @@ import views.html.responsiblepeople.KnownByView
 
 class KnownByViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val known_by: KnownByView = inject[KnownByView]
+  lazy val known_by: KnownByView   = inject[KnownByView]
   lazy val fp: KnownByFormProvider = inject[KnownByFormProvider]
 
   val name = "firstName lastName"
@@ -44,22 +44,24 @@ class KnownByViewSpec extends AmlsViewSpec with Matchers {
 
       def view: HtmlFormat.Appendable = known_by(fp(), edit = true, 1, None, name)
 
-      doc.title must startWith(Messages("responsiblepeople.knownby.title"))
-      heading.html must be(Messages("responsiblepeople.knownby.heading", name))
+      doc.title       must startWith(Messages("responsiblepeople.knownby.title"))
+      heading.html    must be(Messages("responsiblepeople.knownby.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "hasOtherNames") must not be empty
-      doc.getElementsByAttributeValue("name", "otherNames") must not be empty
+      doc.getElementsByAttributeValue("name", "otherNames")    must not be empty
     }
 
     behave like pageWithErrors(
       known_by(fp().withError("hasOtherNames", "error.required.rp.hasOtherNames"), edit = false, 1, None, name),
-      "hasOtherNames", "error.required.rp.hasOtherNames"
+      "hasOtherNames",
+      "error.required.rp.hasOtherNames"
     )
 
     behave like pageWithErrors(
       known_by(fp().withError("otherNames", "error.invalid.rp.char"), edit = false, 1, None, name),
-      "otherNames", "error.invalid.rp.char"
+      "otherNames",
+      "error.invalid.rp.char"
     )
 
     behave like pageWithBackLink(known_by(fp(), edit = false, 1, None, name))

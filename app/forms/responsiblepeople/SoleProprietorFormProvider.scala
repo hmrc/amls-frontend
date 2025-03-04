@@ -22,8 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class SoleProprietorFormProvider @Inject()() extends BooleanFormProvider {
+class SoleProprietorFormProvider @Inject() () extends BooleanFormProvider {
   def apply(): Form[SoleProprietorOfAnotherBusiness] = createForm(
-    "soleProprietorOfAnotherBusiness", "error.required.rp.sole_proprietor"
+    "soleProprietorOfAnotherBusiness",
+    "error.required.rp.sole_proprietor"
   )(SoleProprietorOfAnotherBusiness.apply, _.soleProprietorOfAnotherBusiness)
 }

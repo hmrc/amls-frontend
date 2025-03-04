@@ -30,23 +30,26 @@ import views.html.responsiblepeople.PersonResidenceTypeView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class PersonResidentTypeController @Inject()(override val messagesApi: MessagesApi,
-                                             authAction: AuthAction,
-                                             val ds: CommonPlayDependencies,
-                                             val cc: MessagesControllerComponents,
-                                             personResidenceTypeService: PersonResidentTypeService,
-                                             formProvider: PersonResidentTypeFormProvider,
-                                             view: PersonResidenceTypeView,
-                                             implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
+class PersonResidentTypeController @Inject() (
+  override val messagesApi: MessagesApi,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  personResidenceTypeService: PersonResidentTypeService,
+  formProvider: PersonResidentTypeFormProvider,
+  view: PersonResidenceTypeView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc) {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       personResidenceTypeService.getResponsiblePerson(request.credId, index) map { responsiblePerson =>
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           (person.personName, person.personResidenceType) match {
-            case (Some(name), Some(residenceType)) => Ok(view(formProvider().fill(residenceType), edit, index, flow, name.titleName))
-            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
-            case _ => NotFound(notFoundView)
+            case (Some(name), Some(residenceType)) =>
+              Ok(view(formProvider().fill(residenceType), edit, index, flow, name.titleName))
+            case (Some(name), _)                   => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _                                 => NotFound(notFoundView)
           }
         }
       }
@@ -54,43 +57,44 @@ class PersonResidentTypeController @Inject()(override val messagesApi: MessagesA
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithError =>
-          personResidenceTypeService.getResponsiblePerson(request.credId, index) map { rp =>
-            BadRequest(view(formWithError, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          },
-        data => {
-          val residency = data.isUKResidence
-          (for {
-            cache <- personResidenceTypeService.getCache(data, request.credId, index)
-            rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
-          } yield {
-            redirectGivenResidency(residency, rp, index, edit, flow)
-          }) getOrElse NotFound(notFoundView)
-        }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
-      )
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithError =>
+            personResidenceTypeService.getResponsiblePerson(request.credId, index) map { rp =>
+              BadRequest(view(formWithError, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            },
+          data =>
+            {
+              val residency = data.isUKResidence
+              (for {
+                cache <- personResidenceTypeService.getCache(data, request.credId, index)
+                rp    <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
+              } yield redirectGivenResidency(residency, rp, index, edit, flow)) getOrElse NotFound(notFoundView)
+            }.recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
+            }
+        )
   }
 
   private def redirectGivenResidency(
-                                      isUKResidence: Residency,
-                                      rp: Seq[ResponsiblePerson],
-                                      index: Int,
-                                      edit: Boolean,
-                                      flow: Option[String]
-                                    ) = {
+    isUKResidence: Residency,
+    rp: Seq[ResponsiblePerson],
+    index: Int,
+    edit: Boolean,
+    flow: Option[String]
+  ) = {
 
     val existingPassport = rp(index - 1).ukPassport
 
     isUKResidence match {
-      case UKResidence(_) if edit => Redirect(routes.DetailedAnswersController.get(index, flow))
-      case UKResidence(_) => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
-      case NonUKResidence if existingPassport.isEmpty => Redirect(routes.PersonUKPassportController.get(index, edit, flow))
-      case NonUKResidence if edit => Redirect(routes.DetailedAnswersController.get(index, flow))
-      case NonUKResidence => Redirect(routes.PersonUKPassportController.get(index, edit, flow))
+      case UKResidence(_) if edit                     => Redirect(routes.DetailedAnswersController.get(index, flow))
+      case UKResidence(_)                             => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
+      case NonUKResidence if existingPassport.isEmpty =>
+        Redirect(routes.PersonUKPassportController.get(index, edit, flow))
+      case NonUKResidence if edit                     => Redirect(routes.DetailedAnswersController.get(index, flow))
+      case NonUKResidence                             => Redirect(routes.PersonUKPassportController.get(index, edit, flow))
     }
 
   }
 }
-

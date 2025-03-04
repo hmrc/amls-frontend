@@ -26,8 +26,8 @@ import views.html.renewal.SendMoneyToOtherCountryView
 
 class SendMoneyToOtherCountryViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val send_money_to_other_country = inject[SendMoneyToOtherCountryView]
-  lazy val fp = inject[SendMoneyToOtherCountryFormProvider]
+  lazy val send_money_to_other_country                           = inject[SendMoneyToOtherCountryView]
+  lazy val fp                                                    = inject[SendMoneyToOtherCountryFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   trait ViewFixture extends Fixture
 
@@ -36,17 +36,19 @@ class SendMoneyToOtherCountryViewSpec extends AmlsViewSpec with Matchers {
 
       def view = send_money_to_other_country(fp().fill(SendMoneyToOtherCountry(true)), true)
 
-      doc.title must be(messages("renewal.msb.send.money.title") +
-        " - " + messages("summary.renewal") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("renewal.msb.send.money.title") +
+          " - " + messages("summary.renewal") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = send_money_to_other_country(fp().fill(SendMoneyToOtherCountry(true)), true)
 
-      heading.html must be(messages("renewal.msb.send.money.title"))
+      heading.html    must be(messages("renewal.msb.send.money.title"))
       subHeading.html must include(messages("summary.renewal"))
     }
 
@@ -61,7 +63,7 @@ class SendMoneyToOtherCountryViewSpec extends AmlsViewSpec with Matchers {
       def view = send_money_to_other_country(fp().fill(SendMoneyToOtherCountry(true)), true)
       val link = doc.getElementById("return-to-application")
 
-      link.text() must include(messages("link.return.renewal.progress"))
+      link.text()       must include(messages("link.return.renewal.progress"))
       link.attr("href") must include(controllers.renewal.routes.RenewalProgressController.get.url)
     }
 

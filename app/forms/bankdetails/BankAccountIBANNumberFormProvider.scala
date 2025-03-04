@@ -24,14 +24,15 @@ import javax.inject.Inject
 
 class BankAccountIBANNumberFormProvider @Inject() extends Mappings {
 
-  val length = 34
+  val length                         = 34
   def apply(): Form[NonUKIBANNumber] = Form[NonUKIBANNumber](
     "IBANNumber" -> textAllowWhitespace("error.required.bankdetails.iban")
       .verifying(
-      firstError(
-        maxLength(length, "error.max.length.bankdetails.iban"),
-        regexp(alphanumericRegex, "error.invalid.bankdetails.iban")
+        firstError(
+          maxLength(length, "error.max.length.bankdetails.iban"),
+          regexp(alphanumericRegex, "error.invalid.bankdetails.iban")
+        )
       )
-    ).transform[NonUKIBANNumber](NonUKIBANNumber.apply, _.IBANNumber)
+      .transform[NonUKIBANNumber](NonUKIBANNumber.apply, _.IBANNumber)
   )
 }

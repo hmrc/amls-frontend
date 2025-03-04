@@ -22,13 +22,14 @@ import play.api.data.Form
 class OtherBusinessTaxMattersFormProviderSpec extends BooleanFieldBehaviours[OtherBusinessTaxMatters] {
 
   override val form: Form[OtherBusinessTaxMatters] = new OtherBusinessTaxMattersFormProvider()()
-  override val fieldName: String = "otherBusinessTaxMatters"
-  override val errorMessage: String = "error.required.asp.other.business.tax.matters"
+  override val fieldName: String                   = "otherBusinessTaxMatters"
+  override val errorMessage: String                = "error.required.asp.other.business.tax.matters"
 
   "OtherBusinessTaxMattersFormProvider" must {
 
     behave like booleanFieldWithModel(
-      OtherBusinessTaxMattersYes, OtherBusinessTaxMattersNo
+      OtherBusinessTaxMattersYes,
+      OtherBusinessTaxMattersNo
     )
   }
 }

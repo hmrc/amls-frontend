@@ -26,8 +26,8 @@ import views.html.withdrawal.WithdrawalReasonView
 
 class WithdrawalReasonViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val withdrawal_reason = inject[WithdrawalReasonView]
-  lazy val fp = inject[WithdrawalReasonFormProvider]
+  lazy val withdrawal_reason                                     = inject[WithdrawalReasonView]
+  lazy val fp                                                    = inject[WithdrawalReasonFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   trait TestFixture extends Fixture
 
@@ -36,17 +36,19 @@ class WithdrawalReasonViewSpec extends AmlsViewSpec with Matchers {
 
       def view = withdrawal_reason(fp())
 
-      doc.title must be(messages("withdrawal.reason.heading") +
-        " - " + messages("title.yapp") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("withdrawal.reason.heading") +
+          " - " + messages("title.yapp") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new TestFixture {
 
       def view = withdrawal_reason(fp())
 
-      heading.html must be(messages("withdrawal.reason.heading"))
+      heading.html    must be(messages("withdrawal.reason.heading"))
       subHeading.html must include(messages("summary.status"))
     }
 
@@ -69,12 +71,14 @@ class WithdrawalReasonViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       withdrawal_reason(fp().withError("withdrawalReason", "error.required.withdrawal.reason")),
-      "withdrawalReason", "error.required.withdrawal.reason"
+      "withdrawalReason",
+      "error.required.withdrawal.reason"
     )
 
     behave like pageWithErrors(
       withdrawal_reason(fp().withError("specifyOtherReason", "error.required.withdrawal.reason.format")),
-      "specifyOtherReason", "error.required.withdrawal.reason.format"
+      "specifyOtherReason",
+      "error.required.withdrawal.reason.format"
     )
 
     behave like pageWithBackLink(withdrawal_reason(fp()))

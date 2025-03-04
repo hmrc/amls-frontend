@@ -28,9 +28,9 @@ import views.html.confirmation.ConfirmationAmendmentView
 class ConfirmationAmendmentViewSpec extends AmlsViewSpec with Matchers with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
-    lazy val amendmentView = app.injector.instanceOf[ConfirmationAmendmentView]
+    lazy val amendmentView                                         = app.injector.instanceOf[ConfirmationAmendmentView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
-    implicit val config: ApplicationConfig = app.injector.instanceOf[ApplicationConfig]
+    implicit val config: ApplicationConfig                         = app.injector.instanceOf[ApplicationConfig]
 
     val continueHref = "http://google.co.uk"
 

@@ -36,15 +36,23 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import scala.annotation.tailrec
 import scala.concurrent.Future
 
-class ResponsiblePersonAddControllerSpec extends AmlsSpec
-  with Matchers with MockitoSugar with ScalaFutures with ScalaCheckPropertyChecks {
+class ResponsiblePersonAddControllerSpec
+    extends AmlsSpec
+    with Matchers
+    with MockitoSugar
+    with ScalaFutures
+    with ScalaCheckPropertyChecks {
 
   trait Fixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
-    val controller = new ResponsiblePeopleAddController (
+    val controller = new ResponsiblePeopleAddController(
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc
+    )
 
     @tailrec
     final def buildTestSequence(requiredCount: Int, acc: Seq[ResponsiblePerson] = Nil): Seq[ResponsiblePerson] = {
@@ -52,13 +60,20 @@ class ResponsiblePersonAddControllerSpec extends AmlsSpec
       if (requiredCount == acc.size) {
         acc
       } else {
-        buildTestSequence(requiredCount, acc :+ ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))))
+        buildTestSequence(
+          requiredCount,
+          acc :+ ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
+        )
       }
     }
 
     def guidanceOptions(currentCount: Int) = Table(
       ("guidanceRequested", "fromDeclaration", "expectedRedirect"),
-      (true, Some(`flowFromDeclaration`), controllers.responsiblepeople.routes.WhatYouNeedController.get(currentCount + 1, Some(`flowFromDeclaration`))),
+      (
+        true,
+        Some(`flowFromDeclaration`),
+        controllers.responsiblepeople.routes.WhatYouNeedController.get(currentCount + 1, Some(`flowFromDeclaration`))
+      ),
       (true, None, controllers.responsiblepeople.routes.WhoMustRegisterController.get(currentCount + 1)),
       (false, None, controllers.responsiblepeople.routes.WhatYouNeedController.get(currentCount + 1))
     )
@@ -67,33 +82,35 @@ class ResponsiblePersonAddControllerSpec extends AmlsSpec
   "ResponsiblePeopleController" when {
     "get is called" should {
       "add empty bankdetails and redirect to the correct page" in new Fixture {
-        val min = 0
-        val max = 25
-        val requiredSuccess =10
+        val min             = 0
+        val max             = 25
+        val requiredSuccess = 10
 
-
-        val emptyCache = Cache.empty
+        val emptyCache       = Cache.empty
         val reasonableCounts = for (n <- Gen.choose(min, max)) yield n
 
         forAll(reasonableCounts, minSuccessful(PosInt.from(requiredSuccess).get)) { currentCount: Int =>
-          forAll(guidanceOptions(currentCount)) { (guidanceRequested: Boolean, fromDeclaration: Option[String], expectedRedirect: Call) =>
-            val testSeq  = buildTestSequence(currentCount)
+          forAll(guidanceOptions(currentCount)) {
+            (guidanceRequested: Boolean, fromDeclaration: Option[String], expectedRedirect: Call) =>
+              val testSeq = buildTestSequence(currentCount)
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
-              .thenReturn(Future.successful(Some(testSeq)))
+              when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+                .thenReturn(Future.successful(Some(testSeq)))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
-              .thenReturn(Future.successful(emptyCache))
+              when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+                .thenReturn(Future.successful(emptyCache))
 
-            val resultF = controller.get(guidanceRequested, fromDeclaration)(request)
+              val resultF = controller.get(guidanceRequested, fromDeclaration)(request)
 
-            status(resultF) must be(SEE_OTHER)
-            redirectLocation(resultF) must be(Some(expectedRedirect.url))
+              status(resultF)           must be(SEE_OTHER)
+              redirectLocation(resultF) must be(Some(expectedRedirect.url))
 
-            verify(controller.dataCacheConnector)
-              .save[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key), meq(testSeq :+ ResponsiblePerson()))(any())
+              verify(controller.dataCacheConnector)
+                .save[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key), meq(testSeq :+ ResponsiblePerson()))(
+                  any()
+                )
 
-            reset(controller.dataCacheConnector)
+              reset(controller.dataCacheConnector)
           }
         }
       }

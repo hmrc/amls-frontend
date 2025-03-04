@@ -26,10 +26,9 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.BusinessTelephoneView
 
+class BusinessTelephoneViewSpec extends AmlsViewSpec with Matchers {
 
-class BusinessTelephoneViewSpec extends AmlsViewSpec with Matchers  {
-
-  lazy val phone: BusinessTelephoneView = app.injector.instanceOf[BusinessTelephoneView]
+  lazy val phone: BusinessTelephoneView                = app.injector.instanceOf[BusinessTelephoneView]
   lazy val formProvider: BusinessTelephoneFormProvider = app.injector.instanceOf[BusinessTelephoneFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
@@ -44,11 +43,13 @@ class BusinessTelephoneViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = phone(filledForm, true)
 
-      doc.title must be(messages("businessdetails.contactingyou.phone.title") +
-        " - " + messages("summary.businessdetails") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
-      heading.html must include(messages("businessdetails.contactingyou.phone.title"))
+      doc.title       must be(
+        messages("businessdetails.contactingyou.phone.title") +
+          " - " + messages("summary.businessdetails") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
+      heading.html    must include(messages("businessdetails.contactingyou.phone.title"))
       subHeading.html must include(messages("summary.businessdetails"))
 
       doc.getElementsByAttributeValue("name", "phoneNumber") must not be empty
@@ -69,7 +70,11 @@ class BusinessTelephoneViewSpec extends AmlsViewSpec with Matchers  {
 //
 //    }
 
-    behave like pageWithErrors(phone(formProvider().bind(Map("phoneNumber" -> "")), false), "phoneNumber", "error.required.phone.number")
+    behave like pageWithErrors(
+      phone(formProvider().bind(Map("phoneNumber" -> "")), false),
+      "phoneNumber",
+      "error.required.phone.number"
+    )
 
     behave like pageWithBackLink(phone(formProvider(), false))
   }

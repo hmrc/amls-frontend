@@ -29,7 +29,7 @@ import scala.jdk.CollectionConverters._
 class SummaryViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    lazy val summary = app.injector.instanceOf[SummaryView]
+    lazy val summary                                               = app.injector.instanceOf[SummaryView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView(FakeRequest())
   }
 
@@ -44,7 +44,7 @@ class SummaryViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks
     "have correct headings" in new ViewFixture {
       def view = summary(Asp())
 
-      heading.html must be(messages("title.cya"))
+      heading.html    must be(messages("title.cya"))
       subHeading.html must include(messages("summary.asp"))
     }
 
@@ -64,15 +64,18 @@ class SummaryViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks
         summary(testdata)
       }
 
-      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
-        doc.getElementsByClass("govuk-summary-list__value").asScala
-      ).foreach { case (key, value) =>
+      doc
+        .getElementsByClass("govuk-summary-list__key")
+        .asScala
+        .zip(
+          doc.getElementsByClass("govuk-summary-list__value").asScala
+        )
+        .foreach { case (key, value) =>
+          val maybeRow = list.find(_._1 == key.text())
 
-        val maybeRow = list.find(_._1 == key.text())
-
-        maybeRow.value._1 mustBe key.text()
-        maybeRow.value._2 mustBe value.text()
-      }
+          maybeRow.value._1 mustBe key.text()
+          maybeRow.value._2 mustBe value.text()
+        }
     }
   }
 }

@@ -45,21 +45,21 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
 
   val personNameGen: Gen[PersonName] = for {
     firstName <- stringOfLengthGen(maxNameTypeLength)
-    lastName <- stringOfLengthGen(maxNameTypeLength)
+    lastName  <- stringOfLengthGen(maxNameTypeLength)
   } yield PersonName(firstName, None, lastName)
 
   val personAddressGen: Gen[PersonAddress] = for {
-    line1 <- stringOfLengthGen(10)
-    line2 <- stringOfLengthGen(10)
+    line1    <- stringOfLengthGen(10)
+    line2    <- stringOfLengthGen(10)
     postCode <- postcodeGen
   } yield PersonAddressUK(line1, Some(line2), None, None, postCode)
 
   val responsiblePersonGen: Gen[ResponsiblePerson] = for {
-    personName <- personNameGen
-    positions <- positionsGen
+    personName  <- personNameGen
+    positions   <- positionsGen
     phoneNumber <- numSequence(10)
-    email <- emailGen
-    address <- personAddressGen
+    email       <- emailGen
+    address     <- personAddressGen
   } yield ResponsiblePerson(
     personName = Some(personName),
     legalName = Some(PreviousName(hasPreviousName = Some(false), None, None, None)),
@@ -70,7 +70,8 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
     nonUKPassport = None,
     dateOfBirth = None,
     contactDetails = Some(ContactDetails(phoneNumber, email)),
-    addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(address, Some(ThreeYearsPlus), None)))),
+    addressHistory =
+      Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(address, Some(ThreeYearsPlus), None)))),
     positions = Some(positions),
     saRegistered = Some(SaRegisteredNo),
     vatRegistered = None,
@@ -86,11 +87,11 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
   )
 
   val completeResponsiblePersonGen: Gen[ResponsiblePerson] = for {
-    personName <- personNameGen
-    positions <- positionsGen
+    personName  <- personNameGen
+    positions   <- positionsGen
     phoneNumber <- numSequence(10)
-    email <- emailGen
-    address <- personAddressGen
+    email       <- emailGen
+    address     <- personAddressGen
   } yield new ResponsiblePerson(
     Some(personName),
     Some(PreviousName(hasPreviousName = Some(false), None, None, None)),
@@ -122,6 +123,7 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
     person <- responsiblePersonGen
   } yield person.copy(positions = positions.fold[Option[Positions]](None)(p => Some(Positions(p, None))))
 
-  def responsiblePeopleGen(i: Int): Gen[List[ResponsiblePerson]] = Gen.listOfN[ResponsiblePerson](i, responsiblePersonGen)
+  def responsiblePeopleGen(i: Int): Gen[List[ResponsiblePerson]] =
+    Gen.listOfN[ResponsiblePerson](i, responsiblePersonGen)
 
 }

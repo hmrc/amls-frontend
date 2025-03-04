@@ -26,15 +26,15 @@ import views.html.hvd.WhatYouNeedView
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[WhatYouNeedView]
-    val controller = new WhatYouNeedController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[WhatYouNeedView]
+    val controller = new WhatYouNeedController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      view = view) {
-
-    }
+      view = view
+    ) {}
   }
 
   "WhatYouNeedController" must {
@@ -42,11 +42,11 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     "get" must {
 
       "load the page" in new Fixture {
-        val pageTitle = messages("title.wyn")  + " - " + messages("summary.hvd") + " - " +
+        val pageTitle = messages("title.wyn") + " - " + messages("summary.hvd") + " - " +
           messages("title.amls") + " - " + messages("title.gov")
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(pageTitle)
       }
     }

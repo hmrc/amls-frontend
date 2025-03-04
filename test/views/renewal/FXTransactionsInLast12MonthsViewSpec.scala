@@ -24,12 +24,12 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.FXTransactionsInLast12MonthsView
 
-class FXTransactionsInLast12MonthsViewSpec extends AmlsViewSpec with Matchers  {
+class FXTransactionsInLast12MonthsViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture
 
-  lazy val last12MonthsView = inject[FXTransactionsInLast12MonthsView]
-  lazy val fp = inject[FXTransactionsInLast12MonthsFormProvider]
+  lazy val last12MonthsView                                      = inject[FXTransactionsInLast12MonthsView]
+  lazy val fp                                                    = inject[FXTransactionsInLast12MonthsFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   "FXTransactionsInLast12MonthsView" must {
@@ -40,14 +40,16 @@ class FXTransactionsInLast12MonthsViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = last12MonthsView(fp().fill(fx), true)
 
-      doc.title must startWith(messages("renewal.msb.fx.transactions.expected.title") + " - " + messages("summary.renewal"))
+      doc.title must startWith(
+        messages("renewal.msb.fx.transactions.expected.title") + " - " + messages("summary.renewal")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = last12MonthsView(fp().fill(fx), true)
 
-      heading.text() must be(messages("renewal.msb.fx.transactions.expected.title"))
+      heading.text()    must be(messages("renewal.msb.fx.transactions.expected.title"))
       subHeading.text() must include(messages("summary.renewal"))
     }
 

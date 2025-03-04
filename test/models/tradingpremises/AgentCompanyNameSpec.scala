@@ -23,8 +23,9 @@ class AgentCompanyNameSpec extends PlaySpec {
 
   "Json Validation" must {
     "Successfully read/write Json data" in {
-      AgentCompanyName.format.reads(AgentCompanyName.format.writes(
-        AgentCompanyName("test"))) must be(JsSuccess(AgentCompanyName("test"), JsPath))
+      AgentCompanyName.format.reads(AgentCompanyName.format.writes(AgentCompanyName("test"))) must be(
+        JsSuccess(AgentCompanyName("test"), JsPath)
+      )
     }
   }
 }

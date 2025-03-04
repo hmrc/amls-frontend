@@ -27,7 +27,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class PersonResidentTypeService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) extends RepeatingSection {
+class PersonResidentTypeService @Inject() (val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext)
+    extends RepeatingSection {
 
   def getResponsiblePerson(credId: String, index: Int): Future[Option[ResponsiblePerson]] =
     getData[ResponsiblePerson](credId, index)
@@ -35,9 +36,9 @@ class PersonResidentTypeService @Inject()(val dataCacheConnector: DataCacheConne
   def getCache(data: PersonResidenceType, credId: String, index: Int): OptionT[Future, Cache] =
     OptionT(
       fetchAllAndUpdateStrict[ResponsiblePerson](credId, index) { (_, rp) =>
-        val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
+        val nationality    = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
         val countryOfBirth = rp.personResidenceType.fold[Option[Country]](None)(x => x.countryOfBirth)
-        val updatedData = data.copy(countryOfBirth = countryOfBirth, nationality = nationality)
+        val updatedData    = data.copy(countryOfBirth = countryOfBirth, nationality = nationality)
         data.isUKResidence match {
           case UKResidence(_) => rp.personResidenceType(updatedData).copy(ukPassport = None, nonUKPassport = None)
           case NonUKResidence => rp.personResidenceType(updatedData)

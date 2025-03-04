@@ -25,11 +25,10 @@ import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.businessactivities.WhoIsYourAccountantNameView
 
-
 class WhoIsYourAccountantNameViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val accountant = inject[WhoIsYourAccountantNameView]
-  lazy val fp = inject[WhoIsYourAccountantNameFormProvider]
+  lazy val fp         = inject[WhoIsYourAccountantNameFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -37,9 +36,9 @@ class WhoIsYourAccountantNameViewSpec extends AmlsViewSpec with Matchers {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
-  val defaultName = WhoIsYourAccountantName("accountantName",Some("tradingName"))
-  val defaultIsUkTrue = WhoIsYourAccountantIsUk(true)
-  val defaultUkAddress = UkAccountantsAddress("line1",Some("line2"),None,None,"AB12CD")
+  val defaultName      = WhoIsYourAccountantName("accountantName", Some("tradingName"))
+  val defaultIsUkTrue  = WhoIsYourAccountantIsUk(true)
+  val defaultUkAddress = UkAccountantsAddress("line1", Some("line2"), None, None, "AB12CD")
 
   "who_is_your_accountant_name view" must {
     "have correct title" in new ViewFixture {
@@ -53,7 +52,7 @@ class WhoIsYourAccountantNameViewSpec extends AmlsViewSpec with Matchers {
 
       def view = accountant(fp().fill(defaultName), true)
 
-      heading.html must be(messages("businessactivities.whoisyouraccountant.title"))
+      heading.html    must be(messages("businessactivities.whoisyouraccountant.title"))
       subHeading.html must include(messages("summary.businessactivities"))
 
     }

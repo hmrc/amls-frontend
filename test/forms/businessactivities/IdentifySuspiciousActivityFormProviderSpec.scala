@@ -23,13 +23,14 @@ import play.api.data.Form
 class IdentifySuspiciousActivityFormProviderSpec extends BooleanFieldBehaviours[IdentifySuspiciousActivity] {
 
   override val form: Form[IdentifySuspiciousActivity] = new IdentifySuspiciousActivityFormProvider()()
-  override val fieldName: String = "hasWrittenGuidance"
-  override val errorMessage: String = "error.required.ba.suspicious.activity"
+  override val fieldName: String                      = "hasWrittenGuidance"
+  override val errorMessage: String                   = "error.required.ba.suspicious.activity"
 
   "IdentifySuspiciousActivityFormProvider" must {
 
     behave like booleanFieldWithModel(
-      IdentifySuspiciousActivity(true), IdentifySuspiciousActivity(false)
+      IdentifySuspiciousActivity(true),
+      IdentifySuspiciousActivity(false)
     )
   }
 }

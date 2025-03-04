@@ -27,7 +27,7 @@ import views.html.tcsp.AnotherTCSPSupervisionView
 class AnotherTCSPSupervisionViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val another_tcsp_supervision = inject[AnotherTCSPSupervisionView]
-  lazy val fp = inject[AnotherTCSPSupervisionFormProvider]
+  lazy val fp                       = inject[AnotherTCSPSupervisionFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -41,16 +41,17 @@ class AnotherTCSPSupervisionViewSpec extends AmlsViewSpec with Matchers {
       def view = another_tcsp_supervision(fp(), true)
 
       val title = messages("tcsp.anothertcspsupervision.title") + " - " + messages("summary.tcsp") + " - " +
-                  messages("title.amls") + " - " + messages("title.gov")
+        messages("title.amls") + " - " + messages("title.gov")
 
-      doc.title must be(title)
-      heading.html must be(messages("tcsp.anothertcspsupervision.header"))
+      doc.title       must be(title)
+      heading.html    must be(messages("tcsp.anothertcspsupervision.header"))
       subHeading.html must include(messages("summary.tcsp"))
     }
 
     behave like pageWithErrors(
       another_tcsp_supervision(
-        fp().withError("servicesOfAnotherTCSP", "error.required.tcsp.services.another.tcsp.registered"), false
+        fp().withError("servicesOfAnotherTCSP", "error.required.tcsp.services.another.tcsp.registered"),
+        false
       ),
       "servicesOfAnotherTCSP",
       "error.required.tcsp.services.another.tcsp.registered"
@@ -58,7 +59,8 @@ class AnotherTCSPSupervisionViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       another_tcsp_supervision(
-        fp().withError("mlrRefNumber", "error.tcsp.services.another.tcsp.number.punctuation"), false
+        fp().withError("mlrRefNumber", "error.tcsp.services.another.tcsp.number.punctuation"),
+        false
       ),
       "mlrRefNumber",
       "error.tcsp.services.another.tcsp.number.punctuation"

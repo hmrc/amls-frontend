@@ -44,16 +44,20 @@ case class NonUKIBANNumber(IBANNumber: String) extends NonUKAccount
 
 object BankAccountIsUk {
 
-  implicit val isUkJsonReads: Reads[BankAccountIsUk] = ( __ \ "isUK").read[Boolean] map BankAccountIsUk.apply
+  implicit val isUkJsonReads: Reads[BankAccountIsUk] = (__ \ "isUK").read[Boolean] map BankAccountIsUk.apply
 
-  implicit val isUkJsonWrites: Writes[BankAccountIsUk] = Writes[BankAccountIsUk] { data => Json.obj( "isUK" -> data.isUk) }
+  implicit val isUkJsonWrites: Writes[BankAccountIsUk] = Writes[BankAccountIsUk] { data =>
+    Json.obj("isUK" -> data.isUk)
+  }
 }
 
 object BankAccountHasIban {
 
-  implicit val hasIbanJsonReads: Reads[BankAccountHasIban] = ( __ \ "isIBAN").read[Boolean] map BankAccountHasIban.apply
+  implicit val hasIbanJsonReads: Reads[BankAccountHasIban] = (__ \ "isIBAN").read[Boolean] map BankAccountHasIban.apply
 
-  implicit val hasIbanJsonWrites: Writes[BankAccountHasIban] = Writes[BankAccountHasIban] { data => Json.obj("isIBAN" -> data.hasIban ) }
+  implicit val hasIbanJsonWrites: Writes[BankAccountHasIban] = Writes[BankAccountHasIban] { data =>
+    Json.obj("isIBAN" -> data.hasIban)
+  }
 }
 
 object Account {
@@ -64,28 +68,28 @@ object Account {
     (
       (__ \ "accountNumber").read[String] ~
         (__ \ "sortCode").read[String]
-      ) (UKAccount.apply _)
+    )(UKAccount.apply _)
   }
 
-  val ukJsonWrites = Writes[UKAccount] {
-    data => Json.obj(
-      "accountNumber" -> data.accountNumber,
-      "sortCode" -> data.sortCode)
+  val ukJsonWrites = Writes[UKAccount] { data =>
+    Json.obj("accountNumber" -> data.accountNumber, "sortCode" -> data.sortCode)
   }
 
-  val nonUkAccountJsonWrites = Writes[NonUKAccountNumber] { data => Json.obj("nonUKAccountNumber" -> data.accountNumber) }
+  val nonUkAccountJsonWrites = Writes[NonUKAccountNumber] { data =>
+    Json.obj("nonUKAccountNumber" -> data.accountNumber)
+  }
 
   val nonUkAccountJsonReads: Reads[Account] = (__ \ "nonUKAccountNumber").read[String] map NonUKAccountNumber.apply
 
   val nonUkIbanJsonReads: Reads[Account] = (__ \ "IBANNumber").read[String] map NonUKIBANNumber.apply
 
-  val nonUkIbanJsonWrites = Writes[NonUKIBANNumber] { data => Json.obj("IBANNumber" -> data.IBANNumber)  }
+  val nonUkIbanJsonWrites = Writes[NonUKIBANNumber](data => Json.obj("IBANNumber" -> data.IBANNumber))
 
   implicit val accountReads: Reads[Account] = ukJsonReads orElse nonUkIbanJsonReads orElse nonUkAccountJsonReads
 
   implicit val accountWrites: Writes[Account] = Writes[Account] {
-    case account@UKAccount(_, _) => ukJsonWrites.writes(account)
-    case account@NonUKIBANNumber(_) => nonUkIbanJsonWrites.writes(account)
-    case account@NonUKAccountNumber(_) => nonUkAccountJsonWrites.writes(account)
+    case account @ UKAccount(_, _)       => ukJsonWrites.writes(account)
+    case account @ NonUKIBANNumber(_)    => nonUkIbanJsonWrites.writes(account)
+    case account @ NonUKAccountNumber(_) => nonUkAccountJsonWrites.writes(account)
   }
 }

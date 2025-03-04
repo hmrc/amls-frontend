@@ -39,14 +39,17 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
   trait Fixture {
     self =>
-    val request = addToken(authRequest)
-    lazy val view = inject[VATRegisteredView]
-    val controller = new VATRegisteredController (
+    val request    = addToken(authRequest)
+    lazy val view  = inject[VATRegisteredView]
+    val controller = new VATRegisteredController(
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
       formProvider = inject[VATRegisteredFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
   }
 
   val emptyCache = Cache.empty
@@ -60,15 +63,21 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         "with pre populated data" in new Fixture {
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, vatRegistered = Some(VATRegisteredYes("123456789")))))))
+            .thenReturn(
+              Future.successful(
+                Some(
+                  Seq(ResponsiblePerson(personName = personName, vatRegistered = Some(VATRegisteredYes("123456789"))))
+                )
+              )
+            )
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
           document.select("input[value=false]").hasAttr("checked") must be(false)
-          document.select("input[value=true]").hasAttr("checked") must be(true)
-          document.getElementById("vrnNumber").`val`() must be("123456789")
+          document.select("input[value=true]").hasAttr("checked")  must be(true)
+          document.getElementById("vrnNumber").`val`()             must be("123456789")
         }
 
         "without data" in new Fixture {
@@ -78,7 +87,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           val result = controller.get(1)(request)
           status(result) must be(OK)
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("input[value=true]").hasAttr("checked") must be(false)
+          document.select("input[value=true]").hasAttr("checked")  must be(false)
           document.select("input[value=false]").hasAttr("checked") must be(false)
         }
       }
@@ -102,20 +111,22 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           "edit = false" in new Fixture {
 
             val newRequest = FakeRequest(POST, routes.VATRegisteredController.post(1).url)
-            .withFormUrlEncodedBody(
-              "registeredForVAT" -> "true",
-              "vrnNumber" -> "123456789"
-            )
+              .withFormUrlEncodedBody(
+                "registeredForVAT" -> "true",
+                "vrnNumber"        -> "123456789"
+              )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-              (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(vatRegistered = Some(VATRegisteredNo))))))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(vatRegistered = Some(VATRegisteredNo))))))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())
-              (any())).thenReturn(Future.successful(emptyCache))
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+              .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(1)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1).url))
+            status(result)           must be(SEE_OTHER)
+            redirectLocation(result) must be(
+              Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1).url)
+            )
           }
         }
 
@@ -123,20 +134,22 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           "edit = true" in new Fixture {
 
             val newRequest = FakeRequest(POST, routes.VATRegisteredController.post(1).url)
-            .withFormUrlEncodedBody(
-              "registeredForVAT" -> "true",
-              "vrnNumber" -> "123456789"
-            )
+              .withFormUrlEncodedBody(
+                "registeredForVAT" -> "true",
+                "vrnNumber"        -> "123456789"
+              )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-              (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())
-              (any())).thenReturn(Future.successful(emptyCache))
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+              .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
+            status(result)           must be(SEE_OTHER)
+            redirectLocation(result) must be(
+              Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url)
+            )
           }
         }
       }
@@ -145,9 +158,9 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         "respond with BAD_REQUEST" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.VATRegisteredController.post(1).url)
-          .withFormUrlEncodedBody(
-            "registeredForVATYes" -> "1234567890"
-          )
+            .withFormUrlEncodedBody(
+              "registeredForVATYes" -> "1234567890"
+            )
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))
 
@@ -159,10 +172,10 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
       "Responsible Person cannot be found with given index" must {
         "respond with NOT_FOUND" in new Fixture {
           val newRequest = FakeRequest(POST, routes.VATRegisteredController.post(1).url)
-          .withFormUrlEncodedBody(
-            "registeredForVAT" -> "true",
-            "vrnNumber" -> "123456789"
-          )
+            .withFormUrlEncodedBody(
+              "registeredForVAT" -> "true",
+              "vrnNumber"        -> "123456789"
+            )
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))
 
@@ -176,5 +189,3 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
     }
   }
 }
-
-

@@ -27,7 +27,7 @@ import views.html.responsiblepeople.SelfAssessmentRegisteredView
 class SelfAssessmentRegisteredViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val registeredView = inject[SelfAssessmentRegisteredView]
-  lazy val fp = inject[SelfAssessmentRegisteredFormProvider]
+  lazy val fp             = inject[SelfAssessmentRegisteredFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -43,17 +43,19 @@ class SelfAssessmentRegisteredViewSpec extends AmlsViewSpec with Matchers {
 
       def view = registeredView(fp(), true, 0, None, name)
 
-      doc.title must be(messages("responsiblepeople.registeredforselfassessment.title") + " - " +
-        messages("summary.responsiblepeople") +
-      " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("responsiblepeople.registeredforselfassessment.title") + " - " +
+          messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = registeredView(fp(), true, 0, None, name)
 
-      heading.html must be(messages("responsiblepeople.registeredforselfassessment.heading", name))
+      heading.html    must be(messages("responsiblepeople.registeredforselfassessment.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
     }
 
@@ -62,17 +64,19 @@ class SelfAssessmentRegisteredViewSpec extends AmlsViewSpec with Matchers {
       def view = registeredView(fp(), false, 0, None, name)
 
       doc.getElementsByAttributeValue("name", "saRegistered") must not be empty
-      doc.getElementsByAttributeValue("name", "utrNumber") must not be empty
+      doc.getElementsByAttributeValue("name", "utrNumber")    must not be empty
     }
 
     behave like pageWithErrors(
       registeredView(fp().withError("saRegistered", "error.required.sa.registration"), false, 0, None, name),
-      "saRegistered", "error.required.sa.registration"
+      "saRegistered",
+      "error.required.sa.registration"
     )
 
     behave like pageWithErrors(
       registeredView(fp().withError("utrNumber", "error.required.utr.number"), false, 0, None, name),
-      "utrNumber", "error.required.utr.number"
+      "utrNumber",
+      "error.required.utr.number"
     )
 
     behave like pageWithBackLink(registeredView(fp(), false, 0, None, name))

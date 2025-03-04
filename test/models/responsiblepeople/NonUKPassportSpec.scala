@@ -40,7 +40,7 @@ class NonUKPassportSpec extends PlaySpec {
       "Read the json and return error if passport number is missing" in {
         val json = Json.obj("nonUKPassport" -> true)
         NonUKPassport.jsonReads.reads(json) must be(
-          JsError((JsPath  \ "nonUKPassportNumber") -> play.api.libs.json.JsonValidationError("error.path.missing"))
+          JsError((JsPath \ "nonUKPassportNumber") -> play.api.libs.json.JsonValidationError("error.path.missing"))
         )
       }
     }

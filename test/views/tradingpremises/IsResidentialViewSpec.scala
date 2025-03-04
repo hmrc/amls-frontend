@@ -29,13 +29,21 @@ import views.html.tradingpremises.IsResidentialView
 class IsResidentialViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val is_residential = inject[IsResidentialView]
-  lazy val fp = inject[IsResidentialFormProvider]
+  lazy val fp             = inject[IsResidentialFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
-  val address = Address("56 Southview Road", Some("Newcastle Upon Tyne"), Some("Tyne and Wear"), Some("Whitehill"), Some("NE3 6JAX"), Country(
-    "United Kingdom", "UK"
-  ))
+  val address = Address(
+    "56 Southview Road",
+    Some("Newcastle Upon Tyne"),
+    Some("Tyne and Wear"),
+    Some("Whitehill"),
+    Some("NE3 6JAX"),
+    Country(
+      "United Kingdom",
+      "UK"
+    )
+  )
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
@@ -43,16 +51,16 @@ class IsResidentialViewSpec extends AmlsViewSpec with Matchers {
 
   "IsResidentialView" must {
 
-      "have correct title, heading, back link and load UI with empty form" in new ViewFixture {
+    "have correct title, heading, back link and load UI with empty form" in new ViewFixture {
 
       val pageTitle = messages("tradingpremises.isResidential.title") + " - " +
         messages("summary.tradingpremises") + " - " +
         messages("title.amls") + " - " + messages("title.gov")
 
-      def view = is_residential(fp(),Some(address), 1, false)
+      def view = is_residential(fp(), Some(address), 1, false)
 
-      doc.title must be(pageTitle)
-      heading.html must be(messages("tradingpremises.isResidential.title"))
+      doc.title       must be(pageTitle)
+      heading.html    must be(messages("tradingpremises.isResidential.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
 
       doc.select("input[type=radio]").size() must be(2)

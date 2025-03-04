@@ -27,8 +27,8 @@ import views.html.renewal.MostTransactionsView
 
 class MostTransactionsViewSpec extends AmlsViewSpec with Matchers with AutoCompleteServiceMocks {
 
-  lazy val most_transactions = inject[MostTransactionsView]
-  lazy val fp = inject[MostTransactionsFormProvider]
+  lazy val most_transactions                                     = inject[MostTransactionsView]
+  lazy val fp                                                    = inject[MostTransactionsFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   trait ViewFixture extends Fixture
 
@@ -44,7 +44,7 @@ class MostTransactionsViewSpec extends AmlsViewSpec with Matchers with AutoCompl
 
       def view = most_transactions(fp().fill(MostTransactions(Seq.empty[Country])), true, mockAutoComplete.formOptions)
 
-      heading.html must be(messages("renewal.msb.most.transactions.title"))
+      heading.html    must be(messages("renewal.msb.most.transactions.title"))
       subHeading.html must include(messages("summary.renewal"))
 
     }

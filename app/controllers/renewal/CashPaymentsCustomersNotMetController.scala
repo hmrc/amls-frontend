@@ -31,55 +31,63 @@ import javax.inject.Inject
 import scala.concurrent.Future
 
 @Singleton
-class CashPaymentsCustomersNotMetController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                      val authAction: AuthAction,
-                                                      val ds: CommonPlayDependencies,
-                                                      val renewalService: RenewalService,
-                                                      val cc: MessagesControllerComponents,
-                                                      formProvider: CashPaymentsCustomersNotMetFormProvider,
-                                                      view: CashPaymentsCustomersNotMetView) extends AmlsBaseController(ds, cc) {
+class CashPaymentsCustomersNotMetController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val renewalService: RenewalService,
+  val cc: MessagesControllerComponents,
+  formProvider: CashPaymentsCustomersNotMetFormProvider,
+  view: CashPaymentsCustomersNotMetView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      renewalService.getRenewal(request.credId).map {
-        response =>
-          val form = (for {
-            renewal <- response
-            payments <- renewal.receiveCashPayments map { c => c.cashPaymentsCustomerNotMet }
-          } yield formProvider().fill(payments)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      } recoverWith {
-        case _ => Future.successful(Ok(view(formProvider(), edit)))
-      }
-  }
-
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
-        data =>
-          for {
-            renewal <- renewalService.getRenewal(request.credId)
-            _ <- updateCashPayments(request.credId, data, renewal)
-          } yield data match {
-            case CashPaymentsCustomerNotMet(true) => Redirect(routes.HowCashPaymentsReceivedController.get(edit))
-            case CashPaymentsCustomerNotMet(false) => Redirect(routes.SummaryController.get)
-          }
-      )
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    renewalService.getRenewal(request.credId).map { response =>
+      val form = (for {
+        renewal  <- response
+        payments <- renewal.receiveCashPayments map { c => c.cashPaymentsCustomerNotMet }
+      } yield formProvider().fill(payments)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    } recoverWith { case _ =>
+      Future.successful(Ok(view(formProvider(), edit)))
     }
   }
 
-  private def updateCashPayments(credId: String, data: CashPaymentsCustomerNotMet, renewal: Option[Renewal]): Future[Cache] = {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
+          for {
+            renewal <- renewalService.getRenewal(request.credId)
+            _       <- updateCashPayments(request.credId, data, renewal)
+          } yield data match {
+            case CashPaymentsCustomerNotMet(true)  => Redirect(routes.HowCashPaymentsReceivedController.get(edit))
+            case CashPaymentsCustomerNotMet(false) => Redirect(routes.SummaryController.get)
+          }
+      )
+  }
+
+  private def updateCashPayments(
+    credId: String,
+    data: CashPaymentsCustomerNotMet,
+    renewal: Option[Renewal]
+  ): Future[Cache] = {
 
     val noCashPaymentFromCustomer = CashPayments(cashPaymentsCustomerNotMet = data, None)
 
     if (!data.receiveCashPayments) {
       renewalService.updateRenewal(credId, renewal.receiveCashPayments(noCashPaymentFromCustomer))
     } else {
-      renewalService.updateRenewal(credId, renewal.receiveCashPayments(
-        renewal.receiveCashPayments.map(
-          rcp => CashPayments(data, rcp.howCashPaymentsReceived)).getOrElse(noCashPaymentFromCustomer)))
+      renewalService.updateRenewal(
+        credId,
+        renewal.receiveCashPayments(
+          renewal.receiveCashPayments
+            .map(rcp => CashPayments(data, rcp.howCashPaymentsReceived))
+            .getOrElse(noCashPaymentFromCustomer)
+        )
+      )
     }
   }
 }

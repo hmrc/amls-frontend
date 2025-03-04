@@ -23,8 +23,8 @@ import play.api.data.{Form, FormError}
 class BankAccountNameFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val formProvider: BankAccountNameFormProvider = new BankAccountNameFormProvider()
-  val form: Form[String] = formProvider()
-  val fieldName: String = "accountName"
+  val form: Form[String]                        = formProvider()
+  val fieldName: String                         = "accountName"
 
   "BankAccountNameFormProvider" must {
 
@@ -42,11 +42,12 @@ class BankAccountNameFormProviderSpec extends StringFieldBehaviours with Constra
     "fail to bind fields that violate regex" in {
 
       forAll(
-        alphaStringsShorterThan(formProvider.length - 1).suchThat(_.nonEmpty), invalidCharForNames
+        alphaStringsShorterThan(formProvider.length - 1).suchThat(_.nonEmpty),
+        invalidCharForNames
       ) { (accountName, invalidChar) =>
         val result = form.bind(Map(fieldName -> (accountName + invalidChar)))
 
-        result.value shouldBe None
+        result.value            shouldBe None
         result.error(fieldName) shouldBe Some(
           FormError(fieldName, "error.invalid.bankdetails.char", Seq(basicPunctuationRegex))
         )

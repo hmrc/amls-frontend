@@ -34,16 +34,18 @@ import scala.concurrent.Future
 
 class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
-  trait Fixture extends DependencyMocks{
-    self => val request = addToken(authRequest)
-    lazy val view = inject[CashPaymentView]
+  trait Fixture extends DependencyMocks {
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[CashPaymentView]
     val controller = new CashPaymentController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[CashPaymentFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   val emptyCache = Cache.empty
@@ -61,12 +63,14 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe messages("hvd.cash.payment.title") + " - " + messages("summary.hvd") + " - " + messages("title.amls") + " - " + messages("title.gov")
+        htmlValue.title mustBe messages("hvd.cash.payment.title") + " - " + messages("summary.hvd") + " - " + messages(
+          "title.amls"
+        ) + " - " + messages("title.gov")
       }
 
       "load Yes when Cash payment from mongoCache returns True" in new Fixture {
         // scalastyle:off magic.number
-        val firstDate = Some(CashPaymentFirstDate(LocalDate.of(1990, 2, 24)))
+        val firstDate  = Some(CashPaymentFirstDate(LocalDate.of(1990, 2, 24)))
         val activities = Hvd(cashPayment = Some(CashPayment(CashPaymentOverTenThousandEuros(true), firstDate)))
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
@@ -82,7 +86,7 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
       "load No when cashPayment from mongoCache returns No" in new Fixture {
 
         val cashPayment = Some(CashPayment(CashPaymentOverTenThousandEuros(false), None))
-        val activities = Hvd(cashPayment = cashPayment)
+        val activities  = Hvd(cashPayment = cashPayment)
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(Some(activities)))
@@ -100,7 +104,7 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
       "successfully redirect to the Date of First Cash Payment page on selection of 'Yes' when edit mode is on" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.CashPaymentController.post().url)
-        .withFormUrlEncodedBody("acceptedAnyPayment" -> "true")
+          .withFormUrlEncodedBody("acceptedAnyPayment" -> "true")
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(None))
@@ -109,14 +113,14 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.hvd.routes.CashPaymentFirstDateController.get(true).url))
       }
 
       "successfully redirect to the Date of First Cash Payment page on selection of 'Yes' when edit mode is off" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.CashPaymentController.post().url)
-        .withFormUrlEncodedBody("acceptedAnyPayment" -> "true")
+          .withFormUrlEncodedBody("acceptedAnyPayment" -> "true")
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(None))
@@ -125,13 +129,13 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.hvd.routes.CashPaymentFirstDateController.get().url))
       }
 
       "successfully redirect to the Linked Cash Payments page on selection of 'No' when edit mode is off" in new Fixture {
         val newRequest = FakeRequest(POST, routes.CashPaymentController.post().url)
-        .withFormUrlEncodedBody("acceptedAnyPayment" -> "false")
+          .withFormUrlEncodedBody("acceptedAnyPayment" -> "false")
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(None))
@@ -140,13 +144,13 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.hvd.routes.LinkedCashPaymentsController.get().url))
       }
 
       "successfully redirect to the Summary page on selection of Option 'No' when edit mode is on" in new Fixture {
         val newRequest = FakeRequest(POST, routes.CashPaymentController.post().url)
-        .withFormUrlEncodedBody("acceptedAnyPayment" -> "false")
+          .withFormUrlEncodedBody("acceptedAnyPayment" -> "false")
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(None))
@@ -155,20 +159,20 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
       }
 
       "show invalid data error" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.CashPaymentController.post().url)
-        .withFormUrlEncodedBody("" -> "")
+          .withFormUrlEncodedBody("" -> "")
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)
-        status(result) must be(BAD_REQUEST)
+        status(result)          must be(BAD_REQUEST)
         contentAsString(result) must include(messages("error.required.hvd.accepted.cash.payment"))
       }
     }

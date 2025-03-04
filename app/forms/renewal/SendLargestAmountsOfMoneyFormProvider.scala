@@ -22,13 +22,14 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class SendLargestAmountsOfMoneyFormProvider @Inject()() extends CountryListMappings {
+class SendLargestAmountsOfMoneyFormProvider @Inject() () extends CountryListMappings {
 
   private val emptyErrorKey = "error.required.renewal.largest.amounts.country"
 
   def apply(): Form[SendTheLargestAmountsOfMoney] = Form[SendTheLargestAmountsOfMoney](
     "largestAmountsOfMoney" -> countryListMapping[SendTheLargestAmountsOfMoney](emptyErrorKey)(
-      x => SendTheLargestAmountsOfMoney(x.flatten.distinct), _.countries.distinct.map(Some(_))
+      x => SendTheLargestAmountsOfMoney(x.flatten.distinct),
+      _.countries.distinct.map(Some(_))
     )
   )
 

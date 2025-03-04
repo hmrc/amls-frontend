@@ -22,9 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class ExciseGoodsFormProvider @Inject()() extends BooleanFormProvider {
+class ExciseGoodsFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[ExciseGoods] = createForm[ExciseGoods](
-    "exciseGoods", "error.required.hvd.excise.goods"
+    "exciseGoods",
+    "error.required.hvd.excise.goods"
   )(ExciseGoods.apply, _.exciseGoods)
 }

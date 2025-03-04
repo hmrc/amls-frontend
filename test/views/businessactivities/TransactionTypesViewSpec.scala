@@ -29,7 +29,7 @@ class TransactionTypesViewSpec extends AmlsViewSpec with Matchers {
 
   import views.Fixture
 
-  lazy val transaction: TransactionTypesView = inject[TransactionTypesView]
+  lazy val transaction: TransactionTypesView          = inject[TransactionTypesView]
   lazy val formProvider: TransactionTypesFormProvider = inject[TransactionTypesFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
@@ -50,7 +50,7 @@ class TransactionTypesViewSpec extends AmlsViewSpec with Matchers {
 
       def view = transaction(formProvider().fill(TransactionTypes(Set(DigitalSoftware("name")))), true)
 
-      heading.html must be(messages("businessactivities.do.keep.records"))
+      heading.html    must be(messages("businessactivities.do.keep.records"))
       subHeading.html must include(messages("summary.businessactivities"))
     }
 

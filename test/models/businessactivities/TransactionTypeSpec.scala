@@ -36,18 +36,20 @@ class TransactionTypeSpec extends PlaySpec with Matchers {
       val model = TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test")))
 
       Json.toJson(model) mustBe Json.obj(
-        "types" -> Seq("01", "02", "03"),
+        "types"    -> Seq("01", "02", "03"),
         "software" -> "test"
       )
     }
 
     "read values from JSON" in {
       val json = Json.obj(
-        "types" -> Seq("01", "02", "03"),
+        "types"    -> Seq("01", "02", "03"),
         "software" -> "example software"
       )
 
-      json.asOpt[TransactionTypes] mustBe Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("example software"))))
+      json.asOpt[TransactionTypes] mustBe Some(
+        TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("example software")))
+      )
     }
 
     "read values from JSON without software" in {
@@ -63,7 +65,9 @@ class TransactionTypeSpec extends PlaySpec with Matchers {
         "types" -> Seq("01", "02", "03")
       )
 
-      Json.fromJson[TransactionTypes](json) mustBe JsError(JsPath \ "software" -> play.api.libs.json.JsonValidationError("error.missing"))
+      Json.fromJson[TransactionTypes](json) mustBe JsError(
+        JsPath \ "software" -> play.api.libs.json.JsonValidationError("error.missing")
+      )
     }
 
     "fail when an invalid value was given" in {
@@ -71,13 +75,17 @@ class TransactionTypeSpec extends PlaySpec with Matchers {
         "types" -> Seq("01", "10")
       )
 
-      Json.fromJson[TransactionTypes](json) mustBe JsError(JsPath \ "types" -> play.api.libs.json.JsonValidationError("error.invalid"))
+      Json.fromJson[TransactionTypes](json) mustBe JsError(
+        JsPath \ "types" -> play.api.libs.json.JsonValidationError("error.invalid")
+      )
     }
 
     "fail when no values are given" in {
       val json = Json.obj()
 
-      Json.fromJson[TransactionTypes](json) mustBe JsError(JsPath \ "types" -> play.api.libs.json.JsonValidationError("error.missing"))
+      Json.fromJson[TransactionTypes](json) mustBe JsError(
+        JsPath \ "types" -> play.api.libs.json.JsonValidationError("error.missing")
+      )
     }
   }
 
@@ -92,14 +100,14 @@ class TransactionTypeSpec extends PlaySpec with Matchers {
         val result = TransactionTypes.formValues(html)
 
         TransactionTypes.all.foreach { x =>
-          val index = TransactionTypes.all.indexOf(x)
+          val index    = TransactionTypes.all.indexOf(x)
           val checkbox = result(index)
 
           checkbox.content mustBe Text(messages(s"businessactivities.transactiontype.lbl.${x.value}"))
           checkbox.value mustBe x.toString
           checkbox.id mustBe Some(s"types_${index + 1}")
           checkbox.name mustBe Some(s"types[${index + 1}]")
-          if(checkbox == result.last){
+          if (checkbox == result.last) {
             checkbox.conditionalHtml mustBe Some(html)
           } else {
             checkbox.conditionalHtml mustBe None
