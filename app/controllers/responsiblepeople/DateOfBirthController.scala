@@ -28,16 +28,17 @@ import views.html.responsiblepeople.DateOfBirthView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class DateOfBirthController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       val dataCacheConnector: DataCacheConnector,
-                                       authAction: AuthAction,
-                                       val ds: CommonPlayDependencies,
-                                       val cc: MessagesControllerComponents,
-                                       formProvider: DateOfBirthFormProvider,
-                                       view: DateOfBirthView,
-                                       implicit val error: views.html.ErrorView
-                                     ) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class DateOfBirthController @Inject() (
+  override val messagesApi: MessagesApi,
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: DateOfBirthFormProvider,
+  view: DateOfBirthView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
@@ -45,8 +46,8 @@ class DateOfBirthController @Inject()(
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           (person.personName, person.dateOfBirth) match {
             case (Some(name), Some(date)) => Ok(view(formProvider().fill(date), edit, index, flow, name.titleName))
-            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
-            case _ => NotFound(notFoundView)
+            case (Some(name), _)          => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _                        => NotFound(notFoundView)
           }
         }
       }
@@ -54,25 +55,30 @@ class DateOfBirthController @Inject()(
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors => getData[ResponsiblePerson](request.credId, index) map { rp =>
-          BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-        },
-        data => {
-          for {
-            _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-              rp.dateOfBirth(data)
-            }
-          } yield if (edit) {
-            Redirect(routes.DetailedAnswersController.get(index, flow))
-          } else {
-            Redirect(routes.PersonResidentTypeController.get(index, edit, flow))
-          }
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
+              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            },
+          data =>
+            {
+              for {
+                _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                       rp.dateOfBirth(data)
+                     }
+              } yield
+                if (edit) {
+                  Redirect(routes.DetailedAnswersController.get(index, flow))
+                } else {
+                  Redirect(routes.PersonResidentTypeController.get(index, edit, flow))
+                }
 
-        }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
-      )
+            }.recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
+            }
+        )
   }
 
 }

@@ -38,17 +38,19 @@ import scala.concurrent.Future
 class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
-    self => val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    self =>
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
     lazy val view: AccountantForAMLSRegulationsView = inject[AccountantForAMLSRegulationsView]
 
-   val controller = new AccountantForAMLSRegulationsController(
-     dataCacheConnector = mock[DataCacheConnector],
-     SuccessfulAuthAction,
-     ds = commonDependencies,
-     cc = mockMcc,
-     formProvider = inject[AccountantForAMLSRegulationsFormProvider],
-     view = view)
+    val controller = new AccountantForAMLSRegulationsController(
+      dataCacheConnector = mock[DataCacheConnector],
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      formProvider = inject[AccountantForAMLSRegulationsFormProvider],
+      view = view
+    )
   }
 
   val emptyCache: Cache = Cache.empty
@@ -66,14 +68,16 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
         status(result) must be(OK)
 
         val htmlValue: Document = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("accountantForAMLSRegulations").hasAttr("checked") must be(false)
+        htmlValue.getElementById("accountantForAMLSRegulations").hasAttr("checked")   must be(false)
         htmlValue.getElementById("accountantForAMLSRegulations-2").hasAttr("checked") must be(false)
       }
 
       "pre-populate the form when data is already present" in new Fixture {
 
-        val accountantForAMLSRegulations: Option[AccountantForAMLSRegulations] = Some(AccountantForAMLSRegulations(true))
-        val activities: BusinessActivities = BusinessActivities(accountantForAMLSRegulations = accountantForAMLSRegulations)
+        val accountantForAMLSRegulations: Option[AccountantForAMLSRegulations] =
+          Some(AccountantForAMLSRegulations(true))
+        val activities: BusinessActivities                                     =
+          BusinessActivities(accountantForAMLSRegulations = accountantForAMLSRegulations)
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(Some(activities)))
@@ -82,7 +86,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
         status(result) must be(OK)
 
         val htmlValue: Document = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("accountantForAMLSRegulations").hasAttr("checked") must be(true)
+        htmlValue.getElementById("accountantForAMLSRegulations").hasAttr("checked")   must be(true)
         htmlValue.getElementById("accountantForAMLSRegulations-2").hasAttr("checked") must be(false)
       }
     }
@@ -93,8 +97,9 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
         "edit is true" must {
           "redirect to the WhoIsYourAccountantController when 'yes' is selected'" in new Fixture {
 
-            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
-            .withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
+            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+              FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
+                .withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
@@ -103,16 +108,19 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
               .thenReturn(Future.successful(emptyCache))
 
             val result: Future[Result] = controller.post(true)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhoIsYourAccountantNameController.get().url))
+            status(result)           must be(SEE_OTHER)
+            redirectLocation(result) must be(
+              Some(controllers.businessactivities.routes.WhoIsYourAccountantNameController.get().url)
+            )
           }
 
           "successfully redirect to the SummaryController on selection of Option 'No'" in new Fixture {
 
-            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
-            .withFormUrlEncodedBody(
-              "accountantForAMLSRegulations" -> "false"
-            )
+            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+              FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
+                .withFormUrlEncodedBody(
+                  "accountantForAMLSRegulations" -> "false"
+                )
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
 
@@ -120,15 +128,16 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
               .thenReturn(Future.successful(emptyCache))
 
             val result: Future[Result] = controller.post(true)(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get.url))
           }
         }
 
         "edit is false" must {
           "redirect to the WhoIsYourAccountantController on selection of 'Yes'" in new Fixture {
-            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
-            .withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
+            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+              FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
+                .withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
@@ -137,15 +146,18 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
               .thenReturn(Future.successful(emptyCache))
 
             val result: Future[Result] = controller.post(false)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessactivities.routes.WhoIsYourAccountantNameController.get().url))
+            status(result)           must be(SEE_OTHER)
+            redirectLocation(result) must be(
+              Some(controllers.businessactivities.routes.WhoIsYourAccountantNameController.get().url)
+            )
           }
 
           "successfully redirect to the SummaryController on selection of Option 'No'" in new Fixture {
-            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
-            .withFormUrlEncodedBody(
-              "accountantForAMLSRegulations" -> "false"
-            )
+            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+              FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
+                .withFormUrlEncodedBody(
+                  "accountantForAMLSRegulations" -> "false"
+                )
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
 
@@ -153,7 +165,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
               .thenReturn(Future.successful(emptyCache))
 
             val result: Future[Result] = controller.post(false)(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get.url))
           }
         }
@@ -162,8 +174,9 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
       "respond with BAD_REQUEST" when {
         "no options are selected so that the request body is empty" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
-          .withFormUrlEncodedBody("" -> "")
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
+              .withFormUrlEncodedBody("" -> "")
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
@@ -174,10 +187,11 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
 
         "given invalid json" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
-          .withFormUrlEncodedBody(
-            "WhatYouNeedController" -> ""
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
+              .withFormUrlEncodedBody(
+                "WhatYouNeedController" -> ""
+              )
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
@@ -189,10 +203,11 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
 
       "remove the answers to dependant questions" when {
         "user selected 'no'" in new Fixture {
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(true).url)
-          .withFormUrlEncodedBody(
-            "accountantForAMLSRegulations" -> "false"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(true).url)
+              .withFormUrlEncodedBody(
+                "accountantForAMLSRegulations" -> "false"
+              )
 
           val model: BusinessActivities = BusinessActivities(
             accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
@@ -210,11 +225,12 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
           status(result) must be(SEE_OTHER)
 
           val captor = ArgumentCaptor.forClass(classOf[BusinessActivities])
-          verify(controller.dataCacheConnector).save[BusinessActivities](any(), eqTo(BusinessActivities.key), captor.capture())(any())
+          verify(controller.dataCacheConnector)
+            .save[BusinessActivities](any(), eqTo(BusinessActivities.key), captor.capture())(any())
 
           captor.getValue.accountantForAMLSRegulations mustBe Some(AccountantForAMLSRegulations(false))
           captor.getValue.whoIsYourAccountant must not be defined
-          captor.getValue.taxMatters must not be defined
+          captor.getValue.taxMatters          must not be defined
         }
       }
     }

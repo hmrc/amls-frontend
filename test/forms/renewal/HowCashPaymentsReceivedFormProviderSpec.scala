@@ -23,12 +23,15 @@ import models.renewal.{PaymentMethod, PaymentMethods}
 import models.renewal.HowCashPaymentsReceived
 import play.api.data.{Form, FormError}
 
-class HowCashPaymentsReceivedFormProviderSpec extends CheckboxFieldBehaviours with StringFieldBehaviours with Constraints {
+class HowCashPaymentsReceivedFormProviderSpec
+    extends CheckboxFieldBehaviours
+    with StringFieldBehaviours
+    with Constraints {
 
-  val formProvider = new HowCashPaymentsReceivedFormProvider()
+  val formProvider                        = new HowCashPaymentsReceivedFormProvider()
   val form: Form[HowCashPaymentsReceived] = formProvider()
 
-  val checkboxFieldName = "paymentMethods"
+  val checkboxFieldName    = "paymentMethods"
   val checkboxErrorMessage = "error.required.renewal.hvd.choose.option"
 
   val textFieldName = "details"
@@ -51,35 +54,42 @@ class HowCashPaymentsReceivedFormProviderSpec extends CheckboxFieldBehaviours wi
       "bind when Other is selected" in {
 
         forAll(stringOfLengthGen(formProvider.length)) { otherDetails =>
-          val result = form.bind(Map(
-            checkboxFieldName -> Other("").toString,
-            textFieldName -> otherDetails
-          )).apply(textFieldName)
+          val result = form
+            .bind(
+              Map(
+                checkboxFieldName -> Other("").toString,
+                textFieldName     -> otherDetails
+              )
+            )
+            .apply(textFieldName)
           result.value.value shouldBe otherDetails
         }
       }
 
       "be mandatory if Other is selected" in {
 
-        val result = form.bind(Map(
-          checkboxFieldName -> Other("").toString,
-          textFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            checkboxFieldName -> Other("").toString,
+            textFieldName     -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value                shouldBe None
         result.error(textFieldName) shouldBe Some(FormError(textFieldName, "error.required.renewal.hvd.describe"))
       }
 
       s"not bind strings that are longer that ${formProvider.length}" in {
 
         forAll(stringsLongerThan(formProvider.length).suchThat(_.nonEmpty)) { longString =>
+          val result = form.bind(
+            Map(
+              checkboxFieldName -> Other("").toString,
+              textFieldName     -> longString
+            )
+          )
 
-          val result = form.bind(Map(
-            checkboxFieldName -> Other("").toString,
-            textFieldName -> longString
-          ))
-
-          result.value shouldBe None
+          result.value                shouldBe None
           result.error(textFieldName) shouldBe Some(
             FormError(textFieldName, "error.required.renewal.hvd.describe.invalid.length", Seq(formProvider.length))
           )
@@ -88,17 +98,23 @@ class HowCashPaymentsReceivedFormProviderSpec extends CheckboxFieldBehaviours wi
 
       "not bind invalid strings" in {
 
-        forAll(stringsShorterThan(formProvider.length - 1).suchThat(_.nonEmpty), invalidCharForNames) { (detail, invalid) =>
+        forAll(stringsShorterThan(formProvider.length - 1).suchThat(_.nonEmpty), invalidCharForNames) {
+          (detail, invalid) =>
+            val result = form.bind(
+              Map(
+                checkboxFieldName -> Other("").toString,
+                textFieldName     -> (detail + invalid)
+              )
+            )
 
-          val result = form.bind(Map(
-            checkboxFieldName -> Other("").toString,
-            textFieldName -> (detail + invalid)
-          ))
-
-          result.value shouldBe None
-          result.error(textFieldName) shouldBe Some(
-            FormError(textFieldName, "error.required.renewal.hvd.describe.invalid.characters", Seq(basicPunctuationRegex))
-          )
+            result.value                shouldBe None
+            result.error(textFieldName) shouldBe Some(
+              FormError(
+                textFieldName,
+                "error.required.renewal.hvd.describe.invalid.characters",
+                Seq(basicPunctuationRegex)
+              )
+            )
         }
       }
     }

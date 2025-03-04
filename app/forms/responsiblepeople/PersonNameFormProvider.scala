@@ -23,13 +23,13 @@ import play.api.data.Forms.{mapping, optional}
 
 import javax.inject.Inject
 
-class PersonNameFormProvider @Inject()() extends Mappings {
+class PersonNameFormProvider @Inject() () extends Mappings {
 
   val length = 35
 
   def apply(): Form[PersonName] = Form[PersonName](
     mapping(
-      "firstName" -> text("error.required.rp.first_name").verifying(
+      "firstName"  -> text("error.required.rp.first_name").verifying(
         firstError(
           maxLength(length, "error.invalid.rp.first_name.length"),
           regexp(nameRegex, "error.invalid.rp.first_name.validation")
@@ -43,7 +43,7 @@ class PersonNameFormProvider @Inject()() extends Mappings {
           )
         )
       ),
-      "lastName" -> text("error.required.rp.last_name").verifying(
+      "lastName"   -> text("error.required.rp.last_name").verifying(
         firstError(
           maxLength(length, "error.invalid.rp.last_name.length"),
           regexp(nameRegex, "error.invalid.rp.last_name.validation")

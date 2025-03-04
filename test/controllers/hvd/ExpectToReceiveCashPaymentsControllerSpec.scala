@@ -36,17 +36,18 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
     self =>
     val request = addToken(authRequest)
 
-    lazy val view = inject[ExpectToReceiveView]
+    lazy val view  = inject[ExpectToReceiveView]
     val controller =
       new ExpectToReceiveCashPaymentsController(
-      SuccessfulAuthAction,
-      ds = commonDependencies,
+        SuccessfulAuthAction,
+        ds = commonDependencies,
         mockCacheConnector,
         mockStatusService,
         mockServiceFlow,
         cc = mockMcc,
         formProvider = inject[ExpectToReceiveFormProvider],
-        view = view)
+        view = view
+      )
 
     mockCacheFetch[Hvd](None, Some(Hvd.key))
     mockCacheSave[Hvd]
@@ -83,14 +84,16 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
     }
 
     "post is called" when {
-      "request is valid" must {
+      "request is valid"   must {
         "redirect to PercentageOfCashPaymentOver15000Controller" when {
           "edit is false" in new Fixture {
 
-            val result = controller.post()(FakeRequest(POST, routes.ExpectToReceiveCashPaymentsController.post().url)
-            .withFormUrlEncodedBody("paymentMethods[0]" -> Courier.toString))
+            val result = controller.post()(
+              FakeRequest(POST, routes.ExpectToReceiveCashPaymentsController.post().url)
+                .withFormUrlEncodedBody("paymentMethods[0]" -> Courier.toString)
+            )
 
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.PercentageOfCashPaymentOver15000Controller.get().url))
 
           }
@@ -98,10 +101,12 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
         "redirect to SummaryController" when {
           "edit is true" in new Fixture {
 
-            val result = controller.post(true)(FakeRequest(POST, routes.ExpectToReceiveCashPaymentsController.post().url)
-            .withFormUrlEncodedBody("paymentMethods[0]" -> Courier.toString))
+            val result = controller.post(true)(
+              FakeRequest(POST, routes.ExpectToReceiveCashPaymentsController.post().url)
+                .withFormUrlEncodedBody("paymentMethods[0]" -> Courier.toString)
+            )
 
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
           }

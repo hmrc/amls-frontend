@@ -28,23 +28,23 @@ import views.html.businessactivities.AccountantUKAddressView
 class AccountantUKAddressViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val address = inject[AccountantUKAddressView]
-  lazy val fp = inject[AccountantUKAddressFormProvider]
+  lazy val fp      = inject[AccountantUKAddressFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
-  val line1 = "addressLine1"
-  val line2 = "addressLine2"
-  val line3 = "addressLine3"
-  val line4 = "addressLine4"
+  val line1    = "addressLine1"
+  val line2    = "addressLine2"
+  val line3    = "addressLine3"
+  val line4    = "addressLine4"
   val postCode = "postCode"
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
-  val defaultName = WhoIsYourAccountantName("accountantName",Some("tradingName"))
-  val defaultIsUkTrue = WhoIsYourAccountantIsUk(true)
-  val defaultUkAddress = UkAccountantsAddress("line1",Some("line2"),None,None,"AB12CD")
+  val defaultName      = WhoIsYourAccountantName("accountantName", Some("tradingName"))
+  val defaultIsUkTrue  = WhoIsYourAccountantIsUk(true)
+  val defaultUkAddress = UkAccountantsAddress("line1", Some("line2"), None, None, "AB12CD")
 
   "who_is_your_accountant_uk_address view" must {
     "have correct title" in new ViewFixture {
@@ -58,7 +58,9 @@ class AccountantUKAddressViewSpec extends AmlsViewSpec with Matchers {
 
       def view = address(fp().fill(defaultUkAddress), true, defaultName.accountantsName)
 
-      heading.html must be(messages("businessactivities.whoisyouraccountant.address.header", defaultName.accountantsName))
+      heading.html    must be(
+        messages("businessactivities.whoisyouraccountant.address.header", defaultName.accountantsName)
+      )
       subHeading.html must include(messages("summary.businessactivities"))
 
     }
@@ -70,7 +72,6 @@ class AccountantUKAddressViewSpec extends AmlsViewSpec with Matchers {
       (line4, "error.text.validation.address.line4"),
       (postCode, "error.invalid.postcode")
     ) foreach { case (field, error) =>
-
       behave like pageWithErrors(
         address(fp().withError(field, error), true, defaultName.accountantsName),
         field,

@@ -27,7 +27,7 @@ import scala.concurrent.Future
 class YourResponsiblePeopleServiceSpec extends AmlsSpec with ResponsiblePeopleValues {
 
   val mockCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-  val service = new YourResponsiblePeopleService(mockCacheConnector)
+  val service                                = new YourResponsiblePeopleService(mockCacheConnector)
 
   val credId = "1234567890"
 
@@ -39,8 +39,7 @@ class YourResponsiblePeopleServiceSpec extends AmlsSpec with ResponsiblePeopleVa
 
         "fetch returns None" in {
 
-          when(mockCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())
-          ) thenReturn Future.successful(None)
+          when(mockCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())) thenReturn Future.successful(None)
 
           service.completeAndIncompleteRP(credId).futureValue mustBe None
         }
@@ -50,20 +49,26 @@ class YourResponsiblePeopleServiceSpec extends AmlsSpec with ResponsiblePeopleVa
 
         "status is deleted" in {
 
-          when(mockCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())
-          ) thenReturn Future.successful(Some(Seq(
-            ResponsiblePerson(status = Some(StatusConstants.Deleted))
-          )))
+          when(mockCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())) thenReturn Future.successful(
+            Some(
+              Seq(
+                ResponsiblePerson(status = Some(StatusConstants.Deleted))
+              )
+            )
+          )
 
           service.completeAndIncompleteRP(credId).futureValue.map(_._2) mustBe Some(Seq.empty[(ResponsiblePerson, Int)])
         }
 
         "object is empty" in {
 
-          when(mockCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())
-          ) thenReturn Future.successful(Some(Seq(
-            ResponsiblePerson()
-          )))
+          when(mockCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())) thenReturn Future.successful(
+            Some(
+              Seq(
+                ResponsiblePerson()
+              )
+            )
+          )
 
           service.completeAndIncompleteRP(credId).futureValue.map(_._2) mustBe Some(Seq.empty[(ResponsiblePerson, Int)])
         }
@@ -79,8 +84,9 @@ class YourResponsiblePeopleServiceSpec extends AmlsSpec with ResponsiblePeopleVa
             ResponsiblePerson(Some(PersonName("Simon", None, "Johnson")))
           )
 
-          when(mockCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())
-          ) thenReturn Future.successful(Some(people))
+          when(mockCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())) thenReturn Future.successful(
+            Some(people)
+          )
 
           service.completeAndIncompleteRP(credId).futureValue.map(_._1) mustBe Some(Seq.empty[(ResponsiblePerson, Int)])
           service.completeAndIncompleteRP(credId).futureValue.map(_._2) mustBe Some(people.zipWithIndex.reverse)
@@ -97,8 +103,9 @@ class YourResponsiblePeopleServiceSpec extends AmlsSpec with ResponsiblePeopleVa
             completeResponsiblePerson.copy(personName = Some(PersonName("David", Some("Bradley"), "Philips")))
           )
 
-          when(mockCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())
-          ) thenReturn Future.successful(Some(people))
+          when(mockCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())) thenReturn Future.successful(
+            Some(people)
+          )
 
           service.completeAndIncompleteRP(credId).futureValue.map(_._1) mustBe Some(people.zipWithIndex.reverse)
           service.completeAndIncompleteRP(credId).futureValue.map(_._2) mustBe Some(Seq.empty[(ResponsiblePerson, Int)])
@@ -119,13 +126,14 @@ class YourResponsiblePeopleServiceSpec extends AmlsSpec with ResponsiblePeopleVa
           ResponsiblePerson(Some(PersonName("Simon", None, "Johnson")))
         )
 
-        when(mockCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())
-        ) thenReturn Future.successful(Some(completePeople ++ incompletePeople))
+        when(mockCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())) thenReturn Future.successful(
+          Some(completePeople ++ incompletePeople)
+        )
 
         service.completeAndIncompleteRP(credId).futureValue.map(_._1) mustBe Some(completePeople.zipWithIndex.reverse)
         service.completeAndIncompleteRP(credId).futureValue.map(_._2) mustBe Some(
-          incompletePeople.zipWithIndex.reverse.map {
-            case (rp, i) => (rp, i + completePeople.length)
+          incompletePeople.zipWithIndex.reverse.map { case (rp, i) =>
+            (rp, i + completePeople.length)
           }
         )
       }

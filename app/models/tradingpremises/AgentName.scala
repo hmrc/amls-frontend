@@ -21,7 +21,11 @@ import java.time.LocalDate
 import play.api.libs.json._
 import typeclasses.MongoKey
 
-case class AgentName(agentName: String, dateOfChange: Option[DateOfChange] = None, agentDateOfBirth: Option[LocalDate] = None)
+case class AgentName(
+  agentName: String,
+  dateOfChange: Option[DateOfChange] = None,
+  agentDateOfBirth: Option[LocalDate] = None
+)
 
 object AgentName {
 
@@ -31,7 +35,6 @@ object AgentName {
 
   implicit val format: OFormat[AgentName] = Json.format[AgentName]
 
-  implicit def convert(data: AgentName): Option[TradingPremises] = {
+  implicit def convert(data: AgentName): Option[TradingPremises] =
     Some(TradingPremises(agentName = Some(data)))
-  }
 }

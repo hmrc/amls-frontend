@@ -37,14 +37,14 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   "ProductsController" must {
 
-    "load the 'What will your business sell?' page" in new Fixture  {
+    "load the 'What will your business sell?' page" in new Fixture {
       mockCacheFetch[Hvd](None)
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(Messages("hvd.products.title"))
     }
 
-    "pre-populate the 'What will your business sell?' page" in new Fixture  {
+    "pre-populate the 'What will your business sell?' page" in new Fixture {
       mockCacheFetch(Some(Hvd(products = Some(Products(Set(Alcohol, Tobacco))))))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -53,14 +53,14 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       document.select(s"input[value=${Tobacco.toString}]").hasAttr("checked") must be(true)
     }
 
-    "redirect successfully" when  {
+    "redirect successfully" when {
 
       "alcohol is selected" in new Fixture with RequestModifiers {
         val newRequest = requestWithAlcohol()
         mockCacheFetch[Hvd](None)
         mockApplicationStatus(SubmissionDecisionRejected)
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        val result     = controller.post()(newRequest)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.ExciseGoodsController.get().url))
       }
 
@@ -68,8 +68,8 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
         val newRequest = requestWithAlcohol()
         mockCacheFetch[Hvd](None)
         mockApplicationStatus(SubmissionDecisionRejected)
-        val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        val result     = controller.post(true)(newRequest)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.ExciseGoodsController.get(true).url))
       }
 
@@ -77,8 +77,8 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
         val newRequest = requestWithoutAlcohol()
         mockCacheFetch[Hvd](None)
         mockApplicationStatus(SubmissionDecisionRejected)
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        val result     = controller.post()(newRequest)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.HowWillYouSellGoodsController.get().url))
       }
 
@@ -86,8 +86,8 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
         val newRequest = requestWithoutAlcohol()
         mockCacheFetch[Hvd](None)
         mockApplicationStatus(SubmissionDecisionRejected)
-        val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        val result     = controller.post(true)(newRequest)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       }
     }
@@ -97,19 +97,23 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       "other selected but no text" in new Fixture with RequestModifiers {
         val newRequest = invalidRequestWithEmptyOther()
         mockCacheFetch[Hvd](None)
-        val result = controller.post()(newRequest)
+        val result     = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
         val document = Jsoup.parse(contentAsString(result))
-        document.select("a[href=#otherDetails]").html() must include(Messages("error.required.hvd.business.sell.other.details"))
+        document.select("a[href=#otherDetails]").html() must include(
+          Messages("error.required.hvd.business.sell.other.details")
+        )
       }
 
       "other selected but text over valid length" in new Fixture with RequestModifiers {
         val newRequest = invalidRequestWithTooLongOther()
         mockCacheFetch[Hvd](None)
-        val result = controller.post()(newRequest)
+        val result     = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
         val document = Jsoup.parse(contentAsString(result))
-        document.select("a[href=#otherDetails]").html() must include(Messages("error.invalid.hvd.business.sell.other.details"))
+        document.select("a[href=#otherDetails]").html() must include(
+          Messages("error.invalid.hvd.business.sell.other.details")
+        )
       }
     }
   }
@@ -122,36 +126,44 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
         val newRequest = requestWithAlcohol()
         mockCacheFetch[Hvd](None)
         mockApplicationStatus(SubmissionDecisionApproved)
-        val result = controller.post(false)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoods).url))
+        val result     = controller.post(false)(newRequest)
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoods).url)
+        )
       }
 
       "alcohol is selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
         val newRequest = requestWithAlcohol()
         mockCacheFetch[Hvd](None)
         mockApplicationStatus(SubmissionDecisionApproved)
-        val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoodsEdit).url))
+        val result     = controller.post(true)(newRequest)
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoodsEdit).url)
+        )
       }
 
       "alcohol is not selected" in new Fixture with DateOfChangeHelper with RequestModifiers {
         val newRequest = requestWithoutAlcohol()
         mockCacheFetch[Hvd](None)
         mockApplicationStatus(SubmissionDecisionApproved)
-        val result = controller.post(false)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url))
+        val result     = controller.post(false)(newRequest)
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url)
+        )
       }
 
       "alcohol is not selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
         val newRequest = requestWithoutAlcohol()
         mockCacheFetch[Hvd](None)
         mockApplicationStatus(SubmissionDecisionApproved)
-        val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
+        val result     = controller.post(true)(newRequest)
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url)
+        )
       }
     }
 
@@ -160,36 +172,44 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
         val newRequest = requestWithAlcohol()
         mockCacheFetch[Hvd](None)
         mockApplicationStatus(ReadyForRenewal(None))
-        val result = controller.post(false)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoods).url))
+        val result     = controller.post(false)(newRequest)
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoods).url)
+        )
       }
 
       "alcohol is selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
         val newRequest = requestWithAlcohol()
         mockCacheFetch[Hvd](None)
         mockApplicationStatus(ReadyForRenewal(None))
-        val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoodsEdit).url))
+        val result     = controller.post(true)(newRequest)
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoodsEdit).url)
+        )
       }
 
       "alcohol is not selected" in new Fixture with DateOfChangeHelper with RequestModifiers {
         val newRequest = requestWithoutAlcohol()
         mockCacheFetch[Hvd](None)
         mockApplicationStatus(ReadyForRenewal(None))
-        val result = controller.post(false)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url))
+        val result     = controller.post(false)(newRequest)
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url)
+        )
       }
 
       "alcohol is not selected and in edit mode" in new Fixture with DateOfChangeHelper with RequestModifiers {
         val newRequest = requestWithoutAlcohol()
         mockCacheFetch[Hvd](None)
         mockApplicationStatus(ReadyForRenewal(None))
-        val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
+        val result     = controller.post(true)(newRequest)
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url)
+        )
       }
     }
   }
@@ -209,7 +229,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
             mockApplicationStatus(SubmissionDecisionApproved)
 
             val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.ExciseGoodsController.get().url))
           }
 
@@ -224,7 +244,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
             mockApplicationStatus(SubmissionDecisionApproved)
 
             val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.HowWillYouSellGoodsController.get().url))
           }
         }
@@ -233,10 +253,12 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
   }
 
   trait Fixture extends DependencyMocks {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
-    lazy val view = inject[ProductsView]
-    val controller = new ProductsController(mockCacheConnector,
+    lazy val view  = inject[ProductsView]
+    val controller = new ProductsController(
+      mockCacheConnector,
       mockStatusService,
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -251,38 +273,34 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
   }
 
   trait RequestModifiers {
-    def requestWithAlcohol() = {
+    def requestWithAlcohol() =
       FakeRequest(POST, routes.ProductsController.post().url).withFormUrlEncodedBody(
-        "products[0]" -> Alcohol.toString,
-        "products[1]" -> Tobacco.toString,
-        "products[2]" -> Other("").toString,
+        "products[0]"  -> Alcohol.toString,
+        "products[1]"  -> Tobacco.toString,
+        "products[2]"  -> Other("").toString,
         "otherDetails" -> "test"
       )
-    }
 
-    def requestWithoutAlcohol() = {
+    def requestWithoutAlcohol() =
       FakeRequest(POST, routes.ProductsController.post().url).withFormUrlEncodedBody(
         "products[0]" -> Antiques.toString,
         "products[1]" -> Cars.toString
       )
-    }
 
-    def invalidRequestWithTooLongOther() = {
+    def invalidRequestWithTooLongOther() =
       FakeRequest(POST, routes.ProductsController.post().url).withFormUrlEncodedBody(
-        "products[0]" -> Alcohol.toString,
-        "products[1]" -> Tobacco.toString,
-        "products[2]" -> Other("").toString,
+        "products[0]"  -> Alcohol.toString,
+        "products[1]"  -> Tobacco.toString,
+        "products[2]"  -> Other("").toString,
         "otherDetails" -> "g" * 256
       )
-    }
 
-    def invalidRequestWithEmptyOther() = {
+    def invalidRequestWithEmptyOther() =
       FakeRequest(POST, routes.ProductsController.post().url).withFormUrlEncodedBody(
-        "products[0]" -> Alcohol.toString,
-        "products[1]" -> Other("").toString,
+        "products[0]"  -> Alcohol.toString,
+        "products[1]"  -> Other("").toString,
         "otherDetails" -> ""
       )
-    }
   }
 
 }

@@ -32,35 +32,37 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class WhatYouNeedController @Inject()(
-                                       val dataCacheConnector: DataCacheConnector,
-                                       val authAction: AuthAction,
-                                       val ds: CommonPlayDependencies,
-                                       renewalService: RenewalService,
-                                       val cc: MessagesControllerComponents,
-                                       view: WhatYouNeedView)(implicit executionContext: ExecutionContext) extends AmlsBaseController(ds, cc) with Logging {
+class WhatYouNeedController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  renewalService: RenewalService,
+  val cc: MessagesControllerComponents,
+  view: WhatYouNeedView
+)(implicit executionContext: ExecutionContext)
+    extends AmlsBaseController(ds, cc)
+    with Logging {
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-        (for {
-          bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key))
-          ba <- OptionT.fromOption[Future](bm.activities)
-          section <- OptionT.liftF(getSection(renewalService, request.credId, Some(ba), bm.msbServices))
-        } yield {
-          section
-        }).getOrElse {
-          logger.warn("Unable to retrieve business activities in [renewal][WhatYouNeedController]")
-          throw new Exception("Unable to retrieve business activities in [renewal][WhatYouNeedController]")
-        }
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      bm      <- OptionT(dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key))
+      ba      <- OptionT.fromOption[Future](bm.activities)
+      section <- OptionT.liftF(getSection(renewalService, request.credId, Some(ba), bm.msbServices))
+    } yield section).getOrElse {
+      logger.warn("Unable to retrieve business activities in [renewal][WhatYouNeedController]")
+      throw new Exception("Unable to retrieve business activities in [renewal][WhatYouNeedController]")
+    }
 
   }
 
-  def getSection(renewalService: RenewalService,
-                 credId: String, ba: Option[BusinessActivities],
-                 msbActivities: Option[BusinessMatchingMsbServices])(implicit request: Request[_]): Future[Result] = {
+  def getSection(
+    renewalService: RenewalService,
+    credId: String,
+    ba: Option[BusinessActivities],
+    msbActivities: Option[BusinessMatchingMsbServices]
+  )(implicit request: Request[_]): Future[Result] =
     renewalService.getTaskRow(credId) map {
       case TaskRow(_, _, _, NotStarted | Started, _) => Ok(view(ba, msbActivities))
-      case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+      case _                                         => Redirect(controllers.routes.RegistrationProgressController.get())
     }
-  }
 }

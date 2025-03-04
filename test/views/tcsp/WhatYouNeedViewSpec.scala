@@ -25,8 +25,8 @@ import views.html.tcsp.WhatYouNeedView
 
 class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val what_you_need = inject[WhatYouNeedView]
-  val call = controllers.tcsp.routes.TcspTypesController.get()
+  lazy val what_you_need                                    = inject[WhatYouNeedView]
+  val call                                                  = controllers.tcsp.routes.TcspTypesController.get()
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
@@ -49,7 +49,7 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
       def view = what_you_need(call)
 
-      heading.html must be(messages("title.wyn"))
+      heading.html    must be(messages("title.wyn"))
       subHeading.html must include(messages("summary.tcsp"))
     }
 
@@ -58,7 +58,11 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
       html must include(messages("the type of trust or company service provider you are"))
       html must include(messages("if you use the services of another trust or company service provider"))
-      html must include(messages("your trust or company service provider’s Money Laundering Regulations number, if you use another provider"))
+      html must include(
+        messages(
+          "your trust or company service provider’s Money Laundering Regulations number, if you use another provider"
+        )
+      )
       html must include(messages("You may also need to tell us:"))
       html must include(messages("if you sell off-the-shelf companies"))
       html must include(messages("which services your business provides"))

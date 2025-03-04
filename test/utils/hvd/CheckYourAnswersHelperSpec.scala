@@ -30,7 +30,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
   lazy val cyaHelper: CheckYourAnswersHelper = app.injector.instanceOf[CheckYourAnswersHelper]
 
-  val otherProduct = "Bars of soap"
+  val otherProduct       = "Bars of soap"
   val otherPaymentMethod = "Vouchers"
 
   val productsList = Products.all.map { x =>
@@ -95,9 +95,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     "Products is present" must {
 
       "render the correct content for a single product" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(products = Some(Products(Set(Alcohol))))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(products = Some(Products(Set(Alcohol))))
+          )
+          .rows
 
         assertRowMatches(
           0,
@@ -124,9 +126,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     "Excise goods is present" must {
 
       "render the correct content for 'No'" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(exciseGoods = Some(ExciseGoods(false)))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(exciseGoods = Some(ExciseGoods(false)))
+          )
+          .rows
 
         assertRowMatches(
           1,
@@ -153,9 +157,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     "How Will You Sell Goods is present" must {
 
       "render the correct content for a single good" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Retail))))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Retail))))
+          )
+          .rows
 
         assertRowMatches(
           2,
@@ -182,9 +188,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     "Cash Payment is present" must {
 
       "render the correct content for 'No'" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(cashPayment = Some(CashPayment(CashPaymentOverTenThousandEuros(false), None)))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(cashPayment = Some(CashPayment(CashPaymentOverTenThousandEuros(false), None)))
+          )
+          .rows
 
         assertRowMatches(
           3,
@@ -219,9 +227,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     "Linked Cash Payment is present" must {
 
       "render the correct content for 'No'" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(linkedCashPayment = Some(LinkedCashPayments(false)))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(linkedCashPayment = Some(LinkedCashPayments(false)))
+          )
+          .rows
 
         assertRowMatches(
           5,
@@ -248,9 +258,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     "Receive Cash Payment is present" must {
 
       "render the correct content for 'No'" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(receiveCashPayments = Some(false))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(receiveCashPayments = Some(false))
+          )
+          .rows
 
         assertRowMatches(
           6,
@@ -280,9 +292,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         val singlePaymentMethod = PaymentMethods(true, false, None)
 
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(cashPaymentMethods = Some(singlePaymentMethod))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(cashPaymentMethods = Some(singlePaymentMethod))
+          )
+          .rows
 
         assertRowMatches(
           7,
@@ -309,11 +323,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     "Percentage Payment is present" must {
 
       PercentageOfCashPaymentOver15000.all.foreach { percentage =>
-
         s"render the correct content for $percentage." in new RowFixture {
-          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-            model.copy(percentageOfCashPaymentOver15000 = Some(percentage))
-          ).rows
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+            .getSummaryList(
+              model.copy(percentageOfCashPaymentOver15000 = Some(percentage))
+            )
+            .rows
 
           assertRowMatches(
             8,

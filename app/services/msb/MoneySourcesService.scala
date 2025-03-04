@@ -25,19 +25,20 @@ import play.api.mvc.Results.Redirect
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class MoneySourcesService @Inject()() {
+class MoneySourcesService @Inject() () {
 
-  def redirectToNextPage(maybeMsb: Option[MoneyServiceBusiness], maybeBm: Option[BusinessMatching], edit: Boolean): Option[Result] = {
+  def redirectToNextPage(
+    maybeMsb: Option[MoneyServiceBusiness],
+    maybeBm: Option[BusinessMatching],
+    edit: Boolean
+  ): Option[Result] =
     for {
-      msb <- maybeMsb
-      bm <- maybeBm
+      msb      <- maybeMsb
+      bm       <- maybeBm
       services <- bm.msbServices
-    } yield {
-      services.msbServices.contains(ForeignExchange) match {
-        case true if msb.fxTransactionsInNext12Months.isEmpty || !edit =>
-          Redirect(controllers.msb.routes.FXTransactionsInNext12MonthsController.get(edit))
-        case _ => Redirect(controllers.msb.routes.SummaryController.get)
-      }
+    } yield services.msbServices.contains(ForeignExchange) match {
+      case true if msb.fxTransactionsInNext12Months.isEmpty || !edit =>
+        Redirect(controllers.msb.routes.FXTransactionsInNext12MonthsController.get(edit))
+      case _                                                         => Redirect(controllers.msb.routes.SummaryController.get)
     }
-  }
 }

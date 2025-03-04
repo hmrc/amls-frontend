@@ -27,36 +27,37 @@ import views.html.businessmatching.TypeOfBusinessView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class TypeOfBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                         authAction: AuthAction,
-                                         val ds: CommonPlayDependencies,
-                                         val cc: MessagesControllerComponents,
-                                         formProvider: TypeOfBusinessFormProvider,
-                                         view: TypeOfBusinessView) extends AmlsBaseController(ds, cc) {
+class TypeOfBusinessController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: TypeOfBusinessFormProvider,
+  view: TypeOfBusinessView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map {
-        response =>
-          Ok(view(response.typeOfBusiness.fold(formProvider())(formProvider().fill), edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { response =>
+      Ok(view(response.typeOfBusiness.fold(formProvider())(formProvider().fill), edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
-        data => for {
-          businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-          _ <- dataCacheConnector.save[BusinessMatching](request.credId, BusinessMatching.key,
-            businessMatching.typeOfBusiness(data)
-          )
-        } yield if (edit) {
-          Redirect(routes.SummaryController.get())
-        } else {
-          Redirect(routes.RegisterServicesController.get())
-        }
+        data =>
+          for {
+            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
+            _                <- dataCacheConnector
+                                  .save[BusinessMatching](request.credId, BusinessMatching.key, businessMatching.typeOfBusiness(data))
+          } yield
+            if (edit) {
+              Redirect(routes.SummaryController.get())
+            } else {
+              Redirect(routes.RegisterServicesController.get())
+            }
       )
-    }
   }
 }

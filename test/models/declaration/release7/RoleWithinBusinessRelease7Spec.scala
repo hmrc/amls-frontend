@@ -19,59 +19,84 @@ package models.declaration.release7
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 import utils.AmlsSpec
 
-
 class RoleWithinBusinessRelease7Spec extends AmlsSpec {
 
   "JSON validation" must {
 
     "successfully convert release 6 data to release 7 model" in {
-      val json =  Json.obj(
-        "roleWithinBusiness" -> "01")
+      val json = Json.obj("roleWithinBusiness" -> "01")
 
       Json.fromJson[RoleWithinBusinessRelease7](json) must
         be(JsSuccess(RoleWithinBusinessRelease7(Set(BeneficialShareholder)), JsPath))
     }
 
     "successfully validate given values" in {
-      val json =  Json.obj(
-        "roleWithinBusiness" -> Seq("SoleProprietor","NominatedOfficer", "DesignatedMember", "Director", "BeneficialShareholder"))
+      val json = Json.obj(
+        "roleWithinBusiness" -> Seq(
+          "SoleProprietor",
+          "NominatedOfficer",
+          "DesignatedMember",
+          "Director",
+          "BeneficialShareholder"
+        )
+      )
 
       Json.fromJson[RoleWithinBusinessRelease7](json) must
-        be(JsSuccess(RoleWithinBusinessRelease7(Set(SoleProprietor, NominatedOfficer, DesignatedMember, Director, BeneficialShareholder)), JsPath))
+        be(
+          JsSuccess(
+            RoleWithinBusinessRelease7(
+              Set(SoleProprietor, NominatedOfficer, DesignatedMember, Director, BeneficialShareholder)
+            ),
+            JsPath
+          )
+        )
     }
     "successfully validate given all values" in {
-      val json =  Json.obj(
-        "roleWithinBusiness" -> Seq("BeneficialShareholder","Director","Partner","InternalAccountant","ExternalAccountant",
-          "SoleProprietor","NominatedOfficer","DesignatedMember", "Other"),
-      "roleWithinBusinessOther" -> "some other text")
-
-
+      val json = Json.obj(
+        "roleWithinBusiness"      -> Seq(
+          "BeneficialShareholder",
+          "Director",
+          "Partner",
+          "InternalAccountant",
+          "ExternalAccountant",
+          "SoleProprietor",
+          "NominatedOfficer",
+          "DesignatedMember",
+          "Other"
+        ),
+        "roleWithinBusinessOther" -> "some other text"
+      )
 
       Json.fromJson[RoleWithinBusinessRelease7](json) must
-        be(JsSuccess(RoleWithinBusinessRelease7(Set(
-          BeneficialShareholder,
-          Director,
-          Partner,
-          InternalAccountant,
-          ExternalAccountant,
-          SoleProprietor,
-          NominatedOfficer,
-          DesignatedMember,
-          Other("some other text"))), JsPath))
+        be(
+          JsSuccess(
+            RoleWithinBusinessRelease7(
+              Set(
+                BeneficialShareholder,
+                Director,
+                Partner,
+                InternalAccountant,
+                ExternalAccountant,
+                SoleProprietor,
+                NominatedOfficer,
+                DesignatedMember,
+                Other("some other text")
+              )
+            ),
+            JsPath
+          )
+        )
     }
 
     "successfully validate given values with option other details" in {
-      val json =  Json.obj(
-        "roleWithinBusiness" -> Seq("DesignatedMember", "Other"),
-        "roleWithinBusinessOther" -> "test")
+      val json = Json.obj("roleWithinBusiness" -> Seq("DesignatedMember", "Other"), "roleWithinBusinessOther" -> "test")
 
       Json.fromJson[RoleWithinBusinessRelease7](json) must
         be(JsSuccess(RoleWithinBusinessRelease7(Set(Other("test"), DesignatedMember)), JsPath))
     }
 
     "fail when path is missing" in {
-      Json.fromJson[RoleWithinBusinessRelease7](Json.obj(
-        "roleWithinBusinessOther" -> "other text")) must
+      Json.fromJson[RoleWithinBusinessRelease7](Json.obj("roleWithinBusinessOther" -> "other text")) must
         be(JsError((JsPath \ "roleWithinBusiness") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
 
@@ -83,11 +108,9 @@ class RoleWithinBusinessRelease7Spec extends AmlsSpec {
     "write valid data in using json write" in {
       val release = RoleWithinBusinessRelease7(Set(SoleProprietor, Other("test657")))
 
-      Json.toJson[RoleWithinBusinessRelease7](release) must be (
-        Json.obj("roleWithinBusiness" -> Json.arr("SoleProprietor", "Other"),
-          "roleWithinBusinessOther" -> "test657"
-        ))
+      Json.toJson[RoleWithinBusinessRelease7](release) must be(
+        Json.obj("roleWithinBusiness" -> Json.arr("SoleProprietor", "Other"), "roleWithinBusinessOther" -> "test657")
+      )
     }
   }
 }
-

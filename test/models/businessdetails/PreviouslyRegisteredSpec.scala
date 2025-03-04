@@ -52,10 +52,12 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
         be(Json.obj("previouslyRegistered" -> false))
 
       Json.toJson(PreviouslyRegisteredYes(Some("12345678")).asInstanceOf[PreviouslyRegistered]) must
-        be(Json.obj(
-          "previouslyRegistered" -> true,
-          "prevMLRRegNo" -> "12345678"
-        ))
+        be(
+          Json.obj(
+            "previouslyRegistered" -> true,
+            "prevMLRRegNo"         -> "12345678"
+          )
+        )
     }
   }
 }

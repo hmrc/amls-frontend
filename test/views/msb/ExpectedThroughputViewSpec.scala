@@ -28,7 +28,7 @@ import views.html.msb.ExpectedThroughputView
 class ExpectedThroughputViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val throughputView = inject[ExpectedThroughputView]
-  lazy val fp = inject[ExpectedThroughputFormProvider]
+  lazy val fp             = inject[ExpectedThroughputFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,17 +42,19 @@ class ExpectedThroughputViewSpec extends AmlsViewSpec with Matchers {
 
       def view = throughputView(fp().fill(First), true)
 
-      doc.title must be(messages("msb.throughput.title") +
-        " - " + messages("summary.msb") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("msb.throughput.title") +
+          " - " + messages("summary.msb") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = throughputView(fp().fill(First), true)
 
-      heading.html must be(messages("msb.throughput.title"))
+      heading.html    must be(messages("msb.throughput.title"))
       subHeading.html must include(messages("summary.msb"))
 
     }

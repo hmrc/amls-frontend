@@ -123,9 +123,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
       }
 
       "render the correct content for a single types" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(tcspTypes = Some(TcspTypes(Set(NomineeShareholdersProvider))))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(tcspTypes = Some(TcspTypes(Set(NomineeShareholdersProvider))))
+          )
+          .rows
 
         assertRowMatches(
           0,
@@ -152,9 +154,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
       }
 
       "render the correct content for no" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(onlyOffTheShelfCompsSold = Some(OnlyOffTheShelfCompsSoldNo))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(onlyOffTheShelfCompsSold = Some(OnlyOffTheShelfCompsSoldNo))
+          )
+          .rows
 
         assertRowMatches(
           1,
@@ -181,9 +185,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
       }
 
       "render the correct content for no" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(complexCorpStructureCreation = Some(ComplexCorpStructureCreationNo))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(complexCorpStructureCreation = Some(ComplexCorpStructureCreationNo))
+          )
+          .rows
 
         assertRowMatches(
           2,
@@ -210,9 +216,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
       }
 
       "render the correct content for a single service" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(providedServices = Some(ProvidedServices(Set(EmailServer))))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(providedServices = Some(ProvidedServices(Set(EmailServer))))
+          )
+          .rows
 
         assertRowMatches(
           3,
@@ -239,9 +247,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
       }
 
       "render the correct content for no" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(doesServicesOfAnotherTCSP = Some(false))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(doesServicesOfAnotherTCSP = Some(false))
+          )
+          .rows
 
         assertRowMatches(
           4,
@@ -276,9 +286,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
       }
 
       "render the correct content for no" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPNo))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPNo))
+          )
+          .rows
 
         assertRowMatches(
           5,

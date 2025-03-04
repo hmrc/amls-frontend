@@ -26,8 +26,8 @@ class BusinessFranchiseFormProviderSpec extends BooleanFieldBehaviours[BusinessF
   val formProvider: BusinessFranchiseFormProvider = new BusinessFranchiseFormProvider()
 
   override val form: Form[BusinessFranchise] = formProvider()
-  override val fieldName: String = "businessFranchise"
-  override val errorMessage: String = "error.required.ba.is.your.franchise"
+  override val fieldName: String             = "businessFranchise"
+  override val errorMessage: String          = "error.required.ba.is.your.franchise"
 
   val inputFieldName: String = "franchiseName"
 
@@ -39,17 +39,16 @@ class BusinessFranchiseFormProviderSpec extends BooleanFieldBehaviours[BusinessF
 
         val boundForm = form.bind(Map(fieldName -> "false"))
 
-        boundForm.value shouldBe Some(BusinessFranchiseNo)
+        boundForm.value  shouldBe Some(BusinessFranchiseNo)
         boundForm.errors shouldBe Nil
       }
 
       "'Yes' is submitted and details are given" in {
 
         forAll(stringsShorterThan(formProvider.length).suchThat(_.nonEmpty)) { details =>
-
           val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> details))
 
-          boundForm.value shouldBe Some(BusinessFranchiseYes(details))
+          boundForm.value  shouldBe Some(BusinessFranchiseYes(details))
           boundForm.errors shouldBe Nil
         }
       }
@@ -103,4 +102,3 @@ class BusinessFranchiseFormProviderSpec extends BooleanFieldBehaviours[BusinessF
     }
   }
 }
-

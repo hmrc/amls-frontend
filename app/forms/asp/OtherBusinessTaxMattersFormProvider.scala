@@ -22,16 +22,17 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class OtherBusinessTaxMattersFormProvider @Inject()() extends BooleanFormProvider {
+class OtherBusinessTaxMattersFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[OtherBusinessTaxMatters] = createForm[OtherBusinessTaxMatters](
-    "otherBusinessTaxMatters", "error.required.asp.other.business.tax.matters"
-    )(apply, unapply)
+    "otherBusinessTaxMatters",
+    "error.required.asp.other.business.tax.matters"
+  )(apply, unapply)
 
   private def apply(boolean: Boolean): OtherBusinessTaxMatters =
-    if(boolean) OtherBusinessTaxMattersYes else OtherBusinessTaxMattersNo
-  private def unapply(obj: OtherBusinessTaxMatters) = obj match {
+    if (boolean) OtherBusinessTaxMattersYes else OtherBusinessTaxMattersNo
+  private def unapply(obj: OtherBusinessTaxMatters)            = obj match {
     case OtherBusinessTaxMattersYes => true
-    case OtherBusinessTaxMattersNo => false
+    case OtherBusinessTaxMattersNo  => false
   }
 }

@@ -33,12 +33,17 @@ import views.html.tradingpremises.AgentPartnershipView
 
 import scala.concurrent.Future
 
-class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with TradingPremisesGenerator with Injecting {
+class AgentPartnershipControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with ScalaFutures
+    with TradingPremisesGenerator
+    with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
 
-    val request = addToken(authRequest)
-    lazy val view = inject[AgentPartnershipView]
+    val request    = addToken(authRequest)
+    lazy val view  = inject[AgentPartnershipView]
     val controller = new AgentPartnershipController(
       mockCacheConnector,
       SuccessfulAuthAction,
@@ -47,7 +52,8 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
       cc = mockMcc,
       formProvider = inject[AgentPartnershipFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
 
     mockCacheFetchAll
     mockCacheGetEntry[Seq[TradingPremises]](Some(Seq(tradingPremisesGen.sample.get)), TradingPremises.key)
@@ -66,9 +72,10 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
         val document = Jsoup.parse(contentAsString(result))
 
-        val title = s"${messages("tradingpremises.agentpartnership.title")} - ${messages("summary.tradingpremises")} - ${messages("title.amls")} - ${messages("title.gov")}"
+        val title =
+          s"${messages("tradingpremises.agentpartnership.title")} - ${messages("summary.tradingpremises")} - ${messages("title.amls")} - ${messages("title.gov")}"
 
-        document.title() must be(title)
+        document.title()                            must be(title)
         document.select("input[type=text]").`val`() must be(empty)
       }
 
@@ -82,9 +89,10 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
         val document = Jsoup.parse(contentAsString(result))
 
-        val title = s"${messages("tradingpremises.agentpartnership.title")} - ${messages("summary.tradingpremises")} - ${messages("title.amls")} - ${messages("title.gov")}"
+        val title =
+          s"${messages("tradingpremises.agentpartnership.title")} - ${messages("summary.tradingpremises")} - ${messages("title.amls")} - ${messages("title.gov")}"
 
-        document.title() must be(title)
+        document.title()                            must be(title)
         document.select("input[type=text]").`val`() must be("test")
       }
       "respond with NOT_FOUND" when {
@@ -103,9 +111,9 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
           val newRequest = FakeRequest(POST, routes.AgentPartnershipController.post(99).url)
-          .withFormUrlEncodedBody(
-            "agentPartnership" -> "text"
-          )
+            .withFormUrlEncodedBody(
+              "agentPartnership" -> "text"
+            )
 
           val result = controller.post(99)(newRequest)
           status(result) must be(NOT_FOUND)
@@ -115,30 +123,30 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
         "edit is false and given valid data" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.AgentPartnershipController.post(1).url)
-          .withFormUrlEncodedBody(
-            "agentPartnership" -> "text"
-          )
+            .withFormUrlEncodedBody(
+              "agentPartnership" -> "text"
+            )
 
           when(controller.dataCacheConnector.save(any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.ConfirmAddressController.get(1).url))
         }
 
         "edit is true and given valid data" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.AgentPartnershipController.post(1, true).url)
-          .withFormUrlEncodedBody(
-            "agentPartnership" -> "text"
-          )
+            .withFormUrlEncodedBody(
+              "agentPartnership" -> "text"
+            )
 
           when(controller.dataCacheConnector.save(any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1, true)(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
         }
@@ -148,9 +156,9 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
         "given invalid data" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.AgentPartnershipController.post(1).url)
-          .withFormUrlEncodedBody(
-            "agentPartnership" -> ""
-          )
+            .withFormUrlEncodedBody(
+              "agentPartnership" -> ""
+            )
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -160,7 +168,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
       "set the hasChanged flag to true" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.AgentPartnershipController.post(1).url)
-        .withFormUrlEncodedBody("agentPartnership" -> "text")
+          .withFormUrlEncodedBody("agentPartnership" -> "text")
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse, TradingPremises())))
 
@@ -169,18 +177,24 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
         val result = controller.post(1)(newRequest)
 
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
 
         verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
           any(),
           any(),
-          meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
-            hasChanged = true,
-            agentPartnership = Some(AgentPartnership("text")),
-            agentName = None,
-            agentCompanyDetails = None
-          ), TradingPremises())))(any())
+          meq(
+            Seq(
+              TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
+                hasChanged = true,
+                agentPartnership = Some(AgentPartnership("text")),
+                agentName = None,
+                agentCompanyDetails = None
+              ),
+              TradingPremises()
+            )
+          )
+        )(any())
       }
     }
 

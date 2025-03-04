@@ -39,7 +39,7 @@ import models.moneyservicebusiness._
 import models.responsiblepeople.ResponsiblePerson
 import models.supervision.ProfessionalBodies._
 import models.supervision.{ProfessionalBodyYes => SupervisionProfessionalBodyYes, _}
-import models.tcsp.ProvidedServices.{PhonecallHandling, Other => PSOther}
+import models.tcsp.ProvidedServices.{Other => PSOther, PhonecallHandling}
 import models.tcsp.TcspTypes._
 import models.tcsp._
 import models.tradingpremises.TradingPremises
@@ -52,14 +52,15 @@ import utils.{AmlsSpec, DependencyMocks}
 
 import java.time.LocalDate
 
-class UpdateMongoCacheServiceSpec extends AmlsSpec
-  with BusinessMatchingGenerator
-  with TradingPremisesGenerator
-  with ResponsiblePersonGenerator {
+class UpdateMongoCacheServiceSpec
+    extends AmlsSpec
+    with BusinessMatchingGenerator
+    with TradingPremisesGenerator
+    with ResponsiblePersonGenerator {
 
   trait Fixture extends DependencyMocks {
 
-    val http: HttpClientV2 = mock[HttpClientV2]
+    val http: HttpClientV2      = mock[HttpClientV2]
     val updateMongoCacheService = new UpdateMongoCacheService(http, mockCacheConnector, appConfig)
 
     val credId = "12341234"
@@ -71,7 +72,12 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       tradingPremisesSection = None,
       businessDetailsSection = None,
       bankDetailsSection = Seq(None),
-      aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))),
+      aboutYouSection = AddPerson(
+        "FirstName",
+        None,
+        "LastName",
+        RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))
+      ),
       businessActivitiesSection = None,
       responsiblePeopleSection = None,
       tcspSection = None,
@@ -86,24 +92,24 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
 
     val completeServiceList: Seq[String] = Seq("auctioneering", "residential")
 
-    val completeServices: JsObject = Json.obj("eabServicesProvided" -> completeServiceList )
+    val completeServices: JsObject = Json.obj("eabServicesProvided" -> completeServiceList)
 
     val completeDateOfChange: JsObject = Json.obj(
       "dateOfChange" -> "2019-01-01"
     )
 
     val completeEstateAgencyActPenalty: JsObject = Json.obj(
-      "penalisedEstateAgentsAct" -> true,
+      "penalisedEstateAgentsAct"       -> true,
       "penalisedEstateAgentsActDetail" -> "details"
     )
 
     val completePenalisedProfessionalBody: JsObject = Json.obj(
-      "penalisedProfessionalBody" -> true,
+      "penalisedProfessionalBody"       -> true,
       "penalisedProfessionalBodyDetail" -> "details"
     )
 
     val completeRedressScheme: JsObject = Json.obj(
-      "redressScheme" -> "propertyRedressScheme",
+      "redressScheme"       -> "propertyRedressScheme",
       "redressSchemeDetail" -> "null"
     )
 
@@ -118,10 +124,9 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       completeRedressScheme ++
       completeMoneyProtectionScheme
 
-    val estateAgentBusiness: Eab = Eab(completeData,  hasAccepted = true)
+    val estateAgentBusiness: Eab = Eab(completeData, hasAccepted = true)
 
     val tradingPremises: Seq[TradingPremises] = Seq(tradingPremisesGen.sample.get, tradingPremisesGen.sample.get)
-
 
     val businessDetails: BusinessDetails = BusinessDetails(
       previouslyRegistered = Some(PreviouslyRegisteredYes(Some("12345678"))),
@@ -131,20 +136,31 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       contactingYou = Some(ContactingYou(Some("1234567890"), Some("test@test.com"))),
       registeredOffice = Some(RegisteredOfficeUK("38B", None, None, None, "AA1 1AA")),
       altCorrespondenceAddress = Some(true),
-      correspondenceAddress = Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("Name",
-        "Business Name",
-        "address 1",
-        Some("address 2"),
-        Some("address 3"),
-        Some("address 4"),
-        "AA11 1AA")), None)),
+      correspondenceAddress = Some(
+        CorrespondenceAddress(
+          Some(
+            CorrespondenceAddressUk(
+              "Name",
+              "Business Name",
+              "address 1",
+              Some("address 2"),
+              Some("address 3"),
+              Some("address 4"),
+              "AA11 1AA"
+            )
+          ),
+          None
+        )
+      ),
       hasAccepted = true
     )
 
-    val ukBankAccount: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "00-00-00")))
+    val ukBankAccount: BankAccount =
+      BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "00-00-00")))
 
     val bankDetails: BankDetails = BankDetails(Some(PersonalAccount), None, Some(ukBankAccount), false)
-    val addPerson: AddPerson = AddPerson("FirstName", Some("Middle"), "Last name", RoleWithinBusinessRelease7(Set(BeneficialShareholder)))
+    val addPerson: AddPerson     =
+      AddPerson("FirstName", Some("Middle"), "Last name", RoleWithinBusinessRelease7(Set(BeneficialShareholder)))
 
     val businessActivitiesCompleteModel: BusinessActivities = BusinessActivities(
       involvedInOther = Some(InvolvedInOtherNo),
@@ -155,13 +171,17 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
       ncaRegistered = Some(NCARegistered(true)),
       accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
-      riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))),
+      riskAssessmentPolicy =
+        Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))),
       howManyEmployees = Some(HowManyEmployees(Some("5"), Some("4"))),
       identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true)),
-      whoIsYourAccountant = Some(WhoIsYourAccountant(
-        Some(WhoIsYourAccountantName("Accountant's name", Some("Accountant's trading name"))),
-        Some(WhoIsYourAccountantIsUk(true)),
-        Some(UkAccountantsAddress("address1", Some("address2"), Some("address3"), Some("address4"), "POSTCODE")))),
+      whoIsYourAccountant = Some(
+        WhoIsYourAccountant(
+          Some(WhoIsYourAccountantName("Accountant's name", Some("Accountant's trading name"))),
+          Some(WhoIsYourAccountantIsUk(true)),
+          Some(UkAccountantsAddress("address1", Some("address2"), Some("address3"), Some("address4"), "POSTCODE"))
+        )
+      ),
       taxMatters = Some(TaxMatters(false)),
       transactionRecordTypes = Some(TransactionTypes(Set(Paper))),
       hasChanged = false,
@@ -171,9 +191,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
     val responsiblePeople: ResponsiblePerson = responsiblePersonGen.sample.get
 
     val tcsp: Tcsp = Tcsp(
-      Some(TcspTypes(Set(
-        NomineeShareholdersProvider,
-        TrusteeProvider))),
+      Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider))),
       None,
       None,
       Some(ProvidedServices(Set(PhonecallHandling, PSOther("other service")))),
@@ -188,16 +206,27 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       throughput = Some(ExpectedThroughput.Second),
       businessUseAnIPSP = Some(BusinessUseAnIPSPYes("name", "123456789123456")),
       identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
-      Some(WhichCurrencies(
-        Seq("USD", "GBP", "EUR"),
-        Some(UsesForeignCurrenciesYes),
-        Some(MoneySources(Some(BankMoneySource("bank names")),
-          Some(WholesalerMoneySource("Wholesaler Names")),
-          Some(true)))
-      )),
+      Some(
+        WhichCurrencies(
+          Seq("USD", "GBP", "EUR"),
+          Some(UsesForeignCurrenciesYes),
+          Some(
+            MoneySources(
+              Some(BankMoneySource("bank names")),
+              Some(WholesalerMoneySource("Wholesaler Names")),
+              Some(true)
+            )
+          )
+        )
+      ),
       sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
       fundsTransfer = Some(FundsTransfer(true)),
-      branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))))),
+      branchesOrAgents = Some(
+        BranchesOrAgents(
+          BranchesOrAgentsHasCountries(true),
+          Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB"))))
+        )
+      ),
       sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
       mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
       transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
@@ -208,9 +237,8 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
     )
 
     val hvd: Hvd = Hvd(
-      cashPayment = Some(CashPayment(
-        CashPaymentOverTenThousandEuros(true),
-        Some(CashPaymentFirstDate(LocalDate.of(1956, 2, 15))))),
+      cashPayment =
+        Some(CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(1956, 2, 15))))),
       Some(Products(Set(Cars))),
       None,
       Some(HowWillYouSellGoods(Set(Retail))),
@@ -218,14 +246,15 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       Some(true),
       Some(PaymentMethods(courier = true, direct = true, other = Some("foo"))),
       Some(LinkedCashPayments(false)),
-      Some(DateOfChange(LocalDate.of(2016,2,24))))
+      Some(DateOfChange(LocalDate.of(2016, 2, 24)))
+    )
 
     val ampData: JsObject = Json.obj(
-      "typeOfParticipant"     -> Seq("artGalleryOwner"),
-      "soldOverThreshold"     -> true,
-      "dateTransactionOverThreshold"  -> LocalDate.now.toString,
-      "identifyLinkedTransactions"    -> true,
-      "percentageExpectedTurnover"    -> "fortyOneToSixty"
+      "typeOfParticipant"            -> Seq("artGalleryOwner"),
+      "soldOverThreshold"            -> true,
+      "dateTransactionOverThreshold" -> LocalDate.now.toString,
+      "identifyLinkedTransactions"   -> true,
+      "percentageExpectedTurnover"   -> "fortyOneToSixty"
     )
 
     val amp: Amp = Amp(data = ampData)
@@ -280,7 +309,8 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       Some(amp),
       Some(supervision),
       Some(subscription),
-      Some(amendVariationRenewalResponse))
+      Some(amendVariationRenewalResponse)
+    )
 
   }
 
@@ -324,7 +354,8 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
         verify(mockCacheConnector).save[BusinessDetails](any(), eqTo(BusinessDetails.key), any())(any())
         verify(mockCacheConnector).save[Eab](any(), eqTo(Eab.key), any())(any())
         verify(mockCacheConnector).save[SubscriptionResponse](any(), eqTo(SubscriptionResponse.key), any())(any())
-        verify(mockCacheConnector).save[AmendVariationRenewalResponse](any(), eqTo(AmendVariationRenewalResponse.key), any())(any())
+        verify(mockCacheConnector)
+          .save[AmendVariationRenewalResponse](any(), eqTo(AmendVariationRenewalResponse.key), any())(any())
         verify(mockCacheConnector).save[DataImport](any(), eqTo(DataImport.key), eqTo(dataImport))(any())
       }
     }

@@ -43,7 +43,8 @@ class BankAccountIbanControllerSpec extends AmlsSpec with Injecting {
 
     val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
-    val ukBankAccount: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
+    val ukBankAccount: BankAccount =
+      BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
 
     val accountType: BankAccountType.PersonalAccount.type = PersonalAccount
 
@@ -75,7 +76,7 @@ class BankAccountIbanControllerSpec extends AmlsSpec with Injecting {
           mockApplicationStatus(SubmissionReady)
 
           val result: Future[Result] = controller.get(1, false)(request)
-          val document: Document = Jsoup.parse(contentAsString(result))
+          val document: Document     = Jsoup.parse(contentAsString(result))
 
           status(result) must be(OK)
           for (field <- fieldElements)
@@ -84,7 +85,10 @@ class BankAccountIbanControllerSpec extends AmlsSpec with Injecting {
 
         "there is already bank account detail information" in new Fixture {
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
+          mockCacheFetch[Seq[BankDetails]](
+            Some(Seq(BankDetails(None, None, Some(ukBankAccount)))),
+            Some(BankDetails.key)
+          )
 
           mockApplicationStatus(SubmissionReady)
 
@@ -99,7 +103,7 @@ class BankAccountIbanControllerSpec extends AmlsSpec with Injecting {
             mockApplicationStatus(SubmissionDecisionApproved)
 
             val result: Future[Result] = controller.get(1, edit = true)(request)
-            val document: Document = Jsoup.parse(contentAsString(result))
+            val document: Document     = Jsoup.parse(contentAsString(result))
 
             status(result) must be(OK)
 
@@ -128,7 +132,8 @@ class BankAccountIbanControllerSpec extends AmlsSpec with Injecting {
               Seq(
                 BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true)
               )
-            ), Some(BankDetails.key)
+            ),
+            Some(BankDetails.key)
           )
 
           mockApplicationStatus(SubmissionReadyForReview)
@@ -146,7 +151,8 @@ class BankAccountIbanControllerSpec extends AmlsSpec with Injecting {
               Seq(
                 BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true)
               )
-            ), Some(BankDetails.key)
+            ),
+            Some(BankDetails.key)
           )
 
           mockApplicationStatus(SubmissionDecisionApproved)
@@ -163,11 +169,11 @@ class BankAccountIbanControllerSpec extends AmlsSpec with Injecting {
       "respond with SEE_OTHER" when {
         "given valid data in edit mode" in new Fixture {
 
-
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountIbanController.post(1, edit = true).url)
-          .withFormUrlEncodedBody(
-            "IBANNumber" -> "12345"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BankAccountIbanController.post(1, edit = true).url)
+              .withFormUrlEncodedBody(
+                "IBANNumber" -> "12345"
+              )
 
           when(controller.auditConnector.sendEvent(any())(any(), any()))
             .thenReturn(Future.successful(AuditResult.Success))
@@ -177,16 +183,17 @@ class BankAccountIbanControllerSpec extends AmlsSpec with Injecting {
 
           val result: Future[Result] = controller.post(1, edit = true)(newRequest)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
         }
 
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountIbanController.post(1, false).url)
-          .withFormUrlEncodedBody(
-            "IBANNumber" -> "12345"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BankAccountIbanController.post(1, false).url)
+              .withFormUrlEncodedBody(
+                "IBANNumber" -> "12345"
+              )
 
           when(controller.auditConnector.sendEvent(any())(any(), any()))
             .thenReturn(Future.successful(Success))
@@ -196,7 +203,7 @@ class BankAccountIbanControllerSpec extends AmlsSpec with Injecting {
 
           val result: Future[Result] = controller.post(1)(newRequest)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
         }
 
@@ -205,10 +212,11 @@ class BankAccountIbanControllerSpec extends AmlsSpec with Injecting {
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountIbanController.post(50, edit = true).url)
-          .withFormUrlEncodedBody(
-            "IBANNumber" -> "12345"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BankAccountIbanController.post(50, edit = true).url)
+              .withFormUrlEncodedBody(
+                "IBANNumber" -> "12345"
+              )
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
           mockCacheSave[Seq[BankDetails]]
@@ -219,14 +227,14 @@ class BankAccountIbanControllerSpec extends AmlsSpec with Injecting {
         }
       }
 
-
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountIbanController.post(1, edit = true).url)
-          .withFormUrlEncodedBody(
-            "IBANNumber" -> "!@£$"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BankAccountIbanController.post(1, edit = true).url)
+              .withFormUrlEncodedBody(
+                "IBANNumber" -> "!@£$"
+              )
 
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))
           mockCacheSave[Seq[BankDetails]]
@@ -240,25 +248,24 @@ class BankAccountIbanControllerSpec extends AmlsSpec with Injecting {
 
     "an account is created" must {
       "send an audit event" in new Fixture {
-        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountIbanController.post(1, false).url)
-        .withFormUrlEncodedBody(
-          "IBANNumber" -> "12345"
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+          FakeRequest(POST, routes.BankAccountIbanController.post(1, false).url)
+            .withFormUrlEncodedBody(
+              "IBANNumber" -> "12345"
+            )
+
+        when(controller.auditConnector.sendEvent(any())(any(), any())).thenReturn(Future.successful(Success))
+
+        mockCacheFetch[Seq[BankDetails]](
+          Some(Seq(BankDetails(Some(PersonalAccount), Some("Test account"), Some(ukBankAccount)))),
+          Some(BankDetails.key)
         )
-
-        when(controller.auditConnector.sendEvent(any())(any(), any())).
-          thenReturn(Future.successful(Success))
-
-        mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(
-          Some(PersonalAccount),
-          Some("Test account"),
-          Some(ukBankAccount)))),
-          Some(BankDetails.key))
 
         mockCacheSave[Seq[BankDetails]]
 
         val result: Future[Result] = controller.post(1)(newRequest)
 
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
 
         val captor = ArgumentCaptor.forClass(classOf[DataEvent])

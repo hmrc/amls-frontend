@@ -53,8 +53,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
-    lazy val view = inject[YourRegistrationView]
+    val request    = addToken(authRequest)
+    lazy val view  = inject[YourRegistrationView]
     val controller = new StatusController(
       mock[LandingService],
       mock[StatusService],
@@ -88,7 +88,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       inject[TradeInformationOneActivity],
       inject[TradeInformation],
       inject[TradeInformationFindOut],
-      view = view)
+      view = view
+    )
 
     val controllerNoAmlsNumber = new StatusController(
       mock[LandingService],
@@ -123,10 +124,11 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       inject[TradeInformationOneActivity],
       inject[TradeInformation],
       inject[TradeInformationFindOut],
-      view = view)
+      view = view
+    )
 
-    val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(LocalDate.now())))
-    val rp1 = ResponsiblePerson(
+    val positions              = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(LocalDate.now())))
+    val rp1                    = ResponsiblePerson(
       personName = Some(PersonName("first1", Some("middle"), "last1")),
       legalName = None,
       legalNameChangeDate = None,
@@ -139,7 +141,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       addressHistory = None,
       positions = Some(positions)
     )
-    val rp2 = ResponsiblePerson(
+    val rp2                    = ResponsiblePerson(
       personName = Some(PersonName("first2", None, "last2")),
       legalName = None,
       legalNameChangeDate = None,
@@ -152,7 +154,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       addressHistory = None,
       positions = Some(positions)
     )
-    val responsiblePeople = Seq(rp1, rp2)
+    val responsiblePeople      = Seq(rp1, rp2)
     val amlsRegistrationNumber = "amlsRefNumber"
 
     when(controller.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
@@ -167,7 +169,9 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
     mockCacheFetch[BusinessMatching](Some(BusinessMatching(Some(reviewDetails), None)), Some(BusinessMatching.key))
     mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
 
-    when(controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any()))
+    when(
+      controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any())
+    )
       .thenReturn(Future.successful(Some(feeResponse)))
 
     when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
@@ -187,15 +191,54 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
     LocalDateTime.of(2017, 12, 1, 1, 3)
   )
 
-  val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-    Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+  val reviewDetails = ReviewDetails(
+    "BusinessName",
+    Some(BusinessType.LimitedCompany),
+    Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")),
+    "XE0001234567890"
+  )
 
-  val noMsbNoTcsp = Some(BusinessActivities(Set(TelephonePaymentService, BillPaymentServices, AccountancyServices, EstateAgentBusinessService)))
-  val tcspAndOther = Some(BusinessActivities(Set(TelephonePaymentService, BillPaymentServices, AccountancyServices, EstateAgentBusinessService, TrustAndCompanyServices)))
-  val msbAndOther = Some(BusinessActivities(Set(TelephonePaymentService, BillPaymentServices, AccountancyServices, EstateAgentBusinessService, MoneyServiceBusiness)))
-  val msbAndTcsp = Some(BusinessActivities(Set(TelephonePaymentService, BillPaymentServices, AccountancyServices, EstateAgentBusinessService, MoneyServiceBusiness, TrustAndCompanyServices)))
-  val onlyMsb = Some(BusinessActivities(Set(MoneyServiceBusiness)))
-  val onlyTcsp = Some(BusinessActivities(Set(TrustAndCompanyServices)))
+  val noMsbNoTcsp    = Some(
+    BusinessActivities(
+      Set(TelephonePaymentService, BillPaymentServices, AccountancyServices, EstateAgentBusinessService)
+    )
+  )
+  val tcspAndOther   = Some(
+    BusinessActivities(
+      Set(
+        TelephonePaymentService,
+        BillPaymentServices,
+        AccountancyServices,
+        EstateAgentBusinessService,
+        TrustAndCompanyServices
+      )
+    )
+  )
+  val msbAndOther    = Some(
+    BusinessActivities(
+      Set(
+        TelephonePaymentService,
+        BillPaymentServices,
+        AccountancyServices,
+        EstateAgentBusinessService,
+        MoneyServiceBusiness
+      )
+    )
+  )
+  val msbAndTcsp     = Some(
+    BusinessActivities(
+      Set(
+        TelephonePaymentService,
+        BillPaymentServices,
+        AccountancyServices,
+        EstateAgentBusinessService,
+        MoneyServiceBusiness,
+        TrustAndCompanyServices
+      )
+    )
+  )
+  val onlyMsb        = Some(BusinessActivities(Set(MoneyServiceBusiness)))
+  val onlyTcsp       = Some(BusinessActivities(Set(TrustAndCompanyServices)))
   val msbAndTcspOnly = Some(BusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness)))
 
   "StatusController" should {
@@ -208,11 +251,12 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.enrolmentsService.deEnrol(any(), any())(any(), any()))
           .thenReturn(Future.successful(true))
 
-        when(controller.dataCache.remove(any[String])).thenReturn(Future.successful(true))
+        when(controller.dataCache.remove(any[String]))
+          .thenReturn(Future.successful(true))
           .thenReturn(Future.successful(true))
 
         val result = controller.newSubmission()(request)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         verify(controller.enrolmentsService).deEnrol(eqTo(amlsRegistrationNumber), any())(any(), any())
         redirectLocation(result) must be(Some(controllers.routes.LandingController.start(true).url))
       }
@@ -225,11 +269,12 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.enrolmentsService.deEnrol(any(), any())(any(), any()))
           .thenReturn(Future.successful(true))
 
-        when(controller.dataCache.remove(any[String])).thenReturn(Future.successful(true))
+        when(controller.dataCache.remove(any[String]))
+          .thenReturn(Future.successful(true))
           .thenReturn(Future.successful(true))
 
         val result = controller.newSubmission()(request)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         verify(controller.enrolmentsService).deEnrol(eqTo(amlsRegistrationNumber), any())(any(), any())
         redirectLocation(result) must be(Some(controllers.routes.LandingController.start(true).url))
       }
@@ -268,7 +313,10 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(cacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
-        when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
+        when(
+          controllerNoAmlsNumber.statusService
+            .getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any())
+        )
           .thenReturn(Future.successful((NotCompleted, None)))
 
         when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
@@ -286,7 +334,11 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
             .thenReturn(Future.successful(Some(cacheMap)))
 
           when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
-            .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
+            .thenReturn(
+              Future.successful(
+                Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))
+              )
+            )
 
           when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful((SubmissionReadyForReview, None)))
@@ -296,7 +348,9 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           val result = controller.get()(request)
           status(result) must be(OK)
 
-          contentAsString(result) must include("If you do not pay your fees within 28 days of submitting your application it will be rejected.")
+          contentAsString(result) must include(
+            "If you do not pay your fees within 28 days of submitting your application it will be rejected."
+          )
         }
 
         "there is no ReadStatusResponse" in new Fixture {
@@ -304,9 +358,16 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
             .thenReturn(Future.successful(Some(cacheMap)))
 
           when(controllerNoAmlsNumber.dataCache.fetch[BusinessMatching](any(), any())(any()))
-            .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
+            .thenReturn(
+              Future.successful(
+                Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))
+              )
+            )
 
-          when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
+          when(
+            controllerNoAmlsNumber.statusService
+              .getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any())
+          )
             .thenReturn(Future.successful((SubmissionReadyForReview, None)))
 
           when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
@@ -314,7 +375,9 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(OK)
 
-          contentAsString(result) must include("If you do not pay your fees within 28 days of submitting your application it will be rejected.")
+          contentAsString(result) must include(
+            "If you do not pay your fees within 28 days of submitting your application it will be rejected."
+          )
         }
       }
 
@@ -324,13 +387,19 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
-          .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
+          .thenReturn(
+            Future.successful(
+              Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))
+            )
+          )
 
         when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
+          .thenReturn(
+            Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0))))
+          )
 
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
-          Some(LocalDate.now.plusDays(30)), false)
+        val readStatusResponse =
+          ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(LocalDate.now.plusDays(30)), false)
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionApproved, Some(readStatusResponse))))
@@ -353,7 +422,9 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
+          .thenReturn(
+            Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0))))
+          )
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionRejected, None)))
@@ -378,7 +449,9 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
+          .thenReturn(
+            Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0))))
+          )
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionRevoked, None)))
@@ -404,7 +477,9 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
+          .thenReturn(
+            Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0))))
+          )
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionExpired, None)))
@@ -426,7 +501,9 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
+          .thenReturn(
+            Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0))))
+          )
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionWithdrawn, None)))
@@ -448,7 +525,9 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
+          .thenReturn(
+            Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0))))
+          )
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((DeRegistered, None)))
@@ -470,7 +549,9 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
+          .thenReturn(
+            Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0))))
+          )
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((RenewalSubmitted(Some(LocalDate.now)), None)))
@@ -493,14 +574,16 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
+          .thenReturn(
+            Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0))))
+          )
 
         when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val renewalDate = LocalDate.now().plusDays(15)
 
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
-          Some(renewalDate), false)
+        val readStatusResponse =
+          ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
@@ -523,7 +606,9 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
         when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
+          .thenReturn(
+            Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0))))
+          )
 
         when(controller.renewalService.isRenewalComplete(any(), any[String]())(any()))
           .thenReturn(Future.successful(false))
@@ -532,8 +617,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
         val renewalDate = LocalDate.now().plusDays(15)
 
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
-          Some(renewalDate), false)
+        val readStatusResponse =
+          ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
@@ -553,17 +638,27 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(cacheMap.getEntry[BusinessMatching](any())(any()))
-          .thenReturn(Some(BusinessMatching(
-            activities = Some(BusinessActivities(Set(
-              MoneyServiceBusiness,
-              HighValueDealing
-            ))),
-            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
-            reviewDetails = Some(ReviewDetails("BusinessName", None, mock[Address], "safeId", None))
-          )))
+          .thenReturn(
+            Some(
+              BusinessMatching(
+                activities = Some(
+                  BusinessActivities(
+                    Set(
+                      MoneyServiceBusiness,
+                      HighValueDealing
+                    )
+                  )
+                ),
+                msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
+                reviewDetails = Some(ReviewDetails("BusinessName", None, mock[Address], "safeId", None))
+              )
+            )
+          )
 
         when(cacheMap.getEntry[SubscriptionResponse](contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
+          .thenReturn(
+            Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0))))
+          )
 
         val dataCache = mock[DataCacheConnector]
 
@@ -575,8 +670,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
         val renewalDate = LocalDate.now().plusDays(15)
 
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
-          Some(renewalDate), false)
+        val readStatusResponse =
+          ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
@@ -591,7 +686,12 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           Some(CustomersOutsideIsUK(true)),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
-          Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other")))))),
+          Some(
+            CashPayments(
+              CashPaymentsCustomerNotMet(true),
+              Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+            )
+          ),
           Some(TotalThroughput("01")),
           Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
           Some(TransactionsInLast12Months("1500")),
@@ -611,15 +711,30 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       }
 
       "the status is 'approved' and there is no current mongo cache" in new Fixture {
-        val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+        val reviewDetails = ReviewDetails(
+          "BusinessName",
+          Some(BusinessType.LimitedCompany),
+          Address(
+            "line1",
+            Some("line2"),
+            Some("line3"),
+            Some("line4"),
+            Some("AA1 1AA"),
+            Country("United Kingdom", "GB")
+          ),
+          "XE0001234567890"
+        )
 
         val statusResponse = mock[ReadStatusResponse]
         when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
         when(statusResponse.safeId).thenReturn(None)
 
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
-          .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
+          .thenReturn(
+            Future.successful(
+              Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))
+            )
+          )
 
         when(controller.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -627,7 +742,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionApproved, statusResponse.some)))
 
-        when(controller.landingService.refreshCache(any(), any(), any())(any(), any(), any())).thenReturn(Future.successful(cacheMap))
+        when(controller.landingService.refreshCache(any(), any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(cacheMap))
 
         when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(false))
 
@@ -639,42 +755,77 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
 
     "show the withdrawal link" when {
       "the status is 'ready for review'" in new Fixture {
-        val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+        val reviewDetails = ReviewDetails(
+          "BusinessName",
+          Some(BusinessType.LimitedCompany),
+          Address(
+            "line1",
+            Some("line2"),
+            Some("line3"),
+            Some("line4"),
+            Some("AA1 1AA"),
+            Country("United Kingdom", "GB")
+          ),
+          "XE0001234567890"
+        )
 
         val statusResponse = mock[ReadStatusResponse]
         when(statusResponse.processingDate).thenReturn(LocalDateTime.now)
         when(statusResponse.safeId).thenReturn(None)
 
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
-          .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
+          .thenReturn(
+            Future.successful(
+              Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))
+            )
+          )
 
         when(controllerNoAmlsNumber.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
+        when(
+          controllerNoAmlsNumber.statusService
+            .getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any())
+        )
           .thenReturn(Future.successful((SubmissionReadyForReview, statusResponse.some)))
 
         when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val result = controllerNoAmlsNumber.get()(request)
-        val doc = Jsoup.parse(contentAsString(result))
+        val doc    = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get().url}]").text mustBe s"${messages("status.withdraw.link-text")}"
+        doc
+          .select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get().url}]")
+          .text mustBe s"${messages("status.withdraw.link-text")}"
       }
     }
 
     "show the deregister link" when {
       "the status is 'approved'" in new Fixture {
-        val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+        val reviewDetails = ReviewDetails(
+          "BusinessName",
+          Some(BusinessType.LimitedCompany),
+          Address(
+            "line1",
+            Some("line2"),
+            Some("line3"),
+            Some("line4"),
+            Some("AA1 1AA"),
+            Country("United Kingdom", "GB")
+          ),
+          "XE0001234567890"
+        )
 
         val statusResponse = mock[ReadStatusResponse]
         when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
         when(statusResponse.safeId).thenReturn(None)
 
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
-          .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
+          .thenReturn(
+            Future.successful(
+              Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))
+            )
+          )
 
         when(controller.landingService.cacheMap(any[String]))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -685,9 +836,11 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.renewalService.isCachePresent(any())(any())).thenReturn(Future.successful(true))
 
         val result = controller.get()(request)
-        val doc = Jsoup.parse(contentAsString(result))
+        val doc    = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe s"${messages("your.registration.deregister.link")}"
+        doc
+          .select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]")
+          .text mustBe s"${messages("your.registration.deregister.link")}"
       }
     }
 
@@ -786,7 +939,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         result returns 0
       }
 
-      "return 0 if there is amls ref number available but no notifications returned" in new Fixture with FutureAssertions {
+      "return 0 if there is amls ref number available but no notifications returned" in new Fixture
+        with FutureAssertions {
 
         when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
           .thenReturn(Future.successful(Seq()))
@@ -799,18 +953,61 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       "return 1 if there is amls ref number available and 1 unread notification" in new Fixture with FutureAssertions {
 
         when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
-          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, LocalDateTime.now(), false, amlsRegistrationNumber, "", IDType("")))))
+          .thenReturn(
+            Future.successful(
+              Seq(
+                NotificationRow(
+                  None,
+                  None,
+                  None,
+                  false,
+                  LocalDateTime.now(),
+                  false,
+                  amlsRegistrationNumber,
+                  "",
+                  IDType("")
+                )
+              )
+            )
+          )
 
         val result = controller.countUnreadNotifications(Some(amlsRegistrationNumber), None, ("", ""))
 
         result returns 1
       }
 
-      "return 1 if there is amls ref number available and 1 unread notification and 1 read notification" in new Fixture with FutureAssertions {
+      "return 1 if there is amls ref number available and 1 unread notification and 1 read notification" in new Fixture
+        with FutureAssertions {
 
         when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
-          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, LocalDateTime.now(), false, amlsRegistrationNumber, "", IDType("")),
-            NotificationRow(None, None, None, false, LocalDateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
+          .thenReturn(
+            Future.successful(
+              Seq(
+                NotificationRow(
+                  None,
+                  None,
+                  None,
+                  false,
+                  LocalDateTime.now(),
+                  false,
+                  amlsRegistrationNumber,
+                  "",
+                  IDType("")
+                ),
+                NotificationRow(
+                  None,
+                  None,
+                  None,
+                  false,
+                  LocalDateTime.now(),
+                  true,
+                  amlsRegistrationNumber,
+                  "",
+                  IDType("")
+                )
+              )
+            )
+          )
 
         val result = controller.countUnreadNotifications(Some(amlsRegistrationNumber), None, ("", ""))
 
@@ -820,7 +1017,23 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       "return 0 if there is amls ref number available and 1 read notification" in new Fixture with FutureAssertions {
 
         when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
-          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, LocalDateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
+          .thenReturn(
+            Future.successful(
+              Seq(
+                NotificationRow(
+                  None,
+                  None,
+                  None,
+                  false,
+                  LocalDateTime.now(),
+                  true,
+                  amlsRegistrationNumber,
+                  "",
+                  IDType("")
+                )
+              )
+            )
+          )
 
         val result = controller.countUnreadNotifications(Some(amlsRegistrationNumber), None, ("", ""))
 
@@ -840,18 +1053,61 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       "return 1 if there is safe id available and 1 unread notification" in new Fixture with FutureAssertions {
 
         when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any()))
-          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, LocalDateTime.now(), false, amlsRegistrationNumber, "", IDType("")))))
+          .thenReturn(
+            Future.successful(
+              Seq(
+                NotificationRow(
+                  None,
+                  None,
+                  None,
+                  false,
+                  LocalDateTime.now(),
+                  false,
+                  amlsRegistrationNumber,
+                  "",
+                  IDType("")
+                )
+              )
+            )
+          )
 
         val result = controller.countUnreadNotifications(None, Some("internalId"), ("", ""))
 
         result returns 1
       }
 
-      "return 1 if there is safe id available and 1 unread notification and 1 read notification" in new Fixture with FutureAssertions {
+      "return 1 if there is safe id available and 1 unread notification and 1 read notification" in new Fixture
+        with FutureAssertions {
 
         when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any()))
-          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, LocalDateTime.now(), false, amlsRegistrationNumber, "", IDType("")),
-            NotificationRow(None, None, None, false, LocalDateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
+          .thenReturn(
+            Future.successful(
+              Seq(
+                NotificationRow(
+                  None,
+                  None,
+                  None,
+                  false,
+                  LocalDateTime.now(),
+                  false,
+                  amlsRegistrationNumber,
+                  "",
+                  IDType("")
+                ),
+                NotificationRow(
+                  None,
+                  None,
+                  None,
+                  false,
+                  LocalDateTime.now(),
+                  true,
+                  amlsRegistrationNumber,
+                  "",
+                  IDType("")
+                )
+              )
+            )
+          )
 
         val result = controller.countUnreadNotifications(None, Some("internalId"), ("", ""))
 
@@ -861,7 +1117,23 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
       "return 0 if there is safe id available and 1 read notification" in new Fixture with FutureAssertions {
 
         when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any()))
-          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, LocalDateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
+          .thenReturn(
+            Future.successful(
+              Seq(
+                NotificationRow(
+                  None,
+                  None,
+                  None,
+                  false,
+                  LocalDateTime.now(),
+                  true,
+                  amlsRegistrationNumber,
+                  "",
+                  IDType("")
+                )
+              )
+            )
+          )
 
         val result = controller.countUnreadNotifications(None, Some("internalId"), ("", ""))
 

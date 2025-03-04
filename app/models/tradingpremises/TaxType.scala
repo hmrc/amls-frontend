@@ -23,7 +23,7 @@ import play.api.libs.json._
 sealed trait TaxType {
   def message(implicit messages: Messages): String =
     this match {
-      case TaxTypeSelfAssesment =>
+      case TaxTypeSelfAssesment  =>
         messages("tradingpremises.youragent.taxtype.lbl.01")
       case TaxTypeCorporationTax =>
         messages("tradingpremises.youragent.taxtype.lbl.02")
@@ -37,16 +37,15 @@ object TaxType {
 
   import utils.MappingUtils.Implicits._
 
-  implicit val jsonReadsTaxType: Reads[TaxType] = {
+  implicit val jsonReadsTaxType: Reads[TaxType] =
     (__ \ "taxType").read[String].flatMap[TaxType] {
       case "01" => TaxTypeSelfAssesment
       case "02" => TaxTypeCorporationTax
-      case _ => play.api.libs.json.JsonValidationError("error.invalid")
+      case _    => play.api.libs.json.JsonValidationError("error.invalid")
     }
-  }
 
   implicit val jsonWritesTaxType: Writes[TaxType] = Writes[TaxType] {
-    case TaxTypeSelfAssesment => Json.obj("taxType" -> "01")
+    case TaxTypeSelfAssesment  => Json.obj("taxType" -> "01")
     case TaxTypeCorporationTax => Json.obj("taxType" -> "02")
   }
 }

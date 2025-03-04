@@ -27,10 +27,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.declaration.AddPersonView
 
-class AddPersonViewSpec extends AmlsViewSpec with Matchers  {
+class AddPersonViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val personView = inject[AddPersonView]
-  lazy val fp = inject[AddPersonFormProvider]
+  lazy val fp         = inject[AddPersonFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -41,7 +41,14 @@ class AddPersonViewSpec extends AmlsViewSpec with Matchers  {
   "AddPersonView" must {
     "have correct title" in new ViewFixture {
 
-      val formWithData = fp().fill(AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))))
+      val formWithData = fp().fill(
+        AddPerson(
+          "FirstName",
+          None,
+          "LastName",
+          RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))
+        )
+      )
 
       def view = personView("string1", "string2", Some(BusinessType.LPrLLP), formWithData)
 
@@ -50,29 +57,45 @@ class AddPersonViewSpec extends AmlsViewSpec with Matchers  {
 
     "have correct headings" in new ViewFixture {
 
-      val formWithData = fp().fill(AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))))
+      val formWithData = fp().fill(
+        AddPerson(
+          "FirstName",
+          None,
+          "LastName",
+          RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))
+        )
+      )
 
       def view = personView("string1", "string2", Some(BusinessType.LPrLLP), formWithData)
 
-      heading.html must be(messages("declaration.addperson.title"))
+      heading.html    must be(messages("declaration.addperson.title"))
       subHeading.html must include(messages("string2"))
     }
 
     "have correct h2s" in new ViewFixture {
 
-      val formWithData = fp().fill(AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))))
+      val formWithData = fp().fill(
+        AddPerson(
+          "FirstName",
+          None,
+          "LastName",
+          RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))
+        )
+      )
 
       def view = personView("string1", "string2", Some(BusinessType.LPrLLP), formWithData)
 
-      doc.getElementsByClass("govuk-heading-m").text() must include("Name")
+      doc.getElementsByClass("govuk-heading-m").text()           must include("Name")
       doc.getElementsByClass("govuk-fieldset__legend--m").text() must include("Role in the business")
     }
 
     "pre-populate the fields correctly" in new ViewFixture {
 
-      val role = RoleWithinBusinessRelease7(Set(
-        models.declaration.release7.ExternalAccountant
-      ))
+      val role = RoleWithinBusinessRelease7(
+        Set(
+          models.declaration.release7.ExternalAccountant
+        )
+      )
 
       val person = AddPerson("Forename", Some("Middlename"), "Surname", role)
 
@@ -88,7 +111,14 @@ class AddPersonViewSpec extends AmlsViewSpec with Matchers  {
     }
 
     "pre-populate the 'other' field correctly" in new ViewFixture {
-      val f = fp().fill(AddPerson("Forename", None, "Surname", RoleWithinBusinessRelease7(Set(models.declaration.release7.Other("Other details")))))
+      val f = fp().fill(
+        AddPerson(
+          "Forename",
+          None,
+          "Surname",
+          RoleWithinBusinessRelease7(Set(models.declaration.release7.Other("Other details")))
+        )
+      )
 
       def view = personView("string 1", "string 2", Some(BusinessType.LPrLLP), f)
 
@@ -104,7 +134,8 @@ class AddPersonViewSpec extends AmlsViewSpec with Matchers  {
     ).foreach { case (field, error) =>
       behave like pageWithErrors(
         personView("string 1", "string 2", Some(BusinessType.LPrLLP), fp().withError(field, error)),
-        field, error
+        field,
+        error
       )
     }
 

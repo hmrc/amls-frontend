@@ -35,31 +35,36 @@ class TPControllerHelperSpec extends PlaySpec with MockitoSugar {
 
   trait TestFixture {
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-    val cache: Cache = mock[Cache]
-    implicit val lang: Lang = mock[Lang]
-    implicit val messages: Messages = mock[Messages]
-    implicit val appConfig: ApplicationConfig = mock[ApplicationConfig]
-    implicit val errorView: ErrorView = mock[ErrorView]
+    val cache: Cache                                          = mock[Cache]
+    implicit val lang: Lang                                   = mock[Lang]
+    implicit val messages: Messages                           = mock[Messages]
+    implicit val appConfig: ApplicationConfig                 = mock[ApplicationConfig]
+    implicit val errorView: ErrorView                         = mock[ErrorView]
 
     def setUpTradingPremise(model: Option[TradingPremises]) = when {
       cache.getEntry[Seq[TradingPremises]](any())(any())
     } thenReturn (model match {
       case Some(x) => Some(Seq(x))
-      case _ => Some(Seq.empty[TradingPremises])
+      case _       => Some(Seq.empty[TradingPremises])
     })
   }
 
   "The trading premises controller helper" must {
     "redirect to the WhereAreTradingPremises controller" when {
-     "the business is an agent" in new TestFixture {
+      "the business is an agent" in new TestFixture {
 
-       setUpTradingPremise(TradingPremises(registeringAgentPremises = RegisteringAgentPremises(true).some, status = StatusConstants.Unchanged.some).some)
+        setUpTradingPremise(
+          TradingPremises(
+            registeringAgentPremises = RegisteringAgentPremises(true).some,
+            status = StatusConstants.Unchanged.some
+          ).some
+        )
 
-       val result = TPControllerHelper.redirectToNextPage(cache.some, 1, edit = false)
+        val result = TPControllerHelper.redirectToNextPage(cache.some, 1, edit = false)
 
-       result mustBe Redirect(controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(1))
+        result mustBe Redirect(controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(1))
 
-     }
+      }
     }
   }
 

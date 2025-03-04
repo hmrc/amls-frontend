@@ -24,7 +24,8 @@ import java.time.LocalDate
 trait StatusGenerator extends BaseGenerator {
 
   def rejectedStatusGen: Gen[SubmissionStatus] = Gen.oneOf(
-    Seq(DeRegistered,
+    Seq(
+      DeRegistered,
       SubmissionDecisionRejected,
       SubmissionDecisionRevoked,
       SubmissionDecisionExpired,

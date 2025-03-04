@@ -23,14 +23,16 @@ import play.api.data.FormError
 
 class ChangeBusinessTypesFormProviderSpec extends FieldBehaviours {
 
-  val form = new ChangeBusinessTypesFormProvider()()
+  val form      = new ChangeBusinessTypesFormProvider()()
   val fieldName = "changeServices"
-  val errorKey = "error.businessmatching.updateservice.changeservices"
+  val errorKey  = "error.businessmatching.updateservice.changeservices"
 
   "PercentagePaymentFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, fieldName, Gen.oneOf[String](ChangeBusinessType.all.map(_.toString))
+      form,
+      fieldName,
+      Gen.oneOf[String](ChangeBusinessType.all.map(_.toString))
     )
 
     behave like mandatoryField(form, fieldName, FormError(fieldName, errorKey))
@@ -40,7 +42,7 @@ class ChangeBusinessTypesFormProviderSpec extends FieldBehaviours {
       forAll(Gen.alphaNumStr) { invalidAnswer =>
         val result = form.bind(Map(fieldName -> invalidAnswer))
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(fieldName, errorKey))
       }
     }

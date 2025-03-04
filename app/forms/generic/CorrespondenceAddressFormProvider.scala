@@ -26,14 +26,15 @@ trait CorrespondenceAddressFormProvider[A] extends AddressMappings {
 
   def fromObject: A => Option[(String, String, String, Option[String], Option[String], Option[String], String)]
 
-  val nameMaxLength = 140
+  val nameMaxLength         = 140
   val businessNameMaxLength = 120
 
-  val regex: String = "^[a-zA-Z0-9\u00C0-\u00FF !#$%&'‘’\"“”«»()*+,./:;=?@\\[\\]|~£€¥\\u005C\u2014\u2013\u2010\u005F\u005E\u0060\u000A\u000D\u002d]+$"
+  val regex: String =
+    "^[a-zA-Z0-9\u00C0-\u00FF !#$%&'‘’\"“”«»()*+,./:;=?@\\[\\]|~£€¥\\u005C\u2014\u2013\u2010\u005F\u005E\u0060\u000A\u000D\u002d]+$"
 
   def createForm(isUKAddress: Boolean): Form[A] = Form[A](
     mapping(
-      "yourName" -> text("error.required.yourname").verifying(
+      "yourName"     -> text("error.required.yourname").verifying(
         firstError(
           maxLength(nameMaxLength, "error.invalid.yourname"),
           regexp(regex, "error.invalid.yourname.validation")

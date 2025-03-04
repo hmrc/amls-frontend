@@ -27,53 +27,53 @@ import views.html.supervision.MemberOfProfessionalBodyView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class ProfessionalBodyMemberController @Inject()(
-                                                  val dataCacheConnector: DataCacheConnector,
-                                                  val authAction: AuthAction,
-                                                  val ds: CommonPlayDependencies,
-                                                  val cc: MessagesControllerComponents,
-                                                  formProvider: MemberOfProfessionalBodyFormProvider,
-                                                  view: MemberOfProfessionalBodyView) extends AmlsBaseController(ds, cc) {
+class ProfessionalBodyMemberController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: MemberOfProfessionalBodyFormProvider,
+  view: MemberOfProfessionalBodyView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
-        response =>
-          val form = (for {
-            supervision <- response
-            members <- supervision.professionalBodyMember
-          } yield formProvider().fill(members)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map { response =>
+      val form = (for {
+        supervision <- response
+        members     <- supervision.professionalBodyMember
+      } yield formProvider().fill(members)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
-        data => {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
-            supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
+            supervision        <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
             updatedSupervision <- updateSupervisionFromIncomingData(data, supervision)
-            _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key, updatedSupervision)
+            _                  <- dataCacheConnector.save[Supervision](request.credId, Supervision.key, updatedSupervision)
           } yield redirectTo(updatedSupervision, edit)
-        }
       )
   }
 
-  def updateSupervisionFromIncomingData(data: ProfessionalBodyMember, supervision: Option[Supervision]): Future[Supervision] = {
+  def updateSupervisionFromIncomingData(
+    data: ProfessionalBodyMember,
+    supervision: Option[Supervision]
+  ): Future[Supervision] =
     Future[Supervision](data match {
       case ProfessionalBodyMemberNo => supervision.professionalBodyMember(data).copy(professionalBodies = None)
-      case _ => supervision.professionalBodyMember(data)
+      case _                        => supervision.professionalBodyMember(data)
     })
-  }
 
-  def redirectTo(supervision: Supervision, edit: Boolean): Result = {
+  def redirectTo(supervision: Supervision, edit: Boolean): Result =
     (supervision.professionalBodyMember, edit) match {
-      case (Some(ProfessionalBodyMemberYes), _) if !supervision.isComplete => Redirect(routes.WhichProfessionalBodyController.get(edit))
-      case (Some(ProfessionalBodyMemberNo), false) => Redirect(routes.PenalisedByProfessionalController.get())
-      case _ => Redirect(routes.SummaryController.get())
+      case (Some(ProfessionalBodyMemberYes), _) if !supervision.isComplete =>
+        Redirect(routes.WhichProfessionalBodyController.get(edit))
+      case (Some(ProfessionalBodyMemberNo), false)                         => Redirect(routes.PenalisedByProfessionalController.get())
+      case _                                                               => Redirect(routes.SummaryController.get())
     }
-  }
 }

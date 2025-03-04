@@ -47,11 +47,11 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
     val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
-    val cacheMap = mock[Cache]
-    val emptyCache = Cache.empty
-    val mockRenewalService = mock[RenewalService]
-    lazy val view = inject[MostTransactionsView]
-    val controller = new MostTransactionsController(
+    val cacheMap                  = mock[Cache]
+    val emptyCache                = Cache.empty
+    val mockRenewalService        = mock[RenewalService]
+    lazy val view                 = inject[MostTransactionsView]
+    val controller                = new MostTransactionsController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       self.cache,
@@ -59,11 +59,13 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
       mockAutoComplete,
       cc = mockMcc,
       formProvider = inject[MostTransactionsFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   trait FormSubmissionFixture extends Fixture {
-    def formData(valid: Boolean) = if (valid) "mostTransactionsCountries[0]" -> "GB" else "mostTransactionsCountries[0]" -> ""
+    def formData(valid: Boolean)    =
+      if (valid) "mostTransactionsCountries[0]" -> "GB" else "mostTransactionsCountries[0]" -> ""
     def formRequest(valid: Boolean) =
       FakeRequest(POST, routes.MostTransactionsController.post().url).withFormUrlEncodedBody(formData(valid))
 
@@ -83,7 +85,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
         MostTransactions(
           Seq(Country("United Kingdom", "GB"))
         )
-      ), hasChanged = true
+      ),
+      hasChanged = true
     )
 
     val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url).withFormUrlEncodedBody(
@@ -91,17 +94,25 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
     )
 
     when(cache.fetchAll(any()))
-            .thenReturn(Future.successful(Some(cacheMap)))
+      .thenReturn(Future.successful(Some(cacheMap)))
 
     when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-            .thenReturn(Some(incomingModel))
+      .thenReturn(Some(incomingModel))
 
     when(cache.save[Renewal](any(), eqTo(Renewal.key), eqTo(outgoingModel))(any()))
-            .thenReturn(Future.successful(Cache.empty))
+      .thenReturn(Future.successful(Cache.empty))
 
-    def setupBusinessMatching(activities: Set[BusinessActivity] = Set(), msbServices: Set[BusinessMatchingMsbService] = Set()) = when {
+    def setupBusinessMatching(
+      activities: Set[BusinessActivity] = Set(),
+      msbServices: Set[BusinessMatchingMsbService] = Set()
+    ) = when {
       cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-    } thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(msbServices)), activities = Some(BusinessActivities(activities))))
+    } thenReturn Some(
+      BusinessMatching(
+        msbServices = Some(BusinessMatchingMsbServices(msbServices)),
+        activities = Some(BusinessActivities(activities))
+      )
+    )
   }
 
   "MostTransactionsController" must {
@@ -111,7 +122,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
       when(cache.fetch[Renewal](any(), eqTo(Renewal.key))(any()))
         .thenReturn(Future.successful(None))
 
-      val result = controller.get()(request)
+      val result   = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustEqual OK
@@ -138,7 +149,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
       when(cache.fetch[Renewal](any(), eqTo(Renewal.key))(any()))
         .thenReturn(Future.successful(Some(model)))
 
-      val result = controller.get()(request)
+      val result   = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustEqual OK
@@ -154,7 +165,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
         "mostTransactionsCountries[0]" -> "GBasdadsdas"
       )
 
-      val result = controller.post()(newRequest)
+      val result   = controller.post()(newRequest)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustEqual BAD_REQUEST
@@ -244,7 +255,9 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
 
       "edit is true" must {
         "go to SummaryController" in new RenewalModelFormSubmissionFixture {
-          setupBusinessMatching(msbServices = Set(CurrencyExchange, ForeignExchange, TransmittingMoney, ChequeCashingScrapMetal))
+          setupBusinessMatching(msbServices =
+            Set(CurrencyExchange, ForeignExchange, TransmittingMoney, ChequeCashingScrapMetal)
+          )
 
           post(edit = true) { result =>
             status(result) mustBe SEE_OTHER
@@ -270,12 +283,10 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
       when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
         .thenReturn(Some(incomingModel))
 
-      when(cache.save[Renewal](any(), eqTo(Renewal.key), any())
-        (any())).thenReturn(Future.successful(Cache.empty))
-
+      when(cache.save[Renewal](any(), eqTo(Renewal.key), any())(any())).thenReturn(Future.successful(Cache.empty))
 
       a[Exception] must be thrownBy {
-        ScalaFutures.whenReady(controller.post(true)(newRequest)) { x => x }
+        ScalaFutures.whenReady(controller.post(true)(newRequest))(x => x)
       }
     }
   }

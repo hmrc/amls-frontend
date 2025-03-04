@@ -26,19 +26,20 @@ import views.html.LoginEventView
 import scala.concurrent.Future
 
 @Singleton
-class LoginEventController @Inject()(authAction: AuthAction,
-                                     val ds: CommonPlayDependencies,
-                                     val cc: MessagesControllerComponents,
-                                     applicationConfig: ApplicationConfig,
-                                     view: LoginEventView) extends AmlsBaseController(ds, cc) {
+class LoginEventController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  applicationConfig: ApplicationConfig,
+  view: LoginEventView
+) extends AmlsBaseController(ds, cc) {
 
   val redirectCallType = "GET"
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request => Future(Ok(view(generateRedirect(applicationConfig.eabRedressUrl))))
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    Future(Ok(view(generateRedirect(applicationConfig.eabRedressUrl))))
   }
 
-  private def generateRedirect(destinationUrl: String) = {
+  private def generateRedirect(destinationUrl: String) =
     Call(redirectCallType, destinationUrl)
-  }
 }

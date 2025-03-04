@@ -22,7 +22,7 @@ import play.api.data.{Form, FormError}
 
 class LegalNameInputFormProviderSpec extends StringFieldBehaviours {
 
-  val formProvider = new LegalNameInputFormProvider()
+  val formProvider             = new LegalNameInputFormProvider()
   val form: Form[PreviousName] = formProvider()
 
   val nameRegex = "^[a-zA-Z\\u00C0-\\u00FF '‘’\\u2014\\u2013\\u2010\\u002d]+$"
@@ -34,19 +34,25 @@ class LegalNameInputFormProviderSpec extends StringFieldBehaviours {
     val list = List("first", "middle", "last")
 
     list foreach { field =>
-
       val fieldName = s"${field}Name"
 
       s"evaluating $field name field" must {
 
-        behave like fieldThatBindsValidData(form, fieldName, stringsShorterThan(formProvider.length).suchThat(_.nonEmpty))
+        behave like fieldThatBindsValidData(
+          form,
+          fieldName,
+          stringsShorterThan(formProvider.length).suchThat(_.nonEmpty)
+        )
 
         if (field != "middle") {
-          behave like mandatoryField(form, fieldName, FormError(fieldName, s"error.rp.previous.${field}.invalid"))
+          behave like mandatoryField(form, fieldName, FormError(fieldName, s"error.rp.previous.$field.invalid"))
         }
 
         behave like fieldWithMaxLength(
-          form, fieldName, formProvider.length, FormError(fieldName, s"error.rp.previous.${field}.length.invalid", Seq(formProvider.length))
+          form,
+          fieldName,
+          formProvider.length,
+          FormError(fieldName, s"error.rp.previous.$field.length.invalid", Seq(formProvider.length))
         )
 
         "reject submissions that violate regex" in {
@@ -57,8 +63,10 @@ class LegalNameInputFormProviderSpec extends StringFieldBehaviours {
 
           val result = form.bind(map)
 
-          result.value shouldBe None
-          result.error(fieldName) shouldBe Some(FormError(fieldName, s"error.rp.previous.${field}.char.invalid", Seq(nameRegex)))
+          result.value            shouldBe None
+          result.error(fieldName) shouldBe Some(
+            FormError(fieldName, s"error.rp.previous.$field.char.invalid", Seq(nameRegex))
+          )
         }
       }
     }

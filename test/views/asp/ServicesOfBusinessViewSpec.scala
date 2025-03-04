@@ -25,10 +25,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.asp.ServicesOfBusinessView
 
-class ServicesOfBusinessViewSpec extends AmlsViewSpec with Matchers  {
+class ServicesOfBusinessViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val servicesOfBusiness = inject[ServicesOfBusinessView]
-  lazy val fp = inject[ServicesOfBusinessFormProvider]
+  lazy val fp                 = inject[ServicesOfBusinessFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -49,7 +49,7 @@ class ServicesOfBusinessViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = servicesOfBusiness(fp().fill(ServicesOfBusiness(Service.all.toSet)), true)
 
-      heading.html must be(messages("asp.services.title"))
+      heading.html    must be(messages("asp.services.title"))
       subHeading.html must include(messages("summary.asp"))
     }
 

@@ -28,7 +28,7 @@ import views.html.msb.UsesForeignCurrenciesView
 class UsesForeignCurrenciesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val currenciesView = inject[UsesForeignCurrenciesView]
-  lazy val fp = inject[UsesForeignCurrenciesFormProvider]
+  lazy val fp             = inject[UsesForeignCurrenciesFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -47,7 +47,7 @@ class UsesForeignCurrenciesViewSpec extends AmlsViewSpec with Matchers {
     "have correct headings" in new ViewFixture {
       def view = currenciesView(fp().fill(UsesForeignCurrenciesNo), true)
 
-      heading.html must be(messages("msb.deal_foreign_currencies.title"))
+      heading.html    must be(messages("msb.deal_foreign_currencies.title"))
       subHeading.html must include(messages("summary.msb"))
     }
 
@@ -55,7 +55,7 @@ class UsesForeignCurrenciesViewSpec extends AmlsViewSpec with Matchers {
 
       def view = currenciesView(fp(), true)
 
-      Option(doc.getElementById("usesForeignCurrencies")).isDefined must be(true)
+      Option(doc.getElementById("usesForeignCurrencies")).isDefined   must be(true)
       Option(doc.getElementById("usesForeignCurrencies-2")).isDefined must be(true)
     }
 

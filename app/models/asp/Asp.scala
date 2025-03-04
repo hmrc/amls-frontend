@@ -22,21 +22,29 @@ import typeclasses.MongoKey
 import services.cache.Cache
 
 case class Asp(
-                services: Option[ServicesOfBusiness] = None,
-                otherBusinessTaxMatters: Option[OtherBusinessTaxMatters] = None,
-                hasChanged: Boolean = false,
-                hasAccepted: Boolean = false
-              ) {
+  services: Option[ServicesOfBusiness] = None,
+  otherBusinessTaxMatters: Option[OtherBusinessTaxMatters] = None,
+  hasChanged: Boolean = false,
+  hasAccepted: Boolean = false
+) {
 
   def services(p: ServicesOfBusiness): Asp =
-    this.copy(services = Some(p), hasChanged = hasChanged || !this.services.contains(p), hasAccepted = hasAccepted && this.services.contains(p))
+    this.copy(
+      services = Some(p),
+      hasChanged = hasChanged || !this.services.contains(p),
+      hasAccepted = hasAccepted && this.services.contains(p)
+    )
 
   def otherBusinessTaxMatters(p: OtherBusinessTaxMatters): Asp =
-    this.copy(otherBusinessTaxMatters = Some(p), hasChanged = hasChanged || !this.otherBusinessTaxMatters.contains(p), hasAccepted = hasAccepted && this.otherBusinessTaxMatters.contains(p))
+    this.copy(
+      otherBusinessTaxMatters = Some(p),
+      hasChanged = hasChanged || !this.otherBusinessTaxMatters.contains(p),
+      hasAccepted = hasAccepted && this.otherBusinessTaxMatters.contains(p)
+    )
 
   def isComplete: Boolean = this match {
     case Asp(Some(_), Some(_), _, accepted) => accepted
-    case _ => false
+    case _                                  => false
   }
 }
 
@@ -54,33 +62,32 @@ object Asp {
       NotStarted,
       TaskRow.notStartedTag
     )
-    cache.getEntry[Asp](key).fold(notStarted) {
-      model =>
-        if (model.isComplete && model.hasChanged) {
-          TaskRow(
-            key,
-            controllers.asp.routes.SummaryController.get.url,
-            hasChanged = true,
-            status = Updated,
-            tag = TaskRow.updatedTag
-          )
-        } else if (model.isComplete) {
-          TaskRow(
-            messageKey,
-            controllers.asp.routes.SummaryController.get.url,
-            model.hasChanged,
-            Completed,
-            TaskRow.completedTag
-          )
-        } else {
-          TaskRow(
-            messageKey,
-            controllers.asp.routes.WhatYouNeedController.get.url,
-            model.hasChanged,
-            Started,
-            TaskRow.incompleteTag
-          )
-        }
+    cache.getEntry[Asp](key).fold(notStarted) { model =>
+      if (model.isComplete && model.hasChanged) {
+        TaskRow(
+          key,
+          controllers.asp.routes.SummaryController.get.url,
+          hasChanged = true,
+          status = Updated,
+          tag = TaskRow.updatedTag
+        )
+      } else if (model.isComplete) {
+        TaskRow(
+          messageKey,
+          controllers.asp.routes.SummaryController.get.url,
+          model.hasChanged,
+          Completed,
+          TaskRow.completedTag
+        )
+      } else {
+        TaskRow(
+          messageKey,
+          controllers.asp.routes.WhatYouNeedController.get.url,
+          model.hasChanged,
+          Started,
+          TaskRow.incompleteTag
+        )
+      }
     }
   }
 

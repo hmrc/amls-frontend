@@ -27,8 +27,8 @@ class CustomersOutsideUKViewSpec extends AmlsViewSpec with Matchers with AutoCom
 
   trait ViewFixture extends Fixture
 
-  lazy val customers_outside_uk = inject[CustomersOutsideUKView]
-  lazy val fp = inject[CustomersOutsideUKFormProvider]
+  lazy val customers_outside_uk                                  = inject[CustomersOutsideUKView]
+  lazy val fp                                                    = inject[CustomersOutsideUKFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   "percentage view" must {
@@ -36,14 +36,16 @@ class CustomersOutsideUKViewSpec extends AmlsViewSpec with Matchers with AutoCom
 
       def view = customers_outside_uk(fp(), true, mockAutoComplete.formOptions)
 
-      doc.title must startWith(messages("renewal.customer.outside.uk.countries.title") + " - " + messages("summary.renewal"))
+      doc.title must startWith(
+        messages("renewal.customer.outside.uk.countries.title") + " - " + messages("summary.renewal")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = customers_outside_uk(fp(), true, mockAutoComplete.formOptions)
 
-      heading.html must be(messages("renewal.customer.outside.uk.countries.title"))
+      heading.html    must be(messages("renewal.customer.outside.uk.countries.title"))
       subHeading.html must include(messages("summary.renewal"))
     }
 
@@ -52,11 +54,17 @@ class CustomersOutsideUKViewSpec extends AmlsViewSpec with Matchers with AutoCom
       def view = customers_outside_uk(fp(), true, mockAutoComplete.formOptions)
 
       doc.getElementsByClass("govuk-body").first.text must be(messages("renewal.customer.outside.uk.countries.text"))
-      doc.getElementsByClass("govuk-hint").first.text must be(messages("businessactivities.high.value.customer.lbl.hint"))
+      doc.getElementsByClass("govuk-hint").first.text must be(
+        messages("businessactivities.high.value.customer.lbl.hint")
+      )
     }
 
     behave like pageWithErrors(
-      customers_outside_uk(fp().withError("countries", "error.required.renewal.customer.country.name"), true, mockAutoComplete.formOptions),
+      customers_outside_uk(
+        fp().withError("countries", "error.required.renewal.customer.country.name"),
+        true,
+        mockAutoComplete.formOptions
+      ),
       "location-autocomplete-0",
       "error.required.renewal.customer.country.name"
     )

@@ -27,7 +27,7 @@ import views.html.responsiblepeople.address.NewHomeDateOfChangeView
 class NewHomeDateOfChangeViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val dateView = inject[NewHomeDateOfChangeView]
-  lazy val fp = inject[NewHomeAddressDateOfChangeFormProvider]
+  lazy val fp       = inject[NewHomeAddressDateOfChangeFormProvider]
 
   val name = "firstName lastName"
 
@@ -46,18 +46,19 @@ class NewHomeDateOfChangeViewSpec extends AmlsViewSpec with Matchers {
 
       def view = dateView(fp(), 1, name)
 
-      doc.title must be(pageTitle)
-      heading.html must be(messages("responsiblepeople.new.home.date.of.change.heading", name))
+      doc.title       must be(pageTitle)
+      heading.html    must be(messages("responsiblepeople.new.home.date.of.change.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
-      doc.getElementsContainingOwnText(messages("lbl.day")).hasText must be(true)
+      doc.getElementsContainingOwnText(messages("lbl.day")).hasText   must be(true)
       doc.getElementsContainingOwnText(messages("lbl.month")).hasText must be(true)
-      doc.getElementsContainingOwnText(messages("lbl.year")).hasText must be(true)
+      doc.getElementsContainingOwnText(messages("lbl.year")).hasText  must be(true)
     }
 
     behave like pageWithErrors(
       dateView(fp().withError("dateOfChange", "new.home.error.required.date.fake"), 1, name),
-      "dateOfChange", "new.home.error.required.date.fake"
+      "dateOfChange",
+      "new.home.error.required.date.fake"
     )
 
     behave like pageWithBackLink(

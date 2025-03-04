@@ -52,35 +52,44 @@ object AMPTurnover extends Enumerable.Implicits {
       case "03" => Third
       case "04" => Fourth
       case "05" => Fifth
-      case _ =>
+      case _    =>
         play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 
   implicit val jsonWrites: Writes[AMPTurnover] = Writes[AMPTurnover] {
-    case First => Json.obj("percentageExpectedTurnover" -> "01")
+    case First  => Json.obj("percentageExpectedTurnover" -> "01")
     case Second => Json.obj("percentageExpectedTurnover" -> "02")
-    case Third => Json.obj("percentageExpectedTurnover" -> "03")
+    case Third  => Json.obj("percentageExpectedTurnover" -> "03")
     case Fourth => Json.obj("percentageExpectedTurnover" -> "04")
-    case Fifth => Json.obj("percentageExpectedTurnover" -> "05")
+    case Fifth  => Json.obj("percentageExpectedTurnover" -> "05")
   }
 
-  def update(key: String, jsonObj: JsObject, newValue: JsObject): JsObject = {
-    if(jsonObj.keys.contains(key)) {
+  def update(key: String, jsonObj: JsObject, newValue: JsObject): JsObject =
+    if (jsonObj.keys.contains(key)) {
       (jsonObj - key) ++ newValue
     } else {
       jsonObj
     }
-  }
 
-  def convert(model: Option[AMPTurnover], amp: Amp): Amp = { model match {
-    case Some(AMPTurnover.First) => Amp(update("percentageExpectedTurnover", amp.data, Json.obj("percentageExpectedTurnover" -> "zeroToTwenty")))
-    case Some(AMPTurnover.Second) => Amp(update("percentageExpectedTurnover", amp.data, Json.obj("percentageExpectedTurnover" -> "twentyOneToForty")))
-    case Some(AMPTurnover.Third) => Amp(update("percentageExpectedTurnover", amp.data, Json.obj("percentageExpectedTurnover" -> "fortyOneToSixty")))
-    case Some(AMPTurnover.Fourth) => Amp(update("percentageExpectedTurnover", amp.data, Json.obj("percentageExpectedTurnover" -> "sixtyOneToEighty")))
-    case Some(AMPTurnover.Fifth) => Amp(update("percentageExpectedTurnover", amp.data, Json.obj("percentageExpectedTurnover" -> "eightyOneToOneHundred")))
-    case _ => throw new Exception("Invalid AMP Turnover")
-    }
+  def convert(model: Option[AMPTurnover], amp: Amp): Amp = model match {
+    case Some(AMPTurnover.First)  =>
+      Amp(update("percentageExpectedTurnover", amp.data, Json.obj("percentageExpectedTurnover" -> "zeroToTwenty")))
+    case Some(AMPTurnover.Second) =>
+      Amp(update("percentageExpectedTurnover", amp.data, Json.obj("percentageExpectedTurnover" -> "twentyOneToForty")))
+    case Some(AMPTurnover.Third)  =>
+      Amp(update("percentageExpectedTurnover", amp.data, Json.obj("percentageExpectedTurnover" -> "fortyOneToSixty")))
+    case Some(AMPTurnover.Fourth) =>
+      Amp(update("percentageExpectedTurnover", amp.data, Json.obj("percentageExpectedTurnover" -> "sixtyOneToEighty")))
+    case Some(AMPTurnover.Fifth)  =>
+      Amp(
+        update(
+          "percentageExpectedTurnover",
+          amp.data,
+          Json.obj("percentageExpectedTurnover" -> "eightyOneToOneHundred")
+        )
+      )
+    case _                        => throw new Exception("Invalid AMP Turnover")
   }
 
   val all: Seq[AMPTurnover] = Seq(

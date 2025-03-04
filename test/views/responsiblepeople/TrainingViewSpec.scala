@@ -27,7 +27,7 @@ import views.html.responsiblepeople.TrainingView
 class TrainingViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val training = inject[TrainingView]
-  lazy val fp = inject[TrainingFormProvider]
+  lazy val fp       = inject[TrainingFormProvider]
 
   val name = "Jane Smith"
 
@@ -43,10 +43,11 @@ class TrainingViewSpec extends AmlsViewSpec with Matchers {
 
       def view = training(fp(), false, 0, None, name)
 
-      doc.title must be(messages("responsiblepeople.training.title") + " - " +
-        messages("summary.responsiblepeople")+
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov")
+      doc.title must be(
+        messages("responsiblepeople.training.title") + " - " +
+          messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
       )
     }
 
@@ -54,7 +55,7 @@ class TrainingViewSpec extends AmlsViewSpec with Matchers {
 
       def view = training(fp(), false, 0, None, name)
 
-      heading.html must be(messages("responsiblepeople.training.heading", name))
+      heading.html    must be(messages("responsiblepeople.training.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
     }
 
@@ -69,12 +70,14 @@ class TrainingViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       training(fp().withError("training", "error.required.rp.training"), false, 1, None, name),
-      "training", "error.required.rp.training"
+      "training",
+      "error.required.rp.training"
     )
 
     behave like pageWithErrors(
       training(fp().withError("information", "error.rp.invalid.training.information"), false, 1, None, name),
-      "information", "error.rp.invalid.training.information"
+      "information",
+      "error.rp.invalid.training.information"
     )
 
     behave like pageWithBackLink(training(fp(), false, 1, None, name))

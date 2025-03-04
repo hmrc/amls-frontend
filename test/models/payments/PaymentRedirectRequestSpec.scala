@@ -29,15 +29,16 @@ class PaymentRedirectRequestSpec extends AmlsSpec {
 
       val expectedJson = Json.obj(
         "reference" -> "some_reference",
-        "amount" -> "100.0",
-        "url" -> "http://localhost:9222/anti-money-laundering/start"
+        "amount"    -> "100.0",
+        "url"       -> "http://localhost:9222/anti-money-laundering/start"
       )
 
-      //noinspection ScalaStyle
+      // noinspection ScalaStyle
 
       val applicationConfig = app.injector.instanceOf[ApplicationConfig]
 
-      val model = PaymentRedirectRequest("some_reference", 100, ReturnLocation("/anti-money-laundering/start")(applicationConfig))
+      val model =
+        PaymentRedirectRequest("some_reference", 100, ReturnLocation("/anti-money-laundering/start")(applicationConfig))
 
       Json.toJson(model) mustBe expectedJson
 

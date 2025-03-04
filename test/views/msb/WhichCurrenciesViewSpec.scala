@@ -29,7 +29,7 @@ import views.html.msb.WhichCurrenciesView
 class WhichCurrenciesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val which_currencies = inject[WhichCurrenciesView]
-  lazy val fp = inject[WhichCurrenciesFormProvider]
+  lazy val fp               = inject[WhichCurrenciesFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -52,13 +52,14 @@ class WhichCurrenciesViewSpec extends AmlsViewSpec with Matchers {
 
       def view = which_currencies(fp().fill(WhichCurrencies(Seq("GBP"))), true, values)
 
-      heading.html must be(messages("msb.which_currencies.title"))
+      heading.html    must be(messages("msb.which_currencies.title"))
       subHeading.html must include(messages("summary.msb"))
     }
 
     behave like pageWithErrors(
       which_currencies(fp().withError("currencies[0]", "error.invalid.msb.wc.currencies"), false, values),
-      "currency-autocomplete-0", "error.invalid.msb.wc.currencies"
+      "currency-autocomplete-0",
+      "error.invalid.msb.wc.currencies"
     )
 
     behave like pageWithBackLink(which_currencies(fp(), false, values))

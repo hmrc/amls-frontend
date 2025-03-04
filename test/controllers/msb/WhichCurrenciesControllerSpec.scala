@@ -39,13 +39,14 @@ import views.html.msb.WhichCurrenciesView
 
 import scala.concurrent.Future
 
-class WhichCurrenciesControllerSpec extends AmlsSpec
-                                    with MockitoSugar
-                                    with Matchers
-                                    with PatienceConfiguration
-                                    with IntegrationPatience
-                                    with ScalaFutures
-                                    with Injecting {
+class WhichCurrenciesControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with Matchers
+    with PatienceConfiguration
+    with IntegrationPatience
+    with ScalaFutures
+    with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
@@ -56,15 +57,18 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
 
     when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
       .thenReturn(Future.successful(Cache("TESTID", Map())))
-    lazy val view = inject[WhichCurrenciesView]
-    val controller = new WhichCurrenciesController(dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+    lazy val view  = inject[WhichCurrenciesView]
+    val controller = new WhichCurrenciesController(
+      dataCacheConnector = mockCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow,
       cc = mockMcc,
       autocompleteService = inject[CurrencyAutocompleteService],
       formProvider = inject[WhichCurrenciesFormProvider],
-      view = view)
+      view = view
+    )
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
@@ -83,12 +87,11 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
   trait DealsInForeignCurrencyFixture extends Fixture {
     val newRequest = FakeRequest(POST, routes.WhichCurrenciesController.post().url)
       .withFormUrlEncodedBody(
-      "currencies[0]" -> "USD",
-      "currencies[1]" -> "GBP",
-      "currencies[2]" -> "BOB"
-    )
+        "currencies[0]" -> "USD",
+        "currencies[1]" -> "GBP",
+        "currencies[2]" -> "BOB"
+      )
   }
-
 
   "WhichCurrenciesController" when {
     "get is called" should {
@@ -118,7 +121,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
         when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))
 
-        val result = controller.get()(request)
+        val result   = controller.get()(request)
         val document = Jsoup.parse(contentAsString(result))
 
         status(result) mustEqual OK
@@ -135,19 +138,19 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
           redirectLocation(result) mustBe Some(controllers.msb.routes.UsesForeignCurrenciesController.get().url)
         }
       }
-      "data is valid and edit is true" should {
+      "data is valid and edit is true"  should {
         "redirect to Summary Controller" in new DealsInForeignCurrencyFixture {
           val result = controller.post(edit = true).apply(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.msb.routes.SummaryController.get.url)
         }
       }
-      "data is invalid" should {
+      "data is invalid"                 should {
         "return bad request" in new Fixture {
           val newRequest = FakeRequest(POST, routes.WhichCurrenciesController.post().url)
             .withFormUrlEncodedBody(
-            ("IncorrectData1", "IncorrectData2")
-          )
+              ("IncorrectData1", "IncorrectData2")
+            )
 
           val result = controller.post().apply(newRequest)
           status(result) must be(BAD_REQUEST)

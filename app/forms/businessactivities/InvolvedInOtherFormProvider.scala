@@ -24,32 +24,37 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class InvolvedInOtherFormProvider @Inject()() extends Mappings {
+class InvolvedInOtherFormProvider @Inject() () extends Mappings {
 
-  val length = 255
+  val length                         = 255
   def apply(): Form[InvolvedInOther] = Form[InvolvedInOther](
     mapping(
-      "involvedInOther" -> boolean("error.required.renewal.ba.involved.in.other", "error.required.renewal.ba.involved.in.other"),
-      "details" -> mandatoryIfTrue("involvedInOther", text("error.required.renewal.ba.involved.in.other.text")
-        .verifying(
-          firstError(
-            maxLength(length, "error.invalid.maxlength.255.renewal.ba.involved.in.other"),
-            regexp(basicPunctuationRegex, "error.text.validation.renewal.ba.involved.in.other")
+      "involvedInOther" -> boolean(
+        "error.required.renewal.ba.involved.in.other",
+        "error.required.renewal.ba.involved.in.other"
+      ),
+      "details"         -> mandatoryIfTrue(
+        "involvedInOther",
+        text("error.required.renewal.ba.involved.in.other.text")
+          .verifying(
+            firstError(
+              maxLength(length, "error.invalid.maxlength.255.renewal.ba.involved.in.other"),
+              regexp(basicPunctuationRegex, "error.text.validation.renewal.ba.involved.in.other")
+            )
           )
-        )
       )
     )(apply)(unapply)
   )
 
   private def apply(b: Boolean, s: Option[String]): InvolvedInOther = (b, s) match {
-    case (false, _) => InvolvedInOtherNo
+    case (false, _)        => InvolvedInOtherNo
     case (true, Some(str)) => InvolvedInOtherYes(str)
-    case _ => throw new IllegalArgumentException("No PSR Number available to bind from form")
+    case _                 => throw new IllegalArgumentException("No PSR Number available to bind from form")
   }
 
   private def unapply(obj: InvolvedInOther): Option[(Boolean, Option[String])] = obj match {
-    case InvolvedInOtherNo => Some((false, None))
+    case InvolvedInOtherNo           => Some((false, None))
     case InvolvedInOtherYes(details) => Some((true, Some(details)))
-    case _ => None
+    case _                           => None
   }
 }

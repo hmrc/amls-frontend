@@ -23,12 +23,13 @@ import play.api.data.Forms.seq
 
 import javax.inject.Inject
 
-class MSBServicesFormProvider @Inject()() extends Mappings {
+class MSBServicesFormProvider @Inject() () extends Mappings {
 
   private val errorMessage = "error.required.tp.services"
 
   def apply(): Form[TradingPremisesMsbServices] = Form[TradingPremisesMsbServices](
-    "value" -> seq(enumerable[TradingPremisesMsbService](errorMessage)).verifying(nonEmptySeq(errorMessage))
+    "value" -> seq(enumerable[TradingPremisesMsbService](errorMessage))
+      .verifying(nonEmptySeq(errorMessage))
       .transform[TradingPremisesMsbServices](x => TradingPremisesMsbServices(x.toSet), _.services.toSeq)
   )
 }

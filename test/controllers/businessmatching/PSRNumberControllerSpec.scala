@@ -43,15 +43,12 @@ import views.html.businessmatching.PsrNumberView
 
 import scala.concurrent.Future
 
-class PSRNumberControllerSpec extends AmlsSpec
-  with MockitoSugar
-  with ScalaFutures
-  with BusinessMatchingGenerator {
+class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BusinessMatchingGenerator {
 
   trait Fixture extends DependencyMocks { self =>
 
-    val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[PsrNumberView]
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[PsrNumberView]
     val controller = new PSRNumberController(
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -134,18 +131,23 @@ class PSRNumberControllerSpec extends AmlsSpec
           val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
             .withFormUrlEncodedBody(
               "appliedFor" -> "true",
-              "regNumber" -> "123789"
+              "regNumber"  -> "123789"
             )
 
-          mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
+          mockCacheUpdate[ChangeSubSectorFlowModel](
+            Some(ChangeSubSectorFlowModel.key),
+            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
+          )
 
           val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
 
-          controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(
-            Some(Set(TransmittingMoney)),
-            Some(BusinessAppliedForPSRNumberYes("123789"))))
+          controller.router.verify(
+            "internalId",
+            PsrNumberPageId,
+            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberYes("123789")))
+          )
         }
 
         "redirect when No is selected" in new Fixture {
@@ -163,14 +165,19 @@ class PSRNumberControllerSpec extends AmlsSpec
           val result = controller.post(true)(newRequest)
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberNo)), edit = true)
+          controller.router.verify(
+            "internalId",
+            PsrNumberPageId,
+            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberNo)),
+            edit = true
+          )
         }
 
         "respond with BAD_REQUEST when given invalid data" in new Fixture {
           val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
             .withFormUrlEncodedBody(
               "appliedFor" -> "true",
-              "regNumber" -> ""
+              "regNumber"  -> ""
             )
 
           when {
@@ -195,21 +202,26 @@ class PSRNumberControllerSpec extends AmlsSpec
             controller.helper.updateSubSectors(any(), any())(any())
           } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
-          mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
+          mockCacheUpdate[ChangeSubSectorFlowModel](
+            Some(ChangeSubSectorFlowModel.key),
+            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
+          )
 
           val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
             .withFormUrlEncodedBody(
               "appliedFor" -> "true",
-              "regNumber" -> "1234567"
+              "regNumber"  -> "1234567"
             )
 
           val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
 
-          controller.router.verify("internalId", PsrNumberPageId, ChangeSubSectorFlowModel(
-            Some(Set(TransmittingMoney)),
-            Some(BusinessAppliedForPSRNumberYes("700000"))))
+          controller.router.verify(
+            "internalId",
+            PsrNumberPageId,
+            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberYes("700000")))
+          )
         }
       }
     }

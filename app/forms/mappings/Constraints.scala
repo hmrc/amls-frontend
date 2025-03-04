@@ -23,69 +23,64 @@ import java.time.LocalDate
 
 trait Constraints {
 
-  protected val basicPunctuationRegex: String = "^[a-zA-Z0-9\u00C0-\u00FF !#$%&'‘’\"“”«»()*+,./:;=?@\\[\\]|~£€¥\\u005C\u2014\u2013\u2010\u005F\u005E\u0060\u000A\u000D\u002d]+$"
-  protected val alphanumericRegex: String = "^[0-9a-zA-Z_]+$"
-  protected val nameRegex: String = "^[a-zA-Z\\u00C0-\\u00FF '‘’\\u2014\\u2013\\u2010\\u002d]+$"
-  protected val emailRegex: String = "(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
-  protected val numbersOnlyRegex = "^[0-9]*$"
-  protected val vrnRegex: String = "^[0-9]{9}$"
-  protected val utrRegex: String = "^[0-9]{10}$"
-  protected val transactionsRegex: String = "^[0-9]{1,11}$"
-  protected val postcodeRegex: String = "^[A-Za-z]{1,2}[0-9][0-9A-Za-z]?\\s?[0-9][A-Za-z]{2}$"
+  protected val basicPunctuationRegex: String =
+    "^[a-zA-Z0-9\u00C0-\u00FF !#$%&'‘’\"“”«»()*+,./:;=?@\\[\\]|~£€¥\\u005C\u2014\u2013\u2010\u005F\u005E\u0060\u000A\u000D\u002d]+$"
+  protected val alphanumericRegex: String     = "^[0-9a-zA-Z_]+$"
+  protected val nameRegex: String             = "^[a-zA-Z\\u00C0-\\u00FF '‘’\\u2014\\u2013\\u2010\\u002d]+$"
+  protected val emailRegex: String            =
+    "(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
+  protected val numbersOnlyRegex              = "^[0-9]*$"
+  protected val vrnRegex: String              = "^[0-9]{9}$"
+  protected val utrRegex: String              = "^[0-9]{10}$"
+  protected val transactionsRegex: String     = "^[0-9]{1,11}$"
+  protected val postcodeRegex: String         = "^[A-Za-z]{1,2}[0-9][0-9A-Za-z]?\\s?[0-9][A-Za-z]{2}$"
 
   protected def firstError[A](constraints: Constraint[A]*): Constraint[A] =
-    Constraint {
-      input =>
-        constraints
-          .map(_.apply(input))
-          .find(_ != Valid)
-          .getOrElse(Valid)
+    Constraint { input =>
+      constraints
+        .map(_.apply(input))
+        .find(_ != Valid)
+        .getOrElse(Valid)
     }
 
   protected def minimumValue[A](minimum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
-    Constraint {
-      input =>
+    Constraint { input =>
+      import ev._
 
-        import ev._
-
-        if (input >= minimum) {
-          Valid
-        } else {
-          Invalid(errorKey, minimum)
-        }
+      if (input >= minimum) {
+        Valid
+      } else {
+        Invalid(errorKey, minimum)
+      }
     }
 
   protected def maximumValue[A](maximum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
-    Constraint {
-      input =>
+    Constraint { input =>
+      import ev._
 
-        import ev._
-
-        if (input <= maximum) {
-          Valid
-        } else {
-          Invalid(errorKey, maximum)
-        }
+      if (input <= maximum) {
+        Valid
+      } else {
+        Invalid(errorKey, maximum)
+      }
     }
 
   protected def inRange[A](minimum: A, maximum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
-    Constraint {
-      input =>
+    Constraint { input =>
+      import ev._
 
-        import ev._
-
-        if (input >= minimum && input <= maximum) {
-          Valid
-        } else {
-          Invalid(errorKey, minimum, maximum)
-        }
+      if (input >= minimum && input <= maximum) {
+        Valid
+      } else {
+        Invalid(errorKey, minimum, maximum)
+      }
     }
 
   protected def regexp(regex: String, errorKey: String): Constraint[String] =
     Constraint {
       case str if str.matches(regex) =>
         Valid
-      case _ =>
+      case _                         =>
         Invalid(errorKey, regex)
     }
 
@@ -93,7 +88,7 @@ trait Constraints {
     Constraint {
       case str if str.length >= minimum =>
         Valid
-      case _ =>
+      case _                            =>
         Invalid(errorKey, minimum)
     }
 
@@ -101,7 +96,7 @@ trait Constraints {
     Constraint {
       case str if str.length <= maximum =>
         Valid
-      case _ =>
+      case _                            =>
         Invalid(errorKey, maximum)
     }
 
@@ -109,7 +104,7 @@ trait Constraints {
     Constraint {
       case str if str.length == correctLength =>
         Valid
-      case _ =>
+      case _                                  =>
         Invalid(errorKey, correctLength)
     }
 
@@ -117,7 +112,7 @@ trait Constraints {
     Constraint {
       case str if str <= maximum =>
         Valid
-      case _ =>
+      case _                     =>
         Invalid(errorKey, maximum)
     }
 
@@ -125,7 +120,7 @@ trait Constraints {
     Constraint {
       case date if date.isAfter(maximum) =>
         Invalid(errorKey, args: _*)
-      case _ =>
+      case _                             =>
         Valid
     }
 
@@ -133,7 +128,7 @@ trait Constraints {
     Constraint {
       case date if date.isBefore(minimum) =>
         Invalid(errorKey, args: _*)
-      case _ =>
+      case _                              =>
         Valid
     }
 
@@ -141,13 +136,13 @@ trait Constraints {
     Constraint {
       case seq if seq.nonEmpty =>
         Valid
-      case _ =>
+      case _                   =>
         Invalid(errorKey)
     }
 
   protected def nonEmptyOptionalSeq[A](errorKey: String): Constraint[Seq[Option[A]]] =
     Constraint {
-      case seq if seq.flatten.isEmpty =>
+      case seq if seq.flatten.isEmpty     =>
         Invalid(errorKey)
       case seq if seq.exists(_.isDefined) =>
         Valid
@@ -156,6 +151,6 @@ trait Constraints {
   protected def validNino: Constraint[String] =
     Constraint {
       case str if Nino.isValid(str) => Valid
-      case _ => Invalid("error.invalid.nino")
+      case _                        => Invalid("error.invalid.nino")
     }
 }

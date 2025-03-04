@@ -27,7 +27,7 @@ import views.html.tcsp.ServicesOfAnotherTCSPView
 class ServicesOfAnotherTCSPViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val services_of_another_tcsp = inject[ServicesOfAnotherTCSPView]
-  lazy val fp = inject[ServicesOfAnotherTCSPFormProvider]
+  lazy val fp                       = inject[ServicesOfAnotherTCSPFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -41,15 +41,16 @@ class ServicesOfAnotherTCSPViewSpec extends AmlsViewSpec with Matchers {
       def view = services_of_another_tcsp(fp(), true)
 
       val title = messages("tcsp.servicesOfAnotherTcsp.title") + " - " + messages("summary.tcsp") + " - " +
-                  messages("title.amls") + " - " + messages("title.gov")
-      doc.title must be(title)
-      heading.html must be(messages("tcsp.servicesOfAnotherTcsp.title"))
+        messages("title.amls") + " - " + messages("title.gov")
+      doc.title       must be(title)
+      heading.html    must be(messages("tcsp.servicesOfAnotherTcsp.title"))
       subHeading.html must include(messages("summary.tcsp"))
     }
 
     behave like pageWithErrors(
       services_of_another_tcsp(
-        fp().withError("servicesOfAnotherTCSP", "error.required.tcsp.services.another.tcsp"), true
+        fp().withError("servicesOfAnotherTCSP", "error.required.tcsp.services.another.tcsp"),
+        true
       ),
       "servicesOfAnotherTCSP",
       "error.required.tcsp.services.another.tcsp"

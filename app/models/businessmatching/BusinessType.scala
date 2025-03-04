@@ -45,20 +45,20 @@ object BusinessType extends Enumerable.Implicits {
   }
 
   implicit val writes: Writes[BusinessType] = Writes[BusinessType] {
-    case LimitedCompany => JsString("Corporate Body")
-    case SoleProprietor => JsString("Sole Trader")
-    case Partnership => JsString("Partnership")
-    case LPrLLP => JsString("LLP")
+    case LimitedCompany     => JsString("Corporate Body")
+    case SoleProprietor     => JsString("Sole Trader")
+    case Partnership        => JsString("Partnership")
+    case LPrLLP             => JsString("LLP")
     case UnincorporatedBody => JsString("Unincorporated Body")
   }
 
   implicit val reads: Reads[BusinessType] = Reads[BusinessType] {
-    case JsString("Corporate Body") => JsSuccess(LimitedCompany)
-    case JsString("Sole Trader") => JsSuccess(SoleProprietor)
-    case JsString("Partnership") => JsSuccess(Partnership)
-    case JsString("LLP") => JsSuccess(LPrLLP)
+    case JsString("Corporate Body")      => JsSuccess(LimitedCompany)
+    case JsString("Sole Trader")         => JsSuccess(SoleProprietor)
+    case JsString("Partnership")         => JsSuccess(Partnership)
+    case JsString("LLP")                 => JsSuccess(LPrLLP)
     case JsString("Unincorporated Body") => JsSuccess(UnincorporatedBody)
-    case _ =>
+    case _                               =>
       JsError(JsPath, play.api.libs.json.JsonValidationError("error.invalid"))
   }
 
@@ -70,7 +70,7 @@ object BusinessType extends Enumerable.Implicits {
     UnincorporatedBody
   )
 
-  def radioItems(implicit messages: Messages) = {
+  def radioItems(implicit messages: Messages) =
     all map { bt =>
       RadioItem(
         Text(messages(s"businessmatching.businessType.lbl.${bt.value}")),
@@ -78,7 +78,6 @@ object BusinessType extends Enumerable.Implicits {
         Some(bt.toString)
       )
     }
-  }
 
   implicit val enumerable: Enumerable[BusinessType] = Enumerable(all.map(v => v.toString -> v): _*)
 }

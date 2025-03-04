@@ -27,7 +27,7 @@ import views.html.responsiblepeople.address.AdditionalAddressView
 class AdditionalAddressViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val additional_address = inject[AdditionalAddressView]
-  lazy val fp = inject[AdditionalAddressFormProvider]
+  lazy val fp                 = inject[AdditionalAddressFormProvider]
 
   val name = "firstName lastName"
 
@@ -43,11 +43,13 @@ class AdditionalAddressViewSpec extends AmlsViewSpec with Matchers {
 
       def view = additional_address(fp(), true, 1, None, name)
 
-      doc.title must be(messages("responsiblepeople.additional_address.title") +
-        " - " + messages("summary.responsiblepeople") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
-      heading.html must be(messages("responsiblepeople.additional_address.heading", name))
+      doc.title       must be(
+        messages("responsiblepeople.additional_address.title") +
+          " - " + messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
+      heading.html    must be(messages("responsiblepeople.additional_address.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "isUK") must not be empty
@@ -55,7 +57,11 @@ class AdditionalAddressViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       additional_address(
-        fp().withError("isUK", "error.required.uk.or.overseas.address.previous"), false, 1, None, name
+        fp().withError("isUK", "error.required.uk.or.overseas.address.previous"),
+        false,
+        1,
+        None,
+        name
       ),
       "isUK",
       "error.required.uk.or.overseas.address.previous"

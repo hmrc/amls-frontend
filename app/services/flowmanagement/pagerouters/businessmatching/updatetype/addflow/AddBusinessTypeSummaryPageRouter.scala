@@ -31,20 +31,19 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AddBusinessTypeSummaryPageRouter @Inject()(val statusService: StatusService,
-                                                 val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
+class AddBusinessTypeSummaryPageRouter @Inject() (
+  val statusService: StatusService,
+  val businessMatchingService: BusinessMatchingService
+) extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-
+  override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Result] =
     businessMatchingService.getRemainingBusinessActivities(credId) flatMap {
       case set if set.nonEmpty =>
         OptionT.some(Redirect(addRoutes.AddMoreBusinessTypesController.get()))
-      case _ =>
+      case _                   =>
         OptionT.some(Redirect(addRoutes.NeedMoreInformationController.get()))
     } getOrElse error(AddBusinessTypeSummaryPageId)
-  }
 }
-
-
-

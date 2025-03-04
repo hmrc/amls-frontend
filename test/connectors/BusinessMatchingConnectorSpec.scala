@@ -57,12 +57,13 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
     lazy val hc: HeaderCarrier = app.injector.instanceOf[HeaderCarrier]
 
-    val mocker = new HttpClientMocker()
+    val mocker                               = new HttpClientMocker()
     private val configuration: Configuration = Configuration.load(Environment.simple())
-    private val config = new ApplicationConfig(configuration, new ServicesConfig(configuration))
-    val testBusinessMatchingConnector = new BusinessMatchingConnector(mocker.httpClient, config)
+    private val config                       = new ApplicationConfig(configuration, new ServicesConfig(configuration))
+    val testBusinessMatchingConnector        = new BusinessMatchingConnector(mocker.httpClient, config)
 
-    val address: BusinessMatchingAddress = BusinessMatchingAddress("1 Test Street", Some("Test Town"), None, None, None, "UK")
+    val address: BusinessMatchingAddress =
+      BusinessMatchingAddress("1 Test Street", Some("Test Town"), None, None, None, "UK")
 
     val validResponseDetail: BusinessMatchingReviewDetails = BusinessMatchingReviewDetails(
       businessName = "Test Business",
@@ -86,7 +87,10 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
     "get the review details" in new Fixture {
 
-      mocker.mockGet[Option[BusinessMatchingReviewDetails]](url"http://localhost:9923/business-customer/fetch-review-details/amls", Some(validResponseDetail))
+      mocker.mockGet[Option[BusinessMatchingReviewDetails]](
+        url"http://localhost:9923/business-customer/fetch-review-details/amls",
+        Some(validResponseDetail)
+      )
 
       whenReady(testBusinessMatchingConnector.getReviewDetails) { result =>
         result mustBe Some(validResponseDetail)
@@ -96,7 +100,10 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
     "return None when business matching returns 404" in new Fixture {
 
-      mocker.mockGet[Option[BusinessMatchingReviewDetails]](url"http://localhost:9923/business-customer/fetch-review-details/amls", None)
+      mocker.mockGet[Option[BusinessMatchingReviewDetails]](
+        url"http://localhost:9923/business-customer/fetch-review-details/amls",
+        None
+      )
 
       whenReady(testBusinessMatchingConnector.getReviewDetails) { result =>
         result mustBe None

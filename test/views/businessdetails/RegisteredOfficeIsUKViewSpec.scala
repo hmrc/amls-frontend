@@ -25,10 +25,10 @@ import play.api.test.FakeRequest
 import views.Fixture
 import views.html.businessdetails.RegisteredOfficeIsUKView
 
-class RegisteredOfficeIsUKViewSpec extends AmlsViewSpec with Matchers  {
+class RegisteredOfficeIsUKViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val registered_office_is_uk = app.injector.instanceOf[RegisteredOfficeIsUKView]
-  lazy val formProvider = app.injector.instanceOf[RegisteredOfficeIsUKFormProvider]
+  lazy val formProvider            = app.injector.instanceOf[RegisteredOfficeIsUKFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
@@ -42,7 +42,9 @@ class RegisteredOfficeIsUKViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = registered_office_is_uk(formWithData, true)
 
-      doc.title must startWith(messages("businessdetails.registeredoffice.title") + " - " + messages("summary.businessdetails"))
+      doc.title must startWith(
+        messages("businessdetails.registeredoffice.title") + " - " + messages("summary.businessdetails")
+      )
     }
 
     "have correct headings" in new ViewFixture {
@@ -51,7 +53,7 @@ class RegisteredOfficeIsUKViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = registered_office_is_uk(formWithData, true)
 
-      heading.html must be(messages("businessdetails.registeredoffice.title"))
+      heading.html    must be(messages("businessdetails.registeredoffice.title"))
       subHeading.html must include(messages("summary.businessdetails"))
     }
 

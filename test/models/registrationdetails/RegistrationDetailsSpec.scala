@@ -27,7 +27,7 @@ class RegistrationDetailsSpec extends PlaySpec with Matchers {
       val expectedModel = RegistrationDetails("Test Company", isIndividual = false)
 
       val json = Json.obj(
-        "companyName" -> "Test Company",
+        "companyName"  -> "Test Company",
         "isIndividual" -> false
       )
 

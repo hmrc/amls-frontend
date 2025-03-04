@@ -51,10 +51,12 @@ class CorporationTaxRegisteredSpec extends PlaySpec with MockitoSugar {
         be(Json.obj("registeredForCorporationTax" -> false))
 
       Json.toJson(CorporationTaxRegisteredYes("1234567890").asInstanceOf[CorporationTaxRegistered]) must
-        be(Json.obj(
-          "registeredForCorporationTax" -> true,
-          "corporationTaxReference" -> "1234567890"
-        ))
+        be(
+          Json.obj(
+            "registeredForCorporationTax" -> true,
+            "corporationTaxReference"     -> "1234567890"
+          )
+        )
     }
   }
 }

@@ -23,7 +23,7 @@ import play.api.data.Form
 import java.time.LocalDate
 import javax.inject.Inject
 
-class SupervisionEndFormProvider @Inject()() extends Mappings {
+class SupervisionEndFormProvider @Inject() () extends Mappings {
 
   def apply(): Form[SupervisionEnd] = Form[SupervisionEnd](
     "endDate" -> localDate(
@@ -37,7 +37,8 @@ class SupervisionEndFormProvider @Inject()() extends Mappings {
       minDate(SupervisionEndFormProvider.minDate, "error.supervision.end.invalid.date.after.1900"),
       maxDate(SupervisionEndFormProvider.maxDate, "error.supervision.end.invalid.date.future")
     ).transform[SupervisionEnd](
-      SupervisionEnd(_), _.endDate
+      SupervisionEnd(_),
+      _.endDate
     )
   )
 

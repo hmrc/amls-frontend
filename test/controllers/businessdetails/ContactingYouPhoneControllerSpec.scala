@@ -36,20 +36,22 @@ import scala.concurrent.Future
 
 class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
-  val userId = s"user-${UUID.randomUUID}"
-  val contactingYou = Some(ContactingYou(Some("+44 (0)123 456-7890"), Some("test@test.com")))
+  val userId                  = s"user-${UUID.randomUUID}"
+  val contactingYou           = Some(ContactingYou(Some("+44 (0)123 456-7890"), Some("test@test.com")))
   val businessDetailsWithData = BusinessDetails(contactingYou = contactingYou)
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[BusinessTelephoneView]
-    val controller = new ContactingYouPhoneController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[BusinessTelephoneView]
+    val controller = new ContactingYouPhoneController(
       dataCache = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = app.injector.instanceOf[BusinessTelephoneFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   val emptyCache = Cache.empty
@@ -60,31 +62,30 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
 
       "load the page" in new Fixture {
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())
-          (any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
+          .thenReturn(Future.successful(Some(businessDetailsWithData)))
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("businessdetails.contactingyou.phone.title"))
       }
 
       "load the page with the pre populated data" in new Fixture {
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())
-          (any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
+          .thenReturn(Future.successful(Some(businessDetailsWithData)))
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("businessdetails.contactingyou.phone.title"))
       }
 
       "load the page when business details are unavailable" in new Fixture {
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())
-          (any())).thenReturn(Future.successful(None))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("businessdetails.contactingyou.phone.title"))
       }
     }
@@ -96,14 +97,14 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
         val newRequest = FakeRequest(POST, routes.ContactingYouPhoneController.post(false).url)
           .withFormUrlEncodedBody("phoneNumber" -> "+44 (0)123 456-7890")
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())
-          (any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
+          .thenReturn(Future.successful(Some(businessDetailsWithData)))
 
-        when(controller.dataCache.save[BusinessDetails](any(), any(), any())
-          (any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCache.save[BusinessDetails](any(), any(), any())(any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.LettersAddressController.get().url))
       }
 
@@ -112,14 +113,14 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
         val newRequest = FakeRequest(POST, routes.ContactingYouPhoneController.post(true).url)
           .withFormUrlEncodedBody("phoneNumber" -> "+44 (0)123 456-7890")
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())
-          (any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
+          .thenReturn(Future.successful(Some(businessDetailsWithData)))
 
-        when(controller.dataCache.save[BusinessDetails](any(), any(), any())
-          (any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCache.save[BusinessDetails](any(), any(), any())(any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       }
 
@@ -128,28 +129,26 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
         val newRequest = FakeRequest(POST, routes.ContactingYouPhoneController.post(false).url)
           .withFormUrlEncodedBody("phoneNumber" -> "+44 (0)123 456-7890")
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())
-          (any())).thenReturn(Future.successful(None))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any())).thenReturn(Future.successful(None))
 
-        when(controller.dataCache.save[BusinessDetails](any(), any(), any())
-          (any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCache.save[BusinessDetails](any(), any(), any())(any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.LettersAddressController.get().url))
       }
-
 
       "on post of incomplete data" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.ContactingYouPhoneController.post(false).url)
           .withFormUrlEncodedBody("phoneNumber" -> "")
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())
-          (any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
+          .thenReturn(Future.successful(Some(businessDetailsWithData)))
 
-        when(controller.dataCache.save[BusinessDetails](any(), any(), any())
-          (any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCache.save[BusinessDetails](any(), any(), any())(any()))
+          .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)

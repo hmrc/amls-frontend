@@ -22,11 +22,11 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class CompanyRegistrationNumberFormProvider @Inject()() extends Mappings {
+class CompanyRegistrationNumberFormProvider @Inject() () extends Mappings {
 
   def apply(): Form[CompanyRegistrationNumber] = {
 
-    val length = 8
+    val length                  = 8
     val registrationNumberRegex = "^[A-Z0-9]{8}$"
 
     Form[CompanyRegistrationNumber](
@@ -36,7 +36,8 @@ class CompanyRegistrationNumberFormProvider @Inject()() extends Mappings {
             correctLength(length, "error.invalid.bm.registration.number.length"),
             regexp(registrationNumberRegex, "error.invalid.bm.registration.number.allowed")
           )
-        ).transform[CompanyRegistrationNumber](CompanyRegistrationNumber(_), _.companyRegistrationNumber)
+        )
+        .transform[CompanyRegistrationNumber](CompanyRegistrationNumber(_), _.companyRegistrationNumber)
     )
   }
 }

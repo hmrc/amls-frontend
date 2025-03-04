@@ -18,7 +18,7 @@ package models.businessmatching
 
 import play.api.libs.json.{Json, OFormat}
 
-case class ConfirmPostcode (postCode: String)
+case class ConfirmPostcode(postCode: String)
 
 object ConfirmPostcode {
   implicit val format: OFormat[ConfirmPostcode] = Json.format[ConfirmPostcode]

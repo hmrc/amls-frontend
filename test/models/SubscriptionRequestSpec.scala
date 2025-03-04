@@ -43,17 +43,14 @@ class SubscriptionRequestSpec extends PlaySpec with MockitoSugar {
   )
 
   val businessStructure = SoleProprietor
-  val agentName = AgentName("test")
-  val agentCompanyName = AgentCompanyDetails("test", Some("12345678"))
-  val agentPartnership = AgentPartnership("test")
-  val wdbd = WhatDoesYourBusinessDo(
-    Set(
-      BillPaymentServices,
-      EstateAgentBusinessService,
-      MoneyServiceBusiness)
+  val agentName         = AgentName("test")
+  val agentCompanyName  = AgentCompanyDetails("test", Some("12345678"))
+  val agentPartnership  = AgentPartnership("test")
+  val wdbd              = WhatDoesYourBusinessDo(
+    Set(BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness)
   )
-  val msbServices = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
-  val completeModel = TradingPremises(
+  val msbServices       = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
+  val completeModel     = TradingPremises(
     Some(RegisteringAgentPremises(true)),
     Some(ytp),
     Some(businessStructure),
@@ -66,31 +63,60 @@ class SubscriptionRequestSpec extends PlaySpec with MockitoSugar {
     Some(123456),
     Some("Added"),
     Some(ActivityEndDate(LocalDate.of(1999, 1, 1)))
-
   )
 
   "SubscriptionRequest" must {
 
     "serialize without including empty trading premises" in {
 
-      val emptyTp = TradingPremises()
+      val emptyTp       = TradingPremises()
       val sequenceOfTps = Seq(completeModel, emptyTp)
 
-      val testRequest = SubscriptionRequest(None, None, Some(sequenceOfTps), None, None, None, None, None, None, None, None, None, None, None)
+      val testRequest = SubscriptionRequest(
+        None,
+        None,
+        Some(sequenceOfTps),
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None
+      )
 
-      (Json.toJson(testRequest)).as[SubscriptionRequest].tradingPremisesSection.get.size must be(1)
+      Json.toJson(testRequest).as[SubscriptionRequest].tradingPremisesSection.get.size must be(1)
 
     }
 
     "serialize without including empty responsible people" in {
 
-      val nonEmptyRp = ResponsiblePerson(personName = Some(PersonName("Smith", None, "Jones")))
-      val emptyRp = ResponsiblePerson()
+      val nonEmptyRp    = ResponsiblePerson(personName = Some(PersonName("Smith", None, "Jones")))
+      val emptyRp       = ResponsiblePerson()
       val sequenceOfRps = Seq(nonEmptyRp, emptyRp)
 
-      val testRequest = SubscriptionRequest(None, None, None, None, None, None, None, Some(sequenceOfRps), None, None, None, None, None, None)
+      val testRequest = SubscriptionRequest(
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        Some(sequenceOfRps),
+        None,
+        None,
+        None,
+        None,
+        None,
+        None
+      )
 
-      (Json.toJson(testRequest)).as[SubscriptionRequest].responsiblePeopleSection.get.size must be(1)
+      Json.toJson(testRequest).as[SubscriptionRequest].responsiblePeopleSection.get.size must be(1)
 
     }
   }

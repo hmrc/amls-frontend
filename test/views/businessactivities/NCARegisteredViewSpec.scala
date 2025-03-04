@@ -27,7 +27,7 @@ import views.html.businessactivities.NCARegisteredView
 
 class NCARegisteredViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val registered: NCARegisteredView = inject[NCARegisteredView]
+  lazy val registered: NCARegisteredView           = inject[NCARegisteredView]
   lazy val formProvider: NCARegisteredFormProvider = inject[NCARegisteredFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()

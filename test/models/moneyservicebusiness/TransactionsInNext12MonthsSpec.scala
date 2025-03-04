@@ -27,8 +27,9 @@ class TransactionsInNext12MonthsSpec extends PlaySpec {
 
       "Successfully read/write Json data" in {
 
-        TransactionsInNext12Months.format.reads(TransactionsInNext12Months.format.writes(
-          TransactionsInNext12Months("12345678963"))) must be(JsSuccess(TransactionsInNext12Months("12345678963"), JsPath))
+        TransactionsInNext12Months.format.reads(
+          TransactionsInNext12Months.format.writes(TransactionsInNext12Months("12345678963"))
+        ) must be(JsSuccess(TransactionsInNext12Months("12345678963"), JsPath))
 
       }
     }

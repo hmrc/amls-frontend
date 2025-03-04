@@ -23,13 +23,15 @@ import play.api.data.{Form, FormError}
 
 class MostTransactionsFormProviderSpec extends FieldBehaviours {
   val form: Form[MostTransactions] = new MostTransactionsFormProvider()()
-  val fieldName: String = "mostTransactionsCountries"
-  val errorMessage: String = "error.required.countries.msb.most.transactions"
+  val fieldName: String            = "mostTransactionsCountries"
+  val errorMessage: String         = "error.required.countries.msb.most.transactions"
 
   "MostTransactionsFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, fieldName, Gen.oneOf(models.countries.map(_.code))
+      form,
+      fieldName,
+      Gen.oneOf(models.countries.map(_.code))
     )
 
     "not bind when key is not present at all" in {

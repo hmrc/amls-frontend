@@ -28,13 +28,12 @@ class MoneySourcesSpec extends AmlsSpec {
       Some(true)
     )
 
-    def buildString(length: Int, acc: String = ""): String = {
+    def buildString(length: Int, acc: String = ""): String =
       length match {
         case 0 => ""
         case 1 => "X"
         case _ => "X" ++ buildString(length - 1)
       }
-    }
   }
 
   "MoneySources" must {
@@ -49,7 +48,7 @@ class MoneySourcesSpec extends AmlsSpec {
       }
 
       "show 2 when user has selected any 2 options" in {
-        val data = MoneySources(
+        val data  = MoneySources(
           None,
           Some(WholesalerMoneySource("Wholesaler names")),
           Some(true)
@@ -70,7 +69,7 @@ class MoneySourcesSpec extends AmlsSpec {
       }
 
       "show 1 when user has selected any singular option" in {
-        val data = MoneySources(
+        val data  = MoneySources(
           None,
           None,
           Some(true)
@@ -94,50 +93,57 @@ class MoneySourcesSpec extends AmlsSpec {
 
   "Json reads and writes" must {
     "Serialize bank money sources as expected" in new Fixture {
-      Json.toJson(completeModel.copy(wholesalerMoneySource = None, customerMoneySource = None)) must be(Json.obj("bankMoneySource" -> "Yes",
-        "bankNames" -> "Bank names"))
+      Json.toJson(completeModel.copy(wholesalerMoneySource = None, customerMoneySource = None)) must be(
+        Json.obj("bankMoneySource" -> "Yes", "bankNames" -> "Bank names")
+      )
     }
 
     "Serialize wholesaler money sources as expected" in new Fixture {
-      Json.toJson(completeModel.copy(bankMoneySource = None, customerMoneySource = None)) must be(Json.obj("wholesalerMoneySource" -> "Yes",
-        "wholesalerNames" -> "Wholesaler names"))
+      Json.toJson(completeModel.copy(bankMoneySource = None, customerMoneySource = None)) must be(
+        Json.obj("wholesalerMoneySource" -> "Yes", "wholesalerNames" -> "Wholesaler names")
+      )
     }
 
     "Serialize customer money sources as expected" in new Fixture {
-      Json.toJson(completeModel.copy(wholesalerMoneySource = None, bankMoneySource = None)) must be(Json.obj("customerMoneySource" -> "Yes"))
+      Json.toJson(completeModel.copy(wholesalerMoneySource = None, bankMoneySource = None)) must be(
+        Json.obj("customerMoneySource" -> "Yes")
+      )
     }
 
     "Serialize all sources as expected" in new Fixture {
       Json.toJson(completeModel) must be(
-        Json.obj("bankMoneySource" -> "Yes",
-          "bankNames" -> "Bank names")
-          ++ Json.obj("wholesalerMoneySource" -> "Yes",
-          "wholesalerNames" -> "Wholesaler names")
-          ++ Json.obj("customerMoneySource" -> "Yes"))
+        Json.obj("bankMoneySource" -> "Yes", "bankNames" -> "Bank names")
+          ++ Json.obj("wholesalerMoneySource" -> "Yes", "wholesalerNames" -> "Wholesaler names")
+          ++ Json.obj("customerMoneySource" -> "Yes")
+      )
     }
 
     "Deserialize bank money sources as expected" in new Fixture {
-      val json = Json.obj("bankMoneySource" -> "Yes", "bankNames" -> "Bank names")
+      val json     = Json.obj("bankMoneySource" -> "Yes", "bankNames" -> "Bank names")
       val expected = JsSuccess(completeModel.copy(wholesalerMoneySource = None, customerMoneySource = None), JsPath)
       Json.fromJson[MoneySources](json) must be(expected)
     }
 
     "Deserialize wholesaler money sources as expected" in new Fixture {
-      val json = Json.obj("wholesalerMoneySource" -> "Yes", "wholesalerNames" -> "Wholesaler names")
+      val json     = Json.obj("wholesalerMoneySource" -> "Yes", "wholesalerNames" -> "Wholesaler names")
       val expected = JsSuccess(completeModel.copy(bankMoneySource = None, customerMoneySource = None), JsPath)
       Json.fromJson[MoneySources](json) must be(expected)
     }
 
     "Deserialize customer money sources as expected" in new Fixture {
-      val json = Json.obj("customerMoneySource" -> "Yes")
+      val json     = Json.obj("customerMoneySource" -> "Yes")
       val expected = JsSuccess(completeModel.copy(wholesalerMoneySource = None, bankMoneySource = None), JsPath)
       Json.fromJson[MoneySources](json) must be(expected)
     }
 
     "Deserialize all money sources as expected" in new Fixture {
-      val json = Json.obj("bankMoneySource" -> "Yes", "bankNames" -> "Bank names",
-        "wholesalerMoneySource" -> "Yes", "wholesalerNames" -> "Wholesaler names",
-        "customerMoneySource" -> "Yes")
+      val json     = Json.obj(
+        "bankMoneySource"       -> "Yes",
+        "bankNames"             -> "Bank names",
+        "wholesalerMoneySource" -> "Yes",
+        "wholesalerNames"       -> "Wholesaler names",
+        "customerMoneySource"   -> "Yes"
+      )
       val expected = JsSuccess(completeModel, JsPath)
       Json.fromJson[MoneySources](json) must be(expected)
     }

@@ -26,11 +26,13 @@ import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class EnrolmentStubConnector @Inject()(http: HttpClientV2, config: ApplicationConfig) {
+class EnrolmentStubConnector @Inject() (http: HttpClientV2, config: ApplicationConfig) {
 
   lazy val baseUrl = config.enrolmentStubsUrl
 
-  def enrolments(groupId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Seq[GovernmentGatewayEnrolment]] = {
+  def enrolments(
+    groupId: String
+  )(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Seq[GovernmentGatewayEnrolment]] = {
     val requestUrl = url"$baseUrl/auth/oid/$groupId/enrolments"
     http.get(requestUrl).execute[Seq[GovernmentGatewayEnrolment]]
   }

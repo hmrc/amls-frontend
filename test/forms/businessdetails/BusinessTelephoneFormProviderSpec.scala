@@ -28,18 +28,17 @@ class BusinessTelephoneFormProviderSpec extends StringFieldBehaviours {
   val fieldName = "phoneNumber"
 
   val requiredError = "error.required.phone.number"
-  val lengthError = "error.max.length.phone"
-  val invalidError = "err.invalid.phone.number"
+  val lengthError   = "error.max.length.phone"
+  val invalidError  = "err.invalid.phone.number"
 
   "BusinessEmailAddressFormProvider" must {
 
     "bind data" in {
 
       forAll(numStringOfLength(form.length)) { phoneNumber =>
-
         val result = form().bind(Map(fieldName -> phoneNumber))
 
-        result.value shouldBe Some(ContactingYouPhone(phoneNumber))
+        result.value  shouldBe Some(ContactingYouPhone(phoneNumber))
         result.errors shouldBe Nil
       }
     }
@@ -50,7 +49,7 @@ class BusinessTelephoneFormProviderSpec extends StringFieldBehaviours {
 
         val result = form().bind(Map(fieldName -> ""))
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(fieldName, requiredError))
       }
 
@@ -59,7 +58,7 @@ class BusinessTelephoneFormProviderSpec extends StringFieldBehaviours {
         forAll(Gen.numStr.suchThat(_.length > form.length)) { phoneNumber =>
           val result = form().bind(Map(fieldName -> phoneNumber.toString))
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(
             FormError(fieldName, lengthError, Seq(form.length))
           )
@@ -71,7 +70,7 @@ class BusinessTelephoneFormProviderSpec extends StringFieldBehaviours {
         forAll(numStringOfLength(form.length - 1), Gen.alphaChar) { (phoneNumber, invalidChar) =>
           val result = form().bind(Map(fieldName -> (phoneNumber + invalidChar)))
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(
             FormError(fieldName, invalidError, Seq(form.regex))
           )

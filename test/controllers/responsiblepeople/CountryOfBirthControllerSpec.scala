@@ -42,7 +42,7 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
 
   trait Fixture {
     self =>
-    val request = addToken(authRequest)
+    val request            = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
 
     val controllers = new CountryOfBirthController(
@@ -57,14 +57,17 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
     )
   }
 
-  val emptyCache = Cache.empty
-  val outOfBounds = 99
-  val personName = Some(PersonName("firstname", None, "lastname"))
-  val nino = Nino(nextNino)
-  val personResidenceType = PersonResidenceType(UKResidence(nino), Some(Country("Spain", "ES")), Some(Country("Spain", "ES")))
-  val updtdPersonResidenceType = PersonResidenceType(UKResidence(nino), Some(Country("France", "FR")), Some(Country("Spain", "ES")))
-  val updtdPersonResidenceTypeYes = PersonResidenceType(UKResidence(nino), Some(Country("United Kingdom", "GB")), Some(Country("Spain", "ES")))
-  val responsiblePeople = ResponsiblePerson(personName, personResidenceType = Some(personResidenceType))
+  val emptyCache                  = Cache.empty
+  val outOfBounds                 = 99
+  val personName                  = Some(PersonName("firstname", None, "lastname"))
+  val nino                        = Nino(nextNino)
+  val personResidenceType         =
+    PersonResidenceType(UKResidence(nino), Some(Country("Spain", "ES")), Some(Country("Spain", "ES")))
+  val updtdPersonResidenceType    =
+    PersonResidenceType(UKResidence(nino), Some(Country("France", "FR")), Some(Country("Spain", "ES")))
+  val updtdPersonResidenceTypeYes =
+    PersonResidenceType(UKResidence(nino), Some(Country("United Kingdom", "GB")), Some(Country("Spain", "ES")))
+  val responsiblePeople           = ResponsiblePerson(personName, personResidenceType = Some(personResidenceType))
 
   "CountryOfBirthController" when {
 
@@ -73,8 +76,8 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
       "respond with NOT_FOUND when called with an index that is out of bounds" in new Fixture {
         val responsiblePeople = ResponsiblePerson()
 
-        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controllers.get(40)(request)
         status(result) must be(NOT_FOUND)
@@ -84,8 +87,8 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
 
         val responsiblePeople = ResponsiblePerson(personName)
 
-        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controllers.get(RecordId)(request)
         status(result) must be(OK)
@@ -94,21 +97,22 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
 
       "display the country of birth page successfully with data from mongoCache" in new Fixture {
 
-        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controllers.get(RecordId)(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("bornInUk-false").hasAttr("checked") must be(true)
+        document.getElementById("bornInUk-false").hasAttr("checked")                   must be(true)
         document.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
       }
 
       "display the country of birth page successfully with data from mongoCache for the option 'Yes'" in new Fixture {
 
-        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes))))))
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())).thenReturn(
+          Future.successful(Some(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes)))))
+        )
 
         val result = controllers.get(RecordId)(request)
         status(result) must be(OK)
@@ -123,21 +127,24 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
         "all the mandatory inoput parameters are supplied" in new Fixture {
           val requestWithParams = FakeRequest(POST, routes.CountryOfBirthController.post(1).url)
             .withFormUrlEncodedBody(
-            "bornInUk" -> "false",
-            "country" -> "FR"
-          )
+              "bornInUk" -> "false",
+              "country"  -> "FR"
+            )
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())
-            (any())).thenReturn(Future.successful(emptyCache))
+          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = controllers.post(RecordId)(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.NationalityController.get(RecordId).url))
-          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(),
-            meq(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceType), hasChanged = true))))(any())
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](
+            any(),
+            any(),
+            meq(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceType), hasChanged = true)))
+          )(any())
         }
       }
 
@@ -146,20 +153,25 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
         "all the mandatory input parameters are supplied and in edit mode" in new Fixture {
           val requestWithParams = FakeRequest(POST, routes.CountryOfBirthController.post(1).url)
             .withFormUrlEncodedBody(
-            "bornInUk" -> "true"
-          )
+              "bornInUk" -> "true"
+            )
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())
-            (any())).thenReturn(Future.successful(emptyCache))
+          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = controllers.post(RecordId, edit = true, Some(flowFromDeclaration))(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url))
-          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(),
-            meq(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes), hasChanged = true))))(any())
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url)
+          )
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](
+            any(),
+            any(),
+            meq(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes), hasChanged = true)))
+          )(any())
         }
       }
 
@@ -180,5 +192,3 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
     }
   }
 }
-
-

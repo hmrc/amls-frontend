@@ -27,13 +27,16 @@ import views.html.responsiblepeople.PersonNameView
 
 import scala.concurrent.Future
 
-class PersonNameController @Inject () (val dataCacheConnector: DataCacheConnector,
-                                       authAction: AuthAction,
-                                       val ds: CommonPlayDependencies,
-                                       val cc: MessagesControllerComponents,
-                                       formProvider: PersonNameFormProvider,
-                                       view: PersonNameView,
-                                       implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class PersonNameController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: PersonNameFormProvider,
+  view: PersonNameView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
@@ -41,31 +44,33 @@ class PersonNameController @Inject () (val dataCacheConnector: DataCacheConnecto
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           person.personName match {
             case Some(name) => Ok(view(formProvider().fill(name), edit, index, flow))
-            case None => Ok(view(formProvider(), edit, index, flow))
+            case None       => Ok(view(formProvider(), edit, index, flow))
           }
         }
       }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit, index, flow))),
-        data => {
-          for {
-            _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-              rp.personName(data)
+    implicit request =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, index, flow))),
+          data =>
+            {
+              for {
+                _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                       rp.personName(data)
+                     }
+              } yield
+                if (edit) {
+                  Redirect(routes.DetailedAnswersController.get(index, flow))
+                } else {
+                  Redirect(routes.LegalNameController.get(index, edit, flow))
+                }
+            }.recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
             }
-          } yield if (edit) {
-            Redirect(routes.DetailedAnswersController.get(index, flow))
-          } else {
-            Redirect(routes.LegalNameController.get(index, edit, flow))
-          }
-        }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
-      )
-    }
+        )
   }
 }

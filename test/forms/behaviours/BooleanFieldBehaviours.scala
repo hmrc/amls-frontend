@@ -30,7 +30,7 @@ trait BooleanFieldBehaviours[A] extends FieldBehaviours {
 
       val result = form.bind(Map(fieldName -> "true"))
 
-      result.value shouldBe Some(trueCase)
+      result.value  shouldBe Some(trueCase)
       result.errors shouldBe Nil
     }
 
@@ -38,7 +38,7 @@ trait BooleanFieldBehaviours[A] extends FieldBehaviours {
 
       val result = form.bind(Map(fieldName -> "false"))
 
-      result.value shouldBe Some(falseCase)
+      result.value  shouldBe Some(falseCase)
       result.errors shouldBe Nil
     }
 
@@ -48,7 +48,7 @@ trait BooleanFieldBehaviours[A] extends FieldBehaviours {
 
         val result = form.bind(Map(fieldName -> "foo"))
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(fieldName, errorMessage))
       }
 
@@ -56,15 +56,13 @@ trait BooleanFieldBehaviours[A] extends FieldBehaviours {
 
         val result = form.bind(Map(fieldName -> ""))
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(fieldName, errorMessage))
       }
     }
   }
 
-  def booleanField(form: Form[_],
-                   fieldName: String,
-                   invalidError: FormError): Unit = {
+  def booleanField(form: Form[_], fieldName: String, invalidError: FormError): Unit = {
 
     "bind true" in {
       val result = form.bind(Map(fieldName -> "true"))
@@ -78,10 +76,9 @@ trait BooleanFieldBehaviours[A] extends FieldBehaviours {
 
     "not bind non-booleans" in {
 
-      forAll(nonBooleans -> "nonBoolean") {
-        nonBoolean =>
-          val result = form.bind(Map(fieldName -> nonBoolean)).apply(fieldName)
-          result.errors shouldEqual Seq(invalidError)
+      forAll(nonBooleans -> "nonBoolean") { nonBoolean =>
+        val result = form.bind(Map(fieldName -> nonBoolean)).apply(fieldName)
+        result.errors shouldEqual Seq(invalidError)
       }
     }
   }

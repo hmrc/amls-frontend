@@ -20,22 +20,24 @@ import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import play.api.libs.json._
 
-case class BankMoneySource(bankNames : String)
+case class BankMoneySource(bankNames: String)
 
-case class WholesalerMoneySource(wholesalerNames : String)
+case class WholesalerMoneySource(wholesalerNames: String)
 
-case class MoneySources(bankMoneySource: Option[BankMoneySource] = None,
-                         wholesalerMoneySource: Option[WholesalerMoneySource] = None,
-                         customerMoneySource: Option[Boolean] = None) {
+case class MoneySources(
+  bankMoneySource: Option[BankMoneySource] = None,
+  wholesalerMoneySource: Option[WholesalerMoneySource] = None,
+  customerMoneySource: Option[Boolean] = None
+) {
 
   def size = List(this.bankMoneySource, this.wholesalerMoneySource, this.customerMoneySource).flatten.size
 
   def toFormValues: Seq[MoneySource] = {
     import models.moneyservicebusiness.MoneySources._
     Seq(
-      if(bankMoneySource.isDefined) Some(Banks) else None,
-      if(wholesalerMoneySource.isDefined) Some(Wholesalers) else None,
-      customerMoneySource.flatMap(b => if(b) Some(Customers) else None)
+      if (bankMoneySource.isDefined) Some(Banks) else None,
+      if (wholesalerMoneySource.isDefined) Some(Wholesalers) else None,
+      customerMoneySource.flatMap(b => if (b) Some(Customers) else None)
     ).flatten
   }
 
@@ -60,24 +62,22 @@ object MoneySources extends Enumerable.Implicits {
 
   val bankMoneySourceWriter = new Writes[Option[BankMoneySource]] {
     override def writes(o: Option[BankMoneySource]): JsValue = o match {
-      case Some(x) => Json.obj("bankMoneySource" -> "Yes",
-        "bankNames" -> x.bankNames)
-      case _ => Json.obj()
+      case Some(x) => Json.obj("bankMoneySource" -> "Yes", "bankNames" -> x.bankNames)
+      case _       => Json.obj()
     }
   }
 
   val wholesalerMoneySourceWriter = new Writes[Option[WholesalerMoneySource]] {
     override def writes(o: Option[WholesalerMoneySource]): JsValue = o match {
-      case Some(x) => Json.obj("wholesalerMoneySource" -> "Yes",
-        "wholesalerNames" -> x.wholesalerNames)
-      case _ => Json.obj()
+      case Some(x) => Json.obj("wholesalerMoneySource" -> "Yes", "wholesalerNames" -> x.wholesalerNames)
+      case _       => Json.obj()
     }
   }
 
   val customerMoneySourceWriter = new Writes[Option[Boolean]] {
     override def writes(o: Option[Boolean]): JsValue = o match {
       case Some(true) => Json.obj("customerMoneySource" -> JsString("Yes"))
-      case _ => Json.obj()
+      case _          => Json.obj()
     }
   }
 
@@ -86,10 +86,12 @@ object MoneySources extends Enumerable.Implicits {
     import play.api.libs.json._
 
     ((__ \ "bankMoneySource").readNullable[String] and
-      (__ \ "bankNames").readNullable[String])((a, b) => (a, b) match {
-      case (Some("Yes"), Some(names)) => Some(BankMoneySource(names))
-      case _ => None
-    })
+      (__ \ "bankNames").readNullable[String])((a, b) =>
+      (a, b) match {
+        case (Some("Yes"), Some(names)) => Some(BankMoneySource(names))
+        case _                          => None
+      }
+    )
   }
 
   val readWholesalers = {
@@ -97,10 +99,12 @@ object MoneySources extends Enumerable.Implicits {
     import play.api.libs.json._
 
     ((__ \ "wholesalerMoneySource").readNullable[String] and
-      (__ \ "wholesalerNames").readNullable[String])((a, b) => (a, b) match {
-      case (Some("Yes"), Some(names)) => Some(WholesalerMoneySource(names))
-      case _ => None
-    })
+      (__ \ "wholesalerNames").readNullable[String])((a, b) =>
+      (a, b) match {
+        case (Some("Yes"), Some(names)) => Some(WholesalerMoneySource(names))
+        case _                          => None
+      }
+    )
   }
 
   val readCustomerMoney = {
@@ -109,14 +113,13 @@ object MoneySources extends Enumerable.Implicits {
 
     (__ \ "customerMoneySource").readNullable[String] map {
       case Some("Yes") => Some(true)
-      case _ => None
+      case _           => None
     }
   }
 
   implicit val jsonReads: Reads[MoneySources] = {
     import play.api.libs.functional.syntax._
-    (
-      readBanks and readWholesalers and readCustomerMoney)((bms, wms, cms) => MoneySources(bms, wms, cms))
+    (readBanks and readWholesalers and readCustomerMoney)((bms, wms, cms) => MoneySources(bms, wms, cms))
   }
 
   implicit val jsonWrites: Writes[MoneySources] = {
@@ -124,7 +127,7 @@ object MoneySources extends Enumerable.Implicits {
     import play.api.libs.json._
 
     (__.write(bankMoneySourceWriter) and
-        __.write(wholesalerMoneySourceWriter) and
-        __.write(customerMoneySourceWriter))(x => (x.bankMoneySource, x.wholesalerMoneySource, x.customerMoneySource))
+      __.write(wholesalerMoneySourceWriter) and
+      __.write(customerMoneySourceWriter))(x => (x.bankMoneySource, x.wholesalerMoneySource, x.customerMoneySource))
   }
 }

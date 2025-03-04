@@ -42,19 +42,20 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar with Injecti
 
   trait Fixture {
     self =>
-    val renewalService = mock[RenewalService]
-    val request = addToken(authRequest)
+    val renewalService     = mock[RenewalService]
+    val request            = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
-    val cacheMap = mock[Cache]
-    lazy val view = inject[MoneySourcesView]
-    lazy val controller = new MoneySourcesController(
+    val cacheMap           = mock[Cache]
+    lazy val view          = inject[MoneySourcesView]
+    lazy val controller    = new MoneySourcesController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       renewalService,
       dataCacheConnector,
       cc = mockMcc,
       formProvider = inject[MoneySourcesFormProvider],
-      view = view)
+      view = view
+    )
 
     when {
       renewalService.getRenewal(any())
@@ -67,14 +68,14 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar with Injecti
   trait FormSubmissionFixture extends Fixture {
     val validFormRequest = FakeRequest(POST, routes.MoneySourcesController.post().url).withFormUrlEncodedBody(
       "moneySources[1]" -> "banks",
-      "bankNames" -> "Bank names",
+      "bankNames"       -> "Bank names",
       "moneySources[2]" -> "wholesalers",
       "wholesalerNames" -> "wholesaler names",
       "moneySources[3]" -> "customers"
     )
 
     when {
-      renewalService.updateRenewal(any(),any())
+      renewalService.updateRenewal(any(), any())
     } thenReturn Future.successful(mock[Cache])
   }
 
@@ -82,9 +83,9 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar with Injecti
     val whichCurrencies = WhichCurrencies(
       Seq("USD", "GBP", "BOB"),
       Some(UsesForeignCurrenciesYes),
-      Some(MoneySources(Some(BankMoneySource("Bank names")),
-        Some(WholesalerMoneySource("wholesaler names")),
-        Some(true)))
+      Some(
+        MoneySources(Some(BankMoneySource("Bank names")), Some(WholesalerMoneySource("wholesaler names")), Some(true))
+      )
     )
 
     val renewal = Renewal(whichCurrencies = Some(whichCurrencies))
@@ -98,13 +99,12 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar with Injecti
     )
 
     val businessActivities = Some(
-      BusinessActivities(Set(HighValueDealing,  AccountancyServices))
+      BusinessActivities(Set(HighValueDealing, AccountancyServices))
     )
 
-
-
     val expectedRenewal = renewal.copy(
-      whichCurrencies = Some(whichCurrencies), hasChanged = true
+      whichCurrencies = Some(whichCurrencies),
+      hasChanged = true
     )
 
     when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
@@ -118,7 +118,12 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar with Injecti
 
     def setupBusinessMatching(activities: Set[BusinessActivity], msbServices: Set[BusinessMatchingMsbService]) = when {
       cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-    } thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(msbServices)), activities = Some(BusinessActivities(activities))))
+    } thenReturn Some(
+      BusinessMatching(
+        msbServices = Some(BusinessMatchingMsbServices(msbServices)),
+        activities = Some(BusinessActivities(activities))
+      )
+    )
   }
 
   "Calling the GET action" must {
@@ -143,7 +148,10 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar with Injecti
           val result = controller.post()(validFormRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe controllers.renewal.routes.FXTransactionsInLast12MonthsController.get().url.some
+          redirectLocation(result) mustBe controllers.renewal.routes.FXTransactionsInLast12MonthsController
+            .get()
+            .url
+            .some
         }
       }
 
@@ -184,13 +192,19 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar with Injecti
 
         verify(renewalService).updateRenewal(any(), captor.capture())
 
-        captor.getValue.whichCurrencies mustBe Some(WhichCurrencies(
-          Seq("USD", "GBP", "BOB"),
-          Some(UsesForeignCurrenciesYes),
-          Some(MoneySources(Some(BankMoneySource("Bank names")),
-          Some(WholesalerMoneySource("wholesaler names")),
-          Some(true)))
-        ))
+        captor.getValue.whichCurrencies mustBe Some(
+          WhichCurrencies(
+            Seq("USD", "GBP", "BOB"),
+            Some(UsesForeignCurrenciesYes),
+            Some(
+              MoneySources(
+                Some(BankMoneySource("Bank names")),
+                Some(WholesalerMoneySource("wholesaler names")),
+                Some(true)
+              )
+            )
+          )
+        )
       }
     }
 
@@ -199,7 +213,7 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar with Injecti
         val result = controller.post()(request)
 
         status(result) mustBe BAD_REQUEST
-        verify(renewalService, never()).updateRenewal(any(),any())
+        verify(renewalService, never()).updateRenewal(any(), any())
       }
     }
   }

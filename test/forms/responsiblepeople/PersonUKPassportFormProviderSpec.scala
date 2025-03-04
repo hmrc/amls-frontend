@@ -26,9 +26,9 @@ class PersonUKPassportFormProviderSpec extends StringFieldBehaviours with Constr
 
   val formProvider = new PersonUKPassportFormProvider()
 
-  val form: Form[UKPassport] = formProvider()
+  val form: Form[UKPassport]   = formProvider()
   val booleanFieldName: String = "ukPassport"
-  val stringFieldName: String = "ukPassportNumber"
+  val stringFieldName: String  = "ukPassportNumber"
 
   "PersonResidentTypeFormProvider" must {
 
@@ -37,11 +37,12 @@ class PersonUKPassportFormProviderSpec extends StringFieldBehaviours with Constr
       "true is submitted with nino" in {
 
         forAll(numStringOfLength(formProvider.length)) { number =>
-
-          val result = form.bind(Map(
-            booleanFieldName -> "true",
-            stringFieldName -> number
-          ))
+          val result = form.bind(
+            Map(
+              booleanFieldName -> "true",
+              stringFieldName  -> number
+            )
+          )
 
           result.value shouldBe Some(UKPassportYes(number))
           assert(result.errors.isEmpty)
@@ -50,9 +51,11 @@ class PersonUKPassportFormProviderSpec extends StringFieldBehaviours with Constr
 
       "false is submitted" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> "false"
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> "false"
+          )
+        )
 
         result.value shouldBe Some(UKPassportNo)
         assert(result.errors.isEmpty)
@@ -61,13 +64,15 @@ class PersonUKPassportFormProviderSpec extends StringFieldBehaviours with Constr
 
     "true is submitted with a Password number which contains spaces" in {
 
-      val passString = " 1 2 34 5 6 78 9 "
+      val passString            = " 1 2 34 5 6 78 9 "
       val passStringTransformed = "123456789"
 
-      val result = form.bind(Map(
-        booleanFieldName -> "true",
-        stringFieldName -> passString
-      ))
+      val result = form.bind(
+        Map(
+          booleanFieldName -> "true",
+          stringFieldName  -> passString
+        )
+      )
 
       result.value shouldBe Some(UKPassportYes(passStringTransformed))
       assert(result.errors.isEmpty)
@@ -78,72 +83,87 @@ class PersonUKPassportFormProviderSpec extends StringFieldBehaviours with Constr
       s"$booleanFieldName is an invalid value" in {
 
         forAll(Gen.alphaNumStr.suchThat(_.nonEmpty)) { name =>
+          val result = form.bind(
+            Map(
+              booleanFieldName -> name
+            )
+          )
 
-          val result = form.bind(Map(
-            booleanFieldName -> name
-          ))
-
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(booleanFieldName, "error.required.uk.passport"))
         }
       }
 
       s"$booleanFieldName is empty" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(booleanFieldName, "error.required.uk.passport"))
       }
 
       s"$stringFieldName is empty when $booleanFieldName is true" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> "true",
-          stringFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> "true",
+            stringFieldName  -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(stringFieldName, "error.required.uk.passport.number"))
       }
 
       s"$stringFieldName is longer than ${formProvider.length} when $booleanFieldName is true" in {
 
         forAll(numStringOfLength(formProvider.length + 1).suchThat(_.nonEmpty)) { number =>
-          val result = form.bind(Map(
-            booleanFieldName -> "true",
-            stringFieldName -> number
-          ))
+          val result = form.bind(
+            Map(
+              booleanFieldName -> "true",
+              stringFieldName  -> number
+            )
+          )
 
-          result.value shouldBe None
-          result.errors shouldBe Seq(FormError(stringFieldName, "error.invalid.uk.passport.length.9", Seq(formProvider.length)))
+          result.value  shouldBe None
+          result.errors shouldBe Seq(
+            FormError(stringFieldName, "error.invalid.uk.passport.length.9", Seq(formProvider.length))
+          )
         }
       }
 
       s"$stringFieldName is shorter than ${formProvider.length} when $booleanFieldName is true" in {
 
         forAll(numStringOfLength(formProvider.length - 1).suchThat(_.nonEmpty)) { number =>
-          val result = form.bind(Map(
-            booleanFieldName -> "true",
-            stringFieldName -> number
-          ))
+          val result = form.bind(
+            Map(
+              booleanFieldName -> "true",
+              stringFieldName  -> number
+            )
+          )
 
-          result.value shouldBe None
-          result.errors shouldBe Seq(FormError(stringFieldName, "error.invalid.uk.passport.length.9", Seq(formProvider.length)))
+          result.value  shouldBe None
+          result.errors shouldBe Seq(
+            FormError(stringFieldName, "error.invalid.uk.passport.length.9", Seq(formProvider.length))
+          )
         }
       }
 
       s"$stringFieldName is not a valid passport number when $booleanFieldName is true" in {
 
         forAll(numStringOfLength(formProvider.length - 1).suchThat(_.nonEmpty), Gen.alphaChar) { (number, char) =>
-          val result = form.bind(Map(
-            booleanFieldName -> "true",
-            stringFieldName -> (number + char.toString)
-          ))
+          val result = form.bind(
+            Map(
+              booleanFieldName -> "true",
+              stringFieldName  -> (number + char.toString)
+            )
+          )
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(stringFieldName, "error.invalid.uk.passport", Seq("^[0-9]{9}$")))
         }
       }

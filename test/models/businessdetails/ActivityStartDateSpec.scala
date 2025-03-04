@@ -21,7 +21,6 @@ import play.api.libs.json.Json
 
 import java.time.LocalDate
 
-
 class ActivityStartDateSpec extends PlaySpec {
   // scalastyle:off
 

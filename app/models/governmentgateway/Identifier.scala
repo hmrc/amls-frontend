@@ -19,9 +19,9 @@ package models.governmentgateway
 import play.api.libs.json.{Json, OFormat}
 
 case class Identifier(
-                     `type`: String,
-                     value: String
-                     )
+  `type`: String,
+  value: String
+)
 
 object Identifier {
   implicit val format: OFormat[Identifier] = Json.format[Identifier]

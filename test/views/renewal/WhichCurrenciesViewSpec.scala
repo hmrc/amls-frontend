@@ -27,9 +27,9 @@ import views.html.renewal.WhichCurrenciesView
 
 class WhichCurrenciesViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val which_currencies = inject[WhichCurrenciesView]
-  lazy val fp = inject[WhichCurrenciesFormProvider]
-  lazy val autocompleteService = inject[CurrencyAutocompleteService]
+  lazy val which_currencies                                      = inject[WhichCurrenciesView]
+  lazy val fp                                                    = inject[WhichCurrenciesFormProvider]
+  lazy val autocompleteService                                   = inject[CurrencyAutocompleteService]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -46,14 +46,16 @@ class WhichCurrenciesViewSpec extends AmlsViewSpec with Matchers {
 
       def view = which_currencies(fp().fill(WhichCurrencies(Seq("GBP"))), true, autocompleteService.formOptions)
 
-      heading.html must be(messages("renewal.msb.whichcurrencies.header"))
+      heading.html    must be(messages("renewal.msb.whichcurrencies.header"))
       subHeading.html must include(messages("summary.renewal"))
 
     }
 
     behave like pageWithErrors(
       which_currencies(
-        fp().withError("currencies[0]", "error.required.renewal.wc.currencies"), true, autocompleteService.formOptions
+        fp().withError("currencies[0]", "error.required.renewal.wc.currencies"),
+        true,
+        autocompleteService.formOptions
       ),
       "currency-autocomplete-0",
       "error.required.renewal.wc.currencies"

@@ -30,79 +30,79 @@ trait AmpValues {
   val dateVal = LocalDateTime.now
 
   val completeData = Json.obj(
-    "typeOfParticipant"     -> Seq("artGalleryOwner"),
-    "soldOverThreshold"             -> true,
-    "dateTransactionOverThreshold"  -> LocalDate.now,
-    "identifyLinkedTransactions"    -> true,
-    "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    "typeOfParticipant"            -> Seq("artGalleryOwner"),
+    "soldOverThreshold"            -> true,
+    "dateTransactionOverThreshold" -> LocalDate.now,
+    "identifyLinkedTransactions"   -> true,
+    "percentageExpectedTurnover"   -> "fortyOneToSixty"
   )
 
   val newData = Json.obj(
-    "typeOfParticipant"     -> Seq("artGalleryOwner"),
-    "soldOverThreshold"             -> true,
-    "dateTransactionOverThreshold"  -> LocalDate.now,
-    "identifyLinkedTransactions"    -> false,
-    "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    "typeOfParticipant"            -> Seq("artGalleryOwner"),
+    "soldOverThreshold"            -> true,
+    "dateTransactionOverThreshold" -> LocalDate.now,
+    "identifyLinkedTransactions"   -> false,
+    "percentageExpectedTurnover"   -> "fortyOneToSixty"
   )
 
   val missingTypeOfParticipantData = Json.obj(
-    "typeOfParticipantDetail"       -> "some other type",
-    "soldOverThreshold"             -> true,
-    "dateTransactionOverThreshold"  -> LocalDate.now,
-    "identifyLinkedTransactions"    -> true,
-    "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    "typeOfParticipantDetail"      -> "some other type",
+    "soldOverThreshold"            -> true,
+    "dateTransactionOverThreshold" -> LocalDate.now,
+    "identifyLinkedTransactions"   -> true,
+    "percentageExpectedTurnover"   -> "fortyOneToSixty"
   )
 
   val missingTypeOfParticipantDetailData = Json.obj(
-    "typeOfParticipant"     -> Seq("somethingElse"),
-    "soldOverThreshold"             -> true,
-    "dateTransactionOverThreshold"  -> LocalDate.now,
-    "identifyLinkedTransactions"    -> true,
-    "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    "typeOfParticipant"            -> Seq("somethingElse"),
+    "soldOverThreshold"            -> true,
+    "dateTransactionOverThreshold" -> LocalDate.now,
+    "identifyLinkedTransactions"   -> true,
+    "percentageExpectedTurnover"   -> "fortyOneToSixty"
   )
 
   val missingSoldOverThresholdData = Json.obj(
-    "typeOfParticipant"     -> Seq("artGalleryOwner"),
-    "dateTransactionOverThreshold"  -> LocalDate.now,
-    "identifyLinkedTransactions"    -> true,
-    "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    "typeOfParticipant"            -> Seq("artGalleryOwner"),
+    "dateTransactionOverThreshold" -> LocalDate.now,
+    "identifyLinkedTransactions"   -> true,
+    "percentageExpectedTurnover"   -> "fortyOneToSixty"
   )
 
   val missingDateTransactionOverThresholdData = Json.obj(
-    "typeOfParticipant"     -> Seq("artGalleryOwner"),
-    "soldOverThreshold"             -> true,
-    "identifyLinkedTransactions"    -> true,
-    "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    "typeOfParticipant"          -> Seq("artGalleryOwner"),
+    "soldOverThreshold"          -> true,
+    "identifyLinkedTransactions" -> true,
+    "percentageExpectedTurnover" -> "fortyOneToSixty"
   )
 
   val missingIdentifyLinkedTransactionsData = Json.obj(
-    "typeOfParticipant"     -> Seq("artGalleryOwner"),
-    "soldOverThreshold"             -> true,
-    "dateTransactionOverThreshold"  -> LocalDate.now,
-    "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    "typeOfParticipant"            -> Seq("artGalleryOwner"),
+    "soldOverThreshold"            -> true,
+    "dateTransactionOverThreshold" -> LocalDate.now,
+    "percentageExpectedTurnover"   -> "fortyOneToSixty"
   )
 
   val MissingPercentageExpectedTurnoverData = Json.obj(
-    "typeOfParticipant"     -> Seq("artGalleryOwner"),
-    "soldOverThreshold"             -> true,
-    "dateTransactionOverThreshold"  -> LocalDate.now,
-    "identifyLinkedTransactions"    -> true
+    "typeOfParticipant"            -> Seq("artGalleryOwner"),
+    "soldOverThreshold"            -> true,
+    "dateTransactionOverThreshold" -> LocalDate.now,
+    "identifyLinkedTransactions"   -> true
   )
 
   val completeJson = Json.obj(
-    "data"           -> completeData,
-    "hasChanged"     -> false,
-    "hasAccepted"    -> true
+    "data"        -> completeData,
+    "hasChanged"  -> false,
+    "hasAccepted" -> true
   )
 
-  val completeModel                             = Amp(completeData, false, true)
-  val updatedModel                              = Amp(completeData, true, true)
-  val missingTypeOfParticipantModel             = Amp(missingTypeOfParticipantData)
-  val missingTypeOfParticipantDetailModel       = Amp(missingTypeOfParticipantDetailData)
-  val missingSoldOverTheThresholdModel          = Amp(missingSoldOverThresholdData)
-  val missingDateTransactionOverThresholdModel  = Amp(missingDateTransactionOverThresholdData)
-  val missingIdentifyLinkedTransactionsModel    = Amp(missingIdentifyLinkedTransactionsData)
-  val MissingPercentageExpectedTurnoverModel    = Amp(MissingPercentageExpectedTurnoverData)
+  val completeModel                            = Amp(completeData, false, true)
+  val updatedModel                             = Amp(completeData, true, true)
+  val missingTypeOfParticipantModel            = Amp(missingTypeOfParticipantData)
+  val missingTypeOfParticipantDetailModel      = Amp(missingTypeOfParticipantDetailData)
+  val missingSoldOverTheThresholdModel         = Amp(missingSoldOverThresholdData)
+  val missingDateTransactionOverThresholdModel = Amp(missingDateTransactionOverThresholdData)
+  val missingIdentifyLinkedTransactionsModel   = Amp(missingIdentifyLinkedTransactionsData)
+  val MissingPercentageExpectedTurnoverModel   = Amp(MissingPercentageExpectedTurnoverData)
 }
 
 class AmpSpec extends AmlsSpec with AmpValues {
@@ -123,12 +123,12 @@ class AmpSpec extends AmlsSpec with AmpValues {
     "when setting data that has not changed" must {
       "return Amp with hasChanged false" in {
         val result = completeModel.data(completeData)
-        result must be(Amp(completeData,  false, true))
+        result must be(Amp(completeData, false, true))
       }
     }
 
     "have a task row function that" must {
-      implicit val cache         = mock[Cache]
+      implicit val cache    = mock[Cache]
       val ampWhatYouNeedUrl = "http://localhost:9223/anti-money-laundering/art-market-participant/what-you-need"
       val ampSummaryUrl     = "http://localhost:9223/anti-money-laundering/art-market-participant/check-your-answers"
 
@@ -140,7 +140,7 @@ class AmpSpec extends AmlsSpec with AmpValues {
       }
 
       "returns a Completed task row when model is complete" in {
-        val completedTaskRow = TaskRow("amp", ampSummaryUrl, false, Completed,TaskRow.completedTag)
+        val completedTaskRow = TaskRow("amp", ampSummaryUrl, false, Completed, TaskRow.completedTag)
 
         when(cache.getEntry[Amp]("amp")) thenReturn Some(completeModel)
         Amp.taskRow(appConfig) mustBe completedTaskRow
@@ -154,7 +154,7 @@ class AmpSpec extends AmlsSpec with AmpValues {
       }
 
       "return a Started Section when model is incomplete" in {
-        val incompleteTaskRow = TaskRow("amp", ampWhatYouNeedUrl, false, Started,TaskRow.incompleteTag)
+        val incompleteTaskRow = TaskRow("amp", ampWhatYouNeedUrl, false, Started, TaskRow.incompleteTag)
 
         when(cache.getEntry[Amp]("amp")) thenReturn Some(missingTypeOfParticipantDetailModel)
         Amp.taskRow(appConfig) mustBe incompleteTaskRow
@@ -204,25 +204,29 @@ class AmpSpec extends AmlsSpec with AmpValues {
         completeJson.as[Amp] must be(completeModel)
       }
       "Convert amp section data" in {
-        val ampData = Amp(Json.obj(
-          "typeOfParticipant"      -> Seq("artGalleryOwner"),
-          "soldOverThreshold"             -> true,
-          "dateTransactionOverThreshold"  -> LocalDate.now.toString,
-          "identifyLinkedTransactions"    -> true,
-          "percentageExpectedTurnover"    -> "zeroToTwenty"
-        ))
+        val ampData = Amp(
+          Json.obj(
+            "typeOfParticipant"            -> Seq("artGalleryOwner"),
+            "soldOverThreshold"            -> true,
+            "dateTransactionOverThreshold" -> LocalDate.now.toString,
+            "identifyLinkedTransactions"   -> true,
+            "percentageExpectedTurnover"   -> "zeroToTwenty"
+          )
+        )
 
         Amp.convert(ampData) must be(AMPTurnover.First)
       }
 
       "throw exception when given incorrect data" in {
-        val ampData = Amp(Json.obj(
-          "typeOfParticipant"      -> Seq("artGalleryOwner"),
-          "soldOverThreshold"             -> true,
-          "dateTransactionOverThreshold"  -> LocalDate.now.toString,
-          "identifyLinkedTransactions"    -> true,
-          "percentageExpectedTurnover"    -> "testException"
-        ))
+        val ampData = Amp(
+          Json.obj(
+            "typeOfParticipant"            -> Seq("artGalleryOwner"),
+            "soldOverThreshold"            -> true,
+            "dateTransactionOverThreshold" -> LocalDate.now.toString,
+            "identifyLinkedTransactions"   -> true,
+            "percentageExpectedTurnover"   -> "testException"
+          )
+        )
 
         intercept[Exception] {
           Amp.convert(ampData)

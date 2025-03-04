@@ -26,9 +26,11 @@ import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.ExecutionContext
 
-class TestOnlyStubConnector @Inject()(val http: HttpClientV2,
-                                      applicationConfig: ApplicationConfig,
-                                      val configuration: Configuration) extends ServicesConfig(configuration) {
+class TestOnlyStubConnector @Inject() (
+  val http: HttpClientV2,
+  applicationConfig: ApplicationConfig,
+  val configuration: Configuration
+) extends ServicesConfig(configuration) {
 
   val baseUrl = applicationConfig.amlsStubBaseUrl
 

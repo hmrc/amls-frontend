@@ -16,7 +16,7 @@
 
 package controllers.withdrawal
 
-import connectors.{DataCacheConnector}
+import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.withdrawal.WithdrawalReasonFormProvider
 import models.withdrawal.WithdrawalReason
@@ -38,11 +38,11 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with Injecting {
   trait TestFixture extends AuthorisedFixture {
     self =>
 
-    val request = addToken(authRequest)
-    val authService = mock[AuthEnrolmentsService]
+    val request            = addToken(authRequest)
+    val authService        = mock[AuthEnrolmentsService]
     val dataCacheConnector = mock[DataCacheConnector]
-    lazy val view = inject[WithdrawalReasonView]
-    lazy val controller = new WithdrawalReasonController(
+    lazy val view          = inject[WithdrawalReasonView]
+    lazy val controller    = new WithdrawalReasonController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       enrolments = authService,
@@ -58,7 +58,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with Injecting {
 
       val result: Future[Result] = controller.get()(request)
 
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("withdrawal.reason.heading"))
       val document = Jsoup.parse(contentAsString(result))
       WithdrawalReason.all foreach { reason =>
@@ -71,7 +71,10 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with Injecting {
   "submitting should cache user selection and navigate to the CYA page" in new TestFixture {
     val withdrawalReason: WithdrawalReason = WithdrawalReason.OutOfScope
 
-    when(dataCacheConnector.save[WithdrawalReason](credId = any(), key = eqTo(WithdrawalReason.key), data = eqTo(withdrawalReason))(any()))
+    when(
+      dataCacheConnector
+        .save[WithdrawalReason](credId = any(), key = eqTo(WithdrawalReason.key), data = eqTo(withdrawalReason))(any())
+    )
       .thenAnswer { invocation =>
         Future.successful(mock[Cache])
       }
@@ -104,14 +107,17 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with Injecting {
   "submitting with 'Other' reason should include the specified reason" in new TestFixture {
     val withdrawalReason: WithdrawalReason = WithdrawalReason.Other("some reason")
 
-    when(dataCacheConnector.save[WithdrawalReason](credId = any(), key = eqTo(WithdrawalReason.key), data = eqTo(withdrawalReason))(any()))
+    when(
+      dataCacheConnector
+        .save[WithdrawalReason](credId = any(), key = eqTo(WithdrawalReason.key), data = eqTo(withdrawalReason))(any())
+    )
       .thenAnswer { invocation =>
         Future.successful(mock[Cache])
       }
 
     val postRequest = FakeRequest(POST, routes.WithdrawalReasonController.post().url)
       .withFormUrlEncodedBody(
-        "withdrawalReason" -> WithdrawalReason.Other("some reason").toString,
+        "withdrawalReason"   -> WithdrawalReason.Other("some reason").toString,
         "specifyOtherReason" -> "some reason"
       )
 

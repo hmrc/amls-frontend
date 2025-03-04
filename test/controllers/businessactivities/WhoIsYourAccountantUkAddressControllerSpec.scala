@@ -33,18 +33,16 @@ import views.html.businessactivities.AccountantUKAddressView
 
 import scala.concurrent.Future
 
-class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
-  with MockitoSugar
-  with ScalaFutures
-  with Injecting {
+class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
-  trait Fixture extends AutoCompleteServiceMocks{
+  trait Fixture extends AutoCompleteServiceMocks {
     self =>
-    val request = addToken(authRequest)
-    lazy val view = inject[AccountantUKAddressView]
+    val request    = addToken(authRequest)
+    lazy val view  = inject[AccountantUKAddressView]
     val controller = new WhoIsYourAccountantUkAddressController(
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       autoCompleteService = mockAutoComplete,
       cc = mockMcc,
       formProvider = inject[AccountantUKAddressFormProvider],
@@ -72,19 +70,27 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
         page.getElementById("addressLine2").`val` must be("")
         page.getElementById("addressLine3").`val` must be("")
         page.getElementById("addressLine4").`val` must be("")
-        page.getElementById("postCode").`val` must be("")
+        page.getElementById("postCode").`val`     must be("")
       }
 
       "show the who is your accountant page when there is existing data" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
-          .thenReturn(Future.successful(Some(BusinessActivities(
-            whoIsYourAccountant = Some(WhoIsYourAccountant(
-              Some(WhoIsYourAccountantName("testname", Some("testtradingName"))),
-              Some(WhoIsYourAccountantIsUk(true)),
-              Some(UkAccountantsAddress("line1",Some("line2"),Some("line3"),Some("line4"), "POSTCODE"))
-            ))
-          ))))
+          .thenReturn(
+            Future.successful(
+              Some(
+                BusinessActivities(
+                  whoIsYourAccountant = Some(
+                    WhoIsYourAccountant(
+                      Some(WhoIsYourAccountantName("testname", Some("testtradingName"))),
+                      Some(WhoIsYourAccountantIsUk(true)),
+                      Some(UkAccountantsAddress("line1", Some("line2"), Some("line3"), Some("line4"), "POSTCODE"))
+                    )
+                  )
+                )
+              )
+            )
+          )
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -94,7 +100,7 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
         page.getElementById("addressLine2").`val` must be("line2")
         page.getElementById("addressLine3").`val` must be("line3")
         page.getElementById("addressLine4").`val` must be("line4")
-        page.getElementById("postCode").`val` must be("POSTCODE")
+        page.getElementById("postCode").`val`     must be("POSTCODE")
       }
     }
 
@@ -104,9 +110,21 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
         "respond with BAD_REQUEST" in new Fixture {
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
-            .thenReturn(Future.successful(Some(BusinessActivities(
-              whoIsYourAccountant = Some(WhoIsYourAccountant(
-                Some(WhoIsYourAccountantName("testname", Some("testtradingName"))), None, None))))))
+            .thenReturn(
+              Future.successful(
+                Some(
+                  BusinessActivities(
+                    whoIsYourAccountant = Some(
+                      WhoIsYourAccountant(
+                        Some(WhoIsYourAccountantName("testname", Some("testtradingName"))),
+                        None,
+                        None
+                      )
+                    )
+                  )
+                )
+              )
+            )
 
           val result = controller.post()(request)
           status(result) must be(BAD_REQUEST)
@@ -117,13 +135,13 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
         "respond with SEE_OTHER and redirect to the SummaryController" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.WhoIsYourAccountantUkAddressController.post(true).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "line1",
-            "addressLine2" -> "line2",
-            "addressLine3" -> "line3",
-            "addressLine4" -> "line4",
-            "postCode" -> "AA11AA"
-          )
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "line1",
+              "addressLine2" -> "line2",
+              "addressLine3" -> "line3",
+              "addressLine4" -> "line4",
+              "postCode"     -> "AA11AA"
+            )
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
@@ -142,13 +160,13 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
         "respond with SEE_OTHER and redirect to the TaxMattersController" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.WhoIsYourAccountantUkAddressController.post(false).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "line1",
-            "addressLine2" -> "line2",
-            "addressLine3" -> "line3",
-            "addressLine4" -> "line4",
-            "postCode" -> "AA11AA"
-          )
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "line1",
+              "addressLine2" -> "line2",
+              "addressLine3" -> "line3",
+              "addressLine4" -> "line4",
+              "postCode"     -> "AA11AA"
+            )
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))

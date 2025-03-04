@@ -22,12 +22,15 @@ import models.supervision.ProfessionalBodies.Other
 import models.supervision.{BusinessType, ProfessionalBodies}
 import play.api.data.{Form, FormError}
 
-class WhichProfessionalBodyFormProviderSpec extends CheckboxFieldBehaviours with StringFieldBehaviours with Constraints {
+class WhichProfessionalBodyFormProviderSpec
+    extends CheckboxFieldBehaviours
+    with StringFieldBehaviours
+    with Constraints {
 
-  val formProvider = new WhichProfessionalBodyFormProvider()
+  val formProvider                   = new WhichProfessionalBodyFormProvider()
   val form: Form[ProfessionalBodies] = formProvider()
 
-  val checkboxFieldName = "businessType"
+  val checkboxFieldName    = "businessType"
   val checkboxErrorMessage = "error.required.supervision.one.professional.body"
 
   val textFieldName = "specifyOtherBusiness"
@@ -50,35 +53,44 @@ class WhichProfessionalBodyFormProviderSpec extends CheckboxFieldBehaviours with
       "bind when Other is selected" in {
 
         forAll(stringOfLengthGen(formProvider.length)) { otherBusiness =>
-          val result = form.bind(Map(
-            checkboxFieldName -> Other("").toString,
-            textFieldName -> otherBusiness
-          )).apply(textFieldName)
+          val result = form
+            .bind(
+              Map(
+                checkboxFieldName -> Other("").toString,
+                textFieldName     -> otherBusiness
+              )
+            )
+            .apply(textFieldName)
           result.value.value shouldBe otherBusiness
         }
       }
 
       "be mandatory if Other is selected" in {
 
-        val result = form.bind(Map(
-          checkboxFieldName -> Other("").toString,
-          textFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            checkboxFieldName -> Other("").toString,
+            textFieldName     -> ""
+          )
+        )
 
-        result.value shouldBe None
-        result.error(textFieldName) shouldBe Some(FormError(textFieldName, "error.required.supervision.business.details"))
+        result.value                shouldBe None
+        result.error(textFieldName) shouldBe Some(
+          FormError(textFieldName, "error.required.supervision.business.details")
+        )
       }
 
       s"not bind strings that are longer that ${formProvider.length}" in {
 
         forAll(stringsLongerThan(formProvider.length).suchThat(_.nonEmpty)) { longString =>
+          val result = form.bind(
+            Map(
+              checkboxFieldName -> Other("").toString,
+              textFieldName     -> longString
+            )
+          )
 
-          val result = form.bind(Map(
-            checkboxFieldName -> Other("").toString,
-            textFieldName -> longString
-          ))
-
-          result.value shouldBe None
+          result.value                shouldBe None
           result.error(textFieldName) shouldBe Some(
             FormError(textFieldName, "error.invalid.supervision.business.details.length.255", Seq(formProvider.length))
           )
@@ -87,17 +99,19 @@ class WhichProfessionalBodyFormProviderSpec extends CheckboxFieldBehaviours with
 
       "not bind invalid strings" in {
 
-        forAll(stringsShorterThan(formProvider.length - 1).suchThat(_.nonEmpty), invalidCharForNames) { (detail, invalid) =>
+        forAll(stringsShorterThan(formProvider.length - 1).suchThat(_.nonEmpty), invalidCharForNames) {
+          (detail, invalid) =>
+            val result = form.bind(
+              Map(
+                checkboxFieldName -> Other("").toString,
+                textFieldName     -> (detail + invalid)
+              )
+            )
 
-          val result = form.bind(Map(
-            checkboxFieldName -> Other("").toString,
-            textFieldName -> (detail + invalid)
-          ))
-
-          result.value shouldBe None
-          result.error(textFieldName) shouldBe Some(
-            FormError(textFieldName, "error.invalid.supervision.business.details", Seq(basicPunctuationRegex))
-          )
+            result.value                shouldBe None
+            result.error(textFieldName) shouldBe Some(
+              FormError(textFieldName, "error.invalid.supervision.business.details", Seq(basicPunctuationRegex))
+            )
         }
       }
     }

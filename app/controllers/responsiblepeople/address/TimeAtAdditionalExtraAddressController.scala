@@ -27,26 +27,37 @@ import views.html.responsiblepeople.address.TimeAtAdditionalExtraAddressView
 
 import scala.concurrent.Future
 
-class TimeAtAdditionalExtraAddressController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                        authAction: AuthAction,
-                                                        val ds: CommonPlayDependencies,
-                                                        val cc: MessagesControllerComponents,
-                                                        formProvider: TimeAtAddressFormProvider,
-                                                        view: TimeAtAdditionalExtraAddressView,
-                                                        implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class TimeAtAdditionalExtraAddressController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: TimeAtAddressFormProvider,
+  view: TimeAtAdditionalExtraAddressView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", None, None, None, ""), None)
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-
       getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           (person.personName, person.addressHistory) match {
-            case (Some(name), Some(ResponsiblePersonAddressHistory(_, _, Some(ResponsiblePersonAddress(_, Some(additionalExtraAddress)))))) =>
+            case (
+                  Some(name),
+                  Some(
+                    ResponsiblePersonAddressHistory(
+                      _,
+                      _,
+                      Some(ResponsiblePersonAddress(_, Some(additionalExtraAddress)))
+                    )
+                  )
+                ) =>
               Ok(view(formProvider().fill(additionalExtraAddress), edit, index, flow, name.titleName))
             case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
-            case _ => NotFound(notFoundView)
+            case _               => NotFound(notFoundView)
           }
         }
       }
@@ -54,35 +65,44 @@ class TimeAtAdditionalExtraAddressController @Inject() (val dataCacheConnector: 
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          },
-        data =>
-          getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
-            (for {
-              rp <- responsiblePerson
-              addressHistory <- rp.addressHistory
-              additionalExtraAddress <- addressHistory.additionalExtraAddress
-            } yield {
-              val additionalExtraAddressWithTime = additionalExtraAddress.copy(
-                timeAtAddress = Some(data)
-              )
-              updateAndRedirect(request.credId, additionalExtraAddressWithTime, index, edit, flow)
-            }) getOrElse Future.successful(NotFound(notFoundView))
-          }
-      ).recoverWith {
-        case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-      }
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
+              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            },
+          data =>
+            getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
+              (for {
+                rp                     <- responsiblePerson
+                addressHistory         <- rp.addressHistory
+                additionalExtraAddress <- addressHistory.additionalExtraAddress
+              } yield {
+                val additionalExtraAddressWithTime = additionalExtraAddress.copy(
+                  timeAtAddress = Some(data)
+                )
+                updateAndRedirect(request.credId, additionalExtraAddressWithTime, index, edit, flow)
+              }) getOrElse Future.successful(NotFound(notFoundView))
+            }
+        )
+        .recoverWith { case _: IndexOutOfBoundsException =>
+          Future.successful(NotFound(notFoundView))
+        }
   }
 
-  private def updateAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String]): Future[Result] = {
+  private def updateAndRedirect(
+    credId: String,
+    data: ResponsiblePersonAddress,
+    index: Int,
+    edit: Boolean,
+    flow: Option[String]
+  ): Future[Result] =
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
       res.addressHistory(
         res.addressHistory match {
           case Some(a) => a.additionalExtraAddress(data)
-          case _ => ResponsiblePersonAddressHistory(additionalExtraAddress = Some(data))
+          case _       => ResponsiblePersonAddressHistory(additionalExtraAddress = Some(data))
         }
       )
     } map { _ =>
@@ -92,5 +112,4 @@ class TimeAtAdditionalExtraAddressController @Inject() (val dataCacheConnector: 
         Redirect(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(index, edit, flow))
       }
     }
-  }
 }

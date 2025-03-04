@@ -27,7 +27,7 @@ import views.html.tradingpremises.RegisteringAgentPremisesView
 class RegisteringAgentPremisesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val registering_agent_premises = inject[RegisteringAgentPremisesView]
-  lazy val fp = inject[RegisteringAgentPremisesFormProvider]
+  lazy val fp                         = inject[RegisteringAgentPremisesFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -37,7 +37,7 @@ class RegisteringAgentPremisesViewSpec extends AmlsViewSpec with Matchers {
 
   "RegisteringAgentPremisesView" must {
 
-      "have correct title, heading and load UI with empty form" in new ViewFixture {
+    "have correct title, heading and load UI with empty form" in new ViewFixture {
 
       val pageTitle = messages("tradingpremises.agent.premises.title") + " - " +
         messages("summary.tradingpremises") + " - " +
@@ -45,8 +45,8 @@ class RegisteringAgentPremisesViewSpec extends AmlsViewSpec with Matchers {
 
       def view = registering_agent_premises(fp(), 1, false)
 
-      doc.title must be(pageTitle)
-      heading.html must be(messages("tradingpremises.agent.premises.title"))
+      doc.title       must be(pageTitle)
+      heading.html    must be(messages("tradingpremises.agent.premises.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
 
       doc.select("input[type=radio]").size() must be(2)
@@ -54,7 +54,9 @@ class RegisteringAgentPremisesViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       registering_agent_premises(
-        fp().withError("agentPremises", "error.required.tp.agent.premises"), 1, true
+        fp().withError("agentPremises", "error.required.tp.agent.premises"),
+        1,
+        true
       ),
       "agentPremises",
       "error.required.tp.agent.premises"

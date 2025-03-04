@@ -16,7 +16,6 @@
 
 package models.tcsp
 
-
 import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
 import models.{Enumerable, WithName}
@@ -33,14 +32,14 @@ sealed trait TcspService {
   def getMessage(implicit messages: Messages): String = {
     val message = "tcsp.provided_services.service.lbl."
     this match {
-      case PhonecallHandling => messages(s"${message}01")
-      case EmailHandling => messages(s"${message}02")
-      case EmailServer => messages(s"${message}03")
+      case PhonecallHandling    => messages(s"${message}01")
+      case EmailHandling        => messages(s"${message}02")
+      case EmailServer          => messages(s"${message}03")
       case SelfCollectMailboxes => messages(s"${message}04")
-      case MailForwarding => messages(s"${message}05")
-      case Receptionist => messages(s"${message}06")
-      case ConferenceRooms => messages(s"${message}07")
-      case Other(details) => s"$details"
+      case MailForwarding       => messages(s"${message}05")
+      case Receptionist         => messages(s"${message}06")
+      case ConferenceRooms      => messages(s"${message}07")
+      case Other(details)       => s"$details"
     }
   }
 }
@@ -94,18 +93,19 @@ object ProvidedServices extends Enumerable.Implicits {
 
   def formValues(conditionalHtml: Html)(implicit messages: Messages): Seq[CheckboxItem] = {
 
-    val checkboxItems = all.zipWithIndex.map { case (service, index) =>
+    val checkboxItems = all.zipWithIndex
+      .map { case (service, index) =>
+        val conditional = if (service.value == Other("").value) Some(conditionalHtml) else None
 
-      val conditional = if(service.value == Other("").value) Some(conditionalHtml) else None
-
-      CheckboxItem(
-        content = Text(messages(s"tcsp.provided_services.service.lbl.${service.value}")),
-        value = service.toString,
-        id = Some(s"services_$index"),
-        name = Some(s"services[$index]"),
-        conditionalHtml = conditional
-      )
-    }.sortBy(_.content.asHtml.body)
+        CheckboxItem(
+          content = Text(messages(s"tcsp.provided_services.service.lbl.${service.value}")),
+          value = service.toString,
+          id = Some(s"services_$index"),
+          name = Some(s"services[$index]"),
+          conditionalHtml = conditional
+        )
+      }
+      .sortBy(_.content.asHtml.body)
 
     val from = checkboxItems.indexWhere(_.value == Other("").toString)
 
@@ -115,42 +115,39 @@ object ProvidedServices extends Enumerable.Implicits {
   implicit val enumerable: Enumerable[TcspService] = Enumerable(all.map(v => v.toString -> v): _*)
 
   implicit val jsonReads: Reads[ProvidedServices] =
-      (__ \ "services").read[Set[String]].flatMap { x =>
-        x.map {
-            case "01" => Reads(_ => JsSuccess(PhonecallHandling)) map identity[TcspService]
-            case "02" => Reads(_ => JsSuccess(EmailHandling)) map identity[TcspService]
-            case "03" => Reads(_ => JsSuccess(EmailServer)) map identity[TcspService]
-            case "04" => Reads(_ => JsSuccess(SelfCollectMailboxes)) map identity[TcspService]
-            case "05" => Reads(_ => JsSuccess(MailForwarding)) map identity[TcspService]
-            case "06" => Reads(_ => JsSuccess(Receptionist)) map identity[TcspService]
-            case "07" => Reads(_ => JsSuccess(ConferenceRooms)) map identity[TcspService]
-            case "08" =>
-              (JsPath \ "details").read[String].map (Other.apply  _) map identity[TcspService]
-            case _ =>
-              Reads(_ => JsError((JsPath \ "services") -> play.api.libs.json.JsonValidationError("error.invalid")))
-          }.foldLeft[Reads[Set[TcspService]]](
-            Reads[Set[TcspService]](_ => JsSuccess(Set.empty))
-         ){
-          (result, data) =>
-            data flatMap {m =>
-             result.map {n =>
-               n + m
-             }
-           }
+    (__ \ "services").read[Set[String]].flatMap { x =>
+      x.map {
+        case "01" => Reads(_ => JsSuccess(PhonecallHandling)) map identity[TcspService]
+        case "02" => Reads(_ => JsSuccess(EmailHandling)) map identity[TcspService]
+        case "03" => Reads(_ => JsSuccess(EmailServer)) map identity[TcspService]
+        case "04" => Reads(_ => JsSuccess(SelfCollectMailboxes)) map identity[TcspService]
+        case "05" => Reads(_ => JsSuccess(MailForwarding)) map identity[TcspService]
+        case "06" => Reads(_ => JsSuccess(Receptionist)) map identity[TcspService]
+        case "07" => Reads(_ => JsSuccess(ConferenceRooms)) map identity[TcspService]
+        case "08" =>
+          (JsPath \ "details").read[String].map(Other.apply _) map identity[TcspService]
+        case _    =>
+          Reads(_ => JsError((JsPath \ "services") -> play.api.libs.json.JsonValidationError("error.invalid")))
+      }.foldLeft[Reads[Set[TcspService]]](
+        Reads[Set[TcspService]](_ => JsSuccess(Set.empty))
+      ) { (result, data) =>
+        data flatMap { m =>
+          result.map { n =>
+            n + m
+          }
         }
-      } map ProvidedServices.apply
+      }
+    } map ProvidedServices.apply
 
   implicit val jsonWrites: Writes[ProvidedServices] = Writes[ProvidedServices] { ps =>
     Json.obj(
-      "services" -> (ps.services map {_.value}).toSeq
+      "services" -> (ps.services map { _.value }).toSeq
     ) ++ ps.services.foldLeft[JsObject](Json.obj()) {
-          case (m, Other(details)) =>
-            m ++ Json.obj("details" -> details)
-          case (m, _) =>
-            m
-        }
+      case (m, Other(details)) =>
+        m ++ Json.obj("details" -> details)
+      case (m, _)              =>
+        m
+    }
   }
 
 }
-
-

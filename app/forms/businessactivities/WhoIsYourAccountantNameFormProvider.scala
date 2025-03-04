@@ -23,24 +23,26 @@ import play.api.data.Forms.{mapping, optional}
 
 import javax.inject.Inject
 
-class WhoIsYourAccountantNameFormProvider @Inject()() extends Mappings {
+class WhoIsYourAccountantNameFormProvider @Inject() () extends Mappings {
 
-  val nameLength = 140
-  val tradingNameLength = 120
+  val nameLength                             = 140
+  val tradingNameLength                      = 120
   def apply(): Form[WhoIsYourAccountantName] = Form[WhoIsYourAccountantName](
     mapping(
-      "name" -> text("error.required.ba.advisor.name").verifying(
+      "name"        -> text("error.required.ba.advisor.name").verifying(
         firstError(
           maxLength(nameLength, "error.length.ba.advisor.name"),
           regexp(basicPunctuationRegex, "error.punctuation.ba.advisor.name")
         )
       ),
-      "tradingName" -> optional(text().verifying(
-        firstError(
-          maxLength(tradingNameLength, "error.length.ba.advisor.tradingname"),
-          regexp(basicPunctuationRegex, "error.punctuation.ba.advisor.tradingname")
+      "tradingName" -> optional(
+        text().verifying(
+          firstError(
+            maxLength(tradingNameLength, "error.length.ba.advisor.tradingname"),
+            regexp(basicPunctuationRegex, "error.punctuation.ba.advisor.tradingname")
+          )
         )
-      ))
+      )
     )(WhoIsYourAccountantName.apply)(WhoIsYourAccountantName.unapply)
   )
 }

@@ -23,8 +23,8 @@ import play.api.data.Form
 class CustomersOutsideIsUKFormProviderSpec extends BooleanFieldBehaviours[CustomersOutsideIsUK] {
 
   override val form: Form[CustomersOutsideIsUK] = new CustomersOutsideIsUKFormProvider()()
-  override val fieldName: String = "isOutside"
-  override val errorMessage: String = "error.required.ba.renewal.select.yes"
+  override val fieldName: String                = "isOutside"
+  override val errorMessage: String             = "error.required.ba.renewal.select.yes"
 
   "CustomersOutsideIsUKFormProvider" must {
 

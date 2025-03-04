@@ -26,25 +26,25 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import javax.inject.Inject
 import scala.jdk.CollectionConverters._
 
-class MoneySourcesFormProvider @Inject()() extends Mappings {
+class MoneySourcesFormProvider @Inject() () extends Mappings {
 
   val length = 140
 
-  private val moneySources = "moneySources"
-  private val bankNames = "bankNames"
+  private val moneySources    = "moneySources"
+  private val bankNames       = "bankNames"
   private val wholesalerNames = "wholesalerNames"
 
-  private val emptyErrorPrefix = "error.invalid.renewal.msb.wc"
+  private val emptyErrorPrefix    = "error.invalid.renewal.msb.wc"
   private val maxLengthTextPrefix = "error.invalid.maxlength.140"
-  private val formatTextPrefix = "error.invalid.characters.renewal.msb.wc"
+  private val formatTextPrefix    = "error.invalid.characters.renewal.msb.wc"
 
   private val moneySourcesError = s"$emptyErrorPrefix.$moneySources"
 
   def apply(): Form[MoneySources] = Form[MoneySources](
     mapping(
-      moneySources -> seq(enumerable[MoneySource](moneySourcesError, moneySourcesError)(MoneySources.enumerable))
+      moneySources    -> seq(enumerable[MoneySource](moneySourcesError, moneySourcesError)(MoneySources.enumerable))
         .verifying(nonEmptySeq(moneySourcesError)),
-      bankNames -> mandatoryIf(
+      bankNames       -> mandatoryIf(
         _.values.asJavaCollection.contains(Banks.toString),
         text(s"$emptyErrorPrefix.$bankNames").verifying(
           firstError(
@@ -66,20 +66,22 @@ class MoneySourcesFormProvider @Inject()() extends Mappings {
   )
 
   private def apply(
-                     checkboxes: Seq[MoneySource],
-                     bankNames: Option[String],
-                     wholesalerNames: Option[String]
-                   ): MoneySources =
+    checkboxes: Seq[MoneySource],
+    bankNames: Option[String],
+    wholesalerNames: Option[String]
+  ): MoneySources =
     MoneySources(
       bankNames.map(BankMoneySource),
       wholesalerNames.map(WholesalerMoneySource),
-      if(checkboxes.contains(Customers)) Some(true) else Some(false)
+      if (checkboxes.contains(Customers)) Some(true) else Some(false)
     )
 
   private def unapply(obj: MoneySources): Option[(Seq[MoneySource], Option[String], Option[String])] =
-    Some((
-      obj.toFormValues,
-      obj.bankMoneySource.map(_.bankNames),
-      obj.wholesalerMoneySource.map(_.wholesalerNames)
-    ))
+    Some(
+      (
+        obj.toFormValues,
+        obj.bankMoneySource.map(_.bankNames),
+        obj.wholesalerMoneySource.map(_.wholesalerNames)
+      )
+    )
 }

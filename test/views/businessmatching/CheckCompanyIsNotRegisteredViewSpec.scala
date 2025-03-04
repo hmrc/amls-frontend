@@ -24,7 +24,7 @@ import views.html.businessmatching.CheckCompanyIsNotRegisteredView
 
 class CheckCompanyIsNotRegisteredViewSpec extends AmlsViewSpec {
 
-  lazy val checkView = inject[CheckCompanyIsNotRegisteredView]
+  lazy val checkView                                        = inject[CheckCompanyIsNotRegisteredView]
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   "CheckCompanyIsNotRegisteredView" must {
@@ -40,15 +40,19 @@ class CheckCompanyIsNotRegisteredViewSpec extends AmlsViewSpec {
     "render the correct hint text" in new Fixture {
       override def view = checkView()
 
-      doc.getElementsByClass("govuk-hint")
-        .first().text() mustBe messages("businessmatching.checkbusiness.body")
+      doc
+        .getElementsByClass("govuk-hint")
+        .first()
+        .text() mustBe messages("businessmatching.checkbusiness.body")
     }
 
     "render the correct warning text" in new Fixture {
       override def view = checkView()
 
-      doc.getElementsByClass("govuk-warning-text__text")
-        .first().text() mustBe "Warning " + messages("businessmatching.checkbusiness.warning")
+      doc
+        .getElementsByClass("govuk-warning-text__text")
+        .first()
+        .text() mustBe "Warning " + messages("businessmatching.checkbusiness.warning")
     }
 
     "render the correct button" in new Fixture {

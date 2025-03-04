@@ -26,18 +26,19 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.CorrespondenceAddressIsUKView
 
-
 class CorrespondenceAddressIsUKViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val correspondence_address_is_uk: CorrespondenceAddressIsUKView = inject[CorrespondenceAddressIsUKView]
-  lazy val formProvider: CorrespondenceAddressIsUKFormProvider = inject[CorrespondenceAddressIsUKFormProvider]
+  lazy val formProvider: CorrespondenceAddressIsUKFormProvider         = inject[CorrespondenceAddressIsUKFormProvider]
 
   implicit val request: Request[_] = FakeRequest()
   trait ViewFixture extends Fixture {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
-    val countries = Some(Seq(
-      NameValuePair("Country 1", "country:1")
-    ))
+    val countries                                                  = Some(
+      Seq(
+        NameValuePair("Country 1", "country:1")
+      )
+    )
   }
 
   "correspondence_address view" must {
@@ -47,7 +48,9 @@ class CorrespondenceAddressIsUKViewSpec extends AmlsViewSpec with Matchers {
 
       def view = correspondence_address_is_uk(formWithData, true)
 
-      doc.title must startWith(messages("businessdetails.correspondenceaddress.isuk.title") + " - " + messages("summary.businessdetails"))
+      doc.title must startWith(
+        messages("businessdetails.correspondenceaddress.isuk.title") + " - " + messages("summary.businessdetails")
+      )
     }
 
     "have correct headings" in new ViewFixture {
@@ -56,7 +59,7 @@ class CorrespondenceAddressIsUKViewSpec extends AmlsViewSpec with Matchers {
 
       def view = correspondence_address_is_uk(formWithData, true)
 
-      heading.html must be(messages("businessdetails.correspondenceaddress.isuk.title"))
+      heading.html    must be(messages("businessdetails.correspondenceaddress.isuk.title"))
       subHeading.html must include(messages("summary.businessdetails"))
 
     }

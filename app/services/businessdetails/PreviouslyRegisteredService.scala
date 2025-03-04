@@ -24,19 +24,20 @@ import services.cache.Cache
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PreviouslyRegisteredService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) extends Logging {
+class PreviouslyRegisteredService @Inject() (val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext)
+    extends Logging {
 
-  def getPreviouslyRegistered(credId: String): Future[Option[PreviouslyRegistered]] = {
+  def getPreviouslyRegistered(credId: String): Future[Option[PreviouslyRegistered]] =
     dataCacheConnector.fetch[BusinessDetails](credId, BusinessDetails.key) map { optBusinessDetails =>
       optBusinessDetails.flatMap(_.previouslyRegistered)
     }
-  }
 
   def updatePreviouslyRegistered(credId: String, data: PreviouslyRegistered): Future[Option[Cache]] = {
 
     val businessDetailsOptF = dataCacheConnector.fetchAll(credId) map {
       _.map { cache =>
-        cache.getEntry[BusinessDetails](BusinessDetails.key)
+        cache
+          .getEntry[BusinessDetails](BusinessDetails.key)
           .getOrElse(BusinessDetails())
           .copy(previouslyRegistered = Some(data), hasChanged = true)
       }
@@ -53,10 +54,9 @@ class PreviouslyRegisteredService @Inject()(val dataCacheConnector: DataCacheCon
         logger.info(s"$logPrefix: Business details updated successfully")
         Some(cache)
       }
-    } recover {
-      case _: Exception =>
-        logger.warn(s"$logPrefix: Failed to update Business details")
-        None
+    } recover { case _: Exception =>
+      logger.warn(s"$logPrefix: Failed to update Business details")
+      None
     }
   }
 }

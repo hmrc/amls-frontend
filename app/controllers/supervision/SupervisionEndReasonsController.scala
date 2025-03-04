@@ -29,46 +29,47 @@ import views.html.supervision.SupervisionEndReasonsView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                val authAction: AuthAction,
-                                                val ds: CommonPlayDependencies,
-                                                val cc: MessagesControllerComponents,
-                                                formProvider: SupervisionEndReasonsFormProvider,
-                                                view: SupervisionEndReasonsView) extends AmlsBaseController(ds, cc) {
+class SupervisionEndReasonsController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: SupervisionEndReasonsFormProvider,
+  view: SupervisionEndReasonsView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      val form = formProvider()
-      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
-        case Some(Supervision(anotherBody, _, _, _, _, _)) =>
-          val param = getEndReasons(anotherBody).fold(form)(x => form.fill(SupervisionEndReasons(x)))
-          Ok(view(param, edit))
-        case _ => Ok(view(form, edit))
-      }
-  }
-
-  private def getEndReasons(anotherBody: Option[AnotherBody]): Option[String] = {
-    anotherBody match {
-      case Some(body) if body.isInstanceOf[AnotherBodyYes] => body.asInstanceOf[AnotherBodyYes].endingReason match {
-        case Some(sup) => Option(sup.endingReason)
-        case _ => None
-      }
-      case _ => None
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    val form = formProvider()
+    dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
+      case Some(Supervision(anotherBody, _, _, _, _, _)) =>
+        val param = getEndReasons(anotherBody).fold(form)(x => form.fill(SupervisionEndReasons(x)))
+        Ok(view(param, edit))
+      case _                                             => Ok(view(form, edit))
     }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest(cleanData(request.body, "endingReason")).fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  private def getEndReasons(anotherBody: Option[AnotherBody]): Option[String] =
+    anotherBody match {
+      case Some(body) if body.isInstanceOf[AnotherBodyYes] =>
+        body.asInstanceOf[AnotherBodyYes].endingReason match {
+          case Some(sup) => Option(sup.endingReason)
+          case _         => None
+        }
+      case _                                               => None
+    }
+
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest(cleanData(request.body, "endingReason"))
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           (for {
             supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
-            maybeCache <- dataCacheConnector.save[Supervision](request.credId, Supervision.key,
-              updateData(supervision, data))
-          } yield maybeCache) map {
-            cache => redirectTo(edit, cache)
+            maybeCache  <-
+              dataCacheConnector.save[Supervision](request.credId, Supervision.key, updateData(supervision, data))
+          } yield maybeCache) map { cache =>
+            redirectTo(edit, cache)
           }
       )
   }
@@ -76,7 +77,7 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
   private def updateData(supervision: Supervision, data: SupervisionEndReasons): Supervision = {
     def updatedAnotherBody: AnotherBodyYes = supervision.anotherBody match {
       case Some(ab) => ab.asInstanceOf[AnotherBodyYes].endingReason(data)
-      case None => throw new Exception("An UnknownException has occurred : SupervisionEndReasonsController")
+      case None     => throw new Exception("An UnknownException has occurred : SupervisionEndReasonsController")
     }
 
     supervision.anotherBody(updatedAnotherBody).copy(hasAccepted = true)
@@ -85,10 +86,10 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
   private def redirectTo(edit: Boolean, cache: Cache): Result = {
     import utils.ControllerHelper.supervisionComplete
 
-      if (supervisionComplete(cache)) {
-        Redirect(routes.SummaryController.get())
-      } else {
-        Redirect(routes.ProfessionalBodyMemberController.get())
-      }
+    if (supervisionComplete(cache)) {
+      Redirect(routes.SummaryController.get())
+    } else {
+      Redirect(routes.ProfessionalBodyMemberController.get())
+    }
   }
 }

@@ -32,7 +32,7 @@ import scala.jdk.CollectionConverters._
 
 class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
-  lazy val summary = app.injector.instanceOf[CheckYourAnswersView]
+  lazy val summary   = app.injector.instanceOf[CheckYourAnswersView]
   lazy val cyaHelper = app.injector.instanceOf[CheckYourAnswersHelper]
   trait ViewFixture extends Fixture {
     implicit val requestWithToken: Request[_] = addTokenForView(FakeRequest())
@@ -50,7 +50,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
       def view = summary(SummaryList())
 
-      heading.html must be(messages("title.cya"))
+      heading.html    must be(messages("title.cya"))
       subHeading.html must include(messages("summary.businessactivities"))
 
     }
@@ -68,35 +68,43 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
           ncaRegistered = Some(NCARegistered(true)),
           accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
           identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true)),
-          riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(Digital, PaperBased)))),
+          riskAssessmentPolicy =
+            Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(Digital, PaperBased)))),
           howManyEmployees = Some(HowManyEmployees(Some("123"), Some("456"))),
-          whoIsYourAccountant = Some(WhoIsYourAccountant(
-            Some(WhoIsYourAccountantName("AccountantName", Some("tradingName"))),
-            Some(WhoIsYourAccountantIsUk(true)),
-            Some(UkAccountantsAddress("line1", Some("line2"), Some("line3"), Some("line4"), "AB12CD")))),
+          whoIsYourAccountant = Some(
+            WhoIsYourAccountant(
+              Some(WhoIsYourAccountantName("AccountantName", Some("tradingName"))),
+              Some(WhoIsYourAccountantIsUk(true)),
+              Some(UkAccountantsAddress("line1", Some("line2"), Some("line3"), Some("line4"), "AB12CD"))
+            )
+          ),
           taxMatters = Some(TaxMatters(true)),
-          transactionRecordTypes = Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("SoftwareName"))))
+          transactionRecordTypes =
+            Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("SoftwareName"))))
         ),
         needsAccountancyQuestions = false
       )
 
       def view = summary(list)
 
-      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
-        doc.getElementsByClass("govuk-summary-list__value").asScala
-      ).foreach { case (key, value) =>
+      doc
+        .getElementsByClass("govuk-summary-list__key")
+        .asScala
+        .zip(
+          doc.getElementsByClass("govuk-summary-list__value").asScala
+        )
+        .foreach { case (key, value) =>
+          val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
 
-        val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
+          maybeRow.key.content.asHtml.body must include(key.text())
 
-        maybeRow.key.content.asHtml.body must include(key.text())
+          val valueText = maybeRow.value.content.asHtml.body match {
+            case str if str.startsWith("<") => Jsoup.parse(str).text()
+            case str                        => str
+          }
 
-        val valueText = maybeRow.value.content.asHtml.body match {
-          case str if str.startsWith("<") => Jsoup.parse(str).text()
-          case str => str
+          valueText must include(value.text())
         }
-
-        valueText must include(value.text())
-      }
     }
   }
 }

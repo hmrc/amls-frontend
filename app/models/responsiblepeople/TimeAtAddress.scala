@@ -64,19 +64,19 @@ object TimeAtAddress extends Enumerable.Implicits {
   import utils.MappingUtils.Implicits._
 
   implicit val jsonReads: Reads[TimeAtAddress] = {
-      import play.api.libs.json.Reads.StringReads
-      (__ \ "timeAtAddress").read[String].flatMap[TimeAtAddress] {
-        case "01" => ZeroToFiveMonths
-        case "02" => SixToElevenMonths
-        case "03" => OneToThreeYears
-        case "04" => ThreeYearsPlus
-        case _ =>
-          play.api.libs.json.JsonValidationError("error.invalid")
-      }
+    import play.api.libs.json.Reads.StringReads
+    (__ \ "timeAtAddress").read[String].flatMap[TimeAtAddress] {
+      case "01" => ZeroToFiveMonths
+      case "02" => SixToElevenMonths
+      case "03" => OneToThreeYears
+      case "04" => ThreeYearsPlus
+      case _    =>
+        play.api.libs.json.JsonValidationError("error.invalid")
     }
+  }
 
   implicit val jsonWrites: Writes[TimeAtAddress] = Writes[TimeAtAddress] {
-      case Empty => JsNull
-      case timeAtAddress: TimeAtAddress => Json.obj("timeAtAddress" -> timeAtAddress.value)
-    }
+    case Empty                        => JsNull
+    case timeAtAddress: TimeAtAddress => Json.obj("timeAtAddress" -> timeAtAddress.value)
+  }
 }

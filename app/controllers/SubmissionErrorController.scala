@@ -22,13 +22,15 @@ import views.html.submission._
 
 import javax.inject.Inject
 
-class SubmissionErrorController @Inject()(authAction: AuthAction,
-                                          val ds: CommonPlayDependencies,
-                                          val cc: MessagesControllerComponents,
-                                          duplicateEnrolmentView: DuplicateEnrolmentView,
-                                          duplicateSubmissionView: DuplicateSubmissionView,
-                                          wrongCredentialTypeView: WrongCredentialTypeView,
-                                          badRequestView: BadRequestView) extends AmlsBaseController(ds, cc){
+class SubmissionErrorController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  duplicateEnrolmentView: DuplicateEnrolmentView,
+  duplicateSubmissionView: DuplicateSubmissionView,
+  wrongCredentialTypeView: WrongCredentialTypeView,
+  badRequestView: BadRequestView
+) extends AmlsBaseController(ds, cc) {
 
   def duplicateEnrolment(): Action[AnyContent] = authAction { implicit request =>
     Ok(duplicateEnrolmentView(appConfig.contactFrontendReportUrl))

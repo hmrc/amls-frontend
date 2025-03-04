@@ -26,13 +26,13 @@ class MSBServicesFormProviderSpec extends CheckboxFieldBehaviours {
 
   ".value" must {
 
-    val fieldName = "value"
+    val fieldName   = "value"
     val requiredKey = "error.required.tp.services"
 
     behave like checkboxFieldWithWrapper[TradingPremisesMsbService, TradingPremisesMsbServices](
       form,
       fieldName,
-      validValues  = TradingPremisesMsbService.all,
+      validValues = TradingPremisesMsbService.all,
       x => TradingPremisesMsbServices(Set(x)),
       x => TradingPremisesMsbServices(x.toSet),
       invalidError = FormError(s"$fieldName[0]", "error.invalid")

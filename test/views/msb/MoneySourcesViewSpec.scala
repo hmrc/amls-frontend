@@ -24,10 +24,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.msb.MoneySourcesView
 
-class MoneySourcesViewSpec extends AmlsViewSpec with Matchers{
+class MoneySourcesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val money_sources = inject[MoneySourcesView]
-  lazy val fp = inject[MoneySourcesFormProvider]
+  lazy val fp            = inject[MoneySourcesFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -46,7 +46,7 @@ class MoneySourcesViewSpec extends AmlsViewSpec with Matchers{
     "have correct headings" in new ViewFixture {
       def view = money_sources(fp(), true)
 
-      heading.html must be(messages("msb.supply_foreign_currencies.title"))
+      heading.html    must be(messages("msb.supply_foreign_currencies.title"))
       subHeading.html must include(messages("summary.msb"))
 
     }
@@ -54,26 +54,29 @@ class MoneySourcesViewSpec extends AmlsViewSpec with Matchers{
     "ask the user who will supply the foreign currency" in new ViewFixture {
       def view = money_sources(fp(), true)
 
-      Option(doc.getElementById("moneySources_1")).isDefined must be(true)
-      Option(doc.getElementById("moneySources_2")).isDefined must be(true)
-      Option(doc.getElementById("moneySources_3")).isDefined must be(true)
-      Option(doc.getElementById("bankNames")).isDefined must be(true)
+      Option(doc.getElementById("moneySources_1")).isDefined  must be(true)
+      Option(doc.getElementById("moneySources_2")).isDefined  must be(true)
+      Option(doc.getElementById("moneySources_3")).isDefined  must be(true)
+      Option(doc.getElementById("bankNames")).isDefined       must be(true)
       Option(doc.getElementById("wholesalerNames")).isDefined must be(true)
     }
 
     behave like pageWithErrors(
       money_sources(fp().withError("moneySources", "error.invalid.msb.wc.moneySources"), false),
-      "moneySources", "error.invalid.msb.wc.moneySources"
+      "moneySources",
+      "error.invalid.msb.wc.moneySources"
     )
 
     behave like pageWithErrors(
       money_sources(fp().withError("bankNames", "error.invalid.msb.wc.bankNames"), false),
-      "bankNames", "error.invalid.msb.wc.bankNames"
+      "bankNames",
+      "error.invalid.msb.wc.bankNames"
     )
 
     behave like pageWithErrors(
       money_sources(fp().withError("wholesalerNames", "error.format.msb.wc.wholesaler"), false),
-      "wholesalerNames", "error.format.msb.wc.wholesaler"
+      "wholesalerNames",
+      "error.format.msb.wc.wholesaler"
     )
 
     behave like pageWithBackLink(money_sources(fp(), false))

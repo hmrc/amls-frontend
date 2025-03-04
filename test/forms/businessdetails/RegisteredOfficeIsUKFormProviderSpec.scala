@@ -23,8 +23,8 @@ import play.api.data.Form
 class RegisteredOfficeIsUKFormProviderSpec extends BooleanFieldBehaviours[RegisteredOfficeIsUK] {
 
   override val form: Form[RegisteredOfficeIsUK] = new RegisteredOfficeIsUKFormProvider()()
-  override val fieldName: String = "isUK"
-  override val errorMessage: String = "error.required.atb.registered.office.uk.or.overseas"
+  override val fieldName: String                = "isUK"
+  override val errorMessage: String             = "error.required.atb.registered.office.uk.or.overseas"
 
   "RegisteredOfficeIsUKFormProvider" must {
 

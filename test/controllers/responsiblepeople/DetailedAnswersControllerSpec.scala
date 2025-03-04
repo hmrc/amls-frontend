@@ -44,16 +44,23 @@ import views.html.responsiblepeople.CheckYourAnswersView
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePeopleValues
-  with BusinessMatchingGenerator with OptionValues with Injecting {
+class DetailedAnswersControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with ResponsiblePeopleValues
+    with BusinessMatchingGenerator
+    with OptionValues
+    with Injecting {
 
   trait Fixture extends DependencyMocks {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[CheckYourAnswersView]
-    val controller = new DetailedAnswersController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[CheckYourAnswersView]
+    val controller = new DetailedAnswersController(
       dataCacheConnector = mock[DataCacheConnector],
       recoverActivitiesService = mock[RecoverActivitiesService],
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = mock[StatusService],
       config = mock[ApplicationConfig],
       cc = mockMcc,
@@ -135,19 +142,29 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
     "load yourAnswers page when the status is approved" in new Fixture {
 
-      val model = completeResponsiblePerson.copy(personName = Some(personName), legalName = Some(PreviousName(Some(false), None, None, None)), lineId = Some(121212))
+      val model = completeResponsiblePerson.copy(
+        personName = Some(personName),
+        legalName = Some(PreviousName(Some(false), None, None, None)),
+        lineId = Some(121212)
+      )
       setupMocksFor(model, SubmissionDecisionApproved)
 
       val result = controller.get(1)(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      val element = document.getElementsMatchingOwnText(messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+      val element  = document.getElementsMatchingOwnText(
+        messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName)
+      )
       element.hasAttr("href") must be(true)
     }
 
     "load yourAnswers page when the status is renewal submitted" in new Fixture {
-      val model = completeResponsiblePerson.copy(personName = Some(personName), legalName = Some(PreviousName(Some(false), None, None, None)), lineId = Some(121212))
+      val model = completeResponsiblePerson.copy(
+        personName = Some(personName),
+        legalName = Some(PreviousName(Some(false), None, None, None)),
+        lineId = Some(121212)
+      )
 
       setupMocksFor(model, RenewalSubmitted(None))
 
@@ -155,40 +172,58 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      val element = document.getElementsMatchingOwnText(messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+      val element  = document.getElementsMatchingOwnText(
+        messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName)
+      )
       element.hasAttr("href") must be(true)
     }
 
     "load yourAnswers page when the status is approved and has no lineId" in new Fixture {
 
-      val model = completeResponsiblePerson.copy(personName = Some(personName), legalName = Some(PreviousName(Some(false), None, None, None)), lineId = None)
+      val model = completeResponsiblePerson.copy(
+        personName = Some(personName),
+        legalName = Some(PreviousName(Some(false), None, None, None)),
+        lineId = None
+      )
       setupMocksFor(model, SubmissionDecisionApproved)
 
       val result = controller.get(1)(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      val element = document.getElementsMatchingOwnText(messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+      val element  = document.getElementsMatchingOwnText(
+        messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName)
+      )
       element.hasAttr("href") must be(false)
     }
 
     "load yourAnswers page when the status is ready for renewal" in new Fixture {
 
-      val model = completeResponsiblePerson.copy(personName = Some(personName), legalName = Some(PreviousName(Some(false), None, None, None)), lineId = Some(121212))
+      val model = completeResponsiblePerson.copy(
+        personName = Some(personName),
+        legalName = Some(PreviousName(Some(false), None, None, None)),
+        lineId = Some(121212)
+      )
       setupMocksFor(model, ReadyForRenewal(None))
 
       val result = controller.get(1)(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      val element = document.getElementsMatchingOwnText(messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+      val element  = document.getElementsMatchingOwnText(
+        messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName)
+      )
       element.hasAttr("href") must be(true)
     }
 
     "get is called - NOT from the yourAnswers controller" must {
       "respond with OK and show the detailed answers page with a 'confirm and continue'" in new Fixture {
 
-        val model = completeResponsiblePerson.copy(personName = Some(personName), legalName = Some(PreviousName(Some(false), None, None, None)), lineId = Some(121212))
+        val model = completeResponsiblePerson.copy(
+          personName = Some(personName),
+          legalName = Some(PreviousName(Some(false), None, None, None)),
+          lineId = Some(121212)
+        )
         setupMocksFor(model)
 
         val result = controller.get(1)(request)
@@ -203,7 +238,11 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       "section data is available" must {
         "respond with OK and show the detailed answers page with the correct title" in new Fixture {
 
-          val model = completeResponsiblePerson.copy(personName = Some(personName), legalName = Some(PreviousName(Some(false), None, None, None)), lineId = Some(121212))
+          val model = completeResponsiblePerson.copy(
+            personName = Some(personName),
+            legalName = Some(PreviousName(Some(false), None, None, None)),
+            lineId = Some(121212)
+          )
           setupMocksFor(model)
 
           val result = controller.get(1)(request)
@@ -214,12 +253,14 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
         "respond with OK and show the detailed answers page with a correctly formatted responsiblePerson startDate" in new Fixture {
 
-          private val testStartDate = LocalDate.of(1999,1,1)
+          private val testStartDate = LocalDate.of(1999, 1, 1)
 
-          val model = completeResponsiblePerson.copy(personName = Some(personName),
+          val model = completeResponsiblePerson.copy(
+            personName = Some(personName),
             legalName = Some(PreviousName(Some(false), None, None, None)),
             lineId = Some(121212),
-            positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(testStartDate)))))
+            positions = Some(Positions(Set(BeneficialOwner), Some(PositionStartDate(testStartDate))))
+          )
 
           setupMocksFor(model)
 
@@ -231,15 +272,19 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
         "respond with 303 and redirect to the your responsible people page if for any reason rp model is not complete" in new Fixture {
 
-          val model = completeResponsiblePerson.copy(personName = Some(personName),
-            legalName = Some(PreviousName(Some(true), None, None, None)), //incomplete legal name
-            lineId = Some(121212))
+          val model = completeResponsiblePerson.copy(
+            personName = Some(personName),
+            legalName = Some(PreviousName(Some(true), None, None, None)), // incomplete legal name
+            lineId = Some(121212)
+          )
 
           setupMocksFor(model)
 
           val result = controller.get(1)(request)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url)
+          )
         }
       }
 
@@ -249,11 +294,11 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
             controller.dataCacheConnector.fetchAll(any())
           } thenReturn Future.successful(None)
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-            (any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+            .thenReturn(Future.successful(None))
 
           val result = controller.get(1)(request)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
         }
 
@@ -273,9 +318,12 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
             val result = controller.post(1, None)(request)
 
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
+            redirectLocation(result) must be(
+              Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url)
+            )
 
-            verify(controller.dataCacheConnector).save(any(), any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any())
+            verify(controller.dataCacheConnector)
+              .save(any(), any(), eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any())
           }
         }
       }
@@ -291,12 +339,14 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
               controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
             } thenReturn Future.successful(Cache.empty)
 
-
             val result = controller.post(1, flow)(request)
 
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
+            redirectLocation(result) must be(
+              Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url)
+            )
 
-            verify(controller.dataCacheConnector).save(any(), any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any())
+            verify(controller.dataCacheConnector)
+              .save(any(), any(), eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any())
 
           }
         }
@@ -307,7 +357,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           val flow = Some(`flowFromDeclaration`)
 
           val bm: BusinessMatching = businessMatchingGen.sample.get
-          val rd = reviewDetailsGen.sample.get
+          val rd                   = reviewDetailsGen.sample.get
 
           setupMocksFor(completeResponsiblePerson, SubmissionDecisionApproved)
 
@@ -322,7 +372,9 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
 
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
-            .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(Partnership)))))))
+            .thenReturn(
+              Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(Partnership))))))
+            )
 
           when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -333,11 +385,11 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       }
 
       "redirect to WhoIsRegisteringController" when {
-        "business type is other than partnership, flow is from declaration and nominated officer is defined" in new Fixture  {
+        "business type is other than partnership, flow is from declaration and nominated officer is defined" in new Fixture {
           val flow = Some(`flowFromDeclaration`)
 
           val bm: BusinessMatching = businessMatchingGen.sample.get
-          val rd = reviewDetailsGen.sample.get
+          val rd                   = reviewDetailsGen.sample.get
 
           setupMocksFor(completeResponsiblePerson, SubmissionDecisionApproved)
 
@@ -352,7 +404,9 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
 
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
-            .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
+            .thenReturn(
+              Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany))))))
+            )
 
           when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -363,11 +417,11 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       }
 
       "redirect to WhoIsTheBusinessNominatedOfficerController in update service" when {
-        "business type is other than partnership, flow is from declaration and nominated officer is not defined in pre submission" in new Fixture  {
+        "business type is other than partnership, flow is from declaration and nominated officer is not defined in pre submission" in new Fixture {
           val flow = Some(`flowFromDeclaration`)
 
           val bm: BusinessMatching = businessMatchingGen.sample.get
-          val rd = reviewDetailsGen.sample.get
+          val rd                   = reviewDetailsGen.sample.get
 
           setupMocksFor(completeResponsiblePerson, SubmissionReady)
 
@@ -379,10 +433,22 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           } thenReturn Future.successful(Cache.empty)
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
-            .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson.copy(positions = Some(Positions(Set(SoleProprietor), Some(PositionStartDate(LocalDate.now().minusMonths(5))))))))))
+            .thenReturn(
+              Future.successful(
+                Some(
+                  Seq(
+                    completeResponsiblePerson.copy(positions =
+                      Some(Positions(Set(SoleProprietor), Some(PositionStartDate(LocalDate.now().minusMonths(5)))))
+                    )
+                  )
+                )
+              )
+            )
 
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
-            .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
+            .thenReturn(
+              Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany))))))
+            )
 
           when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
@@ -393,11 +459,11 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       }
 
       "redirect to WhoIsTheBusinessNominatedOfficerController in submit application" when {
-        "business type is other than partnership, flow is from declaration and nominated officer is not defined in post submission" in new Fixture  {
+        "business type is other than partnership, flow is from declaration and nominated officer is not defined in post submission" in new Fixture {
           val flow = Some(`flowFromDeclaration`)
 
           val bm: BusinessMatching = businessMatchingGen.sample.get
-          val rd = reviewDetailsGen.sample.get
+          val rd                   = reviewDetailsGen.sample.get
 
           setupMocksFor(completeResponsiblePerson, SubmissionDecisionApproved)
 
@@ -409,10 +475,22 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           } thenReturn Future.successful(Cache.empty)
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
-            .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson.copy(positions = Some(Positions(Set(SoleProprietor), Some(PositionStartDate(LocalDate.now().minusMonths(5))))))))))
+            .thenReturn(
+              Future.successful(
+                Some(
+                  Seq(
+                    completeResponsiblePerson.copy(positions =
+                      Some(Positions(Set(SoleProprietor), Some(PositionStartDate(LocalDate.now().minusMonths(5)))))
+                    )
+                  )
+                )
+              )
+            )
 
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
-            .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
+            .thenReturn(
+              Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany))))))
+            )
 
           when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))

@@ -28,52 +28,54 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class NewHomeAddressController @Inject()(authAction: AuthAction,
-                                         val dataCacheConnector: DataCacheConnector,
-                                         val ds: CommonPlayDependencies,
-                                         val cc: MessagesControllerComponents,
-                                         formProvider: NewHomeAddressFormProvider,
-                                         view: NewHomeAddressView,
-                                         implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with AddressHelper {
+class NewHomeAddressController @Inject() (
+  authAction: AuthAction,
+  val dataCacheConnector: DataCacheConnector,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: NewHomeAddressFormProvider,
+  view: NewHomeAddressView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with AddressHelper {
 
-  def get(index: Int): Action[AnyContent] = authAction.async {
-    implicit request =>
-      for {
-        rp <- getData[ResponsiblePerson](request.credId, index)
-        newAddress <- dataCacheConnector.fetch[NewHomeAddress](request.credId, NewHomeAddress.key)
-        nameOpt <- Future.successful(rp.map(_.personName))
-      } yield (nameOpt.flatten, newAddress) match {
-        case (Some(name), Some(newHomeAddress))
-        => Ok(view(formProvider().fill(newHomeAddress), index, name.titleName))
-        case (Some(name), None)
-        => Ok(view(formProvider(), index, name.titleName))
-        case _
-        => NotFound(notFoundView)
-      }
+  def get(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    for {
+      rp         <- getData[ResponsiblePerson](request.credId, index)
+      newAddress <- dataCacheConnector.fetch[NewHomeAddress](request.credId, NewHomeAddress.key)
+      nameOpt    <- Future.successful(rp.map(_.personName))
+    } yield (nameOpt.flatten, newAddress) match {
+      case (Some(name), Some(newHomeAddress)) => Ok(view(formProvider().fill(newHomeAddress), index, name.titleName))
+      case (Some(name), None)                 => Ok(view(formProvider(), index, name.titleName))
+      case _                                  => NotFound(notFoundView)
+    }
   }
 
-
-  def post(index: Int): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors => getData[ResponsiblePerson](request.credId, index) map { rp =>
-          BadRequest(view(formWithErrors, index, ControllerHelper.rpTitleName(rp)))
-        },
+  def post(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors =>
+          getData[ResponsiblePerson](request.credId, index) map { rp =>
+            BadRequest(view(formWithErrors, index, ControllerHelper.rpTitleName(rp)))
+          },
         data => processFormAndRedirect(data, index, request.credId)
-      ).recoverWith {
-        case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+      )
+      .recoverWith { case _: IndexOutOfBoundsException =>
+        Future.successful(NotFound(notFoundView))
       }
   }
 
-  private def processFormAndRedirect(data: NewHomeAddress, index: Int, credId: String)(implicit request: Request[AnyContent]): Future[Result] = {
+  private def processFormAndRedirect(data: NewHomeAddress, index: Int, credId: String)(implicit
+    request: Request[AnyContent]
+  ): Future[Result] =
     for {
       redirect <- dataCacheConnector.save[NewHomeAddress](credId, NewHomeAddress.key, data) map { _ =>
-        data.personAddress match {
-          case _: PersonAddressUK => Redirect(routes.NewHomeAddressUKController.get(index))
-          case _: PersonAddressNonUK => Redirect(routes.NewHomeAddressNonUKController.get(index))
-          case _ => NotFound(notFoundView)
-        }
-      }
+                    data.personAddress match {
+                      case _: PersonAddressUK    => Redirect(routes.NewHomeAddressUKController.get(index))
+                      case _: PersonAddressNonUK => Redirect(routes.NewHomeAddressNonUKController.get(index))
+                      case _                     => NotFound(notFoundView)
+                    }
+                  }
     } yield redirect
-  }
 }

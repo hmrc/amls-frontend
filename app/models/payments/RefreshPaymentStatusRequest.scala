@@ -23,4 +23,3 @@ case class RefreshPaymentStatusRequest(paymentReference: String)
 object RefreshPaymentStatusRequest {
   implicit val format: OFormat[RefreshPaymentStatusRequest] = Json.format[RefreshPaymentStatusRequest]
 }
-

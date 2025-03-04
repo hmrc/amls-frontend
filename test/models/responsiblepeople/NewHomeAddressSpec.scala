@@ -26,7 +26,11 @@ class NewHomeAddressSpec extends PlaySpec {
     "Round trip through Json" in {
       val model = NewHomeAddress(
         PersonAddressUK(
-          "some address1", Some("some address2"), Some("Default Line 3"), Some("Default Line 4"), "AA1 1AA"
+          "some address1",
+          Some("some address2"),
+          Some("Default Line 3"),
+          Some("Default Line 4"),
+          "AA1 1AA"
         )
       )
 

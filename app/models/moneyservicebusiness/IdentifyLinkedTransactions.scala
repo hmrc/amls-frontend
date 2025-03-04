@@ -18,8 +18,8 @@ package models.moneyservicebusiness
 
 import play.api.libs.json.{Json, OFormat}
 
-case class IdentifyLinkedTransactions (linkedTxn: Boolean)
+case class IdentifyLinkedTransactions(linkedTxn: Boolean)
 
 object IdentifyLinkedTransactions {
-  implicit val format: OFormat[IdentifyLinkedTransactions] =  Json.format[IdentifyLinkedTransactions]
+  implicit val format: OFormat[IdentifyLinkedTransactions] = Json.format[IdentifyLinkedTransactions]
 }

@@ -26,33 +26,37 @@ class UsesForeignCurrenciesSpec extends AmlsSpec with CharacterSets {
 
     "JSON validation" must {
       "successfully validate given values" in {
-        val json =  Json.obj("foreignCurrencies" -> true)
+        val json = Json.obj("foreignCurrencies" -> true)
 
         Json.fromJson[UsesForeignCurrencies](json) must be(JsSuccess(UsesForeignCurrenciesYes, JsPath))
       }
 
       "successfully validate given values with option No" in {
-        val json =  Json.obj("foreignCurrencies" -> false)
+        val json = Json.obj("foreignCurrencies" -> false)
 
         Json.fromJson[UsesForeignCurrencies](json) must be(JsSuccess(UsesForeignCurrenciesNo, JsPath))
       }
 
       "fail when on path is missing" in {
         Json.fromJson[UsesForeignCurrencies](Json.obj()) must
-          be(JsError((JsPath \"foreignCurrencies") -> play.api.libs.json.JsonValidationError("error.path.missing")))
+          be(JsError((JsPath \ "foreignCurrencies") -> play.api.libs.json.JsonValidationError("error.path.missing")))
       }
 
       "fail when on invalid data" in {
         Json.fromJson[UsesForeignCurrencies](Json.obj("foreignCurrencies" -> "")) must
-          be(JsError((JsPath \ "foreignCurrencies") -> play.api.libs.json.JsonValidationError("error.expected.jsboolean")))
+          be(
+            JsError(
+              (JsPath \ "foreignCurrencies") -> play.api.libs.json.JsonValidationError("error.expected.jsboolean")
+            )
+          )
       }
 
       "write valid data in using json write" in {
-        Json.toJson[UsesForeignCurrencies](UsesForeignCurrenciesYes) must be (Json.obj("foreignCurrencies" -> true))
+        Json.toJson[UsesForeignCurrencies](UsesForeignCurrenciesYes) must be(Json.obj("foreignCurrencies" -> true))
       }
 
       "write valid data in using json write with Option No" in {
-        Json.toJson[UsesForeignCurrencies](UsesForeignCurrenciesNo) must be (Json.obj("foreignCurrencies" -> false))
+        Json.toJson[UsesForeignCurrencies](UsesForeignCurrenciesNo) must be(Json.obj("foreignCurrencies" -> false))
       }
     }
   }

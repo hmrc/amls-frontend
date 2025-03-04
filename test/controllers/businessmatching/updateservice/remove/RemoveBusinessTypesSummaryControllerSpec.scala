@@ -45,10 +45,11 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
     val request = addToken(authRequest)
 
     val removeServiceHelper = mock[RemoveBusinessTypeHelper]
-    val router = createRouter[RemoveBusinessTypeFlowModel]
-    lazy val view = app.injector.instanceOf[RemoveActivitiesSummaryView]
-    val controller = new RemoveBusinessTypesSummaryController(
-      SuccessfulAuthAction, ds = commonDependencies,
+    val router              = createRouter[RemoveBusinessTypeFlowModel]
+    lazy val view           = app.injector.instanceOf[RemoveActivitiesSummaryView]
+    val controller          = new RemoveBusinessTypesSummaryController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
       mockCacheConnector,
       removeServiceHelper,
       router,
@@ -71,7 +72,7 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
         val doc = Jsoup.parse(contentAsString(result))
 
         validateTitle(s"${messages("title.cya")} - ${messages("summary.updateinformation")}")(implicitly, doc)
-        doc.getElementsByTag("h1").text must include(messages("title.cya"))
+        doc.getElementsByTag("h1").text                          must include(messages("title.cya"))
         doc.getElementsByClass("govuk-summary-list__value").text must include(MoneyServiceBusiness.getMessage())
         doc.getElementsByClass("govuk-summary-list__value").text must include(DateHelper.formatDate(now))
       }
@@ -97,7 +98,9 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
           .thenReturn(OptionT.liftF[Future, Seq[Cache]](Future.successful(Seq.empty)))
 
         when(removeServiceHelper.removeFlowData(any())(any()))
-          .thenReturn(OptionT.liftF[Future, RemoveBusinessTypeFlowModel](Future.successful(RemoveBusinessTypeFlowModel())))
+          .thenReturn(
+            OptionT.liftF[Future, RemoveBusinessTypeFlowModel](Future.successful(RemoveBusinessTypeFlowModel()))
+          )
 
         val result = controller.post()(requestWithUrlEncodedBody("" -> ""))
 

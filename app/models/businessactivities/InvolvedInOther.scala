@@ -31,7 +31,6 @@ case object InvolvedInOtherNo extends InvolvedInOther
 object InvolvedInOther {
 
   def formValues(html: Html)(implicit messages: Messages): Seq[RadioItem] = HmrcYesNoRadioItems().map { radioItem =>
-
     if (radioItem.value.contains("true")) {
       radioItem.copy(
         id = Some("involvedInOther-true"),
@@ -46,21 +45,22 @@ object InvolvedInOther {
 
   implicit val jsonReads: Reads[InvolvedInOther] =
     (__ \ "involvedInOther").read[Boolean] flatMap {
-      case true => (__ \ "details").read[String] map InvolvedInOtherYes.apply
+      case true  => (__ \ "details").read[String] map InvolvedInOtherYes.apply
       case false => Reads(_ => JsSuccess(InvolvedInOtherNo))
     }
 
   implicit val jsonWrites: Writes[InvolvedInOther] = Writes[InvolvedInOther] {
-    case InvolvedInOtherYes(details) => Json.obj(
-      "involvedInOther" -> true,
-      "details" -> details
-    )
-    case involvedInOtherNo => Json.obj("involvedInOther" -> false)
+    case InvolvedInOtherYes(details) =>
+      Json.obj(
+        "involvedInOther" -> true,
+        "details"         -> details
+      )
+    case involvedInOtherNo           => Json.obj("involvedInOther" -> false)
   }
 
   implicit def convert(model: InvolvedInOther): models.renewal.InvolvedInOther = model match {
     case InvolvedInOtherYes(details) => models.renewal.InvolvedInOtherYes(details)
-    case InvolvedInOtherNo => models.renewal.InvolvedInOtherNo
+    case InvolvedInOtherNo           => models.renewal.InvolvedInOtherNo
   }
 
 }

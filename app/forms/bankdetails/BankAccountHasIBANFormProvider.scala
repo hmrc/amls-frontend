@@ -22,9 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class BankAccountHasIBANFormProvider @Inject()() extends BooleanFormProvider {
+class BankAccountHasIBANFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[BankAccountHasIban] = createForm[BankAccountHasIban](
-    "hasIBAN", "error.required.bankdetails.isiban"
+    "hasIBAN",
+    "error.required.bankdetails.isiban"
   )(BankAccountHasIban.apply, _.hasIban)
 }

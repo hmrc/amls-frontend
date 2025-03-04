@@ -22,9 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class SendMoneyToOtherCountryFormProvider @Inject()() extends BooleanFormProvider {
+class SendMoneyToOtherCountryFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[SendMoneyToOtherCountry] = createForm[SendMoneyToOtherCountry](
-    "money", "error.required.msb.send.money"
+    "money",
+    "error.required.msb.send.money"
   )(SendMoneyToOtherCountry.apply, _.money)
 }

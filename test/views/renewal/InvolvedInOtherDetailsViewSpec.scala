@@ -29,12 +29,12 @@ import views.html.renewal.InvolvedInOtherDetailsView
 
 class InvolvedInOtherDetailsViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val involved_in_other_details = inject[InvolvedInOtherDetailsView]
-  lazy val fp = inject[InvolvedInOtherDetailsFormProvider]
+  lazy val involved_in_other_details                             = inject[InvolvedInOtherDetailsView]
+  lazy val fp                                                    = inject[InvolvedInOtherDetailsFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
-  val requiredTextErrorMsg = "error.required.renewal.ba.involved.in.other.text"
-  val textMaxLengthErrorMsg = "error.invalid.maxlength.255.renewal.ba.involved.in.other"
+  val requiredTextErrorMsg     = "error.required.renewal.ba.involved.in.other.text"
+  val textMaxLengthErrorMsg    = "error.invalid.maxlength.255.renewal.ba.involved.in.other"
   val basicPunctuationErrorMsg = "error.text.validation.renewal.ba.involved.in.other"
 
   trait ViewFixture extends Fixture
@@ -47,7 +47,7 @@ class InvolvedInOtherDetailsViewSpec extends AmlsViewSpec with Matchers {
 
     "have correct headings" in new ViewFixture {
       override def view: HtmlFormat.Appendable = involved_in_other_details(fp().fill(InvolvedInOtherYes("")), true)
-      heading.text must be(messages("renewal.involvedinother.details.title"))
+      heading.text    must be(messages("renewal.involvedinother.details.title"))
       subHeading.html must include(messages("summary.renewal"))
     }
 
@@ -57,23 +57,26 @@ class InvolvedInOtherDetailsViewSpec extends AmlsViewSpec with Matchers {
     }
 
     "show required error" in {
-      def doc: Document = Jsoup.parse(involved_in_other_details(fp().withError("details", requiredTextErrorMsg), false).body)
+      def doc: Document =
+        Jsoup.parse(involved_in_other_details(fp().withError("details", requiredTextErrorMsg), false).body)
       checkError(doc, requiredTextErrorMsg)
     }
 
     "show max length error" in {
-      def doc: Document = Jsoup.parse(involved_in_other_details(fp().withError("details", textMaxLengthErrorMsg), false).body)
+      def doc: Document =
+        Jsoup.parse(involved_in_other_details(fp().withError("details", textMaxLengthErrorMsg), false).body)
       checkError(doc, textMaxLengthErrorMsg)
     }
 
     "show basic punctuation error" in {
-      def doc: Document = Jsoup.parse(involved_in_other_details(fp().withError("details", basicPunctuationErrorMsg), false).body)
+      def doc: Document =
+        Jsoup.parse(involved_in_other_details(fp().withError("details", basicPunctuationErrorMsg), false).body)
       checkError(doc, basicPunctuationErrorMsg)
     }
   }
 
   private def checkError(doc: Document, expectedError: String): Unit = {
     doc.getElementsByClass("govuk-error-summary__list").first().text() must include(messages(expectedError))
-    doc.getElementById(s"details-error").text() must include(messages(expectedError))
+    doc.getElementById(s"details-error").text()                        must include(messages(expectedError))
   }
 }

@@ -22,7 +22,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class ConfirmPostcodeFormProvider @Inject()() extends Mappings {
+class ConfirmPostcodeFormProvider @Inject() () extends Mappings {
 
   def apply(): Form[ConfirmPostcode] = Form[ConfirmPostcode](
     "postCode" -> text("businessmatching.confirm.postcode.error.empty")

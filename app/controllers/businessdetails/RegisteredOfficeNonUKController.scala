@@ -32,38 +32,44 @@ import views.html.businessdetails.RegisteredOfficeNonUKView
 
 import scala.concurrent.Future
 
-class RegisteredOfficeNonUKController @Inject ()(
-                                                  val dataCacheConnector: DataCacheConnector,
-                                                  val statusService: StatusService,
-                                                  val auditConnector: AuditConnector,
-                                                  val autoCompleteService: AutoCompleteService,
-                                                  val authAction: AuthAction,
-                                                  val ds: CommonPlayDependencies,
-                                                  val cc: MessagesControllerComponents,
-                                                  formProvider: RegisteredOfficeNonUkFormProvider,
-                                                  view: RegisteredOfficeNonUKView) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+class RegisteredOfficeNonUKController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val statusService: StatusService,
+  val auditConnector: AuditConnector,
+  val autoCompleteService: AutoCompleteService,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: RegisteredOfficeNonUkFormProvider,
+  view: RegisteredOfficeNonUKView
+) extends AmlsBaseController(ds, cc)
+    with DateOfChangeHelper {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
-        businessDetails =>
-          Ok(view(
-            businessDetails.registeredOffice.fold(formProvider())(formProvider().fill), edit, autoCompleteService.formOptions
-          ))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map { businessDetails =>
+      Ok(
+        view(
+          businessDetails.registeredOffice.fold(formProvider())(formProvider().fill),
+          edit,
+          autoCompleteService.formOptions
+        )
+      )
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
         data =>
           for {
             businessDetails <- dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key)
-            _ <- dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.registeredOffice(data))
-            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-            _ <- auditAddressChange(data, businessDetails flatMap { _.registeredOffice }, edit)
-          } yield {
+            _               <- dataCacheConnector
+                                 .save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.registeredOffice(data))
+            status          <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+            _               <- auditAddressChange(data, businessDetails flatMap { _.registeredOffice }, edit)
+          } yield
             if (redirectToDateOfChange[RegisteredOffice](status, businessDetails.registeredOffice, data)) {
               Redirect(routes.RegisteredOfficeDateOfChangeController.get)
             } else {
@@ -73,16 +79,16 @@ class RegisteredOfficeNonUKController @Inject ()(
                 Redirect(routes.BusinessEmailAddressController.get())
               }
             }
-          }
       )
   }
 
-  def auditAddressChange(currentAddress: RegisteredOffice, oldAddress: Option[RegisteredOffice], edit: Boolean)
-                        (implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
+  def auditAddressChange(currentAddress: RegisteredOffice, oldAddress: Option[RegisteredOffice], edit: Boolean)(implicit
+    hc: HeaderCarrier,
+    request: Request[_]
+  ): Future[AuditResult] =
     if (edit) {
       auditConnector.sendEvent(AddressModifiedEvent(currentAddress, oldAddress))
     } else {
       auditConnector.sendEvent(AddressCreatedEvent(currentAddress))
     }
-  }
 }

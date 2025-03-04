@@ -24,8 +24,8 @@ import play.api.data.Form
 class CurrentAddressFormProviderSpec extends BooleanFieldBehaviours[ResponsiblePersonCurrentAddress] {
 
   override val form: Form[ResponsiblePersonCurrentAddress] = new CurrentAddressFormProvider()()
-  override val fieldName: String = "isUK"
-  override val errorMessage: String = "error.required.uk.or.overseas.address.current"
+  override val fieldName: String                           = "isUK"
+  override val errorMessage: String                        = "error.required.uk.or.overseas.address.current"
 
   "CurrentAddressFormProvider" must {
 

@@ -23,14 +23,14 @@ import play.api.data.Forms.{mapping, optional}
 
 import javax.inject.Inject
 
-class TradingAddressFormProvider @Inject()() extends AddressMappings {
+class TradingAddressFormProvider @Inject() () extends AddressMappings {
 
   override val countryErrorKey: String = ""
-  val tradingNameLength = 120
+  val tradingNameLength                = 120
 
   def apply(): Form[YourTradingPremises] = Form[YourTradingPremises](
     mapping(
-      "tradingName" -> text("error.required.tp.trading.name").verifying(
+      "tradingName"  -> text("error.required.tp.trading.name").verifying(
         firstError(
           maxLength(tradingNameLength, "error.invalid.tp.trading.name"),
           regexp(basicPunctuationRegex, "error.invalid.char.tp.agent.company.details")
@@ -44,13 +44,21 @@ class TradingAddressFormProvider @Inject()() extends AddressMappings {
     )(toObject)(fromObject)
   )
 
-  private def toObject: (String, String, Option[String], Option[String], Option[String], String) => YourTradingPremises = {
+  private def toObject
+    : (String, String, Option[String], Option[String], Option[String], String) => YourTradingPremises = {
     case (name, line1, line2, line3, line4, postcode) =>
       YourTradingPremises(name, Address(line1, line2, line3, line4, postcode))
   }
 
-  private def fromObject: YourTradingPremises => Option[(String, String, Option[String], Option[String], Option[String], String)] = {
-    case YourTradingPremises(name, Address(addressLine1, addressLine2, addressLine3, addressLine4, postcode, _), _, _, _) =>
+  private def fromObject
+    : YourTradingPremises => Option[(String, String, Option[String], Option[String], Option[String], String)] = {
+    case YourTradingPremises(
+          name,
+          Address(addressLine1, addressLine2, addressLine3, addressLine4, postcode, _),
+          _,
+          _,
+          _
+        ) =>
       Some((name, addressLine1, addressLine2, addressLine3, addressLine4, postcode))
     case _ => None
   }

@@ -20,21 +20,21 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
 case class UpdateService(
-                          areNewActivitiesAtTradingPremises: Option[AreNewActivitiesAtTradingPremises] = None,
-                          tradingPremisesNewActivities: Option[TradingPremisesActivities] = None,
-                          tradingPremisesSubmittedActivities: Option[TradingPremisesActivities] = None,
-                          inNewServiceFlow: Boolean = false
-                        ) {
+  areNewActivitiesAtTradingPremises: Option[AreNewActivitiesAtTradingPremises] = None,
+  tradingPremisesNewActivities: Option[TradingPremisesActivities] = None,
+  tradingPremisesSubmittedActivities: Option[TradingPremisesActivities] = None,
+  inNewServiceFlow: Boolean = false
+) {
 
   def isComplete: Boolean = this match {
-    case UpdateService(Some(_), Some(_), Some(_), false) => true
+    case UpdateService(Some(_), Some(_), Some(_), false)                          => true
     case UpdateService(Some(NewActivitiesAtTradingPremisesNo), _, Some(_), false) => true
-    case _ => false
+    case _                                                                        => false
   }
 
 }
 
-object UpdateService{
+object UpdateService {
 
   val key = "updateservice"
 

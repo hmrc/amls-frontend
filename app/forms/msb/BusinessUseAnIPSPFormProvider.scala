@@ -24,10 +24,10 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class BusinessUseAnIPSPFormProvider @Inject()() extends Mappings {
+class BusinessUseAnIPSPFormProvider @Inject() () extends Mappings {
 
   private val booleanFieldName = "useAnIPSP"
-  private val booleanError = "error.required.msb.ipsp"
+  private val booleanError     = "error.required.msb.ipsp"
 
   val length = 140
 
@@ -35,8 +35,8 @@ class BusinessUseAnIPSPFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[BusinessUseAnIPSP] = Form[BusinessUseAnIPSP](
     mapping(
-      booleanFieldName -> boolean(booleanError, booleanError),
-      "name" -> mandatoryIfTrue(
+      booleanFieldName  -> boolean(booleanError, booleanError),
+      "name"            -> mandatoryIfTrue(
         booleanFieldName,
         text("error.required.msb.ipsp.name").verifying(
           firstError(
@@ -54,18 +54,16 @@ class BusinessUseAnIPSPFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  private def apply(useAnIPSP: Boolean, nameOpt: Option[String], referenceNumber: Option[String]): BusinessUseAnIPSP = {
+  private def apply(useAnIPSP: Boolean, nameOpt: Option[String], referenceNumber: Option[String]): BusinessUseAnIPSP =
     (useAnIPSP, nameOpt, referenceNumber) match {
       case (true, Some(name), Some(refNo)) => BusinessUseAnIPSPYes(name, refNo)
-      case (false, _, _) => BusinessUseAnIPSPNo
-      case _ => throw new IllegalArgumentException("Invalid form entry, cannot make instance of BusinessUseAnIPSP")
+      case (false, _, _)                   => BusinessUseAnIPSPNo
+      case _                               => throw new IllegalArgumentException("Invalid form entry, cannot make instance of BusinessUseAnIPSP")
     }
-  }
 
-  private def unapply(obj: BusinessUseAnIPSP): Option[(Boolean, Option[String], Option[String])] = {
+  private def unapply(obj: BusinessUseAnIPSP): Option[(Boolean, Option[String], Option[String])] =
     obj match {
       case BusinessUseAnIPSPYes(name, reference) => Some((true, Some(name), Some(reference)))
-      case BusinessUseAnIPSPNo => Some((false, None, None))
+      case BusinessUseAnIPSPNo                   => Some((false, None, None))
     }
-  }
 }

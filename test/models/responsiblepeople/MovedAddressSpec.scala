@@ -21,12 +21,12 @@ import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
 class MovedAddressSpec extends PlaySpec with MockitoSugar {
-  
+
   "MovedAddress" must {
 
     "round trip through JSON" in {
 
-      val trueModel = MovedAddress(true)
+      val trueModel  = MovedAddress(true)
       val falseModel = MovedAddress(false)
 
       Json.toJson(trueModel).as[MovedAddress] mustBe trueModel

@@ -39,7 +39,7 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injectin
 
   trait Fixture {
     self =>
-    val request = addToken(authRequest)
+    val request            = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
 
     val mockApplicationConfig = mock[ApplicationConfig]
@@ -55,7 +55,7 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injectin
       errorView
     )
 
-    val emptyCache = Cache.empty
+    val emptyCache   = Cache.empty
     val mockCacheMap = mock[Cache]
 
     val personName = PersonName("firstname", None, "lastname")
@@ -76,15 +76,15 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injectin
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("input[name=dateOfBirth.day]").`val` must be("")
+          document.select("input[name=dateOfBirth.day]").`val`   must be("")
           document.select("input[name=dateOfBirth.month]").`val` must be("")
-          document.select("input[name=dateOfBirth.year]").`val` must be("")
+          document.select("input[name=dateOfBirth.year]").`val`  must be("")
         }
 
         "data is present" in new Fixture {
           val responsiblePeople = ResponsiblePerson(
             personName = Some(personName),
-            dateOfBirth = Some(DateOfBirth(LocalDate.of(2001,12,2)))
+            dateOfBirth = Some(DateOfBirth(LocalDate.of(2001, 12, 2)))
           )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -94,9 +94,9 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injectin
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("input[name=dateOfBirth.day]").`val` must be("2")
+          document.select("input[name=dateOfBirth.day]").`val`   must be("2")
           document.select("input[name=dateOfBirth.month]").`val` must be("12")
-          document.select("input[name=dateOfBirth.year]").`val` must be("2001")
+          document.select("input[name=dateOfBirth.year]").`val`  must be("2001")
         }
       }
 
@@ -118,9 +118,9 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injectin
         "go to PersonResidencyTypeController" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.DateOfBirthController.post(1).url).withFormUrlEncodedBody(
-            "dateOfBirth.day" -> "1",
+            "dateOfBirth.day"   -> "1",
             "dateOfBirth.month" -> "12",
-            "dateOfBirth.year" -> "1990"
+            "dateOfBirth.year"  -> "1990"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -130,8 +130,10 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injectin
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(1)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonResidentTypeController.get(1).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.responsiblepeople.routes.PersonResidentTypeController.get(1).url)
+          )
 
         }
       }
@@ -140,9 +142,9 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injectin
         "go to DetailedAnswersController" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.DateOfBirthController.post(1).url).withFormUrlEncodedBody(
-            "dateOfBirth.day" -> "1",
+            "dateOfBirth.day"   -> "1",
             "dateOfBirth.month" -> "12",
-            "dateOfBirth.year" -> "1990"
+            "dateOfBirth.year"  -> "1990"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -152,8 +154,10 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injectin
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url)
+          )
 
         }
       }
@@ -162,9 +166,9 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injectin
         "respond with BAD_REQUEST" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.DateOfBirthController.post(1).url).withFormUrlEncodedBody(
-            "dateOfBirth.day" -> "sdfsadgadg",
+            "dateOfBirth.day"   -> "sdfsadgadg",
             "dateOfBirth.month" -> "12",
-            "dateOfBirth.year" -> "1990"
+            "dateOfBirth.year"  -> "1990"
           )
 
           val responsiblePeople = ResponsiblePerson()
@@ -191,9 +195,9 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injectin
         "respond with NOT_FOUND" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.DateOfBirthController.post(1).url).withFormUrlEncodedBody(
-            "dateOfBirth.day" -> "1",
+            "dateOfBirth.day"   -> "1",
             "dateOfBirth.month" -> "12",
-            "dateOfBirth.year" -> "1990"
+            "dateOfBirth.year"  -> "1990"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))

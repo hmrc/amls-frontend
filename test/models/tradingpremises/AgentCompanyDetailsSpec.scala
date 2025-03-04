@@ -23,8 +23,9 @@ class AgentCompanyDetailsSpec extends AmlsSpec {
 
   "Json Validation" must {
     "Successfully read/write Json data" in {
-      Json.fromJson[AgentCompanyDetails](Json.toJson[AgentCompanyDetails](
-        AgentCompanyDetails("test", "12345678"))) must be(JsSuccess(AgentCompanyDetails("test", Some("12345678"))))
+      Json.fromJson[AgentCompanyDetails](
+        Json.toJson[AgentCompanyDetails](AgentCompanyDetails("test", "12345678"))
+      ) must be(JsSuccess(AgentCompanyDetails("test", Some("12345678"))))
     }
   }
 }

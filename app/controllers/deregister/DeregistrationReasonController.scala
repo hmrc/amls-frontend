@@ -29,42 +29,43 @@ import views.html.deregister.DeregistrationReasonView
 
 import javax.inject.Inject
 
-class DeregistrationReasonController @Inject()(authAction: AuthAction,
-                                               ds: CommonPlayDependencies,
-                                               dataCacheConnector: DataCacheConnector,
-                                               cc: MessagesControllerComponents,
-                                               formProvider: DeregistrationReasonFormProvider,
-                                               view: DeregistrationReasonView) extends AmlsBaseController(ds, cc) {
+class DeregistrationReasonController @Inject() (
+  authAction: AuthAction,
+  ds: CommonPlayDependencies,
+  dataCacheConnector: DataCacheConnector,
+  cc: MessagesControllerComponents,
+  formProvider: DeregistrationReasonFormProvider,
+  view: DeregistrationReasonView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
-        (for {
-          bm: BusinessMatching <- businessMatching
-          activities <- bm.activities
-        } yield {
-          Ok(view(formProvider(), activities.businessActivities.contains(HighValueDealing)))
-        }) getOrElse Ok(view(formProvider(), false))
-      }
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
+      (for {
+        bm: BusinessMatching <- businessMatching
+        activities           <- bm.activities
+      } yield Ok(view(formProvider(), activities.businessActivities.contains(HighValueDealing)))) getOrElse Ok(
+        view(formProvider(), false)
+      )
+    }
   }
 
-  def post: Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post: Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         (formWithErrors: Form[DeregistrationReason]) =>
           dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
             (for {
-              bm <- businessMatching
+              bm         <- businessMatching
               activities <- bm.activities
-            } yield {
-              BadRequest(view(formWithErrors, activities.businessActivities.contains(HighValueDealing)))
-            }) getOrElse BadRequest(view(formWithErrors, hvdRequired = false))
+            } yield BadRequest(
+              view(formWithErrors, activities.businessActivities.contains(HighValueDealing))
+            )) getOrElse BadRequest(view(formWithErrors, hvdRequired = false))
           },
-        (deregistrationReason: DeregistrationReason) => {
+        (deregistrationReason: DeregistrationReason) =>
           dataCacheConnector
             .save[DeregistrationReason](request.credId, DeregistrationReason.key, deregistrationReason)
             .map(_ => Redirect(controllers.deregister.routes.DeregistrationCheckYourAnswersController.get))
-        }
       )
   }
 }

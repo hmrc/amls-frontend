@@ -27,9 +27,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
 
   val testNotifications = NotificationRow(
     Some(
-      Status(
-        Some(StatusType.Revoked),
-        Some(RevokedReason.RevokedCeasedTrading))
+      Status(Some(StatusType.Revoked), Some(RevokedReason.RevokedCeasedTrading))
     ),
     None,
     None,
@@ -43,25 +41,57 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
 
   "NotificationRows " must {
     "read/write Contact types Json successfully" in {
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RejectionReasons)) must be(JsSuccess(ContactType.RejectionReasons))
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RevocationReasons)) must be(JsSuccess(ContactType.RevocationReasons))
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.MindedToReject)) must be(JsSuccess(ContactType.MindedToReject))
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.NoLongerMindedToReject)) must be(JsSuccess(ContactType.NoLongerMindedToReject))
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.MindedToRevoke)) must be(JsSuccess(ContactType.MindedToRevoke))
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.NoLongerMindedToRevoke)) must be(JsSuccess(ContactType.NoLongerMindedToRevoke))
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.Others)) must be(JsSuccess(ContactType.Others))
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ApplicationApproval)) must be(JsSuccess(ContactType.ApplicationApproval))
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RenewalApproval)) must be(JsSuccess(ContactType.RenewalApproval))
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.AutoExpiryOfRegistration)) must be(JsSuccess(ContactType.AutoExpiryOfRegistration))
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RenewalReminder)) must be(JsSuccess(ContactType.RenewalReminder))
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ReminderToPayForApplication)) must be(JsSuccess(ContactType.ReminderToPayForApplication))
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ReminderToPayForRenewal)) must be(JsSuccess(ContactType.ReminderToPayForRenewal))
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ReminderToPayForVariation)) must be(JsSuccess(ContactType.ReminderToPayForVariation))
-      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ReminderToPayForManualCharges)) must be(JsSuccess(ContactType.ReminderToPayForManualCharges))
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RejectionReasons))              must be(
+        JsSuccess(ContactType.RejectionReasons)
+      )
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RevocationReasons))             must be(
+        JsSuccess(ContactType.RevocationReasons)
+      )
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.MindedToReject))                must be(
+        JsSuccess(ContactType.MindedToReject)
+      )
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.NoLongerMindedToReject))        must be(
+        JsSuccess(ContactType.NoLongerMindedToReject)
+      )
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.MindedToRevoke))                must be(
+        JsSuccess(ContactType.MindedToRevoke)
+      )
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.NoLongerMindedToRevoke))        must be(
+        JsSuccess(ContactType.NoLongerMindedToRevoke)
+      )
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.Others))                        must be(
+        JsSuccess(ContactType.Others)
+      )
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ApplicationApproval))           must be(
+        JsSuccess(ContactType.ApplicationApproval)
+      )
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RenewalApproval))               must be(
+        JsSuccess(ContactType.RenewalApproval)
+      )
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.AutoExpiryOfRegistration))      must be(
+        JsSuccess(ContactType.AutoExpiryOfRegistration)
+      )
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.RenewalReminder))               must be(
+        JsSuccess(ContactType.RenewalReminder)
+      )
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ReminderToPayForApplication))   must be(
+        JsSuccess(ContactType.ReminderToPayForApplication)
+      )
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ReminderToPayForRenewal))       must be(
+        JsSuccess(ContactType.ReminderToPayForRenewal)
+      )
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ReminderToPayForVariation))     must be(
+        JsSuccess(ContactType.ReminderToPayForVariation)
+      )
+      ContactType.jsonReads.reads(ContactType.jsonWrites.writes(ContactType.ReminderToPayForManualCharges)) must be(
+        JsSuccess(ContactType.ReminderToPayForManualCharges)
+      )
     }
 
     "fail with error when status value is passed incorrectly" in {
-      ContactType.jsonReads.reads(JsString("RPM1RPM1")) must be(JsError(List((JsPath \ "contact_type", List(play.api.libs.json.JsonValidationError("error.invalid"))))))
+      ContactType.jsonReads.reads(JsString("RPM1RPM1")) must be(
+        JsError(List((JsPath \ "contact_type", List(play.api.libs.json.JsonValidationError("error.invalid")))))
+      )
     }
 
     "format the date for the table of messages" in {
@@ -74,7 +104,8 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
           Status(
             Some(StatusType.Revoked),
             Some(RevokedReason.RevokedCeasedTrading)
-          )),
+          )
+        ),
         Some(ContactType.MindedToRevoke),
         None,
         false,
@@ -83,10 +114,9 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
         "XJML00000200000",
         "1",
         new IDType("5832e38e01000001005ca3ff")
-        )
+      )
 
-      val json = Json.parse(
-        """
+      val json = Json.parse("""
           |{
           | "status":{
           |   "status_type":"08",
@@ -115,50 +145,62 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
         false,
         "XJML00000200000",
         "1",
-        new IDType("5832e38e01000001005ca3ff"
-        ))
+        new IDType("5832e38e01000001005ca3ff")
+      )
 
       "status reason is 2" in {
-        notificationRow.copy(
-          status = Some(
-            Status(
-              Some(StatusType.Rejected),
-              Some(RejectedReason.FailedToRespond)
-            ))
-        ).subject must be("notifications.fail.title")
+        notificationRow
+          .copy(
+            status = Some(
+              Status(
+                Some(StatusType.Rejected),
+                Some(RejectedReason.FailedToRespond)
+              )
+            )
+          )
+          .subject must be("notifications.fail.title")
       }
 
       "status reason is 3" when {
         "contact number & contact type are present" in {
-          notificationRow.copy(
-            status = Some(
-              Status(
-                Some(StatusType.Rejected),
-                Some(RejectedReason.FailedToPayCharges)
-              ))
-          ).subject must be("notifications.fail.title")
+          notificationRow
+            .copy(
+              status = Some(
+                Status(
+                  Some(StatusType.Rejected),
+                  Some(RejectedReason.FailedToPayCharges)
+                )
+              )
+            )
+            .subject must be("notifications.fail.title")
         }
 
         "contact number & contact type are absent" in {
-          notificationRow.copy(
-            status = Some(
-              Status(
-                Some(StatusType.Rejected),
-                Some(RejectedReason.FailedToPayCharges)
-              )),
-            contactType = None
-          ).subject must be("notifications.fail.title")
+          notificationRow
+            .copy(
+              status = Some(
+                Status(
+                  Some(StatusType.Rejected),
+                  Some(RejectedReason.FailedToPayCharges)
+                )
+              ),
+              contactType = None
+            )
+            .subject must be("notifications.fail.title")
         }
       }
 
       "status reason is 98" in {
-        notificationRow.copy(
-          status = Some(
-            Status(
-              Some(StatusType.Rejected),
-              Some(RejectedReason.OtherFailed)
-            ))
-        ).subject must be("notifications.fail.title")
+        notificationRow
+          .copy(
+            status = Some(
+              Status(
+                Some(StatusType.Rejected),
+                Some(RejectedReason.OtherFailed)
+              )
+            )
+          )
+          .subject must be("notifications.fail.title")
       }
 
       "default" in {
@@ -178,37 +220,46 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
         false,
         "XJML00000200000",
         "1",
-        new IDType("5832e38e01000001005ca3ff"
-        ))
+        new IDType("5832e38e01000001005ca3ff")
+      )
 
       "status reason is 1" in {
-        notificationRow.copy(
-          status = Some(
-            Status(
-              Some(StatusType.Rejected),
-              Some(RejectedReason.NonCompliant)
-            ))
-        ).subject must be("notifications.rejr.title")
+        notificationRow
+          .copy(
+            status = Some(
+              Status(
+                Some(StatusType.Rejected),
+                Some(RejectedReason.NonCompliant)
+              )
+            )
+          )
+          .subject must be("notifications.rejr.title")
       }
 
       "status reason is 4" in {
-        notificationRow.copy(
-          status = Some(
-            Status(
-              Some(StatusType.Rejected),
-              Some(RejectedReason.FitAndProperFailure)
-            ))
-        ).subject must be("notifications.rejr.title")
+        notificationRow
+          .copy(
+            status = Some(
+              Status(
+                Some(StatusType.Rejected),
+                Some(RejectedReason.FitAndProperFailure)
+              )
+            )
+          )
+          .subject must be("notifications.rejr.title")
       }
 
       "status reason is 99" in {
-        notificationRow.copy(
-          status = Some(
-            Status(
-              Some(StatusType.Rejected),
-              Some(RejectedReason.OtherRefused)
-            ))
-        ).subject must be("notifications.rejr.title")
+        notificationRow
+          .copy(
+            status = Some(
+              Status(
+                Some(StatusType.Rejected),
+                Some(RejectedReason.OtherRefused)
+              )
+            )
+          )
+          .subject must be("notifications.rejr.title")
       }
 
     }

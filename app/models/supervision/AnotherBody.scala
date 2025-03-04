@@ -26,10 +26,12 @@ import java.time.LocalDate
 
 sealed trait AnotherBody
 
-case class AnotherBodyYes(supervisorName: String,
-                          startDate: Option[SupervisionStart] = None,
-                          endDate: Option[SupervisionEnd] = None,
-                          endingReason: Option[SupervisionEndReasons] = None) extends AnotherBody {
+case class AnotherBodyYes(
+  supervisorName: String,
+  startDate: Option[SupervisionStart] = None,
+  endDate: Option[SupervisionEnd] = None,
+  endingReason: Option[SupervisionEndReasons] = None
+) extends AnotherBody {
 
   def supervisorName(p: String): AnotherBodyYes =
     this.copy(supervisorName = p)
@@ -45,7 +47,7 @@ case class AnotherBodyYes(supervisorName: String,
 
   def isComplete(): Boolean = this match {
     case AnotherBodyYes(_, Some(_), Some(_), Some(_)) => true
-    case _ => false
+    case _                                            => false
   }
 }
 
@@ -54,7 +56,6 @@ case object AnotherBodyNo extends AnotherBody
 object AnotherBody {
 
   def formValues(html: Html)(implicit messages: Messages): Seq[RadioItem] = HmrcYesNoRadioItems().map { radioItem =>
-
     if (radioItem.value.contains("true")) {
       radioItem.copy(
         id = Some("anotherBody-true"),
@@ -72,17 +73,17 @@ object AnotherBody {
 
   def oldStartDateReader: Reads[Option[SupervisionStart]] =
     (__ \ "startDate").readNullable[LocalDate] map { sd =>
-     sd.fold[Option[SupervisionStart]](None) { e => Some(SupervisionStart(e))}
+      sd.fold[Option[SupervisionStart]](None)(e => Some(SupervisionStart(e)))
     }
 
   def oldEndDateReader: Reads[Option[SupervisionEnd]] =
     (__ \ "endDate").readNullable[LocalDate] map { ed =>
-      ed.fold[Option[SupervisionEnd]](None) { e => Some(SupervisionEnd(e))}
+      ed.fold[Option[SupervisionEnd]](None)(e => Some(SupervisionEnd(e)))
     }
 
   def oldEndReasonsReader: Reads[Option[SupervisionEndReasons]] =
     (__ \ "endingReason").readNullable[String] map { er =>
-      er.fold[Option[SupervisionEndReasons]](None) { e => Some(SupervisionEndReasons(e))}
+      er.fold[Option[SupervisionEndReasons]](None)(e => Some(SupervisionEndReasons(e)))
     }
 
   implicit val jsonReads: Reads[AnotherBody] = {
@@ -97,31 +98,32 @@ object AnotherBody {
           (__ \ "supervisorName").read[String] and
             ((__ \ "startDate").read(Reads.optionNoError[SupervisionStart]) flatMap {
               case None => oldStartDateReader
-              case x => constant(x)
-          }) and
+              case x    => constant(x)
+            }) and
             ((__ \ "endDate").read(Reads.optionNoError[SupervisionEnd]) flatMap {
               case None => oldEndDateReader
-              case x => constant(x)
+              case x    => constant(x)
             }) and
-            ((__ \"endingReason").read(Reads.optionNoError[SupervisionEndReasons]) flatMap {
+            ((__ \ "endingReason").read(Reads.optionNoError[SupervisionEndReasons]) flatMap {
               case None => oldEndReasonsReader
-              case x => constant(x)
+              case x    => constant(x)
             })
-          ) (AnotherBodyYes.apply _) map identity[AnotherBody]
+        )(AnotherBodyYes.apply _) map identity[AnotherBody]
 
       case false => AnotherBodyNo
     }
   }
 
   implicit val jsonWrites: Writes[AnotherBody] = Writes[AnotherBody] {
-    case a : AnotherBodyYes => {
-     Json.obj("anotherBody" -> true,
+    case a: AnotherBodyYes =>
+      Json.obj(
+        "anotherBody"    -> true,
         "supervisorName" -> a.supervisorName,
-        "startDate" -> a.startDate,
-        "endDate" -> a.endDate,
-        "endingReason" -> a.endingReason)
-    }
-    case AnotherBodyNo => Json.obj("anotherBody" -> false)
+        "startDate"      -> a.startDate,
+        "endDate"        -> a.endDate,
+        "endingReason"   -> a.endingReason
+      )
+    case AnotherBodyNo     => Json.obj("anotherBody" -> false)
   }
 
 }

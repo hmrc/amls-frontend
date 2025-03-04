@@ -25,20 +25,20 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class ExperienceTrainingFormProvider @Inject()() extends Mappings {
+class ExperienceTrainingFormProvider @Inject() () extends Mappings {
 
   val length = 255
 
-  private val booleanFieldName = "experienceTraining"
+  private val booleanFieldName                                                                                      = "experienceTraining"
   def apply(name: String, serviceOpt: Option[String] = None)(implicit messages: Messages): Form[ExperienceTraining] = {
 
-    val booleanError = serviceOpt.fold(messages("error.required.rp.experiencetraining", name)) {
-      service => messages("error.required.rp.experiencetraining.one", name, service)
+    val booleanError = serviceOpt.fold(messages("error.required.rp.experiencetraining", name)) { service =>
+      messages("error.required.rp.experiencetraining.one", name, service)
     }
 
     Form[ExperienceTraining](
       mapping(
-        booleanFieldName -> boolean(booleanError, booleanError),
+        booleanFieldName        -> boolean(booleanError, booleanError),
         "experienceInformation" -> mandatoryIfTrue(
           booleanFieldName,
           text("error.required.rp.experiencetraining.information").verifying(
@@ -52,17 +52,16 @@ class ExperienceTrainingFormProvider @Inject()() extends Mappings {
     )
   }
 
-  def apply(hasTraining: Boolean, information: Option[String]): ExperienceTraining = {
+  def apply(hasTraining: Boolean, information: Option[String]): ExperienceTraining =
     (hasTraining, information) match {
       case (true, Some(str)) => ExperienceTrainingYes(str)
-      case (false, None) => ExperienceTrainingNo
-      case _ => throw new IllegalArgumentException(s"Invalid combination of answers")
+      case (false, None)     => ExperienceTrainingNo
+      case _                 => throw new IllegalArgumentException(s"Invalid combination of answers")
     }
-  }
 
   def unapply(obj: ExperienceTraining): Option[(Boolean, Option[String])] = obj match {
     case ExperienceTrainingYes(experienceInformation) => Some((true, Some(experienceInformation)))
-    case ExperienceTrainingNo => Some((false, None))
-    case _ => None
+    case ExperienceTrainingNo                         => Some((false, None))
+    case _                                            => None
   }
 }

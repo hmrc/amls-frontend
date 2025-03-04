@@ -32,7 +32,7 @@ class CheckCompanyControllerSpec extends AmlsSpec with ScalaFutures with Injecti
     mockMcc,
     inject[CheckCompanyIsNotRegisteredView]
   )
-  
+
   val request = FakeRequest()
 
   "CheckCompanyController" when {

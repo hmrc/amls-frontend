@@ -30,12 +30,12 @@ import scala.concurrent.Future
 class BusinessEmailAddressServiceSpec extends AmlsSpec with BeforeAndAfterEach with IntegrationPatience {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[Cache]
+  val mockCacheMap       = mock[Cache]
 
   val service = new BusinessEmailAddressService(mockCacheConnector)
 
   val credId = "123456"
-  val email = "person@domain.com"
+  val email  = "person@domain.com"
 
   override def beforeEach(): Unit = reset(mockCacheConnector, mockCacheMap)
 
@@ -84,16 +84,17 @@ class BusinessEmailAddressServiceSpec extends AmlsSpec with BeforeAndAfterEach w
       "update and save the model correctly" in {
 
         val phone = Some("07123456789")
-        val bd = BusinessDetails().contactingYou(ContactingYou(phoneNumber = phone))
+        val bd    = BusinessDetails().contactingYou(ContactingYou(phoneNumber = phone))
 
         when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
           .thenReturn(Future.successful(Some(bd)))
 
-        when(mockCacheConnector.save[BusinessDetails](
-          eqTo(credId),
-          eqTo(BusinessDetails.key),
-          eqTo(bd.contactingYou(ContactingYou(phoneNumber = phone, email = Some(email))))
-        )(any())
+        when(
+          mockCacheConnector.save[BusinessDetails](
+            eqTo(credId),
+            eqTo(BusinessDetails.key),
+            eqTo(bd.contactingYou(ContactingYou(phoneNumber = phone, email = Some(email))))
+          )(any())
         ).thenReturn(Future.successful(mockCacheMap))
 
         service.updateEmailAddress(credId, ContactingYouEmail(email)).futureValue mustBe Some(mockCacheMap)

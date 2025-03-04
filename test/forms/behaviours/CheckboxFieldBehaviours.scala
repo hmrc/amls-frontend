@@ -20,10 +20,7 @@ import play.api.data.{Form, FormError}
 
 trait CheckboxFieldBehaviours extends FieldBehaviours {
 
-  def checkboxField[T](form: Form[_],
-                       fieldName: String,
-                       validValues: Seq[T],
-                       invalidError: FormError): Unit = {
+  def checkboxField[T](form: Form[_], fieldName: String, validValues: Seq[T], invalidError: FormError): Unit = {
     for {
       (value, i) <- validValues.zipWithIndex
     } yield s"binds `$value` successfully" in {
@@ -41,13 +38,15 @@ trait CheckboxFieldBehaviours extends FieldBehaviours {
     }
   }
 
-  def checkboxFieldWithWrapper[T, A](form: Form[_],
-                       fieldName: String,
-                       validValues: Seq[T],
-                       toWrapperSingle: T => A,
-                       toWrapperMulti: Seq[T] => A,
-                       invalidError: FormError,
-                       extraData: (String, String)*): Unit = {
+  def checkboxFieldWithWrapper[T, A](
+    form: Form[_],
+    fieldName: String,
+    validValues: Seq[T],
+    toWrapperSingle: T => A,
+    toWrapperMulti: Seq[T] => A,
+    invalidError: FormError,
+    extraData: (String, String)*
+  ): Unit = {
     for {
       (value, i) <- validValues.zipWithIndex
     } yield s"bind `$value` successfully" in {
@@ -73,9 +72,7 @@ trait CheckboxFieldBehaviours extends FieldBehaviours {
     }
   }
 
-  def mandatoryCheckboxField(form: Form[_],
-                             fieldName: String,
-                             requiredKey: String): Unit = {
+  def mandatoryCheckboxField(form: Form[_], fieldName: String, requiredKey: String): Unit = {
 
     "fail to bind when no answers are selected" in {
       val data = Map.empty[String, String]

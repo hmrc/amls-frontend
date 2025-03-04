@@ -25,58 +25,105 @@ import services.cache.Cache
 import utils.ControllerHelper
 
 case class MoneyServiceBusiness(
-                                 throughput: Option[ExpectedThroughput] = None,
-                                 businessUseAnIPSP: Option[BusinessUseAnIPSP] = None,
-                                 identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
-                                 whichCurrencies: Option[WhichCurrencies] = None,
-                                 sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
-                                 fundsTransfer: Option[FundsTransfer] = None,
-                                 branchesOrAgents: Option[BranchesOrAgents] = None,
-                                 sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
-                                 mostTransactions: Option[MostTransactions] = None,
-                                 transactionsInNext12Months: Option[TransactionsInNext12Months] = None,
-                                 ceTransactionsInNext12Months: Option[CETransactionsInNext12Months] = None,
-                                 fxTransactionsInNext12Months: Option[FXTransactionsInNext12Months] = None,
-                                 hasChanged: Boolean = false,
-                                 hasAccepted: Boolean = false
-                               ) {
+  throughput: Option[ExpectedThroughput] = None,
+  businessUseAnIPSP: Option[BusinessUseAnIPSP] = None,
+  identifyLinkedTransactions: Option[IdentifyLinkedTransactions] = None,
+  whichCurrencies: Option[WhichCurrencies] = None,
+  sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
+  fundsTransfer: Option[FundsTransfer] = None,
+  branchesOrAgents: Option[BranchesOrAgents] = None,
+  sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
+  mostTransactions: Option[MostTransactions] = None,
+  transactionsInNext12Months: Option[TransactionsInNext12Months] = None,
+  ceTransactionsInNext12Months: Option[CETransactionsInNext12Months] = None,
+  fxTransactionsInNext12Months: Option[FXTransactionsInNext12Months] = None,
+  hasChanged: Boolean = false,
+  hasAccepted: Boolean = false
+) {
 
   def throughput(p: ExpectedThroughput): MoneyServiceBusiness =
-    this.copy(throughput = Some(p), hasChanged = hasChanged || !this.throughput.contains(p), hasAccepted = hasAccepted && this.throughput.contains(p))
+    this.copy(
+      throughput = Some(p),
+      hasChanged = hasChanged || !this.throughput.contains(p),
+      hasAccepted = hasAccepted && this.throughput.contains(p)
+    )
 
   def whichCurrencies(p: WhichCurrencies): MoneyServiceBusiness =
-    this.copy(whichCurrencies = Some(p), hasChanged = hasChanged || !this.whichCurrencies.contains(p), hasAccepted = hasAccepted && this.whichCurrencies.contains(p))
+    this.copy(
+      whichCurrencies = Some(p),
+      hasChanged = hasChanged || !this.whichCurrencies.contains(p),
+      hasAccepted = hasAccepted && this.whichCurrencies.contains(p)
+    )
 
   def businessUseAnIPSP(p: BusinessUseAnIPSP): MoneyServiceBusiness =
-    this.copy(businessUseAnIPSP = Some(p), hasChanged = hasChanged || !this.businessUseAnIPSP.contains(p), hasAccepted = hasAccepted && this.businessUseAnIPSP.contains(p))
+    this.copy(
+      businessUseAnIPSP = Some(p),
+      hasChanged = hasChanged || !this.businessUseAnIPSP.contains(p),
+      hasAccepted = hasAccepted && this.businessUseAnIPSP.contains(p)
+    )
 
   def identifyLinkedTransactions(p: IdentifyLinkedTransactions): MoneyServiceBusiness =
-    this.copy(identifyLinkedTransactions = Some(p), hasChanged = hasChanged || !this.identifyLinkedTransactions.contains(p), hasAccepted = hasAccepted && this.identifyLinkedTransactions.contains(p))
+    this.copy(
+      identifyLinkedTransactions = Some(p),
+      hasChanged = hasChanged || !this.identifyLinkedTransactions.contains(p),
+      hasAccepted = hasAccepted && this.identifyLinkedTransactions.contains(p)
+    )
 
   def fundsTransfer(p: FundsTransfer): MoneyServiceBusiness =
-    this.copy(fundsTransfer = Some(p), hasChanged = hasChanged || !this.fundsTransfer.contains(p), hasAccepted = hasAccepted && this.fundsTransfer.contains(p))
+    this.copy(
+      fundsTransfer = Some(p),
+      hasChanged = hasChanged || !this.fundsTransfer.contains(p),
+      hasAccepted = hasAccepted && this.fundsTransfer.contains(p)
+    )
 
   def branchesOrAgents(p: BranchesOrAgents): MoneyServiceBusiness =
-    this.copy(branchesOrAgents = Some(p), hasChanged = hasChanged || !this.branchesOrAgents.contains(p), hasAccepted = hasAccepted && this.branchesOrAgents.contains(p))
+    this.copy(
+      branchesOrAgents = Some(p),
+      hasChanged = hasChanged || !this.branchesOrAgents.contains(p),
+      hasAccepted = hasAccepted && this.branchesOrAgents.contains(p)
+    )
 
   def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
-    this.copy(sendMoneyToOtherCountry = Some(p), hasChanged = hasChanged || !this.sendMoneyToOtherCountry.contains(p), hasAccepted = hasAccepted && this.sendMoneyToOtherCountry.contains(p))
+    this.copy(
+      sendMoneyToOtherCountry = Some(p),
+      hasChanged = hasChanged || !this.sendMoneyToOtherCountry.contains(p),
+      hasAccepted = hasAccepted && this.sendMoneyToOtherCountry.contains(p)
+    )
 
   def sendTheLargestAmountsOfMoney(p: Option[SendTheLargestAmountsOfMoney]): MoneyServiceBusiness =
-    this.copy(sendTheLargestAmountsOfMoney = p, hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.equals(p),
-      hasAccepted = hasAccepted && this.sendTheLargestAmountsOfMoney.equals(p))
+    this.copy(
+      sendTheLargestAmountsOfMoney = p,
+      hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.equals(p),
+      hasAccepted = hasAccepted && this.sendTheLargestAmountsOfMoney.equals(p)
+    )
 
   def mostTransactions(p: Option[MostTransactions]): MoneyServiceBusiness =
-    this.copy(mostTransactions = p, hasChanged = hasChanged || !this.mostTransactions.equals(p), hasAccepted = hasAccepted && this.mostTransactions.equals(p))
+    this.copy(
+      mostTransactions = p,
+      hasChanged = hasChanged || !this.mostTransactions.equals(p),
+      hasAccepted = hasAccepted && this.mostTransactions.equals(p)
+    )
 
   def transactionsInNext12Months(p: TransactionsInNext12Months): MoneyServiceBusiness =
-    this.copy(transactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.transactionsInNext12Months.contains(p), hasAccepted = hasAccepted && this.transactionsInNext12Months.contains(p))
+    this.copy(
+      transactionsInNext12Months = Some(p),
+      hasChanged = hasChanged || !this.transactionsInNext12Months.contains(p),
+      hasAccepted = hasAccepted && this.transactionsInNext12Months.contains(p)
+    )
 
   def ceTransactionsInNext12Months(p: CETransactionsInNext12Months): MoneyServiceBusiness =
-    this.copy(ceTransactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.ceTransactionsInNext12Months.contains(p), hasAccepted = hasAccepted && this.ceTransactionsInNext12Months.contains(p))
+    this.copy(
+      ceTransactionsInNext12Months = Some(p),
+      hasChanged = hasChanged || !this.ceTransactionsInNext12Months.contains(p),
+      hasAccepted = hasAccepted && this.ceTransactionsInNext12Months.contains(p)
+    )
 
   def fxTransactionsInNext12Months(p: FXTransactionsInNext12Months): MoneyServiceBusiness =
-    this.copy(fxTransactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.fxTransactionsInNext12Months.contains(p), hasAccepted = hasAccepted && this.fxTransactionsInNext12Months.contains(p))
+    this.copy(
+      fxTransactionsInNext12Months = Some(p),
+      hasChanged = hasChanged || !this.fxTransactionsInNext12Months.contains(p),
+      hasAccepted = hasAccepted && this.fxTransactionsInNext12Months.contains(p)
+    )
 
   private def allComplete: Boolean =
     this.throughput.isDefined &&
@@ -84,8 +131,8 @@ case class MoneyServiceBusiness(
       (
         this.branchesOrAgents match {
           case Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(_))) => true
-          case Some(BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)) => true
-          case _ => false
+          case Some(BranchesOrAgents(BranchesOrAgentsHasCountries(false), None))   => true
+          case _                                                                   => false
         }
       ) &&
       this.identifyLinkedTransactions.isDefined
@@ -93,15 +140,15 @@ case class MoneyServiceBusiness(
   private def mtComplete(mtFlag: Boolean): Boolean =
     if (mtFlag) {
       this.businessUseAnIPSP.isDefined &&
-        this.fundsTransfer.isDefined &&
-        this.transactionsInNext12Months.isDefined &&
+      this.fundsTransfer.isDefined &&
+      this.transactionsInNext12Months.isDefined &&
+      (
         (
-          (
-            this.sendMoneyToOtherCountry.contains(SendMoneyToOtherCountry(true)) &&
-              this.sendTheLargestAmountsOfMoney.isDefined &&
-              this.mostTransactions.isDefined
-            ) || this.sendMoneyToOtherCountry.contains(SendMoneyToOtherCountry(false))
-          )
+          this.sendMoneyToOtherCountry.contains(SendMoneyToOtherCountry(true)) &&
+            this.sendTheLargestAmountsOfMoney.isDefined &&
+            this.mostTransactions.isDefined
+        ) || this.sendMoneyToOtherCountry.contains(SendMoneyToOtherCountry(false))
+      )
     } else {
       true
     }
@@ -120,9 +167,8 @@ case class MoneyServiceBusiness(
       true
     }
 
-  def isComplete(mtFlag: Boolean, ceFlag: Boolean, fxFlag: Boolean): Boolean = {
+  def isComplete(mtFlag: Boolean, ceFlag: Boolean, fxFlag: Boolean): Boolean =
     allComplete && mtComplete(mtFlag) && ceComplete(ceFlag) && fxComplete(fxFlag) && this.hasAccepted
-  }
 }
 
 object MoneyServiceBusiness {
@@ -138,38 +184,40 @@ object MoneyServiceBusiness {
       TaskRow.notStartedTag
     )
 
-    cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {
-      model =>
-        val msbService = ControllerHelper.getMsbServices(cache.getEntry[BusinessMatching](BusinessMatching.key)).getOrElse(Set.empty)
-        val isComplete = model.isComplete(
-          msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange), msbService.contains(ForeignExchange)
-        )
+    cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) { model =>
+      val msbService =
+        ControllerHelper.getMsbServices(cache.getEntry[BusinessMatching](BusinessMatching.key)).getOrElse(Set.empty)
+      val isComplete = model.isComplete(
+        msbService.contains(TransmittingMoney),
+        msbService.contains(CurrencyExchange),
+        msbService.contains(ForeignExchange)
+      )
 
-        if (isComplete && model.hasChanged) {
-          TaskRow(
-            key,
-            controllers.msb.routes.SummaryController.get.url,
-            hasChanged = true,
-            status = Updated,
-            tag = TaskRow.updatedTag
-          )
-        } else if (isComplete) {
-          TaskRow(
-            key,
-            controllers.msb.routes.SummaryController.get.url,
-            model.hasChanged,
-            Completed,
-            TaskRow.completedTag
-          )
-        } else {
-          TaskRow(
-            key,
-            controllers.msb.routes.WhatYouNeedController.get.url,
-            model.hasChanged,
-            Started,
-            TaskRow.incompleteTag
-          )
-        }
+      if (isComplete && model.hasChanged) {
+        TaskRow(
+          key,
+          controllers.msb.routes.SummaryController.get.url,
+          hasChanged = true,
+          status = Updated,
+          tag = TaskRow.updatedTag
+        )
+      } else if (isComplete) {
+        TaskRow(
+          key,
+          controllers.msb.routes.SummaryController.get.url,
+          model.hasChanged,
+          Completed,
+          TaskRow.completedTag
+        )
+      } else {
+        TaskRow(
+          key,
+          controllers.msb.routes.WhatYouNeedController.get.url,
+          model.hasChanged,
+          Started,
+          TaskRow.incompleteTag
+        )
+      }
     }
   }
 
@@ -195,16 +243,13 @@ object MoneyServiceBusiness {
         (__ \ "hasAccepted").readNullable[Boolean].map {
           _.getOrElse(false)
         }
-      ) apply MoneyServiceBusiness.apply _
+    ) apply MoneyServiceBusiness.apply _
   }
 
   implicit val writes: Writes[MoneyServiceBusiness] = Json.writes[MoneyServiceBusiness]
 
   implicit val formatOption: Reads[Option[MoneyServiceBusiness]] = Reads.optionWithNull[MoneyServiceBusiness]
 
-  implicit def default(value: Option[MoneyServiceBusiness]): MoneyServiceBusiness = {
+  implicit def default(value: Option[MoneyServiceBusiness]): MoneyServiceBusiness =
     value.getOrElse(MoneyServiceBusiness())
-  }
 }
-
-

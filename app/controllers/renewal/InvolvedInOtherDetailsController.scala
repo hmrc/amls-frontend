@@ -32,45 +32,52 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class InvolvedInOtherDetailsController @Inject()(
-                                                  authAction: AuthAction,
-                                                  commonPlayDeps: CommonPlayDependencies,
-                                                  messagesComps: MessagesControllerComponents,
-                                                  formProvider: InvolvedInOtherDetailsFormProvider,
-                                                  view: InvolvedInOtherDetailsView,
-                                                  renewalService: RenewalService,
-                                                  errorHandler: AmlsErrorHandler) (implicit ec: ExecutionContext) extends AmlsBaseController(commonPlayDeps, messagesComps) with Logging {
-
-
+class InvolvedInOtherDetailsController @Inject() (
+  authAction: AuthAction,
+  commonPlayDeps: CommonPlayDependencies,
+  messagesComps: MessagesControllerComponents,
+  formProvider: InvolvedInOtherDetailsFormProvider,
+  view: InvolvedInOtherDetailsView,
+  renewalService: RenewalService,
+  errorHandler: AmlsErrorHandler
+)(implicit ec: ExecutionContext)
+    extends AmlsBaseController(commonPlayDeps, messagesComps)
+    with Logging {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
     renewalService.getRenewal(request.credId).flatMap {
       case Some(renewal) =>
-        renewal.involvedInOtherActivities.fold(internalServerError)(yes => Future.successful(Ok(view(formProvider().fill(yes.asInstanceOf[InvolvedInOtherYes]), edit))))
-      case None => internalServerError
+        renewal.involvedInOtherActivities.fold(internalServerError)(yes =>
+          Future.successful(Ok(view(formProvider().fill(yes.asInstanceOf[InvolvedInOtherYes]), edit)))
+        )
+      case None          => internalServerError
     }
   }
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
-    formProvider().bindFromRequest(cleanData(request.body, "details")).fold(
-      formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
-      involvedInOtherYes => renewalService.updateOtherBusinessActivities(request.credId, involvedInOtherYes)
-        .flatMap(optBusinessAndOtherActivities => redirect(optBusinessAndOtherActivities, edit, request.credId))
-    )
+    formProvider()
+      .bindFromRequest(cleanData(request.body, "details"))
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        involvedInOtherYes =>
+          renewalService
+            .updateOtherBusinessActivities(request.credId, involvedInOtherYes)
+            .flatMap(optBusinessAndOtherActivities => redirect(optBusinessAndOtherActivities, edit, request.credId))
+      )
   }
 
-  private def redirect(optBusinessAndOtherActivities: Option[BusinessAndOtherActivities], edit: Boolean, credId: String)
-                      (implicit request: Request[_]): Future[Result] = {
+  private def redirect(
+    optBusinessAndOtherActivities: Option[BusinessAndOtherActivities],
+    edit: Boolean,
+    credId: String
+  )(implicit request: Request[_]): Future[Result] =
     optBusinessAndOtherActivities match {
       case Some(_) => Future.successful(Redirect(routes.BusinessTurnoverController.get(edit)))
-      case None => {
+      case None    =>
         logger.error(s"Unable to fetch business activities or other activities for $credId")
         internalServerError
-      }
     }
-  }
 
-  private def internalServerError(implicit request: Request[_]): Future[Result] = {
+  private def internalServerError(implicit request: Request[_]): Future[Result] =
     errorHandler.internalServerErrorTemplate.map(InternalServerError(_))
-  }
 }

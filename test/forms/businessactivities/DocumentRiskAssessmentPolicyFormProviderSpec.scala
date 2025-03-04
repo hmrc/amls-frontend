@@ -25,7 +25,7 @@ import play.api.data.{Form, FormError}
 class DocumentRiskAssessmentPolicyFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val formProvider: DocumentRiskAssessmentPolicyFormProvider = new DocumentRiskAssessmentPolicyFormProvider()
-  val form: Form[RiskAssessmentTypes] = formProvider()
+  val form: Form[RiskAssessmentTypes]                        = formProvider()
 
   val fieldName = "riskassessments"
 

@@ -29,38 +29,39 @@ import views.html.withdrawal.WithdrawalReasonView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class WithdrawalReasonController @Inject()(
-                                            authAction: AuthAction,
-                                            val ds: CommonPlayDependencies,
-                                            enrolments: AuthEnrolmentsService,
-                                            dataCacheConnector: DataCacheConnector,
-                                            val cc: MessagesControllerComponents,
-                                            formProvider: WithdrawalReasonFormProvider,
-                                            view: WithdrawalReasonView
-                                          ) extends AmlsBaseController(ds, cc) {
+class WithdrawalReasonController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  enrolments: AuthEnrolmentsService,
+  dataCacheConnector: DataCacheConnector,
+  val cc: MessagesControllerComponents,
+  formProvider: WithdrawalReasonFormProvider,
+  view: WithdrawalReasonView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction {
-    implicit request => Ok(view(formProvider()))
+  def get: Action[AnyContent] = authAction { implicit request =>
+    Ok(view(formProvider()))
   }
 
-  def post: Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors => {
-          Future.successful(BadRequest(view(formWithErrors)))
-        },
+  def post: Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         data => {
           val withdrawalReasonOthers = data match {
             case WithdrawalReason.Other(reason) => reason.some
-            case _ => None
+            case _                              => None
           }
 
-          dataCacheConnector.save[WithdrawalReason](request.credId, WithdrawalReason.key, data).map { _ =>
-            Redirect(controllers.withdrawal.routes.WithdrawalCheckYourAnswersController.get)
-          }.recover {
-            case ex: Exception =>
+          dataCacheConnector
+            .save[WithdrawalReason](request.credId, WithdrawalReason.key, data)
+            .map { _ =>
+              Redirect(controllers.withdrawal.routes.WithdrawalCheckYourAnswersController.get)
+            }
+            .recover { case ex: Exception =>
               InternalServerError("Error occurred while processing withdrawal reason")
-          }
+            }
         }
       )
   }

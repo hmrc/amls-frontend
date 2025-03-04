@@ -28,41 +28,45 @@ import views.html.businessactivities.CustomerTransactionRecordsView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class TransactionRecordController @Inject()(val authAction: AuthAction,
-                                            val ds: CommonPlayDependencies,
-                                            val dataCacheConnector: DataCacheConnector,
-                                            val cc: MessagesControllerComponents,
-                                            formProvider: TransactionRecordFormProvider,
-                                            view: CustomerTransactionRecordsView) extends AmlsBaseController(ds, cc) {
+class TransactionRecordController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val dataCacheConnector: DataCacheConnector,
+  val cc: MessagesControllerComponents,
+  formProvider: TransactionRecordFormProvider,
+  view: CustomerTransactionRecordsView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-        response =>
-          val form: Form[Boolean] = (for {
-            businessActivities <- response
-            transactionRecord <- businessActivities.transactionRecord
-          } yield formProvider().fill(transactionRecord)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { response =>
+      val form: Form[Boolean] = (for {
+        businessActivities <- response
+        transactionRecord  <- businessActivities.transactionRecord
+      } yield formProvider().fill(transactionRecord)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithError =>
-          Future.successful(BadRequest(view(formWithError, edit))),
-        data => {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithError => Future.successful(BadRequest(view(formWithError, edit))),
+        data =>
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, businessActivity.transactionRecord(data))
+            _                <- dataCacheConnector.save[BusinessActivities](
+                                  request.credId,
+                                  BusinessActivities.key,
+                                  businessActivity.transactionRecord(data)
+                                )
           } yield (edit, data) match {
-            case (false, true) => Redirect(routes.TransactionTypesController.get())
-            case (false, false) => Redirect(routes.IdentifySuspiciousActivityController.get())
-            case (true, true) if businessActivity.transactionRecordTypes.isEmpty => Redirect(routes.TransactionTypesController.get(edit))
-            case _ => Redirect(routes.SummaryController.get)
+            case (false, true)                                                   => Redirect(routes.TransactionTypesController.get())
+            case (false, false)                                                  => Redirect(routes.IdentifySuspiciousActivityController.get())
+            case (true, true) if businessActivity.transactionRecordTypes.isEmpty =>
+              Redirect(routes.TransactionTypesController.get(edit))
+            case _                                                               => Redirect(routes.SummaryController.get)
           }
-        }
-    )
+      )
   }
 }

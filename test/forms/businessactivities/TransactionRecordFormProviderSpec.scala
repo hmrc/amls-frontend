@@ -21,8 +21,8 @@ import play.api.data.{Form, FormError}
 
 class TransactionRecordFormProviderSpec extends BooleanFieldBehaviours[Boolean] {
 
-  override val form: Form[Boolean] = new TransactionRecordFormProvider()()
-  override val fieldName: String = "isRecorded"
+  override val form: Form[Boolean]  = new TransactionRecordFormProvider()()
+  override val fieldName: String    = "isRecorded"
   override val errorMessage: String = "error.required.ba.select.transaction.record"
 
   "TransactionRecordFormProvider" must {

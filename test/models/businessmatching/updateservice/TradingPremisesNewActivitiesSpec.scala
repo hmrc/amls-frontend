@@ -44,11 +44,15 @@ class TradingPremisesNewActivitiesSpec extends PlaySpec with Matchers {
 
     "write serialise to json" when {
       "TradingPremisesNewActivitiesYes" in {
-        Json.toJson(NewActivitiesAtTradingPremisesYes(HighValueDealing).asInstanceOf[AreNewActivitiesAtTradingPremises]) must
-          be(Json.obj(
-            "tradingPremisesNewActivities" -> true,
-            "businessActivities" -> "04"
-          ))
+        Json.toJson(
+          NewActivitiesAtTradingPremisesYes(HighValueDealing).asInstanceOf[AreNewActivitiesAtTradingPremises]
+        ) must
+          be(
+            Json.obj(
+              "tradingPremisesNewActivities" -> true,
+              "businessActivities"           -> "04"
+            )
+          )
       }
       "TradingPremisesNewActivitiesNo" in {
         Json.toJson(NewActivitiesAtTradingPremisesNo.asInstanceOf[AreNewActivitiesAtTradingPremises]) must

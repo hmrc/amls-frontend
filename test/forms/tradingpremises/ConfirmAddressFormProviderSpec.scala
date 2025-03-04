@@ -23,13 +23,14 @@ import play.api.data.Form
 class ConfirmAddressFormProviderSpec extends BooleanFieldBehaviours[ConfirmAddress] {
 
   override val form: Form[ConfirmAddress] = new ConfirmAddressFormProvider()()
-  override val fieldName: String = "confirmAddress"
-  override val errorMessage: String = "error.required.tp.confirm.address"
+  override val fieldName: String          = "confirmAddress"
+  override val errorMessage: String       = "error.required.tp.confirm.address"
 
   "AccountantIsUKAddressFormProvider" must {
 
     behave like booleanFieldWithModel(
-      ConfirmAddress(true), ConfirmAddress(false)
+      ConfirmAddress(true),
+      ConfirmAddress(false)
     )
   }
 }

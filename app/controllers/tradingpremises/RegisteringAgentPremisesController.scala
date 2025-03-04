@@ -30,61 +30,68 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                   val authAction: AuthAction,
-                                                   val ds: CommonPlayDependencies,
-                                                   override val messagesApi: MessagesApi,
-                                                   val cc: MessagesControllerComponents,
-                                                   formProvider: RegisteringAgentPremisesFormProvider,
-                                                   view: RegisteringAgentPremisesView,
-                                                   implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class RegisteringAgentPremisesController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  override val messagesApi: MessagesApi,
+  val cc: MessagesControllerComponents,
+  formProvider: RegisteringAgentPremisesFormProvider,
+  view: RegisteringAgentPremisesView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
-  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
-   implicit request =>
-      dataCacheConnector.fetchAll(request.credId).map {
-        cache =>
-          cache.map{ c =>
-            getData[TradingPremises](c, index) match {
-              case Some(tp) if ControllerHelper.isMSBSelected(c.getEntry[BusinessMatching](BusinessMatching.key)) => {
-                val form = tp.registeringAgentPremises match {
-                  case Some(service) => formProvider().fill(service)
-                  case None => formProvider()
-                }
-                Ok(view(form, index, edit))
-              }
-              case Some(tp) if !edit => {
-                TPControllerHelper.redirectToNextPage(cache, index, edit)
-              }
-              case _ => NotFound(notFoundView)
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetchAll(request.credId).map { cache =>
+      cache.map { c =>
+        getData[TradingPremises](c, index) match {
+          case Some(tp) if ControllerHelper.isMSBSelected(c.getEntry[BusinessMatching](BusinessMatching.key)) =>
+            val form = tp.registeringAgentPremises match {
+              case Some(service) => formProvider().fill(service)
+              case None          => formProvider()
             }
-          } getOrElse NotFound(notFoundView)
-      }
+            Ok(view(form, index, edit))
+          case Some(tp) if !edit                                                                              =>
+            TPControllerHelper.redirectToNextPage(cache, index, edit)
+          case _                                                                                              => NotFound(notFoundView)
+        }
+      } getOrElse NotFound(notFoundView)
+    }
   }
 
-  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, index, edit))),
-        data => {
-          for {
-            result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_,tp) =>
-              resetAgentValues(tp.registeringAgentPremises(data), data)
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, index, edit))),
+        data =>
+          {
+            for {
+              result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_, tp) =>
+                          resetAgentValues(tp.registeringAgentPremises(data), data)
+                        }
+            } yield (data.agentPremises, edit) match {
+              case (true, _)      => Redirect(routes.BusinessStructureController.get(index, edit))
+              case (false, true)  => Redirect(routes.CheckYourAnswersController.get(index))
+              case (false, false) => TPControllerHelper.redirectToNextPage(result, index, edit)
             }
-          } yield (data.agentPremises, edit) match {
-            case (true, _) => Redirect(routes.BusinessStructureController.get(index,edit))
-            case (false, true) => Redirect(routes.CheckYourAnswersController.get(index))
-            case (false, false) => TPControllerHelper.redirectToNextPage(result, index, edit)
+          }.recoverWith { case _: IndexOutOfBoundsException =>
+            Future.successful(NotFound(notFoundView))
           }
-        }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
       )
   }
 
-  private def resetAgentValues(tp:TradingPremises, data:RegisteringAgentPremises):TradingPremises = data.agentPremises match {
-    case true => tp.registeringAgentPremises(data)
-    case false => tp.copy(agentName=None,businessStructure=None,agentCompanyDetails=None,agentPartnership=None, hasChanged=true)
-  }
+  private def resetAgentValues(tp: TradingPremises, data: RegisteringAgentPremises): TradingPremises =
+    data.agentPremises match {
+      case true  => tp.registeringAgentPremises(data)
+      case false =>
+        tp.copy(
+          agentName = None,
+          businessStructure = None,
+          agentCompanyDetails = None,
+          agentPartnership = None,
+          hasChanged = true
+        )
+    }
 }
-

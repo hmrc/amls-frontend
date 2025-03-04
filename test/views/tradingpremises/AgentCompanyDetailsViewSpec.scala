@@ -28,7 +28,7 @@ import views.html.tradingpremises.AgentCompanyDetailsView
 class AgentCompanyDetailsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val agent_company_details = inject[AgentCompanyDetailsView]
-  lazy val fp = inject[AgentCompanyDetailsFormProvider]
+  lazy val fp                    = inject[AgentCompanyDetailsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -41,7 +41,9 @@ class AgentCompanyDetailsViewSpec extends AmlsViewSpec with Matchers {
 
       def view = agent_company_details(fp().fill(AgentCompanyDetails("A Name", Some("QWER1234"))), 0, false)
 
-      doc.title() must startWith(messages("tradingpremises.youragent.company.details.title") + " - " + messages("summary.tradingpremises"))
+      doc.title() must startWith(
+        messages("tradingpremises.youragent.company.details.title") + " - " + messages("summary.tradingpremises")
+      )
 
     }
 
@@ -49,13 +51,15 @@ class AgentCompanyDetailsViewSpec extends AmlsViewSpec with Matchers {
 
       def view = agent_company_details(fp(), 0, false)
 
-      heading.html() must be(messages("tradingpremises.youragent.company.details.title"))
+      heading.html()    must be(messages("tradingpremises.youragent.company.details.title"))
       subHeading.html() must include(messages("summary.tradingpremises"))
     }
 
     behave like pageWithErrors(
       agent_company_details(
-        fp().withError("agentCompanyName", "error.invalid.char.tp.agent.company.details"), 0, false
+        fp().withError("agentCompanyName", "error.invalid.char.tp.agent.company.details"),
+        0,
+        false
       ),
       "agentCompanyName",
       "error.invalid.char.tp.agent.company.details"
@@ -63,7 +67,9 @@ class AgentCompanyDetailsViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       agent_company_details(
-        fp().withError("companyRegistrationNumber", "error.char.to.agent.company.reg.number"), 0, false
+        fp().withError("companyRegistrationNumber", "error.char.to.agent.company.reg.number"),
+        0,
+        false
       ),
       "companyRegistrationNumber",
       "error.char.to.agent.company.reg.number"

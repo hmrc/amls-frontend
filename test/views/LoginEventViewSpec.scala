@@ -24,9 +24,9 @@ import views.html.LoginEventView
 class LoginEventViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val login_event = inject[LoginEventView]
+    lazy val login_event                                           = inject[LoginEventView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
-    implicit val redirectCall: Call = Call("GET", "someurl")
+    implicit val redirectCall: Call                                = Call("GET", "someurl")
   }
 
   "Login Event Page View" must {

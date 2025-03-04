@@ -27,7 +27,7 @@ import views.html.responsiblepeople.PersonNameView
 class PersonNameViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val person_name = inject[PersonNameView]
-  lazy val fp = inject[PersonNameFormProvider]
+  lazy val fp          = inject[PersonNameFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -40,22 +40,22 @@ class PersonNameViewSpec extends AmlsViewSpec with Matchers {
 
       def view = person_name(fp(), true, 1)
 
-      doc.title must startWith(messages("responsiblepeople.personName.title"))
-      heading.html must be(messages("responsiblepeople.personName.title"))
+      doc.title       must startWith(messages("responsiblepeople.personName.title"))
+      heading.html    must be(messages("responsiblepeople.personName.title"))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
-      doc.getElementsByAttributeValue("name", "firstName") must not be empty
+      doc.getElementsByAttributeValue("name", "firstName")  must not be empty
       doc.getElementsByAttributeValue("name", "middleName") must not be empty
-      doc.getElementsByAttributeValue("name", "lastName") must not be empty
+      doc.getElementsByAttributeValue("name", "lastName")   must not be empty
     }
 
     List("first", "middle", "last") foreach { field =>
-
       val fieldName = s"${field}Name"
 
       behave like pageWithErrors(
         person_name(fp().withError(fieldName, s"error.invalid.rp.${field}_name.validation"), false, 1),
-        fieldName, s"error.invalid.rp.${field}_name.validation"
+        fieldName,
+        s"error.invalid.rp.${field}_name.validation"
       )
     }
 

@@ -31,7 +31,7 @@ import scala.concurrent.Future
 class BranchesOrAgentsWhichCountriesServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
   val mockCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-  val service = new BranchesOrAgentsWhichCountriesService(mockCacheConnector)
+  val service                                = new BranchesOrAgentsWhichCountriesService(mockCacheConnector)
 
   val credId = "1234567890"
 
@@ -50,17 +50,18 @@ class BranchesOrAgentsWhichCountriesServiceSpec extends AmlsSpec with BeforeAndA
 
           val obj = BranchesOrAgentsWhichCountries(Seq(Country("United States", "US")))
 
-          when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any())
-          ) thenReturn Future.successful(Some(
-            MoneyServiceBusiness(
-              branchesOrAgents = Some(
-                BranchesOrAgents(
-                  BranchesOrAgentsHasCountries(true),
-                  Some(obj)
+          when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any())) thenReturn Future.successful(
+            Some(
+              MoneyServiceBusiness(
+                branchesOrAgents = Some(
+                  BranchesOrAgents(
+                    BranchesOrAgentsHasCountries(true),
+                    Some(obj)
+                  )
                 )
               )
             )
-          ))
+          )
 
           service.fetchBranchesOrAgents(credId).futureValue mustBe Some(obj)
         }
@@ -70,16 +71,16 @@ class BranchesOrAgentsWhichCountriesServiceSpec extends AmlsSpec with BeforeAndA
 
         "MSB record is present but branches or agents is empty" in {
 
-          when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any())
-          ) thenReturn Future.successful(Some(MoneyServiceBusiness()))
+          when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any())) thenReturn Future.successful(
+            Some(MoneyServiceBusiness())
+          )
 
           service.fetchBranchesOrAgents(credId).futureValue mustBe None
         }
 
         "no record is present" in {
 
-          when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any())
-          ) thenReturn Future.successful(None)
+          when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any())) thenReturn Future.successful(None)
 
           service.fetchBranchesOrAgents(credId).futureValue mustBe None
         }
@@ -89,22 +90,25 @@ class BranchesOrAgentsWhichCountriesServiceSpec extends AmlsSpec with BeforeAndA
     ".fetchAndSaveBranchesOrAgents is called" must {
 
       "return the given redirect after saving data" in {
-        val msb = MoneyServiceBusiness()
-        val data = BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))
+        val msb        = MoneyServiceBusiness()
+        val data       = BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))
         val updatedMsb = msb.branchesOrAgents(
           BranchesOrAgents.update(
-            msb.branchesOrAgents.getOrElse(BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)), data
+            msb.branchesOrAgents.getOrElse(BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)),
+            data
           )
         )
 
-        when(mockCacheConnector.fetch[MoneyServiceBusiness](meq(credId), any())(any())
-        ) thenReturn Future.successful(Some(MoneyServiceBusiness()))
+        when(mockCacheConnector.fetch[MoneyServiceBusiness](meq(credId), any())(any())) thenReturn Future.successful(
+          Some(MoneyServiceBusiness())
+        )
 
-        when(mockCacheConnector.save[MoneyServiceBusiness](meq(credId), any(), meq(updatedMsb))(any())
+        when(
+          mockCacheConnector.save[MoneyServiceBusiness](meq(credId), any(), meq(updatedMsb))(any())
         ) thenReturn Future.successful(Cache("id", Map.empty))
 
         val redirect = Redirect("/foo")
-        service.fetchAndSaveBranchesOrAgents(credId, data, redirect).futureValue mustBe(redirect)
+        service.fetchAndSaveBranchesOrAgents(credId, data, redirect).futureValue mustBe redirect
 
         verify(mockCacheConnector).fetch(meq(credId), any())(any())
         verify(mockCacheConnector).save(meq(credId), any(), meq(updatedMsb))(any())

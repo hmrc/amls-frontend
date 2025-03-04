@@ -32,7 +32,7 @@ import services.cache.Cache
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class BusinessMatchingService @Inject()(dataCacheConnector: DataCacheConnector) {
+class BusinessMatchingService @Inject() (dataCacheConnector: DataCacheConnector) {
 
   def preApplicationComplete(credId: String)(implicit ec: ExecutionContext): Future[Boolean] = {
     for {
@@ -43,50 +43,58 @@ class BusinessMatchingService @Inject()(dataCacheConnector: DataCacheConnector) 
   def getModel(credId: String): OptionT[Future, BusinessMatching] =
     OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
 
-  def updateModel(credId: String, model: BusinessMatching)
-                 (implicit ec: ExecutionContext): OptionT[Future, Cache] =
+  def updateModel(credId: String, model: BusinessMatching)(implicit ec: ExecutionContext): OptionT[Future, Cache] =
     OptionT.liftF(dataCacheConnector.save[BusinessMatching](credId, BusinessMatching.key, model))
-
 
   private def fetchActivitySet(cacheId: String)(implicit ec: ExecutionContext) =
     for {
       viewResponse <- OptionT(dataCacheConnector.fetch[ViewResponse](cacheId, ViewResponse.key))
-      submitted <- OptionT.fromOption[Future](viewResponse.businessMatchingSection.activities)
-      model <- getModel(cacheId)
-      current <- OptionT.fromOption[Future](model.activities)
-    } yield (current.businessActivities, current.removeActivities.fold(submitted.businessActivities) { removed =>
-      submitted.businessActivities diff removed
-    })
+      submitted    <- OptionT.fromOption[Future](viewResponse.businessMatchingSection.activities)
+      model        <- getModel(cacheId)
+      current      <- OptionT.fromOption[Future](model.activities)
+    } yield (
+      current.businessActivities,
+      current.removeActivities.fold(submitted.businessActivities) { removed =>
+        submitted.businessActivities diff removed
+      }
+    )
 
-  private def getActivitySet(cacheId: String, fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity])
-                            (implicit ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
+  private def getActivitySet(
+    cacheId: String,
+    fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity]
+  )(implicit ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     fetchActivitySet(cacheId) map fn.tupled
 
-
-  def getAdditionalBusinessActivities(cacheId: String)(implicit ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
+  def getAdditionalBusinessActivities(cacheId: String)(implicit
+    ec: ExecutionContext
+  ): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(cacheId, _ diff _)
 
-  def getSubmittedBusinessActivities(credId: String)(implicit ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
+  def getSubmittedBusinessActivities(credId: String)(implicit
+    ec: ExecutionContext
+  ): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(credId, _ intersect _)
 
-  def getRemainingBusinessActivities(credId: String)(implicit ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
+  def getRemainingBusinessActivities(
+    credId: String
+  )(implicit ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     for {
-      model <- getModel(credId)
+      model      <- getModel(credId)
       activities <- OptionT.fromOption[Future](model.activities)
     } yield BusinessActivities.all diff activities.businessActivities
 
   def clearSection(credId: String, activity: BusinessActivity): Future[Cache] = activity match {
-    case AccountancyServices =>
+    case AccountancyServices        =>
       dataCacheConnector.removeByKey(credId, Asp.key)
     case EstateAgentBusinessService =>
       dataCacheConnector.removeByKey(credId, Eab.key)
-    case HighValueDealing =>
+    case HighValueDealing           =>
       dataCacheConnector.removeByKey(credId, Hvd.key)
-    case MoneyServiceBusiness =>
+    case MoneyServiceBusiness       =>
       dataCacheConnector.removeByKey(credId, Msb.key)
-    case TrustAndCompanyServices =>
+    case TrustAndCompanyServices    =>
       dataCacheConnector.removeByKey(credId, Tcsp.key)
-    case _ => throw new Exception("An Unknown Exception has occurred : BusinessMatchingService")
+    case _                          => throw new Exception("An Unknown Exception has occurred : BusinessMatchingService")
   }
 
 }

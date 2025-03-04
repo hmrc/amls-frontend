@@ -28,7 +28,7 @@ import views.html.tradingpremises.RemoveTradingPremisesView
 class RemoveTradingPremisesViewSpec extends AmlsViewSpec with Matchers with Injecting {
 
   lazy val remove_trading_premises: RemoveTradingPremisesView = inject[RemoveTradingPremisesView]
-  lazy val fp: RemoveTradingPremisesFormProvider = inject[RemoveTradingPremisesFormProvider]
+  lazy val fp: RemoveTradingPremisesFormProvider              = inject[RemoveTradingPremisesFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -43,42 +43,52 @@ class RemoveTradingPremisesViewSpec extends AmlsViewSpec with Matchers with Inje
         messages("summary.tradingpremises") + " - " +
         messages("title.amls") + " - " + messages("title.gov")
 
-      def view: HtmlFormat.Appendable = remove_trading_premises(fp(), 1, complete = false, "trading address", showDateField = true )
+      def view: HtmlFormat.Appendable =
+        remove_trading_premises(fp(), 1, complete = false, "trading address", showDateField = true)
 
       doc.title must be(pageTitle)
 
-      heading.html must include(messages("tradingpremises.remove.trading.premises.title"))
+      heading.html    must include(messages("tradingpremises.remove.trading.premises.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
 
       doc.getElementsMatchingOwnText(messages("tradingpremises.remove.trading.premises.btn")).last().html() must be(
-        messages("tradingpremises.remove.trading.premises.btn"))
+        messages("tradingpremises.remove.trading.premises.btn")
+      )
     }
 
     "shows correct heading for input param showDateField equal false." in new ViewFixture {
 
-      def view: HtmlFormat.Appendable = remove_trading_premises(fp(), 1, complete = false, "trading address", showDateField = false )
+      def view: HtmlFormat.Appendable =
+        remove_trading_premises(fp(), 1, complete = false, "trading address", showDateField = false)
 
-      heading.html must be(messages("tradingpremises.remove.trading.premises.title"))
+      heading.html    must be(messages("tradingpremises.remove.trading.premises.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
     }
 
     "check date field existence when input param showDateField is set to true" in new ViewFixture {
-      def view: HtmlFormat.Appendable = remove_trading_premises(fp(), 1, complete = false, "trading Address", showDateField = true)
+      def view: HtmlFormat.Appendable =
+        remove_trading_premises(fp(), 1, complete = false, "trading Address", showDateField = true)
 
-      doc.getElementsByAttributeValue("id", "endDate") must not be empty
-      doc.getElementsMatchingOwnText(messages("lbl.day")).hasText must be(true)
+      doc.getElementsByAttributeValue("id", "endDate")              must not be empty
+      doc.getElementsMatchingOwnText(messages("lbl.day")).hasText   must be(true)
       doc.getElementsMatchingOwnText(messages("lbl.month")).hasText must be(true)
-      doc.getElementsMatchingOwnText(messages("lbl.year")).hasText must be(true)
+      doc.getElementsMatchingOwnText(messages("lbl.year")).hasText  must be(true)
     }
 
     behave like pageWithErrors(
       remove_trading_premises(
-        fp().withError("endDate.day", "error.expected.date.format"), 1, complete = true, "trading address",showDateField = true
+        fp().withError("endDate.day", "error.expected.date.format"),
+        1,
+        complete = true,
+        "trading address",
+        showDateField = true
       ),
       "endDate",
       "error.expected.date.format"
     )
 
-    behave like pageWithBackLink(remove_trading_premises(fp(), 1, complete = false, "trading Address", showDateField = true))
+    behave like pageWithBackLink(
+      remove_trading_premises(fp(), 1, complete = false, "trading Address", showDateField = true)
+    )
   }
 }

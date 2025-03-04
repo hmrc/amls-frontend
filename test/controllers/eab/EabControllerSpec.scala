@@ -35,17 +35,17 @@ import scala.concurrent.Future
 class EabControllerSpec extends AmlsSpec with CacheMocks {
 
   val completeEstateAgencyActPenalty = Json.obj(
-    "penalisedEstateAgentsAct" -> true,
+    "penalisedEstateAgentsAct"       -> true,
     "penalisedEstateAgentsActDetail" -> "details"
   )
 
   val completePenalisedProfessionalBody = Json.obj(
-    "penalisedProfessionalBody" -> true,
+    "penalisedProfessionalBody"       -> true,
     "penalisedProfessionalBodyDetail" -> "details"
   )
 
   val completeRedressScheme = Json.obj(
-    "redressScheme" -> "propertyRedressScheme",
+    "redressScheme"       -> "propertyRedressScheme",
     "redressSchemeDetail" -> "null"
   )
 
@@ -63,16 +63,13 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
     "lettings",
     "relocation",
     "residential",
-    "socialHousingProvision")
+    "socialHousingProvision"
+  )
 
-  val updatedServiceList = Seq(
-    "assetManagement",
-    "auctioneering",
-    "lettings",
-    "socialHousingProvision")
+  val updatedServiceList = Seq("assetManagement", "auctioneering", "lettings", "socialHousingProvision")
 
-  val completeServices = Json.obj("eabServicesProvided" -> completeServiceList )
-  val updatedServices  = Json.obj("eabServicesProvided" -> updatedServiceList )
+  val completeServices = Json.obj("eabServicesProvided" -> completeServiceList)
+  val updatedServices  = Json.obj("eabServicesProvided" -> updatedServiceList)
 
   val completeEabData = completeServices ++
     completeEstateAgencyActPenalty ++
@@ -89,27 +86,27 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
   val noEabData = Json.obj()
 
   val completeEabJson = Json.obj(
-    "data"           -> completeEabData,
-    "hasChanged"     -> false,
-    "hasAccepted"    -> false
+    "data"        -> completeEabData,
+    "hasChanged"  -> false,
+    "hasAccepted" -> false
   )
 
   val updatedEabJson = Json.obj(
-    "data"           -> completeEabData,
-    "hasChanged"     -> false,
-    "hasAccepted"    -> false
+    "data"        -> completeEabData,
+    "hasChanged"  -> false,
+    "hasAccepted" -> false
   )
 
-  val completeEabModel    = Eab(completeEabData)
-  val updatedEabModel     = Eab(updatedEabData)
-  val noEabModel  = Eab(noEabData)
+  val completeEabModel = Eab(completeEabData)
+  val updatedEabModel  = Eab(updatedEabData)
+  val noEabModel       = Eab(noEabData)
 
   trait Fixture extends AuthorisedFixture {
     self =>
-    val request         = addToken(authRequest)
+    val request           = addToken(authRequest)
     val proxyCacheService = mock[ProxyCacheService]
-    val credId          = "someId"
-    val mockServiceFlow = mock[ServiceFlow]
+    val credId            = "someId"
+    val mockServiceFlow   = mock[ServiceFlow]
 
     lazy val app = new GuiceApplicationBuilder()
       .configure(
@@ -121,20 +118,18 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
       .overrides(bind[ServiceFlow].to(mockServiceFlow))
       .build()
 
-    val controller      = app.injector.instanceOf[EabController]
+    val controller = app.injector.instanceOf[EabController]
   }
 
   "get returns 200" when {
     "no eab section in cache" in new Fixture {
       when(proxyCacheService.getEab(any())).thenReturn(Future.successful(Some(Json.obj())))
 
-
-
       val result = controller.get(credId)(request)
       status(result) must be(OK)
 
       val document = Json.parse(contentAsString(result))
-      document mustBe(Json.obj())
+      document mustBe (Json.obj())
     }
 
     "eab section in cache" in new Fixture {
@@ -144,7 +139,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
       status(result) must be(OK)
 
       val document = Json.parse(contentAsString(result))
-      document mustBe(completeEabJson)
+      document mustBe completeEabJson
     }
   }
 
@@ -159,7 +154,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
       val result = controller.set(credId)(postRequest)
       status(result) must be(OK)
       val document = Json.parse(contentAsString(result))
-      document mustBe(Json.obj("_id" -> credId))
+      document mustBe (Json.obj("_id" -> credId))
     }
   }
 
@@ -177,8 +172,8 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
       status(result) mustBe SEE_OTHER
       redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get().toString
 
-      verify(mockCacheConnector).save[Eab](any(), eqTo(Eab.key),
-        eqTo(completeEabJson.as[Eab].copy(hasAccepted = true)))(any())
+      verify(mockCacheConnector)
+        .save[Eab](any(), eqTo(Eab.key), eqTo(completeEabJson.as[Eab].copy(hasAccepted = true)))(any())
     }
   }
 
@@ -196,13 +191,12 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val document = Json.parse(contentAsString(result))
 
-      document mustBe(Json.obj("requireDateOfChange" -> false))
+      document mustBe (Json.obj("requireDateOfChange" -> false))
     }
 
     "return false where the current list of activities does not differ from the new" in new Fixture {
       val postRequest = FakeRequest("POST", "/")
         .withHeaders(CONTENT_TYPE -> "application/json")
-
         .withBody[JsValue](completeEabJson)
 
       val status = "Approved"
@@ -217,13 +211,12 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val document = Json.parse(contentAsString(result))
 
-      document mustBe(Json.obj("requireDateOfChange" -> false))
+      document mustBe (Json.obj("requireDateOfChange" -> false))
     }
 
     "return false where the raw status from API9 is not Approved" in new Fixture {
       val postRequest = FakeRequest("POST", "/")
         .withHeaders(CONTENT_TYPE -> "application/json")
-
         .withBody[JsValue](completeEabJson)
 
       val status = "NotYetSubmitted"
@@ -238,13 +231,12 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val document = Json.parse(contentAsString(result))
 
-      document mustBe(Json.obj("requireDateOfChange" -> false))
+      document mustBe (Json.obj("requireDateOfChange" -> false))
     }
 
     "return true where is not new activity and list of activities differs and status is Approved" in new Fixture {
       val postRequest = FakeRequest("POST", "/")
         .withHeaders(CONTENT_TYPE -> "application/json")
-
         .withBody[JsValue](completeEabJson)
 
       val status = "Approved"
@@ -259,13 +251,12 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val document = Json.parse(contentAsString(result))
 
-      document mustBe(Json.obj("requireDateOfChange" -> true))
+      document mustBe (Json.obj("requireDateOfChange" -> true))
     }
 
     "return false where is not new activity and no current EAB model and status is NotYetSubmitted" in new Fixture {
       val postRequest = FakeRequest("POST", "/")
         .withHeaders(CONTENT_TYPE -> "application/json")
-
         .withBody[JsValue](completeEabJson)
 
       val status = "NotYetSubmitted"
@@ -280,7 +271,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       val document = Json.parse(contentAsString(result))
 
-      document mustBe(Json.obj("requireDateOfChange" -> false))
+      document mustBe (Json.obj("requireDateOfChange" -> false))
     }
   }
 }

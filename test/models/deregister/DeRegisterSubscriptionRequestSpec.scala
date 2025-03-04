@@ -31,11 +31,13 @@ class DeRegisterSubscriptionRequestSpec extends PlaySpec with Matchers {
 
       val expectedJson = Json.obj(
         "acknowledgementReference" -> reference,
-        "deregistrationDate" -> LocalDate.now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-        "deregistrationReason" -> "Out of scope"
+        "deregistrationDate"       -> LocalDate.now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+        "deregistrationReason"     -> "Out of scope"
       )
 
-      Json.toJson(DeRegisterSubscriptionRequest(reference, LocalDate.now, DeregistrationReason.OutOfScope)) mustBe expectedJson
+      Json.toJson(
+        DeRegisterSubscriptionRequest(reference, LocalDate.now, DeregistrationReason.OutOfScope)
+      ) mustBe expectedJson
     }
   }
 

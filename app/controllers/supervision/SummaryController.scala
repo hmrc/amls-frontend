@@ -28,28 +28,34 @@ import views.html.supervision.CheckYourAnswersView
 
 import javax.inject.Inject
 
-class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                  val authAction: AuthAction,
-                                  val ds: CommonPlayDependencies,
-                                  val cc: MessagesControllerComponents,
-                                  cyaHelper: CheckYourAnswersHelper,
-                                  val view: CheckYourAnswersView,
-                                  implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
+class SummaryController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  cyaHelper: CheckYourAnswersHelper,
+  val view: CheckYourAnswersView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
-        case Some(data@Supervision(Some(anotherBody), Some(_), _, Some(_), _, _)) if ControllerHelper.isAbComplete(anotherBody) =>
-          Ok(view(cyaHelper.getSummaryList(data)))
-        case _ =>
-          Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+  def get(): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
+      case Some(data @ Supervision(Some(anotherBody), Some(_), _, Some(_), _, _))
+          if ControllerHelper.isAbComplete(anotherBody) =>
+        Ok(view(cyaHelper.getSummaryList(data)))
+      case _ =>
+        Redirect(controllers.routes.RegistrationProgressController.get())
+    }
   }
 
-  def post: Action[AnyContent] = authAction.async {
-    implicit request => (for {
+  def post: Action[AnyContent] = authAction.async { implicit request =>
+    (for {
       supervision <- OptionT(dataCacheConnector.fetch[Supervision](request.credId, Supervision.key))
-      _ <- OptionT.liftF(dataCacheConnector.save[Supervision](request.credId, Supervision.key, supervision.copy(hasAccepted = true)))
-    } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update supervision")
+      _           <- OptionT.liftF(
+                       dataCacheConnector.save[Supervision](request.credId, Supervision.key, supervision.copy(hasAccepted = true))
+                     )
+    } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError(
+      "Could not update supervision"
+    )
   }
 }

@@ -17,25 +17,24 @@
 package models.businessdetails
 
 case class CorrespondenceAddressUk(
-                                  yourName: String,
-                                  businessName: String,
-                                  addressLine1: String,
-                                  addressLine2: Option[String],
-                                  addressLine3: Option[String],
-                                  addressLine4: Option[String],
-                                  postCode: String
-                                  ) {
+  yourName: String,
+  businessName: String,
+  addressLine1: String,
+  addressLine2: Option[String],
+  addressLine3: Option[String],
+  addressLine4: Option[String],
+  postCode: String
+) {
   def toLines: Seq[String] =
-      Seq(
-        Some(yourName),
-        Some(businessName),
-        Some(addressLine1),
-        addressLine2,
-        addressLine3,
-        addressLine4,
-        Some(postCode)
-      ).flatten
+    Seq(
+      Some(yourName),
+      Some(businessName),
+      Some(addressLine1),
+      addressLine2,
+      addressLine3,
+      addressLine4,
+      Some(postCode)
+    ).flatten
 }
 
 object CorrespondenceAddressUk
-

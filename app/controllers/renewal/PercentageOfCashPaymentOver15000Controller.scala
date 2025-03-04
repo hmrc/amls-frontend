@@ -29,38 +29,38 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class PercentageOfCashPaymentOver15000Controller @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                           val authAction: AuthAction,
-                                                           val ds: CommonPlayDependencies,
-                                                           val renewalService: RenewalService,
-                                                           val cc: MessagesControllerComponents,
-                                                           formProvider: PercentageFormProvider,
-                                                           view: PercentageView) extends AmlsBaseController(ds, cc) {
+class PercentageOfCashPaymentOver15000Controller @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val renewalService: RenewalService,
+  val cc: MessagesControllerComponents,
+  formProvider: PercentageFormProvider,
+  view: PercentageView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[Renewal](request.credId, Renewal.key) map {
-        response =>
-          val form = (for {
-            renewal <- response
-            percentageOfCashPaymentOver15000 <- renewal.percentageOfCashPaymentOver15000
-          } yield formProvider().fill(percentageOfCashPaymentOver15000)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[Renewal](request.credId, Renewal.key) map { response =>
+      val form = (for {
+        renewal                          <- response
+        percentageOfCashPaymentOver15000 <- renewal.percentageOfCashPaymentOver15000
+      } yield formProvider().fill(percentageOfCashPaymentOver15000)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
 
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           for {
             renewal <- renewalService.getRenewal(request.credId)
-            _ <- renewalService.updateRenewal(request.credId, renewal.percentageOfCashPaymentOver15000(data))
+            _       <- renewalService.updateRenewal(request.credId, renewal.percentageOfCashPaymentOver15000(data))
           } yield redirectDependingOnEdit(edit)
       )
-    }
   }
 
   private def redirectDependingOnEdit(edit: Boolean) = if (edit) {

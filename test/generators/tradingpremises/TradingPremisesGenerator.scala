@@ -30,16 +30,16 @@ trait TradingPremisesGenerator extends BaseGenerator with BusinessActivitiesGene
   private val nameLength = 10
 
   val tradingPremisesAddressGen: Gen[Address] = for {
-    line1 <- stringOfLengthGen(nameLength)
-    line2 <- stringOfLengthGen(nameLength)
+    line1    <- stringOfLengthGen(nameLength)
+    line2    <- stringOfLengthGen(nameLength)
     postcode <- postcodeGen
   } yield Address(line1, Some(line2), None, None, postcode, None)
 
   val yourTradingPremisesGen: Gen[YourTradingPremises] = for {
-    name <- stringOfLengthGen(nameLength)
-    address <- tradingPremisesAddressGen
+    name        <- stringOfLengthGen(nameLength)
+    address     <- tradingPremisesAddressGen
     residential <- Gen.oneOf(Some(true), Some(false), None)
-    startDate <- localDateGen
+    startDate   <- localDateGen
   } yield YourTradingPremises(name, address, residential, Some(startDate), None)
 
   val whatBusinessActivitiesGen: Gen[WhatDoesYourBusinessDo] = for {
@@ -48,19 +48,27 @@ trait TradingPremisesGenerator extends BaseGenerator with BusinessActivitiesGene
 
   val whatBusinessTypesAtLeastOneGen: Gen[WhatDoesYourBusinessDo] = for {
     activities <- businessActivitiesListGen
-    activity <- singleBusinessTypeGen
+    activity   <- singleBusinessTypeGen
   } yield WhatDoesYourBusinessDo(activities.toSet union Set(activity), None)
 
   val tpSubSectorGen: Gen[TradingPremisesMsbServices] = for {
-    subSectors <- Gen.choose(1, 3).flatMap(Gen.pick(_, Seq(
-      models.tradingpremises.TradingPremisesMsbService.TransmittingMoney,
-      models.tradingpremises.TradingPremisesMsbService.CurrencyExchange,
-      models.tradingpremises.TradingPremisesMsbService.ChequeCashingScrapMetal,
-      models.tradingpremises.TradingPremisesMsbService.ChequeCashingNotScrapMetal)))
+    subSectors <- Gen
+                    .choose(1, 3)
+                    .flatMap(
+                      Gen.pick(
+                        _,
+                        Seq(
+                          models.tradingpremises.TradingPremisesMsbService.TransmittingMoney,
+                          models.tradingpremises.TradingPremisesMsbService.CurrencyExchange,
+                          models.tradingpremises.TradingPremisesMsbService.ChequeCashingScrapMetal,
+                          models.tradingpremises.TradingPremisesMsbService.ChequeCashingNotScrapMetal
+                        )
+                      )
+                    )
   } yield TradingPremisesMsbServices(subSectors.toSet)
 
   val tradingPremisesGen: Gen[TradingPremises] = for {
-    ytp <- yourTradingPremisesGen
+    ytp        <- yourTradingPremisesGen
     activities <- whatBusinessActivitiesGen
   } yield TradingPremises(
     yourTradingPremises = Some(ytp),
@@ -70,19 +78,19 @@ trait TradingPremisesGenerator extends BaseGenerator with BusinessActivitiesGene
   )
 
   val tradingPremisesWithAtLeastOneBusinessTypeGen: Gen[TradingPremises] = for {
-    ytp <- yourTradingPremisesGen
+    ytp        <- yourTradingPremisesGen
     activities <- whatBusinessTypesAtLeastOneGen
     subSectors <- tpSubSectorGen
   } yield TradingPremises(
     yourTradingPremises = Some(ytp),
     whatDoesYourBusinessDoAtThisAddress = Some(activities),
-    msbServices = if(activities.activities.contains(MoneyServiceBusiness)) Some(subSectors) else None,
+    msbServices = if (activities.activities.contains(MoneyServiceBusiness)) Some(subSectors) else None,
     hasAccepted = true,
     hasChanged = true
   )
 
   val fullTradingPremisesGen: Gen[TradingPremises] = for {
-    ytp <- yourTradingPremisesGen.suchThat(_.nonEmpty)
+    ytp        <- yourTradingPremisesGen.suchThat(_.nonEmpty)
     activities <- whatBusinessActivitiesGen.suchThat(_.activities.nonEmpty)
     subSectors <- tpSubSectorGen.suchThat(_.services.nonEmpty)
   } yield TradingPremises(

@@ -25,18 +25,19 @@ import views.html.businessmatching.{CannotAddServicesView, CannotContinueWithApp
 
 import javax.inject.Inject
 
-class NoPsrController @Inject()(val authAction: AuthAction,
-                                val ds: CommonPlayDependencies,
-                                statusService: StatusService,
-                                val cc: MessagesControllerComponents,
-                                cannotAddServicesView: CannotAddServicesView,
-                                cannotContinueView: CannotContinueWithApplicationView) extends AmlsBaseController(ds, cc) {
+class NoPsrController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  statusService: StatusService,
+  val cc: MessagesControllerComponents,
+  cannotAddServicesView: CannotAddServicesView,
+  cannotContinueView: CannotContinueWithApplicationView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-      statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
-        case NotCompleted | SubmissionReady => Ok(cannotContinueView())
-        case _ => Ok(cannotAddServicesView())
-      }
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
+      case NotCompleted | SubmissionReady => Ok(cannotContinueView())
+      case _                              => Ok(cannotAddServicesView())
+    }
   }
 }

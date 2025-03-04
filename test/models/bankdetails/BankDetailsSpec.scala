@@ -28,7 +28,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
   val emptyBankDetails: Option[BankDetails] = None
 
   val accountTypePartialModel = BankDetails(Some(accountType), None)
-  val accountTypeNew = BelongsToBusiness
+  val accountTypeNew          = BelongsToBusiness
 
   val bankAccountPartialModel = BankDetails(None, None, Some(bankAccount))
 
@@ -43,7 +43,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
       }
       "has the hasChanged flag set as true" in {
         Json.toJson[BankDetails](completeModelChanged)(BankDetails.writes) must be(completeJsonChanged)
-        Json.toJson[BankDetails](completeModelChanged) must be(completeJsonChanged)
+        Json.toJson[BankDetails](completeModelChanged)                     must be(completeJsonChanged)
       }
       "partially complete model" which {
         "contains only accountType" in {
@@ -84,7 +84,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
     "return true" when {
       "given complete model" in {
         val bankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "00-00-00")))
-        val bankDetails = BankDetails(Some(accountType), Some("name"), Some( bankAccount), hasAccepted = true)
+        val bankDetails = BankDetails(Some(accountType), Some("name"), Some(bankAccount), hasAccepted = true)
         bankDetails.isComplete must be(true)
       }
 
@@ -109,25 +109,25 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
     "return false" when {
       "given incomplete UK BankAccount" in {
         val bankAccount = BankAccount(Some(BankAccountIsUk(true)), None, None)
-        val bankDetails = BankDetails(Some(accountType), Some("name"), Some( bankAccount), hasAccepted = true)
+        val bankDetails = BankDetails(Some(accountType), Some("name"), Some(bankAccount), hasAccepted = true)
         bankDetails.isComplete must be(false)
       }
 
       "given incomplete Non UK BankAccount without IBAN" in {
         val bankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), None)
-        val bankDetails = BankDetails(Some(accountType), Some("name"), Some( bankAccount), hasAccepted = true)
+        val bankDetails = BankDetails(Some(accountType), Some("name"), Some(bankAccount), hasAccepted = true)
         bankDetails.isComplete must be(false)
       }
 
       "given incomplete Non UK BankAccount without IBAN answer" in {
         val bankAccount = BankAccount(Some(BankAccountIsUk(false)), None, None)
-        val bankDetails = BankDetails(Some(accountType), Some("name"), Some( bankAccount), hasAccepted = true)
+        val bankDetails = BankDetails(Some(accountType), Some("name"), Some(bankAccount), hasAccepted = true)
         bankDetails.isComplete must be(false)
       }
 
       "given incomplete UK BankAccount with IBAN" in {
         val bankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), None)
-        val bankDetails = BankDetails(Some(accountType), Some("name"), Some( bankAccount), hasAccepted = true)
+        val bankDetails = BankDetails(Some(accountType), Some("name"), Some(bankAccount), hasAccepted = true)
         bankDetails.isComplete must be(false)
       }
     }
@@ -136,42 +136,72 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
   "getBankAccountDescription" must {
     "return the correct uk account descriptions" in {
 
-      val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, Some(bankAccount))
-      val bankDetailsBelongstoBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToBusiness))
+      val bankDetailsPersonal               = BankDetails(Some(PersonalAccount), None, Some(bankAccount))
+      val bankDetailsBelongstoBusiness      = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToBusiness))
       val bankDetailsBelongstoOtherBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToOtherBusiness))
-      val bankDetailsNoBankAccountUsed = bankDetailsPersonal.copy(bankAccountType = Some(NoBankAccountUsed))
+      val bankDetailsNoBankAccountUsed      = bankDetailsPersonal.copy(bankAccountType = Some(NoBankAccountUsed))
 
-      BankDetails.getBankAccountDescription(bankDetailsPersonal) must be(messages("bankdetails.accounttype.uk.lbl.01"))
-      BankDetails.getBankAccountDescription(bankDetailsBelongstoBusiness) must be(messages("bankdetails.accounttype.uk.lbl.02"))
-      BankDetails.getBankAccountDescription(bankDetailsBelongstoOtherBusiness) must be(messages("bankdetails.accounttype.uk.lbl.03"))
-      BankDetails.getBankAccountDescription(bankDetailsNoBankAccountUsed) must be(messages("bankdetails.accounttype.uk.lbl.04"))
-   }
-  "return the correct non-uk account descriptions" in {
+      BankDetails.getBankAccountDescription(bankDetailsPersonal)               must be(messages("bankdetails.accounttype.uk.lbl.01"))
+      BankDetails.getBankAccountDescription(bankDetailsBelongstoBusiness)      must be(
+        messages("bankdetails.accounttype.uk.lbl.02")
+      )
+      BankDetails.getBankAccountDescription(bankDetailsBelongstoOtherBusiness) must be(
+        messages("bankdetails.accounttype.uk.lbl.03")
+      )
+      BankDetails.getBankAccountDescription(bankDetailsNoBankAccountUsed)      must be(
+        messages("bankdetails.accounttype.uk.lbl.04")
+      )
+    }
+    "return the correct non-uk account descriptions" in {
 
-    val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, Some(BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))))
-    val bankDetailsBelongstoBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToBusiness))
-    val bankDetailsBelongstoOtherBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToOtherBusiness))
-    val bankDetailsNoBankAccountUsed = bankDetailsPersonal.copy(bankAccountType = Some(NoBankAccountUsed))
+      val bankDetailsPersonal               = BankDetails(
+        Some(PersonalAccount),
+        None,
+        Some(
+          BankAccount(
+            Some(BankAccountIsUk(false)),
+            Some(BankAccountHasIban(false)),
+            Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD"))
+          )
+        )
+      )
+      val bankDetailsBelongstoBusiness      = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToBusiness))
+      val bankDetailsBelongstoOtherBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToOtherBusiness))
+      val bankDetailsNoBankAccountUsed      = bankDetailsPersonal.copy(bankAccountType = Some(NoBankAccountUsed))
 
-    BankDetails.getBankAccountDescription(bankDetailsPersonal) must be(messages("bankdetails.accounttype.nonuk.lbl.01"))
-    BankDetails.getBankAccountDescription(bankDetailsBelongstoBusiness) must be(messages("bankdetails.accounttype.nonuk.lbl.02"))
-    BankDetails.getBankAccountDescription(bankDetailsBelongstoOtherBusiness) must be(messages("bankdetails.accounttype.nonuk.lbl.03"))
-    BankDetails.getBankAccountDescription(bankDetailsNoBankAccountUsed) must be(messages("bankdetails.accounttype.nonuk.lbl.04"))
- }
+      BankDetails.getBankAccountDescription(bankDetailsPersonal)               must be(
+        messages("bankdetails.accounttype.nonuk.lbl.01")
+      )
+      BankDetails.getBankAccountDescription(bankDetailsBelongstoBusiness)      must be(
+        messages("bankdetails.accounttype.nonuk.lbl.02")
+      )
+      BankDetails.getBankAccountDescription(bankDetailsBelongstoOtherBusiness) must be(
+        messages("bankdetails.accounttype.nonuk.lbl.03")
+      )
+      BankDetails.getBankAccountDescription(bankDetailsNoBankAccountUsed)      must be(
+        messages("bankdetails.accounttype.nonuk.lbl.04")
+      )
+    }
 
-  "return the correct description wheere there are no account numbers present" in {
+    "return the correct description wheere there are no account numbers present" in {
 
-    val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, None)
-    val bankDetailsBelongstoBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToBusiness))
-    val bankDetailsBelongstoOtherBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToOtherBusiness))
-    val bankDetailsNoBankAccountUsed = bankDetailsPersonal.copy(bankAccountType = Some(NoBankAccountUsed))
+      val bankDetailsPersonal               = BankDetails(Some(PersonalAccount), None, None)
+      val bankDetailsBelongstoBusiness      = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToBusiness))
+      val bankDetailsBelongstoOtherBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToOtherBusiness))
+      val bankDetailsNoBankAccountUsed      = bankDetailsPersonal.copy(bankAccountType = Some(NoBankAccountUsed))
 
-    BankDetails.getBankAccountDescription(bankDetailsPersonal) must be(messages("bankdetails.accounttype.lbl.01"))
-    BankDetails.getBankAccountDescription(bankDetailsBelongstoBusiness) must be(messages("bankdetails.accounttype.lbl.02"))
-    BankDetails.getBankAccountDescription(bankDetailsBelongstoOtherBusiness) must be(messages("bankdetails.accounttype.lbl.03"))
-    BankDetails.getBankAccountDescription(bankDetailsNoBankAccountUsed) must be(messages("bankdetails.accounttype.lbl.04"))
- }
-}
+      BankDetails.getBankAccountDescription(bankDetailsPersonal)               must be(messages("bankdetails.accounttype.lbl.01"))
+      BankDetails.getBankAccountDescription(bankDetailsBelongstoBusiness)      must be(
+        messages("bankdetails.accounttype.lbl.02")
+      )
+      BankDetails.getBankAccountDescription(bankDetailsBelongstoOtherBusiness) must be(
+        messages("bankdetails.accounttype.lbl.03")
+      )
+      BankDetails.getBankAccountDescription(bankDetailsNoBankAccountUsed)      must be(
+        messages("bankdetails.accounttype.lbl.04")
+      )
+    }
+  }
 
   "taskRow" must {
 
@@ -193,7 +223,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
 
     "return a Completed TaskRow" when {
       "model is complete and has not changed" in {
-        val complete = Seq(completeModel)
+        val complete         = Seq(completeModel)
         val completedTaskRow = TaskRow(
           "bankdetails",
           controllers.bankdetails.routes.YourBankAccountsController.get().url,
@@ -221,7 +251,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
       }
 
       "model is complete with only deleted bankaccounts that have not changed" in {
-        val deleted = Seq(completeModel.copy(status = Some(StatusConstants.Deleted)))
+        val deleted          = Seq(completeModel.copy(status = Some(StatusConstants.Deleted)))
         val completedTaskRow = TaskRow(
           "bankdetails",
           controllers.bankdetails.routes.YourBankAccountsController.get().url,
@@ -238,7 +268,8 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
     "return an Updated TaskRow" when {
 
       "model is complete and has changed" in {
-        val updatedChangedModel = BankDetails(Some(accountType), Some("name"), Some(bankAccount), true, hasAccepted = true)
+        val updatedChangedModel =
+          BankDetails(Some(accountType), Some("name"), Some(bankAccount), true, hasAccepted = true)
 
         val updatedTaskRow = TaskRow(
           "bankdetails",
@@ -254,7 +285,8 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
       }
 
       "model is complete with only deleted bankaccounts that have changed" in {
-        val deleted = Seq(completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true))
+        val deleted        =
+          Seq(completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true))
         val updatedTaskRow = TaskRow(
           "bankdetails",
           controllers.bankdetails.routes.YourBankAccountsController.get().url,
@@ -269,7 +301,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
     }
 
     "return a Started TaskRow when model is incomplete" in {
-      val incomplete = Seq(accountTypePartialModel)
+      val incomplete     = Seq(accountTypePartialModel)
       val startedTaskRow = TaskRow(
         "bankdetails",
         controllers.bankdetails.routes.YourBankAccountsController.get().url,
@@ -293,7 +325,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
   }
 
   "anyChanged" must {
-    val originalBankDetails = Seq(BankDetails(Some(accountType), None, Some(bankAccount), false))
+    val originalBankDetails        = Seq(BankDetails(Some(accountType), None, Some(bankAccount), false))
     val originalBankDetailsChanged = Seq(BankDetails(Some(accountType), None, Some(bankAccountNew), true))
 
     "return false" when {
@@ -315,7 +347,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
       "is the same as before" must {
         "leave the object unchanged" in {
           val res = completeModel.bankAccountType(Some(accountType))
-          res must be(completeModel)
+          res            must be(completeModel)
           res.hasChanged must be(false)
         }
       }
@@ -323,9 +355,9 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
           val res = completeModel.bankAccountType(Some(accountTypeNew))
-          res.hasChanged must be(true)
+          res.hasChanged                   must be(true)
           BankDetails.anyChanged(Seq(res)) must be(true)
-          res.bankAccountType must be(Some(accountTypeNew))
+          res.bankAccountType              must be(Some(accountTypeNew))
         }
       }
     }
@@ -334,7 +366,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
       "is the same as before" must {
         "leave the object unchanged" in {
           val res = completeModel.bankAccount(Some(bankAccount))
-          res must be(completeModel)
+          res            must be(completeModel)
           res.hasChanged must be(false)
         }
       }
@@ -342,7 +374,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
           val res = completeModel.bankAccount(Some(bankAccountNew))
-          res.hasChanged must be(true)
+          res.hasChanged  must be(true)
           res.bankAccount must be(Some(bankAccountNew))
         }
       }
@@ -353,64 +385,56 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
 
 trait BankDetailsModels {
 
-  val accountType = PersonalAccount
+  val accountType     = PersonalAccount
   val accountTypeJson = Json.obj(
-    "bankAccountType" -> Json.obj(
+    "bankAccountType"     -> Json.obj(
       "bankAccountType" -> "01"
     ),
-    "hasChanged" -> false,
+    "hasChanged"          -> false,
     "refreshedFromServer" -> false,
-    "hasAccepted" -> false
+    "hasAccepted"         -> false
   )
 
-  val bankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("111111", "00-00-00")))
+  val bankAccount     = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("111111", "00-00-00")))
   val bankAccountJson = Json.obj(
-    "bankAccount" -> Json.obj(
-      "isUK" -> true,
+    "bankAccount"         -> Json.obj(
+      "isUK"          -> true,
       "accountNumber" -> "111111",
-      "sortCode" -> "00-00-00"
+      "sortCode"      -> "00-00-00"
     ),
-    "hasChanged" -> false,
+    "hasChanged"          -> false,
     "refreshedFromServer" -> false,
-    "hasAccepted" -> false
+    "hasAccepted"         -> false
   )
 
   val completeModel = BankDetails(Some(accountType), Some("bankName"), Some(bankAccount), hasAccepted = true)
-  val completeJson = Json.obj(
-    "bankAccountType" -> Json.obj(
-      "bankAccountType" -> "01"),
-    "accountName" -> "bankName",
-    "bankAccount" -> Json.obj(
-      "isUK" -> true,
-      "accountNumber" -> "111111",
-      "sortCode" -> "00-00-00"),
-    "hasChanged" -> false,
+  val completeJson  = Json.obj(
+    "bankAccountType"     -> Json.obj("bankAccountType" -> "01"),
+    "accountName"         -> "bankName",
+    "bankAccount"         -> Json.obj("isUK" -> true, "accountNumber" -> "111111", "sortCode" -> "00-00-00"),
+    "hasChanged"          -> false,
     "refreshedFromServer" -> false,
-    "hasAccepted" -> true)
+    "hasAccepted"         -> true
+  )
 
-  val completeModelChanged = BankDetails(Some(accountType), Some("anotherName"), Some(bankAccount), true, hasAccepted = true)
-  val completeJsonChanged = Json.obj(
-    "bankAccountType" -> Json.obj(
-      "bankAccountType" -> "01"),
-    "accountName" -> "anotherName",
-    "bankAccount" -> Json.obj(
-      "isUK" -> true,
-      "accountNumber" -> "111111",
-      "sortCode" -> "00-00-00"),
-    "hasChanged" -> true,
+  val completeModelChanged =
+    BankDetails(Some(accountType), Some("anotherName"), Some(bankAccount), true, hasAccepted = true)
+  val completeJsonChanged  = Json.obj(
+    "bankAccountType"     -> Json.obj("bankAccountType" -> "01"),
+    "accountName"         -> "anotherName",
+    "bankAccount"         -> Json.obj("isUK" -> true, "accountNumber" -> "111111", "sortCode" -> "00-00-00"),
+    "hasChanged"          -> true,
     "refreshedFromServer" -> false,
-    "hasAccepted" -> true)
+    "hasAccepted"         -> true
+  )
 
   val oldCompleteJson = Json.obj(
-    "bankAccountType" -> Json.obj(
-      "bankAccountType" -> "01"),
-    "bankAccount" -> Json.obj(
-      "accountName" -> "bankName",
-      "isUK" -> true,
-      "accountNumber" -> "111111",
-      "sortCode" -> "00-00-00"),
-    "hasChanged" -> false,
+    "bankAccountType"     -> Json.obj("bankAccountType" -> "01"),
+    "bankAccount"         -> Json
+      .obj("accountName" -> "bankName", "isUK" -> true, "accountNumber" -> "111111", "sortCode" -> "00-00-00"),
+    "hasChanged"          -> false,
     "refreshedFromServer" -> false,
-    "hasAccepted" -> true)
+    "hasAccepted"         -> true
+  )
 
 }

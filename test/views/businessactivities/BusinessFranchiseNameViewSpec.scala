@@ -25,10 +25,9 @@ import play.api.test.FakeRequest
 import views.Fixture
 import views.html.businessactivities.BusinessFranchiseNameView
 
+class BusinessFranchiseNameViewSpec extends AmlsViewSpec with Matchers {
 
-class BusinessFranchiseNameViewSpec extends AmlsViewSpec with Matchers  {
-
-  lazy val franchise = inject[BusinessFranchiseNameView]
+  lazy val franchise    = inject[BusinessFranchiseNameView]
   lazy val formProvider = inject[BusinessFranchiseFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
@@ -42,14 +41,16 @@ class BusinessFranchiseNameViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = franchise(formProvider().fill(BusinessFranchiseYes("Franchise name")), true)
 
-      doc.title must startWith(messages("businessactivities.businessfranchise.title") + " - " + messages("summary.businessactivities"))
+      doc.title must startWith(
+        messages("businessactivities.businessfranchise.title") + " - " + messages("summary.businessactivities")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = franchise(formProvider().fill(BusinessFranchiseNo), true)
 
-      heading.html must be(messages("businessactivities.businessfranchise.title"))
+      heading.html    must be(messages("businessactivities.businessfranchise.title"))
       subHeading.html must include(messages("summary.businessactivities"))
     }
 

@@ -39,33 +39,36 @@ import java.net.URLEncoder
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthActionSpec extends PlaySpec with MockitoSugar
-  with ScalaFutures
-  with GuiceOneAppPerSuite
-  with AmlsReferenceNumberGenerator{
+class AuthActionSpec
+    extends PlaySpec
+    with MockitoSugar
+    with ScalaFutures
+    with GuiceOneAppPerSuite
+    with AmlsReferenceNumberGenerator {
 
   import AuthActionSpec._
 
-  override def fakeApplication(): Application = {
+  override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .configure(
         "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
       )
       .build()
-  }
 
   val mockApplicationConfig: ApplicationConfig = mock[ApplicationConfig]
-  val mockParser: BodyParsers.Default = mock[BodyParsers.Default]
+  val mockParser: BodyParsers.Default          = mock[BodyParsers.Default]
 
   private lazy val unauthorisedUrl = URLEncoder.encode(
-    ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(mockApplicationConfig).absoluteUrl, "utf-8"
+    ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(mockApplicationConfig).absoluteUrl,
+    "utf-8"
   )
-  def unauthorised = s"${mockApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
-  def signout      = s"${mockApplicationConfig.logoutUrl}"
+  def unauthorised                 = s"${mockApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
+  def signout                      = s"${mockApplicationConfig.logoutUrl}"
 
   def fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
 
-  lazy val headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
+  lazy val headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter =
+    app.injector.instanceOf[HeaderCarrierForPartialsConverter]
 
   implicit val hc: HeaderCarrier = headerCarrierForPartialsConverter.fromRequestWithEncryptedCookie(fakeRequest)
 
@@ -73,7 +76,12 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
     "AffinityGroup is Organisation" must {
       "the user has valid credentials" must {
         "redirect the user to amls frontend" in {
-          val authAction = new DefaultAuthAction(fakeAuthConnector(orgAuthRetrievals), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
+          val authAction = new DefaultAuthAction(
+            fakeAuthConnector(orgAuthRetrievals),
+            mockApplicationConfig,
+            mockParser,
+            headerCarrierForPartialsConverter
+          )
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(fakeRequest)
@@ -85,7 +93,12 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
     "AffinityGroup is not Organisation" must {
       "the user has valid credentials for sa" must {
         "redirect the user to amls frontend" in {
-          val authAction = new DefaultAuthAction(fakeAuthConnector(agentSaAuthRetrievals), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
+          val authAction = new DefaultAuthAction(
+            fakeAuthConnector(agentSaAuthRetrievals),
+            mockApplicationConfig,
+            mockParser,
+            headerCarrierForPartialsConverter
+          )
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(fakeRequest)
@@ -95,7 +108,12 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
       "the user has inactive credentials for sa" must {
         "redirect the user to amls frontend" in {
-          val authAction = new DefaultAuthAction(fakeAuthConnector(agentSaAuthRetrievalsInactive), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
+          val authAction = new DefaultAuthAction(
+            fakeAuthConnector(agentSaAuthRetrievalsInactive),
+            mockApplicationConfig,
+            mockParser,
+            headerCarrierForPartialsConverter
+          )
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(fakeRequest)
@@ -104,9 +122,14 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
         }
       }
 
-      "the user has valid credentials for ct" must {
+      "the user has valid credentials for ct"    must {
         "redirect the user to amls frontend" in {
-          val authAction = new DefaultAuthAction(fakeAuthConnector(agentCtAuthRetrievals), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
+          val authAction = new DefaultAuthAction(
+            fakeAuthConnector(agentCtAuthRetrievals),
+            mockApplicationConfig,
+            mockParser,
+            headerCarrierForPartialsConverter
+          )
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(fakeRequest)
@@ -115,7 +138,12 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
       }
       "the user has inactive credentials for ct" must {
         "redirect the user to amls frontend" in {
-          val authAction = new DefaultAuthAction(fakeAuthConnector(agentCtAuthRetrievalsInactive), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
+          val authAction = new DefaultAuthAction(
+            fakeAuthConnector(agentCtAuthRetrievalsInactive),
+            mockApplicationConfig,
+            mockParser,
+            headerCarrierForPartialsConverter
+          )
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(fakeRequest)
@@ -127,7 +155,12 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "erroneous retrievals are obtained" must {
       "redirect the user to unauthorised" in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(erroneousRetrievals), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
+        val authAction = new DefaultAuthAction(
+          fakeAuthConnector(erroneousRetrievals),
+          mockApplicationConfig,
+          mockParser,
+          headerCarrierForPartialsConverter
+        )
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -138,7 +171,12 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "the user hasn't logged in" must {
       "redirect the user to signout " in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new MissingBearerToken)), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
+        val authAction = new DefaultAuthAction(
+          fakeAuthConnector(Future.failed(new MissingBearerToken)),
+          mockApplicationConfig,
+          mockParser,
+          headerCarrierForPartialsConverter
+        )
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -149,7 +187,12 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "the user's session has expired" must {
       "redirect the user to signout " in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new BearerTokenExpired)), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
+        val authAction = new DefaultAuthAction(
+          fakeAuthConnector(Future.failed(new BearerTokenExpired)),
+          mockApplicationConfig,
+          mockParser,
+          headerCarrierForPartialsConverter
+        )
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -160,7 +203,12 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "the user doesn't have sufficient enrolments" must {
       "redirect the user to the unauthorised" in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new InsufficientEnrolments)), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
+        val authAction = new DefaultAuthAction(
+          fakeAuthConnector(Future.failed(new InsufficientEnrolments)),
+          mockApplicationConfig,
+          mockParser,
+          headerCarrierForPartialsConverter
+        )
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -171,7 +219,12 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "the user doesn't have sufficient confidence level" must {
       "redirect the user to the unauthorised" in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new InsufficientConfidenceLevel)), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
+        val authAction = new DefaultAuthAction(
+          fakeAuthConnector(Future.failed(new InsufficientConfidenceLevel)),
+          mockApplicationConfig,
+          mockParser,
+          headerCarrierForPartialsConverter
+        )
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -182,7 +235,12 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "the user used an unaccepted auth provider" must {
       "redirect the user to the unauthorised" in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new UnsupportedAuthProvider)), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
+        val authAction = new DefaultAuthAction(
+          fakeAuthConnector(Future.failed(new UnsupportedAuthProvider)),
+          mockApplicationConfig,
+          mockParser,
+          headerCarrierForPartialsConverter
+        )
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -193,7 +251,12 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "the user has an unsupported affinity group" must {
       "redirect the user to the unauthorised" in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new UnsupportedAffinityGroup)), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
+        val authAction = new DefaultAuthAction(
+          fakeAuthConnector(Future.failed(new UnsupportedAffinityGroup)),
+          mockApplicationConfig,
+          mockParser,
+          headerCarrierForPartialsConverter
+        )
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -204,7 +267,12 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "the user has an unsupported credential role" must {
       "redirect the user to the unauthorised" in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new UnsupportedCredentialRole)), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
+        val authAction = new DefaultAuthAction(
+          fakeAuthConnector(Future.failed(new UnsupportedCredentialRole)),
+          mockApplicationConfig,
+          mockParser,
+          headerCarrierForPartialsConverter
+        )
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -216,71 +284,114 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
 }
 
-object AuthActionSpec extends AmlsReferenceNumberGenerator{
+object AuthActionSpec extends AmlsReferenceNumberGenerator {
   private def fakeAuthConnector(stubbedRetrievalResult: Future[_]): AuthConnector = new AuthConnector {
 
-    def authorise[A](predicate: Predicate, retrieval: Retrieval[A])
-                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] = {
+    def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit
+      hc: HeaderCarrier,
+      ec: ExecutionContext
+    ): Future[A] =
       stubbedRetrievalResult.asInstanceOf[Future[A]]
-    }
   }
 
-  val enrolments: Enrolments = Enrolments(Set(
-    Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"),
-    Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated")
-  ))
+  val enrolments: Enrolments    = Enrolments(
+    Set(
+      Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"),
+      Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated")
+    )
+  )
   private def orgAuthRetrievals = Future.successful(
-    new ~ (new ~ (new ~(new ~(enrolments, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Organisation)), Some("groupIdentifier")), Some(User))
+    new ~(
+      new ~(
+        new ~(new ~(enrolments, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Organisation)),
+        Some("groupIdentifier")
+      ),
+      Some(User)
+    )
   )
 
-  val enrolmentsSa: Enrolments = Enrolments(Set(
-    Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"),
-    Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"),
-    Enrolment("IR-SA", Seq(EnrolmentIdentifier("UTR", "saRef")), "Activated")
-  ))
+  val enrolmentsSa: Enrolments      = Enrolments(
+    Set(
+      Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"),
+      Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"),
+      Enrolment("IR-SA", Seq(EnrolmentIdentifier("UTR", "saRef")), "Activated")
+    )
+  )
   private def agentSaAuthRetrievals = Future.successful(
-    new ~ (new ~(new ~(new~(enrolmentsSa, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)), Some("groupIdentifier")), Some(User))
+    new ~(
+      new ~(
+        new ~(new ~(enrolmentsSa, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)),
+        Some("groupIdentifier")
+      ),
+      Some(User)
+    )
   )
 
-  val enrolmentsSaInactive: Enrolments = Enrolments(Set(
-    Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Active"),
-    Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Active"),
-    Enrolment("IR-SA", Seq(EnrolmentIdentifier("UTR", "saRef")), "Inactive")
-  ))
+  val enrolmentsSaInactive: Enrolments      = Enrolments(
+    Set(
+      Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Active"),
+      Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Active"),
+      Enrolment("IR-SA", Seq(EnrolmentIdentifier("UTR", "saRef")), "Inactive")
+    )
+  )
   private def agentSaAuthRetrievalsInactive = Future.successful(
-    new ~ (new ~(new ~(new~(enrolmentsSaInactive, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)), Some("groupIdentifier")), Some(User))
+    new ~(
+      new ~(
+        new ~(new ~(enrolmentsSaInactive, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)),
+        Some("groupIdentifier")
+      ),
+      Some(User)
+    )
   )
 
-  val enrolmentsCt: Enrolments = Enrolments(Set(
-    Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"),
-    Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"),
-    Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", "ctRef")), "Activated")
-  ))
+  val enrolmentsCt: Enrolments      = Enrolments(
+    Set(
+      Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"),
+      Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"),
+      Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", "ctRef")), "Activated")
+    )
+  )
   private def agentCtAuthRetrievals = Future.successful(
-    new ~ (new ~(new ~(new ~(enrolmentsCt, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)), Some("groupIdentifier")), Some(User))
+    new ~(
+      new ~(
+        new ~(new ~(enrolmentsCt, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)),
+        Some("groupIdentifier")
+      ),
+      Some(User)
+    )
   )
 
-  val enrolmentsCtInactive: Enrolments = Enrolments(Set(
-    Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Active"),
-    Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Active"),
-    Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", "ctRef")), "Inactive")
-  ))
+  val enrolmentsCtInactive: Enrolments      = Enrolments(
+    Set(
+      Enrolment("HMCE-VATVAR-ORG", Seq(EnrolmentIdentifier("VATRegNo", "000000000")), "Active"),
+      Enrolment("HMRC-MLR-ORG", Seq(EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Active"),
+      Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", "ctRef")), "Inactive")
+    )
+  )
   private def agentCtAuthRetrievalsInactive = Future.successful(
-    new ~ (new ~(new ~(new ~(enrolmentsCtInactive, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)), Some("groupIdentifier")), Some(User))
+    new ~(
+      new ~(
+        new ~(new ~(enrolmentsCtInactive, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)),
+        Some("groupIdentifier")
+      ),
+      Some(User)
+    )
   )
 
 //  private def emptyAuthRetrievals = Future.successful(
 //    new ~(new ~(new ~(Enrolments(Set()), Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Organisation)), Some("groupIdentifier"))
 //  )
   private def erroneousRetrievals = Future.successful(
-    new ~ (new ~(new ~(new ~(Enrolments(Set()), None), Some(AffinityGroup.Organisation)), Some("groupIdentifier")), Some(User))
+    new ~(
+      new ~(new ~(new ~(Enrolments(Set()), None), Some(AffinityGroup.Organisation)), Some("groupIdentifier")),
+      Some(User)
+    )
   )
 
   class Harness(authAction: AuthAction) extends BaseController {
-    def onPageLoad(): Action[AnyContent] = authAction { _ => Ok }
+    def onPageLoad(): Action[AnyContent] = authAction(_ => Ok)
 
     override protected def controllerComponents: ControllerComponents = ???
   }
 
 }
-

@@ -22,7 +22,7 @@ import play.api.data.{Form, FormError}
 
 class CurrencyExchangesInNext12MonthsFormProviderSpec extends StringFieldBehaviours {
 
-  val formProvider = new CurrencyExchangesInNext12MonthsFormProvider()
+  val formProvider                             = new CurrencyExchangesInNext12MonthsFormProvider()
   val form: Form[CETransactionsInNext12Months] = formProvider()
 
   val fieldName = "ceTransaction"
@@ -35,9 +35,13 @@ class CurrencyExchangesInNext12MonthsFormProviderSpec extends StringFieldBehavio
 
     s"not bind numbers longer that ${formProvider.length}" in {
 
-      val result = form.bind(Map(
-        fieldName -> "123456789123"
-      )).apply(fieldName)
+      val result = form
+        .bind(
+          Map(
+            fieldName -> "123456789123"
+          )
+        )
+        .apply(fieldName)
       result.errors shouldEqual Seq(
         FormError(fieldName, "error.invalid.msb.ce.transactions.in.12months", Seq(formProvider.length))
       )

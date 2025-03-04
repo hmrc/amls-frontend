@@ -36,137 +36,141 @@ import scala.concurrent.Future
 
 class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
-    trait Fixture extends DependencyMocks {
-        self =>
-        val request = addToken(authRequest)
-        lazy val view = inject[FxTransactionInNext12MonthsView]
-        val controller = new FXTransactionsInNext12MonthsController(
-            authAction = SuccessfulAuthAction, ds = commonDependencies,
-            dataCacheConnector = mockCacheConnector,
-            statusService = mockStatusService,
-            serviceFlow = mockServiceFlow,
-            cc = mockMcc,
-            formProvider = inject[FxTransactionsInNext12MonthsFormProvider],
-            view = view
-        )
-
-        mockIsNewActivityNewAuth(false)
-        mockCacheFetch[ServiceChangeRegister](None, None)
-    }
-
-    val emptyCache = Cache.empty
-
-    val fullModel = WhichCurrencies(
-        Seq("USD", "CHF", "EUR"),
-        Some(UsesForeignCurrenciesNo),
-        Some(MoneySources(Some(BankMoneySource("Bank names")),
-        Some(WholesalerMoneySource("wholesaler names")),
-        Some(true)))
+  trait Fixture extends DependencyMocks {
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[FxTransactionInNext12MonthsView]
+    val controller = new FXTransactionsInNext12MonthsController(
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      dataCacheConnector = mockCacheConnector,
+      statusService = mockStatusService,
+      serviceFlow = mockServiceFlow,
+      cc = mockMcc,
+      formProvider = inject[FxTransactionsInNext12MonthsFormProvider],
+      view = view
     )
 
-    "FETransactionsInNext12MonthsController" must {
+    mockIsNewActivityNewAuth(false)
+    mockCacheFetch[ServiceChangeRegister](None, None)
+  }
 
-        "load the page 'How many foreign exchange transactions do you expect in the next 12 months?'" in new Fixture {
+  val emptyCache = Cache.empty
 
-            mockApplicationStatus(NotCompleted)
+  val fullModel = WhichCurrencies(
+    Seq("USD", "CHF", "EUR"),
+    Some(UsesForeignCurrenciesNo),
+    Some(MoneySources(Some(BankMoneySource("Bank names")), Some(WholesalerMoneySource("wholesaler names")), Some(true)))
+  )
 
-            when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-                    (any())).thenReturn(Future.successful(None))
+  "FETransactionsInNext12MonthsController" must {
 
-            val result = controller.get()(request)
-            status(result) must be(OK)
-            contentAsString(result) must include(Messages("msb.fx.transactions.expected.in.12.months.title"))
-        }
+    "load the page 'How many foreign exchange transactions do you expect in the next 12 months?'" in new Fixture {
 
-        "load the page 'How many foreign exchange transactions do you expect in the next 12 months?' with pre populated data" in new Fixture {
+      mockApplicationStatus(NotCompleted)
 
-            mockApplicationStatus(NotCompleted)
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-                    (any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(
-                fxTransactionsInNext12Months = Some(FXTransactionsInNext12Months("12345678963"))))))
-
-            val result = controller.get()(request)
-            status(result) must be(OK)
-            contentAsString(result) must include("12345678963")
-        }
-
-        "load the page when the application status is approved and the service has just been added" in new Fixture {
-            mockApplicationStatus(NotCompleted)
-
-            when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-                    (any())).thenReturn(Future.successful(None))
-
-            mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
-
-            val result = controller.get()(request)
-
-            status(result) must be(OK)
-            contentAsString(result) must include(Messages("msb.fx.transactions.expected.in.12.months.title"))
-        }
-
-        "Show error message when user has not filled the mandatory fields" in new Fixture {
-
-            val newRequest = FakeRequest(POST, routes.FXTransactionsInNext12MonthsController.post().url)
-            .withFormUrlEncodedBody(
-                "fxTransaction" -> ""
-            )
-
-            when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-                    (any())).thenReturn(Future.successful(None))
-
-            when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
-                    (any())).thenReturn(Future.successful(emptyCache))
-
-            val result = controller.post()(newRequest)
-            status(result) must be(BAD_REQUEST)
-            contentAsString(result) must include(Messages("error.required.msb.fx.transactions.in.12months"))
-
-        }
-
-        "Successfully save data in mongoCache and navigate to Summary page" in new Fixture {
-            val newRequest = FakeRequest(POST, routes.FXTransactionsInNext12MonthsController.post().url)
-            .withFormUrlEncodedBody(
-                "fxTransaction" -> "12345678963"
-            )
-
-            when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-                    (any())).thenReturn(Future.successful(None))
-
-            when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
-                    (any())).thenReturn(Future.successful(emptyCache))
-
-            val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
-        }
-
-        "Successfully save data in mongoCache and navigate to Summary page in edit mode if the next page's data is in store" in new Fixture {
-
-            val incomingModel = MoneyServiceBusiness(
-                whichCurrencies = Some(fullModel)
-            )
-
-            val outgoingModel = incomingModel.copy(
-                fxTransactionsInNext12Months = Some(
-                    FXTransactionsInNext12Months("12345678963")
-                ), hasChanged = true
-            )
-
-            val newRequest = FakeRequest(POST, routes.FXTransactionsInNext12MonthsController.post().url)
-            .withFormUrlEncodedBody(
-                "fxTransaction" -> "12345678963"
-            )
-
-            when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))
-                    (any())).thenReturn(Future.successful(Some(incomingModel)))
-
-            when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-                    (any())).thenReturn(Future.successful(emptyCache))
-
-            val result = controller.post(true)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
-        }
+      val result = controller.get()(request)
+      status(result)          must be(OK)
+      contentAsString(result) must include(Messages("msb.fx.transactions.expected.in.12.months.title"))
     }
+
+    "load the page 'How many foreign exchange transactions do you expect in the next 12 months?' with pre populated data" in new Fixture {
+
+      mockApplicationStatus(NotCompleted)
+
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any())).thenReturn(
+        Future.successful(
+          Some(MoneyServiceBusiness(fxTransactionsInNext12Months = Some(FXTransactionsInNext12Months("12345678963"))))
+        )
+      )
+
+      val result = controller.get()(request)
+      status(result)          must be(OK)
+      contentAsString(result) must include("12345678963")
+    }
+
+    "load the page when the application status is approved and the service has just been added" in new Fixture {
+      mockApplicationStatus(NotCompleted)
+
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
+
+      mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
+
+      val result = controller.get()(request)
+
+      status(result)          must be(OK)
+      contentAsString(result) must include(Messages("msb.fx.transactions.expected.in.12.months.title"))
+    }
+
+    "Show error message when user has not filled the mandatory fields" in new Fixture {
+
+      val newRequest = FakeRequest(POST, routes.FXTransactionsInNext12MonthsController.post().url)
+        .withFormUrlEncodedBody(
+          "fxTransaction" -> ""
+        )
+
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result)          must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.required.msb.fx.transactions.in.12months"))
+
+    }
+
+    "Successfully save data in mongoCache and navigate to Summary page" in new Fixture {
+      val newRequest = FakeRequest(POST, routes.FXTransactionsInNext12MonthsController.post().url)
+        .withFormUrlEncodedBody(
+          "fxTransaction" -> "12345678963"
+        )
+
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
+    }
+
+    "Successfully save data in mongoCache and navigate to Summary page in edit mode if the next page's data is in store" in new Fixture {
+
+      val incomingModel = MoneyServiceBusiness(
+        whichCurrencies = Some(fullModel)
+      )
+
+      val outgoingModel = incomingModel.copy(
+        fxTransactionsInNext12Months = Some(
+          FXTransactionsInNext12Months("12345678963")
+        ),
+        hasChanged = true
+      )
+
+      val newRequest = FakeRequest(POST, routes.FXTransactionsInNext12MonthsController.post().url)
+        .withFormUrlEncodedBody(
+          "fxTransaction" -> "12345678963"
+        )
+
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Future.successful(Some(incomingModel)))
+
+      when(
+        controller.dataCacheConnector
+          .save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any())
+      ).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(true)(newRequest)
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
+    }
+  }
 }

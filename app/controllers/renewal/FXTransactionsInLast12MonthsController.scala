@@ -28,49 +28,48 @@ import views.html.renewal.FXTransactionsInLast12MonthsView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class FXTransactionsInLast12MonthsController @Inject()(val authAction: AuthAction,
-                                                       val ds: CommonPlayDependencies,
-                                                       val renewalService: RenewalService,
-                                                       val cc: MessagesControllerComponents,
-                                                       formProvider: FXTransactionsInLast12MonthsFormProvider,
-                                                       view: FXTransactionsInLast12MonthsView) extends AmlsBaseController(ds, cc) {
+class FXTransactionsInLast12MonthsController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val renewalService: RenewalService,
+  val cc: MessagesControllerComponents,
+  formProvider: FXTransactionsInLast12MonthsFormProvider,
+  view: FXTransactionsInLast12MonthsView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      for {
-        renewal <- renewalService.getRenewal(request.credId)
-        formOpt = renewal.fxTransactionsInLast12Months.map(formProvider().fill)
-      } yield {
-        Ok(view(formOpt.getOrElse(formProvider()), edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    for {
+      renewal <- renewalService.getRenewal(request.credId)
+      formOpt  = renewal.fxTransactionsInLast12Months.map(formProvider().fill)
+    } yield Ok(view(formOpt.getOrElse(formProvider()), edit))
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           renewalService.fetchAndUpdateRenewal(
             request.credId,
             _.fxTransactionsInLast12Months(data)
           ) flatMap {
-            case Some(_) => renewalService.getBusinessMatching(request.credId) map { bmOpt =>
+            case Some(_) =>
+              renewalService.getBusinessMatching(request.credId) map { bmOpt =>
                 standardRouting(
                   ControllerHelper.getBusinessActivity(bmOpt).map(_.businessActivities),
                   edit
                 )
               }
-            case None => Future.successful(InternalServerError("Failed to update cache"))
+            case None    => Future.successful(InternalServerError("Failed to update cache"))
           }
       )
-    }
   }
 
   private def standardRouting(businessActivities: Option[Set[BusinessActivity]], edit: Boolean): Result =
     (businessActivities, edit) match {
       case (x, false) if x.fold(false)(y => y.contains(HighValueDealing) || y.contains(AccountancyServices)) =>
         Redirect(routes.CustomersOutsideIsUKController.get())
-      case _ => Redirect(routes.SummaryController.get)
+      case _                                                                                                 => Redirect(routes.SummaryController.get)
     }
 }

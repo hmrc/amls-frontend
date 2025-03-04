@@ -37,16 +37,22 @@ import views.html.businessmatching.CompanyRegistrationNumberView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-
-class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with StatusMocks with CacheMocks {
+class CompanyRegistrationNumberControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with ScalaFutures
+    with StatusMocks
+    with CacheMocks {
 
   trait Fixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request                       = addToken(authRequest)
     implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
-    lazy val view = app.injector.instanceOf[CompanyRegistrationNumberView]
+    lazy val view  = app.injector.instanceOf[CompanyRegistrationNumberView]
     val controller = new CompanyRegistrationNumberController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       mockCacheConnector,
       statusService = mockStatusService,
       mock[BusinessMatchingService],
@@ -77,10 +83,9 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
         controller.businessMatchingService.getModel(any())
       } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(None))
 
-
       val result = controller.get()(request)
       status(result) must be(OK)
-      val document = Jsoup.parse(contentAsString(result))
+      val document  = Jsoup.parse(contentAsString(result))
       val pageTitle = Messages("businessmatching.registrationnumber.title") + " - " +
         Messages("summary.businessmatching") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
@@ -101,8 +106,8 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
       val invalidRequest = FakeRequest(POST, routes.CompanyRegistrationNumberController.post(true).url)
         .withFormUrlEncodedBody(("value", "1234567#"))
 
-      val result = controller.post()(invalidRequest)
-      val document = Jsoup.parse(contentAsString(result))
+      val result    = controller.post()(invalidRequest)
+      val document  = Jsoup.parse(contentAsString(result))
       val pageTitle = Messages("businessmatching.registrationnumber.title") + " - " +
         Messages("summary.businessmatching") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
@@ -115,14 +120,14 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
       val validRequest = FakeRequest(POST, routes.CompanyRegistrationNumberController.post(true).url)
         .withFormUrlEncodedBody(("value", "12345678"))
 
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-        (any())).thenReturn(Future.successful(Some(businessMatching)))
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
+        .thenReturn(Future.successful(Some(businessMatching)))
 
-      when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(validRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
@@ -131,14 +136,14 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
       val validRequest = FakeRequest(POST, routes.CompanyRegistrationNumberController.post(false).url)
         .withFormUrlEncodedBody(("value", "12345678"))
 
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-        (any())).thenReturn(Future.successful(Some(businessMatching)))
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
+        .thenReturn(Future.successful(Some(businessMatching)))
 
-      when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(false)(validRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.RegisterServicesController.get().url))
     }
 

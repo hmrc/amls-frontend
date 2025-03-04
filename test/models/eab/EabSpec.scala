@@ -26,32 +26,32 @@ import utils.AmlsSpec
 class EabSpec extends AmlsSpec {
 
   val completeEstateAgencyActPenalty = Json.obj(
-    "penalisedEstateAgentsAct" -> true,
+    "penalisedEstateAgentsAct"       -> true,
     "penalisedEstateAgentsActDetail" -> "details"
   )
 
   val incompleteEstateAgencyActPenalty = Json.obj(
-    "penalisedEstateAgentsAct" -> true,
+    "penalisedEstateAgentsAct"       -> true,
     "penalisedEstateAgentsActDetail" -> ""
   )
 
   val completePenalisedProfessionalBody = Json.obj(
-    "penalisedProfessionalBody" -> true,
+    "penalisedProfessionalBody"       -> true,
     "penalisedProfessionalBodyDetail" -> "details"
   )
 
   val incompletePenalisedProfessionalBody = Json.obj(
-    "penalisedProfessionalBody" -> true,
+    "penalisedProfessionalBody"       -> true,
     "penalisedProfessionalBodyDetail" -> ""
   )
 
   val completeRedressScheme = Json.obj(
-    "redressScheme" -> "propertyRedressScheme",
+    "redressScheme"       -> "propertyRedressScheme",
     "redressSchemeDetail" -> "null"
   )
 
   val incompleteRedressScheme = Json.obj(
-    "redressScheme" -> "",
+    "redressScheme"       -> "",
     "redressSchemeDetail" -> "null"
   )
 
@@ -69,9 +69,10 @@ class EabSpec extends AmlsSpec {
     "lettings",
     "relocation",
     "residential",
-    "socialHousingProvision")
+    "socialHousingProvision"
+  )
 
-  val completeServices = Json.obj("eabServicesProvided" -> completeServiceList )
+  val completeServices = Json.obj("eabServicesProvided" -> completeServiceList)
 
   val completeServicesWithoutResidential = Json.obj(
     "eabServicesProvided" -> completeServiceList.filter(s => !s.equals("residential"))
@@ -97,8 +98,8 @@ class EabSpec extends AmlsSpec {
       val constructedEab = Eab(completeData, hasAccepted = true)
 
       val completeEab = Json.obj(
-        "data" -> completeData,
-        "hasChanged" -> false,
+        "data"        -> completeData,
+        "hasChanged"  -> false,
         "hasAccepted" -> true
       )
 
@@ -122,8 +123,8 @@ class EabSpec extends AmlsSpec {
       val constructedEab = Eab(incompleteData)
 
       val incompleteEab = Json.obj(
-        "data" -> incompleteData,
-        "hasChanged" -> false,
+        "data"        -> incompleteData,
+        "hasChanged"  -> false,
         "hasAccepted" -> false
       )
 
@@ -137,92 +138,82 @@ class EabSpec extends AmlsSpec {
         deserialisedEab mustBe constructedEab
       }
 
-      checkIsComplete(constructedEab,
+      checkIsComplete(
+        constructedEab,
         isProfessionalBodyPenaltyComplete = false,
         isRedressSchemeComplete = false,
         isProtectionSchemeComplete = false,
-        isComplete = false)
+        isComplete = false
+      )
     }
   }
 
   "Pre-existing data" when {
 
-    val oldServices = Json.obj("services" -> Json.arr("08", "03", "07", "02", "05", "01", "06", "09", "04" ))
+    val oldServices = Json.obj("services" -> Json.arr("08", "03", "07", "02", "05", "01", "06", "09", "04"))
 
     val oldDateOfChange = Json.obj("dateOfChange" -> "2002-02-02")
 
-    val oldProfessionalBody = Json.obj(
-      "penalised" -> true,
-      "professionalBody" -> "test10")
+    val oldProfessionalBody = Json.obj("penalised" -> true, "professionalBody" -> "test10")
 
-    val oldEstateAct = Json.obj(
-      "penalisedUnderEstateAgentsAct" -> true,
-      "penalisedUnderEstateAgentsActDetails" -> "test10")
+    val oldEstateAct =
+      Json.obj("penalisedUnderEstateAgentsAct" -> true, "penalisedUnderEstateAgentsActDetails" -> "test10")
 
-    val oldRedressScheme = Json.obj(
-      "isRedress" -> false,
-      "propertyRedressScheme" -> "03")
+    val oldRedressScheme = Json.obj("isRedress" -> false, "propertyRedressScheme" -> "03")
 
-    val oldRedressSchemeNoRedress = Json.obj(
-      "isRedress" -> false)
+    val oldRedressSchemeNoRedress = Json.obj("isRedress" -> false)
 
-    val oldClientProtection = Json.obj(
-      "clientMoneyProtection" -> false)
+    val oldClientProtection = Json.obj("clientMoneyProtection" -> false)
 
     "data are complete" must {
-      val completeOldEab = (
-        oldServices ++
-          oldDateOfChange ++
-          oldRedressScheme ++
-          oldProfessionalBody ++
-          oldEstateAct ++
-          oldClientProtection ++ Json.obj(
-          "hasChanged" -> true,
-          "hasAccepted" -> true)).as[Eab]
+      val completeOldEab = (oldServices ++
+        oldDateOfChange ++
+        oldRedressScheme ++
+        oldProfessionalBody ++
+        oldEstateAct ++
+        oldClientProtection ++ Json.obj("hasChanged" -> true, "hasAccepted" -> true)).as[Eab]
 
       checkIsComplete(completeOldEab)
     }
 
     "data are complete no redress" must {
-      val completeOldEab = (
-        oldServices ++
-          oldDateOfChange ++
-          oldRedressSchemeNoRedress ++
-          oldProfessionalBody ++
-          oldEstateAct ++ Json.obj(
-          "hasChanged" -> true,
-          "hasAccepted" -> true)).as[Eab]
+      val completeOldEab = (oldServices ++
+        oldDateOfChange ++
+        oldRedressSchemeNoRedress ++
+        oldProfessionalBody ++
+        oldEstateAct ++ Json.obj("hasChanged" -> true, "hasAccepted" -> true)).as[Eab]
 
       checkIsComplete(completeOldEab)
     }
 
     "data are incomplete" must {
-      val incompleteOldEab = (
-        oldServices ++
-          oldRedressScheme ++
-          Json.obj(
-            "hasChanged" -> false,
-            "hasAccepted" -> false)).as[Eab]
+      val incompleteOldEab = (oldServices ++
+        oldRedressScheme ++
+        Json.obj("hasChanged" -> false, "hasAccepted" -> false)).as[Eab]
 
-      checkIsComplete(incompleteOldEab,
+      checkIsComplete(
+        incompleteOldEab,
         isEstateAgentActPenaltyComplete = false,
         isProfessionalBodyPenaltyComplete = false,
-        isComplete = false)
+        isComplete = false
+      )
     }
   }
 
   "An Eab model" when {
     "EstateAgentActPenalty is true but EstateAgentActPenaltyDetails is empty" must {
 
-      val eab = Json.obj(
-        "data" -> (completeServices ++
-          incompleteEstateAgencyActPenalty ++
-          completePenalisedProfessionalBody ++
-          completeRedressScheme ++
-          completeMoneyProtectionScheme),
-        "hasChanged" -> false,
-        "hasAccepted" -> true
-      ).as[Eab]
+      val eab = Json
+        .obj(
+          "data"        -> (completeServices ++
+            incompleteEstateAgencyActPenalty ++
+            completePenalisedProfessionalBody ++
+            completeRedressScheme ++
+            completeMoneyProtectionScheme),
+          "hasChanged"  -> false,
+          "hasAccepted" -> true
+        )
+        .as[Eab]
 
       "return false for isEstateAgentActPenaltyComplete" in {
         eab.isEstateAgentActPenaltyComplete mustBe false
@@ -235,15 +226,17 @@ class EabSpec extends AmlsSpec {
 
     "PenalisedProfessionalBody is true but PenalisedProfessionalBodyDetails is empty" must {
 
-      val eab = Json.obj(
-        "data" -> (completeServices ++
-          completeEstateAgencyActPenalty ++
-          incompletePenalisedProfessionalBody ++
-          completeRedressScheme ++
-          completeMoneyProtectionScheme),
-        "hasChanged" -> false,
-        "hasAccepted" -> true
-      ).as[Eab]
+      val eab = Json
+        .obj(
+          "data"        -> (completeServices ++
+            completeEstateAgencyActPenalty ++
+            incompletePenalisedProfessionalBody ++
+            completeRedressScheme ++
+            completeMoneyProtectionScheme),
+          "hasChanged"  -> false,
+          "hasAccepted" -> true
+        )
+        .as[Eab]
 
       "return false for isProfessionalBodyPenaltyComplete" in {
         eab.isProfessionalBodyPenaltyComplete mustBe false
@@ -256,14 +249,16 @@ class EabSpec extends AmlsSpec {
 
     "protection scheme is empty" when {
       "services contain 'lettings'" must {
-        val eab = Json.obj(
-          "data" -> (completeServices ++
-            completeEstateAgencyActPenalty ++
-            completePenalisedProfessionalBody ++
-            completeRedressScheme),
-          "hasChanged" -> false,
-          "hasAccepted" -> true
-        ).as[Eab]
+        val eab = Json
+          .obj(
+            "data"        -> (completeServices ++
+              completeEstateAgencyActPenalty ++
+              completePenalisedProfessionalBody ++
+              completeRedressScheme),
+            "hasChanged"  -> false,
+            "hasAccepted" -> true
+          )
+          .as[Eab]
 
         "return false for isProtectionSchemeComplete" in {
           eab.isProtectionSchemeComplete mustBe false
@@ -276,12 +271,12 @@ class EabSpec extends AmlsSpec {
 
       "services do not contain 'lettings'" must {
         val completeEab = Json.obj(
-          "data" -> (completeServicesWithoutLetting ++
+          "data"        -> (completeServicesWithoutLetting ++
             completeEstateAgencyActPenalty ++
             completePenalisedProfessionalBody ++
             completeRedressScheme ++
             completeMoneyProtectionScheme),
-          "hasChanged" -> false,
+          "hasChanged"  -> false,
           "hasAccepted" -> true
         )
 
@@ -306,8 +301,8 @@ class EabSpec extends AmlsSpec {
           completeMoneyProtectionScheme
 
         val incompleteEab = Json.obj(
-          "data" -> incompleteData,
-          "hasChanged" -> false,
+          "data"        -> incompleteData,
+          "hasChanged"  -> false,
           "hasAccepted" -> true
         )
 
@@ -330,8 +325,8 @@ class EabSpec extends AmlsSpec {
           completeMoneyProtectionScheme
 
         val incompleteEab = Json.obj(
-          "data" -> incompleteData,
-          "hasChanged" -> false,
+          "data"        -> incompleteData,
+          "hasChanged"  -> false,
           "hasAccepted" -> true
         )
 
@@ -350,7 +345,7 @@ class EabSpec extends AmlsSpec {
     "taskRow is called" must {
 
       val mockCache = mock[Cache]
-      val msgKey = "eab"
+      val msgKey    = "eab"
 
       val completeData = completeServices ++
         completeDateOfChange ++
@@ -360,8 +355,8 @@ class EabSpec extends AmlsSpec {
         completeMoneyProtectionScheme
 
       def completeEab(hasChanged: Boolean = false, hasAccepted: Boolean = true) = Json.obj(
-        "data" -> completeData,
-        "hasChanged" -> hasChanged,
+        "data"        -> completeData,
+        "hasChanged"  -> hasChanged,
         "hasAccepted" -> hasAccepted
       )
 
@@ -430,8 +425,8 @@ class EabSpec extends AmlsSpec {
           completeMoneyProtectionScheme
 
         val incompleteEab = Json.obj(
-          "data" -> incompleteData,
-          "hasChanged" -> false,
+          "data"        -> incompleteData,
+          "hasChanged"  -> false,
           "hasAccepted" -> true
         )
 
@@ -443,13 +438,15 @@ class EabSpec extends AmlsSpec {
     }
   }
 
-  def checkIsComplete(eab: Eab,
-                      isServicesComplete: Boolean = true,
-                      isRedressSchemeComplete: Boolean = true,
-                      isProtectionSchemeComplete: Boolean = true,
-                      isEstateAgentActPenaltyComplete: Boolean = true,
-                      isProfessionalBodyPenaltyComplete: Boolean = true,
-                      isComplete: Boolean = true) = {
+  def checkIsComplete(
+    eab: Eab,
+    isServicesComplete: Boolean = true,
+    isRedressSchemeComplete: Boolean = true,
+    isProtectionSchemeComplete: Boolean = true,
+    isEstateAgentActPenaltyComplete: Boolean = true,
+    isProfessionalBodyPenaltyComplete: Boolean = true,
+    isComplete: Boolean = true
+  ) = {
     s"return $isServicesComplete for isServicesComplete" in {
       eab.isServicesComplete mustBe isServicesComplete
     }

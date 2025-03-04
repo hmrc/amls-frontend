@@ -22,13 +22,12 @@ import java.time.LocalDate
 
 case class CashPayment(acceptedPayment: CashPaymentOverTenThousandEuros, firstDate: Option[CashPaymentFirstDate]) {
 
-  def isCashPaymentsComplete: Boolean = {
+  def isCashPaymentsComplete: Boolean =
     this match {
       case CashPayment(CashPaymentOverTenThousandEuros(true), Some(_)) => true
-      case CashPayment(CashPaymentOverTenThousandEuros(false), None) => true
-      case _ => false
+      case CashPayment(CashPaymentOverTenThousandEuros(false), None)   => true
+      case _                                                           => false
     }
-  }
 }
 
 object CashPayment {
@@ -38,30 +37,28 @@ object CashPayment {
     ((__ \ "acceptedAnyPayment").read[Boolean] map CashPaymentOverTenThousandEuros.apply and
       (__ \ "paymentDate").readNullable[LocalDate].map {
         case Some(date) => Some(CashPaymentFirstDate.apply(date))
-        case None => None
-      })(CashPayment.apply _ )
+        case None       => None
+      })(CashPayment.apply _)
   }
 
-  implicit val jsonWrites:Writes[CashPayment] = {
+  implicit val jsonWrites: Writes[CashPayment] =
     Writes[CashPayment] {
-      case CashPayment(CashPaymentOverTenThousandEuros(acceptedAnyPayment), None) =>
+      case CashPayment(CashPaymentOverTenThousandEuros(acceptedAnyPayment), None)                                  =>
         Json.obj(
           "acceptedAnyPayment" -> acceptedAnyPayment
         )
       case CashPayment(CashPaymentOverTenThousandEuros(acceptedAnyPayment), Some(CashPaymentFirstDate(firstDate))) =>
         Json.obj(
           "acceptedAnyPayment" -> acceptedAnyPayment,
-          "paymentDate" -> firstDate.toString
+          "paymentDate"        -> firstDate.toString
         )
     }
-  }
 
-  def update(cashPayment: CashPayment, acceptedAnyPayment: CashPaymentOverTenThousandEuros): CashPayment = {
+  def update(cashPayment: CashPayment, acceptedAnyPayment: CashPaymentOverTenThousandEuros): CashPayment =
     acceptedAnyPayment match {
       case CashPaymentOverTenThousandEuros(false) => CashPayment(acceptedAnyPayment, None)
-      case CashPaymentOverTenThousandEuros(true) => CashPayment(acceptedAnyPayment, cashPayment.firstDate)
+      case CashPaymentOverTenThousandEuros(true)  => CashPayment(acceptedAnyPayment, cashPayment.firstDate)
     }
-  }
 
   def update(cashPayment: CashPayment, firstDate: CashPaymentFirstDate): CashPayment =
     CashPayment(CashPaymentOverTenThousandEuros(true), Some(firstDate))

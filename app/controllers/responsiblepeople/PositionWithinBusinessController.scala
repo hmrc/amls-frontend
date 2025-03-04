@@ -28,82 +28,123 @@ import views.html.responsiblepeople.PositionWithinBusinessView
 
 import scala.concurrent.Future
 
-class PositionWithinBusinessController @Inject () (
-                                                    val dataCacheConnector: DataCacheConnector,
-                                                    authAction: AuthAction,
-                                                    val ds: CommonPlayDependencies,
-                                                    val cc: MessagesControllerComponents,
-                                                    formProvider: PositionWithinBusinessFormProvider,
-                                                    view: PositionWithinBusinessView,
-                                                    implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
-
-
+class PositionWithinBusinessController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: PositionWithinBusinessFormProvider,
+  view: PositionWithinBusinessView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
         (optionalCache flatMap { cache =>
-
-          val bt: BusinessType = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
+          val bt: BusinessType = ControllerHelper
+            .getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
             .getOrElse(BusinessType.SoleProprietor)
 
           val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
-          ResponsiblePerson.getResponsiblePersonFromData(data,index) map { person =>
-
+          ResponsiblePerson.getResponsiblePersonFromData(data, index) map { person =>
             val positionsInBusiness: Seq[PositionWithinBusiness] =
-              PositionWithinBusiness.buildOptionsList(bt, isDeclaration = false, ResponsiblePerson.displayNominatedOfficer(person, ResponsiblePerson.hasNominatedOfficer(data)))
+              PositionWithinBusiness.buildOptionsList(
+                bt,
+                isDeclaration = false,
+                ResponsiblePerson.displayNominatedOfficer(person, ResponsiblePerson.hasNominatedOfficer(data))
+              )
 
             (person.personName, person.positions) match {
-              case (Some(name), Some(p)) => Ok(view(formProvider().fill(p.positions), edit, index, bt, name.titleName, ResponsiblePerson.displayNominatedOfficer(person, ResponsiblePerson.hasNominatedOfficer(data)), flow, positionsInBusiness))
-              case (Some(name), _) =>       Ok(view(formProvider(), edit, index, bt, name.titleName, ResponsiblePerson.displayNominatedOfficer(person, ResponsiblePerson.hasNominatedOfficer(data)), flow, positionsInBusiness))
-              case _ => NotFound(notFoundView)
+              case (Some(name), Some(p)) =>
+                Ok(
+                  view(
+                    formProvider().fill(p.positions),
+                    edit,
+                    index,
+                    bt,
+                    name.titleName,
+                    ResponsiblePerson.displayNominatedOfficer(person, ResponsiblePerson.hasNominatedOfficer(data)),
+                    flow,
+                    positionsInBusiness
+                  )
+                )
+              case (Some(name), _)       =>
+                Ok(
+                  view(
+                    formProvider(),
+                    edit,
+                    index,
+                    bt,
+                    name.titleName,
+                    ResponsiblePerson.displayNominatedOfficer(person, ResponsiblePerson.hasNominatedOfficer(data)),
+                    flow,
+                    positionsInBusiness
+                  )
+                )
+              case _                     => NotFound(notFoundView)
             }
           }
         }).getOrElse(NotFound(notFoundView))
       }
-    }
+  }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
-            (optionalCache map { cache =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
+              (optionalCache map { cache =>
+                val bt = ControllerHelper
+                  .getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
+                  .getOrElse(BusinessType.SoleProprietor)
 
-              val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
-                .getOrElse(BusinessType.SoleProprietor)
+                val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
-              val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+                ResponsiblePerson.getResponsiblePersonFromData(data, index) match {
+                  case s @ Some(rp) =>
+                    val positionsInBusiness: Seq[PositionWithinBusiness] =
+                      PositionWithinBusiness.buildOptionsList(
+                        bt,
+                        isDeclaration = false,
+                        ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data))
+                      )
 
-              ResponsiblePerson.getResponsiblePersonFromData(data,index) match {
-                case s@Some(rp) =>
-                  val positionsInBusiness: Seq[PositionWithinBusiness] =
-                    PositionWithinBusiness.buildOptionsList(bt, isDeclaration = false, ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)))
-
-
-                  BadRequest(view(formWithErrors, edit, index, bt, ControllerHelper.rpTitleName(s),
-                    ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow, positionsInBusiness))
-                case None => InternalServerError("Post: An UnknownException has occurred: PositionWithinBusinessController")
-              }
-            }).getOrElse(NotFound(notFoundView))
-          },
-        data => {
-          for {
-            _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp => {
-                rp.positions match {
-                  case Some(x) => rp.positions(Positions.update(x, data))
-                  case None => rp.positions(Positions(data, None))
+                    BadRequest(
+                      view(
+                        formWithErrors,
+                        edit,
+                        index,
+                        bt,
+                        ControllerHelper.rpTitleName(s),
+                        ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)),
+                        flow,
+                        positionsInBusiness
+                      )
+                    )
+                  case None         =>
+                    InternalServerError("Post: An UnknownException has occurred: PositionWithinBusinessController")
                 }
-              }
+              }).getOrElse(NotFound(notFoundView))
+            },
+          data =>
+            {
+              for {
+                _           <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                                 rp.positions match {
+                                   case Some(x) => rp.positions(Positions.update(x, data))
+                                   case None    => rp.positions(Positions(data, None))
+                                 }
+                               }
+                rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
+              } yield Redirect(routes.PositionWithinBusinessStartDateController.get(index, edit, flow))
+            } recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
             }
-            rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
-          } yield {
-                Redirect(routes.PositionWithinBusinessStartDateController.get(index, edit, flow))
-          }
-        } recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
-      )
+        )
   }
 }

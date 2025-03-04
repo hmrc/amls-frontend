@@ -28,37 +28,32 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Key
 
 import javax.inject.Inject
 
-class CheckYourAnswersHelper @Inject()() extends Logging {
+class CheckYourAnswersHelper @Inject() () extends Logging {
 
-  def getSummaryList(model: Tcsp)(implicit messages: Messages): SummaryList = {
-
+  def getSummaryList(model: Tcsp)(implicit messages: Messages): SummaryList =
     SummaryList(
       Seq(kindOfServiceProviderRow(sortProviders(model))) ++
-      Seq(
-        onlyOffTheShelfCompsSoldRow(model),
-        complexCorpStructureCreationRow(model),
-        providedServicesRow(model),
-        doesServicesOfAnotherTCSPRow(model)
-      ).flatten ++
-      anotherTCSPSupervisionRows(model).getOrElse(Seq.empty)
+        Seq(
+          onlyOffTheShelfCompsSoldRow(model),
+          complexCorpStructureCreationRow(model),
+          providedServicesRow(model),
+          doesServicesOfAnotherTCSPRow(model)
+        ).flatten ++
+        anotherTCSPSupervisionRows(model).getOrElse(Seq.empty)
     )
-  }
 
   private def sortProviders(data: Tcsp)(implicit messages: Messages): List[String] = {
 
     val sortedList = (for {
-      types <- data.tcspTypes
-      providers <- Some(types.serviceProviders)
-      labels <- Some(providers.collect {
-        case provider if !provider.value.eq("05") => messages(s"tcsp.service.provider.lbl.${provider.value}")
-      }
-      )
+      types       <- data.tcspTypes
+      providers   <- Some(types.serviceProviders)
+      labels      <- Some(providers.collect {
+                       case provider if !provider.value.eq("05") => messages(s"tcsp.service.provider.lbl.${provider.value}")
+                     })
       specialCase <- Some(providers.collect {
-        case provider if provider.value.eq("05") => messages(s"tcsp.service.provider.lbl.05")
-      }
-      )
+                       case provider if provider.value.eq("05") => messages(s"tcsp.service.provider.lbl.05")
+                     })
     } yield labels.toList.sorted ++ specialCase.toList).getOrElse(List())
-
 
     if (sortedList.isEmpty) {
       logger.warn(s"[tcsp][CheckYourAnswersHelper][sortProviders] - tcsp provider list is empty")
@@ -69,7 +64,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
 
   private def kindOfServiceProviderRow(sortedProviders: List[String])(implicit messages: Messages): SummaryListRow = {
 
-    val answer = if(sortedProviders.length > 1) {
+    val answer = if (sortedProviders.length > 1) {
       toBulletList(sortedProviders)
     } else {
       Value(Text(sortedProviders.mkString))
@@ -89,7 +84,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
 
     def label(answer: OnlyOffTheShelfCompsSold): String = answer match {
       case OnlyOffTheShelfCompsSoldYes => booleanToLabel(bool = true)
-      case OnlyOffTheShelfCompsSoldNo => booleanToLabel(bool = false)
+      case OnlyOffTheShelfCompsSoldNo  => booleanToLabel(bool = false)
     }
 
     model.onlyOffTheShelfCompsSold.map { s =>
@@ -109,7 +104,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
 
     def label(answer: ComplexCorpStructureCreation): String = answer match {
       case ComplexCorpStructureCreationYes => booleanToLabel(bool = true)
-      case ComplexCorpStructureCreationNo => booleanToLabel(bool = false)
+      case ComplexCorpStructureCreationNo  => booleanToLabel(bool = false)
     }
 
     model.complexCorpStructureCreation.map { s =>
@@ -129,17 +124,16 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
 
     def label(answer: ProvidedServices): Value = answer.services.toSeq match {
       case Seq(x) => Value(Text(x.getMessage))
-      case seq =>
+      case seq    =>
         toBulletList(
           (seq.filterNot(_.isInstanceOf[Other]) ++ seq.find(_.isInstanceOf[Other])).map(_.getMessage)
         )
     }
 
     for {
-      types <- model.tcspTypes
+      types    <- model.tcspTypes
       services <- model.providedServices
-    } yield {
-
+    } yield
       if (types.serviceProviders.contains(RegisteredOfficeEtc)) {
         Some(
           SummaryListRow(
@@ -155,11 +149,9 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
       } else {
         None
       }
-    }
   }.flatten
 
-  private def doesServicesOfAnotherTCSPRow(model: Tcsp)(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def doesServicesOfAnotherTCSPRow(model: Tcsp)(implicit messages: Messages): Option[SummaryListRow] =
     model.doesServicesOfAnotherTCSP.map { x =>
       row(
         "tcsp.servicesOfAnotherTcsp.title",
@@ -171,7 +163,6 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
         )
       )
     }
-  }
 
   private def anotherTCSPSupervisionRows(model: Tcsp)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
 
@@ -186,20 +177,21 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
     )
 
     model.servicesOfAnotherTCSP.map {
-      case ServicesOfAnotherTCSPYes(Some(mlrRefNumber)) => Seq(
-        yesNoRow(true),
-        row(
-          "tcsp.anothertcspsupervision.cya.additional.header",
-          mlrRefNumber,
-          editAction(
-            controllers.tcsp.routes.AnotherTCSPSupervisionController.get(true).url,
-            "tcsp.checkYourAnswers.change.tcspMLRNo",
-            "mlrrefnumber-edit"
+      case ServicesOfAnotherTCSPYes(Some(mlrRefNumber)) =>
+        Seq(
+          yesNoRow(true),
+          row(
+            "tcsp.anothertcspsupervision.cya.additional.header",
+            mlrRefNumber,
+            editAction(
+              controllers.tcsp.routes.AnotherTCSPSupervisionController.get(true).url,
+              "tcsp.checkYourAnswers.change.tcspMLRNo",
+              "mlrrefnumber-edit"
+            )
           )
         )
-      )
-      case ServicesOfAnotherTCSPYes(None) => Seq(yesNoRow(true))
-      case ServicesOfAnotherTCSPNo => Seq(yesNoRow(false))
+      case ServicesOfAnotherTCSPYes(None)               => Seq(yesNoRow(true))
+      case ServicesOfAnotherTCSPNo                      => Seq(yesNoRow(false))
     }
   }
 
@@ -221,22 +213,24 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
     )
   )
 
-  private def row(title: String, label: String, actions: Option[Actions])(implicit messages: Messages): SummaryListRow = {
+  private def row(title: String, label: String, actions: Option[Actions])(implicit messages: Messages): SummaryListRow =
     SummaryListRow(
       Key(Text(messages(title))),
       Value(Text(label)),
       actions = actions
     )
-  }
 
-  private def editAction(route: String, hiddenText: String, id: String)(implicit messages: Messages): Option[Actions] = {
-    Some(Actions(
-      items = Seq(ActionItem(
-        route,
-        Text(messages("button.edit")),
-        visuallyHiddenText = Some(messages(hiddenText)),
-        attributes = Map("id" -> id)
-      ))
-    ))
-  }
+  private def editAction(route: String, hiddenText: String, id: String)(implicit messages: Messages): Option[Actions] =
+    Some(
+      Actions(
+        items = Seq(
+          ActionItem(
+            route,
+            Text(messages("button.edit")),
+            visuallyHiddenText = Some(messages(hiddenText)),
+            attributes = Map("id" -> id)
+          )
+        )
+      )
+    )
 }

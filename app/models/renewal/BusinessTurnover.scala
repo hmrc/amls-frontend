@@ -62,30 +62,30 @@ object BusinessTurnover extends Enumerable.Implicits {
       case "05" => Fifth
       case "06" => Sixth
       case "07" => Seventh
-      case _ =>
+      case _    =>
         play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 
   implicit val jsonWrites: Writes[BusinessTurnover] = Writes[BusinessTurnover] {
-    case First => Json.obj("businessTurnover" -> "01")
-    case Second => Json.obj("businessTurnover" -> "02")
-    case Third => Json.obj("businessTurnover" -> "03")
-    case Fourth => Json.obj("businessTurnover" -> "04")
-    case Fifth => Json.obj("businessTurnover" -> "05")
-    case Sixth => Json.obj("businessTurnover" -> "06")
+    case First   => Json.obj("businessTurnover" -> "01")
+    case Second  => Json.obj("businessTurnover" -> "02")
+    case Third   => Json.obj("businessTurnover" -> "03")
+    case Fourth  => Json.obj("businessTurnover" -> "04")
+    case Fifth   => Json.obj("businessTurnover" -> "05")
+    case Sixth   => Json.obj("businessTurnover" -> "06")
     case Seventh => Json.obj("businessTurnover" -> "07")
   }
 
   implicit def convert(model: BusinessTurnover): ExpectedBusinessTurnover = model match {
-    case BusinessTurnover.First => ExpectedBusinessTurnover.First
-    case BusinessTurnover.Second => ExpectedBusinessTurnover.Second
-    case BusinessTurnover.Third => ExpectedBusinessTurnover.Third
-    case BusinessTurnover.Fourth => ExpectedBusinessTurnover.Fourth
-    case BusinessTurnover.Fifth => ExpectedBusinessTurnover.Fifth
-    case BusinessTurnover.Sixth => ExpectedBusinessTurnover.Sixth
+    case BusinessTurnover.First   => ExpectedBusinessTurnover.First
+    case BusinessTurnover.Second  => ExpectedBusinessTurnover.Second
+    case BusinessTurnover.Third   => ExpectedBusinessTurnover.Third
+    case BusinessTurnover.Fourth  => ExpectedBusinessTurnover.Fourth
+    case BusinessTurnover.Fifth   => ExpectedBusinessTurnover.Fifth
+    case BusinessTurnover.Sixth   => ExpectedBusinessTurnover.Sixth
     case BusinessTurnover.Seventh => ExpectedBusinessTurnover.Seventh
-    case _ => throw new Exception("Invalid business turnover value")
+    case _                        => throw new Exception("Invalid business turnover value")
   }
 
   val all: Seq[BusinessTurnover] = Seq(

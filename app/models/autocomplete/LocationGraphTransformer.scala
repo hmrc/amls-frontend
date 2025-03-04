@@ -23,7 +23,7 @@ import play.api.libs.json._
 
 // $COVERAGE-OFF$
 @Singleton
-class LocationGraphJsonLoader @Inject()(env: Environment) {
+class LocationGraphJsonLoader @Inject() (env: Environment) {
   private val fileName = "public/autocomplete/location-autocomplete-graph.json"
 
   def load = env.resourceAsStream(fileName) flatMap { stream =>
@@ -34,21 +34,22 @@ class LocationGraphJsonLoader @Inject()(env: Environment) {
 // $COVERAGE-ON$
 
 @Singleton
-class LocationGraphTransformer @Inject()(jsonLoader: LocationGraphJsonLoader) {
+class LocationGraphTransformer @Inject() (jsonLoader: LocationGraphJsonLoader) {
 
   def transform(allowList: Set[String]): Option[JsObject] = {
     val filtered = jsonLoader.load.map {
       _.fields filter {
-        case (code, _) => code.split(':')(1) match {
-          case c if allowList.contains(c) => true
-          case _ => false
-        }
-        case _ => false
+        case (code, _) =>
+          code.split(':')(1) match {
+            case c if allowList.contains(c) => true
+            case _                          => false
+          }
+        case _         => false
       } map { f =>
         (f._1, Json.toJsFieldJsValueWrapper(f._2))
       }
     }
 
-    filtered map { f => Json.obj(f.toSeq:_*) }
+    filtered map { f => Json.obj(f.toSeq: _*) }
   }
 }

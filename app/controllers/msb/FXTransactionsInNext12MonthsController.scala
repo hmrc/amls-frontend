@@ -29,40 +29,41 @@ import views.html.msb.FxTransactionInNext12MonthsView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class FXTransactionsInNext12MonthsController @Inject()(authAction: AuthAction,
-                                                       val ds: CommonPlayDependencies,
-                                                       implicit val dataCacheConnector: DataCacheConnector,
-                                                       implicit val statusService: StatusService,
-                                                       implicit val serviceFlow: ServiceFlow,
-                                                       val cc: MessagesControllerComponents,
-                                                       formProvider: FxTransactionsInNext12MonthsFormProvider,
-                                                       view: FxTransactionInNext12MonthsView) extends AmlsBaseController(ds, cc) {
+class FXTransactionsInNext12MonthsController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val dataCacheConnector: DataCacheConnector,
+  implicit val statusService: StatusService,
+  implicit val serviceFlow: ServiceFlow,
+  val cc: MessagesControllerComponents,
+  formProvider: FxTransactionsInNext12MonthsFormProvider,
+  view: FxTransactionInNext12MonthsView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
-        response =>
-          val form = (for {
-            msb <- response
-            transactions <- msb.fxTransactionsInNext12Months
-          } yield transactions).fold(formProvider())(formProvider().fill)
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map { response =>
+      val form = (for {
+        msb          <- response
+        transactions <- msb.fxTransactionsInNext12Months
+      } yield transactions).fold(formProvider())(formProvider().fill)
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           for {
             msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
-            _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
-              msb.fxTransactionsInNext12Months(data)
-            )
+            _   <- dataCacheConnector.save[MoneyServiceBusiness](
+                     request.credId,
+                     MoneyServiceBusiness.key,
+                     msb.fxTransactionsInNext12Months(data)
+                   )
           } yield Redirect(routes.SummaryController.get)
       )
-    }
   }
 }

@@ -29,15 +29,16 @@ import views.html.supervision.PenaltyDetailsView
 class PenaltyDetailsControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
-    val request = addToken(authRequest)
-    lazy val view = inject[PenaltyDetailsView]
-    val controller = new PenaltyDetailsController (
+    val request    = addToken(authRequest)
+    lazy val view  = inject[PenaltyDetailsView]
+    val controller = new PenaltyDetailsController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[PenaltyDetailsFormProvider],
-      view = view)
+      view = view
+    )
 
     mockCacheSave[Supervision]
   }
@@ -49,64 +50,67 @@ class PenaltyDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
       mockCacheFetch[Supervision](None)
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("supervision.penaltydetails.title"))
     }
 
+    "on get display the Penalised By Professional Body page with pre populated data" in new Fixture {
 
-  "on get display the Penalised By Professional Body page with pre populated data" in new Fixture {
+      mockCacheFetch[Supervision](
+        Some(
+          Supervision(
+            None,
+            None,
+            None,
+            Some(ProfessionalBodyYes("details"))
+          )
+        )
+      )
 
-    mockCacheFetch[Supervision](Some(Supervision(
-      None,
-      None,
-      None,
-      Some(ProfessionalBodyYes("details"))
-    )))
+      val result = controller.get()(request)
+      status(result)          must be(OK)
+      contentAsString(result) must include("details")
 
-    val result = controller.get()(request)
-    status(result) must be(OK)
-    contentAsString(result) must include ("details")
+    }
 
-  }
+    "on post with valid data" in new Fixture {
 
-  "on post with valid data" in new Fixture {
+      val newRequest = FakeRequest(POST, routes.PenaltyDetailsController.post().url)
+        .withFormUrlEncodedBody(
+          "professionalBody" -> "details"
+        )
 
-    val newRequest = FakeRequest(POST, routes.PenaltyDetailsController.post().url)
-    .withFormUrlEncodedBody(
-      "professionalBody" -> "details"
-    )
+      mockCacheFetch[Supervision](None)
 
-    mockCacheFetch[Supervision](None)
+      val result = controller.post()(newRequest)
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
+    }
 
-    val result = controller.post()(newRequest)
-    status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
-  }
+    "on post with invalid data" in new Fixture {
 
-  "on post with invalid data" in new Fixture {
+      val newRequest = FakeRequest(POST, routes.PenaltyDetailsController.post().url)
+        .withFormUrlEncodedBody(
+          "professionalBody" -> "§§§§"
+        )
 
-    val newRequest = FakeRequest(POST, routes.PenaltyDetailsController.post().url)
-    .withFormUrlEncodedBody(
-      "professionalBody" -> "§§§§"
-    )
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
 
-    val result = controller.post()(newRequest)
-    status(result) must be(BAD_REQUEST)
+    }
 
-  }
+    "on post with valid data in edit mode" in new Fixture {
 
-   "on post with valid data in edit mode" in new Fixture {
+      val newRequest = FakeRequest(POST, routes.PenaltyDetailsController.post(true).url)
+        .withFormUrlEncodedBody(
+          "professionalBody" -> "details"
+        )
 
-     val newRequest = FakeRequest(POST, routes.PenaltyDetailsController.post(true).url)
-     .withFormUrlEncodedBody(
-       "professionalBody" -> "details"
-     )
+      mockCacheFetch[Supervision](None)
 
-     mockCacheFetch[Supervision](None)
-
-     val result = controller.post(true)(newRequest)
-     status(result) must be(SEE_OTHER)
-     redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
-   }
+      val result = controller.post(true)(newRequest)
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
+    }
   }
 }

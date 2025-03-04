@@ -25,7 +25,7 @@ import views.html.Start
 class StartViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val start: Start = app.injector.instanceOf[Start]
+    lazy val start: Start                                          = app.injector.instanceOf[Start]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
@@ -52,21 +52,33 @@ class StartViewSpec extends AmlsViewSpec with Matchers {
       html must include("check messages about your registration")
       html must include("apply for annual supervision")
       html must include("deregister, if you no longer need to be registered under the Money Laundering Regulations")
-      html must include("You’ll need to sign in using your existing sign in details for this service. You can create new sign in details when you first register.")
+      html must include(
+        "You’ll need to sign in using your existing sign in details for this service. You can create new sign in details when you first register."
+      )
 
       doc.getElementById("button").text() mustBe "Sign in"
       doc.getElementsByClass("govuk-heading-m").text() mustBe "Before you start"
 
-      html must include("Before applying to register, <a class=\"govuk-link\" href=\"https://www.gov.uk/topic/business-tax/money-laundering-regulations\">check the Money Laundering Regulations guidance from Gov.uk (opens in new tab)</a>.")
-      html must include("You need to check <a class=\"govuk-link\" href=\"https://www.gov.uk/guidance/money-laundering-regulations-registration-fees\">fees for anti-money laundering supervision (opens in new tab)</a>.")
+      html must include(
+        "Before applying to register, <a class=\"govuk-link\" href=\"https://www.gov.uk/topic/business-tax/money-laundering-regulations\">check the Money Laundering Regulations guidance from Gov.uk (opens in new tab)</a>."
+      )
+      html must include(
+        "You need to check <a class=\"govuk-link\" href=\"https://www.gov.uk/guidance/money-laundering-regulations-registration-fees\">fees for anti-money laundering supervision (opens in new tab)</a>."
+      )
       html must include("You must sign out when leaving the service.")
     }
 
     "contain the expected links" in new ViewFixture {
       def view: HtmlFormat.Appendable = start()
 
-      doc.getElementsContainingOwnText("check the Money Laundering Regulations guidance from Gov.uk (opens in new tab)").first().attr("href") mustBe "https://www.gov.uk/topic/business-tax/money-laundering-regulations"
-      doc.getElementsContainingOwnText("fees for anti-money laundering supervision (opens in new tab)").first().attr("href") mustBe "https://www.gov.uk/guidance/money-laundering-regulations-registration-fees"
+      doc
+        .getElementsContainingOwnText("check the Money Laundering Regulations guidance from Gov.uk (opens in new tab)")
+        .first()
+        .attr("href") mustBe "https://www.gov.uk/topic/business-tax/money-laundering-regulations"
+      doc
+        .getElementsContainingOwnText("fees for anti-money laundering supervision (opens in new tab)")
+        .first()
+        .attr("href") mustBe "https://www.gov.uk/guidance/money-laundering-regulations-registration-fees"
     }
   }
 }

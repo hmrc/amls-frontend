@@ -29,13 +29,20 @@ import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.tcsp.ServicesOfAnotherTCSPView
 
-class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator with Injecting {
+class ServicesOfAnotherTCSPControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with ScalaFutures
+    with AmlsReferenceNumberGenerator
+    with Injecting {
 
   trait Fixture extends DependencyMocks {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[ServicesOfAnotherTCSPView]
-    val controller = new ServicesOfAnotherTCSPController (
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[ServicesOfAnotherTCSPView]
+    val controller = new ServicesOfAnotherTCSPController(
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       cc = mockMcc,
       formProvider = inject[ServicesOfAnotherTCSPFormProvider],
@@ -76,17 +83,19 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
           "edit is true" when {
             "further action is not required in AnotherTCSPSupervisionController" in new Fixture {
 
-              mockCacheFetch[Tcsp](Some(Tcsp(servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(Some(amlsRegistrationNumber))))))
+              mockCacheFetch[Tcsp](
+                Some(Tcsp(servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(Some(amlsRegistrationNumber)))))
+              )
               mockCacheSave[Tcsp]
 
               val newRequest = FakeRequest(POST, routes.ServicesOfAnotherTCSPController.post(true).url)
-              .withFormUrlEncodedBody(
-                "servicesOfAnotherTCSP" -> "true"
-              )
+                .withFormUrlEncodedBody(
+                  "servicesOfAnotherTCSP" -> "true"
+                )
 
               val result = controller.post(true)(newRequest)
 
-              status(result) must be(SEE_OTHER)
+              status(result)           must be(SEE_OTHER)
               redirectLocation(result) must be(Some(routes.SummaryController.get().url))
             }
           }
@@ -98,13 +107,13 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
               mockCacheSave[Tcsp]
 
               val newRequest = FakeRequest(POST, routes.ServicesOfAnotherTCSPController.post().url)
-              .withFormUrlEncodedBody(
-                "servicesOfAnotherTCSP" -> "false"
-              )
+                .withFormUrlEncodedBody(
+                  "servicesOfAnotherTCSP" -> "false"
+                )
 
               val result = controller.post()(newRequest)
 
-              status(result) must be(SEE_OTHER)
+              status(result)           must be(SEE_OTHER)
               redirectLocation(result) must be(Some(routes.SummaryController.get().url))
             }
           }
@@ -119,13 +128,13 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
             mockCacheSave[Tcsp]
 
             val newRequest = FakeRequest(POST, routes.ServicesOfAnotherTCSPController.post().url)
-            .withFormUrlEncodedBody(
-              "servicesOfAnotherTCSP" -> "true"
-            )
+              .withFormUrlEncodedBody(
+                "servicesOfAnotherTCSP" -> "true"
+              )
 
             val result = controller.post()(newRequest)
 
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.AnotherTCSPSupervisionController.get().url))
           }
 
@@ -136,13 +145,13 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
               mockCacheSave[Tcsp]
 
               val newRequest = FakeRequest(POST, routes.ServicesOfAnotherTCSPController.post().url)
-              .withFormUrlEncodedBody(
-                "servicesOfAnotherTCSP" -> "true"
-              )
+                .withFormUrlEncodedBody(
+                  "servicesOfAnotherTCSP" -> "true"
+                )
 
               val result = controller.post()(newRequest)
 
-              status(result) must be(SEE_OTHER)
+              status(result)           must be(SEE_OTHER)
               redirectLocation(result) must be(Some(routes.AnotherTCSPSupervisionController.get().url))
             }
           }
@@ -155,9 +164,9 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
         "invalid data" in new Fixture {
 
           val newRequestInvalid = FakeRequest(POST, routes.ServicesOfAnotherTCSPController.post().url)
-          .withFormUrlEncodedBody(
-            "servicesOfAnotherTCSP" -> ""
-          )
+            .withFormUrlEncodedBody(
+              "servicesOfAnotherTCSP" -> ""
+            )
 
           val result = controller.post()(newRequestInvalid)
           status(result) must be(BAD_REQUEST)
@@ -173,21 +182,28 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
     "remove data from ServicesOfAnotherTCSP" when {
       "request is edit from true to false" in new Fixture {
 
-        mockCacheFetch[Tcsp](Some(Tcsp(doesServicesOfAnotherTCSP = Some(true), servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(Some(amlsRegistrationNumber))))))
+        mockCacheFetch[Tcsp](
+          Some(
+            Tcsp(
+              doesServicesOfAnotherTCSP = Some(true),
+              servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(Some(amlsRegistrationNumber)))
+            )
+          )
+        )
         mockCacheSave[Tcsp]
 
         val newRequest = FakeRequest(POST, routes.ServicesOfAnotherTCSPController.post(true).url)
-        .withFormUrlEncodedBody(
-          "servicesOfAnotherTCSP" -> "false"
-        )
+          .withFormUrlEncodedBody(
+            "servicesOfAnotherTCSP" -> "false"
+          )
 
         val result = controller.post(true)(newRequest)
 
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get().url))
 
-        verify(controller.dataCacheConnector).save(any(), any(),eqTo(Tcsp(doesServicesOfAnotherTCSP = Some(false), hasChanged = true)))(any())
-
+        verify(controller.dataCacheConnector)
+          .save(any(), any(), eqTo(Tcsp(doesServicesOfAnotherTCSP = Some(false), hasChanged = true)))(any())
 
       }
     }

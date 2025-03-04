@@ -26,8 +26,10 @@ class BusinessMatchingMsbServicesSpec extends PlaySpec {
 
     "round trip through Json correctly" in {
 
-      val data = BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, ForeignExchange))
-      val js = Json.toJson(data)
+      val data = BusinessMatchingMsbServices(
+        Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, ForeignExchange)
+      )
+      val js   = Json.toJson(data)
       js.as[BusinessMatchingMsbServices] mustEqual data
     }
   }

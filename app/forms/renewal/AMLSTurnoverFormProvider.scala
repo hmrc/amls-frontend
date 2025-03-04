@@ -23,10 +23,10 @@ import play.api.i18n.Messages
 
 import javax.inject.Inject
 
-class AMLSTurnoverFormProvider @Inject()() extends Mappings {
+class AMLSTurnoverFormProvider @Inject() () extends Mappings {
 
-  private val singleServiceError = "error.required.renewal.ba.turnover.from.mlr.single.service"
-  private val multiServiceError = "error.required.renewal.ba.turnover.from.mlr"
+  private val singleServiceError                                                             = "error.required.renewal.ba.turnover.from.mlr.single.service"
+  private val multiServiceError                                                              = "error.required.renewal.ba.turnover.from.mlr"
   def apply(service: Option[String] = None)(implicit messages: Messages): Form[AMLSTurnover] = Form(
     "turnover" -> enumerable[AMLSTurnover](
       service.fold(multiServiceError)(key => messages(singleServiceError, key))

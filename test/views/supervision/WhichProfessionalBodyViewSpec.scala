@@ -24,10 +24,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.supervision.WhichProfessionalBodyView
 
-class WhichProfessionalBodyViewSpec extends AmlsViewSpec with Matchers  {
+class WhichProfessionalBodyViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val which_professional_body = inject[WhichProfessionalBodyView]
-  lazy val fp = inject[WhichProfessionalBodyFormProvider]
+  lazy val fp                      = inject[WhichProfessionalBodyFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -41,7 +41,9 @@ class WhichProfessionalBodyViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = which_professional_body(fp(), false)
 
-      doc.title must startWith(messages("supervision.whichprofessionalbody.title") + " - " + messages("summary.supervision"))
+      doc.title must startWith(
+        messages("supervision.whichprofessionalbody.title") + " - " + messages("summary.supervision")
+      )
 
     }
 
@@ -49,14 +51,15 @@ class WhichProfessionalBodyViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = which_professional_body(fp(), false)
 
-      heading.html must be(messages("supervision.whichprofessionalbody.title"))
+      heading.html    must be(messages("supervision.whichprofessionalbody.title"))
       subHeading.html must include(messages("summary.supervision"))
 
     }
 
     behave like pageWithErrors(
       which_professional_body(
-        fp().withError("businessType", "error.required.supervision.one.professional.body"), false
+        fp().withError("businessType", "error.required.supervision.one.professional.body"),
+        false
       ),
       "businessType",
       "error.required.supervision.one.professional.body"
@@ -64,7 +67,8 @@ class WhichProfessionalBodyViewSpec extends AmlsViewSpec with Matchers  {
 
     behave like pageWithErrors(
       which_professional_body(
-        fp().withError("specifyOtherBusiness", "error.invalid.supervision.business.details"), true
+        fp().withError("specifyOtherBusiness", "error.invalid.supervision.business.details"),
+        true
       ),
       "specifyOtherBusiness",
       "error.invalid.supervision.business.details"

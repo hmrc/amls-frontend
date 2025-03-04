@@ -26,6 +26,6 @@ sealed trait EnrolmentKey {
 
 case class AmlsEnrolmentKey(amlsRefNumber: String) extends EnrolmentKey {
   override protected val serviceName: String = "HMRC-MLR-ORG"
-  override protected val identifier: String = "MLRRefNumber"
-  override protected val value: String = amlsRefNumber
+  override protected val identifier: String  = "MLRRefNumber"
+  override protected val value: String       = amlsRefNumber
 }

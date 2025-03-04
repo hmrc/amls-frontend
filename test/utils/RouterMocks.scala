@@ -27,7 +27,7 @@ import services.flowmanagement.{Router, Router2}
 import scala.concurrent.Future
 
 trait RouterMocks extends MockitoSugar {
-  implicit def createRouter[T](implicit m: Manifest[Router[T]]): Router[T] = {
+  implicit def createRouter[T](implicit m: Manifest[Router[T]]): Router[T]    = {
     val r = mock[Router[T]]
     r.mockRoute
     r
@@ -41,7 +41,13 @@ trait RouterMocks extends MockitoSugar {
   val defaultResult = Future.successful(Redirect("/"))
 
   implicit class RouterMocking[T](router: Router[T]) {
-    def mockRoute(credId: String, pageId: PageId, model: T, edit: Boolean = false, returnValue: Future[Result] = defaultResult) =
+    def mockRoute(
+      credId: String,
+      pageId: PageId,
+      model: T,
+      edit: Boolean = false,
+      returnValue: Future[Result] = defaultResult
+    ) =
       when(router.getRoute(credId, eqTo(pageId), eqTo(model), eqTo(edit))(any(), any())) thenReturn returnValue
 
     def mockRoute(returnValue: Future[Result]) =
@@ -58,20 +64,37 @@ trait RouterMocks extends MockitoSugar {
   }
 
   implicit class RouterMocking2[T](router: Router2[T]) {
-    def mockRoute(credId: String, pageId: PageId, model: T, edit: Boolean = false,includeCompanyNotRegistered: Boolean = false, returnValue: Future[Result] = defaultResult) =
-      when(router.getRoute(credId, eqTo(pageId), eqTo(model), eqTo(edit), eqTo(includeCompanyNotRegistered))(any(), any())) thenReturn returnValue
+    def mockRoute(
+      credId: String,
+      pageId: PageId,
+      model: T,
+      edit: Boolean = false,
+      includeCompanyNotRegistered: Boolean = false,
+      returnValue: Future[Result] = defaultResult
+    ) =
+      when(
+        router.getRoute(credId, eqTo(pageId), eqTo(model), eqTo(edit), eqTo(includeCompanyNotRegistered))(any(), any())
+      ) thenReturn returnValue
 
     def mockRoute(returnValue: Future[Result]) =
       when(router.getRoute(any(), any(), any(), any(), any())(any(), any())) thenReturn returnValue
 
     def mockRoute(url: Call) =
-      when(router.getRoute(any(), any(), any(), any(),any())(any(), any())) thenReturn Future.successful(Redirect(url))
+      when(router.getRoute(any(), any(), any(), any(), any())(any(), any())) thenReturn Future.successful(Redirect(url))
 
     def mockRoute =
-      when(router.getRoute(any(), any(), any(), any(),any())(any(), any())) thenReturn defaultResult
+      when(router.getRoute(any(), any(), any(), any(), any())(any(), any())) thenReturn defaultResult
 
-    def verify(credId: String, pageId: PageId, model: T, edit: Boolean = false, includeCompanyNotRegistered: Boolean = false) =
-      org.mockito.Mockito.verify(router).getRoute(eqTo(credId), eqTo(pageId), eqTo(model), eqTo(edit), eqTo(includeCompanyNotRegistered))(any(), any())
+    def verify(
+      credId: String,
+      pageId: PageId,
+      model: T,
+      edit: Boolean = false,
+      includeCompanyNotRegistered: Boolean = false
+    ) =
+      org.mockito.Mockito
+        .verify(router)
+        .getRoute(eqTo(credId), eqTo(pageId), eqTo(model), eqTo(edit), eqTo(includeCompanyNotRegistered))(any(), any())
 
   }
 }

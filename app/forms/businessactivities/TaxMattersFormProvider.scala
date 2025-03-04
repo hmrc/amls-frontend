@@ -22,9 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class TaxMattersFormProvider @Inject()() extends Mappings {
+class TaxMattersFormProvider @Inject() () extends Mappings {
 
-  private val errorMessage = "error.required.ba.tax.matters"
+  private val errorMessage      = "error.required.ba.tax.matters"
   def apply(): Form[TaxMatters] = Form[TaxMatters](
     "manageYourTaxAffairs" -> boolean(errorMessage, errorMessage)
       .transform[TaxMatters](TaxMatters.apply, _.manageYourTaxAffairs)

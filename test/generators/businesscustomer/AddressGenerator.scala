@@ -25,10 +25,10 @@ trait AddressGenerator extends BaseGenerator with CountryGenerator {
   private val nameLength = 10
 
   val addressGen: Gen[Address] = for {
-    line1 <- stringOfLengthGen(nameLength)
-    line2 <- stringOfLengthGen(nameLength)
+    line1    <- stringOfLengthGen(nameLength)
+    line2    <- stringOfLengthGen(nameLength)
     postcode <- postcodeGen
-    country <- countryGen
+    country  <- countryGen
   } yield Address(line1, Some(line2), None, None, Some(postcode), country)
 
 }

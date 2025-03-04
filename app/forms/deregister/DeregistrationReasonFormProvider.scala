@@ -26,15 +26,16 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import javax.inject.Inject
 import scala.jdk.CollectionConverters._
 
-class DeregistrationReasonFormProvider @Inject()() extends Mappings {
+class DeregistrationReasonFormProvider @Inject() () extends Mappings {
 
   private def error = "error.required.deregistration.reason"
-  val length = 40
+  val length        = 40
 
-  def apply(): Form[DeregistrationReason] = Form[DeregistrationReason](
+  def apply(): Form[DeregistrationReason]                                                            = Form[DeregistrationReason](
     mapping(
       "deregistrationReason" -> enumerable[DeregistrationReason](error, error),
-      "specifyOtherReason" -> mandatoryIf(_.values.asJavaCollection.contains(Other("").toString),
+      "specifyOtherReason"   -> mandatoryIf(
+        _.values.asJavaCollection.contains(Other("").toString),
         text("error.required.deregistration.reason.input").verifying(
           firstError(
             maxLength(length, "error.required.deregistration.reason.length"),
@@ -44,14 +45,16 @@ class DeregistrationReasonFormProvider @Inject()() extends Mappings {
       )
     )(apply)(unapply)
   )
-  private def apply(reason: DeregistrationReason, otherReason: Option[String]): DeregistrationReason = (reason, otherReason) match {
-    case (_: DeregistrationReason.Other, Some(reason)) => Other(reason)
-    case (_: DeregistrationReason.Other, None) => throw new IllegalArgumentException("Description is required when Other is selected")
-    case (reason, _) => reason
-  }
+  private def apply(reason: DeregistrationReason, otherReason: Option[String]): DeregistrationReason =
+    (reason, otherReason) match {
+      case (_: DeregistrationReason.Other, Some(reason)) => Other(reason)
+      case (_: DeregistrationReason.Other, None)         =>
+        throw new IllegalArgumentException("Description is required when Other is selected")
+      case (reason, _)                                   => reason
+    }
 
   private def unapply(obj: DeregistrationReason): Option[(DeregistrationReason, Option[String])] = obj match {
     case Other(otherReason) => Some((Other(""), Some(otherReason)))
-    case reason => Some((reason, None))
+    case reason             => Some((reason, None))
   }
 }

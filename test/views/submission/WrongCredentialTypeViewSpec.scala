@@ -25,10 +25,10 @@ import views.html.submission.WrongCredentialTypeView
 class WrongCredentialTypeViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val wrongCredentialTypeView = app.injector.instanceOf[WrongCredentialTypeView]
+    lazy val wrongCredentialTypeView                               = app.injector.instanceOf[WrongCredentialTypeView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
-    val url = "/foo"
+    val url           = "/foo"
     override def view = wrongCredentialTypeView(url)
   }
 

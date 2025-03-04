@@ -27,7 +27,7 @@ import views.html.responsiblepeople.FitAndProperView
 class FitAndProperViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val fit_and_proper = inject[FitAndProperView]
-  lazy val fp = inject[FitAndProperFormProvider]
+  lazy val fp             = inject[FitAndProperFormProvider]
 
   val name = "John Smith"
 
@@ -44,18 +44,18 @@ class FitAndProperViewSpec extends AmlsViewSpec with Matchers {
       def view = fit_and_proper(fp(), true, 0, None, name)
       doc.title must be(
         messages("responsiblepeople.fit_and_proper.title", name)
-        + " - " + messages("summary.responsiblepeople")+
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov")
+          + " - " + messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
       )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = fit_and_proper(fp(), true, 0, None, name)
-      heading.html must be(messages("responsiblepeople.fit_and_proper.heading", name))
+      heading.html    must be(messages("responsiblepeople.fit_and_proper.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
-      doc.title must include(messages("responsiblepeople.fit_and_proper.title"))
+      doc.title       must include(messages("responsiblepeople.fit_and_proper.title"))
     }
 
     "have the correct content" in new ViewFixture {
@@ -67,9 +67,14 @@ class FitAndProperViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       fit_and_proper(
-        fp().withError("hasAlreadyPassedFitAndProper", "error.required.rp.fit_and_proper"), false, 1, None, name
+        fp().withError("hasAlreadyPassedFitAndProper", "error.required.rp.fit_and_proper"),
+        false,
+        1,
+        None,
+        name
       ),
-      "hasAlreadyPassedFitAndProper", "error.required.rp.fit_and_proper"
+      "hasAlreadyPassedFitAndProper",
+      "error.required.rp.fit_and_proper"
     )
 
     behave like pageWithBackLink(fit_and_proper(fp(), false, 1, None, name))

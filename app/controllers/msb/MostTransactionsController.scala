@@ -33,47 +33,48 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class MostTransactionsController @Inject()(authAction: AuthAction,
-                                           val ds: CommonPlayDependencies,
-                                           implicit val cacheConnector: DataCacheConnector,
-                                           implicit val statusService: StatusService,
-                                           implicit val serviceFlow: ServiceFlow,
-                                           val autoCompleteService: AutoCompleteService,
-                                           val cc: MessagesControllerComponents,
-                                           formProvider: MostTransactionsFormProvider,
-                                           view: MostTransactionsView) extends AmlsBaseController(ds, cc) {
+class MostTransactionsController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val cacheConnector: DataCacheConnector,
+  implicit val statusService: StatusService,
+  implicit val serviceFlow: ServiceFlow,
+  val autoCompleteService: AutoCompleteService,
+  val cc: MessagesControllerComponents,
+  formProvider: MostTransactionsFormProvider,
+  view: MostTransactionsView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      cacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
-        response =>
-          val form = (for {
-            msb <- response
-            transactions <- msb.mostTransactions
-          } yield transactions).fold(formProvider())(formProvider().fill)
-          Ok(view(form, edit, autoCompleteService.formOptions))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    cacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map { response =>
+      val form = (for {
+        msb          <- response
+        transactions <- msb.mostTransactions
+      } yield transactions).fold(formProvider())(formProvider().fill)
+      Ok(view(form, edit, autoCompleteService.formOptions))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
         data =>
           cacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
             val result = for {
               cacheMap <- maybeCache
-              msb <- cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
-              bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+              msb      <- cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+              bm       <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
               services <- bm.msbServices
-              register <- cacheMap.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
-            } yield {
-              cacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
-                msb.mostTransactions(Some(data))
-              ) map {
-                _ => routing(services.msbServices, register, msb, edit)
-              }
+              register <-
+                cacheMap.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
+            } yield cacheConnector.save[MoneyServiceBusiness](
+              request.credId,
+              MoneyServiceBusiness.key,
+              msb.mostTransactions(Some(data))
+            ) map { _ =>
+              routing(services.msbServices, register, msb, edit)
             }
 
             result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
@@ -81,24 +82,30 @@ class MostTransactionsController @Inject()(authAction: AuthAction,
       )
   }
 
-  private def shouldAnswerCurrencyExchangeQuestions(msbServices: Set[BusinessMatchingMsbService],
-                                                     register: ServiceChangeRegister,
-                                                     msb: MoneyServiceBusiness,
-                                                     edit: Boolean): Boolean = {
-
+  private def shouldAnswerCurrencyExchangeQuestions(
+    msbServices: Set[BusinessMatchingMsbService],
+    register: ServiceChangeRegister,
+    msb: MoneyServiceBusiness,
+    edit: Boolean
+  ): Boolean =
     currencyExchangeAddedPostSubmission(msbServices, register) ||
-            (msbServices.contains(CurrencyExchange) && (msb.ceTransactionsInNext12Months.isEmpty || !edit))
-  }
+      (msbServices.contains(CurrencyExchange) && (msb.ceTransactionsInNext12Months.isEmpty || !edit))
 
-  private def shouldAnswerForeignExchangeQuestions(msbServices: Set[BusinessMatchingMsbService],
-                                                    register: ServiceChangeRegister,
-                                                    msb: MoneyServiceBusiness,
-                                                    edit: Boolean): Boolean = {
+  private def shouldAnswerForeignExchangeQuestions(
+    msbServices: Set[BusinessMatchingMsbService],
+    register: ServiceChangeRegister,
+    msb: MoneyServiceBusiness,
+    edit: Boolean
+  ): Boolean =
     foreignExchangeAddedPostSubmission(msbServices, register) ||
-            (msbServices.contains(ForeignExchange) && (msb.fxTransactionsInNext12Months.isEmpty || !edit))
-  }
+      (msbServices.contains(ForeignExchange) && (msb.fxTransactionsInNext12Months.isEmpty || !edit))
 
-  private def routing(msbServices: Set[BusinessMatchingMsbService], register: ServiceChangeRegister, msb: MoneyServiceBusiness, edit: Boolean) = {
+  private def routing(
+    msbServices: Set[BusinessMatchingMsbService],
+    register: ServiceChangeRegister,
+    msb: MoneyServiceBusiness,
+    edit: Boolean
+  ) =
     if (shouldAnswerCurrencyExchangeQuestions(msbServices, register, msb, edit)) {
       Redirect(routes.CurrencyExchangesInNext12MonthsController.get(edit))
     } else if (shouldAnswerForeignExchangeQuestions(msbServices, register, msb, edit)) {
@@ -106,5 +113,4 @@ class MostTransactionsController @Inject()(authAction: AuthAction,
     } else {
       Redirect(routes.SummaryController.get)
     }
-  }
 }

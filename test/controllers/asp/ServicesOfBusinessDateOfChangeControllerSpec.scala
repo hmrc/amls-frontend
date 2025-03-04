@@ -60,18 +60,19 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
 
     "on get display date of change view" in new Fixture {
       val result: Future[Result] = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("summary.asp"))
     }
 
     "submit with valid data" in new Fixture {
 
-      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.ServicesOfBusinessDateOfChangeController.post.url)
-      .withFormUrlEncodedBody(
-        "dateOfChange.day" -> "24",
-        "dateOfChange.month" -> "2",
-        "dateOfChange.year" -> "1990"
-      )
+      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+        FakeRequest(POST, routes.ServicesOfBusinessDateOfChangeController.post.url)
+          .withFormUrlEncodedBody(
+            "dateOfChange.day"   -> "24",
+            "dateOfChange.month" -> "2",
+            "dateOfChange.year"  -> "1990"
+          )
 
       when(mockService.getModelWithDate(any()))
         .thenReturn(Future.successful((Asp(), Some(ActivityStartDate(LocalDate.of(1990, 2, 24))))))
@@ -80,38 +81,42 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
         .thenReturn(Future.successful(Some(Asp())))
 
       val result: Future[Result] = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.asp.routes.SummaryController.get.url))
     }
 
     "fail submission when invalid date is supplied" in new Fixture {
 
-      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.ServicesOfBusinessDateOfChangeController.post.url)
-      .withFormUrlEncodedBody(
-        "dateOfChange.day" -> "24",
-        "dateOfChange.month" -> "2",
-        "dateOfChange.year" -> "foo"
-      )
+      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+        FakeRequest(POST, routes.ServicesOfBusinessDateOfChangeController.post.url)
+          .withFormUrlEncodedBody(
+            "dateOfChange.day"   -> "24",
+            "dateOfChange.month" -> "2",
+            "dateOfChange.year"  -> "foo"
+          )
 
       val result: Future[Result] = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
+      status(result)          must be(BAD_REQUEST)
       contentAsString(result) must include(messages("error.invalid.dateofchange.one", "year"))
     }
 
     "fail submission when input date is before activity start date" in new Fixture {
 
-      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.ServicesOfBusinessDateOfChangeController.post.url)
-      .withFormUrlEncodedBody(
-        "dateOfChange.day" -> "24",
-        "dateOfChange.month" -> "2",
-        "dateOfChange.year" -> "1980"
-      )
+      val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+        FakeRequest(POST, routes.ServicesOfBusinessDateOfChangeController.post.url)
+          .withFormUrlEncodedBody(
+            "dateOfChange.day"   -> "24",
+            "dateOfChange.month" -> "2",
+            "dateOfChange.year"  -> "1980"
+          )
 
       val startDate: LocalDate = LocalDate.of(1990, 2, 24)
 
       val result: Future[Result] = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(messages("error.expected.dateofchange.date.after.activitystartdate", DateHelper.formatDate(startDate)))
+      status(result)          must be(BAD_REQUEST)
+      contentAsString(result) must include(
+        messages("error.expected.dateofchange.date.after.activitystartdate", DateHelper.formatDate(startDate))
+      )
     }
   }
 }

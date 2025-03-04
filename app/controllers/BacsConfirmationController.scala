@@ -28,24 +28,25 @@ import views.html.confirmation.ConfirmationBacsView
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class BacsConfirmationController @Inject()(authAction: AuthAction,
-                                           val ds: CommonPlayDependencies,
-                                           private[controllers] implicit val dataCacheConnector: DataCacheConnector,
-                                           private[controllers] implicit val amlsConnector: AmlsConnector,
-                                           private[controllers] implicit val statusService: StatusService,
-                                           private[controllers] val enrolmentService: AuthEnrolmentsService,
-                                           val cc: MessagesControllerComponents,
-                                           view: ConfirmationBacsView) extends AmlsBaseController(ds, cc) {
+class BacsConfirmationController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  private[controllers] implicit val dataCacheConnector: DataCacheConnector,
+  private[controllers] implicit val amlsConnector: AmlsConnector,
+  private[controllers] implicit val statusService: StatusService,
+  private[controllers] val enrolmentService: AuthEnrolmentsService,
+  val cc: MessagesControllerComponents,
+  view: ConfirmationBacsView
+) extends AmlsBaseController(ds, cc) {
 
-  def bacsConfirmation(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      val okResult = for {
-        refNo <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-        status <- OptionT.liftF(statusService.getReadStatus(refNo, request.accountTypeId))
-        name <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
-        isRenewal <- OptionT.liftF(dataCacheConnector.fetch[Renewal](request.credId, Renewal.key).map(_.isDefined))
-      } yield Ok(view(name, refNo, isRenewal))
+  def bacsConfirmation(): Action[AnyContent] = authAction.async { implicit request =>
+    val okResult = for {
+      refNo     <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+      status    <- OptionT.liftF(statusService.getReadStatus(refNo, request.accountTypeId))
+      name      <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
+      isRenewal <- OptionT.liftF(dataCacheConnector.fetch[Renewal](request.credId, Renewal.key).map(_.isDefined))
+    } yield Ok(view(name, refNo, isRenewal))
 
-      okResult getOrElse InternalServerError("Unable to get BACS confirmation")
+    okResult getOrElse InternalServerError("Unable to get BACS confirmation")
   }
 }

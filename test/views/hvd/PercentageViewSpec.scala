@@ -28,7 +28,7 @@ import views.html.hvd.PercentageView
 class PercentageViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val percentage = inject[PercentageView]
-  lazy val fp = inject[PercentagePaymentFormProvider]
+  lazy val fp         = inject[PercentagePaymentFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -49,7 +49,7 @@ class PercentageViewSpec extends AmlsViewSpec with Matchers {
 
       def view = percentage(fp().fill(Third), true)
 
-      heading.html must be(messages("hvd.percentage.title"))
+      heading.html    must be(messages("hvd.percentage.title"))
       subHeading.html must include(messages("summary.hvd"))
     }
 

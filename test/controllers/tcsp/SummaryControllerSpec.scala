@@ -37,17 +37,16 @@ class SummaryControllerSpec extends AmlsSpec with Injecting {
   trait Fixture extends DependencyMocks {
     self =>
 
-    val request = addToken(authRequest)
+    val request                       = addToken(authRequest)
     implicit val ec: ExecutionContext = inject[ExecutionContext]
 
-    val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
+    val defaultProvidedServices      = ProvidedServices(Set(PhonecallHandling, Other("other service")))
     val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes(Some("12345678"))
-    val mockTcsp = mock[Tcsp]
+    val mockTcsp                     = mock[Tcsp]
 
-    val defaultCompanyServiceProviders = TcspTypes(Set(RegisteredOfficeEtc,
-      CompanyFormationAgent))
+    val defaultCompanyServiceProviders = TcspTypes(Set(RegisteredOfficeEtc, CompanyFormationAgent))
 
-    val model = Tcsp(
+    val model      = Tcsp(
       Some(defaultCompanyServiceProviders),
       Some(OnlyOffTheShelfCompsSoldYes),
       Some(ComplexCorpStructureCreationNo),
@@ -55,10 +54,11 @@ class SummaryControllerSpec extends AmlsSpec with Injecting {
       Some(true),
       Some(defaultServicesOfAnotherTCSP)
     )
-    lazy val view = app.injector.instanceOf[CheckYourAnswersView]
+    lazy val view  = app.injector.instanceOf[CheckYourAnswersView]
     val controller = new SummaryController(
       mockCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       mock[ServiceFlow],
       mockStatusService,
       cc = mockMcc,

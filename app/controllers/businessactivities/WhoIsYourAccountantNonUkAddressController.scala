@@ -26,47 +26,58 @@ import services.AutoCompleteService
 import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities.AccountantNonUKAddressView
 
-class WhoIsYourAccountantNonUkAddressController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                          val autoCompleteService: AutoCompleteService,
-                                                          val authAction: AuthAction,
-                                                          val ds: CommonPlayDependencies,
-                                                          val cc: MessagesControllerComponents,
-                                                          formProvider: AccountantNonUKAddressFormProvider,
-                                                          view: AccountantNonUKAddressView) extends AmlsBaseController(ds, cc) {
+class WhoIsYourAccountantNonUkAddressController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val autoCompleteService: AutoCompleteService,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: AccountantNonUKAddressFormProvider,
+  view: AccountantNonUKAddressView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-        response =>
-          val form = (for {
-            businessActivities <- response
-            whoIsYourAccountant <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.address)
-          } yield {
-            if(!whoIsYourAccountant.isUk) formProvider().fill(whoIsYourAccountant) else formProvider()
-          }).getOrElse(formProvider())
-          Ok(view(form, edit, ControllerHelper.accountantName(response), autoCompleteService.formOptionsExcludeUK))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { response =>
+      val form = (for {
+        businessActivities  <- response
+        whoIsYourAccountant <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.address)
+      } yield if (!whoIsYourAccountant.isUk) formProvider().fill(whoIsYourAccountant) else formProvider())
+        .getOrElse(formProvider())
+      Ok(view(form, edit, ControllerHelper.accountantName(response), autoCompleteService.formOptionsExcludeUK))
+    }
   }
 
-  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors =>
-          dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-            response => BadRequest(view(
-              formWithErrors, edit, ControllerHelper.accountantName(response), autoCompleteService.formOptionsExcludeUK))
+          dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { response =>
+            BadRequest(
+              view(
+                formWithErrors,
+                edit,
+                ControllerHelper.accountantName(response),
+                autoCompleteService.formOptionsExcludeUK
+              )
+            )
           },
         data =>
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivity.whoIsYourAccountant(businessActivity.flatMap(ba => ba.whoIsYourAccountant).map(acc => acc.copy(address = Option(data))))
-            )
-          } yield if (edit) {
-            Redirect(routes.SummaryController.get)
-          } else {
-            Redirect(routes.TaxMattersController.get())
-          }
+            _                <- dataCacheConnector.save[BusinessActivities](
+                                  request.credId,
+                                  BusinessActivities.key,
+                                  businessActivity.whoIsYourAccountant(
+                                    businessActivity.flatMap(ba => ba.whoIsYourAccountant).map(acc => acc.copy(address = Option(data)))
+                                  )
+                                )
+          } yield
+            if (edit) {
+              Redirect(routes.SummaryController.get)
+            } else {
+              Redirect(routes.TaxMattersController.get())
+            }
       )
   }
 }

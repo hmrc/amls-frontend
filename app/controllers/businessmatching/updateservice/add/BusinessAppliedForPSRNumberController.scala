@@ -31,39 +31,40 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class BusinessAppliedForPSRNumberController @Inject()(
-                                                       authAction: AuthAction,
-                                                       val ds: CommonPlayDependencies,
-                                                       implicit val dataCacheConnector: DataCacheConnector,
-                                                       val router: Router[AddBusinessTypeFlowModel],
-                                                       val cc: MessagesControllerComponents,
-                                                       formProvider: PSRNumberFormProvider,
-                                                       view: BusinessAppliedForPSRNumberView) extends AmlsBaseController(ds, cc) {
+class BusinessAppliedForPSRNumberController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val dataCacheConnector: DataCacheConnector,
+  val router: Router[AddBusinessTypeFlowModel],
+  val cc: MessagesControllerComponents,
+  formProvider: PSRNumberFormProvider,
+  view: BusinessAppliedForPSRNumberView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)) map {
-        case model if model.isMsbTmDefined =>
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)) map {
+      case model if model.isMsbTmDefined =>
         val form = model.businessAppliedForPSRNumber.fold(formProvider())(formProvider().fill)
         Ok(view(form, edit))
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-      } getOrElse InternalServerError("Get: Unable to show Business Applied For PSR Number page")
+      case _                             => Redirect(controllers.routes.RegistrationProgressController.get())
+    } getOrElse InternalServerError("Get: Unable to show Business Applied For PSR Number page")
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
-        data => {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
             case Some(model) => model.businessAppliedForPSRNumber(data)
-            case None => throw new Exception("An UnknownException has occurred: BusinessAppliedForPSRNumberController")
+            case None        => throw new Exception("An UnknownException has occurred: BusinessAppliedForPSRNumberController")
           } flatMap {
             case Some(model) => router.getRoute(request.credId, PsrNumberPageId, model, edit)
-            case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: BusinessAppliedForPSRNumberController"))
+            case _           =>
+              Future
+                .successful(InternalServerError("Post: Cannot retrieve data: BusinessAppliedForPSRNumberController"))
           }
-        }
       )
   }
 }

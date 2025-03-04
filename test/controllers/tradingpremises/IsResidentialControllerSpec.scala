@@ -38,15 +38,28 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
     val request = addToken(authRequest)
 
-    val ytp = YourTradingPremises("foo", Address("1st line of address",Some("2nd line of address"),Some("3rd line of address"),Some("4th line of address"),"AA1 1BB",None), Some(true), Some(LocalDate.of(2010, 10, 10)), None)
+    val ytp = YourTradingPremises(
+      "foo",
+      Address(
+        "1st line of address",
+        Some("2nd line of address"),
+        Some("3rd line of address"),
+        Some("4th line of address"),
+        "AA1 1BB",
+        None
+      ),
+      Some(true),
+      Some(LocalDate.of(2010, 10, 10)),
+      None
+    )
 
-    val pageTitle = messages("tradingpremises.isResidential.title", "firstname lastname") + " - " +
+    val pageTitle  = messages("tradingpremises.isResidential.title", "firstname lastname") + " - " +
       messages("summary.tradingpremises") + " - " +
       messages("title.amls") + " - " + messages("title.gov")
 
     mockCacheGetEntry[Seq[TradingPremises]](Some(Seq(TradingPremises())), TradingPremises.key)
     mockCacheGetEntry[BusinessMatching](Some(BusinessMatching()), BusinessMatching.key)
-    lazy val view = app.injector.instanceOf[IsResidentialView]
+    lazy val view  = app.injector.instanceOf[IsResidentialView]
     val controller = new IsResidentialController(
       messagesApi,
       SuccessfulAuthAction,
@@ -55,7 +68,8 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
       cc = mockMcc,
       inject[IsResidentialFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
 
     mockCacheSave[Seq[TradingPremises]]
   }
@@ -93,11 +107,11 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
           val document = Jsoup.parse(contentAsString(result))
           document.title mustBe pageTitle
           document.select("input[value=true]").hasAttr("checked") must be(true)
-          document.body().text() must include (ytp.tradingPremisesAddress.addressLine1)
-          document.body().text() must include (ytp.tradingPremisesAddress.addressLine2.get)
-          document.body().text() must include (ytp.tradingPremisesAddress.addressLine3.get)
-          document.body().text() must include (ytp.tradingPremisesAddress.addressLine4.get)
-          document.body().text() must include (ytp.tradingPremisesAddress.postcode)
+          document.body().text()                                  must include(ytp.tradingPremisesAddress.addressLine1)
+          document.body().text()                                  must include(ytp.tradingPremisesAddress.addressLine2.get)
+          document.body().text()                                  must include(ytp.tradingPremisesAddress.addressLine3.get)
+          document.body().text()                                  must include(ytp.tradingPremisesAddress.addressLine4.get)
+          document.body().text()                                  must include(ytp.tradingPremisesAddress.postcode)
         }
 
       }
@@ -120,9 +134,9 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
         "redirect to WhatDoesYourBusinessDoController" in new Fixture {
           val postRequest = FakeRequest(POST, routes.IsResidentialController.post(1, false).url)
-          .withFormUrlEncodedBody(
-            "isResidential" -> "true"
-          )
+            .withFormUrlEncodedBody(
+              "isResidential" -> "true"
+            )
 
           mockCacheGetEntry[Seq[TradingPremises]](
             Some(Seq(TradingPremises(yourTradingPremises = Some(ytp)))),
@@ -131,15 +145,15 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
           val result = controller.post(1)(postRequest)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.WhatDoesYourBusinessDoController.get(1).url))
         }
 
         "redirect to DetailedAnswersController in edit mode" in new Fixture {
           val postRequest = FakeRequest(POST, routes.IsResidentialController.post(1, true).url)
-          .withFormUrlEncodedBody(
-            "isResidential" -> "false"
-          )
+            .withFormUrlEncodedBody(
+              "isResidential" -> "false"
+            )
 
           mockCacheGetEntry[Seq[TradingPremises]](
             Some(Seq(TradingPremises(yourTradingPremises = Some(ytp)))),
@@ -148,7 +162,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
           val result = controller.post(1, true)(postRequest)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
         }
@@ -158,9 +172,9 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
       "on invalid request" must {
         "respond with BAD_REQUEST" in new Fixture {
           val postRequest = FakeRequest(POST, routes.IsResidentialController.post(1, false).url)
-          .withFormUrlEncodedBody(
-            "isResidential" -> ""
-          )
+            .withFormUrlEncodedBody(
+              "isResidential" -> ""
+            )
 
           val result = controller.post(1)(postRequest)
           status(result) must be(BAD_REQUEST)
@@ -234,13 +248,13 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
     "save an updated Trading Premises model" in new Fixture {
       val postRequest = FakeRequest(POST, routes.IsResidentialController.post(1, false).url)
-      .withFormUrlEncodedBody(
-        "isResidential" -> "true"
-      )
+        .withFormUrlEncodedBody(
+          "isResidential" -> "true"
+        )
 
       override val ytp = YourTradingPremises(
         "foo",
-        Address("1",None,None,None,"AA1 1BB",None),
+        Address("1", None, None, None, "AA1 1BB", None),
         Some(false),
         Some(LocalDate.of(2010, 10, 10)),
         None
@@ -257,10 +271,18 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
       status(result) must be(SEE_OTHER)
 
-      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), eqTo(TradingPremises.key), eqTo(Seq(TradingPremises(
-        yourTradingPremises = Some(ytp.copy(isResidential = Some(true))),
-        hasChanged = true
-      ))))(any())
+      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
+        any(),
+        eqTo(TradingPremises.key),
+        eqTo(
+          Seq(
+            TradingPremises(
+              yourTradingPremises = Some(ytp.copy(isResidential = Some(true))),
+              hasChanged = true
+            )
+          )
+        )
+      )(any())
 
     }
 

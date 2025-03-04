@@ -34,40 +34,42 @@ object ResponseType {
   case object AmendOrVariationResponseType extends ResponseType
 
   implicit val jsonWrites: Writes[ResponseType] = Writes[ResponseType] {
-    case SubscriptionResponseType => JsString("SubscriptionReponse")
+    case SubscriptionResponseType     => JsString("SubscriptionReponse")
     case AmendOrVariationResponseType => JsString("AmendOrVariationResponse")
   }
 
   implicit val jsonReads: Reads[ResponseType] = {
     import play.api.libs.json.Reads.StringReads
     __.read[String] flatMap {
-      case "SubscriptionReponse" => SubscriptionResponseType
+      case "SubscriptionReponse"      => SubscriptionResponseType
       case "AmendOrVariationResponse" => AmendOrVariationResponseType
-      case _ =>
+      case _                          =>
         play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 }
 
-case class FeeResponse(responseType: ResponseType,
-                       amlsReferenceNumber: String,
-                       registrationFee: BigDecimal,
-                       fpFee: Option[BigDecimal],
-                       approvalCheckFee: Option[BigDecimal],
-                       premiseFee: BigDecimal,
-                       totalFees: BigDecimal,
-                       paymentReference: Option[String],
-                       difference: Option[BigDecimal],
-                       createdAt: LocalDateTime) {
+case class FeeResponse(
+  responseType: ResponseType,
+  amlsReferenceNumber: String,
+  registrationFee: BigDecimal,
+  fpFee: Option[BigDecimal],
+  approvalCheckFee: Option[BigDecimal],
+  premiseFee: BigDecimal,
+  totalFees: BigDecimal,
+  paymentReference: Option[String],
+  difference: Option[BigDecimal],
+  createdAt: LocalDateTime
+) {
 
   def toPay(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus] = None): BigDecimal = {
     val isRenewalAmendment: Boolean = submissionRequestStatus exists {
       _.isRenewalAmendment.getOrElse(false)
     }
     status match {
-      case (RenewalSubmitted(_) | ReadyForRenewal(_)) if isRenewalAmendment => difference.getOrElse(0)
+      case (RenewalSubmitted(_) | ReadyForRenewal(_)) if isRenewalAmendment         => difference.getOrElse(0)
       case SubmissionReadyForReview if responseType == AmendOrVariationResponseType => difference.getOrElse(0)
-      case _ => totalFees
+      case _                                                                        => totalFees
     }
   }
 
@@ -76,17 +78,24 @@ case class FeeResponse(responseType: ResponseType,
 object FeeResponse {
 
   implicit val dateTimeRead: Reads[LocalDateTime] =
-    (__ \ "$date").read[Long].map { dateTime =>
-      LocalDateTime.ofInstant(Instant.ofEpochMilli(dateTime), UTC)
-    }.orElse {
-      (__ \ "$date" \ "$numberLong").read[Long].map { dateTime =>
+    (__ \ "$date")
+      .read[Long]
+      .map { dateTime =>
         LocalDateTime.ofInstant(Instant.ofEpochMilli(dateTime), UTC)
       }
-    }.orElse {
-      (__ \ "$date" \ "$numberLong").read[String].map(dateTime => LocalDateTime.ofInstant(Instant.ofEpochMilli(dateTime.toLong), UTC))
-    }
-  
-  implicit val dateTimeWrite: Writes[LocalDateTime] = (dateTime: LocalDateTime) => Json.obj("$date" -> dateTime.atZone(UTC).toInstant.toEpochMilli)
+      .orElse {
+        (__ \ "$date" \ "$numberLong").read[Long].map { dateTime =>
+          LocalDateTime.ofInstant(Instant.ofEpochMilli(dateTime), UTC)
+        }
+      }
+      .orElse {
+        (__ \ "$date" \ "$numberLong")
+          .read[String]
+          .map(dateTime => LocalDateTime.ofInstant(Instant.ofEpochMilli(dateTime.toLong), UTC))
+      }
+
+  implicit val dateTimeWrite: Writes[LocalDateTime] = (dateTime: LocalDateTime) =>
+    Json.obj("$date" -> dateTime.atZone(UTC).toInstant.toEpochMilli)
 
   implicit val format: OFormat[FeeResponse] = Json.format[FeeResponse]
 }

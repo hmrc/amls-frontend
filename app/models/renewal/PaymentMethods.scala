@@ -23,31 +23,26 @@ import play.api.libs.json.{JsPath, Json, Reads, Writes}
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.Aliases.{CheckboxItem, Text}
 
+case class PaymentMethods(courier: Boolean, direct: Boolean, other: Option[String]) {
 
-case class PaymentMethods(courier: Boolean,
-                         direct: Boolean,
-                         other: Option[String]) {
-
-  def getSummaryMessages(implicit messages: Messages): Seq[String] = {
+  def getSummaryMessages(implicit messages: Messages): Seq[String] =
     Seq(
       if (courier) Some(messages("hvd.receiving.option.01")) else None,
       if (direct) Some(messages("hvd.receiving.option.02")) else None,
       other
     ).flatten
-  }
 }
 
 sealed trait PaymentMethod
 
 object PaymentMethods extends Enumerable.Implicits {
 
-  def apply(methods: Seq[PaymentMethod], detail: Option[String]): PaymentMethods = {
+  def apply(methods: Seq[PaymentMethod], detail: Option[String]): PaymentMethods =
     PaymentMethods(
       methods.contains(Courier),
       methods.contains(Direct),
       if (methods.exists(_.isInstanceOf[Other])) detail else None
     )
-  }
 
   case object Courier extends WithName("courier") with PaymentMethod
 
@@ -59,8 +54,7 @@ object PaymentMethods extends Enumerable.Implicits {
 
   def formValues(html: Html)(implicit messages: Messages): Seq[CheckboxItem] = all.zipWithIndex map {
     case (method, index) =>
-
-      val conditional = if(method.toString == Other("").toString) Some(html) else None
+      val conditional = if (method.toString == Other("").toString) Some(html) else None
 
       CheckboxItem(
         content = Text(messages(s"renewal.cash.payments.received.lbl${index + 1}")),
@@ -73,26 +67,25 @@ object PaymentMethods extends Enumerable.Implicits {
 
   implicit val enumerable: Enumerable[PaymentMethod] = Enumerable(all.map(v => v.toString -> v): _*)
 
-  implicit val jsonR: Reads[PaymentMethods] = {
+  implicit val jsonR: Reads[PaymentMethods] =
     (
       (JsPath \ "courier").read[Boolean] and
         (JsPath \ "direct").read[Boolean] and
         (JsPath \ "other").read[Boolean] and
         (JsPath \ "details").readNullable[String]
-      )((courier, direct, _, details) =>
+    )((courier, direct, _, details) =>
       PaymentMethods(
-        courier, direct, details
+        courier,
+        direct,
+        details
       )
     )
-  }
 
   implicit val jsonW: Writes[PaymentMethods] = Writes[PaymentMethods] { x =>
-    val jsMethods = Json.obj("courier" -> x.courier,
-      "direct" -> x.direct,
-      "other" -> x.other.isDefined)
+    val jsMethods = Json.obj("courier" -> x.courier, "direct" -> x.direct, "other" -> x.other.isDefined)
     val jsDetails = Json.obj("details" -> x.other)
     x.other.isDefined match {
-      case true => jsMethods ++ jsDetails
+      case true  => jsMethods ++ jsDetails
       case false => jsMethods
     }
   }

@@ -30,62 +30,62 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class CustomersOutsideIsUKController @Inject()(val authAction: AuthAction,
-                                               val ds: CommonPlayDependencies,
-                                               val renewalService: RenewalService,
-                                               val autoCompleteService: AutoCompleteService,
-                                               val cc: MessagesControllerComponents,
-                                               formProvider: CustomersOutsideIsUKFormProvider,
-                                               view: CustomersOutsideIsUKView) extends AmlsBaseController(ds, cc) {
+class CustomersOutsideIsUKController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val renewalService: RenewalService,
+  val autoCompleteService: AutoCompleteService,
+  val cc: MessagesControllerComponents,
+  formProvider: CustomersOutsideIsUKFormProvider,
+  view: CustomersOutsideIsUKView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      renewalService.getRenewal(request.credId) map {
-        response =>
-          val form = (for {
-            renewal <- response
-            customers <- renewal.customersOutsideIsUK
-          } yield formProvider().fill(customers)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    renewalService.getRenewal(request.credId) map { response =>
+      val form = (for {
+        renewal   <- response
+        customers <- renewal.customersOutsideIsUK
+      } yield formProvider().fill(customers)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false): Action[AnyContent]                                                       = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           renewalService.fetchAndUpdateRenewal(
             request.credId,
-            renewal => if (data.isOutside) {
-              renewal.customersOutsideIsUK(data)
-            } else {
-              renewal.customersOutsideIsUK(data).copy(customersOutsideUK = None)
-            }
+            renewal =>
+              if (data.isOutside) {
+                renewal.customersOutsideIsUK(data)
+              } else {
+                renewal.customersOutsideIsUK(data).copy(customersOutsideUK = None)
+              }
           ) flatMap {
-            case Some(_) => renewalService.getBusinessMatching(request.credId) map { bmOpt =>
+            case Some(_) =>
+              renewalService.getBusinessMatching(request.credId) map { bmOpt =>
                 redirectTo(
                   data,
                   edit,
                   ControllerHelper.getBusinessActivity(bmOpt).map(_.businessActivities)
                 )
               }
-            case None => Future.successful(InternalServerError("Failed to update cache"))
+            case None    => Future.successful(InternalServerError("Failed to update cache"))
           }
       )
   }
-  private def redirectTo(outsideUK: CustomersOutsideIsUK, edit: Boolean, ba: Option[Set[BusinessActivity]]) = {
+  private def redirectTo(outsideUK: CustomersOutsideIsUK, edit: Boolean, ba: Option[Set[BusinessActivity]]) =
     (outsideUK, edit) match {
       case (CustomersOutsideIsUK(true), false) => Redirect(routes.CustomersOutsideUKController.get())
-      case (CustomersOutsideIsUK(true), true) => Redirect(routes.CustomersOutsideUKController.get(true))
-      case (CustomersOutsideIsUK(false), _) => (ba, edit) match {
-        case (x, false) if x.fold(false)(_.contains(HighValueDealing)) =>
-          Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-        case _ => Redirect(routes.SummaryController.get)
-      }
+      case (CustomersOutsideIsUK(true), true)  => Redirect(routes.CustomersOutsideUKController.get(true))
+      case (CustomersOutsideIsUK(false), _)    =>
+        (ba, edit) match {
+          case (x, false) if x.fold(false)(_.contains(HighValueDealing)) =>
+            Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+          case _                                                         => Redirect(routes.SummaryController.get)
+        }
     }
-  }
 }
-
-

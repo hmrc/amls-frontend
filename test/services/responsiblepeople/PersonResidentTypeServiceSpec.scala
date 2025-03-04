@@ -36,11 +36,18 @@ import scala.concurrent.Future
 class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValues with BeforeAndAfterEach {
 
   lazy val mockDataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-  lazy val mockCacheMap: Cache = mock[Cache]
-  lazy val service = new PersonResidentTypeService(mockDataCacheConnector)
+  lazy val mockCacheMap: Cache                        = mock[Cache]
+  lazy val service                                    = new PersonResidentTypeService(mockDataCacheConnector)
 
   implicit val authorisedRequest: AuthorisedRequest[AnyContentAsEmpty.type] = AuthorisedRequest(
-    FakeRequest(), Some("REF"), "CREDID", Organisation, Enrolments(Set()), ("TYPE", "ID"), Some("GROUPID"), Some(User)
+    FakeRequest(),
+    Some("REF"),
+    "CREDID",
+    Organisation,
+    Enrolments(Set()),
+    ("TYPE", "ID"),
+    Some("GROUPID"),
+    Some(User)
   )
 
   override def beforeEach(): Unit = {

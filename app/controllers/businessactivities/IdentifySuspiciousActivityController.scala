@@ -27,41 +27,44 @@ import views.html.businessactivities.IdentifySuspiciousActivityView
 
 import scala.concurrent.Future
 
-class IdentifySuspiciousActivityController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                     val authAction: AuthAction,
-                                                     val ds: CommonPlayDependencies,
-                                                     val cc: MessagesControllerComponents,
-                                                     formProvider: IdentifySuspiciousActivityFormProvider,
-                                                     view: IdentifySuspiciousActivityView) extends AmlsBaseController(ds, cc) {
+class IdentifySuspiciousActivityController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: IdentifySuspiciousActivityFormProvider,
+  view: IdentifySuspiciousActivityView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-        response =>
-          val activity = for {
-            businessActivities <- response
-            identifySuspiciousActivity <- businessActivities.identifySuspiciousActivity
-          } yield identifySuspiciousActivity
-          Ok(view(activity.fold(formProvider())(formProvider().fill), edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { response =>
+      val activity = for {
+        businessActivities         <- response
+        identifySuspiciousActivity <- businessActivities.identifySuspiciousActivity
+      } yield identifySuspiciousActivity
+      Ok(view(activity.fold(formProvider())(formProvider().fill), edit))
+    }
   }
 
-  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivities.identifySuspiciousActivity(data)
-            )
-          } yield if (edit) {
-            Redirect(routes.SummaryController.get)
-          } else {
-            Redirect(routes.NCARegisteredController.get())
-          }
+            _                  <- dataCacheConnector.save[BusinessActivities](
+                                    request.credId,
+                                    BusinessActivities.key,
+                                    businessActivities.identifySuspiciousActivity(data)
+                                  )
+          } yield
+            if (edit) {
+              Redirect(routes.SummaryController.get)
+            } else {
+              Redirect(routes.NCARegisteredController.get())
+            }
       )
   }
 }

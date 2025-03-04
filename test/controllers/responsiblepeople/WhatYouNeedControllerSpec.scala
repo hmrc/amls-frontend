@@ -33,14 +33,16 @@ import scala.concurrent.Future
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[WhatYouNeedView]
-    val controller = new WhatYouNeedController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[WhatYouNeedView]
+    val controller = new WhatYouNeedController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      view = view)
+      view = view
+    )
   }
 
   "WhatYouNeedController" must {
@@ -48,10 +50,13 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     "get" must {
 
       "load the page" in new Fixture {
-        val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-        val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+        val BusinessActivitiesModel =
+          BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+        val bm                      = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
 
-        when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any())) thenReturn(Future.successful(bm))
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any())) thenReturn (Future.successful(
+          bm
+        ))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -69,7 +74,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         .thenReturn(Future.successful(None))
 
       a[Exception] must be thrownBy {
-        ScalaFutures.whenReady(controller.get(1)(request)) { x => x }
+        ScalaFutures.whenReady(controller.get(1)(request))(x => x)
       }
     }
   }

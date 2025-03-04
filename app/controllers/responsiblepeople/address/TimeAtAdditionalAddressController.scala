@@ -29,13 +29,16 @@ import views.html.responsiblepeople.address.TimeAtAdditionalAddressView
 
 import scala.concurrent.Future
 
-class TimeAtAdditionalAddressController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                   authAction: AuthAction,
-                                                   val ds: CommonPlayDependencies,
-                                                   val cc: MessagesControllerComponents,
-                                                   formProvider: TimeAtAddressFormProvider,
-                                                   view: TimeAtAdditionalAddressView,
-                                                   implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class TimeAtAdditionalAddressController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: TimeAtAddressFormProvider,
+  view: TimeAtAdditionalAddressView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", None, None, None, ""), None)
 
@@ -44,10 +47,13 @@ class TimeAtAdditionalAddressController @Inject() (val dataCacheConnector: DataC
       getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           (person.personName, person.addressHistory) match {
-            case (Some(name), Some(ResponsiblePersonAddressHistory(_, Some(ResponsiblePersonAddress(_, Some(timeAtAddress))), _))) =>
+            case (
+                  Some(name),
+                  Some(ResponsiblePersonAddressHistory(_, Some(ResponsiblePersonAddress(_, Some(timeAtAddress))), _))
+                ) =>
               Ok(view(formProvider().fill(timeAtAddress), edit, index, flow, name.titleName))
             case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
-            case _ => NotFound(notFoundView)
+            case _               => NotFound(notFoundView)
           }
         }
       }
@@ -55,49 +61,50 @@ class TimeAtAdditionalAddressController @Inject() (val dataCacheConnector: DataC
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          },
-        data => {
-          getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
-            (for {
-              rp <- responsiblePerson
-              addressHistory <- rp.addressHistory
-              additionalAddress <- addressHistory.additionalAddress
-            } yield {
-              val additionalAddressWithTime = additionalAddress.copy(
-                timeAtAddress = Some(data)
-              )
-              doUpdate(request.credId, index, additionalAddressWithTime).map { _ =>
-                redirectTo(index, edit, flow, data)
-              }
-            }) getOrElse Future.successful(NotFound(notFoundView))
-          }
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
+              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            },
+          data =>
+            getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
+              (for {
+                rp                <- responsiblePerson
+                addressHistory    <- rp.addressHistory
+                additionalAddress <- addressHistory.additionalAddress
+              } yield {
+                val additionalAddressWithTime = additionalAddress.copy(
+                  timeAtAddress = Some(data)
+                )
+                doUpdate(request.credId, index, additionalAddressWithTime).map { _ =>
+                  redirectTo(index, edit, flow, data)
+                }
+              }) getOrElse Future.successful(NotFound(notFoundView))
+            }
+        )
+        .recoverWith { case _: IndexOutOfBoundsException =>
+          Future.successful(NotFound(notFoundView))
         }
-      ).recoverWith {
-        case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-      }
   }
 
-  private def redirectTo(index: Int, edit: Boolean, flow: Option[String], data: TimeAtAddress): Result = {
+  private def redirectTo(index: Int, edit: Boolean, flow: Option[String], data: TimeAtAddress): Result =
     data match {
-      case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(index, edit, flow))
-      case ThreeYearsPlus | OneToThreeYears if edit => Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))
-      case _ => Redirect(routes.AdditionalExtraAddressController.get(index, edit, flow))
+      case ThreeYearsPlus | OneToThreeYears if !edit =>
+        Redirect(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(index, edit, flow))
+      case ThreeYearsPlus | OneToThreeYears if edit  =>
+        Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))
+      case _                                         => Redirect(routes.AdditionalExtraAddressController.get(index, edit, flow))
     }
-  }
 
-  private def doUpdate(credId: String, index: Int, data: ResponsiblePersonAddress): Future[Cache] = {
+  private def doUpdate(credId: String, index: Int, data: ResponsiblePersonAddress): Future[Cache] =
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
-      res.addressHistory(
-        res.addressHistory match {
-          case Some(a) if data.timeAtAddress.contains(ThreeYearsPlus) | data.timeAtAddress.contains(OneToThreeYears) =>
-            a.additionalAddress(data).removeAdditionalExtraAddress
-          case Some(a) => a.additionalAddress(data)
-          case _ => ResponsiblePersonAddressHistory(additionalAddress = Some(data))
-        })
+      res.addressHistory(res.addressHistory match {
+        case Some(a) if data.timeAtAddress.contains(ThreeYearsPlus) | data.timeAtAddress.contains(OneToThreeYears) =>
+          a.additionalAddress(data).removeAdditionalExtraAddress
+        case Some(a)                                                                                               => a.additionalAddress(data)
+        case _                                                                                                     => ResponsiblePersonAddressHistory(additionalAddress = Some(data))
+      })
     }
-  }
 }

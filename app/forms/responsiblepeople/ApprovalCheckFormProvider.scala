@@ -21,8 +21,8 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class ApprovalCheckFormProvider @Inject()() extends Mappings {
+class ApprovalCheckFormProvider @Inject() () extends Mappings {
 
-  private val error = "error.required.rp.approval_check"
+  private val error          = "error.required.rp.approval_check"
   def apply(): Form[Boolean] = Form[Boolean]("hasAlreadyPaidApprovalCheck" -> boolean(error, error))
 }

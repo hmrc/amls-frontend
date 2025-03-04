@@ -28,12 +28,15 @@ class RiskAssessmentPolicySpec extends PlaySpec with MockitoSugar {
     "successfully validate" when {
 
       "hasPolicy is true and riskassesments field is populated" in {
-        val json = Json.obj(
-          "hasPolicy" -> true,
-          "riskassessments" -> Seq("01", "02"))
+        val json = Json.obj("hasPolicy" -> true, "riskassessments" -> Seq("01", "02"))
 
         Json.fromJson[RiskAssessmentPolicy](json) must
-          be(JsSuccess(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(formalRiskAssessments)), JsPath))
+          be(
+            JsSuccess(
+              RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(formalRiskAssessments)),
+              JsPath
+            )
+          )
       }
 
       "hasPolicy is false" in {
@@ -45,20 +48,24 @@ class RiskAssessmentPolicySpec extends PlaySpec with MockitoSugar {
     }
     "fail validation" when {
       "given invalid data" in {
-        Json.fromJson[RiskAssessmentPolicy](Json.obj("hasPolicy" -> true, "riskassessments" -> Seq("01", "99"))) mustBe a[JsError]
+        Json.fromJson[RiskAssessmentPolicy](
+          Json.obj("hasPolicy" -> true, "riskassessments" -> Seq("01", "99"))
+        ) mustBe a[JsError]
       }
     }
 
     "successfully write JSON" when {
       "hasPolicy is true" in {
-        Json.toJson[RiskAssessmentPolicy](RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(formalRiskAssessments)))must
-          be(Json.obj("hasPolicy" -> true,
-          "riskassessments" -> Seq("01", "02")
-        ))
+        Json.toJson[RiskAssessmentPolicy](
+          RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(formalRiskAssessments))
+        ) must
+          be(Json.obj("hasPolicy" -> true, "riskassessments" -> Seq("01", "02")))
       }
 
       "hasPolicy is false" in {
-        Json.toJson[RiskAssessmentPolicy](RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))must
+        Json.toJson[RiskAssessmentPolicy](
+          RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set()))
+        ) must
           be(Json.obj("hasPolicy" -> false))
       }
     }

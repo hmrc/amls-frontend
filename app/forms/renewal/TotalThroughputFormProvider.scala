@@ -23,7 +23,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class TotalThroughputFormProvider @Inject()() extends Mappings {
+class TotalThroughputFormProvider @Inject() () extends Mappings {
 
   private val error = "renewal.msb.throughput.selection.invalid"
 

@@ -21,71 +21,71 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class ExpectedThroughputSpec extends PlaySpec with Matchers{
+class ExpectedThroughputSpec extends PlaySpec with Matchers {
 
-    "JSON validation" must {
+  "JSON validation" must {
 
-      "successfully validate given an enum value" in {
+    "successfully validate given an enum value" in {
 
-        Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "01")) must
-          be(JsSuccess(ExpectedThroughput.First, JsPath))
+      Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "01")) must
+        be(JsSuccess(ExpectedThroughput.First, JsPath))
 
-        Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "02")) must
-          be(JsSuccess(ExpectedThroughput.Second, JsPath))
+      Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "02")) must
+        be(JsSuccess(ExpectedThroughput.Second, JsPath))
 
-        Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "03")) must
-          be(JsSuccess(ExpectedThroughput.Third, JsPath))
+      Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "03")) must
+        be(JsSuccess(ExpectedThroughput.Third, JsPath))
 
-        Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "04")) must
-          be(JsSuccess(ExpectedThroughput.Fourth, JsPath))
+      Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "04")) must
+        be(JsSuccess(ExpectedThroughput.Fourth, JsPath))
 
-        Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "05")) must
-          be(JsSuccess(ExpectedThroughput.Fifth, JsPath))
+      Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "05")) must
+        be(JsSuccess(ExpectedThroughput.Fifth, JsPath))
 
-        Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "06")) must
-          be(JsSuccess(ExpectedThroughput.Sixth, JsPath))
+      Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "06")) must
+        be(JsSuccess(ExpectedThroughput.Sixth, JsPath))
 
-        Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "07")) must
-          be(JsSuccess(ExpectedThroughput.Seventh, JsPath))
-      }
-
-      "write the correct value" in {
-        Json.toJson(ExpectedThroughput.First.asInstanceOf[ExpectedThroughput]) must
-          be(Json.obj("throughput" -> "01"))
-
-        Json.toJson(ExpectedThroughput.Second.asInstanceOf[ExpectedThroughput]) must
-          be(Json.obj("throughput" -> "02"))
-
-        Json.toJson(ExpectedThroughput.Third.asInstanceOf[ExpectedThroughput]) must
-          be(Json.obj("throughput" -> "03"))
-
-        Json.toJson(ExpectedThroughput.Fourth.asInstanceOf[ExpectedThroughput]) must
-          be(Json.obj("throughput" -> "04"))
-
-        Json.toJson(ExpectedThroughput.Fifth.asInstanceOf[ExpectedThroughput]) must
-          be(Json.obj("throughput" -> "05"))
-
-        Json.toJson(ExpectedThroughput.Sixth.asInstanceOf[ExpectedThroughput]) must
-          be(Json.obj("throughput" -> "06"))
-
-        Json.toJson(ExpectedThroughput.Seventh.asInstanceOf[ExpectedThroughput]) must
-          be(Json.obj("throughput" -> "07"))
-      }
-
-      "throw error for invalid data" in {
-        Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "20")) must
-          be(JsError(JsPath, play.api.libs.json.JsonValidationError("error.invalid")))
-      }
+      Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "07")) must
+        be(JsSuccess(ExpectedThroughput.Seventh, JsPath))
     }
 
-    "convert to renewal throughput model" in {
-      ExpectedThroughput.convert(ExpectedThroughput.First) must be(TotalThroughput("01"))
-      ExpectedThroughput.convert(ExpectedThroughput.Second) must be(TotalThroughput("02"))
-      ExpectedThroughput.convert(ExpectedThroughput.Third) must be(TotalThroughput("03"))
-      ExpectedThroughput.convert(ExpectedThroughput.Fourth) must be(TotalThroughput("04"))
-      ExpectedThroughput.convert(ExpectedThroughput.Fifth) must be(TotalThroughput("05"))
-      ExpectedThroughput.convert(ExpectedThroughput.Sixth) must be(TotalThroughput("06"))
-      ExpectedThroughput.convert(ExpectedThroughput.Seventh) must be(TotalThroughput("07"))
+    "write the correct value" in {
+      Json.toJson(ExpectedThroughput.First.asInstanceOf[ExpectedThroughput]) must
+        be(Json.obj("throughput" -> "01"))
+
+      Json.toJson(ExpectedThroughput.Second.asInstanceOf[ExpectedThroughput]) must
+        be(Json.obj("throughput" -> "02"))
+
+      Json.toJson(ExpectedThroughput.Third.asInstanceOf[ExpectedThroughput]) must
+        be(Json.obj("throughput" -> "03"))
+
+      Json.toJson(ExpectedThroughput.Fourth.asInstanceOf[ExpectedThroughput]) must
+        be(Json.obj("throughput" -> "04"))
+
+      Json.toJson(ExpectedThroughput.Fifth.asInstanceOf[ExpectedThroughput]) must
+        be(Json.obj("throughput" -> "05"))
+
+      Json.toJson(ExpectedThroughput.Sixth.asInstanceOf[ExpectedThroughput]) must
+        be(Json.obj("throughput" -> "06"))
+
+      Json.toJson(ExpectedThroughput.Seventh.asInstanceOf[ExpectedThroughput]) must
+        be(Json.obj("throughput" -> "07"))
     }
+
+    "throw error for invalid data" in {
+      Json.fromJson[ExpectedThroughput](Json.obj("throughput" -> "20")) must
+        be(JsError(JsPath, play.api.libs.json.JsonValidationError("error.invalid")))
+    }
+  }
+
+  "convert to renewal throughput model" in {
+    ExpectedThroughput.convert(ExpectedThroughput.First)   must be(TotalThroughput("01"))
+    ExpectedThroughput.convert(ExpectedThroughput.Second)  must be(TotalThroughput("02"))
+    ExpectedThroughput.convert(ExpectedThroughput.Third)   must be(TotalThroughput("03"))
+    ExpectedThroughput.convert(ExpectedThroughput.Fourth)  must be(TotalThroughput("04"))
+    ExpectedThroughput.convert(ExpectedThroughput.Fifth)   must be(TotalThroughput("05"))
+    ExpectedThroughput.convert(ExpectedThroughput.Sixth)   must be(TotalThroughput("06"))
+    ExpectedThroughput.convert(ExpectedThroughput.Seventh) must be(TotalThroughput("07"))
+  }
 
 }

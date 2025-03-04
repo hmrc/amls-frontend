@@ -23,8 +23,8 @@ import play.api.data.Form
 class CashPaymentsCustomersNotMetFormProviderSpec extends BooleanFieldBehaviours[CashPaymentsCustomerNotMet] {
 
   override val form: Form[CashPaymentsCustomerNotMet] = new CashPaymentsCustomersNotMetFormProvider()()
-  override val fieldName: String = "receiveCashPayments"
-  override val errorMessage: String = "error.required.renewal.hvd.receive.cash.payments"
+  override val fieldName: String                      = "receiveCashPayments"
+  override val errorMessage: String                   = "error.required.renewal.hvd.receive.cash.payments"
 
   "CashPaymentsCustomersNotMetFormProvider" must {
     behave like booleanFieldWithModel(CashPaymentsCustomerNotMet(true), CashPaymentsCustomerNotMet(false))

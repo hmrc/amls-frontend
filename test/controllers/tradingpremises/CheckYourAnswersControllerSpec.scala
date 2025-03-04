@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.BusinessActivity.{AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, TransmittingMoney}
-import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities, _}
+import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, BusinessMatching, _}
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.mockito.ArgumentMatchers.{eq => eqTo, _}
@@ -41,15 +41,15 @@ import scala.concurrent.Future
 class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   implicit val request: FakeRequest.type = FakeRequest
-  val userId = s"user-${UUID.randomUUID()}"
-  val mockDataCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[Cache]
-  val statusService = mock[StatusService]
+  val userId                             = s"user-${UUID.randomUUID()}"
+  val mockDataCacheConnector             = mock[DataCacheConnector]
+  val mockCacheMap                       = mock[Cache]
+  val statusService                      = mock[StatusService]
 
-  trait Fixture  {
+  trait Fixture {
     self =>
-    val request = addToken(authRequest)
-    lazy val view = inject[CheckYourAnswersView]
+    val request    = addToken(authRequest)
+    lazy val view  = inject[CheckYourAnswersView]
     val controller = new CheckYourAnswersController(
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -57,9 +57,12 @@ class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Inj
       cc = mockMcc,
       cyaHelper = inject[CheckYourAnswersHelper],
       view = view,
-      error = errorView)
+      error = errorView
+    )
 
-    when(statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+    when(
+      statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
+    ) thenReturn Future.successful(SubmissionDecisionApproved)
 
     val model = TradingPremises()
   }
@@ -72,16 +75,18 @@ class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Inj
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val businessMatchingActivitiesAll = BusinessMatchingActivities(
-          Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+          Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness)
+        )
 
-        val businessMatchingMsbServices = BusinessMatchingMsbServices(
-          Set(TransmittingMoney, CurrencyExchange))
+        val businessMatchingMsbServices = BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll), Some(businessMatchingMsbServices))))
+          .thenReturn(
+            Some(BusinessMatching(None, Some(businessMatchingActivitiesAll), Some(businessMatchingMsbServices)))
+          )
 
-        when(mockCacheMap.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))
-          (any())).thenReturn(Some(Seq(TradingPremises())))
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(TradingPremises())))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -95,7 +100,13 @@ class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Inj
       "redirect to YourTradingPremisesController" when {
         "all questions are complete and answers accepted" in new Fixture {
 
-          val ytpModel = YourTradingPremises("foo", Address("1",None,None,None,"AA1 1BB",None), None, Some(LocalDate.of(2010, 10, 10)), None)
+          val ytpModel = YourTradingPremises(
+            "foo",
+            Address("1", None, None, None, "AA1 1BB", None),
+            None,
+            Some(LocalDate.of(2010, 10, 10)),
+            None
+          )
 
           val emptyCache = Cache.empty
 
@@ -103,15 +114,19 @@ class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Inj
             .withFormUrlEncodedBody("hasAccepted" -> "true")
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
-            .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel), hasAccepted = true)))))
+            .thenReturn(
+              Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(ytpModel), hasAccepted = true))))
+            )
 
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(1)(newRequest)
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
+          )
         }
       }
     }

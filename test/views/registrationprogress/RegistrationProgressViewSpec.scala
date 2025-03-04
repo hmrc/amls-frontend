@@ -27,8 +27,8 @@ import views.html.registrationprogress._
 class RegistrationProgressViewSpec extends AmlsViewSpec with MockitoSugar with AddressGenerator {
 
   lazy val registration_progress = app.injector.instanceOf[RegistrationProgressView]
-  val businessName = "BusinessName"
-  val serviceNames = Seq("Service 1", "Service 2", "Service 3")
+  val businessName               = "BusinessName"
+  val serviceNames               = Seq("Service 1", "Service 2", "Service 3")
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
@@ -38,10 +38,16 @@ class RegistrationProgressViewSpec extends AmlsViewSpec with MockitoSugar with A
     )
 
     val taskList = TaskList(
-      Seq(TaskRow(
-        "section1", "/foo", true, Completed, TaskRow.completedTag
+      Seq(
+        TaskRow(
+          "section1",
+          "/foo",
+          true,
+          Completed,
+          TaskRow.completedTag
+        )
       )
-    ))
+    )
   }
 
   "The registration progress view" must {
@@ -49,8 +55,10 @@ class RegistrationProgressViewSpec extends AmlsViewSpec with MockitoSugar with A
 
       def view = registration_progress(taskList, true, "biz name", Seq.empty[String], true)
 
-      doc.title must be(messages("progress.title") + " - " +
-        messages("title.amls") + " - " + messages("title.gov"))
+      doc.title    must be(
+        messages("progress.title") + " - " +
+          messages("title.amls") + " - " + messages("title.gov")
+      )
       heading.html must be(messages("progress.title"))
 
       doc.getElementsByClass("govuk-summary-list__key").get(0).text() must include("Your business")
@@ -81,7 +89,8 @@ class RegistrationProgressViewSpec extends AmlsViewSpec with MockitoSugar with A
         serviceNames = serviceNames,
         canEditPreApplication = true,
         hasCompleteNominatedOfficer = true,
-        nominatedOfficerName = Some(officerName))
+        nominatedOfficerName = Some(officerName)
+      )
 
       val element = doc.getElementsByClass("govuk-summary-list__row").get(1).text()
 
@@ -97,7 +106,8 @@ class RegistrationProgressViewSpec extends AmlsViewSpec with MockitoSugar with A
         serviceNames = serviceNames,
         canEditPreApplication = true,
         hasCompleteNominatedOfficer = false,
-        nominatedOfficerName = None)
+        nominatedOfficerName = None
+      )
 
       val element = Option(doc.getElementById("nominated-officer"))
 

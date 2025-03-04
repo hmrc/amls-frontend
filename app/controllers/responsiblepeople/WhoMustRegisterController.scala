@@ -22,13 +22,14 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
 import views.html.responsiblepeople.WhoMustRegisterView
 
-class WhoMustRegisterController @Inject () (
-                                             authAction: AuthAction,
-                                             val ds: CommonPlayDependencies,
-                                             val cc: MessagesControllerComponents,
-                                             view: WhoMustRegisterView) extends AmlsBaseController(ds, cc) {
+class WhoMustRegisterController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  view: WhoMustRegisterView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(index : Int, flow: Option[String] = None): Action[AnyContent] = authAction {
-    implicit request => Ok(view(index, flow))
+  def get(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction { implicit request =>
+    Ok(view(index, flow))
   }
 }

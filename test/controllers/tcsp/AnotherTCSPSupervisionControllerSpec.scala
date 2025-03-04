@@ -29,10 +29,12 @@ import views.html.tcsp.AnotherTCSPSupervisionView
 class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[AnotherTCSPSupervisionView]
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[AnotherTCSPSupervisionView]
     val controller = new AnotherTCSPSupervisionController(
-      SuccessfulAuthAction, ds = commonDependencies,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       cc = mockMcc,
       formProvider = inject[AnotherTCSPSupervisionFormProvider],
@@ -81,13 +83,13 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar wi
 
             val newRequest = FakeRequest(POST, routes.AnotherTCSPSupervisionController.post().url)
               .withFormUrlEncodedBody(
-              "servicesOfAnotherTCSP" -> "true",
-              "mlrRefNumber" -> "12345678"
-            )
+                "servicesOfAnotherTCSP" -> "true",
+                "mlrRefNumber"          -> "12345678"
+              )
 
             val result = controller.post()(newRequest)
 
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.SummaryController.get().url))
           }
 
@@ -98,13 +100,13 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar wi
 
             val newRequest = FakeRequest(POST, routes.AnotherTCSPSupervisionController.post(true).url)
               .withFormUrlEncodedBody(
-              "servicesOfAnotherTCSP" -> "true",
-              "mlrRefNumber" -> "12345678"
-            )
+                "servicesOfAnotherTCSP" -> "true",
+                "mlrRefNumber"          -> "12345678"
+              )
 
             val result = controller.post(true)(newRequest)
 
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.SummaryController.get().url))
           }
         }

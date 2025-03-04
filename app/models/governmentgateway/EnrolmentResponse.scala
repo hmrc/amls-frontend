@@ -19,11 +19,11 @@ package models.governmentgateway
 import play.api.libs.json.{Json, OFormat}
 
 case class EnrolmentResponse(
-                       serviceName: String,
-                       state: String,
-                       friendlyName: String,
-                       identifiersForDisplay: Seq[Identifier]
-                       )
+  serviceName: String,
+  state: String,
+  friendlyName: String,
+  identifiersForDisplay: Seq[Identifier]
+)
 
 object EnrolmentResponse {
   implicit val format: OFormat[EnrolmentResponse] = Json.format[EnrolmentResponse]

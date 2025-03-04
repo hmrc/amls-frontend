@@ -25,9 +25,9 @@ class KnownByFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val formProvider = new KnownByFormProvider()
 
-  val form: Form[KnownBy] = formProvider()
+  val form: Form[KnownBy]      = formProvider()
   val booleanFieldName: String = "hasOtherNames"
-  val stringFieldName: String = "otherNames"
+  val stringFieldName: String  = "otherNames"
 
   "KnownByFormProvider" must {
 
@@ -36,11 +36,12 @@ class KnownByFormProviderSpec extends StringFieldBehaviours with Constraints {
       "true is submitted with other names" in {
 
         forAll(stringsShorterThan(formProvider.length).suchThat(_.nonEmpty)) { name =>
-
-          val result = form.bind(Map(
-            booleanFieldName -> "true",
-            stringFieldName -> name
-          ))
+          val result = form.bind(
+            Map(
+              booleanFieldName -> "true",
+              stringFieldName  -> name
+            )
+          )
 
           result.value shouldBe Some(KnownBy(Some(true), Some(name)))
           assert(result.errors.isEmpty)
@@ -49,9 +50,11 @@ class KnownByFormProviderSpec extends StringFieldBehaviours with Constraints {
 
       "false is submitted" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> "false"
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> "false"
+          )
+        )
 
         result.value shouldBe Some(KnownBy(Some(false), None))
         assert(result.errors.isEmpty)
@@ -63,58 +66,69 @@ class KnownByFormProviderSpec extends StringFieldBehaviours with Constraints {
       s"$booleanFieldName is an invalid value" in {
 
         forAll(alphaStringsShorterThan(formProvider.length).suchThat(_.nonEmpty)) { name =>
+          val result = form.bind(
+            Map(
+              booleanFieldName -> name
+            )
+          )
 
-          val result = form.bind(Map(
-            booleanFieldName -> name
-          ))
-
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(booleanFieldName, "error.required.rp.hasOtherNames"))
         }
       }
 
       s"$booleanFieldName is empty" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(booleanFieldName, "error.required.rp.hasOtherNames"))
       }
 
       s"$stringFieldName is empty when $booleanFieldName is true" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> "true",
-          stringFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> "true",
+            stringFieldName  -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(stringFieldName, "error.required.rp.otherNames"))
       }
 
       s"$stringFieldName is longer than ${formProvider.length} when $booleanFieldName is true" in {
 
         forAll(stringsLongerThan(formProvider.length).suchThat(_.nonEmpty)) { name =>
-          val result = form.bind(Map(
-            booleanFieldName -> "true",
-            stringFieldName -> name
-          ))
+          val result = form.bind(
+            Map(
+              booleanFieldName -> "true",
+              stringFieldName  -> name
+            )
+          )
 
-          result.value shouldBe None
-          result.errors shouldBe Seq(FormError(stringFieldName, "error.invalid.rp.maxlength.140", Seq(formProvider.length)))
+          result.value  shouldBe None
+          result.errors shouldBe Seq(
+            FormError(stringFieldName, "error.invalid.rp.maxlength.140", Seq(formProvider.length))
+          )
         }
       }
 
       s"$stringFieldName violates regex when $booleanFieldName is true" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> "true",
-          stringFieldName -> "§±@*(&%!£"
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> "true",
+            stringFieldName  -> "§±@*(&%!£"
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(stringFieldName, "error.invalid.rp.char", Seq(basicPunctuationRegex)))
       }
     }

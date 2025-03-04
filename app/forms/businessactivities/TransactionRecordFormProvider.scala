@@ -21,9 +21,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class TransactionRecordFormProvider @Inject()() extends Mappings {
+class TransactionRecordFormProvider @Inject() () extends Mappings {
 
-  private val errorMessage = "error.required.ba.select.transaction.record"
+  private val errorMessage   = "error.required.ba.select.transaction.record"
   def apply(): Form[Boolean] = Form[Boolean](
     "isRecorded" -> boolean(errorMessage, errorMessage)
   )

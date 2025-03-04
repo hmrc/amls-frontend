@@ -24,18 +24,18 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class PersonUKPassportFormProvider @Inject()() extends Mappings {
+class PersonUKPassportFormProvider @Inject() () extends Mappings {
 
   private val booleanFieldName = "ukPassport"
-  private val booleanError = "error.required.uk.passport"
-  private val lengthError = "error.invalid.uk.passport.length.9"
+  private val booleanError     = "error.required.uk.passport"
+  private val lengthError      = "error.invalid.uk.passport.length.9"
 
   private val regex = "^[0-9]{9}$"
-  val length = 9
+  val length        = 9
 
   def apply(): Form[UKPassport] = Form[UKPassport](
     mapping(
-      booleanFieldName -> boolean(booleanError, booleanError),
+      booleanFieldName   -> boolean(booleanError, booleanError),
       "ukPassportNumber" -> mandatoryIfTrue(
         booleanFieldName,
         textAllowWhitespace(s"$booleanError.number")
@@ -50,15 +50,15 @@ class PersonUKPassportFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  private def apply(ukPassport: Boolean, ukPassportNumber: Option[String]): UKPassport = (ukPassport, ukPassportNumber) match {
-    case (true, Some(number)) => UKPassportYes(number)
-    case (false, None) => UKPassportNo
-    case _ => throw new IllegalArgumentException(s"Invalid combination of answers")
-  }
-
+  private def apply(ukPassport: Boolean, ukPassportNumber: Option[String]): UKPassport =
+    (ukPassport, ukPassportNumber) match {
+      case (true, Some(number)) => UKPassportYes(number)
+      case (false, None)        => UKPassportNo
+      case _                    => throw new IllegalArgumentException(s"Invalid combination of answers")
+    }
 
   private def unapply(obj: UKPassport): Option[(Boolean, Option[String])] = obj match {
     case UKPassportYes(number) => Some((true, Some(number)))
-    case UKPassportNo => Some((false, None))
+    case UKPassportNo          => Some((false, None))
   }
 }

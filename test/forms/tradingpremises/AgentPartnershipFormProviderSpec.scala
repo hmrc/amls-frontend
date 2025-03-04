@@ -24,7 +24,7 @@ import play.api.data.{Form, FormError}
 class AgentPartnershipFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val formProvider: AgentPartnershipFormProvider = new AgentPartnershipFormProvider()
-  val form: Form[AgentPartnership] = formProvider()
+  val form: Form[AgentPartnership]               = formProvider()
 
   val fieldName = "agentPartnership"
 
@@ -53,13 +53,16 @@ class AgentPartnershipFormProviderSpec extends StringFieldBehaviours with Constr
 
       "fail to bind strings with special characters" in {
 
-        forAll(alphaStringsShorterThan(formProvider.length).suchThat(_.nonEmpty), invalidCharForNames) { (str, invalidStr) =>
-          val result = form.bind(Map(fieldName -> (str + invalidStr)))
+        forAll(alphaStringsShorterThan(formProvider.length).suchThat(_.nonEmpty), invalidCharForNames) {
+          (str, invalidStr) =>
+            val result = form.bind(Map(fieldName -> (str + invalidStr)))
 
-          result.value shouldBe None
-          result.error(fieldName).value shouldBe FormError(
-            fieldName, "error.char.tp.agent.partnership", Seq(basicPunctuationRegex)
-          )
+            result.value                  shouldBe None
+            result.error(fieldName).value shouldBe FormError(
+              fieldName,
+              "error.char.tp.agent.partnership",
+              Seq(basicPunctuationRegex)
+            )
         }
       }
     }

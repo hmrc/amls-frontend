@@ -33,26 +33,18 @@ import views.html.bankdetails.WhatYouNeedView
 
 import scala.concurrent.Future
 
-class WhatYouNeedControllerSpec
-  extends AmlsSpec
-    with ScalaFutures
-    with TitleValidator
-    with BankDetailsGenerator {
+class WhatYouNeedControllerSpec extends AmlsSpec with ScalaFutures with TitleValidator with BankDetailsGenerator {
 
   trait Fixture extends DependencyMocks {
     self =>
     val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
-    lazy val whatYouNeed: WhatYouNeedView = app.injector.instanceOf[WhatYouNeedView]
+    lazy val whatYouNeed: WhatYouNeedView        = app.injector.instanceOf[WhatYouNeedView]
 
-    val controller = new WhatYouNeedController(SuccessfulAuthAction,
-      commonDependencies,
-      mockCacheConnector,
-      mockMcc,
-      whatYouNeed)
+    val controller =
+      new WhatYouNeedController(SuccessfulAuthAction, commonDependencies, mockCacheConnector, mockMcc, whatYouNeed)
 
-    def assertHref(url: String)(implicit doc: Document): Assertion = {
+    def assertHref(url: String)(implicit doc: Document): Assertion =
       doc.getElementById("button").attr("href") mustBe url
-    }
   }
 
   "The GET action" must {
@@ -70,7 +62,7 @@ class WhatYouNeedControllerSpec
     }
 
     "remove the itemIndex from session if there was one present" in new Fixture {
-      override val request: Request[AnyContentAsEmpty.type] = addTokenWithSessionParam(authRequest)(("itemIndex" -> "4"))
+      override val request: Request[AnyContentAsEmpty.type] = addTokenWithSessionParam(authRequest)("itemIndex" -> "4")
 
       mockCacheFetch(Gen.listOfN(3, bankDetailsGen).sample, Some(BankDetails.key))
 
@@ -79,7 +71,6 @@ class WhatYouNeedControllerSpec
       status(result) must be(OK)
       session(result).get("itemIndex") mustBe None
     }
-
 
     "configure the link href correctly," which {
       "should link to the 'has bank accounts' page" when {

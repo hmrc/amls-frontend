@@ -26,7 +26,7 @@ class SupervisionEndSpec extends PlaySpec with MockitoSugar {
   trait Fixture {
 
     val startDateField = Map("extraStartDate" -> Seq("2000-01-01"))
-    val end = LocalDate.of(2005, 2, 24)//scalastyle:off magic.number
+    val end            = LocalDate.of(2005, 2, 24) // scalastyle:off magic.number
   }
 
   "Json read and writes" must {
@@ -42,13 +42,11 @@ class SupervisionEndSpec extends PlaySpec with MockitoSugar {
 
     "Deserialise SupervisionEnd as expected" in new Fixture {
 
-      val input = Json.obj(
-        "anotherBody" -> true,
-        "supervisionEndDate" -> "2005-02-24")
+      val input = Json.obj("anotherBody" -> true, "supervisionEndDate" -> "2005-02-24")
 
       val expected = SupervisionEnd(end)
 
-      Json.fromJson[SupervisionEnd](input) must be (JsSuccess(expected, JsPath \ "supervisionEndDate"))
+      Json.fromJson[SupervisionEnd](input) must be(JsSuccess(expected, JsPath \ "supervisionEndDate"))
     }
 
     "fail when data is missing" in {

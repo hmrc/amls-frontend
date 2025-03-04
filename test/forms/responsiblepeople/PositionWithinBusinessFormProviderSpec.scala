@@ -22,20 +22,27 @@ import models.responsiblepeople.{Other, PositionWithinBusiness}
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
-class PositionWithinBusinessFormProviderSpec extends CheckboxFieldBehaviours with StringFieldBehaviours with Constraints {
+class PositionWithinBusinessFormProviderSpec
+    extends CheckboxFieldBehaviours
+    with StringFieldBehaviours
+    with Constraints {
 
   val formProvider = new PositionWithinBusinessFormProvider()
 
   val form: Form[Set[PositionWithinBusiness]] = formProvider()
 
   val checkboxFieldName = "positions"
-  val textFieldName = "otherPosition"
+  val textFieldName     = "otherPosition"
 
   "PositionWithinBusinessFormProvider" when {
 
     s"$checkboxFieldName is evaluated" must {
 
-      behave like fieldThatBindsValidData(form, checkboxFieldName, Gen.oneOf(PositionWithinBusiness.all.map(_.toString)))
+      behave like fieldThatBindsValidData(
+        form,
+        checkboxFieldName,
+        Gen.oneOf(PositionWithinBusiness.all.map(_.toString))
+      )
 
       behave like checkboxFieldWithWrapper[PositionWithinBusiness, Set[PositionWithinBusiness]](
         form,
@@ -52,16 +59,20 @@ class PositionWithinBusinessFormProviderSpec extends CheckboxFieldBehaviours wit
     s"$textFieldName is evaluated" must {
 
       behave like fieldThatBindsValidData(
-        form, textFieldName, stringsShorterThan(formProvider.length).suchThat(_.nonEmpty)
+        form,
+        textFieldName,
+        stringsShorterThan(formProvider.length).suchThat(_.nonEmpty)
       )
 
       s"bind when Other is selected and $textFieldName is populated" in {
 
         forAll(stringsShorterThan(formProvider.length).suchThat(_.nonEmpty)) { other =>
-          val result = form.bind(Map(
-            s"$checkboxFieldName[0]" -> Other("").toString,
-            textFieldName -> other
-          ))
+          val result = form.bind(
+            Map(
+              s"$checkboxFieldName[0]" -> Other("").toString,
+              textFieldName            -> other
+            )
+          )
 
           result.value shouldBe Some(Set(Other(other)))
           assert(result.errors.isEmpty)
@@ -72,12 +83,14 @@ class PositionWithinBusinessFormProviderSpec extends CheckboxFieldBehaviours wit
 
         s"Other is selected but $textFieldName is empty" in {
 
-          val result = form.bind(Map(
-            s"$checkboxFieldName[0]" -> Other("").toString,
-            textFieldName -> ""
-          ))
+          val result = form.bind(
+            Map(
+              s"$checkboxFieldName[0]" -> Other("").toString,
+              textFieldName            -> ""
+            )
+          )
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(
             FormError(textFieldName, "responsiblepeople.position_within_business.other_position.othermissing")
           )
@@ -86,15 +99,19 @@ class PositionWithinBusinessFormProviderSpec extends CheckboxFieldBehaviours wit
         s"Other is selected but $textFieldName is longer than ${formProvider.length}" in {
 
           forAll(stringsLongerThan(formProvider.length).suchThat(_.nonEmpty)) { invalid =>
-            val result = form.bind(Map(
-              s"$checkboxFieldName[0]" -> Other("").toString,
-              textFieldName -> invalid
-            ))
+            val result = form.bind(
+              Map(
+                s"$checkboxFieldName[0]" -> Other("").toString,
+                textFieldName            -> invalid
+              )
+            )
 
-            result.value shouldBe None
+            result.value  shouldBe None
             result.errors shouldBe Seq(
               FormError(
-                textFieldName, "error.invalid.rp.position_within_business.other_position.maxlength.255", Seq(formProvider.length)
+                textFieldName,
+                "error.invalid.rp.position_within_business.other_position.maxlength.255",
+                Seq(formProvider.length)
               )
             )
           }
@@ -103,15 +120,19 @@ class PositionWithinBusinessFormProviderSpec extends CheckboxFieldBehaviours wit
         s"Other is selected but $textFieldName violates regex" in {
 
           forAll(invalidCharForNames.suchThat(_.nonEmpty)) { invalid =>
-            val result = form.bind(Map(
-              s"$checkboxFieldName[0]" -> Other("").toString,
-              textFieldName -> invalid
-            ))
+            val result = form.bind(
+              Map(
+                s"$checkboxFieldName[0]" -> Other("").toString,
+                textFieldName            -> invalid
+              )
+            )
 
-            result.value shouldBe None
+            result.value  shouldBe None
             result.errors shouldBe Seq(
               FormError(
-                textFieldName, "error.invalid.rp.position_within_business.other_position", Seq(basicPunctuationRegex)
+                textFieldName,
+                "error.invalid.rp.position_within_business.other_position",
+                Seq(basicPunctuationRegex)
               )
             )
           }

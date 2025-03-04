@@ -16,6 +16,4 @@
 
 package models.businessmatching.updateservice
 
-class HaveAllPassedFitAndProperSpec {
-
-}
+class HaveAllPassedFitAndProperSpec {}

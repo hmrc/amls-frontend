@@ -24,13 +24,12 @@ import play.api.inject.guice.GuiceApplicationBuilder
 
 class ReturnNameValuePairSpec extends PlaySpec with GuiceOneAppPerSuite {
 
-  override def fakeApplication(): Application = {
+  override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .configure(
         "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
       )
       .build()
-  }
 
   "The ReturnLocation model" must {
     "correctly determine the absolute url based on the current request" when {

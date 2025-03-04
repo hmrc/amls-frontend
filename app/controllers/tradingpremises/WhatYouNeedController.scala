@@ -28,35 +28,37 @@ import play.api.Logging
 import views.html.tradingpremises.WhatYouNeedView
 
 @Singleton
-class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                      val authAction: AuthAction,
-                                      val ds: CommonPlayDependencies,
-                                      val cc: MessagesControllerComponents,
-                                      view: WhatYouNeedView) extends AmlsBaseController(ds, cc) with Logging {
+class WhatYouNeedController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  view: WhatYouNeedView
+) extends AmlsBaseController(ds, cc)
+    with Logging {
 
-  def get(index: Int): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
-        (for {
-          bm <- businessMatching
-          ba <- bm.activities
-        } yield {
+  def get(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
+      (for {
+        bm <- businessMatching
+        ba <- bm.activities
+      } yield {
 
-          val call = if (ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness)) {
-            controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index)
+        val call = if (ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness)) {
+          controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index)
+        } else {
+          if (index == 1) {
+            controllers.tradingpremises.routes.ConfirmAddressController.get(index)
           } else {
-            if(index == 1) {
-              controllers.tradingpremises.routes.ConfirmAddressController.get(index)
-            } else {
-              controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index)
-            }
+            controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index)
           }
-
-          Ok(view(call, index, Some(ba), bm.msbServices))
-      }).getOrElse {
-          logger.warn("Unable to retrieve business activities in [tradingpremises][WhatYouNeedController]")
-          throw new Exception("Unable to retrieve business activities in [tradingpremises][WhatYouNeedController]")
         }
+
+        Ok(view(call, index, Some(ba), bm.msbServices))
+      }).getOrElse {
+        logger.warn("Unable to retrieve business activities in [tradingpremises][WhatYouNeedController]")
+        throw new Exception("Unable to retrieve business activities in [tradingpremises][WhatYouNeedController]")
+      }
     }
   }
 }

@@ -26,21 +26,19 @@ import utils.Strings.TextHelpers
 import scala.jdk.CollectionConverters._
 
 trait ParagraphHelpers extends Matchers {
-  def validateParagraphizedContent(messageKey: String)(implicit messages: Messages, doc: Document): Unit = {
-    for(p <- Jsoup.parse(messages(messageKey).paragraphize).getElementsByTag("p").asScala) {
+  def validateParagraphizedContent(messageKey: String)(implicit messages: Messages, doc: Document): Unit =
+    for (p <- Jsoup.parse(messages(messageKey).paragraphize).getElementsByTag("p").asScala)
       doc.body().toString must include(p.text())
-    }
-  }
 }
 
 trait Fixture extends Matchers with ParagraphHelpers with TitleValidator {
 
   def view: HtmlFormat.Appendable
-  lazy val html = view.body
+  lazy val html                   = view.body
   implicit lazy val doc: Document = Jsoup.parse(html)
-  lazy val form = doc.getElementsByTag("form").first()
-  lazy val heading = doc.getElementsByTag("h1").first()
-  lazy val caption = doc.getElementById("stage-caption")
-  lazy val subHeading = doc.getElementsByClass("heading-secondary").first()
-  lazy val errorSummary = doc.getElementsByClass("amls-error-summary").first()
+  lazy val form                   = doc.getElementsByTag("form").first()
+  lazy val heading                = doc.getElementsByTag("h1").first()
+  lazy val caption                = doc.getElementById("stage-caption")
+  lazy val subHeading             = doc.getElementsByClass("heading-secondary").first()
+  lazy val errorSummary           = doc.getElementsByClass("amls-error-summary").first()
 }

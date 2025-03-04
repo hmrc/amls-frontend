@@ -23,12 +23,14 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
 import views.html.asp.WhatYouNeedView
 
-class WhatYouNeedController @Inject()(authAction: AuthAction,
-                                      val ds: CommonPlayDependencies,
-                                      val cc: MessagesControllerComponents,
-                                      view: WhatYouNeedView) extends AmlsBaseController(ds, cc) {
+class WhatYouNeedController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  view: WhatYouNeedView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction {
-      implicit request => Ok(view(controllers.asp.routes.ServicesOfBusinessController.get()))
+  def get: Action[AnyContent] = authAction { implicit request =>
+    Ok(view(controllers.asp.routes.ServicesOfBusinessController.get()))
   }
 }

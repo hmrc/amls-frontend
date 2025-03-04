@@ -22,17 +22,18 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class MemberOfProfessionalBodyFormProvider @Inject()() extends BooleanFormProvider {
+class MemberOfProfessionalBodyFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[ProfessionalBodyMember] = createForm[ProfessionalBodyMember](
-    "isAMember", "error.required.supervision.business.a.member"
+    "isAMember",
+    "error.required.supervision.business.a.member"
   )(apply, unapply)
 
   private def apply(boolean: Boolean): ProfessionalBodyMember =
-    if(boolean) ProfessionalBodyMemberYes else ProfessionalBodyMemberNo
+    if (boolean) ProfessionalBodyMemberYes else ProfessionalBodyMemberNo
 
   private def unapply(obj: ProfessionalBodyMember): Boolean = obj match {
     case ProfessionalBodyMemberYes => true
-    case ProfessionalBodyMemberNo => false
+    case ProfessionalBodyMemberNo  => false
   }
 }

@@ -29,11 +29,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
 
   lazy val cyaHelper: CheckYourAnswersHelper = app.injector.instanceOf[CheckYourAnswersHelper]
 
-  val now = LocalDate.now()
+  val now       = LocalDate.now()
   val startDate = now.minusYears(5)
-  val vatNo = "946185"
-  val phoneNo = "07174625489"
-  val email = "test@email.com"
+  val vatNo     = "946185"
+  val phoneNo   = "07174625489"
+  val email     = "test@email.com"
 
   val model = BusinessDetails(
     Some(PreviouslyRegisteredYes(Some("19462729"))),
@@ -42,15 +42,34 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
     Some(CorporationTaxRegisteredYes("FJIEI284791862S")),
     Some(ContactingYou(Some(phoneNo), Some(email))),
     Some(RegisteredOfficeIsUK(true)),
-    Some(RegisteredOfficeUK(
-      "Line 1", Some("Line 2"), Some("Line 3"), Some("Line 4"), "AG1 3RE", Some(DateOfChange(now.minusYears(1)))
-    )),
+    Some(
+      RegisteredOfficeUK(
+        "Line 1",
+        Some("Line 2"),
+        Some("Line 3"),
+        Some("Line 4"),
+        "AG1 3RE",
+        Some(DateOfChange(now.minusYears(1)))
+      )
+    ),
     Some(true),
     Some(CorrespondenceAddressIsUk(true)),
-    Some(CorrespondenceAddress(
-      Some(CorrespondenceAddressUk("John Smith", "Big Corp", "Line A", Some("Line B"), Some("Line C"), Some("Line D"), "UE3 5DQ")),
-      None
-    ))
+    Some(
+      CorrespondenceAddress(
+        Some(
+          CorrespondenceAddressUk(
+            "John Smith",
+            "Big Corp",
+            "Line A",
+            Some("Line B"),
+            Some("Line C"),
+            Some("Line D"),
+            "UE3 5DQ"
+          )
+        ),
+        None
+      )
+    )
   )
 
   trait RowFixture {
@@ -100,9 +119,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
         "answer is false and showRegisteredForMLR is true" in new RowFixture {
 
           override val summaryListRows: Seq[SummaryListRow] =
-            cyaHelper.createSummaryList(
-              model.copy(previouslyRegistered = Some(PreviouslyRegisteredNo)), true
-            ).rows
+            cyaHelper
+              .createSummaryList(
+                model.copy(previouslyRegistered = Some(PreviouslyRegisteredNo)),
+                true
+              )
+              .rows
 
           assertRowMatches(
             0,
@@ -123,13 +145,17 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
           row(
             "businessdetails.registeredformlr.title",
             booleanToLabel(true),
-            Some(Actions(
-              items = Seq(ActionItem(
-                controllers.businessdetails.routes.PreviouslyRegisteredController.get(true).url,
-                Text(messages("button.edit")),
-                attributes = Map("id" -> "businessdetailsregform-edit")
-              ))
-            ))
+            Some(
+              Actions(
+                items = Seq(
+                  ActionItem(
+                    controllers.businessdetails.routes.PreviouslyRegisteredController.get(true).url,
+                    Text(messages("button.edit")),
+                    attributes = Map("id" -> "businessdetailsregform-edit")
+                  )
+                )
+              )
+            )
           )
         )
       }
@@ -216,12 +242,23 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
           val address = Seq("line1", "line2", "line3", "line4", "United States")
 
           override val summaryListRows: Seq[SummaryListRow] =
-            cyaHelper.createSummaryList(
-              model.copy(registeredOffice = Some(RegisteredOfficeNonUK(
-                address(0), Some(address(1)), Some(address(2)), Some(address(3)), Country(address(4), "US"), None
-              ))),
-              true
-            ).rows
+            cyaHelper
+              .createSummaryList(
+                model.copy(registeredOffice =
+                  Some(
+                    RegisteredOfficeNonUK(
+                      address(0),
+                      Some(address(1)),
+                      Some(address(2)),
+                      Some(address(3)),
+                      Country(address(4), "US"),
+                      None
+                    )
+                  )
+                ),
+                true
+              )
+              .rows
 
           assertRowMatches(
             4,
@@ -318,13 +355,22 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
         "answer is yes and address is not in the UK" in new RowFixture {
 
           val nonUkAddress = CorrespondenceAddressNonUk(
-            "Ben Jones", "Business Ltd", "123 Street", Some("Test Lane"), None, None, Country("United States", "US")
+            "Ben Jones",
+            "Business Ltd",
+            "123 Street",
+            Some("Test Lane"),
+            None,
+            None,
+            Country("United States", "US")
           )
 
           override val summaryListRows: Seq[SummaryListRow] =
-            cyaHelper.createSummaryList(model.copy(correspondenceAddress =
-              Some(CorrespondenceAddress(None, Some(nonUkAddress)))), true
-            ).rows
+            cyaHelper
+              .createSummaryList(
+                model.copy(correspondenceAddress = Some(CorrespondenceAddress(None, Some(nonUkAddress)))),
+                true
+              )
+              .rows
 
           assertRowMatches(
             8,

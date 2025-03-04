@@ -41,8 +41,8 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
   trait Fixture extends DependencyMocks { self =>
 
     val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
-    val mockSectionsProvider: SectionsProvider = mock[SectionsProvider]
-    val renewalService = mock[RenewalService]
+    val mockSectionsProvider: SectionsProvider   = mock[SectionsProvider]
+    val renewalService                           = mock[RenewalService]
     when(renewalService.isRenewalFlow(any(), any(), any())(any(), any())).thenReturn(Future.successful(false))
 
     lazy val controller = new WhoIsTheBusinessNominatedOfficerController(
@@ -60,20 +60,20 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
   "WhoIsTheBusinessNominatedOfficerController" must {
 
-    val personName = PersonName("firstName", Some("middleName"), "lastName")
-    val personName1 = PersonName("firstName1", Some("middleName1"), "lastName1")
-    val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(LocalDate.now())))
-    val rp = ResponsiblePerson (
+    val personName         = PersonName("firstName", Some("middleName"), "lastName")
+    val personName1        = PersonName("firstName1", Some("middleName1"), "lastName1")
+    val positions          = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(LocalDate.now())))
+    val rp                 = ResponsiblePerson(
       personName = Some(personName),
       positions = Some(positions),
       status = None
     )
-    val rp2 = ResponsiblePerson (
+    val rp2                = ResponsiblePerson(
       personName = Some(personName1),
       positions = Some(positions),
       status = None
     )
-    val rp1 = ResponsiblePerson(
+    val rp1                = ResponsiblePerson(
       personName = Some(personName),
       positions = Some(positions),
       status = Some(StatusConstants.Deleted)
@@ -177,37 +177,45 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
         "selected option is a valid responsible person in amendment mode" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
-          .withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
+              .withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
-          val updatedList: Seq[ResponsiblePerson] = Seq(rp.copy(
-            positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
-          ), rp2)
+          val updatedList: Seq[ResponsiblePerson] = Seq(
+            rp.copy(
+              positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
+            ),
+            rp2
+          )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
           mockApplicationStatus(SubmissionDecisionApproved)
           mockCacheSave[Option[Seq[ResponsiblePerson]]](Some(updatedList))
 
           val result: Future[Result] = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.WhoIsRegisteringController.get.url))
         }
 
         "selected option is a valid responsible person" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
-          .withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
+              .withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
-          val updatedList: Seq[ResponsiblePerson] = Seq(rp.copy(
-            positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
-          ), rp2)
+          val updatedList: Seq[ResponsiblePerson] = Seq(
+            rp.copy(
+              positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
+            ),
+            rp2
+          )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
           mockApplicationStatus(SubmissionReadyForReview)
           mockCacheSave[Option[Seq[ResponsiblePerson]]](Some(updatedList))
 
           val result: Future[Result] = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get.url))
         }
 
@@ -216,32 +224,39 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
     "successfully redirect to adding new responsible people .i.e what you need page of RP" when {
       "selected option is 'Register someone else'" in new Fixture {
-        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
-        .withFormUrlEncodedBody("value" -> "-1")
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+          FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
+            .withFormUrlEncodedBody("value" -> "-1")
 
         mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
         mockApplicationStatus(SubmissionReady)
 
         val result: Future[Result] = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(displayGuidance = true, Some(flowFromDeclaration)).url))
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(
+            controllers.responsiblepeople.routes.ResponsiblePeopleAddController
+              .get(displayGuidance = true, Some(flowFromDeclaration))
+              .url
+          )
+        )
       }
     }
 
     "fail validation" when {
       "no option is selected on the UI" in new Fixture {
-        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
-        .withFormUrlEncodedBody("" -> "")
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+          FakeRequest(POST, routes.WhoIsTheBusinessNominatedOfficerController.post().url)
+            .withFormUrlEncodedBody("" -> "")
 
         mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
         mockApplicationStatus(SubmissionReady)
 
         val result: Future[Result] = controller.post()(newRequest)
-        status(result) must be(BAD_REQUEST)
+        status(result)          must be(BAD_REQUEST)
         contentAsString(result) must include(messages("error.required.declaration.nominated.officer"))
       }
     }
   }
 
 }
-

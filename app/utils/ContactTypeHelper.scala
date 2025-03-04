@@ -25,16 +25,16 @@ object ContactTypeHelper {
   def getContactType(status: Option[Status], contactType: Option[ContactType], variation: Boolean): ContactType = {
 
     val statusReason = for {
-      st <- status
+      st     <- status
       reason <- st.statusReason
     } yield reason
 
     contactType.getOrElse(
       (status, statusReason, variation) match {
         case (Some(Status(Some(DeRegistered), _)), _, _) => DeRegistrationEffectiveDateChange
-        case (_, Some(_), _) => ApplicationAutorejectionForFailureToPay
-        case (_, _, true) => RegistrationVariationApproval
-        case _ => NoSubject
+        case (_, Some(_), _)                             => ApplicationAutorejectionForFailureToPay
+        case (_, _, true)                                => RegistrationVariationApproval
+        case _                                           => NoSubject
       }
     )
   }

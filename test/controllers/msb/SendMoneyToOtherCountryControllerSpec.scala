@@ -41,16 +41,17 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
-    lazy val view = inject[SendMoneyToOtherCountryView]
-    val controller = new SendMoneyToOtherCountryController(
+    val request                       = addToken(authRequest)
+    lazy val view                     = inject[SendMoneyToOtherCountryView]
+    val controller                    = new SendMoneyToOtherCountryController(
       mockCacheConnector,
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockStatusService,
       mockMcc,
       formProvider = inject[SendMoneyToOtherCountryFormProvider],
-      view = view)
+      view = view
+    )
     implicit val ec: ExecutionContext = inject[ExecutionContext]
 
     mockCacheGetEntry[ServiceChangeRegister](None, ServiceChangeRegister.key)
@@ -66,24 +67,24 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
 
     "load the page 'Do you send money to other countries?'" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any()))
+        .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("msb.send.money.title"))
     }
 
     "load the page 'Do you send money to other countries?' with pre populated data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(
-        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))))))
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())(any())).thenReturn(
+        Future.successful(Some(MoneyServiceBusiness(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)))))
+      )
 
-      val result = controller.get()(request)
+      val result   = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
 
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("msb.send.money.title"))
       document.select("input[name=money][checked]").`val` mustEqual "true"
     }
@@ -91,15 +92,17 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
     "Show error message when user has not filled the mandatory fields" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
-      .withFormUrlEncodedBody(
-      )
-
-      val msbServices = Some(BusinessMatchingMsbServices(
-        Set(
-          TransmittingMoney,
-          CurrencyExchange
+        .withFormUrlEncodedBody(
         )
-      ))
+
+      val msbServices = Some(
+        BusinessMatchingMsbServices(
+          Set(
+            TransmittingMoney,
+            CurrencyExchange
+          )
+        )
+      )
 
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(None)
@@ -107,11 +110,11 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
+      status(result)          must be(BAD_REQUEST)
       contentAsString(result) must include(messages("error.required.msb.send.money"))
 
     }
@@ -119,9 +122,9 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
     "on valid post where the value is true" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
-      .withFormUrlEncodedBody(
-        "money" -> "true"
-      )
+        .withFormUrlEncodedBody(
+          "money" -> "true"
+        )
 
       val incomingModel = MoneyServiceBusiness()
 
@@ -129,12 +132,14 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
         hasChanged = true
       )
-      val msbServices = Some(BusinessMatchingMsbServices(
-        Set(
-          TransmittingMoney,
-          CurrencyExchange
+      val msbServices   = Some(
+        BusinessMatchingMsbServices(
+          Set(
+            TransmittingMoney,
+            CurrencyExchange
+          )
         )
-      ))
+      )
       when(controller.dataCacheConnector.fetchAll(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
@@ -144,26 +149,29 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(
+        controller.dataCacheConnector
+          .save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any())
+      ).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get().url))
     }
 
     "on valid post where the value is false and was previously true" in new Fixture {
 
-      val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
-      .withFormUrlEncodedBody(
-        "money" -> "false"
-      )
-      val msbServices = Some(BusinessMatchingMsbServices(
-        Set(
-          TransmittingMoney
+      val newRequest  = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
+        .withFormUrlEncodedBody(
+          "money" -> "false"
         )
-      ))
+      val msbServices = Some(
+        BusinessMatchingMsbServices(
+          Set(
+            TransmittingMoney
+          )
+        )
+      )
 
       val incomingModel = MoneyServiceBusiness(
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
@@ -196,26 +204,30 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(
+        controller.dataCacheConnector
+          .save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any())
+      ).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(false)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "on valid post where the value is false (CE)" in new Fixture {
 
-      val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
-      .withFormUrlEncodedBody(
-        "money" -> "false"
-      )
-      val msbServices = Some(BusinessMatchingMsbServices(
-        Set(
-          TransmittingMoney,
-          CurrencyExchange
+      val newRequest  = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
+        .withFormUrlEncodedBody(
+          "money" -> "false"
         )
-      ))
+      val msbServices = Some(
+        BusinessMatchingMsbServices(
+          Set(
+            TransmittingMoney,
+            CurrencyExchange
+          )
+        )
+      )
 
       val incomingModel = MoneyServiceBusiness()
 
@@ -233,27 +245,30 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(
+        controller.dataCacheConnector
+          .save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any())
+      ).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(false)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.CurrencyExchangesInNext12MonthsController.get().url))
     }
 
     "on valid post where the value is false (FX)" in new Fixture {
-      val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
-      .withFormUrlEncodedBody("money" -> "false")
-      val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange, TransmittingMoney)))
+      val newRequest    = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
+        .withFormUrlEncodedBody("money" -> "false")
+      val msbServices   = Some(BusinessMatchingMsbServices(Set(ForeignExchange, TransmittingMoney)))
       val incomingModel = MoneyServiceBusiness()
 
       mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
       mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
       mockCacheSave[MoneyServiceBusiness]
 
-      mockCacheGetEntry[ServiceChangeRegister](Some(
-        ServiceChangeRegister(addedSubSectors = Some(Set(CurrencyExchange)))), ServiceChangeRegister.key)
+      mockCacheGetEntry[ServiceChangeRegister](
+        Some(ServiceChangeRegister(addedSubSectors = Some(Set(CurrencyExchange)))),
+        ServiceChangeRegister.key
+      )
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -262,9 +277,9 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
 
     "redirect to the CE transactions page" when {
       trait NotPreSubmissionCEFixture extends Fixture {
-        val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
-        .withFormUrlEncodedBody("money" -> "false")
-        val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
+        val newRequest    = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
+          .withFormUrlEncodedBody("money" -> "false")
+        val msbServices   = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
         val incomingModel = MoneyServiceBusiness()
 
         val outgoingModel = incomingModel.copy(
@@ -282,8 +297,10 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
       }
 
       "the application is not registered as Currency Exchange, but it has just been added to the application" in new NotPreSubmissionCEFixture {
-        mockCacheGetEntry[ServiceChangeRegister](Some(
-          ServiceChangeRegister(addedSubSectors = Some(Set(CurrencyExchange)))), ServiceChangeRegister.key)
+        mockCacheGetEntry[ServiceChangeRegister](
+          Some(ServiceChangeRegister(addedSubSectors = Some(Set(CurrencyExchange)))),
+          ServiceChangeRegister.key
+        )
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -291,8 +308,10 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
       }
 
       "MSB has just been added to the application with Currency Exchange, and we're not in pre-application mode" in new NotPreSubmissionCEFixture {
-        mockCacheGetEntry[ServiceChangeRegister](Some(
-          ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusinessActivity)))), ServiceChangeRegister.key)
+        mockCacheGetEntry[ServiceChangeRegister](
+          Some(ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusinessActivity)))),
+          ServiceChangeRegister.key
+        )
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -303,8 +322,10 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
         override val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
         mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
 
-        mockCacheGetEntry[ServiceChangeRegister](Some(
-          ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusinessActivity)))), ServiceChangeRegister.key)
+        mockCacheGetEntry[ServiceChangeRegister](
+          Some(ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusinessActivity)))),
+          ServiceChangeRegister.key
+        )
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -315,9 +336,9 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
 
     "redirect to the FX transactions page" when {
       trait NotPreSubmissionFXFixture extends Fixture {
-        val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
-        .withFormUrlEncodedBody("money" -> "false")
-        val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange, TransmittingMoney)))
+        val newRequest    = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
+          .withFormUrlEncodedBody("money" -> "false")
+        val msbServices   = Some(BusinessMatchingMsbServices(Set(ForeignExchange, TransmittingMoney)))
         val incomingModel = MoneyServiceBusiness()
 
         val outgoingModel = incomingModel.copy(
@@ -335,8 +356,10 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
       }
 
       "the application is not registered as Foreign Exchange, but it has just been added to the application" in new NotPreSubmissionFXFixture {
-        mockCacheGetEntry[ServiceChangeRegister](Some(
-          ServiceChangeRegister(addedSubSectors = Some(Set(ForeignExchange)))), ServiceChangeRegister.key)
+        mockCacheGetEntry[ServiceChangeRegister](
+          Some(ServiceChangeRegister(addedSubSectors = Some(Set(ForeignExchange)))),
+          ServiceChangeRegister.key
+        )
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -344,8 +367,10 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
       }
 
       "MSB has just been added to the application with Foreign Exchange, and we're not in pre-application mode" in new NotPreSubmissionFXFixture {
-        mockCacheGetEntry[ServiceChangeRegister](Some(
-          ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusinessActivity)))), ServiceChangeRegister.key)
+        mockCacheGetEntry[ServiceChangeRegister](
+          Some(ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusinessActivity)))),
+          ServiceChangeRegister.key
+        )
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -357,11 +382,9 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
     "redirect to the CETransactionsInNext12Months page" when {
       "the application is registered as Currency Exchange, but it has not just been added to the application" in new Fixture {
         val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
-        .withFormUrlEncodedBody("money" -> "false")
+          .withFormUrlEncodedBody("money" -> "false")
 
-        val msbServices = Some(BusinessMatchingMsbServices(
-          Set(TransmittingMoney,
-            CurrencyExchange)))
+        val msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange)))
 
         val incomingModel = MoneyServiceBusiness()
 
@@ -382,9 +405,9 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
     "on valid post where the value is false (Non-CE, Non-fx)" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
-      .withFormUrlEncodedBody(
-        "money" -> "false"
-      )
+        .withFormUrlEncodedBody(
+          "money" -> "false"
+        )
 
       val incomingModel = MoneyServiceBusiness()
 
@@ -392,7 +415,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
         hasChanged = true
       )
-      val msbServices = Some(
+      val msbServices   = Some(
         BusinessMatchingMsbServices(
           Set(
             TransmittingMoney
@@ -408,20 +431,22 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(
+        controller.dataCacheConnector
+          .save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any())
+      ).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(false)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "on valid post where the value is true in edit mode" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
-      .withFormUrlEncodedBody(
-        "money" -> "true"
-      )
+        .withFormUrlEncodedBody(
+          "money" -> "true"
+        )
 
       val incomingModel = MoneyServiceBusiness()
 
@@ -429,7 +454,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
         hasChanged = true
       )
-      val msbServices = Some(
+      val msbServices   = Some(
         BusinessMatchingMsbServices(
           Set(
             TransmittingMoney
@@ -445,19 +470,23 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(
+        controller.dataCacheConnector
+          .save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any())
+      ).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).url))
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(
+        Some(controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).url)
+      )
     }
 
     trait FalseInEditModeFixture extends Fixture {
-      val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
-      .withFormUrlEncodedBody(
-        "money" -> "false"
-      )
+      val newRequest    = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
+        .withFormUrlEncodedBody(
+          "money" -> "false"
+        )
       val incomingModel = MoneyServiceBusiness(
         hasChanged = true
       )
@@ -471,56 +500,58 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(
+        controller.dataCacheConnector
+          .save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any())
+      ).thenReturn(Future.successful(emptyCache))
     }
 
     "on valid post where the value is false in edit mode (CE)" in new FalseInEditModeFixture {
       val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "on valid post where the value is false in edit mode (CE, FX)" in new FalseInEditModeFixture {
       val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ForeignExchange)))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "on valid post where the value is false in edit mode (FX)" in new FalseInEditModeFixture {
       val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "on valid post where the value is false in edit mode (Non-CE, Non-FX)" in new FalseInEditModeFixture {
       val msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "throw exception when Msb services in Business Matching returns none" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url)
-      .withFormUrlEncodedBody(
-        "money" -> "false"
-      )
+        .withFormUrlEncodedBody(
+          "money" -> "false"
+        )
 
       val incomingModel = MoneyServiceBusiness()
 
@@ -538,12 +569,13 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any())).thenReturn(Future.successful(emptyCache))
-
+      when(
+        controller.dataCacheConnector
+          .save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any())
+      ).thenReturn(Future.successful(emptyCache))
 
       a[Exception] must be thrownBy {
-        ScalaFutures.whenReady(controller.post(true)(newRequest)) { x => x }
+        ScalaFutures.whenReady(controller.post(true)(newRequest))(x => x)
       }
     }
   }

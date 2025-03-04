@@ -21,8 +21,8 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class InvolvedInOtherFormProvider @Inject()() extends Mappings {
+class InvolvedInOtherFormProvider @Inject() () extends Mappings {
 
-  private val error = "error.required.renewal.ba.involved.in.other"
+  private val error          = "error.required.renewal.ba.involved.in.other"
   def apply(): Form[Boolean] = Form[Boolean]("involvedInOther" -> boolean(error, error))
 }

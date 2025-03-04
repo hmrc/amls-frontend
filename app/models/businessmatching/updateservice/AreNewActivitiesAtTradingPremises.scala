@@ -28,15 +28,16 @@ object AreNewActivitiesAtTradingPremises {
 
   implicit val jsonReads: Reads[AreNewActivitiesAtTradingPremises] =
     (__ \ "tradingPremisesNewActivities").read[Boolean] flatMap {
-      case true => (__ \ "businessActivities").read[BusinessActivity] map NewActivitiesAtTradingPremisesYes.apply
+      case true  => (__ \ "businessActivities").read[BusinessActivity] map NewActivitiesAtTradingPremisesYes.apply
       case false => Reads(_ => JsSuccess(NewActivitiesAtTradingPremisesNo))
     }
 
   implicit val jsonWrites: Writes[AreNewActivitiesAtTradingPremises] = Writes[AreNewActivitiesAtTradingPremises] {
-    case NewActivitiesAtTradingPremisesYes(value) => Json.obj(
-      "tradingPremisesNewActivities" -> true,
-      "businessActivities" -> value
-    )
-    case NewActivitiesAtTradingPremisesNo => Json.obj("tradingPremisesNewActivities" -> false)
+    case NewActivitiesAtTradingPremisesYes(value) =>
+      Json.obj(
+        "tradingPremisesNewActivities" -> true,
+        "businessActivities"           -> value
+      )
+    case NewActivitiesAtTradingPremisesNo         => Json.obj("tradingPremisesNewActivities" -> false)
   }
 }

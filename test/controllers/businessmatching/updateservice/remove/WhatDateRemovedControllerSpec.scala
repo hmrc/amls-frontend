@@ -33,10 +33,11 @@ class WhatDateRemovedControllerSpec extends AmlsSpec with Injecting {
   trait Fixture extends DependencyMocks {
     self =>
 
-    val request = addToken(authRequest)
-    lazy val view = inject[DateOfChangeView]
+    val request    = addToken(authRequest)
+    lazy val view  = inject[DateOfChangeView]
     val controller = new WhatDateRemovedController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[RemoveBusinessTypeFlowModel],
       cc = mockMcc,
@@ -53,7 +54,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec with Injecting {
         mockCacheFetch[RemoveBusinessTypeFlowModel](Some(RemoveBusinessTypeFlowModel()))
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)                               must be(OK)
         Jsoup.parse(contentAsString(result)).title() must include(messages("dateofchange.title"))
       }
 
@@ -70,46 +71,68 @@ class WhatDateRemovedControllerSpec extends AmlsSpec with Injecting {
 
         mockCacheFetch[RemoveBusinessTypeFlowModel](
           Some(RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today)))),
-          Some(RemoveBusinessTypeFlowModel.key))
+          Some(RemoveBusinessTypeFlowModel.key)
+        )
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).getElementById("dateOfChange.day").attr("value") mustBe today.getDayOfMonth.toString
-        Jsoup.parse(contentAsString(result)).getElementById("dateOfChange.month").attr("value") mustBe today.getMonthValue.toString
-        Jsoup.parse(contentAsString(result)).getElementById("dateOfChange.year").attr("value") mustBe today.getYear.toString
+        Jsoup
+          .parse(contentAsString(result))
+          .getElementById("dateOfChange.day")
+          .attr("value") mustBe today.getDayOfMonth.toString
+        Jsoup
+          .parse(contentAsString(result))
+          .getElementById("dateOfChange.month")
+          .attr("value") mustBe today.getMonthValue.toString
+        Jsoup
+          .parse(contentAsString(result))
+          .getElementById("dateOfChange.year")
+          .attr("value") mustBe today.getYear.toString
       }
     }
-
 
     "post is called" must {
       "redirect to next page" in new Fixture {
         val today = LocalDate.now
-        mockCacheUpdate(Some(RemoveBusinessTypeFlowModel.key), RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today))))
+        mockCacheUpdate(
+          Some(RemoveBusinessTypeFlowModel.key),
+          RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today)))
+        )
 
-        val result = controller.post()(FakeRequest(POST, routes.WhatDateRemovedController.post().url).withFormUrlEncodedBody(
-          "dateOfChange.day" -> today.getDayOfMonth.toString,
-          "dateOfChange.month" -> today.getMonthValue.toString,
-          "dateOfChange.year" -> today.getYear.toString
-        ))
+        val result = controller.post()(
+          FakeRequest(POST, routes.WhatDateRemovedController.post().url).withFormUrlEncodedBody(
+            "dateOfChange.day"   -> today.getDayOfMonth.toString,
+            "dateOfChange.month" -> today.getMonthValue.toString,
+            "dateOfChange.year"  -> today.getYear.toString
+          )
+        )
 
         status(result) mustBe SEE_OTHER
-     }
+      }
 
       "save the data to the flow model" in new Fixture {
         val today = LocalDate.now
-        mockCacheUpdate(Some(RemoveBusinessTypeFlowModel.key), RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today.minusDays(10)))))
+        mockCacheUpdate(
+          Some(RemoveBusinessTypeFlowModel.key),
+          RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today.minusDays(10))))
+        )
 
         await {
-          controller.post()(FakeRequest(POST, routes.WhatDateRemovedController.post().url).withFormUrlEncodedBody(
-            "dateOfChange.day" -> today.getDayOfMonth.toString,
-            "dateOfChange.month" -> today.getMonthValue.toString,
-            "dateOfChange.year" -> today.getYear.toString
-          ))
+          controller.post()(
+            FakeRequest(POST, routes.WhatDateRemovedController.post().url).withFormUrlEncodedBody(
+              "dateOfChange.day"   -> today.getDayOfMonth.toString,
+              "dateOfChange.month" -> today.getMonthValue.toString,
+              "dateOfChange.year"  -> today.getYear.toString
+            )
+          )
         }
 
-        controller.router.verify("internalId", WhatDateRemovedPageId, RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today))))
+        controller.router.verify(
+          "internalId",
+          WhatDateRemovedPageId,
+          RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today)))
+        )
       }
-
 
       "return badRequest" must {
         "on invalid request" in new Fixture {

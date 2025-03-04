@@ -32,36 +32,33 @@ trait DateOfChangeHelper extends Logging {
 
   object DateOfChangeRedirect {
 
-    val checkYourAnswers:String = "1"
-    val cashPayment:String = "2"
-    val howWillYouSellGoods:String = "3"
-    val exciseGoods: String = "4"
-    val exciseGoodsEdit: String = "5"
+    val checkYourAnswers: String    = "1"
+    val cashPayment: String         = "2"
+    val howWillYouSellGoods: String = "3"
+    val exciseGoods: String         = "4"
+    val exciseGoodsEdit: String     = "5"
 
-    def apply(key: String): DateOfChangeRedirect = {
+    def apply(key: String): DateOfChangeRedirect =
       key match {
-        case `checkYourAnswers` => DateOfChangeRedirect(routes.SummaryController.get)
-        case `cashPayment` => DateOfChangeRedirect(routes.CashPaymentController.get())
+        case `checkYourAnswers`    => DateOfChangeRedirect(routes.SummaryController.get)
+        case `cashPayment`         => DateOfChangeRedirect(routes.CashPaymentController.get())
         case `howWillYouSellGoods` => DateOfChangeRedirect(routes.HowWillYouSellGoodsController.get())
-        case `exciseGoods` => DateOfChangeRedirect(routes.ExciseGoodsController.get())
-        case `exciseGoodsEdit` => DateOfChangeRedirect(routes.ExciseGoodsController.get(true))
-        case _ =>
+        case `exciseGoods`         => DateOfChangeRedirect(routes.ExciseGoodsController.get())
+        case `exciseGoodsEdit`     => DateOfChangeRedirect(routes.ExciseGoodsController.get(true))
+        case _                     =>
           logger.warn(s"Could not retrieve Date of Change redirect for '$key', redirecting to Check Your Answers")
           DateOfChangeRedirect(routes.SummaryController.get)
       }
-    }
   }
 
-  def isEligibleForDateOfChange(status: SubmissionStatus): Boolean = {
+  def isEligibleForDateOfChange(status: SubmissionStatus): Boolean =
     status match {
       case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) => true
-      case _ => false
+      case _                                                                     => false
     }
-  }
 
-  private def isEligibleApplicationStatus(status: String): Boolean = {
+  private def isEligibleApplicationStatus(status: String): Boolean =
     status.contains("Approved")
-  }
 
   def redirectToDateOfChange[A](status: SubmissionStatus, a: Option[A], b: A): Boolean =
     !a.contains(b) && isEligibleForDateOfChange(status)
@@ -69,16 +66,20 @@ trait DateOfChangeHelper extends Logging {
   def dateOfChangApplicable[A](status: String, a: Option[A], b: A): Boolean =
     !a.contains(b) && isEligibleApplicationStatus(status)
 
-  def startDateFormFields(startDate: Option[LocalDate], fieldName: String = "activityStartDate"): Map[String, Seq[String]] = {
+  def startDateFormFields(
+    startDate: Option[LocalDate],
+    fieldName: String = "activityStartDate"
+  ): Map[String, Seq[String]] =
     startDate match {
       case Some(date) => Map(fieldName -> Seq(date.format(ofPattern("yyyy-MM-dd"))))
-      case _ => Map.empty[String, Seq[String]]
+      case _          => Map.empty[String, Seq[String]]
     }
-  }
 
-  implicit class TradingPremisesExtensions(tradingPremises: Option[TradingPremises])(implicit messages: Messages) extends DateOfChangeHelper {
+  implicit class TradingPremisesExtensions(tradingPremises: Option[TradingPremises])(implicit messages: Messages)
+      extends DateOfChangeHelper {
 
-    def startDate: Option[LocalDate] = tradingPremises.yourTradingPremises.fold[Option[LocalDate]](None)(ytp => ytp.startDate)
+    def startDate: Option[LocalDate] =
+      tradingPremises.yourTradingPremises.fold[Option[LocalDate]](None)(ytp => ytp.startDate)
   }
 
 }

@@ -26,33 +26,30 @@ import utils.{CheckYourAnswersHelperFunctions, DateHelper}
 
 import javax.inject.Inject
 
-class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions {
+class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunctions {
 
-  def getSummaryList(model: Hvd)(implicit messages: Messages): SummaryList = {
-
+  def getSummaryList(model: Hvd)(implicit messages: Messages): SummaryList =
     SummaryList(
       Seq(
         productRow(model),
         exciseGoodsRow(model),
         howWillYouSellGoodsRow(model)
       ).flatten ++ cashPaymentRows(model).getOrElse(Seq.empty[SummaryListRow]) ++
-      Seq(
-        linkedCashPaymentRow(model),
-        receiveCashPaymentsRow(model),
-        cashPaymentMethodsRow(model),
-        percentagePaymentsRow(model)
-      ).flatten
+        Seq(
+          linkedCashPaymentRow(model),
+          receiveCashPaymentsRow(model),
+          cashPaymentMethodsRow(model),
+          percentagePaymentsRow(model)
+        ).flatten
     )
-  }
 
   private def productRow(model: Hvd)(implicit messages: Messages): Option[SummaryListRow] = {
 
-    def productsValue(products: Products): Value = {
+    def productsValue(products: Products): Value =
       products.sorted.toList match {
         case item :: Nil => Value(Text(item.getMessage))
-        case items => toBulletList(items.map(_.getMessage))
+        case items       => toBulletList(items.map(_.getMessage))
       }
-    }
 
     model.products.map { products =>
       SummaryListRow(
@@ -70,10 +67,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
   private def exciseGoodsRow(model: Hvd)(implicit messages: Messages): Option[SummaryListRow] = {
 
     for {
-      products <- model.products
+      products    <- model.products
       exciseGoods <- model.exciseGoods
-    } yield {
-      if(products.items.contains(Alcohol) || products.items.contains(Tobacco)) {
+    } yield
+      if (products.items.contains(Alcohol) || products.items.contains(Tobacco)) {
         Some(
           row(
             "hvd.excise.goods.title",
@@ -88,20 +85,17 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
       } else {
         None
       }
-    }
   }.flatten
 
   private def howWillYouSellGoodsRow(model: Hvd)(implicit messages: Messages): Option[SummaryListRow] = {
 
-    def goodsValue(goods: HowWillYouSellGoods): Value = {
+    def goodsValue(goods: HowWillYouSellGoods): Value =
       goods.channels.toList match {
         case item :: Nil => Value(Text(item.getMessage))
-        case items => toBulletList(items.map(_.getMessage))
+        case items       => toBulletList(items.map(_.getMessage))
       }
-    }
 
     model.howWillYouSellGoods.map { goods =>
-
       SummaryListRow(
         Key(Text(messages("hvd.how-will-you-sell-goods.title"))),
         goodsValue(goods),
@@ -114,8 +108,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
     }
   }
 
-  private def cashPaymentRows(model: Hvd)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
-
+  private def cashPaymentRows(model: Hvd)(implicit messages: Messages): Option[Seq[SummaryListRow]] =
     model.cashPayment.map { payment =>
       Seq(
         Some(
@@ -142,10 +135,8 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         }
       ).flatten
     }
-  }
 
-  private def linkedCashPaymentRow(model: Hvd)(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def linkedCashPaymentRow(model: Hvd)(implicit messages: Messages): Option[SummaryListRow] =
     model.linkedCashPayment.map { payments =>
       row(
         "hvd.identify.linked.cash.payment.title",
@@ -157,10 +148,8 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def receiveCashPaymentsRow(model: Hvd)(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def receiveCashPaymentsRow(model: Hvd)(implicit messages: Messages): Option[SummaryListRow] =
     model.receiveCashPayments.map { payments =>
       row(
         "hvd.receiving.title",
@@ -172,19 +161,16 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
   private def cashPaymentMethodsRow(model: Hvd)(implicit messages: Messages) = {
 
-    def paymentsValue(methods: PaymentMethods): Value = {
+    def paymentsValue(methods: PaymentMethods): Value =
       methods.getSummaryMessages.toList match {
         case message :: Nil => Value(Text(message))
-        case msgs => toBulletList(msgs)
+        case msgs           => toBulletList(msgs)
       }
-    }
 
     model.cashPaymentMethods.map { cpm =>
-
       SummaryListRow(
         Key(Text(messages("hvd.receiving.expect.to.receive"))),
         paymentsValue(cpm),
@@ -197,8 +183,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
     }
   }
 
-  private def percentagePaymentsRow(model: Hvd)(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def percentagePaymentsRow(model: Hvd)(implicit messages: Messages): Option[SummaryListRow] =
     model.percentageOfCashPaymentOver15000.map { percentage =>
       row(
         "hvd.percentage.title",
@@ -210,5 +195,4 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 }

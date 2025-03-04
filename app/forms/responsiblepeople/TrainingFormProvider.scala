@@ -24,16 +24,16 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class TrainingFormProvider @Inject()() extends Mappings {
+class TrainingFormProvider @Inject() () extends Mappings {
 
   val length = 255
 
   private val booleanFieldName = "training"
-  private val booleanError = "error.required.rp.training"
-  def apply(): Form[Training] = Form[Training](
+  private val booleanError     = "error.required.rp.training"
+  def apply(): Form[Training]  = Form[Training](
     mapping(
       booleanFieldName -> boolean(booleanError, booleanError),
-      "information" -> mandatoryIfTrue(
+      "information"    -> mandatoryIfTrue(
         booleanFieldName,
         text("error.required.rp.training.information").verifying(
           firstError(
@@ -45,17 +45,16 @@ class TrainingFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  def apply(hasTraining: Boolean, information: Option[String]): Training = {
+  def apply(hasTraining: Boolean, information: Option[String]): Training =
     (hasTraining, information) match {
       case (true, Some(info)) => TrainingYes(info)
-      case (false, None) => TrainingNo
-      case _ => throw new IllegalArgumentException(s"Invalid combination of answers")
+      case (false, None)      => TrainingNo
+      case _                  => throw new IllegalArgumentException(s"Invalid combination of answers")
     }
-  }
 
   def unapply(obj: Training): Option[(Boolean, Option[String])] = obj match {
     case TrainingYes(info) => Some((true, Some(info)))
-    case TrainingNo => Some((false, None))
-    case _ => None
+    case TrainingNo        => Some((false, None))
+    case _                 => None
   }
 }

@@ -22,7 +22,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class RegisteredOfficeUKFormProvider @Inject()() extends AddressFormProvider[RegisteredOffice] {
+class RegisteredOfficeUKFormProvider @Inject() () extends AddressFormProvider[RegisteredOffice] {
 
   override val countryErrorKey: String = ""
 
@@ -30,10 +30,11 @@ class RegisteredOfficeUKFormProvider @Inject()() extends AddressFormProvider[Reg
     case (line1, line2, line3, line4, postcode) => RegisteredOfficeUK(line1, line2, line3, line4, postcode)
   }
 
-  override def fromObject: RegisteredOffice => Option[(String, Option[String], Option[String], Option[String], String)] = {
+  override def fromObject
+    : RegisteredOffice => Option[(String, Option[String], Option[String], Option[String], String)] = {
     case RegisteredOfficeUK(addressLine1, addressLine2, addressLine3, addressLine4, postCode, _) =>
       Some((addressLine1, addressLine2, addressLine3, addressLine4, postCode))
-    case _ => None
+    case _                                                                                       => None
   }
 
   def apply(): Form[RegisteredOffice] = createForm(isUKAddress = true)

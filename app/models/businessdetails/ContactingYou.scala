@@ -19,9 +19,9 @@ package models.businessdetails
 import play.api.libs.json.{Json, OFormat}
 
 case class ContactingYou(
-                          phoneNumber: Option[String] = None,
-                          email: Option[String] = None
-                        )
+  phoneNumber: Option[String] = None,
+  email: Option[String] = None
+)
 
 object ContactingYou {
   implicit val formats: OFormat[ContactingYou] = Json.format[ContactingYou]

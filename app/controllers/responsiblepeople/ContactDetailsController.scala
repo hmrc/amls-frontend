@@ -27,51 +27,55 @@ import views.html.responsiblepeople.ContactDetailsView
 
 import scala.concurrent.Future
 
-class ContactDetailsController @Inject () (
-                                            val dataCacheConnector: DataCacheConnector,
-                                            authAction: AuthAction,
-                                            val ds: CommonPlayDependencies,
-                                            val cc: MessagesControllerComponents,
-                                            formProvider: ContactDetailsFormProvider,
-                                            view: ContactDetailsView,
-                                            implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
-
+class ContactDetailsController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: ContactDetailsFormProvider,
+  view: ContactDetailsView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           (person.personName, person.contactDetails) match {
-            case (Some(name), Some(details)) => Ok(view(formProvider().fill(details), edit, index, flow, name.titleName))
-            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
-            case _ => NotFound(notFoundView)
+            case (Some(name), Some(details)) =>
+              Ok(view(formProvider().fill(details), edit, index, flow, name.titleName))
+            case (Some(name), _)             => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _                           => NotFound(notFoundView)
           }
         }
       }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
-    authAction.async {
-      implicit request => {
-        formProvider().bindFromRequest().fold(
+    authAction.async { implicit request =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
           formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             },
-          data => {
-            for {
-              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                rp.contactDetails(data)
-              }
-            } yield if (edit) {
-              Redirect(routes.DetailedAnswersController.get(index, flow))
-            } else {
-              Redirect(controllers.responsiblepeople.address.routes.CurrentAddressController.get(index, edit, flow))
+          data =>
+            {
+              for {
+                _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                       rp.contactDetails(data)
+                     }
+              } yield
+                if (edit) {
+                  Redirect(routes.DetailedAnswersController.get(index, flow))
+                } else {
+                  Redirect(controllers.responsiblepeople.address.routes.CurrentAddressController.get(index, edit, flow))
+                }
+            }.recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
             }
-          }.recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-          }
         )
-      }
     }
 }

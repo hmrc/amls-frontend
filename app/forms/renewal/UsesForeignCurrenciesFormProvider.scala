@@ -22,16 +22,18 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class UsesForeignCurrenciesFormProvider @Inject()() extends BooleanFormProvider {
+class UsesForeignCurrenciesFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[UsesForeignCurrencies] = createForm[UsesForeignCurrencies](
-    "usesForeignCurrencies", "error.required.renewal.wc.foreign.currencies"
+    "usesForeignCurrencies",
+    "error.required.renewal.wc.foreign.currencies"
   )(apply, unapply)
 
-  private def apply(bool: Boolean): UsesForeignCurrencies = if(bool) UsesForeignCurrenciesYes else UsesForeignCurrenciesNo
+  private def apply(bool: Boolean): UsesForeignCurrencies =
+    if (bool) UsesForeignCurrenciesYes else UsesForeignCurrenciesNo
 
   private def unapply(obj: UsesForeignCurrencies): Boolean = obj match {
     case UsesForeignCurrenciesYes => true
-    case UsesForeignCurrenciesNo => false
+    case UsesForeignCurrenciesNo  => false
   }
 }

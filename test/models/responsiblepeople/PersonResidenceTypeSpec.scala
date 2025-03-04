@@ -30,11 +30,11 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
 
       "read non-uk residence type in old format" in {
         val json = Json.obj(
-          "isUKResidence" -> false,
-          "dateOfBirth" -> "1990-10-02",
+          "isUKResidence"       -> false,
+          "dateOfBirth"         -> "1990-10-02",
           "nonUKPassportNumber" -> "87654321",
-          "countryOfBirth" -> "GB",
-          "nationality" -> "GB"
+          "countryOfBirth"      -> "GB",
+          "nationality"         -> "GB"
         )
 
         json.as[PersonResidenceType] must be(
@@ -47,8 +47,11 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
       }
 
       "read uk residence type model" in {
-        val ukModel = PersonResidenceType(UKResidence(Nino("AA346464A")),
-          Some(Country("United Kingdom", "GB")), Some(Country("United Kingdom", "GB")))
+        val ukModel = PersonResidenceType(
+          UKResidence(Nino("AA346464A")),
+          Some(Country("United Kingdom", "GB")),
+          Some(Country("United Kingdom", "GB"))
+        )
 
         PersonResidenceType.jsonRead.reads(PersonResidenceType.jsonWrite.writes(ukModel)) must
           be(JsSuccess(ukModel))
@@ -59,11 +62,10 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
         val nonUKModel = PersonResidenceType(
           NonUKResidence,
           Some(Country("United Kingdom", "GB")),
-          Some(Country("United Kingdom", "GB")
-          ))
+          Some(Country("United Kingdom", "GB"))
+        )
 
-        PersonResidenceType.jsonRead.reads(
-          PersonResidenceType.jsonWrite.writes(nonUKModel)) must
+        PersonResidenceType.jsonRead.reads(PersonResidenceType.jsonWrite.writes(nonUKModel)) must
           be(JsSuccess(nonUKModel))
       }
     }

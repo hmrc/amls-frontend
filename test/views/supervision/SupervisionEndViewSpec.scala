@@ -24,10 +24,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.supervision.SupervisionEndView
 
-class SupervisionEndViewSpec extends AmlsViewSpec with Matchers  {
+class SupervisionEndViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val supervision_end = app.injector.instanceOf[SupervisionEndView]
-  lazy val fp = app.injector.instanceOf[SupervisionEndFormProvider]
+  lazy val fp              = app.injector.instanceOf[SupervisionEndFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -41,8 +41,8 @@ class SupervisionEndViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = supervision_end(fp(), edit = false)
 
-      doc.title must startWith(messages("supervision.supervision_end.title"))
-      heading.html must be(messages("supervision.supervision_end.title"))
+      doc.title       must startWith(messages("supervision.supervision_end.title"))
+      heading.html    must be(messages("supervision.supervision_end.title"))
       subHeading.html must include(messages("summary.supervision"))
     }
 

@@ -23,14 +23,12 @@ import play.api.data.Forms.seq
 
 import javax.inject.Inject
 
-class RegisterBusinessActivitiesFormProvider @Inject()() extends Mappings {
+class RegisterBusinessActivitiesFormProvider @Inject() () extends Mappings {
 
-  def apply(): Form[Seq[BusinessActivity]] = {
-
+  def apply(): Form[Seq[BusinessActivity]] =
     Form[Seq[BusinessActivity]](
       "value" -> seq(enumerable[BusinessActivity]("error.required.bm.register.service")).verifying(
         nonEmptySeq("error.required.bm.register.service")
       )
     )
-  }
 }

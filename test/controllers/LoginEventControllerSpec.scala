@@ -42,8 +42,8 @@ class LoginEventControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
       )
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
 
-    val builder: GuiceApplicationBuilder = defaultBuilder
-    lazy val app: Application = builder.build()
+    val builder: GuiceApplicationBuilder      = defaultBuilder
+    lazy val app: Application                 = builder.build()
     lazy val controller: LoginEventController = app.injector.instanceOf[LoginEventController]
   }
 

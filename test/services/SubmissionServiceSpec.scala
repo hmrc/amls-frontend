@@ -49,11 +49,12 @@ import utils.{AmlsSpec, DependencyMocks}
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class SubmissionServiceSpec extends AmlsSpec
-  with ScalaFutures
-  with IntegrationPatience
-  with ResponsiblePersonGenerator
-  with TradingPremisesGenerator {
+class SubmissionServiceSpec
+    extends AmlsSpec
+    with ScalaFutures
+    with IntegrationPatience
+    with ResponsiblePersonGenerator
+    with TradingPremisesGenerator {
 
   override lazy val app = GuiceApplicationBuilder()
     .configure(
@@ -65,7 +66,7 @@ class SubmissionServiceSpec extends AmlsSpec
 
     val config = mock[ApplicationConfig]
 
-    val submissionService = new SubmissionService (
+    val submissionService = new SubmissionService(
       mockCacheConnector,
       mock[AuthEnrolmentsService],
       mock[AmlsConnector],
@@ -78,17 +79,20 @@ class SubmissionServiceSpec extends AmlsSpec
     val subscriptionResponse = SubscriptionResponse(
       etmpFormBundleNumber = "",
       amlsRefNo = "amlsRef",
-      Some(SubscriptionFees(
-        registrationFee = 0,
-        fpFee = None,
-        fpFeeRate = None,
-        approvalCheckFee = None,
-        approvalCheckFeeRate = None,
-        premiseFee = 0,
-        premiseFeeRate = None,
-        totalFees = 0,
-        paymentReference = ""
-      )))
+      Some(
+        SubscriptionFees(
+          registrationFee = 0,
+          fpFee = None,
+          fpFeeRate = None,
+          approvalCheckFee = None,
+          approvalCheckFeeRate = None,
+          premiseFee = 0,
+          premiseFeeRate = None,
+          totalFees = 0,
+          paymentReference = ""
+        )
+      )
+    )
 
     val amendmentResponse = AmendVariationRenewalResponse(
       processingDate = "",
@@ -105,21 +109,23 @@ class SubmissionServiceSpec extends AmlsSpec
       difference = Some(0)
     )
 
-    val safeId = "safeId"
+    val safeId                 = "safeId"
     val amlsRegistrationNumber = "amlsRegNo"
-    val businessType = SoleProprietor
+    val businessType           = SoleProprietor
 
-    val reviewDetails = mock[ReviewDetails]
-    val activities = mock[BusinessActivities]
+    val reviewDetails    = mock[ReviewDetails]
+    val activities       = mock[BusinessActivities]
     val businessMatching = mock[BusinessMatching]
-    val businessDetails = mock[BusinessDetails]
-    val amp = Amp(Json.obj(
-      "typeOfParticipant"      -> Seq("artGalleryOwner"),
-      "soldOverThreshold"             -> true,
-      "dateTransactionOverThreshold"  -> LocalDate.now.toString,
-      "identifyLinkedTransactions"    -> true,
-      "percentageExpectedTurnover"    -> "zeroToTwenty"
-    ))
+    val businessDetails  = mock[BusinessDetails]
+    val amp              = Amp(
+      Json.obj(
+        "typeOfParticipant"            -> Seq("artGalleryOwner"),
+        "soldOverThreshold"            -> true,
+        "dateTransactionOverThreshold" -> LocalDate.now.toString,
+        "identifyLinkedTransactions"   -> true,
+        "percentageExpectedTurnover"   -> "zeroToTwenty"
+      )
+    )
 
     mockCacheFetchAll
     mockCacheSave[SubscriptionResponse]
@@ -198,9 +204,12 @@ class SubmissionServiceSpec extends AmlsSpec
         when {
           submissionService.amlsConnector.subscribe(any(), eqTo(safeId), any())(any(), any(), any(), any())
         } thenReturn Future.failed(
-          UpstreamErrorResponse(Json.toJson(SubscriptionErrorResponse(amlsRegistrationNumber, "An error occurred")).toString(),
+          UpstreamErrorResponse(
+            Json.toJson(SubscriptionErrorResponse(amlsRegistrationNumber, "An error occurred")).toString(),
             UNPROCESSABLE_ENTITY,
-            UNPROCESSABLE_ENTITY))
+            UNPROCESSABLE_ENTITY
+          )
+        )
 
         intercept[DuplicateSubscriptionException] {
           await(submissionService.subscribe("12345678", ("accType", "id"), Some("GROUP_ID")))
@@ -214,7 +223,9 @@ class SubmissionServiceSpec extends AmlsSpec
 
         when {
           submissionService.amlsConnector.subscribe(any(), eqTo(safeId), any())(any(), any(), any(), any())
-        } thenReturn Future.failed(UpstreamErrorResponse("Some other kind of error occurred", UNPROCESSABLE_ENTITY, UNPROCESSABLE_ENTITY))
+        } thenReturn Future.failed(
+          UpstreamErrorResponse("Some other kind of error occurred", UNPROCESSABLE_ENTITY, UNPROCESSABLE_ENTITY)
+        )
 
         intercept[UpstreamErrorResponse] {
           await(submissionService.subscribe("12345678", ("accType", "id"), Some("GROUP_ID")))
@@ -246,17 +257,15 @@ class SubmissionServiceSpec extends AmlsSpec
           submissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber), any())(any(), any(), any(), any())
         } thenReturn Future.successful(amendmentResponse)
 
-        whenReady(submissionService.update("12345678", Some(amlsRegistrationNumber), ("accType", "id"))) {
-          result =>
-            result must equal(amendmentResponse)
+        whenReady(submissionService.update("12345678", Some(amlsRegistrationNumber), ("accType", "id"))) { result =>
+          result must equal(amendmentResponse)
         }
       }
 
       "return failed future when no enrolment" in new Fixture {
 
-        whenReady(submissionService.update("12345678", None, ("accType", "id")).failed) {
-          result =>
-            result mustBe a[NoEnrolmentException]
+        whenReady(submissionService.update("12345678", None, ("accType", "id")).failed) { result =>
+          result mustBe a[NoEnrolmentException]
         }
       }
     }
@@ -265,12 +274,12 @@ class SubmissionServiceSpec extends AmlsSpec
       "submit variation" in new Fixture {
 
         when {
-          submissionService.amlsConnector.variation(any(), eqTo(amlsRegistrationNumber), any())(any(), any(), any(), any())
+          submissionService.amlsConnector
+            .variation(any(), eqTo(amlsRegistrationNumber), any())(any(), any(), any(), any())
         } thenReturn Future.successful(amendmentResponse)
 
-        whenReady(submissionService.variation("12345678", Some(amlsRegistrationNumber), ("accType", "id"))) {
-          result =>
-            result must equal(amendmentResponse)
+        whenReady(submissionService.variation("12345678", Some(amlsRegistrationNumber), ("accType", "id"))) { result =>
+          result must equal(amendmentResponse)
         }
       }
     }
@@ -289,14 +298,33 @@ class SubmissionServiceSpec extends AmlsSpec
         customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("Test", "T"))))),
         involvedInOtherActivities = Some(InvolvedInOtherNo),
         mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(
-          Country("United Kingdom", "GB"), Country("France", "FR"), Country("us", "US")))),
-        whichCurrencies = Some(WhichCurrencies(
-          Seq("USD", "CHF", "EUR"), Some(UsesForeignCurrenciesYes), Some(MoneySources(Some(models.renewal.BankMoneySource("Bank Names")), Some(models.renewal.WholesalerMoneySource("wholesaler")), Some(true))))),
+        sendTheLargestAmountsOfMoney = Some(
+          SendTheLargestAmountsOfMoney(
+            Seq(Country("United Kingdom", "GB"), Country("France", "FR"), Country("us", "US"))
+          )
+        ),
+        whichCurrencies = Some(
+          WhichCurrencies(
+            Seq("USD", "CHF", "EUR"),
+            Some(UsesForeignCurrenciesYes),
+            Some(
+              MoneySources(
+                Some(models.renewal.BankMoneySource("Bank Names")),
+                Some(models.renewal.WholesalerMoneySource("wholesaler")),
+                Some(true)
+              )
+            )
+          )
+        ),
         ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963")),
         transactionsInLast12Months = Some(TransactionsInLast12Months("2500")),
         percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-        receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
+        receiveCashPayments = Some(
+          CashPayments(
+            CashPaymentsCustomerNotMet(true),
+            Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+          )
+        ),
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
         fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("10"))
       )
@@ -343,14 +371,33 @@ class SubmissionServiceSpec extends AmlsSpec
         customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("Test", "T"))))),
         involvedInOtherActivities = Some(InvolvedInOtherNo),
         mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(
-          Country("United Kingdom", "GB"), Country("France", "FR"), Country("us", "US")))),
-        whichCurrencies = Some(WhichCurrencies(
-          Seq("USD", "CHF", "EUR"), Some(UsesForeignCurrenciesYes), Some(MoneySources(Some(models.renewal.BankMoneySource("Bank Names")), Some(models.renewal.WholesalerMoneySource("Wholesaler")), Some(true))))),
+        sendTheLargestAmountsOfMoney = Some(
+          SendTheLargestAmountsOfMoney(
+            Seq(Country("United Kingdom", "GB"), Country("France", "FR"), Country("us", "US"))
+          )
+        ),
+        whichCurrencies = Some(
+          WhichCurrencies(
+            Seq("USD", "CHF", "EUR"),
+            Some(UsesForeignCurrenciesYes),
+            Some(
+              MoneySources(
+                Some(models.renewal.BankMoneySource("Bank Names")),
+                Some(models.renewal.WholesalerMoneySource("Wholesaler")),
+                Some(true)
+              )
+            )
+          )
+        ),
         ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963")),
         transactionsInLast12Months = Some(TransactionsInLast12Months("2500")),
         percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-        receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other"))))))
+        receiveCashPayments = Some(
+          CashPayments(
+            CashPaymentsCustomerNotMet(true),
+            Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+          )
+        )
       )
 
       await(submissionService.renewalAmendment("12345678", Some(amlsRegistrationNumber), ("accType", "id"), renewal))

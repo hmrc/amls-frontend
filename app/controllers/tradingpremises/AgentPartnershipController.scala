@@ -29,51 +29,61 @@ import views.html.tradingpremises.AgentPartnershipView
 import scala.concurrent.Future
 
 @Singleton
-class AgentPartnershipController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                           val authAction: AuthAction,
-                                           val ds: CommonPlayDependencies,
-                                           override val messagesApi: MessagesApi,
-                                           val cc: MessagesControllerComponents,
-                                           formProvider: AgentPartnershipFormProvider,
-                                           view: AgentPartnershipView,
-                                           implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class AgentPartnershipController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  override val messagesApi: MessagesApi,
+  val cc: MessagesControllerComponents,
+  formProvider: AgentPartnershipFormProvider,
+  view: AgentPartnershipView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
-    def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
-      implicit request =>
-        getData[TradingPremises](request.credId, index) map {
-          case Some(tp) => {
-            val form = tp.agentPartnership match {
-              case Some(data) => formProvider().fill(data)
-              case None => formProvider()
-            }
-            Ok(view(form, index, edit))
-          }
-          case None => NotFound(notFoundView)
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    getData[TradingPremises](request.credId, index) map {
+      case Some(tp) =>
+        val form = tp.agentPartnership match {
+          case Some(data) => formProvider().fill(data)
+          case None       => formProvider()
         }
-    }
-
-   def post(index: Int ,edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, index,edit))),
-        data => {
-          for {
-            result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_,tp) =>
-                TradingPremises(tp.registeringAgentPremises,
-                  tp.yourTradingPremises, tp.businessStructure,
-                  None, None, Some(data),tp.whatDoesYourBusinessDoAtThisAddress,
-                  tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
-            }
-          } yield edit match {
-            case true => Redirect(routes.CheckYourAnswersController.get(index))
-            case false => TPControllerHelper.redirectToNextPage(result, index, edit)
-          }
-        }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
-      )
+        Ok(view(form, index, edit))
+      case None     => NotFound(notFoundView)
     }
   }
-}
 
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, index, edit))),
+        data =>
+          {
+            for {
+              result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_, tp) =>
+                          TradingPremises(
+                            tp.registeringAgentPremises,
+                            tp.yourTradingPremises,
+                            tp.businessStructure,
+                            None,
+                            None,
+                            Some(data),
+                            tp.whatDoesYourBusinessDoAtThisAddress,
+                            tp.msbServices,
+                            true,
+                            tp.lineId,
+                            tp.status,
+                            tp.endDate
+                          )
+                        }
+            } yield edit match {
+              case true  => Redirect(routes.CheckYourAnswersController.get(index))
+              case false => TPControllerHelper.redirectToNextPage(result, index, edit)
+            }
+          }.recoverWith { case _: IndexOutOfBoundsException =>
+            Future.successful(NotFound(notFoundView))
+          }
+      )
+  }
+}

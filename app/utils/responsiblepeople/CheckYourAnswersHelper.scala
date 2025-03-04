@@ -26,25 +26,25 @@ import utils.{CheckYourAnswersHelperFunctions, DateHelper}
 
 import javax.inject.Inject
 
-class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions {
+class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunctions {
 
-  def getHeadingsAndSummaryLists(model: ResponsiblePerson,
-                                 businessMatching: BusinessMatching,
-                                 personName: String,
-                                 idx: Int,
-                                 flow: Option[String],
-                                 showHide: Boolean = false,
-                                 showApprovalSection: Boolean = false
-                                )(implicit messages: Messages): Seq[(String, SummaryList)] = {
-
+  def getHeadingsAndSummaryLists(
+    model: ResponsiblePerson,
+    businessMatching: BusinessMatching,
+    personName: String,
+    idx: Int,
+    flow: Option[String],
+    showHide: Boolean = false,
+    showApprovalSection: Boolean = false
+  )(implicit messages: Messages): Seq[(String, SummaryList)] =
     Seq(
       (
         messages("responsiblepeople.check_your_answers.subheading.1"),
         SummaryList(
           getPersonNameRow(model, idx, flow).asSeq ++
-          getLegalNameRows(model, personName, idx, flow).asSeq ++
-          getKnownByRows(model, personName, idx, flow).asSeq ++
-          getDateOfBirthRow(model, personName, idx, flow),
+            getLegalNameRows(model, personName, idx, flow).asSeq ++
+            getKnownByRows(model, personName, idx, flow).asSeq ++
+            getDateOfBirthRow(model, personName, idx, flow),
           classes = "govuk-!-margin-bottom-9"
         )
       ),
@@ -52,9 +52,9 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         messages("responsiblepeople.check_your_answers.subheading.2"),
         SummaryList(
           getPersonResidenceRows(model, personName, idx, flow).asSeq ++
-          getUKPassportRows(model, personName, idx, flow).asSeq ++
-          getNonUKPassportRows(model, personName, idx, flow).asSeq ++
-          getCountryAndNationalityRows(model, personName, idx, flow).asSeq,
+            getUKPassportRows(model, personName, idx, flow).asSeq ++
+            getNonUKPassportRows(model, personName, idx, flow).asSeq ++
+            getCountryAndNationalityRows(model, personName, idx, flow).asSeq,
           classes = "govuk-!-margin-bottom-9"
         )
       ),
@@ -69,8 +69,8 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         messages("responsiblepeople.check_your_answers.subheading.4"),
         SummaryList(
           getCurrentAddressRows(model, personName, idx, flow, showHide).asSeq ++
-          getAdditionalAddressRows(model, personName, idx, flow).asSeq ++
-          getExtraAddressRows(model, personName, idx, flow).asSeq,
+            getAdditionalAddressRows(model, personName, idx, flow).asSeq ++
+            getExtraAddressRows(model, personName, idx, flow).asSeq,
           classes = "govuk-!-margin-bottom-9"
         )
       ),
@@ -78,9 +78,9 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         messages("responsiblepeople.check_your_answers.subheading.5"),
         SummaryList(
           getPositionsRows(model, personName, idx, flow).asSeq ++
-          getSoleProprietorRow(model, personName, idx, flow).asSeq ++
-          getVATRegisteredRows(model, personName, idx, flow).asSeq ++
-          getSARegisteredRows(model, personName, idx, flow).asSeq,
+            getSoleProprietorRow(model, personName, idx, flow).asSeq ++
+            getVATRegisteredRows(model, personName, idx, flow).asSeq ++
+            getSARegisteredRows(model, personName, idx, flow).asSeq,
           classes = "govuk-!-margin-bottom-9"
         )
       ),
@@ -88,20 +88,21 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         messages("responsiblepeople.check_your_answers.subheading.6"),
         SummaryList(
           getExperienceTrainingRows(model, businessMatching, personName, idx, flow).asSeq ++
-          getTrainingRows(model, personName, idx, flow).asSeq ++
-          getApprovalFlagsRow(model, personName, idx, flow).asSeq ++
-          (if (showApprovalSection) {
-            getHasAlreadyPaidRow(model, personName, idx, flow)
-          } else {
-            None
-          }).asSeq,
+            getTrainingRows(model, personName, idx, flow).asSeq ++
+            getApprovalFlagsRow(model, personName, idx, flow).asSeq ++
+            (if (showApprovalSection) {
+               getHasAlreadyPaidRow(model, personName, idx, flow)
+             } else {
+               None
+             }).asSeq,
           classes = "govuk-!-margin-bottom-9"
         )
       )
     )
-  }
 
-  private def getPersonNameRow(model: ResponsiblePerson, idx: Int, flow: Option[String])(implicit messages: Messages): Option[SummaryListRow] = {
+  private def getPersonNameRow(model: ResponsiblePerson, idx: Int, flow: Option[String])(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     model.personName.map { name =>
       row(
         "responsiblepeople.personName.title",
@@ -113,11 +114,11 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def getLegalNameRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getLegalNameRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit
+    messages: Messages
+  ): Option[Seq[SummaryListRow]] =
     model.legalName.map { name =>
-
       val dateRow = model.legalNameChangeDate.map { date =>
         row(
           messages("responsiblepeople.legalnamechangedate.heading", personName),
@@ -141,28 +142,29 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
       )
 
       (name.hasPreviousName, dateRow) match {
-        case (Some(true), Some(dateRow)) => Seq(
-          legalNameRow(true),
-          row(
-            messages("responsiblepeople.legalNameInput.heading", personName),
-            name.fullName,
-            editAction(
-              controllers.responsiblepeople.routes.LegalNameInputController.get(idx, true, flow).url,
-              "responsiblepeople.checkYourAnswers.change.personsPreviousName",
-              "rp-legalname-edit"
-            )
-          ),
-          dateRow
-        )
+        case (Some(true), Some(dateRow))  =>
+          Seq(
+            legalNameRow(true),
+            row(
+              messages("responsiblepeople.legalNameInput.heading", personName),
+              name.fullName,
+              editAction(
+                controllers.responsiblepeople.routes.LegalNameInputController.get(idx, true, flow).url,
+                "responsiblepeople.checkYourAnswers.change.personsPreviousName",
+                "rp-legalname-edit"
+              )
+            ),
+            dateRow
+          )
         case (Some(false), Some(dateRow)) => Seq(legalNameRow(false), dateRow)
-        case _ => Seq(legalNameRow(false))
+        case _                            => Seq(legalNameRow(false))
       }
     }
-  }
 
-  private def getKnownByRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getKnownByRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit
+    messages: Messages
+  ): Option[Seq[SummaryListRow]] =
     model.knownBy.map { knownBy =>
-
       def knownByRow(boolean: Boolean): SummaryListRow = row(
         messages("responsiblepeople.knownby.heading", personName),
         booleanToLabel(boolean),
@@ -190,9 +192,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         Seq(knownByRow(false))
       }
     }
-  }
 
-  private def getDateOfBirthRow(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit messages: Messages): Option[SummaryListRow] = {
+  private def getDateOfBirthRow(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     model.dateOfBirth.map { dob =>
       row(
         messages("responsiblepeople.detailed_answers.dob", personName),
@@ -204,11 +207,11 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def getPersonResidenceRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getPersonResidenceRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(
+    implicit messages: Messages
+  ): Option[Seq[SummaryListRow]] =
     model.personResidenceType.map { residenceType =>
-
       def personResidenceRow(boolean: Boolean): SummaryListRow = row(
         messages("responsiblepeople.detailed_answers.uk_resident", personName),
         booleanToLabel(boolean),
@@ -233,14 +236,14 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               )
             )
           )
-        case NonUKResidence => Seq(personResidenceRow(false))
+        case NonUKResidence    => Seq(personResidenceRow(false))
       }
     }
-  }
 
-  private def getUKPassportRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getUKPassportRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit
+    messages: Messages
+  ): Option[Seq[SummaryListRow]] =
     model.ukPassport.map { passport =>
-
       def ukPassportRow(boolean: Boolean): SummaryListRow = row(
         messages("responsiblepeople.detailed_answers.uk.passport", personName),
         booleanToLabel(boolean),
@@ -265,14 +268,14 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               )
             )
           )
-        case UKPassportNo => Seq(ukPassportRow(false))
+        case UKPassportNo          => Seq(ukPassportRow(false))
       }
     }
-  }
 
-  private def getNonUKPassportRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getNonUKPassportRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(
+    implicit messages: Messages
+  ): Option[Seq[SummaryListRow]] =
     model.nonUKPassport.map { passport =>
-
       def nonUKPassportRow(boolean: Boolean): SummaryListRow = row(
         messages("responsiblepeople.detailed_answers.non.uk.passport", personName),
         booleanToLabel(boolean),
@@ -297,14 +300,17 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               )
             )
           )
-        case NoPassport => Seq(nonUKPassportRow(false))
+        case NoPassport               => Seq(nonUKPassportRow(false))
       }
     }
-  }
 
-  private def getCountryAndNationalityRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getCountryAndNationalityRows(
+    model: ResponsiblePerson,
+    personName: String,
+    idx: Int,
+    flow: Option[String]
+  )(implicit messages: Messages): Option[Seq[SummaryListRow]] =
     model.personResidenceType.flatMap { residenceType =>
-
       def isBritishRow(boolean: Boolean) = row(
         messages("responsiblepeople.nationality.heading", personName),
         if (boolean) {
@@ -340,7 +346,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             )
           )
         ) ++ (
-          if(country.isUK) {
+          if (country.isUK) {
             Seq(isBritishRow(true))
           } else {
             Seq(
@@ -359,14 +365,16 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       }
     }
-  }
 
-  private def getContactDetailsRow(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit messages: Messages): Option[SummaryListRow] = {
+  private def getContactDetailsRow(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(
+    implicit messages: Messages
+  ): Option[SummaryListRow] =
     model.contactDetails.map { details =>
       SummaryListRow(
         Key(Text(messages("responsiblepeople.contact_details.heading", personName))),
-        Value(HtmlContent(
-          s"""<p class="govuk-body">${messages("responsiblepeople.detailed_answers.phone_number")}<br>${details.phoneNumber}</p>
+        Value(HtmlContent(s"""<p class="govuk-body">${messages(
+            "responsiblepeople.detailed_answers.phone_number"
+          )}<br>${details.phoneNumber}</p>
             <p class="govuk-body">${messages("responsiblepeople.detailed_answers.email")}<br>${details.emailAddress}</p>
           """)),
         actions = editAction(
@@ -376,21 +384,21 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def getCurrentAddressRows(model: ResponsiblePerson,
-                                    personName: String,
-                                    idx: Int,
-                                    flow: Option[String],
-                                    showHide: Boolean
-                                   )(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getCurrentAddressRows(
+    model: ResponsiblePerson,
+    personName: String,
+    idx: Int,
+    flow: Option[String],
+    showHide: Boolean
+  )(implicit messages: Messages): Option[Seq[SummaryListRow]] =
     model.addressHistory.flatMap(_.currentAddress).map { currentAddress =>
       Seq(
         row(
           messages("responsiblepeople.detailed_answers.address.UK", personName),
           currentAddress.personAddress.isUK(),
           editAction(
-            if(showHide) {
+            if (showHide) {
               controllers.responsiblepeople.address.routes.MovedAddressController.get(idx).url
             } else {
               controllers.responsiblepeople.address.routes.CurrentAddressController.get(idx, true, flow).url
@@ -404,11 +412,11 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           addressToLines(currentAddress.personAddress.toLines),
           actions = editAction(
             (currentAddress.personAddress, showHide) match {
-              case (_, true) =>
+              case (_, true)                      =>
                 controllers.responsiblepeople.address.routes.MovedAddressController.get(idx).url
               case (_: PersonAddressNonUK, false) =>
                 controllers.responsiblepeople.address.routes.CurrentAddressNonUKController.get(idx, true, flow).url
-              case (_: PersonAddressUK, false) =>
+              case (_: PersonAddressUK, false)    =>
                 controllers.responsiblepeople.address.routes.CurrentAddressUKController.get(idx, true, flow).url
             },
             "responsiblepeople.checkYourAnswers.change.homeAddress",
@@ -426,13 +434,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def getAdditionalAddressRows(model: ResponsiblePerson,
-                                       personName: String,
-                                       idx: Int,
-                                       flow: Option[String]
-                                      )(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getAdditionalAddressRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(
+    implicit messages: Messages
+  ): Option[Seq[SummaryListRow]] =
     model.addressHistory.flatMap(_.additionalAddress).map { additionalAddress =>
       Seq(
         row(
@@ -451,7 +456,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             additionalAddress.personAddress match {
               case _: PersonAddressNonUK =>
                 controllers.responsiblepeople.address.routes.AdditionalAddressNonUKController.get(idx, true, flow).url
-              case _: PersonAddressUK =>
+              case _: PersonAddressUK    =>
                 controllers.responsiblepeople.address.routes.AdditionalAddressUKController.get(idx, true, flow).url
             },
             "responsiblepeople.checkYourAnswers.change.previousAddress",
@@ -469,13 +474,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def getExtraAddressRows(model: ResponsiblePerson,
-                                  personName: String,
-                                  idx: Int,
-                                  flow: Option[String]
-                                 )(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getExtraAddressRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit
+    messages: Messages
+  ): Option[Seq[SummaryListRow]] =
     model.addressHistory.flatMap(_.additionalExtraAddress).map { extraAddress =>
       Seq(
         row(
@@ -493,8 +495,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           actions = editAction(
             extraAddress.personAddress match {
               case _: PersonAddressNonUK =>
-                controllers.responsiblepeople.address.routes.AdditionalExtraAddressNonUKController.get(idx, true, flow).url
-              case _: PersonAddressUK =>
+                controllers.responsiblepeople.address.routes.AdditionalExtraAddressNonUKController
+                  .get(idx, true, flow)
+                  .url
+              case _: PersonAddressUK    =>
                 controllers.responsiblepeople.address.routes.AdditionalExtraAddressUKController.get(idx, true, flow).url
             },
             "responsiblepeople.checkYourAnswers.change.previousAddress",
@@ -505,26 +509,24 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           messages("responsiblepeople.timeataddress.address_history.heading", personName),
           extraAddress.timeAtAddress.fold("")(x => messages(s"responsiblepeople.timeataddress.${x.toString}")),
           editAction(
-            controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController.get(idx, true, flow).url,
+            controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController
+              .get(idx, true, flow)
+              .url,
             "responsiblepeople.checkYourAnswers.change.previousAddressDuration",
             "rp-timeatotherpreviousaddress-edit"
           )
         )
       )
     }
-  }
 
-  private def getPositionsRows(model: ResponsiblePerson,
-                               personName: String,
-                               idx: Int,
-                               flow: Option[String]
-                              )(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
-
+  private def getPositionsRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit
+    messages: Messages
+  ): Option[Seq[SummaryListRow]] =
     model.positions.map { pos =>
       Seq(
         SummaryListRow(
           Key(Text(messages("responsiblepeople.position_within_business.heading", personName))),
-          if(pos.positions.size == 1) {
+          if (pos.positions.size == 1) {
             Value(Text(PositionWithinBusiness.getPrettyName(pos.positions.head)))
           } else {
             toBulletList(pos.positions.map(p => PositionWithinBusiness.getPrettyName(p)).toList.sorted)
@@ -546,14 +548,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def getSoleProprietorRow(model: ResponsiblePerson,
-                                   personName: String,
-                                   idx: Int,
-                                   flow: Option[String]
-                                  )(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def getSoleProprietorRow(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(
+    implicit messages: Messages
+  ): Option[SummaryListRow] =
     model.soleProprietorOfAnotherBusiness.map { anotherBusiness =>
       row(
         messages("responsiblepeople.sole.proprietor.another.business.heading", personName),
@@ -565,15 +563,12 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def getVATRegisteredRows(model: ResponsiblePerson,
-                                   personName: String,
-                                   idx: Int,
-                                   flow: Option[String]
-                                  )(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getVATRegisteredRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(
+    implicit messages: Messages
+  ): Option[Seq[SummaryListRow]] = {
 
-    def vatYesNoRow(isRegistered: Boolean): SummaryListRow = {
+    def vatYesNoRow(isRegistered: Boolean): SummaryListRow =
       row(
         messages("responsiblepeople.registeredforvat.heading", personName),
         booleanToLabel(isRegistered),
@@ -583,7 +578,6 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           "rp-registeredforvat-edit"
         )
       )
-    }
 
     model.vatRegistered map {
       case VATRegisteredYes(regNumber) =>
@@ -599,17 +593,15 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             )
           )
         )
-      case VATRegisteredNo => Seq(vatYesNoRow(false))
+      case VATRegisteredNo             => Seq(vatYesNoRow(false))
     }
   }
 
-  private def getSARegisteredRows(model: ResponsiblePerson,
-                                   personName: String,
-                                   idx: Int,
-                                   flow: Option[String]
-                                  )(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getSARegisteredRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit
+    messages: Messages
+  ): Option[Seq[SummaryListRow]] = {
 
-    def saYesNoRow(isRegistered: Boolean): SummaryListRow = {
+    def saYesNoRow(isRegistered: Boolean): SummaryListRow =
       row(
         messages("responsiblepeople.registeredforselfassessment.heading", personName),
         booleanToLabel(isRegistered),
@@ -619,7 +611,6 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           "rp-registeredforsa-edit"
         )
       )
-    }
 
     model.saRegistered map {
       case SaRegisteredYes(regNumber) =>
@@ -635,18 +626,19 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             )
           )
         )
-      case SaRegisteredNo => Seq(saYesNoRow(false))
+      case SaRegisteredNo             => Seq(saYesNoRow(false))
     }
   }
 
-  private def getExperienceTrainingRows(model: ResponsiblePerson,
-                                        businessMatching: BusinessMatching,
-                                        personName: String,
-                                        idx: Int,
-                                        flow: Option[String]
-                                       )(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getExperienceTrainingRows(
+    model: ResponsiblePerson,
+    businessMatching: BusinessMatching,
+    personName: String,
+    idx: Int,
+    flow: Option[String]
+  )(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
 
-    def trainingYesNoRow(hasTraining: Boolean): SummaryListRow = {
+    def trainingYesNoRow(hasTraining: Boolean): SummaryListRow =
       row(
         businessMatching.activities.fold(messages("responsiblepeople.experiencetraining.title")) { types =>
           if (types.businessActivities.size > 1) {
@@ -666,7 +658,6 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           "rp-training-edit"
         )
       )
-    }
 
     model.experienceTraining map {
       case ExperienceTrainingYes(info) =>
@@ -682,17 +673,15 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             )
           )
         )
-      case ExperienceTrainingNo => Seq(trainingYesNoRow(false))
+      case ExperienceTrainingNo        => Seq(trainingYesNoRow(false))
     }
   }
 
-  private def getTrainingRows(model: ResponsiblePerson,
-                              personName: String,
-                              idx: Int,
-                              flow: Option[String]
-                             )(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getTrainingRows(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit
+    messages: Messages
+  ): Option[Seq[SummaryListRow]] = {
 
-    def trainingYesNoRow(hasTraining: Boolean): SummaryListRow = {
+    def trainingYesNoRow(hasTraining: Boolean): SummaryListRow =
       row(
         messages("responsiblepeople.training.heading", personName),
         booleanToLabel(hasTraining),
@@ -702,7 +691,6 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           "rp-traininginmlre-edit"
         )
       )
-    }
 
     model.training map {
       case TrainingYes(info) =>
@@ -718,16 +706,13 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             )
           )
         )
-      case TrainingNo => Seq(trainingYesNoRow(false))
+      case TrainingNo        => Seq(trainingYesNoRow(false))
     }
   }
 
-  private def getApprovalFlagsRow(model: ResponsiblePerson,
-                                  personName: String,
-                                  idx: Int,
-                                  flow: Option[String]
-                                 )(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def getApprovalFlagsRow(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     model.approvalFlags.hasAlreadyPassedFitAndProper.map { fp =>
       row(
         messages("responsiblepeople.fit_and_proper.heading", personName),
@@ -739,14 +724,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def getHasAlreadyPaidRow(model: ResponsiblePerson,
-                                  personName: String,
-                                  idx: Int,
-                                  flow: Option[String]
-                                 )(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def getHasAlreadyPaidRow(model: ResponsiblePerson, personName: String, idx: Int, flow: Option[String])(
+    implicit messages: Messages
+  ): Option[SummaryListRow] =
     model.approvalFlags.hasAlreadyPaidApprovalCheck.map { fp =>
       row(
         messages("responsiblepeople.approval_check.heading", personName),
@@ -758,12 +739,11 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
   implicit class OptionUnwrapper[A](opt: Option[A]) {
-    def asSeq: Seq[SummaryListRow] = opt.fold(Seq.empty[SummaryListRow]){
+    def asSeq: Seq[SummaryListRow] = opt.fold(Seq.empty[SummaryListRow]) {
       case x: Seq[SummaryListRow] => x
-      case x: SummaryListRow => Seq(x)
+      case x: SummaryListRow      => Seq(x)
     }
   }
 }

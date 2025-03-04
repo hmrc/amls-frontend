@@ -27,26 +27,27 @@ import views.html.msb.BranchesOrAgentsWhichCountriesView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class BranchesOrAgentsWhichCountriesController @Inject()(authAction: AuthAction,
-                                                         val ds: CommonPlayDependencies,
-                                                         val autoCompleteService: AutoCompleteService,
-                                                         val cc: MessagesControllerComponents,
-                                                         branchesOrAgentsWhichCountriesService: BranchesOrAgentsWhichCountriesService,
-                                                         formProvider: BranchesOrAgentsWhichCountriesFormProvider,
-                                                         view: BranchesOrAgentsWhichCountriesView) extends AmlsBaseController(ds, cc) {
+class BranchesOrAgentsWhichCountriesController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val autoCompleteService: AutoCompleteService,
+  val cc: MessagesControllerComponents,
+  branchesOrAgentsWhichCountriesService: BranchesOrAgentsWhichCountriesService,
+  formProvider: BranchesOrAgentsWhichCountriesFormProvider,
+  view: BranchesOrAgentsWhichCountriesView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      branchesOrAgentsWhichCountriesService.fetchBranchesOrAgents(request.credId) map { branchesOrAgents =>
-        Ok(view(branchesOrAgents.fold(formProvider())(formProvider().fill), edit, autoCompleteService.formOptions))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    branchesOrAgentsWhichCountriesService.fetchBranchesOrAgents(request.credId) map { branchesOrAgents =>
+      Ok(view(branchesOrAgents.fold(formProvider())(formProvider().fill), edit, autoCompleteService.formOptions))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
         data => {
           val redirect = if (edit) {
             Redirect(routes.SummaryController.get)

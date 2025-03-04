@@ -25,12 +25,15 @@ class SoleProprietorOfAnotherBusinessSpec extends PlaySpec {
 
     "Read and write successfully" in {
 
-      SoleProprietorOfAnotherBusiness.format.reads(SoleProprietorOfAnotherBusiness.format.writes(SoleProprietorOfAnotherBusiness(true))) must be(
-        JsSuccess(SoleProprietorOfAnotherBusiness(true), JsPath))
+      SoleProprietorOfAnotherBusiness.format.reads(
+        SoleProprietorOfAnotherBusiness.format.writes(SoleProprietorOfAnotherBusiness(true))
+      ) must be(JsSuccess(SoleProprietorOfAnotherBusiness(true), JsPath))
     }
 
     "write successfully" in {
-      SoleProprietorOfAnotherBusiness.format.writes(SoleProprietorOfAnotherBusiness(true)) must be(Json.obj("soleProprietorOfAnotherBusiness" -> true))
+      SoleProprietorOfAnotherBusiness.format.writes(SoleProprietorOfAnotherBusiness(true)) must be(
+        Json.obj("soleProprietorOfAnotherBusiness" -> true)
+      )
     }
   }
 }

@@ -25,9 +25,9 @@ class TrainingFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val formProvider = new TrainingFormProvider()
 
-  val form: Form[Training] = formProvider()
+  val form: Form[Training]     = formProvider()
   val booleanFieldName: String = "training"
-  val stringFieldName: String = "information"
+  val stringFieldName: String  = "information"
 
   "TrainingFormProvider" must {
 
@@ -36,11 +36,12 @@ class TrainingFormProviderSpec extends StringFieldBehaviours with Constraints {
       "true is submitted with other names" in {
 
         forAll(stringsShorterThan(formProvider.length).suchThat(_.nonEmpty)) { info =>
-
-          val result = form.bind(Map(
-            booleanFieldName -> "true",
-            stringFieldName -> info
-          ))
+          val result = form.bind(
+            Map(
+              booleanFieldName -> "true",
+              stringFieldName  -> info
+            )
+          )
 
           result.value shouldBe Some(TrainingYes(info))
           assert(result.errors.isEmpty)
@@ -49,9 +50,11 @@ class TrainingFormProviderSpec extends StringFieldBehaviours with Constraints {
 
       "false is submitted" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> "false"
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> "false"
+          )
+        )
 
         result.value shouldBe Some(TrainingNo)
         assert(result.errors.isEmpty)
@@ -63,46 +66,53 @@ class TrainingFormProviderSpec extends StringFieldBehaviours with Constraints {
       s"$booleanFieldName is an invalid value" in {
 
         forAll(alphaStringsShorterThan(formProvider.length).suchThat(_.nonEmpty)) { invalid =>
+          val result = form.bind(
+            Map(
+              booleanFieldName -> invalid
+            )
+          )
 
-          val result = form.bind(Map(
-            booleanFieldName -> invalid
-          ))
-
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(booleanFieldName, "error.required.rp.training"))
         }
       }
 
       s"$booleanFieldName is empty" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(booleanFieldName, "error.required.rp.training"))
       }
 
       s"$stringFieldName is empty when $booleanFieldName is true" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> "true",
-          stringFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> "true",
+            stringFieldName  -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(stringFieldName, "error.required.rp.training.information"))
       }
 
       s"$stringFieldName is longer than ${formProvider.length} when $booleanFieldName is true" in {
 
         forAll(stringsLongerThan(formProvider.length).suchThat(_.nonEmpty)) { info =>
-          val result = form.bind(Map(
-            booleanFieldName -> "true",
-            stringFieldName -> info
-          ))
+          val result = form.bind(
+            Map(
+              booleanFieldName -> "true",
+              stringFieldName  -> info
+            )
+          )
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(
             FormError(
               stringFieldName,
@@ -115,12 +125,14 @@ class TrainingFormProviderSpec extends StringFieldBehaviours with Constraints {
 
       s"$stringFieldName violates regex when $booleanFieldName is true" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> "true",
-          stringFieldName -> "§±@*(&%!£"
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> "true",
+            stringFieldName  -> "§±@*(&%!£"
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(
           FormError(
             stringFieldName,

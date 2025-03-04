@@ -23,8 +23,8 @@ import play.api.data.Form
 class MemberOfProfessionalBodyFormProviderSpec extends BooleanFieldBehaviours[ProfessionalBodyMember] {
 
   override val form: Form[ProfessionalBodyMember] = new MemberOfProfessionalBodyFormProvider()()
-  override val fieldName: String = "isAMember"
-  override val errorMessage: String = "error.required.supervision.business.a.member"
+  override val fieldName: String                  = "isAMember"
+  override val errorMessage: String               = "error.required.supervision.business.a.member"
 
   "MemberOfProfessionalBodyFormProvider" must {
 

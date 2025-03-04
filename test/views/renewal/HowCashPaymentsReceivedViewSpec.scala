@@ -27,12 +27,12 @@ class HowCashPaymentsReceivedViewSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture
 
-  lazy val receivedView = inject[HowCashPaymentsReceivedView]
-  lazy val fp = inject[HowCashPaymentsReceivedFormProvider]
+  lazy val receivedView                                          = inject[HowCashPaymentsReceivedView]
+  lazy val fp                                                    = inject[HowCashPaymentsReceivedFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
-  val howReceived = HowCashPaymentsReceived(paymentMethods)
+  val howReceived    = HowCashPaymentsReceived(paymentMethods)
 
   "HowCashPaymentsReceivedView" must {
 
@@ -40,14 +40,16 @@ class HowCashPaymentsReceivedViewSpec extends AmlsViewSpec {
 
       def view = receivedView(fp().fill(howReceived), true)
 
-      doc.title must startWith("How did you receive cash payments from customers you have not met in person?" + " - " + "Extend your supervision")
+      doc.title must startWith(
+        "How did you receive cash payments from customers you have not met in person?" + " - " + "Extend your supervision"
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = receivedView(fp().fill(howReceived), true)
 
-      heading.text() must be("How did you receive cash payments from customers you have not met in person?")
+      heading.text()    must be("How did you receive cash payments from customers you have not met in person?")
       subHeading.text() must include("Extend your supervision")
     }
 

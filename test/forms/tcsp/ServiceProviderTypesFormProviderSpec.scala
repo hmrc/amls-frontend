@@ -26,13 +26,13 @@ class ServiceProviderTypesFormProviderSpec extends CheckboxFieldBehaviours {
 
   ".serviceProviders" must {
 
-    val fieldName = "serviceProviders"
+    val fieldName   = "serviceProviders"
     val requiredKey = "error.required.tcsp.service.providers"
 
     behave like checkboxFieldWithWrapper[ServiceProvider, TcspTypes](
       form,
       fieldName,
-      validValues  = TcspTypes.all,
+      validValues = TcspTypes.all,
       x => TcspTypes(Set(x)),
       x => TcspTypes(x.toSet),
       invalidError = FormError(s"$fieldName[0]", requiredKey)

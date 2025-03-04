@@ -30,7 +30,7 @@ import scala.concurrent.Future
 class HowManyEmployeesServiceSpec extends AmlsSpec with BeforeAndAfterEach with IntegrationPatience {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[Cache]
+  val mockCacheMap       = mock[Cache]
 
   val service = new HowManyEmployeesService(mockCacheConnector)
 
@@ -84,17 +84,19 @@ class HowManyEmployeesServiceSpec extends AmlsSpec with BeforeAndAfterEach with 
 
       "update model correctly" in {
 
-        val ba = BusinessActivities().howManyEmployees(HowManyEmployees(employeeCountAMLSSupervision = Some("54")))
+        val ba   = BusinessActivities().howManyEmployees(HowManyEmployees(employeeCountAMLSSupervision = Some("54")))
         val data = EmployeeCount("86")
 
         when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
           .thenReturn(Future.successful(Some(ba)))
 
-        when(mockCacheConnector.save[BusinessActivities](
-          eqTo(credId),
-          eqTo(BusinessActivities.key),
-          eqTo(ba.howManyEmployees(HowManyEmployees(Some(data.employeeCount), Some("54"))))
-        )(any()))
+        when(
+          mockCacheConnector.save[BusinessActivities](
+            eqTo(credId),
+            eqTo(BusinessActivities.key),
+            eqTo(ba.howManyEmployees(HowManyEmployees(Some(data.employeeCount), Some("54"))))
+          )(any())
+        )
           .thenReturn(Future.successful(mockCacheMap))
 
         service.updateEmployeeCount(credId, data).futureValue mustBe Some(mockCacheMap)

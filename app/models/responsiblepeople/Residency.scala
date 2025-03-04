@@ -40,11 +40,10 @@ object Residency {
         Json.obj(
           "nino" -> nino
         )
-      case NonUKResidence => {
+      case NonUKResidence    =>
         Json.obj(
           "isUKResidence" -> "false"
         )
-      }
     }
   }
 

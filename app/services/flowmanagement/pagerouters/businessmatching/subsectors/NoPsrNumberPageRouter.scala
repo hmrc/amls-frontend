@@ -26,21 +26,24 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class NoPsrNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
 
-  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)
-                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-
+  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Result] =
     routes.SummaryController.get()
 
-  }
 }
 class NoPsrNumberPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[ChangeSubSectorFlowModel] {
 
-  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean, includeCompanyNotRegistered: Boolean)
-                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-        if (includeCompanyNotRegistered) {
-          routes.CheckCompanyController.get()
-        }else{
-          routes.SummaryController.get()
-        }
-      }
+  override def getRoute(
+    credId: String,
+    model: ChangeSubSectorFlowModel,
+    edit: Boolean,
+    includeCompanyNotRegistered: Boolean
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
+    if (includeCompanyNotRegistered) {
+      routes.CheckCompanyController.get()
+    } else {
+      routes.SummaryController.get()
+    }
 }

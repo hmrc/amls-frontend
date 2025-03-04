@@ -23,8 +23,8 @@ import play.api.data.Form
 class ConfirmRegisteredOfficeFormProviderSpec extends BooleanFieldBehaviours[ConfirmRegisteredOffice] {
 
   override val form: Form[ConfirmRegisteredOffice] = new ConfirmRegisteredOfficeFormProvider()()
-  override val fieldName: String = "isRegOfficeOrMainPlaceOfBusiness"
-  override val errorMessage: String = "error.required.atb.confirm.office"
+  override val fieldName: String                   = "isRegOfficeOrMainPlaceOfBusiness"
+  override val errorMessage: String                = "error.required.atb.confirm.office"
 
   "ConfirmRegisteredOfficeFormProvider" must {
 

@@ -26,11 +26,11 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.declaration.WhoIsRegisteringThisRegistrationView
 
-class WhoIsRegisteringThisRegistrationViewSpec extends AmlsViewSpec with Matchers  {
+class WhoIsRegisteringThisRegistrationViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val registrationView = inject[WhoIsRegisteringThisRegistrationView]
-  lazy val fp = inject[WhoIsRegisteringFormProvider]
-  lazy val regForm = fp("registration")
+  lazy val fp               = inject[WhoIsRegisteringFormProvider]
+  lazy val regForm          = fp("registration")
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -52,8 +52,12 @@ class WhoIsRegisteringThisRegistrationViewSpec extends AmlsViewSpec with Matcher
     }
 
     behave like pageWithErrors(
-      registrationView(regForm.withError("person", "error.required.declaration.who.is.registering"), Seq(ResponsiblePerson())),
-      "person", "error.required.declaration.who.is.registering"
+      registrationView(
+        regForm.withError("person", "error.required.declaration.who.is.registering"),
+        Seq(ResponsiblePerson())
+      ),
+      "person",
+      "error.required.declaration.who.is.registering"
     )
 
     behave like pageWithBackLink(registrationView(regForm, Seq(ResponsiblePerson())))

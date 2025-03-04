@@ -19,7 +19,7 @@ package controllers.businessmatching
 import controllers.actions.SuccessfulAuthAction
 import forms.businessmatching.BusinessTypeFormProvider
 import models.businessmatching.BusinessType
-import org.mockito.ArgumentMatchers.{eq => eqTo, any}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
@@ -37,15 +37,17 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
   val mockService = mock[BusinessTypeService]
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[BusinessTypeView]
-    val controller = new BusinessTypeController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[BusinessTypeView]
+    val controller = new BusinessTypeController(
       SuccessfulAuthAction,
       commonDependencies,
       mockMcc,
       mockService,
       inject[BusinessTypeFormProvider],
-      view)
+      view
+    )
   }
 
   override def beforeEach(): Unit = reset(mockService)
@@ -66,8 +68,8 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
         .thenReturn(Future.successful(Some(BusinessType.LimitedCompany)))
 
       val result = controller.get()(request)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be (Some(routes.CompanyRegistrationNumberController.get().url))
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.CompanyRegistrationNumberController.get().url))
     }
 
     "display Registration Number page for LLP" in new Fixture {
@@ -76,8 +78,8 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
         .thenReturn(Future.successful(Some(BusinessType.LPrLLP)))
 
       val result = controller.get()(request)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be (Some(routes.CompanyRegistrationNumberController.get().url))
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.CompanyRegistrationNumberController.get().url))
     }
 
     "display Type of Business Page" in new Fixture {
@@ -86,8 +88,8 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
         .thenReturn(Future.successful(Some(BusinessType.UnincorporatedBody)))
 
       val result = controller.get()(request)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be (Some(routes.TypeOfBusinessController.get().url))
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.TypeOfBusinessController.get().url))
     }
 
     "display Register Services Page" in new Fixture {
@@ -96,8 +98,8 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
         .thenReturn(Future.successful(Some(BusinessType.LPrLLP)))
 
       val result = controller.get()(request)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be (Some(routes.CompanyRegistrationNumberController.get().url))
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.CompanyRegistrationNumberController.get().url))
     }
 
     "redirect to register services controller when sole proprietor" in new Fixture {
@@ -106,10 +108,9 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
         .thenReturn(Future.successful(Some(BusinessType.SoleProprietor)))
 
       val result = controller.get()(request)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be (Some(routes.RegisterServicesController.get().url))
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.RegisterServicesController.get().url))
     }
-
 
     "post with updated business matching data" in new Fixture {
 
@@ -120,20 +121,21 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecti
         .thenReturn(Future.successful(Some(BusinessType.LimitedCompany)))
 
       val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.CompanyRegistrationNumberController.get().url))
     }
 
     "post with valid data" in new Fixture {
 
-      val newRequest = test.FakeRequest(POST, routes.BusinessTypeController.post().url)
+      val newRequest = test
+        .FakeRequest(POST, routes.BusinessTypeController.post().url)
         .withFormUrlEncodedBody("businessType" -> BusinessType.LimitedCompany.toString)
 
       when(mockService.updateBusinessType(any(), eqTo(BusinessType.LimitedCompany))(any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.RegisterServicesController.get().url))
     }
 

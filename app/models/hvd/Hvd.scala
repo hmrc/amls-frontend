@@ -24,24 +24,33 @@ import play.api.i18n.Messages
 import play.api.libs.json._
 import services.cache.Cache
 
-case class Hvd (cashPayment: Option[CashPayment] = None,
-                products: Option[Products] = None,
-                exciseGoods:  Option[ExciseGoods] = None,
-                howWillYouSellGoods: Option[HowWillYouSellGoods] = None,
-                percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
-                receiveCashPayments: Option[Boolean] = None,
-                cashPaymentMethods: Option[PaymentMethods] = None,
-                linkedCashPayment: Option[LinkedCashPayments] = None,
-                dateOfChange: Option[DateOfChange] = None,
-                hasChanged: Boolean = false,
-                hasAccepted: Boolean = false) extends Logging {
-
+case class Hvd(
+  cashPayment: Option[CashPayment] = None,
+  products: Option[Products] = None,
+  exciseGoods: Option[ExciseGoods] = None,
+  howWillYouSellGoods: Option[HowWillYouSellGoods] = None,
+  percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
+  receiveCashPayments: Option[Boolean] = None,
+  cashPaymentMethods: Option[PaymentMethods] = None,
+  linkedCashPayment: Option[LinkedCashPayments] = None,
+  dateOfChange: Option[DateOfChange] = None,
+  hasChanged: Boolean = false,
+  hasAccepted: Boolean = false
+) extends Logging {
 
   def cashPayment(p: CashPayment): Hvd =
-    this.copy(cashPayment = Some(p), hasChanged = hasChanged || !this.cashPayment.contains(p), hasAccepted = hasAccepted && this.cashPayment.contains(p))
+    this.copy(
+      cashPayment = Some(p),
+      hasChanged = hasChanged || !this.cashPayment.contains(p),
+      hasAccepted = hasAccepted && this.cashPayment.contains(p)
+    )
 
   def products(p: Products): Hvd =
-    this.copy(products = Some(p), hasChanged = hasChanged || !this.products.contains(p), hasAccepted = hasAccepted && this.products.contains(p))
+    this.copy(
+      products = Some(p),
+      hasChanged = hasChanged || !this.products.contains(p),
+      hasAccepted = hasAccepted && this.products.contains(p)
+    )
 
   def receiveCashPayments(p: Boolean): Hvd =
     this.copy(
@@ -58,26 +67,32 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
     )
 
   def exciseGoods(p: ExciseGoods): Hvd =
-    this.copy(exciseGoods = Some(p),
+    this.copy(
+      exciseGoods = Some(p),
       hasChanged = hasChanged || !this.exciseGoods.contains(p),
-      hasAccepted = hasAccepted && this.exciseGoods.contains(p))
+      hasAccepted = hasAccepted && this.exciseGoods.contains(p)
+    )
 
   def linkedCashPayment(p: LinkedCashPayments): Hvd =
-    this.copy(linkedCashPayment = Some(p),
+    this.copy(
+      linkedCashPayment = Some(p),
       hasChanged = hasChanged || !this.linkedCashPayment.contains(p),
-      hasAccepted = hasAccepted && this.linkedCashPayment.contains(p))
+      hasAccepted = hasAccepted && this.linkedCashPayment.contains(p)
+    )
 
-  def howWillYouSellGoods(p: HowWillYouSellGoods): Hvd = {
-    copy(howWillYouSellGoods = Some(p),
+  def howWillYouSellGoods(p: HowWillYouSellGoods): Hvd =
+    copy(
+      howWillYouSellGoods = Some(p),
       hasChanged = hasChanged || !this.howWillYouSellGoods.contains(p),
-      hasAccepted = hasAccepted && this.howWillYouSellGoods.contains(p))
-  }
+      hasAccepted = hasAccepted && this.howWillYouSellGoods.contains(p)
+    )
 
   def percentageOfCashPaymentOver15000(v: PercentageOfCashPaymentOver15000): Hvd =
     this.copy(
       percentageOfCashPaymentOver15000 = Some(v),
       hasChanged = hasChanged || !this.percentageOfCashPaymentOver15000.contains(v),
-      hasAccepted = hasAccepted && this.percentageOfCashPaymentOver15000.contains(v))
+      hasAccepted = hasAccepted && this.percentageOfCashPaymentOver15000.contains(v)
+    )
 
   def dateOfChange(v: DateOfChange): Hvd = this.copy(dateOfChange = Some(v))
 
@@ -86,20 +101,24 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
     logger.debug(s"[Hvd][isComplete] $this")
     // $COVERAGE-ON$
     this match {
-        case Hvd(Some(cp), Some(pr), _, Some(_), Some(_), Some(true), Some(_), Some(_), _, _, true)
-          if pr.items.forall(item => item != Alcohol && item != Tobacco) && cp.isCashPaymentsComplete => true
+      case Hvd(Some(cp), Some(pr), _, Some(_), Some(_), Some(true), Some(_), Some(_), _, _, true)
+          if pr.items.forall(item => item != Alcohol && item != Tobacco) && cp.isCashPaymentsComplete =>
+        true
 
-        case Hvd(Some(cp), Some(_), Some(_), Some(_), Some(_), Some(true), Some(_), Some(_), _, _, true)
-        if cp.isCashPaymentsComplete => true
+      case Hvd(Some(cp), Some(_), Some(_), Some(_), Some(_), Some(true), Some(_), Some(_), _, _, true)
+          if cp.isCashPaymentsComplete =>
+        true
 
-        case Hvd(Some(cp), Some(pr), _, Some(_), Some(_), Some(false), _, Some(_), _, _, true)
-          if pr.items.forall(item => item != Alcohol && item != Tobacco) && cp.isCashPaymentsComplete => true
+      case Hvd(Some(cp), Some(pr), _, Some(_), Some(_), Some(false), _, Some(_), _, _, true)
+          if pr.items.forall(item => item != Alcohol && item != Tobacco) && cp.isCashPaymentsComplete =>
+        true
 
-        case Hvd(Some(cp), Some(_), Some(_), Some(_), Some(_), Some(false), _, Some(_), _, _, true)
-        if cp.isCashPaymentsComplete => true
+      case Hvd(Some(cp), Some(_), Some(_), Some(_), Some(_), Some(false), _, Some(_), _, _, true)
+          if cp.isCashPaymentsComplete =>
+        true
 
-        case _ => false
-      }
+      case _ => false
+    }
   }
 }
 
@@ -111,13 +130,12 @@ object Hvd {
 
   def section(implicit cache: Cache): Section = {
     val notStarted = Section(key, NotStarted, false, controllers.hvd.routes.WhatYouNeedController.get)
-    cache.getEntry[Hvd](key).fold(notStarted)  {
-      model =>
-        if (model.isComplete) {
-          Section(key, Completed, model.hasChanged, controllers.hvd.routes.SummaryController.get)
-        } else {
-          Section(key, Started, model.hasChanged, controllers.hvd.routes.WhatYouNeedController.get)
-        }
+    cache.getEntry[Hvd](key).fold(notStarted) { model =>
+      if (model.isComplete) {
+        Section(key, Completed, model.hasChanged, controllers.hvd.routes.SummaryController.get)
+      } else {
+        Section(key, Started, model.hasChanged, controllers.hvd.routes.WhatYouNeedController.get)
+      }
     }
   }
 
@@ -129,33 +147,32 @@ object Hvd {
       NotStarted,
       TaskRow.notStartedTag
     )
-    cache.getEntry[Hvd](key).fold(notStarted) {
-      model =>
-        if (model.isComplete && model.hasChanged) {
-          TaskRow(
-            key,
-            controllers.hvd.routes.SummaryController.get.url,
-            hasChanged = true,
-            status = Updated,
-            tag = TaskRow.updatedTag
-          )
-        } else if (model.isComplete) {
-          TaskRow(
-            key,
-            controllers.hvd.routes.SummaryController.get.url,
-            model.hasChanged,
-            Completed,
-            TaskRow.completedTag
-          )
-        } else {
-          TaskRow(
-            key,
-            controllers.hvd.routes.WhatYouNeedController.get.url,
-            model.hasChanged,
-            Started,
-            TaskRow.incompleteTag
-          )
-        }
+    cache.getEntry[Hvd](key).fold(notStarted) { model =>
+      if (model.isComplete && model.hasChanged) {
+        TaskRow(
+          key,
+          controllers.hvd.routes.SummaryController.get.url,
+          hasChanged = true,
+          status = Updated,
+          tag = TaskRow.updatedTag
+        )
+      } else if (model.isComplete) {
+        TaskRow(
+          key,
+          controllers.hvd.routes.SummaryController.get.url,
+          model.hasChanged,
+          Completed,
+          TaskRow.completedTag
+        )
+      } else {
+        TaskRow(
+          key,
+          controllers.hvd.routes.WhatYouNeedController.get.url,
+          model.hasChanged,
+          Started,
+          TaskRow.incompleteTag
+        )
+      }
     }
   }
 
@@ -165,12 +182,14 @@ object Hvd {
     }
 
   def oldCashPaymentMethodsReader: Reads[Option[PaymentMethods]] =
-    (__ \ "receiveCashPayments").readNullable[ReceiveCashPayments] map { _ flatMap { _.paymentMethods } } orElse constant(None)
+    (__ \ "receiveCashPayments").readNullable[ReceiveCashPayments] map {
+      _ flatMap { _.paymentMethods }
+    } orElse constant(None)
 
   def cashPaymentMethodsReader: Reads[Option[PaymentMethods]] =
     (__ \ "cashPaymentMethods").readNullable[PaymentMethods] flatMap {
       case None => oldCashPaymentMethodsReader
-      case p => constant(p)
+      case p    => constant(p)
     }
 
   implicit val reads: Reads[Hvd] = {
@@ -186,9 +205,9 @@ object Hvd {
         cashPaymentMethodsReader and
         (__ \ "linkedCashPayment").readNullable[LinkedCashPayments] and
         (__ \ "dateOfChange").readNullable[DateOfChange] and
-        (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
-        (__ \ "hasAccepted").readNullable[Boolean].map {_.getOrElse(false)}
-      ) apply Hvd.apply _
+        (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
+        (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
+    ) apply Hvd.apply _
   }
 
   implicit val writes: Writes[Hvd] = Json.writes[Hvd]

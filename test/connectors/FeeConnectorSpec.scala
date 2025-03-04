@@ -31,24 +31,26 @@ import utils.HttpClientMocker
 import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with AmlsReferenceNumberGenerator {
+class FeeConnectorSpec
+    extends PlaySpec
+    with MockitoSugar
+    with ScalaFutures
+    with IntegrationPatience
+    with AmlsReferenceNumberGenerator {
 
   trait Fixture {
 
-    val mocker = new HttpClientMocker()
+    val mocker                               = new HttpClientMocker()
     private val configuration: Configuration = Configuration.load(Environment.simple())
-    private val config = new ApplicationConfig(configuration, new ServicesConfig(configuration))
+    private val config                       = new ApplicationConfig(configuration, new ServicesConfig(configuration))
 
-    val connector = new FeeConnector(
-      http = mocker.httpClient,
-      appConfig =config)
+    val connector = new FeeConnector(http = mocker.httpClient, appConfig = config)
 
-    val safeId = "SAFEID"
+    val safeId                          = "SAFEID"
     val accountTypeId: (String, String) = ("org", "id")
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
   }
-
 
   "FeeConnector" must {
 
@@ -62,13 +64,14 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with
       totalFees = 550.0,
       paymentReference = Some("XA000000000000"),
       difference = None,
-      createdAt = LocalDateTime.of(2017, 12, 1, 1, 3))
+      createdAt = LocalDateTime.of(2017, 12, 1, 1, 3)
+    )
 
     "successfully receive feeResponse" in new Fixture {
 
       mocker.mockGet(url"http://localhost:8940/amls/payment/org/id/$amlsRegistrationNumber", feeResponse)
 
-      whenReady(connector.feeResponse(amlsRegistrationNumber, accountTypeId)){
+      whenReady(connector.feeResponse(amlsRegistrationNumber, accountTypeId)) {
         _ mustBe feeResponse
       }
     }

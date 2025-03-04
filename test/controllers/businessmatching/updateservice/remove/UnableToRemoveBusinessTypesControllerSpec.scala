@@ -29,10 +29,11 @@ class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
   trait Fixture extends DependencyMocks {
     self =>
 
-    val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[UnableToRemoveActivityView]
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[UnableToRemoveActivityView]
     val controller = new UnableToRemoveBusinessTypesController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       cc = mockMcc,
       view = view
@@ -46,15 +47,14 @@ class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
 
           val oneActivityBusiness = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))
 
-          mockCacheFetch[BusinessMatching](
-            Some(oneActivityBusiness),
-            Some(BusinessMatching.key))
+          mockCacheFetch[BusinessMatching](Some(oneActivityBusiness), Some(BusinessMatching.key))
 
           val result = controller.get()(request)
 
           status(result) mustBe OK
           contentAsString(result) must include(
-            messages("businessmatching.updateservice.removeactivitiesinformation.heading",
+            messages(
+              "businessmatching.updateservice.removeactivitiesinformation.heading",
               messages("businessmatching.registerservices.servicename.lbl.06.phrased")
             )
           )
@@ -67,9 +67,7 @@ class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         val noneActivityBusiness = BusinessMatching(activities = None)
 
-        mockCacheFetch[BusinessMatching](
-          Some(noneActivityBusiness),
-          Some(BusinessMatching.key))
+        mockCacheFetch[BusinessMatching](Some(noneActivityBusiness), Some(BusinessMatching.key))
 
         val result = controller.get()(request)
 

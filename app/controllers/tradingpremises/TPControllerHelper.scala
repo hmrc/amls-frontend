@@ -24,12 +24,12 @@ import utils.{ControllerHelper, StatusConstants}
 
 object TPControllerHelper {
 
-  def redirectToNextPage(maybeCache: Option[Cache], index: Int, edit: Boolean)
-                        (implicit request: Request[AnyContent],
-                         messages: Messages,
-                         error: views.html.ErrorView): Result = {
+  def redirectToNextPage(maybeCache: Option[Cache], index: Int, edit: Boolean)(implicit
+    request: Request[AnyContent],
+    messages: Messages,
+    error: views.html.ErrorView
+  ): Result =
     maybeCache map { cache =>
-
       val maybeTradingPremises = for {
         tp <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
       } yield tp collect {
@@ -38,18 +38,17 @@ object TPControllerHelper {
 
       val isAgent = (for {
         tpList <- maybeTradingPremises
-        tp <- tpList.headOption
+        tp     <- tpList.headOption
       } yield tp.registeringAgentPremises.contains(RegisteringAgentPremises(true))) getOrElse false
 
       val isFirst = maybeTradingPremises.fold(0)(_.size) == 1
 
       isFirst match {
         case true if isAgent => Results.Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
-        case true if !edit => Results.Redirect(routes.ConfirmAddressController.get(index))
-        case false => Results.Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
+        case true if !edit   => Results.Redirect(routes.ConfirmAddressController.get(index))
+        case false           => Results.Redirect(routes.WhereAreTradingPremisesController.get(index, edit))
       }
 
     } getOrElse Results.NotFound(ControllerHelper.notFoundView)
-  }
 
 }

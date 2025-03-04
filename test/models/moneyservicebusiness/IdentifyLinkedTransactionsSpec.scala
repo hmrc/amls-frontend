@@ -27,8 +27,9 @@ class IdentifyLinkedTransactionsSpec extends PlaySpec {
 
       "Successfully read/write Json data" in {
 
-        IdentifyLinkedTransactions.format.reads(IdentifyLinkedTransactions.format.writes(
-          IdentifyLinkedTransactions(false))) must be(JsSuccess(IdentifyLinkedTransactions(false), JsPath))
+        IdentifyLinkedTransactions.format.reads(
+          IdentifyLinkedTransactions.format.writes(IdentifyLinkedTransactions(false))
+        ) must be(JsSuccess(IdentifyLinkedTransactions(false), JsPath))
 
       }
     }

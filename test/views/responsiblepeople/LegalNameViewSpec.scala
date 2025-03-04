@@ -27,7 +27,7 @@ import views.html.responsiblepeople.LegalNameView
 class LegalNameViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val legal_name = inject[LegalNameView]
-  lazy val fp = inject[LegalNameFormProvider]
+  lazy val fp         = inject[LegalNameFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,8 +42,8 @@ class LegalNameViewSpec extends AmlsViewSpec with Matchers {
 
       def view = legal_name(fp(), true, 1, None, name)
 
-      doc.title must startWith(messages("responsiblepeople.legalName.title"))
-      heading.html must be(messages("responsiblepeople.legalName.heading", name))
+      doc.title       must startWith(messages("responsiblepeople.legalName.title"))
+      heading.html    must be(messages("responsiblepeople.legalName.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "hasPreviousName") must not be empty
@@ -51,7 +51,8 @@ class LegalNameViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       legal_name(fp().withError("hasPreviousName", "error.required.rp.hasPreviousName"), false, 1, None, name),
-      "hasPreviousName", "error.required.rp.hasPreviousName"
+      "hasPreviousName",
+      "error.required.rp.hasPreviousName"
     )
 
     behave like pageWithBackLink(legal_name(fp(), false, 1, None, name))

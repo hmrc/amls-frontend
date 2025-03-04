@@ -22,9 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class TypeOfBusinessFormProvider @Inject()() extends Mappings {
+class TypeOfBusinessFormProvider @Inject() () extends Mappings {
 
-  val maxLength = 40
+  val maxLength                     = 40
   def apply(): Form[TypeOfBusiness] = Form[TypeOfBusiness](
     "typeOfBusiness" -> text("error.required.bm.businesstype.type")
       .verifying(
@@ -32,6 +32,7 @@ class TypeOfBusinessFormProvider @Inject()() extends Mappings {
           maxLength(maxLength, "error.max.length.bm.businesstype.type"),
           regexp(basicPunctuationRegex, "error.bm.businesstype.type.characters")
         )
-      ).transform[TypeOfBusiness](TypeOfBusiness(_), _.typeOfBusiness)
+      )
+      .transform[TypeOfBusiness](TypeOfBusiness(_), _.typeOfBusiness)
   )
 }

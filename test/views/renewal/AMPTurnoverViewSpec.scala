@@ -24,10 +24,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.AMPTurnoverView
 
-class AMPTurnoverViewSpec extends AmlsViewSpec with Matchers  {
+class AMPTurnoverViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val amp_turnover = inject[AMPTurnoverView]
-  lazy val fp = inject[AMPTurnoverFormProvider]
+  lazy val amp_turnover                                          = inject[AMPTurnoverView]
+  lazy val fp                                                    = inject[AMPTurnoverFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -37,20 +37,25 @@ class AMPTurnoverViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = amp_turnover(fp().fill(Second), true)
 
-      doc.title must startWith("How much of your turnover for the last 12 months came from sales of art for €10,000 or more? - Extend your supervision - Manage your anti-money laundering supervision - GOV.UK")
+      doc.title must startWith(
+        "How much of your turnover for the last 12 months came from sales of art for €10,000 or more? - Extend your supervision - Manage your anti-money laundering supervision - GOV.UK"
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = amp_turnover(fp().fill(Third), true)
 
-      heading.html must be("How much of your turnover for the last 12 months came from sales of art for €10,000 or more?")
+      heading.html    must be(
+        "How much of your turnover for the last 12 months came from sales of art for €10,000 or more?"
+      )
       subHeading.html must include(messages("summary.renewal"))
     }
 
     behave like pageWithErrors(
       amp_turnover(
-        fp().withError("percentageExpectedTurnover", "error.required.renewal.amp.percentage"), false
+        fp().withError("percentageExpectedTurnover", "error.required.renewal.amp.percentage"),
+        false
       ),
       "percentageExpectedTurnover",
       "error.required.renewal.amp.percentage"

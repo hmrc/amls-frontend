@@ -44,17 +44,18 @@ import java.time.LocalDateTime
 import scala.concurrent.Future
 
 // scalastyle:off magic.number
-class BacsConfirmationControllerSpec extends AmlsSpec
-  with AmlsReferenceNumberGenerator
-  with PaymentGenerator
-  with SubscriptionResponseGenerator {
+class BacsConfirmationControllerSpec
+    extends AmlsSpec
+    with AmlsReferenceNumberGenerator
+    with PaymentGenerator
+    with SubscriptionResponseGenerator {
 
   trait Fixture {
     self =>
-    val baseUrl = "http://localhost"
+    val baseUrl                                  = "http://localhost"
     val request: Request[AnyContentAsEmpty.type] = addToken(authRequest(uri = baseUrl))
-    lazy val view = app.injector.instanceOf[ConfirmationBacsView]
-    val controller = new BacsConfirmationController(
+    lazy val view                                = app.injector.instanceOf[ConfirmationBacsView]
+    val controller                               = new BacsConfirmationController(
       authAction = SuccessfulAuthAction,
       statusService = mock[StatusService],
       dataCacheConnector = mock[DataCacheConnector],
@@ -62,14 +63,15 @@ class BacsConfirmationControllerSpec extends AmlsSpec
       enrolmentService = mock[AuthEnrolmentsService],
       ds = commonDependencies,
       cc = mockMcc,
-      view = view)
+      view = view
+    )
 
     val amlsRegistrationNumber = "amlsRefNumber"
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
 
-    protected val mockCacheMap = mock[Cache]
-    val companyNameFromCache = "My Test Company Name From Cache"
+    protected val mockCacheMap      = mock[Cache]
+    val companyNameFromCache        = "My Test Company Name From Cache"
     val companyNameFromRegistration = "My Test Company Name From Registration"
 
     setupBusinessMatching(companyNameFromCache)

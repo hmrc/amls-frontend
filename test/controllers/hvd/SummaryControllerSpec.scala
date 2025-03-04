@@ -49,8 +49,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
     val request = addToken(authRequest)
 
     implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
-    lazy val view = inject[CheckYourAnswersView]
-    lazy val controller =
+    lazy val view                             = inject[CheckYourAnswersView]
+    lazy val controller                       =
       new SummaryController(
         authAction = SuccessfulAuthAction,
         ds = commonDependencies,
@@ -59,13 +59,17 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         mockServiceFlow,
         cc = mockMcc,
         cyaHelper = inject[CheckYourAnswersHelper],
-        view = view)
+        view = view
+      )
 
-    val day = 15
+    val day   = 15
     val month = 2
-    val year = 1956
+    val year  = 1956
 
-    val completeModel = Hvd(Some(CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(year, month, day))))),
+    val completeModel = Hvd(
+      Some(
+        CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(year, month, day))))
+      ),
       Some(Products(Set(Alcohol, Tobacco, Other("test")))),
       Some(ExciseGoods(true)),
       Some(HowWillYouSellGoods(Set(Wholesale, Retail, Auction))),
@@ -79,7 +83,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
 
     when {
-      controller.statusService.isPreSubmission(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
+      controller.statusService
+        .isPreSubmission(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
     } thenReturn Future.successful(true)
   }
 
@@ -89,22 +94,27 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
 
       val model = Hvd(None)
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
+      when(
+        controller.statusService
+          .getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
+      )
         .thenReturn(Future.successful(NotCompleted))
-      when(controller.dataCache.fetch[Hvd](any(), any())
-        (any())).thenReturn(Future.successful(Some(model)))
+      when(controller.dataCache.fetch[Hvd](any(), any())(any())).thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("summary.checkyouranswers.title"))
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
+      when(
+        controller.statusService
+          .getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
+      )
         .thenReturn(Future.successful(NotCompleted))
 
-      when(controller.dataCache.fetch[Hvd](any(), any())( any()))
+      when(controller.dataCache.fetch[Hvd](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -114,21 +124,23 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
     "show edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
       "application in variation mode" in new Fixture {
 
-        when(controller.dataCache.fetch[Hvd](any(), eqTo(Hvd.key))
-          (any())).thenReturn(Future.successful(Some(completeModel)))
+        when(controller.dataCache.fetch[Hvd](any(), eqTo(Hvd.key))(any()))
+          .thenReturn(Future.successful(Some(completeModel)))
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
+        when(
+          controller.statusService
+            .getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
+        )
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        val document = Jsoup.parse(contentAsString(result))
+        val document   = Jsoup.parse(contentAsString(result))
         val answerRows = document.getElementsByClass("govuk-summary-list__row").toArray(Array[Element]())
         answerRows.size mustBe 9
 
-        for ( el <- answerRows ) {
+        for (el <- answerRows)
           el.getElementsByTag("a").first().text() must include(messages("button.edit"))
-        }
       }
     }
 
@@ -137,23 +149,28 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         when(controller.dataCache.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(Some(completeModel)))
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
+        when(
+          controller.statusService
+            .getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
+        )
           .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get()(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
         val elements = document.getElementsByTag("section").iterator
-        while (elements.hasNext) {
+        while (elements.hasNext)
           elements.next().getElementsByTag("a").hasClass("change-answer") must be(true)
-        }
       }
 
       "in variation mode and also in the new service flow" in new Fixture {
-        when(controller.dataCache.fetch[Hvd]( any(), eqTo(Hvd.key))
-          (any())).thenReturn(Future.successful(Some(completeModel)))
+        when(controller.dataCache.fetch[Hvd](any(), eqTo(Hvd.key))(any()))
+          .thenReturn(Future.successful(Some(completeModel)))
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
+        when(
+          controller.statusService
+            .getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
+        )
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         mockIsNewActivityNewAuth(true, Some(HighValueDealing))
@@ -164,9 +181,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         val document = Jsoup.parse(contentAsString(result))
         val elements = document.getElementsByTag("section").iterator
 
-        while (elements.hasNext) {
+        while (elements.hasNext)
           elements.next().getElementsByTag("a").hasClass("change-answer") must be(true)
-        }
       }
     }
   }
@@ -176,7 +192,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
       val cache = mock[Cache]
 
       when {
-        (controller.dataCache.fetch[Hvd](any(), any())(any()))
+        controller.dataCache.fetch[Hvd](any(), any())(any())
       } thenReturn Future.successful(Some(completeModel.copy(hasAccepted = false)))
 
       when {

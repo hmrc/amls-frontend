@@ -29,9 +29,9 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
   val accountNameIndex = 0
   val accountTypeIndex = 1
-  val isUKIndex = 2
+  val isUKIndex        = 2
 
-  val sortCodeIndex = 3
+  val sortCodeIndex      = 3
   val accountNumberIndex = 4
 
   val hasIBANIndex = 3
@@ -40,29 +40,35 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
   val ibanNumberIndex = 4
 
-  val ukAccount: UKAccount = UKAccount("12345678", "111111")
-  val ibanAccount: NonUKIBANNumber = NonUKIBANNumber("NL26RABO0163975856")
+  val ukAccount: UKAccount             = UKAccount("12345678", "111111")
+  val ibanAccount: NonUKIBANNumber     = NonUKIBANNumber("NL26RABO0163975856")
   val nonUkAccount: NonUKAccountNumber = NonUKAccountNumber("123456789")
 
-  val ukBankAccount: BankAccount = BankAccount(
-    Some(BankAccountIsUk(true)), None, Some(ukAccount)
+  val ukBankAccount: BankAccount    = BankAccount(
+    Some(BankAccountIsUk(true)),
+    None,
+    Some(ukAccount)
   )
   val nonUkBankAccount: BankAccount = BankAccount(
-    Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(nonUkAccount)
+    Some(BankAccountIsUk(false)),
+    Some(BankAccountHasIban(false)),
+    Some(nonUkAccount)
   )
-  val nonUkIban: BankAccount = BankAccount(
-    Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some(ibanAccount)
+  val nonUkIban: BankAccount        = BankAccount(
+    Some(BankAccountIsUk(false)),
+    Some(BankAccountHasIban(true)),
+    Some(ibanAccount)
   )
 
-  val ukBankDetails = BankDetails(Some(PersonalAccount), Some("Main Account"), Some(ukBankAccount))
-  val ibanBankDetails = BankDetails(Some(BelongsToBusiness), Some("Business Account"), Some(nonUkIban))
+  val ukBankDetails    = BankDetails(Some(PersonalAccount), Some("Main Account"), Some(ukBankAccount))
+  val ibanBankDetails  = BankDetails(Some(BelongsToBusiness), Some("Business Account"), Some(nonUkIban))
   val nonUkBankDetails = BankDetails(Some(BelongsToOtherBusiness), Some("Outsourced Account"), Some(nonUkBankAccount))
 
   def getRows(bankType: String): Seq[SummaryListRow] = bankType match {
-    case "UK" => cyaHelper.createSummaryList(ukBankDetails, 1).rows
-    case "IBAN" => cyaHelper.createSummaryList(ibanBankDetails, 1).rows
+    case "UK"    => cyaHelper.createSummaryList(ukBankDetails, 1).rows
+    case "IBAN"  => cyaHelper.createSummaryList(ibanBankDetails, 1).rows
     case "NONUK" => cyaHelper.createSummaryList(nonUkBankDetails, 1).rows
-    case _ => fail("Invalid bank type")
+    case _       => fail("Invalid bank type")
   }
   trait RowFixture {
 
@@ -179,7 +185,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
           ibanAccount.IBANNumber,
           controllers.bankdetails.routes.BankAccountIbanController.get(1, true).url,
           "ibannumber-edit"
-
         )
       }
     }

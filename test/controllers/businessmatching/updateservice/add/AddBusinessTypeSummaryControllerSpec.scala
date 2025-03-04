@@ -16,7 +16,6 @@
 
 package controllers.businessmatching.updateservice.add
 
-
 import cats.data.OptionT
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
@@ -24,7 +23,7 @@ import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
-import models.businessmatching.BusinessActivity.{TrustAndCompanyServices, HighValueDealing, BillPaymentServices}
+import models.businessmatching.BusinessActivity.{BillPaymentServices, HighValueDealing, TrustAndCompanyServices}
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPageId}
 import models.status.SubmissionDecisionApproved
@@ -41,26 +40,28 @@ import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.add.UpdateServicesSummaryView
 
-
 import scala.concurrent.Future
 
-class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
-  with MockitoSugar
-  with TradingPremisesGenerator
-  with BusinessMatchingGenerator with ResponsiblePersonGenerator {
+class AddBusinessTypeSummaryControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with TradingPremisesGenerator
+    with BusinessMatchingGenerator
+    with ResponsiblePersonGenerator {
 
   sealed trait Fixture extends DependencyMocks {
     self =>
 
-    val request = addToken(authRequest)
-    val mockTradingPremisesService = mock[TradingPremisesService]
+    val request                                   = addToken(authRequest)
+    val mockTradingPremisesService                = mock[TradingPremisesService]
     val mockUpdateServicesSummaryControllerHelper = mock[AddBusinessTypeHelper]
-    val mockBusinessMatchingService = mock[BusinessMatchingService]
-    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
+    val mockBusinessMatchingService               = mock[BusinessMatchingService]
+    val mockUpdateServiceHelper                   = mock[AddBusinessTypeHelper]
 
-    lazy val view = app.injector.instanceOf[UpdateServicesSummaryView]
+    lazy val view  = app.injector.instanceOf[UpdateServicesSummaryView]
     val controller = new AddBusinessTypeSummaryController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
@@ -71,12 +72,13 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
       view = view
     )
 
-    val flowModel = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
-        addMoreActivities = None,
-        hasChanged = true,
-        hasAccepted = false,
-        businessAppliedForPSRNumber = None,
-        subSectors = None
+    val flowModel = AddBusinessTypeFlowModel(
+      activity = Some(TrustAndCompanyServices),
+      addMoreActivities = None,
+      hasChanged = true,
+      hasAccepted = false,
+      businessAppliedForPSRNumber = None,
+      subSectors = None
     )
 
     mockCacheFetch[AddBusinessTypeFlowModel](Some(flowModel))
@@ -86,12 +88,11 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
 
   "UpdateServicesSummaryController" when {
 
-
     "get is called" must {
       "return OK with update_service_summary view" in new Fixture {
         val result = controller.get()(request)
 
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(Messages("title.cya"))
         contentAsString(result) must include(Messages("button.checkyouranswers.acceptandcomplete"))
       }
@@ -101,58 +102,63 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
       "respond with OK and redirect to the 'do you want to add more activities' page " +
         "if the user clicks continue and there are available Activities to select" in new Fixture {
 
-        // scalastyle:off magic.number
-        val tradingPremises: Seq[TradingPremises] = Gen.listOfN(5, tradingPremisesGen).sample.get
+          // scalastyle:off magic.number
+          val tradingPremises: Seq[TradingPremises] = Gen.listOfN(5, tradingPremisesGen).sample.get
 
-        val modifiedTradingPremises = tradingPremises map {
-          _.copy(
-            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing)))
+          val modifiedTradingPremises = tradingPremises map {
+            _.copy(
+              whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing)))
+            )
+          }
+
+          val businessMatchingModel = businessMatchingGen.sample.get.copy(
+            activities = Some(BusinessActivities(Set(BillPaymentServices)))
           )
+
+          val serviceChangeRegister: ServiceChangeRegister = ServiceChangeRegister(
+            Some(Set(BillPaymentServices))
+          )
+
+          when {
+            controller.helper.updateBusinessMatching(any(), any())(any())
+          } thenReturn OptionT.fromOption[Future](Some(businessMatchingModel))
+
+          when {
+            controller.helper.updateServicesRegister(any(), any())(any())
+          } thenReturn OptionT.liftF(Future.successful(serviceChangeRegister))
+
+          when {
+            controller.tradingPremisesService.updateTradingPremises(
+              eqTo(Seq(0)),
+              eqTo(tradingPremises),
+              eqTo(HighValueDealing),
+              eqTo(None),
+              eqTo(false)
+            )
+          } thenReturn modifiedTradingPremises
+
+          when {
+            controller.helper.updateHasAcceptedFlag(any(), eqTo(flowModel))(any())
+          } thenReturn OptionT.fromOption[Future](Some(mockCacheMap))
+
+          when {
+            controller.helper.updateBusinessActivities(any(), any())
+          } thenReturn OptionT.liftF(Future.successful(mock[models.businessactivities.BusinessActivities]))
+
+          when {
+            controller.helper.updateSupervision(any())(any())
+          } thenReturn OptionT.liftF(Future.successful(Supervision()))
+
+          when {
+            controller.helper.clearFlowModel(any())
+          } thenReturn OptionT.liftF(Future.successful(AddBusinessTypeFlowModel()))
+
+          val result = controller.post()(request)
+
+          status(result) must be(SEE_OTHER)
+
+          controller.router.verify("internalId", AddBusinessTypeSummaryPageId, flowModel)
         }
-
-        val businessMatchingModel = businessMatchingGen.sample.get.copy(
-          activities = Some(BusinessActivities(Set(BillPaymentServices)))
-        )
-
-        val serviceChangeRegister: ServiceChangeRegister = ServiceChangeRegister(
-          Some(Set(BillPaymentServices))
-        )
-
-        when {
-          controller.helper.updateBusinessMatching(any(), any())(any())
-        } thenReturn OptionT.fromOption[Future](Some(businessMatchingModel))
-
-        when {
-          controller.helper.updateServicesRegister(any(), any())(any())
-        } thenReturn OptionT.liftF(Future.successful(serviceChangeRegister))
-
-        when {
-          controller.tradingPremisesService.updateTradingPremises(eqTo(Seq(0)), eqTo(tradingPremises), eqTo(HighValueDealing), eqTo(None), eqTo(false))
-        } thenReturn modifiedTradingPremises
-
-        when {
-          controller.helper.updateHasAcceptedFlag(any(), eqTo(flowModel))(any())
-        } thenReturn OptionT.fromOption[Future](Some(mockCacheMap))
-
-        when {
-          controller.helper.updateBusinessActivities(any(), any())
-        } thenReturn OptionT.liftF(Future.successful(mock[models.businessactivities.BusinessActivities]))
-
-        when {
-          controller.helper.updateSupervision(any())(any())
-        } thenReturn OptionT.liftF(Future.successful(Supervision()))
-
-        when {
-          controller.helper.clearFlowModel(any())
-        } thenReturn OptionT.liftF(Future.successful(AddBusinessTypeFlowModel()))
-
-        val result = controller.post()(request)
-
-        status(result) must be(SEE_OTHER)
-
-        controller.router.verify("internalId", AddBusinessTypeSummaryPageId, flowModel)
-      }
     }
   }
 }
-

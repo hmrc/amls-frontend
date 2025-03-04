@@ -24,8 +24,7 @@ class DateOfChangeHelperSpec extends AmlsSpec {
 
   "DateOfChangeHelper" should {
 
-    object DateOfChangeHelperTest extends DateOfChangeHelper{
-    }
+    object DateOfChangeHelperTest extends DateOfChangeHelper {}
 
     val originalModel = RegisteredOfficeUK(
       "addressLine1",
@@ -36,7 +35,7 @@ class DateOfChangeHelperSpec extends AmlsSpec {
       None
     )
 
-    val changeModel = RegisteredOfficeUK("",None,None, None, "", None)
+    val changeModel = RegisteredOfficeUK("", None, None, None, "", None)
     "DateOfChangeHelper" must {
 
       "redirect to Summary Controller" when {
@@ -44,7 +43,6 @@ class DateOfChangeHelperSpec extends AmlsSpec {
           DateOfChangeHelperTest.DateOfChangeRedirect("blah").call.url mustBe routes.SummaryController.get.url
         }
       }
-
 
       "redirect to Summary Controller" when {
         "1 is passed" in {
@@ -60,7 +58,9 @@ class DateOfChangeHelperSpec extends AmlsSpec {
 
       "redirect to HowWillYouSellGoods Controller" when {
         "3 is passed" in {
-          DateOfChangeHelperTest.DateOfChangeRedirect("3").call.url mustBe routes.HowWillYouSellGoodsController.get().url
+          DateOfChangeHelperTest.DateOfChangeRedirect("3").call.url mustBe routes.HowWillYouSellGoodsController
+            .get()
+            .url
         }
       }
 
@@ -71,7 +71,10 @@ class DateOfChangeHelperSpec extends AmlsSpec {
 
         "redirect to ExciseGoods Controller with edit set to true" when {
           "5 is passed" in {
-            DateOfChangeHelperTest.DateOfChangeRedirect("5").call.url mustBe s"${routes.ExciseGoodsController.get().url}?edit=true"
+            DateOfChangeHelperTest
+              .DateOfChangeRedirect("5")
+              .call
+              .url mustBe s"${routes.ExciseGoodsController.get().url}?edit=true"
           }
         }
 
@@ -87,47 +90,74 @@ class DateOfChangeHelperSpec extends AmlsSpec {
 
     "return true" when {
       "a change has been made to a model" in {
-        DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionDecisionApproved, Some(originalModel), changeModel) must be(true)
+        DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](
+          SubmissionDecisionApproved,
+          Some(originalModel),
+          changeModel
+        ) must be(true)
       }
     }
 
     "return false" when {
       "no change has been made to a model" in {
-        DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionDecisionApproved, Some(originalModel), originalModel) must be(false)
+        DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](
+          SubmissionDecisionApproved,
+          Some(originalModel),
+          originalModel
+        ) must be(false)
       }
     }
 
     "return isEligibleForDateOfChange false when status is Amendment" in {
-      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionReadyForReview, Some(originalModel), changeModel) must be(false)
+      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](
+        SubmissionReadyForReview,
+        Some(originalModel),
+        changeModel
+      ) must be(false)
     }
 
     "return isEligibleForDateOfChange true when status is Variation" in {
-      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionDecisionApproved, Some(originalModel), changeModel) must be(true)
+      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](
+        SubmissionDecisionApproved,
+        Some(originalModel),
+        changeModel
+      ) must be(true)
     }
 
     "return isEligibleForDateOfChange true when status is Renewal" in {
-      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](ReadyForRenewal(None), Some(originalModel), changeModel) must be(true)
+      DateOfChangeHelperTest
+        .redirectToDateOfChange[RegisteredOffice](ReadyForRenewal(None), Some(originalModel), changeModel) must be(true)
     }
 
     "return isEligibleForDateOfChange true when status is Renewal Submitted" in {
-      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](RenewalSubmitted(None), Some(originalModel), changeModel) must be(true)
+      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](
+        RenewalSubmitted(None),
+        Some(originalModel),
+        changeModel
+      ) must be(true)
     }
 
     "dateOfChangApplicable return false when models not changed" in {
       DateOfChangeHelperTest.dateOfChangApplicable(
-        "Approved", Some(originalModel), originalModel
+        "Approved",
+        Some(originalModel),
+        originalModel
       ) must be(false)
     }
 
     "dateOfChangApplicable return false when status not Approved" in {
       DateOfChangeHelperTest.dateOfChangApplicable(
-        "NotYestSubmitted", Some(originalModel), changeModel
+        "NotYestSubmitted",
+        Some(originalModel),
+        changeModel
       ) must be(false)
     }
 
     "dateOfChangApplicable return true when models changed and status is Approved" in {
       DateOfChangeHelperTest.dateOfChangApplicable(
-        "Approved", Some(originalModel), changeModel
+        "Approved",
+        Some(originalModel),
+        changeModel
       ) must be(true)
     }
   }

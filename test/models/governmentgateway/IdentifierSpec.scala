@@ -25,7 +25,7 @@ class IdentifierSpec extends PlaySpec with MockitoSugar {
   val model = Identifier("foo", "bar")
 
   val json = Json.obj(
-    "type" -> "foo",
+    "type"  -> "foo",
     "value" -> "bar"
   )
 
@@ -33,12 +33,12 @@ class IdentifierSpec extends PlaySpec with MockitoSugar {
 
     "correctly serialise" in {
       Json.toJson(model) must
-        equal (json)
+        equal(json)
     }
 
     "correctly deserialise" in {
       Json.fromJson[Identifier](json) must
-        equal (JsSuccess(model))
+        equal(JsSuccess(model))
     }
   }
 }

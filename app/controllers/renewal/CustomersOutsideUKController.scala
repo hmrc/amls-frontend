@@ -31,47 +31,46 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                             val authAction: AuthAction,
-                                             val ds: CommonPlayDependencies,
-                                             val renewalService: RenewalService,
-                                             val autoCompleteService: AutoCompleteService,
-                                             val cc: MessagesControllerComponents,
-                                             formProvider: CustomersOutsideUKFormProvider,
-                                             view: CustomersOutsideUKView) extends AmlsBaseController(ds, cc) {
+class CustomersOutsideUKController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val renewalService: RenewalService,
+  val autoCompleteService: AutoCompleteService,
+  val cc: MessagesControllerComponents,
+  formProvider: CustomersOutsideUKFormProvider,
+  view: CustomersOutsideUKView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      renewalService.getRenewal(request.credId).map {
-        response =>
-          val form = (for {
-            renewal <- response
-            customers <- renewal.customersOutsideUK
-          } yield formProvider().fill(customers)).getOrElse(formProvider())
-          Ok(view(form, edit, autoCompleteService.formOptions))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    renewalService.getRenewal(request.credId).map { response =>
+      val form = (for {
+        renewal   <- response
+        customers <- renewal.customersOutsideUK
+      } yield formProvider().fill(customers)).getOrElse(formProvider())
+      Ok(view(form, edit, autoCompleteService.formOptions))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
         data =>
           dataCacheConnector.fetchAll(request.credId).flatMap { optionalCache =>
             (for {
-              cache <- optionalCache
+              cache            <- optionalCache
               businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-              renewal <- cache.getEntry[Renewal](Renewal.key)
-            } yield {
-              renewalService.updateRenewal(request.credId, renewal.customersOutsideUK(data)) map {
-                _ =>
-                  (edit, businessMatching) match {
-                    case (true, _) => Redirect(routes.SummaryController.get)
-                    case (false, bm) if bm.activities.isDefined => bm.activities.get.businessActivities match {
-                      case x if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-                      case _ => Redirect(routes.SummaryController.get)
-                    }
+              renewal          <- cache.getEntry[Renewal](Renewal.key)
+            } yield renewalService.updateRenewal(request.credId, renewal.customersOutsideUK(data)) map { _ =>
+              (edit, businessMatching) match {
+                case (true, _)                              => Redirect(routes.SummaryController.get)
+                case (false, bm) if bm.activities.isDefined =>
+                  bm.activities.get.businessActivities match {
+                    case x if x.contains(HighValueDealing) =>
+                      Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+                    case _                                 => Redirect(routes.SummaryController.get)
                   }
               }
             }) getOrElse Future.successful(InternalServerError("Unable to get data from the cache"))

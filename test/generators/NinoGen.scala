@@ -20,7 +20,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.domain.Nino
 
 trait NinoGen {
-  val invalidPrefixes = List("BG", "GB", "NK", "KN", "TN", "NT", "ZZ")
+  val invalidPrefixes                  = List("BG", "GB", "NK", "KN", "TN", "NT", "ZZ")
   val validFirstCharacters: List[Char] = ('A' to 'Z').filterNot(List('D', 'F', 'I', 'Q', 'U', 'V').contains).toList
 
   val validSecondCharacters: List[Char] =

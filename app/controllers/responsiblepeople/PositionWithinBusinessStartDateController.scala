@@ -29,20 +29,24 @@ import views.html.responsiblepeople.PositionWithinBusinessStartDateView
 
 import scala.concurrent.Future
 
-class PositionWithinBusinessStartDateController @Inject ()(val dataCacheConnector: DataCacheConnector,
-                                                           authAction: AuthAction,
-                                                           val ds: CommonPlayDependencies,
-                                                           val cc: MessagesControllerComponents,
-                                                           formProvider: PositionWithinBusinessStartDateFormProvider,
-                                                           view: PositionWithinBusinessStartDateView,
-                                                           implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with Logging {
+class PositionWithinBusinessStartDateController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: PositionWithinBusinessStartDateFormProvider,
+  view: PositionWithinBusinessStartDateView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection
+    with Logging {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
         (optionalCache flatMap { cache =>
-
-          val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
+          val bt = ControllerHelper
+            .getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
             .getOrElse(BusinessType.SoleProprietor)
 
           val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
@@ -51,15 +55,31 @@ class PositionWithinBusinessStartDateController @Inject ()(val dataCacheConnecto
             (person.personName, person.positions) match {
               case (Some(name), Some(Positions(positions, Some(startDate)))) =>
                 Ok(
-                  view(formProvider().fill(startDate), edit, index, bt, name.titleName, positions,
-                    ResponsiblePerson.displayNominatedOfficer(person, ResponsiblePerson.hasNominatedOfficer(data)), flow)
+                  view(
+                    formProvider().fill(startDate),
+                    edit,
+                    index,
+                    bt,
+                    name.titleName,
+                    positions,
+                    ResponsiblePerson.displayNominatedOfficer(person, ResponsiblePerson.hasNominatedOfficer(data)),
+                    flow
+                  )
                 )
-              case (Some(name), Some(Positions(positions, _))) =>
+              case (Some(name), Some(Positions(positions, _)))               =>
                 Ok(
-                  view(formProvider(), edit, index, bt, name.titleName, positions,
-                    ResponsiblePerson.displayNominatedOfficer(person, ResponsiblePerson.hasNominatedOfficer(data)), flow)
+                  view(
+                    formProvider(),
+                    edit,
+                    index,
+                    bt,
+                    name.titleName,
+                    positions,
+                    ResponsiblePerson.displayNominatedOfficer(person, ResponsiblePerson.hasNominatedOfficer(data)),
+                    flow
+                  )
                 )
-              case _ => NotFound(notFoundView)
+              case _                                                         => NotFound(notFoundView)
             }
           }
         }).getOrElse(NotFound(notFoundView))
@@ -68,50 +88,86 @@ class PositionWithinBusinessStartDateController @Inject ()(val dataCacheConnecto
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
-            (optionalCache map { cache =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
+              (optionalCache map { cache =>
+                val bt = ControllerHelper
+                  .getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
+                  .getOrElse(BusinessType.SoleProprietor)
 
-              val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
-                .getOrElse(BusinessType.SoleProprietor)
+                val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
-              val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
-
-              ResponsiblePerson.getResponsiblePersonFromData(data,index) match {
-                case s@Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions,_)),_,_,_,_,_,_,_,_,_,_,_)) =>
-                  BadRequest(view(formWithErrors, edit, index, bt, ControllerHelper.rpTitleName(s), positions,
-                    ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
-                case _
-                  => NotFound(notFoundView)
-              }
-            }).getOrElse(NotFound(notFoundView))
-          },
-        data => {
-          for {
-            _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp => rp.positions match {
-                case Some(x) => rp.positions(Positions.update(x, data))
-                case _ =>
-                  val message = "Positions does not exist, cannot update start date"
-                  // $COVERAGE-OFF$
-                  logger.warn(message)
-                  // $COVERAGE-ON$
-                  throw new IllegalStateException(message)
-              }
+                ResponsiblePerson.getResponsiblePersonFromData(data, index) match {
+                  case s @ Some(
+                        rp @ ResponsiblePerson(
+                          Some(personName),
+                          _,
+                          _,
+                          _,
+                          _,
+                          _,
+                          _,
+                          _,
+                          _,
+                          _,
+                          Some(Positions(positions, _)),
+                          _,
+                          _,
+                          _,
+                          _,
+                          _,
+                          _,
+                          _,
+                          _,
+                          _,
+                          _,
+                          _
+                        )
+                      ) =>
+                    BadRequest(
+                      view(
+                        formWithErrors,
+                        edit,
+                        index,
+                        bt,
+                        ControllerHelper.rpTitleName(s),
+                        positions,
+                        ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)),
+                        flow
+                      )
+                    )
+                  case _ => NotFound(notFoundView)
+                }
+              }).getOrElse(NotFound(notFoundView))
+            },
+          data =>
+            {
+              for {
+                _           <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                                 rp.positions match {
+                                   case Some(x) => rp.positions(Positions.update(x, data))
+                                   case _       =>
+                                     val message = "Positions does not exist, cannot update start date"
+                                     // $COVERAGE-OFF$
+                                     logger.warn(message)
+                                     // $COVERAGE-ON$
+                                     throw new IllegalStateException(message)
+                                 }
+                               }
+                rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
+              } yield
+                if (edit) {
+                  Redirect(routes.DetailedAnswersController.get(index, flow))
+                } else {
+                  Redirect(routes.SoleProprietorOfAnotherBusinessController.get(index, edit, flow))
+                }
+            } recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
             }
-            rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
-          } yield {
-              if (edit) {
-                Redirect(routes.DetailedAnswersController.get(index, flow))
-              } else {
-                Redirect(routes.SoleProprietorOfAnotherBusinessController.get(index, edit, flow))
-              }
-          }
-        } recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
-      )
+        )
   }
-
 
 }

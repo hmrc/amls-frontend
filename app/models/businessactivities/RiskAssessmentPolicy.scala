@@ -18,7 +18,6 @@ package models.businessactivities
 
 import play.api.libs.json.{Reads, Writes, _}
 
-
 case class RiskAssessmentPolicy(hasPolicy: RiskAssessmentHasPolicy, riskassessments: RiskAssessmentTypes)
 
 object RiskAssessmentPolicy {
@@ -26,16 +25,19 @@ object RiskAssessmentPolicy {
   implicit val jsonReads: Reads[RiskAssessmentPolicy] = {
     import play.api.libs.functional.syntax._
     ((__ \ "hasPolicy").read[Boolean] and
-      (__ \ "riskassessments").readNullable[Set[RiskAssessmentType]]
-      )((hasPolicy, riskAssessmentTypes) =>
-      RiskAssessmentPolicy(RiskAssessmentHasPolicy(hasPolicy), RiskAssessmentTypes(riskAssessmentTypes.getOrElse(Set[RiskAssessmentType]()))))
+      (__ \ "riskassessments").readNullable[Set[RiskAssessmentType]])((hasPolicy, riskAssessmentTypes) =>
+      RiskAssessmentPolicy(
+        RiskAssessmentHasPolicy(hasPolicy),
+        RiskAssessmentTypes(riskAssessmentTypes.getOrElse(Set[RiskAssessmentType]()))
+      )
+    )
   }
 
-  implicit val jsonWrites:Writes[RiskAssessmentPolicy] = {
+  implicit val jsonWrites: Writes[RiskAssessmentPolicy] =
     Writes[RiskAssessmentPolicy] {
       case RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(riskAssessmentTypes)) =>
         Json.obj(
-          "hasPolicy" -> true,
+          "hasPolicy"       -> true,
           "riskassessments" -> riskAssessmentTypes.toSeq.map(_.value)
         )
 
@@ -44,5 +46,4 @@ object RiskAssessmentPolicy {
           "hasPolicy" -> false
         )
     }
-  }
 }

@@ -26,7 +26,7 @@ class CorrespondenceAddressIsUkSpec extends PlaySpec with MockitoSugar {
 
     "round trip through JSON" in {
 
-      val trueModel = CorrespondenceAddressIsUk(true)
+      val trueModel  = CorrespondenceAddressIsUk(true)
       val falseModel = CorrespondenceAddressIsUk(false)
 
       Json.toJson(trueModel).as[CorrespondenceAddressIsUk] mustBe trueModel

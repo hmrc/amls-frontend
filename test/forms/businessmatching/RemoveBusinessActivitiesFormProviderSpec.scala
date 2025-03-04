@@ -50,10 +50,12 @@ class RemoveBusinessActivitiesFormProviderSpec extends CheckboxFieldBehaviours {
 
       "give error when all checkboxes are selected" in {
 
-        val result = form.bind(Map(
-          s"$fieldName[0]" -> AccountancyServices.toString,
-          s"$fieldName[1]" -> ArtMarketParticipant.toString,
-        ))
+        val result = form.bind(
+          Map(
+            s"$fieldName[0]" -> AccountancyServices.toString,
+            s"$fieldName[1]" -> ArtMarketParticipant.toString
+          )
+        )
 
         result.errors shouldBe Seq(FormError(fieldName, "error.required.bm.remove.leave.twobusinesses"))
       }
@@ -80,11 +82,13 @@ class RemoveBusinessActivitiesFormProviderSpec extends CheckboxFieldBehaviours {
 
       "give error when all checkboxes are selected and number of services is not 2" in {
 
-        val result = form.bind(Map(
-          s"$fieldName[0]" -> AccountancyServices.toString,
-          s"$fieldName[1]" -> ArtMarketParticipant.toString,
-          s"$fieldName[2]" -> HighValueDealing.toString,
-        ))
+        val result = form.bind(
+          Map(
+            s"$fieldName[0]" -> AccountancyServices.toString,
+            s"$fieldName[1]" -> ArtMarketParticipant.toString,
+            s"$fieldName[2]" -> HighValueDealing.toString
+          )
+        )
 
         result.errors shouldBe Seq(FormError(fieldName, "error.required.bm.remove.leave.one"))
       }

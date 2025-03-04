@@ -24,13 +24,12 @@ import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 
 sealed trait VATRegistered
 
-case class VATRegisteredYes(value : String) extends VATRegistered
+case class VATRegisteredYes(value: String) extends VATRegistered
 case object VATRegisteredNo extends VATRegistered
 
 object VATRegistered {
 
   def formValues(html: Html)(implicit messages: Messages): Seq[RadioItem] = HmrcYesNoRadioItems().map { radioItem =>
-
     if (radioItem.value.contains("true")) {
       radioItem.copy(
         id = Some("registeredForVAT-true"),
@@ -45,15 +44,16 @@ object VATRegistered {
 
   implicit val jsonReads: Reads[VATRegistered] =
     (__ \ "registeredForVAT").read[Boolean] flatMap {
-    case true => (__ \ "vrnNumber").read[String] map (VATRegisteredYes.apply _)
-    case false => Reads(_ => JsSuccess(VATRegisteredNo))
-  }
+      case true  => (__ \ "vrnNumber").read[String] map (VATRegisteredYes.apply _)
+      case false => Reads(_ => JsSuccess(VATRegisteredNo))
+    }
 
   implicit val jsonWrites: Writes[VATRegistered] = Writes[VATRegistered] {
-    case VATRegisteredYes(value) => Json.obj(
-      "registeredForVAT" -> true,
-      "vrnNumber" -> value
-    )
-    case VATRegisteredNo => Json.obj("registeredForVAT" -> false)
+    case VATRegisteredYes(value) =>
+      Json.obj(
+        "registeredForVAT" -> true,
+        "vrnNumber"        -> value
+      )
+    case VATRegisteredNo         => Json.obj("registeredForVAT" -> false)
   }
 }

@@ -23,13 +23,14 @@ import play.api.data.Form
 class CashPaymentFormProviderSpec extends BooleanFieldBehaviours[CashPaymentOverTenThousandEuros] {
 
   override val form: Form[CashPaymentOverTenThousandEuros] = new CashPaymentFormProvider()()
-  override val fieldName: String = "acceptedAnyPayment"
-  override val errorMessage: String = "error.required.hvd.accepted.cash.payment"
+  override val fieldName: String                           = "acceptedAnyPayment"
+  override val errorMessage: String                        = "error.required.hvd.accepted.cash.payment"
 
   "CashPaymentFormProvider" must {
 
     behave like booleanFieldWithModel(
-      CashPaymentOverTenThousandEuros(true), CashPaymentOverTenThousandEuros(false)
+      CashPaymentOverTenThousandEuros(true),
+      CashPaymentOverTenThousandEuros(false)
     )
   }
 }

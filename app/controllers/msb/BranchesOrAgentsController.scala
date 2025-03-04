@@ -28,51 +28,52 @@ import views.html.msb.BranchesOrAgentsView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                            authAction: AuthAction,
-                                            val ds: CommonPlayDependencies,
-                                            val autoCompleteService: AutoCompleteService,
-                                            val cc: MessagesControllerComponents,
-                                            formProvider: BranchesOrAgentsFormProvider,
-                                            view: BranchesOrAgentsView) extends AmlsBaseController(ds, cc) {
+class BranchesOrAgentsController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val autoCompleteService: AutoCompleteService,
+  val cc: MessagesControllerComponents,
+  formProvider: BranchesOrAgentsFormProvider,
+  view: BranchesOrAgentsView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
-        response =>
-          val form = (for {
-            msb <- response
-            branches <- msb.branchesOrAgents
-          } yield formProvider().fill(branches.hasCountries)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map { response =>
+      val form = (for {
+        msb      <- response
+        branches <- msb.branchesOrAgents
+      } yield formProvider().fill(branches.hasCountries)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
-        data => {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
-            msb <-  dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
-            boa: BranchesOrAgents <- Future(msb.flatMap((m:MoneyServiceBusiness) => m.branchesOrAgents)
-              .map((boa:BranchesOrAgents) => BranchesOrAgents.update(boa, data))
-              .getOrElse(BranchesOrAgents(data, None)))
-            _ <- dataCacheConnector.save(request.credId, MoneyServiceBusiness.key, msb.branchesOrAgents(boa))
+            msb                   <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+            boa: BranchesOrAgents <- Future(
+                                       msb
+                                         .flatMap((m: MoneyServiceBusiness) => m.branchesOrAgents)
+                                         .map((boa: BranchesOrAgents) => BranchesOrAgents.update(boa, data))
+                                         .getOrElse(BranchesOrAgents(data, None))
+                                     )
+            _                     <- dataCacheConnector.save(request.credId, MoneyServiceBusiness.key, msb.branchesOrAgents(boa))
           } yield Redirect(getNextPage(data, edit))
-        }
       )
   }
 
   private def getNextPage(data: BranchesOrAgentsHasCountries, edit: Boolean): Call =
-     (data, edit) match {
+    (data, edit) match {
       case (BranchesOrAgentsHasCountries(false), false) =>
         routes.IdentifyLinkedTransactionsController.get()
-      case (BranchesOrAgentsHasCountries(false), true) =>
+      case (BranchesOrAgentsHasCountries(false), true)  =>
         routes.SummaryController.get
-      case (BranchesOrAgentsHasCountries(true), _) =>
+      case (BranchesOrAgentsHasCountries(true), _)      =>
         routes.BranchesOrAgentsWhichCountriesController.get(edit)
     }
 }

@@ -49,7 +49,6 @@ class ExpectedBusinessTurnoverSpec extends PlaySpec with MockitoSugar {
         be(JsSuccess(ExpectedBusinessTurnover.Seventh, JsPath))
     }
 
-
     "write the correct value" in {
       Json.toJson(ExpectedBusinessTurnover.First.asInstanceOf[ExpectedBusinessTurnover]) must
         be(Json.obj("expectedBusinessTurnover" -> "01"))
@@ -79,12 +78,12 @@ class ExpectedBusinessTurnoverSpec extends PlaySpec with MockitoSugar {
     }
 
     "convert ExpectedBusinessTurnover to renewal BusinessTurnover model" in {
-      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.First) must be(BusinessTurnover.First)
-      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Second) must be(BusinessTurnover.Second)
-      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Third) must be(BusinessTurnover.Third)
-      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Fourth) must be(BusinessTurnover.Fourth)
-      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Fifth) must be(BusinessTurnover.Fifth)
-      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Sixth) must be(BusinessTurnover.Sixth)
+      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.First)   must be(BusinessTurnover.First)
+      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Second)  must be(BusinessTurnover.Second)
+      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Third)   must be(BusinessTurnover.Third)
+      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Fourth)  must be(BusinessTurnover.Fourth)
+      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Fifth)   must be(BusinessTurnover.Fifth)
+      ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Sixth)   must be(BusinessTurnover.Sixth)
       ExpectedBusinessTurnover.convert(ExpectedBusinessTurnover.Seventh) must be(BusinessTurnover.Seventh)
 
     }

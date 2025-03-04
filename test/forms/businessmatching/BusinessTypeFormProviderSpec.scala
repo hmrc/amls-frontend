@@ -25,13 +25,15 @@ class BusinessTypeFormProviderSpec extends FieldBehaviours {
 
   val form = new BusinessTypeFormProvider()()
 
-  val field = "businessType"
+  val field     = "businessType"
   val formError = FormError(field, "businessmatching.businessType.error")
 
   "BusinessTypeFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, field, Gen.oneOf(BusinessType.all.map(_.toString))
+      form,
+      field,
+      Gen.oneOf(BusinessType.all.map(_.toString))
     )
 
     behave like mandatoryField(form, field, formError)
@@ -42,7 +44,7 @@ class BusinessTypeFormProviderSpec extends FieldBehaviours {
 
         val result = form.bind(Map(field -> "foo"))
 
-        result.value shouldBe None
+        result.value        shouldBe None
         result.error(field) shouldBe Some(formError)
       }
     }

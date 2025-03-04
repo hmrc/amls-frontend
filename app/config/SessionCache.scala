@@ -39,7 +39,6 @@ trait SessionCache {
 
   private val noSession = Future.failed[String](NoSessionException)
 
-
   private def cacheId(implicit hc: HeaderCarrier): Future[String] =
     hc.sessionId.fold(noSession)(c => Future.successful(c.value))
 
@@ -55,17 +54,19 @@ trait SessionCache {
 
   def remove()(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[HttpResponse] =
     for {
-      c <- cacheId
+      c      <- cacheId
       result <- delete(buildUri(defaultSource, c))
     } yield result
 }
 
-class BusinessCustomerSessionCache @Inject()(val configuration: Configuration,
-                                             val httpClientV2: HttpClientV2)
-                                             extends ServicesConfig(configuration) with SessionCache {
-  override def defaultSource: String = getConfString("cachable.session-cache.review-details.cache", "business-customer-frontend")
-  override def baseUri = baseUrl("cachable.session-cache")
-  override def domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
+class BusinessCustomerSessionCache @Inject() (val configuration: Configuration, val httpClientV2: HttpClientV2)
+    extends ServicesConfig(configuration)
+    with SessionCache {
+  override def defaultSource: String =
+    getConfString("cachable.session-cache.review-details.cache", "business-customer-frontend")
+  override def baseUri               = baseUrl("cachable.session-cache")
+  override def domain                = getConfString(
+    "cachable.session-cache.domain",
+    throw new Exception(s"Could not find config 'cachable.session-cache.domain'")
+  )
 }
-
-

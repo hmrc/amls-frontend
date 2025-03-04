@@ -23,7 +23,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class CustomersOutsideUKFormProvider @Inject()() extends CountryListMappings {
+class CustomersOutsideUKFormProvider @Inject() () extends CountryListMappings {
 
   private val emptyErrorKey = "error.required.renewal.customer.country.name"
 

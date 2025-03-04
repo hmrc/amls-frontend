@@ -32,8 +32,8 @@ import scala.jdk.CollectionConverters._
 
 class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
-  lazy val cyaView = inject[CheckYourAnswersView]
-  lazy val cyaHelper = inject[CheckYourAnswersHelper]
+  lazy val cyaView                                          = inject[CheckYourAnswersView]
+  lazy val cyaHelper                                        = inject[CheckYourAnswersHelper]
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   trait ViewFixture extends Fixture
 
@@ -48,7 +48,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
     "have correct headings" in new ViewFixture {
       def view = cyaView(cyaHelper.getSummaryList(Renewal(), None))
 
-      heading.html must be(messages("title.cya"))
+      heading.html    must be(messages("title.cya"))
       subHeading.html must include(messages("summary.renewal"))
     }
 
@@ -76,13 +76,16 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
         ),
         Some(TotalThroughput("01")),
         Some(
-          WhichCurrencies(Seq("GBP", "USD", "JPY"),
+          WhichCurrencies(
+            Seq("GBP", "USD", "JPY"),
             Some(UsesForeignCurrenciesYes),
-            Some(MoneySources(
-              Some(BankMoneySource("Bank Name")),
-              Some(WholesalerMoneySource("Wholesaler Name")),
-              Some(true)
-            ))
+            Some(
+              MoneySources(
+                Some(BankMoneySource("Bank Name")),
+                Some(WholesalerMoneySource("Wholesaler Name")),
+                Some(true)
+              )
+            )
           )
         ),
         Some(TransactionsInLast12Months("1500")),
@@ -104,21 +107,24 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
       def view = cyaView(list)
 
-      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
-        doc.getElementsByClass("govuk-summary-list__value").asScala
-      ).foreach { case (key, value) =>
+      doc
+        .getElementsByClass("govuk-summary-list__key")
+        .asScala
+        .zip(
+          doc.getElementsByClass("govuk-summary-list__value").asScala
+        )
+        .foreach { case (key, value) =>
+          val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
 
-        val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
+          maybeRow.key.content.asHtml.body must include(key.text())
 
-        maybeRow.key.content.asHtml.body must include(key.text())
+          val valueText = maybeRow.value.content.asHtml.body match {
+            case str if str.startsWith("<") => Jsoup.parse(str).text()
+            case str                        => str
+          }
 
-        val valueText = maybeRow.value.content.asHtml.body match {
-          case str if str.startsWith("<") => Jsoup.parse(str).text()
-          case str => str
+          valueText must include(value.text())
         }
-
-        valueText must include(value.text())
-      }
     }
   }
 }

@@ -51,13 +51,16 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "called with business types to remove" must {
         "return seq of updated cache maps" in new Fixture {
           val activitiesToRemove = RemoveBusinessTypeFlowModel(
-            activitiesToRemove = Some(Set(
-              HighValueDealing,
-              AccountancyServices,
-              EstateAgentBusinessService,
-              MoneyServiceBusiness,
-              TrustAndCompanyServices
-            )))
+            activitiesToRemove = Some(
+              Set(
+                HighValueDealing,
+                AccountancyServices,
+                EstateAgentBusinessService,
+                MoneyServiceBusiness,
+                TrustAndCompanyServices
+              )
+            )
+          )
 
           mockCacheRemoveByKey[MSBSection]
           mockCacheRemoveByKey[Hvd]
@@ -67,8 +70,8 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
           val result = helper.removeSectionData("internalId", activitiesToRemove).value
 
-          whenReady(result) {
-            case Some(seqOfCache) => seqOfCache.size mustBe 5
+          whenReady(result) { case Some(seqOfCache) =>
+            seqOfCache.size mustBe 5
           }
         }
       }
@@ -76,16 +79,19 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "called with BPS" must {
         "return cache map" in new Fixture {
           val activitiesToRemove = RemoveBusinessTypeFlowModel(
-            activitiesToRemove = Some(Set(
-              BillPaymentServices
-            )))
+            activitiesToRemove = Some(
+              Set(
+                BillPaymentServices
+              )
+            )
+          )
 
           when(mockCacheConnector.fetchAllWithDefault("internalId")).thenReturn(Future.successful(mockCacheMap))
 
           val result = helper.removeSectionData("internalId", activitiesToRemove).value
 
-          whenReady(result) {
-            case Some(seqOfCache) => seqOfCache.size mustBe 1
+          whenReady(result) { case Some(seqOfCache) =>
+            seqOfCache.size mustBe 1
           }
         }
       }
@@ -95,28 +101,39 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "called with activities to remove" must {
         "return updated business matching" in new Fixture {
           val activitiesToRemove = RemoveBusinessTypeFlowModel(
-            activitiesToRemove = Some(Set(
-              HighValueDealing,
-              AccountancyServices,
-              EstateAgentBusinessService,
-              MoneyServiceBusiness,
-              TrustAndCompanyServices
-            )))
+            activitiesToRemove = Some(
+              Set(
+                HighValueDealing,
+                AccountancyServices,
+                EstateAgentBusinessService,
+                MoneyServiceBusiness,
+                TrustAndCompanyServices
+              )
+            )
+          )
 
-          val businessMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(
-            HighValueDealing,
-            AccountancyServices,
-            EstateAgentBusinessService,
-            MoneyServiceBusiness,
-            TrustAndCompanyServices,
-            BillPaymentServices))),
+          val businessMatching = BusinessMatching(
+            activities = Some(
+              BMBusinessActivities(
+                Set(
+                  HighValueDealing,
+                  AccountancyServices,
+                  EstateAgentBusinessService,
+                  MoneyServiceBusiness,
+                  TrustAndCompanyServices,
+                  BillPaymentServices
+                )
+              )
+            ),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true
+          )
 
-          val newBusinessMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(
-            BillPaymentServices))),
+          val newBusinessMatching = BusinessMatching(
+            activities = Some(BMBusinessActivities(Set(BillPaymentServices))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true
+          )
 
           mockCacheFetch[BusinessMatching](Some(businessMatching))
 
@@ -130,31 +147,43 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
     "must have removeTradingPremisesBusinessTypes method which" when {
       "called with activities to remove" must {
         "return updated trading premises" in new Fixture {
-          val businessMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(
-            HighValueDealing,
-            AccountancyServices,
-            EstateAgentBusinessService,
-            MoneyServiceBusiness,
-            TrustAndCompanyServices,
-            BillPaymentServices))),
+          val businessMatching = BusinessMatching(
+            activities = Some(
+              BMBusinessActivities(
+                Set(
+                  HighValueDealing,
+                  AccountancyServices,
+                  EstateAgentBusinessService,
+                  MoneyServiceBusiness,
+                  TrustAndCompanyServices,
+                  BillPaymentServices
+                )
+              )
+            ),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true
+          )
 
           mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
           val activitiesToRemove = RemoveBusinessTypeFlowModel(
-            activitiesToRemove = Some(Set(
-              HighValueDealing,
-              AccountancyServices,
-              EstateAgentBusinessService,
-              MoneyServiceBusiness,
-              TrustAndCompanyServices
-            )))
+            activitiesToRemove = Some(
+              Set(
+                HighValueDealing,
+                AccountancyServices,
+                EstateAgentBusinessService,
+                MoneyServiceBusiness,
+                TrustAndCompanyServices
+              )
+            )
+          )
 
-          val newTradingPremises = Seq(TradingPremises(
-            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(
-              activities = Set(BillPaymentServices))),
-            hasAccepted = true))
+          val newTradingPremises = Seq(
+            TradingPremises(
+              whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(activities = Set(BillPaymentServices))),
+              hasAccepted = true
+            )
+          )
 
           mockCacheUpdate[Seq[TradingPremises]](Some(TradingPremises.key), newTradingPremises)
 
@@ -168,31 +197,39 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
     "there is more than one business type" when {
       "the business is TCSP and they answered yes to F&P then do not remove the responsible people approval" in new Fixture {
 
-        val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
+        val model =
+          RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
-        val startResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true)),
-          hasAccepted = true,
-          hasChanged = true))
+        val startResultRP = Seq(
+          ResponsiblePerson(
+            approvalFlags =
+              ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true)),
+            hasAccepted = true,
+            hasChanged = true
+          )
+        )
 
-        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, BillPaymentServices))),
+        val startResultMatching = BusinessMatching(
+          activities = Some(BMBusinessActivities(Set(HighValueDealing, BillPaymentServices))),
           businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
           hasAccepted = true,
-          hasChanged = true)
+          hasChanged = true
+        )
 
-        mockCacheFetch[BusinessMatching](
-          Some(startResultMatching),
-          Some(BusinessMatching.key))
+        mockCacheFetch[BusinessMatching](Some(startResultMatching), Some(BusinessMatching.key))
 
         mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
 
-        mockCacheFetch[Seq[ResponsiblePerson]](
-          Some(startResultRP),
-          Some(ResponsiblePerson.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(startResultRP), Some(ResponsiblePerson.key))
 
-        val expectedResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true)),
-          hasAccepted = true,
-          hasChanged = true))
-
+        val expectedResultRP = Seq(
+          ResponsiblePerson(
+            approvalFlags =
+              ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true)),
+            hasAccepted = true,
+            hasChanged = true
+          )
+        )
 
         mockCacheUpdate(Some(ResponsiblePerson.key), expectedResultRP)
 
@@ -200,30 +237,39 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       }
       "the business is TCSP and they answered no to F&P then do remove the responsible people approval" in new Fixture {
 
-        val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
+        val model =
+          RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
-        val startResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = Some(true)),
-          hasAccepted = true,
-          hasChanged = true))
+        val startResultRP = Seq(
+          ResponsiblePerson(
+            approvalFlags =
+              ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = Some(true)),
+            hasAccepted = true,
+            hasChanged = true
+          )
+        )
 
-        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, BillPaymentServices))),
+        val startResultMatching = BusinessMatching(
+          activities = Some(BMBusinessActivities(Set(HighValueDealing, BillPaymentServices))),
           businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
           hasAccepted = true,
-          hasChanged = true)
+          hasChanged = true
+        )
 
-        mockCacheFetch[BusinessMatching](
-          Some(startResultMatching),
-          Some(BusinessMatching.key))
+        mockCacheFetch[BusinessMatching](Some(startResultMatching), Some(BusinessMatching.key))
 
         mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
 
-        mockCacheFetch[Seq[ResponsiblePerson]](
-          Some(startResultRP),
-          Some(ResponsiblePerson.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(startResultRP), Some(ResponsiblePerson.key))
 
-        val expectedResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = None),
-          hasAccepted = true,
-          hasChanged = true))
+        val expectedResultRP = Seq(
+          ResponsiblePerson(
+            approvalFlags =
+              ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = None),
+            hasAccepted = true,
+            hasChanged = true
+          )
+        )
 
         mockCacheUpdate(Some(ResponsiblePerson.key), expectedResultRP)
 

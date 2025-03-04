@@ -31,59 +31,58 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class AMPTurnoverController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                      val authAction: AuthAction,
-                                      val ds: CommonPlayDependencies,
-                                      val renewalService: RenewalService,
-                                      val cc: MessagesControllerComponents,
-                                      formProvider: AMPTurnoverFormProvider,
-                                      view: AMPTurnoverView) extends AmlsBaseController(ds, cc) {
+class AMPTurnoverController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val renewalService: RenewalService,
+  val cc: MessagesControllerComponents,
+  formProvider: AMPTurnoverFormProvider,
+  view: AMPTurnoverView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetchAll(request.credId) map {
-        optionalCache =>
-          (for {
-            cache <- optionalCache
-          } yield {
-            val form = (for {
-              renewal <- cache.getEntry[Renewal](Renewal.key)
-              ampTurnover <- renewal.ampTurnover
-            } yield formProvider().fill(ampTurnover)) getOrElse formProvider()
-            Ok(view(form, edit))
-          }) getOrElse Ok(view(formProvider(), edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
+      (for {
+        cache <- optionalCache
+      } yield {
+        val form = (for {
+          renewal     <- cache.getEntry[Renewal](Renewal.key)
+          ampTurnover <- renewal.ampTurnover
+        } yield formProvider().fill(ampTurnover)) getOrElse formProvider()
+        Ok(view(form, edit))
+      }) getOrElse Ok(view(formProvider(), edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           for {
-            renewal <- renewalService.getRenewal(request.credId)
-            _ <- renewalService.updateRenewal(request.credId, renewal.ampTurnover(data))
+            renewal          <- renewalService.getRenewal(request.credId)
+            _                <- renewalService.updateRenewal(request.credId, renewal.ampTurnover(data))
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-          } yield {
+          } yield
             if (edit) {
               Redirect(routes.SummaryController.get)
             } else {
               getRouting(ControllerHelper.getBusinessActivity(businessMatching))
             }
-          }
       )
-    }
   }
 
-  private def getRouting(ba: Option[BusinessActivities]) = {
+  private def getRouting(ba: Option[BusinessActivities]) =
     ba match {
-      case Some(activities) => activities.businessActivities match {
-        case x if x.contains(MoneyServiceBusiness) => Redirect(routes.TotalThroughputController.get())
-        case x if x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
-        case x if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideIsUKController.get())
-        case _ => Redirect(routes.SummaryController.get)
-      }
-      case _ => InternalServerError("Unable to redirect from AMP Turnover page")
+      case Some(activities) =>
+        activities.businessActivities match {
+          case x if x.contains(MoneyServiceBusiness) => Redirect(routes.TotalThroughputController.get())
+          case x if x.contains(AccountancyServices)  => Redirect(routes.CustomersOutsideIsUKController.get())
+          case x if x.contains(HighValueDealing)     => Redirect(routes.CustomersOutsideIsUKController.get())
+          case _                                     => Redirect(routes.SummaryController.get)
+        }
+      case _                => InternalServerError("Unable to redirect from AMP Turnover page")
     }
-  }
 }

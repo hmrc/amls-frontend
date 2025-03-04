@@ -39,18 +39,18 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec {
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(authRequest)
 
-    val businessName = "Business Name from registration details"
+    val businessName         = "Business Name from registration details"
     val applicationReference = "SUIYD3274890384"
-    val safeId = "X87FUDIKJJKJH87364"
-    val registrationDate = LocalDateTime.now()
-    val reviewDetails = mock[ReviewDetails]
-    val activities = mock[BusinessActivities]
-    val statusService = mock[StatusService]
-    val dataCache = mock[DataCacheConnector]
-    val enrolments = mock[AuthEnrolmentsService]
-    val amlsConnector = mock[AmlsConnector]
-    lazy val view = app.injector.instanceOf[DeregisterApplicationView]
-    val controller = new DeRegisterApplicationController(
+    val safeId               = "X87FUDIKJJKJH87364"
+    val registrationDate     = LocalDateTime.now()
+    val reviewDetails        = mock[ReviewDetails]
+    val activities           = mock[BusinessActivities]
+    val statusService        = mock[StatusService]
+    val dataCache            = mock[DataCacheConnector]
+    val enrolments           = mock[AuthEnrolmentsService]
+    val amlsConnector        = mock[AmlsConnector]
+    lazy val view            = app.injector.instanceOf[DeregisterApplicationView]
+    val controller           = new DeRegisterApplicationController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       dataCache,
@@ -89,7 +89,9 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec {
       "show the correct page" in new TestFixture {
         val result = controller.get()(request)
         status(result) mustBe OK
-        contentAsString(result) must include(messages("Deregister Business Name from registration details under the Money Laundering Regulations"))
+        contentAsString(result) must include(
+          messages("Deregister Business Name from registration details under the Money Laundering Regulations")
+        )
       }
 
       "show the name of the business" in new TestFixture {

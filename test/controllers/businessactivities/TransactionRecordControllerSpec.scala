@@ -34,14 +34,16 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar with In
 
   trait Fixture extends DependencyMocks {
     self =>
-    lazy val view = inject[CustomerTransactionRecordsView]
-    val request = addToken(authRequest)
-    val controller = new TransactionRecordController(SuccessfulAuthAction,
+    lazy val view  = inject[CustomerTransactionRecordsView]
+    val request    = addToken(authRequest)
+    val controller = new TransactionRecordController(
+      SuccessfulAuthAction,
       ds = commonDependencies,
       mockCacheConnector,
       mockMcc,
       inject[TransactionRecordFormProvider],
-      view = view)
+      view = view
+    )
 
     mockCacheSave[BusinessActivities]
   }
@@ -58,14 +60,18 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar with In
         status(result) must be(OK)
 
         val page = Jsoup.parse(contentAsString(result))
-        page.getElementById("isRecorded").hasAttr("checked") must be(false)
+        page.getElementById("isRecorded").hasAttr("checked")   must be(false)
         page.getElementById("isRecorded-2").hasAttr("checked") must be(false)
       }
 
       "pre-populate the Customer Record Page" in new Fixture {
-        mockCacheFetch(Some(BusinessActivities(
-          transactionRecord = Some(true)
-        )))
+        mockCacheFetch(
+          Some(
+            BusinessActivities(
+              transactionRecord = Some(true)
+            )
+          )
+        )
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -80,8 +86,8 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar with In
         "given valid data not in edit mode" in new Fixture {
           val newRequest = FakeRequest(POST, routes.TransactionRecordController.post().url)
             .withFormUrlEncodedBody(
-            "isRecorded" -> "true"
-          )
+              "isRecorded" -> "true"
+            )
 
           mockCacheFetch[BusinessActivities](None)
 
@@ -93,8 +99,8 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar with In
         "given valid data not in edit mode, and 'no' is selected" in new Fixture {
           val newRequest = FakeRequest(POST, routes.TransactionRecordController.post().url)
             .withFormUrlEncodedBody(
-            "isRecorded" -> "false"
-          )
+              "isRecorded" -> "false"
+            )
 
           mockCacheFetch[BusinessActivities](None)
 
@@ -107,13 +113,13 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar with In
 
           val newRequest = FakeRequest(POST, routes.TransactionRecordController.post().url)
             .withFormUrlEncodedBody(
-            "isRecorded" -> "false"
-          )
+              "isRecorded" -> "false"
+            )
 
           mockCacheFetch[BusinessActivities](None)
 
           val result = controller.post(true)(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get.url))
         }
 
@@ -121,26 +127,30 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar with In
 
           val newRequest = FakeRequest(POST, routes.TransactionRecordController.post().url)
             .withFormUrlEncodedBody(
-            "isRecorded" -> "true"
-          )
+              "isRecorded" -> "true"
+            )
 
           mockCacheFetch[BusinessActivities](None)
 
           val result = controller.post(true)(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.TransactionTypesController.get(edit = true).url))
         }
 
         "given valid data in edit mode, 'yes' is selected and the next question has already been asked" in new Fixture {
           val newRequest = FakeRequest(POST, routes.TransactionRecordController.post().url)
             .withFormUrlEncodedBody(
-            "isRecorded" -> "true"
-          )
+              "isRecorded" -> "true"
+            )
 
-          mockCacheFetch(Some(BusinessActivities(
-            transactionRecord = Some(true),
-            transactionRecordTypes = Some(TransactionTypes(Set(Paper)))
-          )))
+          mockCacheFetch(
+            Some(
+              BusinessActivities(
+                transactionRecord = Some(true),
+                transactionRecordTypes = Some(TransactionTypes(Set(Paper)))
+              )
+            )
+          )
 
           val result = controller.post(true)(newRequest)
           status(result) mustBe SEE_OTHER
@@ -151,27 +161,34 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar with In
       "reset the transaction types if 'no' is selected" in new Fixture {
         val newRequest = FakeRequest(POST, routes.TransactionRecordController.post().url)
           .withFormUrlEncodedBody(
-          "isRecorded" -> "false"
-        )
+            "isRecorded" -> "false"
+          )
 
-        mockCacheFetch[BusinessActivities](Some(BusinessActivities(
-          transactionRecord = Some(true),
-          transactionRecordTypes = Some(TransactionTypes(Set(Paper)))
-        )))
+        mockCacheFetch[BusinessActivities](
+          Some(
+            BusinessActivities(
+              transactionRecord = Some(true),
+              transactionRecordTypes = Some(TransactionTypes(Set(Paper)))
+            )
+          )
+        )
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(routes.IdentifySuspiciousActivityController.get().url)
 
-        verify(mockCacheConnector).save[BusinessActivities](any(),
+        verify(mockCacheConnector).save[BusinessActivities](
+          any(),
           eqTo(BusinessActivities.key),
-          eqTo(BusinessActivities(
-            transactionRecord = Some(false),
-            transactionRecordTypes = None,
-            hasChanged = true,
-            hasAccepted = false
+          eqTo(
+            BusinessActivities(
+              transactionRecord = Some(false),
+              transactionRecordTypes = None,
+              hasChanged = true,
+              hasAccepted = false
+            )
           )
-        ))(any())
+        )(any())
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {

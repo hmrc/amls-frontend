@@ -23,13 +23,14 @@ import play.api.data.Form
 class LinkedCashPaymentsFormProviderSpec extends BooleanFieldBehaviours[LinkedCashPayments] {
 
   override val form: Form[LinkedCashPayments] = new LinkedCashPaymentsFormProvider()()
-  override val fieldName: String = "linkedCashPayments"
-  override val errorMessage: String = "error.required.hvd.linked.cash.payment"
+  override val fieldName: String              = "linkedCashPayments"
+  override val errorMessage: String           = "error.required.hvd.linked.cash.payment"
 
   "LinkedCashPaymentsFormProvider" must {
 
     behave like booleanFieldWithModel(
-      LinkedCashPayments(true), LinkedCashPayments(false)
+      LinkedCashPayments(true),
+      LinkedCashPayments(false)
     )
   }
 }

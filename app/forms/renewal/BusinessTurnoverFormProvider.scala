@@ -22,7 +22,7 @@ import models.renewal.BusinessTurnover
 
 import javax.inject.Inject
 
-class BusinessTurnoverFormProvider @Inject()() extends Mappings {
+class BusinessTurnoverFormProvider @Inject() () extends Mappings {
 
   def apply(): Form[BusinessTurnover] = Form(
     "businessTurnover" -> enumerable[BusinessTurnover]("error.required.renewal.ba.business.turnover")

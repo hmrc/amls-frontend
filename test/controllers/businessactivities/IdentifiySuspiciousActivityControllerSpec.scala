@@ -39,15 +39,17 @@ import scala.concurrent.Future
 class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture {
-    self => val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    self =>
+    val request: Request[AnyContentAsEmpty.type]  = addToken(authRequest)
     lazy val view: IdentifySuspiciousActivityView = inject[IdentifySuspiciousActivityView]
-    val controller = new IdentifySuspiciousActivityController (
+    val controller                                = new IdentifySuspiciousActivityController(
       dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[IdentifySuspiciousActivityFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   "IdentifySuspiciousActivityController" when {
@@ -63,7 +65,7 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
 
         val page: Document = Jsoup.parse(contentAsString(result))
 
-        page.select("input[type=radio][name=hasWrittenGuidance][value=true]").hasAttr("checked") must be(false)
+        page.select("input[type=radio][name=hasWrittenGuidance][value=true]").hasAttr("checked")  must be(false)
         page.select("input[type=radio][name=hasWrittenGuidance][value=false]").hasAttr("checked") must be(false)
 
       }
@@ -71,9 +73,15 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
       "display the identify suspicious activity page with pre populated data" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
-          .thenReturn(Future.successful(Some(BusinessActivities(
-            identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true))
-          ))))
+          .thenReturn(
+            Future.successful(
+              Some(
+                BusinessActivities(
+                  identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true))
+                )
+              )
+            )
+          )
 
         val result: Future[Result] = controller.get()(request)
         status(result) must be(OK)
@@ -88,10 +96,11 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
     "post is called" must {
       "on post with valid data" in new Fixture {
 
-        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.IdentifySuspiciousActivityController.post(false).url)
-          .withFormUrlEncodedBody(
-          "hasWrittenGuidance" -> "true"
-        )
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+          FakeRequest(POST, routes.IdentifySuspiciousActivityController.post(false).url)
+            .withFormUrlEncodedBody(
+              "hasWrittenGuidance" -> "true"
+            )
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(None))
@@ -100,25 +109,27 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
           .thenReturn(Future.successful(Cache(BusinessActivities.key, Map("" -> Json.obj()))))
 
         val result: Future[Result] = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.NCARegisteredController.get(false).url))
       }
 
       "on post with invalid data" in new Fixture {
-        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.IdentifySuspiciousActivityController.post(false).url)
-          .withFormUrlEncodedBody(
-          "hasWrittenGuidance" -> "grrrrr"
-        )
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+          FakeRequest(POST, routes.IdentifySuspiciousActivityController.post(false).url)
+            .withFormUrlEncodedBody(
+              "hasWrittenGuidance" -> "grrrrr"
+            )
 
         val result: Future[Result] = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
       }
 
       "on post with empty data" in new Fixture {
-        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.IdentifySuspiciousActivityController.post(false).url)
-          .withFormUrlEncodedBody(
-            "hasWrittenGuidance" -> ""
-          )
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+          FakeRequest(POST, routes.IdentifySuspiciousActivityController.post(false).url)
+            .withFormUrlEncodedBody(
+              "hasWrittenGuidance" -> ""
+            )
 
         val result: Future[Result] = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
@@ -126,10 +137,11 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
 
       "on post with valid data in edit mode" in new Fixture {
 
-        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.IdentifySuspiciousActivityController.post(true).url)
-          .withFormUrlEncodedBody(
-          "hasWrittenGuidance" -> "true"
-        )
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+          FakeRequest(POST, routes.IdentifySuspiciousActivityController.post(true).url)
+            .withFormUrlEncodedBody(
+              "hasWrittenGuidance" -> "true"
+            )
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(None))
@@ -138,7 +150,7 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
           .thenReturn(Future.successful(Cache(BusinessActivities.key, Map("" -> Json.obj()))))
 
         val result: Future[Result] = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       }
     }

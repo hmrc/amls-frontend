@@ -25,31 +25,34 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
 import views.html.bankdetails.YourBankAccountsView
 
-class YourBankAccountsController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                           val authAction: AuthAction,
-                                           val ds: CommonPlayDependencies,
-                                           val mcc: MessagesControllerComponents,
-                                           view: YourBankAccountsView) extends BankDetailsController(ds, mcc) {
+class YourBankAccountsController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val mcc: MessagesControllerComponents,
+  view: YourBankAccountsView
+) extends BankDetailsController(ds, mcc) {
 
-  def get(complete: Boolean = false): Action[AnyContent] = authAction.async {
-      implicit request =>
-        for {
-          bankDetails <- dataCacheConnector.fetch[Seq[BankDetails]](request.credId, BankDetails.key)
-        } yield bankDetails match {
-          case Some(data) =>
-            val filteredBankDetails = data.zipWithIndex.visibleAccounts.reverse
-            val result = Ok(view(
-              filteredBankDetails.incompleteAccounts,
-              filteredBankDetails.completeAccounts
-            ))
+  def get(complete: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    for {
+      bankDetails <- dataCacheConnector.fetch[Seq[BankDetails]](request.credId, BankDetails.key)
+    } yield bankDetails match {
+      case Some(data) =>
+        val filteredBankDetails = data.zipWithIndex.visibleAccounts.reverse
+        val result              = Ok(
+          view(
+            filteredBankDetails.incompleteAccounts,
+            filteredBankDetails.completeAccounts
+          )
+        )
 
-            if(filteredBankDetails.incompleteAccounts.isEmpty) {
-              result.removingFromSession("itemIndex")
-            } else {
-              result
-            }
-
-          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+        if (filteredBankDetails.incompleteAccounts.isEmpty) {
+          result.removingFromSession("itemIndex")
+        } else {
+          result
         }
+
+      case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+    }
   }
 }

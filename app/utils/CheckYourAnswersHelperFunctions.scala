@@ -54,22 +54,24 @@ trait CheckYourAnswersHelperFunctions {
     )
   )
 
-  def row(title: String, label: String, actions: Option[Actions])(implicit messages: Messages): SummaryListRow = {
+  def row(title: String, label: String, actions: Option[Actions])(implicit messages: Messages): SummaryListRow =
     SummaryListRow(
       Key(Text(messages(title))),
       Value(Text(label)),
       actions = actions
     )
-  }
 
-  def editAction(route: String, hiddenText: String, id: String)(implicit messages: Messages): Option[Actions] = {
-    Some(Actions(
-      items = Seq(ActionItem(
-        route,
-        Text(messages("button.edit")),
-        visuallyHiddenText = Some(messages(hiddenText)),
-        attributes = Map("id" -> id)
-      ))
-    ))
-  }
+  def editAction(route: String, hiddenText: String, id: String)(implicit messages: Messages): Option[Actions] =
+    Some(
+      Actions(
+        items = Seq(
+          ActionItem(
+            route,
+            Text(messages("button.edit")),
+            visuallyHiddenText = Some(messages(hiddenText)),
+            attributes = Map("id" -> id)
+          )
+        )
+      )
+    )
 }

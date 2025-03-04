@@ -26,11 +26,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.PreviouslyRegisteredView
 
+class PreviouslyRegisteredViewSpec extends AmlsViewSpec with Matchers {
 
-class PreviouslyRegisteredViewSpec extends AmlsViewSpec with Matchers  {
-
-  lazy val previously_registered = app.injector.instanceOf[PreviouslyRegisteredView]
-  lazy val formProvider = app.injector.instanceOf[PreviouslyRegisteredFormProvider]
+  lazy val previously_registered                                 = app.injector.instanceOf[PreviouslyRegisteredView]
+  lazy val formProvider                                          = app.injector.instanceOf[PreviouslyRegisteredFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -42,7 +41,9 @@ class PreviouslyRegisteredViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = previously_registered(form2, true)
 
-      doc.title must startWith(Messages("businessdetails.registeredformlr.title") + " - " + Messages("summary.businessdetails"))
+      doc.title must startWith(
+        Messages("businessdetails.registeredformlr.title") + " - " + Messages("summary.businessdetails")
+      )
     }
 
     "have correct headings" in new ViewFixture {
@@ -51,7 +52,7 @@ class PreviouslyRegisteredViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = previously_registered(form2, true)
 
-      heading.html must be(Messages("businessdetails.registeredformlr.title"))
+      heading.html    must be(Messages("businessdetails.registeredformlr.title"))
       subHeading.html must include(Messages("summary.businessdetails"))
 
     }
@@ -60,7 +61,8 @@ class PreviouslyRegisteredViewSpec extends AmlsViewSpec with Matchers  {
 
       val errorKey = "error.required.atb.previously.registered"
 
-      val form2: Form[PreviouslyRegistered] = formProvider().withError(FormError("value", "error.required.atb.previously.registered"))
+      val form2: Form[PreviouslyRegistered] =
+        formProvider().withError(FormError("value", "error.required.atb.previously.registered"))
 
       def view = previously_registered(form2, true)
 

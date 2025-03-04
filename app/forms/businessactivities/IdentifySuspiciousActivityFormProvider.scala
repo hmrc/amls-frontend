@@ -22,9 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class IdentifySuspiciousActivityFormProvider @Inject()() extends Mappings {
+class IdentifySuspiciousActivityFormProvider @Inject() () extends Mappings {
 
-  private val errorMessage = "error.required.ba.suspicious.activity"
+  private val errorMessage                      = "error.required.ba.suspicious.activity"
   def apply(): Form[IdentifySuspiciousActivity] = Form[IdentifySuspiciousActivity](
     "hasWrittenGuidance" -> boolean(errorMessage, errorMessage)
       .transform[IdentifySuspiciousActivity](IdentifySuspiciousActivity.apply, _.hasWrittenGuidance)

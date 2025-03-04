@@ -24,23 +24,23 @@ import utils.{AuthAction, FeeHelper}
 import views.html.applicationstatus.HowToPayView
 
 @Singleton
-class HowToPayController @Inject()(authAction: AuthAction,
-                                   val ds: CommonPlayDependencies,
-                                   val cc: MessagesControllerComponents,
-                                   val feeHelper: FeeHelper,
-                                   view: HowToPayView) extends AmlsBaseController(ds, cc) {
+class HowToPayController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  val feeHelper: FeeHelper,
+  view: HowToPayView
+) extends AmlsBaseController(ds, cc) {
 
   val prefix = "[HowToPayController]"
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-      feeHelper.retrieveFeeResponse(request.amlsRefNumber, request.accountTypeId, request.groupIdentifier, prefix) map {
-        case Some(fees) if !isEmpty(fees.paymentReference) => Ok(view(fees.paymentReference))
-        case _          => Ok(view(None))
-      }
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    feeHelper.retrieveFeeResponse(request.amlsRefNumber, request.accountTypeId, request.groupIdentifier, prefix) map {
+      case Some(fees) if !isEmpty(fees.paymentReference) => Ok(view(fees.paymentReference))
+      case _                                             => Ok(view(None))
+    }
   }
 
-  def isEmpty(x: Option[String]): Boolean = {
+  def isEmpty(x: Option[String]): Boolean =
     x.isEmpty || x == null || (x.isDefined && x.get.trim.isEmpty)
-  }
 }

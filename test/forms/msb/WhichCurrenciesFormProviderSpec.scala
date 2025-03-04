@@ -23,13 +23,15 @@ import play.api.data.{Form, FormError}
 
 class WhichCurrenciesFormProviderSpec extends FieldBehaviours {
   val form: Form[WhichCurrencies] = new WhichCurrenciesFormProvider()()
-  val fieldName: String = "currencies"
-  val errorMessage: String = "error.invalid.msb.wc.currencies"
+  val fieldName: String           = "currencies"
+  val errorMessage: String        = "error.invalid.msb.wc.currencies"
 
   "WhichCurrenciesFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, fieldName, Gen.oneOf(models.currencies)
+      form,
+      fieldName,
+      Gen.oneOf(models.currencies)
     )
 
     "not bind when key is not present at all" in {

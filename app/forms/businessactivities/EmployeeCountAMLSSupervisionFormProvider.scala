@@ -22,10 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class EmployeeCountAMLSSupervisionFormProvider @Inject()() extends Mappings {
+class EmployeeCountAMLSSupervisionFormProvider @Inject() () extends Mappings {
 
-  val length = 11
-  val regex = "^[0-9]+$"
+  val length                                      = 11
+  val regex                                       = "^[0-9]+$"
   def apply(): Form[EmployeeCountAMLSSupervision] = Form[EmployeeCountAMLSSupervision](
     "employeeCountAMLSSupervision" -> text("error.empty.ba.mlr.employee.count")
       .verifying(
@@ -33,7 +33,8 @@ class EmployeeCountAMLSSupervisionFormProvider @Inject()() extends Mappings {
           maxLength(length, "error.max.length.ba.employee.count"),
           regexp(regex, "error.invalid.ba.employee.count")
         )
-      ).transform[EmployeeCountAMLSSupervision](EmployeeCountAMLSSupervision.apply, _.employeeCountAMLSSupervision)
+      )
+      .transform[EmployeeCountAMLSSupervision](EmployeeCountAMLSSupervision.apply, _.employeeCountAMLSSupervision)
   )
 
 }

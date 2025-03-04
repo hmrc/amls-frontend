@@ -28,7 +28,7 @@ import java.time.LocalDate
 
 class RenewRegistrationViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val renewView: RenewRegistrationView = inject[RenewRegistrationView]
+  lazy val renewView: RenewRegistrationView  = inject[RenewRegistrationView]
   lazy val fp: RenewRegistrationFormProvider = inject[RenewRegistrationFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
@@ -46,7 +46,7 @@ class RenewRegistrationViewSpec extends AmlsViewSpec with Matchers {
       def view = renewView(fp(), Some(endDate))
 
       doc.title mustBe s"${messages("declaration.renew.registration.title")} - ${messages("summary.declaration")} - ${messages("title.amls")} - ${messages("title.gov")}"
-      heading.html must include(messages("declaration.renew.registration.title"))
+      heading.html    must include(messages("declaration.renew.registration.title"))
       subHeading.html must include(messages("summary.declaration"))
 
       doc.text() must include(messages("declaration.renew.registration.section1"))
@@ -58,7 +58,8 @@ class RenewRegistrationViewSpec extends AmlsViewSpec with Matchers {
         fp().withError("renewRegistration", "error.required.declaration.renew.registration"),
         Some(endDate)
       ),
-      "renewRegistration", "error.required.declaration.renew.registration"
+      "renewRegistration",
+      "error.required.declaration.renew.registration"
     )
 
     behave like pageWithBackLink(renewView(fp(), Some(endDate)))

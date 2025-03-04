@@ -24,8 +24,8 @@ import play.api.data.{Form, FormError}
 class ConfirmPostcodeFormProviderSpec extends AddressFieldBehaviours with Constraints {
 
   override val form: Form[ConfirmPostcode] = new ConfirmPostcodeFormProvider()()
-  override val maxLength: Int = 8
-  override val regexString: String = ""
+  override val maxLength: Int              = 8
+  override val regexString: String         = ""
 
   "ConfirmPostcodeFormProvider" must {
 
@@ -34,7 +34,6 @@ class ConfirmPostcodeFormProviderSpec extends AddressFieldBehaviours with Constr
     "bind a valid postcode" in {
 
       forAll(postcodeGen) { postcode =>
-
         val newForm = form.bind(Map(postcodeField -> postcode))
 
         newForm(postcodeField).value shouldBe Some(postcode)
@@ -47,17 +46,20 @@ class ConfirmPostcodeFormProviderSpec extends AddressFieldBehaviours with Constr
 
         val newForm = form.bind(Map(postcodeField -> ""))
 
-        newForm(postcodeField).error shouldBe Some(FormError(postcodeField, "businessmatching.confirm.postcode.error.empty"))
+        newForm(postcodeField).error shouldBe Some(
+          FormError(postcodeField, "businessmatching.confirm.postcode.error.empty")
+        )
       }
 
       "postcode is invalid" in {
 
         forAll(postcodeGen.suchThat(_.nonEmpty), invalidChar) { case (postcode: String, invalidChar: String) =>
-
           val invalidPostcode = postcode.dropRight(1) + invalidChar
-          val newForm = form.bind(Map(postcodeField -> invalidPostcode))
+          val newForm         = form.bind(Map(postcodeField -> invalidPostcode))
 
-          newForm(postcodeField).error shouldBe Some(FormError(postcodeField, "error.invalid.postcode", Seq(postcodeRegex)))
+          newForm(postcodeField).error shouldBe Some(
+            FormError(postcodeField, "error.invalid.postcode", Seq(postcodeRegex))
+          )
         }
       }
     }

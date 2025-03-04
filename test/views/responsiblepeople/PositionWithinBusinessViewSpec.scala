@@ -30,7 +30,7 @@ import views.html.responsiblepeople.PositionWithinBusinessView
 class PositionWithinBusinessViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val businessView: PositionWithinBusinessView = inject[PositionWithinBusinessView]
-  lazy val fp: PositionWithinBusinessFormProvider = inject[PositionWithinBusinessFormProvider]
+  lazy val fp: PositionWithinBusinessFormProvider   = inject[PositionWithinBusinessFormProvider]
 
   val name = "firstName lastName"
 
@@ -51,16 +51,36 @@ class PositionWithinBusinessViewSpec extends AmlsViewSpec with Matchers {
 
     "have correct title" in new ViewFixture {
 
-      def view: HtmlFormat.Appendable = businessView(fp(), edit = true, 1, BusinessType.SoleProprietor, name, displayNominatedOfficer = true, None, positions)
-      doc.title must be(messages("responsiblepeople.position_within_business.title") +
-        " - " + messages("summary.responsiblepeople") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      def view: HtmlFormat.Appendable = businessView(
+        fp(),
+        edit = true,
+        1,
+        BusinessType.SoleProprietor,
+        name,
+        displayNominatedOfficer = true,
+        None,
+        positions
+      )
+      doc.title must be(
+        messages("responsiblepeople.position_within_business.title") +
+          " - " + messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
-      def view: HtmlFormat.Appendable = businessView(fp(), edit = true, 1, BusinessType.SoleProprietor, name, displayNominatedOfficer = true, None, positions)
-      heading.html must be(messages("responsiblepeople.position_within_business.heading", name))
+      def view: HtmlFormat.Appendable = businessView(
+        fp(),
+        edit = true,
+        1,
+        BusinessType.SoleProprietor,
+        name,
+        displayNominatedOfficer = true,
+        None,
+        positions
+      )
+      heading.html    must be(messages("responsiblepeople.position_within_business.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
     }
 
@@ -94,6 +114,17 @@ class PositionWithinBusinessViewSpec extends AmlsViewSpec with Matchers {
       "error.invalid.rp.position_within_business.other_position"
     )
 
-    behave like pageWithBackLink(businessView(fp(), edit = true, 1, BusinessType.SoleProprietor, name, displayNominatedOfficer = true, None, positions))
+    behave like pageWithBackLink(
+      businessView(
+        fp(),
+        edit = true,
+        1,
+        BusinessType.SoleProprietor,
+        name,
+        displayNominatedOfficer = true,
+        None,
+        positions
+      )
+    )
   }
 }

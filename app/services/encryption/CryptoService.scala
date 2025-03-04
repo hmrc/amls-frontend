@@ -31,68 +31,66 @@ import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Success, Try}
 
 @Singleton
-class CryptoService @Inject()(applicationConfig: ApplicationConfig, applicationCrypto: ApplicationCrypto) {
+class CryptoService @Inject() (applicationConfig: ApplicationConfig, applicationCrypto: ApplicationCrypto) {
 
-  private val logger = Logger(getClass)
-  private val encryptionKey = applicationConfig.encryptionKey
+  private val logger                = Logger(getClass)
+  private val encryptionKey         = applicationConfig.encryptionKey
   private val keyBytes: Array[Byte] = Base64.decodeBase64(encryptionKey.getBytes(UTF_8))
-  private val secretKeySpec = new SecretKeySpec(keyBytes, "AES")
+  private val secretKeySpec         = new SecretKeySpec(keyBytes, "AES")
 
   private implicit val encrypterDecrypter: Encrypter with Decrypter = applicationCrypto.JsonCrypto
 
-  /**
-    * Take an encrypted string & return the decrypted value string
+  /** Take an encrypted string & return the decrypted value string
     *
-    * @param encryptedValue the value to decrypt
-    * @return the decrypted string
+    * @param encryptedValue
+    *   the value to decrypt
+    * @return
+    *   the decrypted string
     */
-  def decrypt(encryptedValue: String): String = {
+  def decrypt(encryptedValue: String): String =
     decryptAsBytes(encryptedValue) match {
       case Success(decryptedBytes) => new String(decryptedBytes)
-      case Failure(_) => encryptedValue
+      case Failure(_)              => encryptedValue
     }
-  }
 
-  /**
-    * Perform decryption twice to a JSON string that has been encrypted twice
+  /** Perform decryption twice to a JSON string that has been encrypted twice
     *
-    * @param doublyEncryptedValue The JSON string that has been encrypted twice
-    * @return The decrypted value
+    * @param doublyEncryptedValue
+    *   The JSON string that has been encrypted twice
+    * @return
+    *   The decrypted value
     */
   def doubleDecryptJsonString(doublyEncryptedValue: String): PlainText = {
     val value = decrypt(doublyEncryptedValue)
     value.startsWith("{") | value.startsWith("[") match {
-      case true => PlainText(value)
-      case false => {
+      case true  => PlainText(value)
+      case false =>
         logger.warn(s"performing double decryption")
         PlainText(decrypt(value))
-      }
     }
   }
 
-  /**
-    * Encrypt a JSON string using the implicit Encrypter
+  /** Encrypt a JSON string using the implicit Encrypter
     * @param jsonString
     * @return
     */
-  def encryptJsonString(jsonString: String): JsValue = {
+  def encryptJsonString(jsonString: String): JsValue =
     JsonEncryption.stringEncrypter.writes(jsonString)
-  }
 
-  /**
-    * Take an encrypted string & return the decrypted raw array of bytes
+  /** Take an encrypted string & return the decrypted raw array of bytes
     *
-    * @param encryptedValue the value to decrypt
-    * @return the decrypted raw array of bytes
+    * @param encryptedValue
+    *   the value to decrypt
+    * @return
+    *   the decrypted raw array of bytes
     */
-  def decryptAsBytes(encryptedValue: String): Try[Array[Byte]] = {
+  def decryptAsBytes(encryptedValue: String): Try[Array[Byte]] =
     Try {
       val cipher: Cipher = Cipher.getInstance(secretKeySpec.getAlgorithm)
       cipher.init(DECRYPT_MODE, secretKeySpec, cipher.getParameters)
       cipher.doFinal(Base64.decodeBase64(encryptedValue.getBytes(UTF_8)))
     } match {
-      case Success(value) => Success(value)
+      case Success(value)     => Success(value)
       case Failure(exception) => Failure(new SecurityException(exception))
     }
-  }
 }

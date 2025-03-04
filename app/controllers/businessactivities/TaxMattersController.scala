@@ -26,46 +26,46 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities.TaxMattersView
 
-class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                      val authAction: AuthAction,
-                                      val ds: CommonPlayDependencies,
-                                      val cc: MessagesControllerComponents,
-                                      view: TaxMattersView,
-                                      formProvider: TaxMattersFormProvider,
-                                      implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
+class TaxMattersController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  view: TaxMattersView,
+  formProvider: TaxMattersFormProvider,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    def accountantNames(businessActivities: BusinessActivities): Option[String] =
+      businessActivities.whoIsYourAccountant.head.names.map(name => name.accountantsName)
 
-      def accountantNames(businessActivities: BusinessActivities): Option[String] = {
-        businessActivities.whoIsYourAccountant.head.names.map(name => name.accountantsName)
-      }
-
-      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-        case Some(x) if x.taxMattersAndHasAccountant =>
-          Ok(view(formProvider().fill(x.taxMatters.head), edit, accountantNames(x)))
-        case Some(y) if y.hasAccountant =>
-          Ok(view(formProvider(), edit, accountantNames(y)))
-        case None =>
-          NotFound(notFoundView)
-      }
+    dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
+      case Some(x) if x.taxMattersAndHasAccountant =>
+        Ok(view(formProvider().fill(x.taxMatters.head), edit, accountantNames(x)))
+      case Some(y) if y.hasAccountant              =>
+        Ok(view(formProvider(), edit, accountantNames(y)))
+      case None                                    =>
+        NotFound(notFoundView)
+    }
   }
 
-  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors => {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors =>
           dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { ba =>
             BadRequest(view(formWithErrors, edit, ControllerHelper.accountantName(ba)))
-          }
-        },
+          },
         data =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId,
-              BusinessActivities.key,
-              businessActivities.taxMatters(Some(data))
-            )
+            _                  <- dataCacheConnector.save[BusinessActivities](
+                                    request.credId,
+                                    BusinessActivities.key,
+                                    businessActivities.taxMatters(Some(data))
+                                  )
           } yield Redirect(routes.SummaryController.get)
       )
   }

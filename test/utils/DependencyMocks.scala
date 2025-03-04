@@ -16,4 +16,9 @@
 
 package utils
 
-trait DependencyMocks extends CacheMocks with StatusMocks with ServiceFlowMocks with RouterMocks with AutoCompleteServiceMocks
+trait DependencyMocks
+    extends CacheMocks
+    with StatusMocks
+    with ServiceFlowMocks
+    with RouterMocks
+    with AutoCompleteServiceMocks

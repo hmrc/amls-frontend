@@ -25,14 +25,14 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class RemoveResponsiblePersonFormProvider @Inject()() extends Mappings {
+class RemoveResponsiblePersonFormProvider @Inject() () extends Mappings {
 
   private val booleanKey = "dateRequired"
 
   def apply(): Form[Either[Boolean, ResponsiblePersonEndDate]] = Form[Either[Boolean, ResponsiblePersonEndDate]](
     mapping(
       booleanKey -> boolean(),
-      "endDate" -> mandatoryIfTrue(
+      "endDate"  -> mandatoryIfTrue(
         booleanKey,
         localDate(
           oneInvalidKey = "error.invalid.rp.one",
@@ -49,15 +49,17 @@ class RemoveResponsiblePersonFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  private def apply(isRequired: Boolean, optDate: Option[LocalDate]): Either[Boolean, ResponsiblePersonEndDate] = (isRequired, optDate) match {
-    case (true, Some(date)) => Right(ResponsiblePersonEndDate(date))
-    case (false, None) => Left(false)
-  }
+  private def apply(isRequired: Boolean, optDate: Option[LocalDate]): Either[Boolean, ResponsiblePersonEndDate] =
+    (isRequired, optDate) match {
+      case (true, Some(date)) => Right(ResponsiblePersonEndDate(date))
+      case (false, None)      => Left(false)
+    }
 
-  private def unapply(either: Either[Boolean, ResponsiblePersonEndDate]): Option[(Boolean, Option[LocalDate])] = either match {
-    case Left(value) => Some((false, None))
-    case Right(value) => Some((true, Some(value.endDate)))
-  }
+  private def unapply(either: Either[Boolean, ResponsiblePersonEndDate]): Option[(Boolean, Option[LocalDate])] =
+    either match {
+      case Left(value)  => Some((false, None))
+      case Right(value) => Some((true, Some(value.endDate)))
+    }
 }
 
 object RemoveResponsiblePersonFormProvider {

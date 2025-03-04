@@ -23,7 +23,7 @@ import services.cache.Cache
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
+class DataCacheConnector @Inject() (val cacheConnector: MongoCacheConnector) {
 
   def fetch[T](credId: String, key: String)(implicit formats: Format[T]): Future[Option[T]] =
     cacheConnector.fetch(credId, key)

@@ -26,16 +26,14 @@ sealed trait PercentageOfCashPaymentOver15000 {
 
 object PercentageOfCashPaymentOver15000 extends Enumerable.Implicits {
 
-  implicit def convert(model: PercentageOfCashPaymentOver15000): RPercentageOfCashPaymentOver15000 = {
+  implicit def convert(model: PercentageOfCashPaymentOver15000): RPercentageOfCashPaymentOver15000 =
     model match {
-      case First => RPercentageOfCashPaymentOver15000.First
+      case First  => RPercentageOfCashPaymentOver15000.First
       case Second => RPercentageOfCashPaymentOver15000.Second
-      case Third => RPercentageOfCashPaymentOver15000.Third
+      case Third  => RPercentageOfCashPaymentOver15000.Third
       case Fourth => RPercentageOfCashPaymentOver15000.Fourth
-      case Fifth => RPercentageOfCashPaymentOver15000.Fifth
+      case Fifth  => RPercentageOfCashPaymentOver15000.Fifth
     }
-  }
-
 
   case object First extends WithName("first") with PercentageOfCashPaymentOver15000 {
     override val value: String = "01"
@@ -67,16 +65,16 @@ object PercentageOfCashPaymentOver15000 extends Enumerable.Implicits {
       case "03" => Third
       case "04" => Fourth
       case "05" => Fifth
-      case _ =>
+      case _    =>
         play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 
   implicit val jsonWrites: Writes[PercentageOfCashPaymentOver15000] = Writes[PercentageOfCashPaymentOver15000] {
-    case First => Json.obj("percentage" -> "01")
+    case First  => Json.obj("percentage" -> "01")
     case Second => Json.obj("percentage" -> "02")
-    case Third => Json.obj("percentage" -> "03")
+    case Third  => Json.obj("percentage" -> "03")
     case Fourth => Json.obj("percentage" -> "04")
-    case Fifth => Json.obj("percentage" -> "05")
+    case Fifth  => Json.obj("percentage" -> "05")
   }
 }

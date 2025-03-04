@@ -28,52 +28,54 @@ import views.html.businessdetails.BusinessTelephoneView
 
 import scala.concurrent.Future
 
-class ContactingYouPhoneController @Inject () (val dataCache: DataCacheConnector,
-                                               val authAction: AuthAction,
-                                               val ds: CommonPlayDependencies,
-                                               val cc: MessagesControllerComponents,
-                                               formProvider: BusinessTelephoneFormProvider,
-                                               view: BusinessTelephoneView) extends AmlsBaseController(ds, cc) {
+class ContactingYouPhoneController @Inject() (
+  val dataCache: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: BusinessTelephoneFormProvider,
+  view: BusinessTelephoneView
+) extends AmlsBaseController(ds, cc) {
 
-  def updateData(contactingYou: Option[ContactingYou], data: ContactingYouPhone): ContactingYou = {
+  def updateData(contactingYou: Option[ContactingYou], data: ContactingYouPhone): ContactingYou =
     contactingYou.fold[ContactingYou](ContactingYou(Some(data.phoneNumber))) {
       _.copy(phoneNumber = Some(data.phoneNumber))
     }
+
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    implicit val form: Form[ContactingYouPhone] = formProvider()
+    for {
+      businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+    } yield businessDetails match {
+      case Some(BusinessDetails(_, _, _, _, Some(details), _, _, _, _, _, _, _)) if details.phoneNumber.isDefined =>
+        Ok(
+          view(details.phoneNumber.fold(form)(x => form.fill(ContactingYouPhone(x))), edit)
+        )
+      case _                                                                                                      => Ok(view(form, edit))
+    }
   }
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      implicit val form: Form[ContactingYouPhone] = formProvider()
-      for {
-        businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
-      } yield businessDetails match {
-        case Some(BusinessDetails(_, _, _, _, Some(details), _, _, _, _, _, _, _)) if details.phoneNumber.isDefined =>
-          Ok(
-            view(details.phoneNumber.fold(form)(x => form.fill(ContactingYouPhone(x))), edit)
-          )
-        case _ => Ok(view(form, edit))
-      }
-  }
-
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithError => Future.successful(BadRequest(view(formWithError, edit))),
         data =>
           for {
             businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
-            _ <- dataCache.save[BusinessDetails](
-              request.credId, BusinessDetails.key, businessDetails.contactingYou(
-                updateData(businessDetails.contactingYou, data)
-              )
-            )
-          } yield {
+            _               <- dataCache.save[BusinessDetails](
+                                 request.credId,
+                                 BusinessDetails.key,
+                                 businessDetails.contactingYou(
+                                   updateData(businessDetails.contactingYou, data)
+                                 )
+                               )
+          } yield
             if (edit) {
               Redirect(routes.SummaryController.get)
             } else {
               Redirect(routes.LettersAddressController.get(edit))
             }
-          }
       )
   }
 }

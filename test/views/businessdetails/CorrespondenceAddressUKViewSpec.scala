@@ -27,24 +27,38 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.CorrespondenceAddressUKView
 
-
 class CorrespondenceAddressUKViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val correspondence_address_uk: CorrespondenceAddressUKView = inject[CorrespondenceAddressUKView]
-  lazy val formProvider: CorrespondenceAddressUKFormProvider = inject[CorrespondenceAddressUKFormProvider]
+  lazy val formProvider: CorrespondenceAddressUKFormProvider      = inject[CorrespondenceAddressUKFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
-    val countries = Some(Seq(
-      NameValuePair("Country 1", "country:1")
-    ))
+    val countries                                                  = Some(
+      Seq(
+        NameValuePair("Country 1", "country:1")
+      )
+    )
   }
 
   "correspondence_address view" must {
     "have correct title" in new ViewFixture {
       val formWithData: Form[CorrespondenceAddressUk] = formProvider().fill(
+        CorrespondenceAddressUk("Name", "BusinessName", "addressLine1", Some("addressLine2"), None, None, "AB12CD")
+      )
+
+      def view = correspondence_address_uk(formWithData, true)
+
+      doc.title must startWith(
+        messages("businessdetails.correspondenceaddress.title") + " - " + messages("summary.businessdetails")
+      )
+    }
+
+    "have correct headings" in new ViewFixture {
+
+      val formWithData = formProvider().fill(
         CorrespondenceAddressUk(
           "Name",
           "BusinessName",
@@ -52,39 +66,26 @@ class CorrespondenceAddressUKViewSpec extends AmlsViewSpec with Matchers {
           Some("addressLine2"),
           None,
           None,
-          "AB12CD"))
+          "AB12CD"
+        )
+      )
+      def view         = correspondence_address_uk(formWithData, true)
 
-      def view = correspondence_address_uk(formWithData, true)
-
-      doc.title must startWith(messages("businessdetails.correspondenceaddress.title") + " - " + messages("summary.businessdetails"))
-    }
-
-    "have correct headings" in new ViewFixture {
-
-      val formWithData = formProvider().fill(CorrespondenceAddressUk(
-        "Name",
-        "BusinessName",
-        "addressLine1",
-        Some("addressLine2"),
-        None,
-        None,
-        "AB12CD"
-      ))
-      def view = correspondence_address_uk(formWithData, true)
-
-      heading.html must be(messages("businessdetails.correspondenceaddress.title"))
+      heading.html    must be(messages("businessdetails.correspondenceaddress.title"))
       subHeading.html must include(messages("summary.businessdetails"))
     }
 
-    val formWithError = formProvider().bind(Map(
-      "yourName" -> "John Doe",
-      "businessName" -> "Big Corp Inc",
-      "addressLine1" -> "123 Test Flat",
-      "addressLine2" -> "Test Street",
-      "addressLine3" -> "Test Town",
-      "addressLine4" -> "Test City",
-      "postCode" -> ""
-    ))
+    val formWithError = formProvider().bind(
+      Map(
+        "yourName"     -> "John Doe",
+        "businessName" -> "Big Corp Inc",
+        "addressLine1" -> "123 Test Flat",
+        "addressLine2" -> "Test Street",
+        "addressLine3" -> "Test Town",
+        "addressLine4" -> "Test City",
+        "postCode"     -> ""
+      )
+    )
 
     behave like pageWithErrors(
       correspondence_address_uk(formWithError, true),

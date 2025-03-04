@@ -30,7 +30,7 @@ object RevokedReason {
   case object RevokedFailedToRespond extends RevokedReason
   case object RevokedOther extends RevokedReason
 
-  implicit def reason(reason:String) : RevokedReason = {
+  implicit def reason(reason: String): RevokedReason =
     reason match {
       case "01" => RevokedMissingTrader
       case "02" => RevokedCeasedTrading
@@ -40,15 +40,14 @@ object RevokedReason {
       case "06" => RevokedFailedToRespond
       case "99" => RevokedOther
     }
-  }
 
   implicit val jsonWrites: Writes[RevokedReason] = Writes[RevokedReason] {
-    case RevokedMissingTrader =>  JsString("01")
-    case RevokedCeasedTrading =>  JsString("02")
-    case RevokedNonCompliant =>  JsString("03")
-    case RevokedFitAndProperFailure =>  JsString("04")
-    case RevokedFailedToPayCharges =>  JsString("05")
-    case RevokedFailedToRespond =>  JsString("06")
-    case RevokedOther =>  JsString("99")
+    case RevokedMissingTrader       => JsString("01")
+    case RevokedCeasedTrading       => JsString("02")
+    case RevokedNonCompliant        => JsString("03")
+    case RevokedFitAndProperFailure => JsString("04")
+    case RevokedFailedToPayCharges  => JsString("05")
+    case RevokedFailedToRespond     => JsString("06")
+    case RevokedOther               => JsString("99")
   }
 }

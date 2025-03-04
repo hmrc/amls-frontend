@@ -60,30 +60,30 @@ object ExpectedAMLSTurnover extends Enumerable.Implicits {
       case "05" => Fifth
       case "06" => Sixth
       case "07" => Seventh
-      case _ =>
+      case _    =>
         play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 
   implicit val jsonWrites: Writes[ExpectedAMLSTurnover] = Writes[ExpectedAMLSTurnover] {
-    case First => Json.obj("expectedAMLSTurnover" -> "01")
-    case Second => Json.obj("expectedAMLSTurnover" -> "02")
-    case Third => Json.obj("expectedAMLSTurnover" -> "03")
-    case Fourth => Json.obj("expectedAMLSTurnover" -> "04")
-    case Fifth => Json.obj("expectedAMLSTurnover" -> "05")
-    case Sixth => Json.obj("expectedAMLSTurnover" -> "06")
+    case First   => Json.obj("expectedAMLSTurnover" -> "01")
+    case Second  => Json.obj("expectedAMLSTurnover" -> "02")
+    case Third   => Json.obj("expectedAMLSTurnover" -> "03")
+    case Fourth  => Json.obj("expectedAMLSTurnover" -> "04")
+    case Fifth   => Json.obj("expectedAMLSTurnover" -> "05")
+    case Sixth   => Json.obj("expectedAMLSTurnover" -> "06")
     case Seventh => Json.obj("expectedAMLSTurnover" -> "07")
   }
 
   implicit def convert(model: ExpectedAMLSTurnover): AMLSTurnover = model match {
-    case ExpectedAMLSTurnover.First => AMLSTurnover.First
-    case ExpectedAMLSTurnover.Second => AMLSTurnover.Second
-    case ExpectedAMLSTurnover.Third => AMLSTurnover.Third
-    case ExpectedAMLSTurnover.Fourth => AMLSTurnover.Fourth
-    case ExpectedAMLSTurnover.Fifth => AMLSTurnover.Fifth
-    case ExpectedAMLSTurnover.Sixth => AMLSTurnover.Sixth
+    case ExpectedAMLSTurnover.First   => AMLSTurnover.First
+    case ExpectedAMLSTurnover.Second  => AMLSTurnover.Second
+    case ExpectedAMLSTurnover.Third   => AMLSTurnover.Third
+    case ExpectedAMLSTurnover.Fourth  => AMLSTurnover.Fourth
+    case ExpectedAMLSTurnover.Fifth   => AMLSTurnover.Fifth
+    case ExpectedAMLSTurnover.Sixth   => AMLSTurnover.Sixth
     case ExpectedAMLSTurnover.Seventh => AMLSTurnover.Seventh
-    case _ => throw new Exception("Invalid AMLS turnover")
+    case _                            => throw new Exception("Invalid AMLS turnover")
   }
 
   val all: Seq[ExpectedAMLSTurnover] = Seq(

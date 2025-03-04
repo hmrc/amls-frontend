@@ -23,19 +23,19 @@ import org.scalacheck.Gen
 import cats.implicits._
 import models.businesscustomer.ReviewDetails
 
-
-trait BusinessMatchingGenerator extends BaseGenerator
-  with ReviewDetailsGenerator
-  with BusinessActivitiesGenerator
-  with PsrNumberGen {
+trait BusinessMatchingGenerator
+    extends BaseGenerator
+    with ReviewDetailsGenerator
+    with BusinessActivitiesGenerator
+    with PsrNumberGen {
 
   val businessMatchingGen: Gen[BusinessMatching] = for {
     reviewDetails <- reviewDetailsGen
-    activities <- businessActivitiesGen
+    activities    <- businessActivitiesGen
   } yield BusinessMatching(Some(reviewDetails), Some(activities))
 
   val businessMatchingWithPsrGen: Gen[BusinessMatching] = for {
-    bm <- businessMatchingGen
+    bm  <- businessMatchingGen
     psr <- psrNumberGen
   } yield bm.copy(businessAppliedForPSRNumber = Some(psr))
 

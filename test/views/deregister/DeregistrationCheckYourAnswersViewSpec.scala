@@ -26,17 +26,18 @@ import views.html.deregister.DeregistrationCheckYourAnswersView
 
 class DeregistrationCheckYourAnswersViewSpec extends AmlsViewSpec {
 
-
   "render view" in new Fixture {
 
-    val deregistrationCheckYourAnswersView = inject[DeregistrationCheckYourAnswersView]
+    val deregistrationCheckYourAnswersView                = inject[DeregistrationCheckYourAnswersView]
     implicit val request: Request[AnyContentAsEmpty.type] = addTokenForView()
-    def view: Html = deregistrationCheckYourAnswersView(DeregistrationReason.OutOfScope)
+    def view: Html                                        = deregistrationCheckYourAnswersView(DeregistrationReason.OutOfScope)
 
     val content: String = doc.text()
     content must include("Check your answers")
     content must include("Why are you deregistering the business?")
-    content must include("Business is out of scope as no longer carrying out activities covered by the Money Laundering Regulations")
+    content must include(
+      "Business is out of scope as no longer carrying out activities covered by the Money Laundering Regulations"
+    )
     val changeLink: Element = doc.getElementById("cya-change-link")
 
     changeLink.text() mustBe "Change"

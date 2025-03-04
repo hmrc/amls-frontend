@@ -26,13 +26,13 @@ class SalesChannelFormProviderSpec extends CheckboxFieldBehaviours {
 
   "form" must {
 
-    val fieldName = "salesChannels"
+    val fieldName   = "salesChannels"
     val requiredKey = "error.required.hvd.how-will-you-sell-goods"
 
     behave like checkboxFieldWithWrapper[SalesChannel, HowWillYouSellGoods](
       form,
       fieldName,
-      validValues  = SalesChannel.all,
+      validValues = SalesChannel.all,
       x => HowWillYouSellGoods(Set(x)),
       x => HowWillYouSellGoods(x.toSet),
       invalidError = FormError(s"$fieldName[0]", requiredKey)

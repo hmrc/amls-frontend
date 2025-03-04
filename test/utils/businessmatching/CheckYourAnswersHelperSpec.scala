@@ -30,12 +30,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
   lazy val cyaHelper: CheckYourAnswersHelper = app.injector.instanceOf[CheckYourAnswersHelper]
 
-  val businessAddressIndex = 0
-  val registrationTypeIndex = 1
+  val businessAddressIndex    = 0
+  val registrationTypeIndex   = 1
   val registeredServicesIndex = 2
-  val msbActivitiesIndex = 3
-  val hasPsrNumberIndex = 4
-  val psrNumberIndex = 5
+  val msbActivitiesIndex      = 3
+  val hasPsrNumberIndex       = 4
+  val psrNumberIndex          = 5
 
   def failIfEmpty = fail("HTML was not present")
 
@@ -43,11 +43,25 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
   ".createSummaryList" must {
 
-    val msbServices = BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, ForeignExchange))
-    val businessActivitiesModel = BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-    val businessAddress = Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
-    val reviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany), businessAddress, "XE0000000000000")
-    val typeOfBusinessModel = TypeOfBusiness("Charity")
+    val msbServices                    = BusinessMatchingMsbServices(
+      Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, ForeignExchange)
+    )
+    val businessActivitiesModel        = BusinessActivities(
+      Set(
+        AccountancyServices,
+        BillPaymentServices,
+        EstateAgentBusinessService,
+        HighValueDealing,
+        MoneyServiceBusiness,
+        TrustAndCompanyServices,
+        TelephonePaymentService
+      )
+    )
+    val businessAddress                =
+      Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
+    val reviewDetailsModel             =
+      ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany), businessAddress, "XE0000000000000")
+    val typeOfBusinessModel            = TypeOfBusiness("Charity")
     val companyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
 
     def checkChangeLink(slr: SummaryListRow, href: String, id: String) = {
@@ -64,9 +78,15 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "review details are present" in {
 
-          val result = cyaHelper.createSummaryList(
-            BusinessMatching(reviewDetails = Some(reviewDetailsModel)), isPreSubmission = true, isPending = false
-          ).rows.lift(businessAddressIndex).getOrElse(failIfEmpty)
+          val result = cyaHelper
+            .createSummaryList(
+              BusinessMatching(reviewDetails = Some(reviewDetailsModel)),
+              isPreSubmission = true,
+              isPending = false
+            )
+            .rows
+            .lift(businessAddressIndex)
+            .getOrElse(failIfEmpty)
 
           result.key.toString must include(messages("businessmatching.summary.business.address.lbl"))
 
@@ -82,16 +102,20 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "Business Type is LPrLLP" in {
 
-          val result = cyaHelper.createSummaryList(
-            BusinessMatching(
-              reviewDetails = Some(
-                reviewDetailsModel.copy(businessType = Some(BusinessType.LPrLLP))
+          val result = cyaHelper
+            .createSummaryList(
+              BusinessMatching(
+                reviewDetails = Some(
+                  reviewDetailsModel.copy(businessType = Some(BusinessType.LPrLLP))
+                ),
+                companyRegistrationNumber = Some(companyRegistrationNumberModel)
               ),
-              companyRegistrationNumber = Some(companyRegistrationNumberModel)
-            ),
-            isPreSubmission = true,
-            isPending = false
-          ).rows.lift(registrationTypeIndex).getOrElse(failIfEmpty)
+              isPreSubmission = true,
+              isPending = false
+            )
+            .rows
+            .lift(registrationTypeIndex)
+            .getOrElse(failIfEmpty)
 
           result.key.toString must include(messages("businessmatching.registrationnumber.title"))
 
@@ -100,14 +124,18 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "Business Type is LimitedCompany" in {
 
-          val result = cyaHelper.createSummaryList(
-            BusinessMatching(
-              reviewDetails = Some(reviewDetailsModel),
-              companyRegistrationNumber = Some(companyRegistrationNumberModel)
-            ),
-            isPreSubmission = true,
-            isPending = false
-          ).rows.lift(registrationTypeIndex).getOrElse(failIfEmpty)
+          val result = cyaHelper
+            .createSummaryList(
+              BusinessMatching(
+                reviewDetails = Some(reviewDetailsModel),
+                companyRegistrationNumber = Some(companyRegistrationNumberModel)
+              ),
+              isPreSubmission = true,
+              isPending = false
+            )
+            .rows
+            .lift(registrationTypeIndex)
+            .getOrElse(failIfEmpty)
 
           result.key.toString must include(messages("businessmatching.registrationnumber.title"))
 
@@ -119,16 +147,20 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "Business Type is UnincorporatedBody" in {
 
-          val result = cyaHelper.createSummaryList(
-            BusinessMatching(
-              reviewDetails = Some(
-                reviewDetailsModel.copy(businessType = Some(BusinessType.UnincorporatedBody))
+          val result = cyaHelper
+            .createSummaryList(
+              BusinessMatching(
+                reviewDetails = Some(
+                  reviewDetailsModel.copy(businessType = Some(BusinessType.UnincorporatedBody))
+                ),
+                typeOfBusiness = Some(typeOfBusinessModel)
               ),
-              typeOfBusiness = Some(typeOfBusinessModel)
-            ),
-            isPreSubmission = true,
-            isPending = false
-          ).rows.lift(registrationTypeIndex).getOrElse(failIfEmpty)
+              isPreSubmission = true,
+              isPending = false
+            )
+            .rows
+            .lift(registrationTypeIndex)
+            .getOrElse(failIfEmpty)
 
           result.key.toString must include(messages("businessmatching.typeofbusiness.title"))
 
@@ -150,49 +182,71 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           "has the correct change link when is in pre-submission but not pending" in {
 
-            val result = cyaHelper.createSummaryList(
-              bm,
-              isPreSubmission = true,
-              isPending = false
-            ).rows.lift(registeredServicesIndex).getOrElse(failIfEmpty)
+            val result = cyaHelper
+              .createSummaryList(
+                bm,
+                isPreSubmission = true,
+                isPending = false
+              )
+              .rows
+              .lift(registeredServicesIndex)
+              .getOrElse(failIfEmpty)
 
             result.key.toString must include(messages("businessmatching.registerservices.title"))
 
-            result.value.toString must include(messages(s"businessmatching.registerservices.servicename.lbl.${HighValueDealing.value}"))
+            result.value.toString must include(
+              messages(s"businessmatching.registerservices.servicename.lbl.${HighValueDealing.value}")
+            )
 
             checkChangeLink(result, controllers.businessmatching.routes.RegisterServicesController.get().url, id)
           }
 
           "has the correct change link when is NOT in pre-submission and not pending" in {
 
-            val result = cyaHelper.createSummaryList(
-              bm,
-              isPreSubmission = false,
-              isPending = false
-            ).rows.lift(registeredServicesIndex).getOrElse(failIfEmpty)
+            val result = cyaHelper
+              .createSummaryList(
+                bm,
+                isPreSubmission = false,
+                isPending = false
+              )
+              .rows
+              .lift(registeredServicesIndex)
+              .getOrElse(failIfEmpty)
 
             result.key.toString must include(messages("businessmatching.registerservices.title"))
 
-            result.value.toString must include(messages(s"businessmatching.registerservices.servicename.lbl.${HighValueDealing.value}"))
+            result.value.toString must include(
+              messages(s"businessmatching.registerservices.servicename.lbl.${HighValueDealing.value}")
+            )
 
-            checkChangeLink(result, controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get().url, id)
+            checkChangeLink(
+              result,
+              controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get().url,
+              id
+            )
           }
 
           "has no change link when is pending" in {
 
-            val result = cyaHelper.createSummaryList(
-              BusinessMatching(
-                reviewDetails = Some(reviewDetailsModel),
-                companyRegistrationNumber = Some(companyRegistrationNumberModel),
-                activities = Some(BusinessActivities(Set(HighValueDealing)))
-              ),
-              isPreSubmission = false,
-              isPending = true
-            ).rows.lift(registeredServicesIndex).getOrElse(failIfEmpty)
+            val result = cyaHelper
+              .createSummaryList(
+                BusinessMatching(
+                  reviewDetails = Some(reviewDetailsModel),
+                  companyRegistrationNumber = Some(companyRegistrationNumberModel),
+                  activities = Some(BusinessActivities(Set(HighValueDealing)))
+                ),
+                isPreSubmission = false,
+                isPending = true
+              )
+              .rows
+              .lift(registeredServicesIndex)
+              .getOrElse(failIfEmpty)
 
             result.key.toString must include(messages("businessmatching.registerservices.title"))
 
-            result.value.toString must include(messages(s"businessmatching.registerservices.servicename.lbl.${HighValueDealing.value}"))
+            result.value.toString must include(
+              messages(s"businessmatching.registerservices.servicename.lbl.${HighValueDealing.value}")
+            )
 
             result.actions mustBe None
           }
@@ -208,14 +262,22 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           "has the correct change link when is in pre-submission but not pending" in {
 
-            val result = cyaHelper.createSummaryList(
-              bm, isPreSubmission = true, isPending = false
-            ).rows.lift(registeredServicesIndex).getOrElse(failIfEmpty)
+            val result = cyaHelper
+              .createSummaryList(
+                bm,
+                isPreSubmission = true,
+                isPending = false
+              )
+              .rows
+              .lift(registeredServicesIndex)
+              .getOrElse(failIfEmpty)
 
             result.key.toString must include(messages("businessmatching.registerservices.title"))
 
             businessActivitiesModel.businessActivities foreach { activity =>
-              result.value.toString must include(messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}"))
+              result.value.toString must include(
+                messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}")
+              )
             }
 
             checkChangeLink(result, controllers.businessmatching.routes.RegisterServicesController.get().url, id)
@@ -223,29 +285,49 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           "has the correct change link when is NOT in pre-submission and not pending" in {
 
-            val result = cyaHelper.createSummaryList(
-              bm, isPreSubmission = false, isPending = false
-            ).rows.lift(registeredServicesIndex).getOrElse(failIfEmpty)
+            val result = cyaHelper
+              .createSummaryList(
+                bm,
+                isPreSubmission = false,
+                isPending = false
+              )
+              .rows
+              .lift(registeredServicesIndex)
+              .getOrElse(failIfEmpty)
 
             result.key.toString must include(messages("businessmatching.registerservices.title"))
 
             businessActivitiesModel.businessActivities foreach { activity =>
-              result.value.toString must include(messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}"))
+              result.value.toString must include(
+                messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}")
+              )
             }
 
-            checkChangeLink(result, controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get().url, id)
+            checkChangeLink(
+              result,
+              controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get().url,
+              id
+            )
           }
 
           "has no change link when is pending" in {
 
-            val result = cyaHelper.createSummaryList(
-              bm, isPreSubmission = false, isPending = true
-            ).rows.lift(registeredServicesIndex).getOrElse(failIfEmpty)
+            val result = cyaHelper
+              .createSummaryList(
+                bm,
+                isPreSubmission = false,
+                isPending = true
+              )
+              .rows
+              .lift(registeredServicesIndex)
+              .getOrElse(failIfEmpty)
 
             result.key.toString must include(messages("businessmatching.registerservices.title"))
 
             businessActivitiesModel.businessActivities foreach { activity =>
-              result.value.toString must include(messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}"))
+              result.value.toString must include(
+                messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}")
+              )
             }
 
             result.actions mustBe None
@@ -268,30 +350,42 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           "has the correct change link when status is not pending" in {
 
-            val result = cyaHelper.createSummaryList(
-              bm,
-              isPreSubmission = true,
-              isPending = false
-            ).rows.lift(msbActivitiesIndex).getOrElse(failIfEmpty)
+            val result = cyaHelper
+              .createSummaryList(
+                bm,
+                isPreSubmission = true,
+                isPending = false
+              )
+              .rows
+              .lift(msbActivitiesIndex)
+              .getOrElse(failIfEmpty)
 
             result.key.toString must include(messages("businessmatching.services.title"))
 
-            result.value.toString must include(messages(s"businessmatching.services.list.lbl.${TransmittingMoney.value}"))
+            result.value.toString must include(
+              messages(s"businessmatching.services.list.lbl.${TransmittingMoney.value}")
+            )
 
             checkChangeLink(result, controllers.businessmatching.routes.MsbSubSectorsController.get(true).url, id)
           }
 
           "has no change link when status is pending" in {
 
-            val result = cyaHelper.createSummaryList(
-              bm,
-              isPreSubmission = true,
-              isPending = true
-            ).rows.lift(msbActivitiesIndex).getOrElse(failIfEmpty)
+            val result = cyaHelper
+              .createSummaryList(
+                bm,
+                isPreSubmission = true,
+                isPending = true
+              )
+              .rows
+              .lift(msbActivitiesIndex)
+              .getOrElse(failIfEmpty)
 
             result.key.toString must include(messages("businessmatching.services.title"))
 
-            result.value.toString must include(messages(s"businessmatching.services.list.lbl.${TransmittingMoney.value}"))
+            result.value.toString must include(
+              messages(s"businessmatching.services.list.lbl.${TransmittingMoney.value}")
+            )
 
             result.actions mustBe None
           }
@@ -308,11 +402,15 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           "has the correct change link when status is not pending" in {
 
-            val result = cyaHelper.createSummaryList(
-              bm,
-              isPreSubmission = true,
-              isPending = false
-            ).rows.lift(msbActivitiesIndex).getOrElse(failIfEmpty)
+            val result = cyaHelper
+              .createSummaryList(
+                bm,
+                isPreSubmission = true,
+                isPending = false
+              )
+              .rows
+              .lift(msbActivitiesIndex)
+              .getOrElse(failIfEmpty)
 
             result.key.toString must include(messages("businessmatching.services.title"))
 
@@ -325,11 +423,15 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           "has no change link when status is pending" in {
 
-            val result = cyaHelper.createSummaryList(
-              bm,
-              isPreSubmission = true,
-              isPending = true
-            ).rows.lift(msbActivitiesIndex).getOrElse(failIfEmpty)
+            val result = cyaHelper
+              .createSummaryList(
+                bm,
+                isPreSubmission = true,
+                isPending = true
+              )
+              .rows
+              .lift(msbActivitiesIndex)
+              .getOrElse(failIfEmpty)
 
             result.key.toString must include(messages("businessmatching.services.title"))
 
@@ -354,22 +456,28 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             businessAppliedForPSRNumber = Some(businessAppliedForPSRNumberModel)
           )
 
-          val rows = cyaHelper.createSummaryList(
-            bm,
-            isPreSubmission = true,
-            isPending = true
-          )(messages, request).rows
+          val rows = cyaHelper
+            .createSummaryList(
+              bm,
+              isPreSubmission = true,
+              isPending = true
+            )(messages, request)
+            .rows
 
           val hasPsrNumberRow = rows.lift(hasPsrNumberIndex).getOrElse(failIfEmpty)
-          val psrNumberRow = rows.lift(psrNumberIndex).getOrElse(failIfEmpty)
+          val psrNumberRow    = rows.lift(psrNumberIndex).getOrElse(failIfEmpty)
 
-          hasPsrNumberRow.key.toString must include(messages("businessmatching.psr.number.title"))
+          hasPsrNumberRow.key.toString   must include(messages("businessmatching.psr.number.title"))
           hasPsrNumberRow.value.toString must include(messages("lbl.yes"))
 
-          psrNumberRow.key.toString must include(messages("businessmatching.psr.number.cya.title"))
+          psrNumberRow.key.toString   must include(messages("businessmatching.psr.number.cya.title"))
           psrNumberRow.value.toString must include("123456")
 
-          checkChangeLink(psrNumberRow, controllers.businessmatching.routes.PSRNumberController.get(true).url, "edit-psr-number")
+          checkChangeLink(
+            psrNumberRow,
+            controllers.businessmatching.routes.PSRNumberController.get(true).url,
+            "edit-psr-number"
+          )
         }
       }
     }
@@ -380,9 +488,14 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "is caused by an empty address" in {
 
-          cyaHelper.createSummaryList(
-            BusinessMatching(), isPreSubmission = true, isPending = false
-          ).rows.lift(businessAddressIndex) mustBe None
+          cyaHelper
+            .createSummaryList(
+              BusinessMatching(),
+              isPreSubmission = true,
+              isPending = false
+            )
+            .rows
+            .lift(businessAddressIndex) mustBe None
         }
       }
 
@@ -390,11 +503,16 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "is caused by an empty CompanyRegistrationNumber" in {
 
-          cyaHelper.createSummaryList(
-            BusinessMatching(
-              reviewDetails = Some(reviewDetailsModel)
-            ), isPreSubmission = true, isPending = false
-          ).rows.lift(registrationTypeIndex) mustBe None
+          cyaHelper
+            .createSummaryList(
+              BusinessMatching(
+                reviewDetails = Some(reviewDetailsModel)
+              ),
+              isPreSubmission = true,
+              isPending = false
+            )
+            .rows
+            .lift(registrationTypeIndex) mustBe None
         }
       }
 
@@ -402,15 +520,18 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "is caused by an empty TypeOfBusiness" in {
 
-          cyaHelper.createSummaryList(
-            BusinessMatching(
-              reviewDetails = Some(
-                reviewDetailsModel.copy(businessType = Some(BusinessType.UnincorporatedBody))
-              )
-            ),
-            isPreSubmission = true,
-            isPending = false
-          ).rows.lift(registrationTypeIndex) mustBe None
+          cyaHelper
+            .createSummaryList(
+              BusinessMatching(
+                reviewDetails = Some(
+                  reviewDetailsModel.copy(businessType = Some(BusinessType.UnincorporatedBody))
+                )
+              ),
+              isPreSubmission = true,
+              isPending = false
+            )
+            .rows
+            .lift(registrationTypeIndex) mustBe None
         }
       }
 
@@ -418,14 +539,17 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "is caused by empty Business Activities" in {
 
-          cyaHelper.createSummaryList(
-            BusinessMatching(
-              reviewDetails = Some(reviewDetailsModel),
-              companyRegistrationNumber = Some(companyRegistrationNumberModel)
-            ),
-            isPreSubmission = true,
-            isPending = false
-          ).rows.lift(registeredServicesIndex) mustBe None
+          cyaHelper
+            .createSummaryList(
+              BusinessMatching(
+                reviewDetails = Some(reviewDetailsModel),
+                companyRegistrationNumber = Some(companyRegistrationNumberModel)
+              ),
+              isPreSubmission = true,
+              isPending = false
+            )
+            .rows
+            .lift(registeredServicesIndex) mustBe None
         }
       }
 
@@ -433,15 +557,18 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "is caused by empty MSB Business Activities" in {
 
-          cyaHelper.createSummaryList(
-            BusinessMatching(
-              reviewDetails = Some(reviewDetailsModel),
-              companyRegistrationNumber = Some(companyRegistrationNumberModel),
-              activities = Some(businessActivitiesModel)
-            ),
-            isPreSubmission = true,
-            isPending = false
-          ).rows.lift(msbActivitiesIndex) mustBe None
+          cyaHelper
+            .createSummaryList(
+              BusinessMatching(
+                reviewDetails = Some(reviewDetailsModel),
+                companyRegistrationNumber = Some(companyRegistrationNumberModel),
+                activities = Some(businessActivitiesModel)
+              ),
+              isPreSubmission = true,
+              isPending = false
+            )
+            .rows
+            .lift(msbActivitiesIndex) mustBe None
         }
       }
 
@@ -449,16 +576,18 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "is caused by NOT selecting 'Transmitting Money' in MSB services" in {
 
-          val result = cyaHelper.createSummaryList(
-            BusinessMatching(
-              reviewDetails = Some(reviewDetailsModel),
-              companyRegistrationNumber = Some(companyRegistrationNumberModel),
-              activities = Some(businessActivitiesModel),
-              msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal)))
-            ),
-            isPreSubmission = true,
-            isPending = false
-          ).rows
+          val result = cyaHelper
+            .createSummaryList(
+              BusinessMatching(
+                reviewDetails = Some(reviewDetailsModel),
+                companyRegistrationNumber = Some(companyRegistrationNumberModel),
+                activities = Some(businessActivitiesModel),
+                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal)))
+              ),
+              isPreSubmission = true,
+              isPending = false
+            )
+            .rows
 
           result.lift(hasPsrNumberIndex) mustBe None
           result.lift(psrNumberIndex) mustBe None
@@ -466,17 +595,19 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "is caused by the user answering 'No'" in {
 
-          val result = cyaHelper.createSummaryList(
-            BusinessMatching(
-              reviewDetails = Some(reviewDetailsModel),
-              companyRegistrationNumber = Some(companyRegistrationNumberModel),
-              activities = Some(businessActivitiesModel),
-              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-              businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)
-            ),
-            isPreSubmission = true,
-            isPending = false
-          ).rows
+          val result = cyaHelper
+            .createSummaryList(
+              BusinessMatching(
+                reviewDetails = Some(reviewDetailsModel),
+                companyRegistrationNumber = Some(companyRegistrationNumberModel),
+                activities = Some(businessActivitiesModel),
+                msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+                businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)
+              ),
+              isPreSubmission = true,
+              isPending = false
+            )
+            .rows
 
           result.lift(hasPsrNumberIndex) mustBe None
           result.lift(psrNumberIndex) mustBe None
@@ -491,9 +622,14 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
       "application is in pre-submission and 'No' for PSR number is answered" in {
 
-        val result = cyaHelper.getSubmitButton(
-          Some(BusinessAppliedForPSRNumberNo), isPreSubmission = true, preAppCompleted = false
-        ).getOrElse(failIfEmpty).toString()
+        val result = cyaHelper
+          .getSubmitButton(
+            Some(BusinessAppliedForPSRNumberNo),
+            isPreSubmission = true,
+            preAppCompleted = false
+          )
+          .getOrElse(failIfEmpty)
+          .toString()
 
         result must include(messages("button.logout"))
         result must include(appConfig.logoutUrl)
@@ -506,16 +642,24 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "pre-submission and pre-app are completed" in {
 
-          val result = cyaHelper.getSubmitButton(
-            Some(businessAppliedForPSRNumberModel), isPreSubmission = true, preAppCompleted = true
-          ).getOrElse(failIfEmpty).toString()
+          val result = cyaHelper
+            .getSubmitButton(
+              Some(businessAppliedForPSRNumberModel),
+              isPreSubmission = true,
+              preAppCompleted = true
+            )
+            .getOrElse(failIfEmpty)
+            .toString()
 
           result must include(messages("businessmatching.summary.noedit.anchortext"))
         }
 
         "pre-submission is NOT completed" in {
 
-          val result = cyaHelper.getSubmitButton(None, isPreSubmission = false, preAppCompleted = false).getOrElse(failIfEmpty).toString()
+          val result = cyaHelper
+            .getSubmitButton(None, isPreSubmission = false, preAppCompleted = false)
+            .getOrElse(failIfEmpty)
+            .toString()
 
           result must include(messages("businessmatching.summary.noedit.anchortext"))
         }
@@ -525,9 +669,14 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "pre-submission is completed but and pre-app is NOT completed" in {
 
-          val result = cyaHelper.getSubmitButton(
-            Some(businessAppliedForPSRNumberModel), isPreSubmission = true, preAppCompleted = false
-          ).getOrElse(failIfEmpty).toString()
+          val result = cyaHelper
+            .getSubmitButton(
+              Some(businessAppliedForPSRNumberModel),
+              isPreSubmission = true,
+              preAppCompleted = false
+            )
+            .getOrElse(failIfEmpty)
+            .toString()
 
           result must include(messages("businessmatching.button.confirm.start"))
         }

@@ -22,19 +22,19 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class EmployeeCountFormProvider @Inject()() extends Mappings {
+class EmployeeCountFormProvider @Inject() () extends Mappings {
 
-  val length = 11
-  val regex = "^[0-9]+$"
+  val length                       = 11
+  val regex                        = "^[0-9]+$"
   def apply(): Form[EmployeeCount] = Form[EmployeeCount](
-
     "employeeCount" -> text("error.empty.ba.employee.count")
       .verifying(
         firstError(
           maxLength(length, "error.max.length.ba.employee.count"),
           regexp(regex, "error.invalid.ba.employee.count")
         )
-      ).transform[EmployeeCount](EmployeeCount.apply, _.employeeCount)
+      )
+      .transform[EmployeeCount](EmployeeCount.apply, _.employeeCount)
   )
 
 }
