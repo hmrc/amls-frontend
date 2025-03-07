@@ -39,7 +39,7 @@ trait AmlsSummaryViewSpec extends PlaySpec with GuiceOneAppPerSuite with Mockito
       .build()
   }
 
-  var authConnector = mock[AuthConnector]
+  val authConnector = mock[AuthConnector]
 
   def addTokenForView[T](request: Request[T]) = {
     import play.api.test.CSRFTokenHelper._
