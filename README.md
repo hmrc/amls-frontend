@@ -41,9 +41,9 @@ To run the service with test-only routes enabled, run the script `run-local-no-i
 This service requires authentication stubbing before it can be accessed. Details can be found on the
 [DDCY Live Services Credentials sheet](https://docs.google.com/spreadsheets/d/1ecLTROmzZtv97jxM-5LgoujinGxmDoAuZauu2tFoAVU/edit?gid=1186990023#gid=1186990023)
 for both staging and local url's or check the Tech Overview section in the
-[service runbook ](https://confluence.tools.tax.service.gov.uk/display/ELSY/AMLS+Service+Summary)
+[service summary page ](https://confluence.tools.tax.service.gov.uk/display/ELSY/AMLS+Service+Summary)
 
-Additional test data can be found within the [amls-stub](https://github.com/hmrc/amls-stub) repositories. Check the README to see different enrollment values and data states.
+Additional test data can be found within the [amls-stub](https://github.com/hmrc/amls-stub) repository. Check the README to see different enrollment values and data states.
 
 
 ## Running tests via terminal
