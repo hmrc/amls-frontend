@@ -18,8 +18,8 @@ package models.moneyservicebusiness
 
 import play.api.libs.json.{Json, OFormat}
 
-case class FXTransactionsInNext12Months (fxTransaction: String)
+case class FXTransactionsInNext12Months(fxTransaction: String)
 
 object FXTransactionsInNext12Months {
-    implicit val format: OFormat[FXTransactionsInNext12Months] = Json.format[FXTransactionsInNext12Months]
+  implicit val format: OFormat[FXTransactionsInNext12Months] = Json.format[FXTransactionsInNext12Months]
 }

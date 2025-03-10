@@ -28,37 +28,37 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import scala.concurrent.Future
 
 @Singleton
-class TradingPremisesAddController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                             val authAction: AuthAction,
-                                             val ds: CommonPlayDependencies,
-                                             val cc: MessagesControllerComponents,
-                                             implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class TradingPremisesAddController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   private def isMSBSelected(cacheMap: Option[Cache]): Boolean = {
     val test = for {
-      c <- cacheMap
+      c                <- cacheMap
       businessMatching <- c.getEntry[BusinessMatching](BusinessMatching.key)
     } yield businessMatching
     ControllerHelper.isMSBSelected(test)
   }
 
-  def redirectToNextPage(credId: String, idx: Int) (implicit request: Request[AnyContent]) = {
-     dataCacheConnector.fetchAll(credId).map {
-      cache => isMSBSelected(cache) match {
-        case true => Redirect(controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(idx))
+  def redirectToNextPage(credId: String, idx: Int)(implicit request: Request[AnyContent]) =
+    dataCacheConnector.fetchAll(credId).map { cache =>
+      isMSBSelected(cache) match {
+        case true  => Redirect(controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(idx))
         case false => TPControllerHelper.redirectToNextPage(cache, idx, false)
       }
     }
-  }
 
-  def get(displayGuidance: Boolean = true) = authAction.async {
-    implicit request =>
-          addData[TradingPremises](request.credId, TradingPremises.default(None)) flatMap { idx =>
-            displayGuidance match {
-              case true => Future.successful(Redirect(controllers.tradingpremises.routes.WhatYouNeedController.get(idx)))
-              case false => redirectToNextPage(request.credId, idx)
-          }
+  def get(displayGuidance: Boolean = true) = authAction.async { implicit request =>
+    addData[TradingPremises](request.credId, TradingPremises.default(None)) flatMap { idx =>
+      displayGuidance match {
+        case true  => Future.successful(Redirect(controllers.tradingpremises.routes.WhatYouNeedController.get(idx)))
+        case false => redirectToNextPage(request.credId, idx)
       }
+    }
   }
 }
-

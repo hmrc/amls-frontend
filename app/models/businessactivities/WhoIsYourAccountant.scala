@@ -18,15 +18,19 @@ package models.businessactivities
 
 import play.api.libs.json._
 
-case class WhoIsYourAccountant(names: Option[WhoIsYourAccountantName], isUk: Option[WhoIsYourAccountantIsUk], address: Option[AccountantsAddress]) {
-  def names(newName: WhoIsYourAccountantName): WhoIsYourAccountant = this.copy(names = Option(newName))
-  def isUk(newIsUk: WhoIsYourAccountantIsUk): WhoIsYourAccountant = this.copy(isUk = Option(newIsUk))
-  def address(newAddress: AccountantsAddress): WhoIsYourAccountant = this.copy(address = Option(newAddress))
+case class WhoIsYourAccountant(
+  names: Option[WhoIsYourAccountantName],
+  isUk: Option[WhoIsYourAccountantIsUk],
+  address: Option[AccountantsAddress]
+) {
+  def names(newName: WhoIsYourAccountantName): WhoIsYourAccountant         = this.copy(names = Option(newName))
+  def isUk(newIsUk: WhoIsYourAccountantIsUk): WhoIsYourAccountant          = this.copy(isUk = Option(newIsUk))
+  def address(newAddress: AccountantsAddress): WhoIsYourAccountant         = this.copy(address = Option(newAddress))
   def address(newAddress: Option[AccountantsAddress]): WhoIsYourAccountant = this.copy(address = newAddress)
 
   def isComplete: Boolean = this match {
     case WhoIsYourAccountant(Some(_), Some(_), Some(a)) if a.isComplete => true
-    case _ => false
+    case _                                                              => false
   }
 }
 
@@ -35,23 +39,19 @@ object WhoIsYourAccountant {
 
   import play.api.libs.functional.syntax._
 
-  implicit val jsonReads : Reads[WhoIsYourAccountant] = (
-      __.read(Reads.optionNoError[WhoIsYourAccountantName]) and
+  implicit val jsonReads: Reads[WhoIsYourAccountant] = (
+    __.read(Reads.optionNoError[WhoIsYourAccountantName]) and
       __.read(Reads.optionNoError[WhoIsYourAccountantIsUk]) and
       __.read(Reads.optionNoError[AccountantsAddress])
-    )(WhoIsYourAccountant.apply _)
+  )(WhoIsYourAccountant.apply _)
 
-  implicit val jsonWrites: Writes[WhoIsYourAccountant] = Writes[WhoIsYourAccountant] {
-    model =>
-      Seq(
-        Json.toJson(model.names).asOpt[JsObject],
-        Json.toJson(model.isUk).asOpt[JsObject],
-        Json.toJson(model.address).asOpt[JsObject]
-      ).flatten.fold(Json.obj()) {
-        _ ++ _
-      }
+  implicit val jsonWrites: Writes[WhoIsYourAccountant] = Writes[WhoIsYourAccountant] { model =>
+    Seq(
+      Json.toJson(model.names).asOpt[JsObject],
+      Json.toJson(model.isUk).asOpt[JsObject],
+      Json.toJson(model.address).asOpt[JsObject]
+    ).flatten.fold(Json.obj()) {
+      _ ++ _
+    }
   }
 }
-
-
-

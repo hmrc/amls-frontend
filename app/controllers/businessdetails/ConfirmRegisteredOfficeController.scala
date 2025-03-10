@@ -24,42 +24,43 @@ import services.businessdetails.ConfirmRegisteredOfficeService
 import utils.AuthAction
 import views.html.businessdetails.ConfirmRegisteredOfficeOrMainPlaceView
 
-class ConfirmRegisteredOfficeController @Inject()(val authAction: AuthAction,
-                                                  val ds: CommonPlayDependencies,
-                                                  val cc: MessagesControllerComponents,
-                                                  formProvider: ConfirmRegisteredOfficeFormProvider,
-                                                  service: ConfirmRegisteredOfficeService,
-                                                  view: ConfirmRegisteredOfficeOrMainPlaceView) extends AmlsBaseController(ds, cc) {
+class ConfirmRegisteredOfficeController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: ConfirmRegisteredOfficeFormProvider,
+  service: ConfirmRegisteredOfficeService,
+  view: ConfirmRegisteredOfficeOrMainPlaceView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      service.hasRegisteredAddress(request.credId).flatMap { optHasRegAddress =>
-        service.getAddress(request.credId).map { optAddress =>
-          (optHasRegAddress, optAddress) match {
-            case (Some(false), Some(data)) => Ok(view(formProvider(), data))
-            case _ => Redirect(routes.RegisteredOfficeIsUKController.get(edit))
-          }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    service.hasRegisteredAddress(request.credId).flatMap { optHasRegAddress =>
+      service.getAddress(request.credId).map { optAddress =>
+        (optHasRegAddress, optAddress) match {
+          case (Some(false), Some(data)) => Ok(view(formProvider(), data))
+          case _                         => Redirect(routes.RegisteredOfficeIsUKController.get(edit))
         }
       }
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors =>
           service.getAddress(request.credId).map { optAddress =>
-            optAddress.fold(Redirect(routes.RegisteredOfficeIsUKController.get(edit))){
-              data => BadRequest(view(formWithErrors, data))
+            optAddress.fold(Redirect(routes.RegisteredOfficeIsUKController.get(edit))) { data =>
+              BadRequest(view(formWithErrors, data))
             }
           },
-        data => {
+        data =>
           service.updateRegisteredOfficeAddress(request.credId, data).map {
             case Some(_) if data.isRegOfficeOrMainPlaceOfBusiness =>
               Redirect(routes.BusinessEmailAddressController.get(edit))
-            case _ =>
+            case _                                                =>
               Redirect(routes.RegisteredOfficeIsUKController.get(edit))
           }
-        }
       )
   }
 }

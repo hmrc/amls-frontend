@@ -27,28 +27,33 @@ import utils.AuthAction
 import scala.concurrent.Future
 
 @Singleton
-class RetryPaymentController @Inject()(authAction: AuthAction,
-                                       val ds: CommonPlayDependencies,
-                                       private[controllers] implicit val dataCacheConnector: DataCacheConnector,
-                                       private[controllers] implicit val amlsConnector: AmlsConnector,
-                                       private[controllers] implicit val statusService: StatusService,
-                                       private[controllers] val paymentsService: PaymentsService,
-                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+class RetryPaymentController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  private[controllers] implicit val dataCacheConnector: DataCacheConnector,
+  private[controllers] implicit val amlsConnector: AmlsConnector,
+  private[controllers] implicit val statusService: StatusService,
+  private[controllers] val paymentsService: PaymentsService,
+  val cc: MessagesControllerComponents
+) extends AmlsBaseController(ds, cc) {
 
-  def retryPayment = authAction.async {
-      implicit request =>
-        val result = for {
-          form <- OptionT.fromOption[Future](request.body.asFormUrlEncoded)
-          paymentRef <- OptionT.fromOption[Future](form("paymentRef").headOption)
-          oldPayment <- OptionT(amlsConnector.getPaymentByPaymentReference(paymentRef, request.accountTypeId))
-          nextUrl <- OptionT.liftF(paymentsService.paymentsUrlOrDefault(
-            paymentRef,
-            oldPayment.amountInPence.toDouble / 100,
-            controllers.routes.PaymentConfirmationController.paymentConfirmation(paymentRef).url,
-            oldPayment.amlsRefNo,
-            oldPayment.safeId, request.accountTypeId))
-        } yield Redirect(nextUrl.value)
+  def retryPayment = authAction.async { implicit request =>
+    val result = for {
+      form       <- OptionT.fromOption[Future](request.body.asFormUrlEncoded)
+      paymentRef <- OptionT.fromOption[Future](form("paymentRef").headOption)
+      oldPayment <- OptionT(amlsConnector.getPaymentByPaymentReference(paymentRef, request.accountTypeId))
+      nextUrl    <- OptionT.liftF(
+                      paymentsService.paymentsUrlOrDefault(
+                        paymentRef,
+                        oldPayment.amountInPence.toDouble / 100,
+                        controllers.routes.PaymentConfirmationController.paymentConfirmation(paymentRef).url,
+                        oldPayment.amlsRefNo,
+                        oldPayment.safeId,
+                        request.accountTypeId
+                      )
+                    )
+    } yield Redirect(nextUrl.value)
 
-        result getOrElse InternalServerError("Unable to retry payment due to a failure")
+    result getOrElse InternalServerError("Unable to retry payment due to a failure")
   }
 }

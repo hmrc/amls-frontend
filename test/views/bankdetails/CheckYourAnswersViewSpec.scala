@@ -27,7 +27,7 @@ import views.{Fixture, HtmlAssertions}
 
 class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with HtmlAssertions {
 
-  lazy val summary = inject[CheckYourAnswersView]
+  lazy val summary   = inject[CheckYourAnswersView]
   lazy val cyaHelper = inject[CheckYourAnswersHelper]
 
   trait ViewFixture extends Fixture {
@@ -37,9 +37,14 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with HtmlAssertions {
 
     val accountName = "Account Name"
 
-    val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12345678", "111111")))
-    val nonUkBankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("123456789")))
-    val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some(NonUKIBANNumber("NL26RABO0163975856")))
+    val ukBankAccount    = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12345678", "111111")))
+    val nonUkBankAccount =
+      BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("123456789")))
+    val nonUkIban        = BankAccount(
+      Some(BankAccountIsUk(false)),
+      Some(BankAccountHasIban(true)),
+      Some(NonUKIBANNumber("NL26RABO0163975856"))
+    )
 
   }
 
@@ -57,7 +62,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with HtmlAssertions {
 
       def view = summary(cyaHelper.createSummaryList(model, 1), 1)
 
-      heading.html must be(messages("title.cya"))
+      heading.html    must be(messages("title.cya"))
       subHeading.html must include(messages("summary.bankdetails"))
     }
 
@@ -68,7 +73,6 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with HtmlAssertions {
 
       doc.getElementsByTag("button").html must include(messages("button.checkyouranswers.acceptandaddbankaccount"))
     }
-
 
     "include the provided data for a UKAccount" in new ViewFixture {
 

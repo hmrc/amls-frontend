@@ -31,7 +31,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
     PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
 
   trait Fixture extends DependencyMocks { self =>
-    val request = addToken(authRequest)
+    val request    = addToken(authRequest)
     lazy val view1 = app.injector.instanceOf[CannotAddServicesView]
     lazy val view2 = app.injector.instanceOf[CannotContinueWithApplicationView]
     val controller = new NoPsrController(

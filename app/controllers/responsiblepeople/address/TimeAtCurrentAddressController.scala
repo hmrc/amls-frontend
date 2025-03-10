@@ -30,14 +30,17 @@ import views.html.responsiblepeople.address.TimeAtAddressView
 
 import scala.concurrent.Future
 
-class TimeAtCurrentAddressController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                authAction: AuthAction,
-                                                val statusService: StatusService,
-                                                val ds: CommonPlayDependencies,
-                                                val cc: MessagesControllerComponents,
-                                                formProvider: TimeAtAddressFormProvider,
-                                                view: TimeAtAddressView,
-                                                implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class TimeAtCurrentAddressController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val statusService: StatusService,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: TimeAtAddressFormProvider,
+  view: TimeAtAddressView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", None, None, None, ""), None)
 
@@ -46,11 +49,20 @@ class TimeAtCurrentAddressController @Inject() (val dataCacheConnector: DataCach
       getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           (person.personName, person.addressHistory) match {
-            case (Some(name), Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_, Some(timeAtAddress), _)), _, _))) =>
+            case (
+                  Some(name),
+                  Some(
+                    ResponsiblePersonAddressHistory(
+                      Some(ResponsiblePersonCurrentAddress(_, Some(timeAtAddress), _)),
+                      _,
+                      _
+                    )
+                  )
+                ) =>
               Ok(view(formProvider().fill(timeAtAddress), edit, index, flow, name.titleName))
             case (Some(name), _) =>
               Ok(view(formProvider(), edit, index, flow, name.titleName))
-            case _ => NotFound(notFoundView)
+            case _               => NotFound(notFoundView)
           }
         }
       }
@@ -58,55 +70,52 @@ class TimeAtCurrentAddressController @Inject() (val dataCacheConnector: DataCach
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          },
-        data => {
-          getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
-            (for {
-              rp <- responsiblePerson
-              addressHistory <- rp.addressHistory
-              currentAddress <- addressHistory.currentAddress
-            } yield {
-              val currentAddressWithTime = currentAddress.copy(
-                timeAtAddress = Some(data)
-              )
-              doUpdate(request.credId, index, currentAddressWithTime).flatMap { _ =>
-                for {
-                  status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-                } yield {
-                  redirectTo(index, data, edit, flow)
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
+              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            },
+          data =>
+            getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
+              (for {
+                rp             <- responsiblePerson
+                addressHistory <- rp.addressHistory
+                currentAddress <- addressHistory.currentAddress
+              } yield {
+                val currentAddressWithTime = currentAddress.copy(
+                  timeAtAddress = Some(data)
+                )
+                doUpdate(request.credId, index, currentAddressWithTime).flatMap { _ =>
+                  for {
+                    status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+                  } yield redirectTo(index, data, edit, flow)
                 }
-              }
-            }) getOrElse Future.successful(NotFound(notFoundView))
-          }
+              }) getOrElse Future.successful(NotFound(notFoundView))
+            }
+        )
+        .recoverWith { case _: IndexOutOfBoundsException =>
+          Future.successful(NotFound(notFoundView))
         }
-      ).recoverWith {
-        case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-      }
   }
 
-  private def doUpdate(credId: String, index: Int, rp: ResponsiblePersonCurrentAddress): Future[Cache] = {
+  private def doUpdate(credId: String, index: Int, rp: ResponsiblePersonCurrentAddress): Future[Cache] =
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
-      res.addressHistory(
-        res.addressHistory match {
-          case Some(_) if rp.timeAtAddress.contains(OneToThreeYears) | rp.timeAtAddress.contains(ThreeYearsPlus) =>
-            ResponsiblePersonAddressHistory(currentAddress = Some(rp))
-          case Some(a) => a.currentAddress(rp)
-          case _ => ResponsiblePersonAddressHistory(currentAddress = Some(rp))
-        })
+      res.addressHistory(res.addressHistory match {
+        case Some(_) if rp.timeAtAddress.contains(OneToThreeYears) | rp.timeAtAddress.contains(ThreeYearsPlus) =>
+          ResponsiblePersonAddressHistory(currentAddress = Some(rp))
+        case Some(a)                                                                                           => a.currentAddress(rp)
+        case _                                                                                                 => ResponsiblePersonAddressHistory(currentAddress = Some(rp))
+      })
     }
-  }
 
-  private def redirectTo(index: Int, timeAtAddress: TimeAtAddress,
-                         edit: Boolean,
-                         flow: Option[String]): Result = {
+  private def redirectTo(index: Int, timeAtAddress: TimeAtAddress, edit: Boolean, flow: Option[String]): Result =
     timeAtAddress match {
-      case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(index, edit, flow))
-      case ThreeYearsPlus | OneToThreeYears if edit => Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))
-      case _ => Redirect(routes.AdditionalAddressController.get(index, edit, flow))
+      case ThreeYearsPlus | OneToThreeYears if !edit =>
+        Redirect(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(index, edit, flow))
+      case ThreeYearsPlus | OneToThreeYears if edit  =>
+        Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))
+      case _                                         => Redirect(routes.AdditionalAddressController.get(index, edit, flow))
     }
-  }
 }

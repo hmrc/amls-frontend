@@ -26,7 +26,7 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
     "successfully validate given an enum value" in {
 
       Json.fromJson[Training](Json.obj("training" -> false)) must
-        be(JsSuccess(TrainingNo, JsPath ))
+        be(JsSuccess(TrainingNo, JsPath))
     }
 
     "successfully validate given an `Yes` value" in {
@@ -34,7 +34,7 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("training" -> true, "information" -> "0123456789")
 
       Json.fromJson[Training](json) must
-        be(JsSuccess(TrainingYes("0123456789"), JsPath  \ "information"))
+        be(JsSuccess(TrainingYes("0123456789"), JsPath \ "information"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
@@ -42,7 +42,7 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("training" -> true)
 
       Json.fromJson[Training](json) must
-        be(JsError((JsPath  \ "information") -> play.api.libs.json.JsonValidationError("error.path.missing")))
+        be(JsError((JsPath \ "information") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
 
     "write the correct value" in {
@@ -50,10 +50,12 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
       Json.toJson(TrainingNo.asInstanceOf[Training]) must be(Json.obj("training" -> false))
 
       Json.toJson(TrainingYes("0123456789").asInstanceOf[Training]) must
-        be(Json.obj(
-          "training" -> true,
-          "information" -> "0123456789"
-        ))
+        be(
+          Json.obj(
+            "training"    -> true,
+            "information" -> "0123456789"
+          )
+        )
     }
   }
 

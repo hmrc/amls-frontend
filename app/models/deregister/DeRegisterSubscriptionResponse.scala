@@ -23,5 +23,3 @@ case class DeRegisterSubscriptionResponse(processingDate: String)
 object DeRegisterSubscriptionResponse {
   implicit val formats: OFormat[DeRegisterSubscriptionResponse] = Json.format[DeRegisterSubscriptionResponse]
 }
-
-

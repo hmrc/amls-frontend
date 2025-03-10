@@ -41,15 +41,20 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
     self =>
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    val mockApplicationConfig = mock[ApplicationConfig]
+    val mockApplicationConfig       = mock[ApplicationConfig]
 
     val removeBusinessTypeHelper = new RemoveBusinessTypeHelper()(mockCacheConnector)
 
     val router = new RemoveBusinessTypeRouter(
       businessMatchingService = mockBusinessMatchingService,
-      whatServicesToRemovePageRouter = new WhatBusinessTypesToRemovePageRouter(mockStatusService, mockBusinessMatchingService, removeBusinessTypeHelper = removeBusinessTypeHelper),
+      whatServicesToRemovePageRouter = new WhatBusinessTypesToRemovePageRouter(
+        mockStatusService,
+        mockBusinessMatchingService,
+        removeBusinessTypeHelper = removeBusinessTypeHelper
+      ),
       needToUpdatePageRouter = new NeedToUpdatePageRouter(),
-      removeServicesSummaryPageRouter = new RemoveBusinessTypesSummaryPageRouter(mockStatusService, mockBusinessMatchingService, mockCacheConnector),
+      removeServicesSummaryPageRouter =
+        new RemoveBusinessTypesSummaryPageRouter(mockStatusService, mockBusinessMatchingService, mockCacheConnector),
       unableToRemovePageRouter = new UnableToRemovePageRouter(mockStatusService, mockBusinessMatchingService),
       whatDateToRemovePageRouter = new WhatDateToRemovePageRouter(mockStatusService, mockBusinessMatchingService)
     )
@@ -57,7 +62,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
 
   "getRoute" must {
 
-    //What do you want to remove
+    // What do you want to remove
     "return the 'Date of change' page (WhatDateRemovedController)" when {
       "the user is on the 'What do you want to remove' page (WhatBusinessTypesToRemovePageId)" when {
 
@@ -69,9 +74,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
 
           val justAdded = ServiceChangeRegister(addedActivities = Some(Set(HighValueDealing, MoneyServiceBusiness)))
 
-          mockCacheFetch[ServiceChangeRegister](
-            Some(justAdded),
-            Some(ServiceChangeRegister.key))
+          mockCacheFetch[ServiceChangeRegister](Some(justAdded), Some(ServiceChangeRegister.key))
 
           val result = await(router.getRoute("internalId", WhatBusinessTypesToRemovePageId, model))
 
@@ -89,9 +92,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
 
           val justAdded = ServiceChangeRegister(addedActivities = Some(Set(TrustAndCompanyServices)))
 
-          mockCacheFetch[ServiceChangeRegister](
-            Some(justAdded),
-            Some(ServiceChangeRegister.key))
+          mockCacheFetch[ServiceChangeRegister](Some(justAdded), Some(ServiceChangeRegister.key))
           val result = await(router.getRoute("internalId", WhatBusinessTypesToRemovePageId, model))
 
           result mustBe Redirect(removeRoutes.WhatDateRemovedController.get())
@@ -104,9 +105,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
 
           val justAdded = ServiceChangeRegister(addedActivities = Some(Set(TrustAndCompanyServices)))
 
-          mockCacheFetch[ServiceChangeRegister](
-            Some(justAdded),
-            Some(ServiceChangeRegister.key))
+          mockCacheFetch[ServiceChangeRegister](Some(justAdded), Some(ServiceChangeRegister.key))
           val result = await(router.getRoute("internalId", WhatBusinessTypesToRemovePageId, model, true))
 
           result mustBe Redirect(removeRoutes.WhatDateRemovedController.get())
@@ -114,12 +113,12 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
       }
     }
 
-    //Date of change
+    // Date of change
     "return the 'check your answers' page (RemoveBusinessTypesSummaryController)" when {
       "the user is on the 'Date of change' page (WhatDateRemovedPageId)" when {
         "there is more than one business type in the model" in new Fixture {
 
-          val model = RemoveBusinessTypeFlowModel(
+          val model  = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness)),
             dateOfChange = Some(DateOfChange(LocalDate.now()))
           )
@@ -130,12 +129,14 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
       }
     }
 
-    //check your answers (2 options - option 1)
+    // check your answers (2 options - option 1)
     "return the 'Need to update Answers' page (NeedToUpdateController)" when {
       "the user is on the 'check your answers' page (RemoveBusinessTypesSummaryPageId)" when {
         "there is no ASP business type in the model" in new Fixture {
 
-          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(2, tradingPremisesWithAtLeastOneBusinessTypeGen).sample.get))
+          mockCacheFetch[Seq[TradingPremises]](
+            Some(Gen.listOfN(2, tradingPremisesWithAtLeastOneBusinessTypeGen).sample.get)
+          )
 
           val model = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness)),
@@ -149,13 +150,15 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
       }
     }
 
-    //check your answers (2 options - option 2)
+    // check your answers (2 options - option 2)
     "return the 'Need to update Answers' page (NeedToUpdateController)" when {
       "the user is on the 'check your answers' page (RemoveBusinessTypesSummaryPageId)" when {
         "there is an ASP business type in the model" in new Fixture {
-          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(2, tradingPremisesWithAtLeastOneBusinessTypeGen).sample.get))
+          mockCacheFetch[Seq[TradingPremises]](
+            Some(Gen.listOfN(2, tradingPremisesWithAtLeastOneBusinessTypeGen).sample.get)
+          )
 
-          val model = RemoveBusinessTypeFlowModel(
+          val model  = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness, AccountancyServices)),
             dateOfChange = Some(DateOfChange(LocalDate.now()))
           )
@@ -166,7 +169,9 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
 
         "there are incomplete trading premises in the data" in new Fixture {
 
-          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(4, tradingPremisesGen).sample.get map { tp => tp.copy(hasAccepted = false) }))
+          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(4, tradingPremisesGen).sample.get map { tp =>
+            tp.copy(hasAccepted = false)
+          }))
 
           val model = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing)),
@@ -180,12 +185,12 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
       }
     }
 
-    //Need to update answers
+    // Need to update answers
     "return the 'progress' page (RegistrationProgressController)" when {
       "the user is on the 'Need to update Answers' page (NeedToUpdatePageId)" when {
         "there is an ASP business type in the model" in new Fixture {
 
-          val model = RemoveBusinessTypeFlowModel(
+          val model  = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness, AccountancyServices)),
             dateOfChange = Some(DateOfChange(LocalDate.now()))
           )
@@ -196,12 +201,12 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
       }
     }
 
-    //Unable to remove
+    // Unable to remove
     "return the 'status' page (StatusController)" when {
       "the user is on the 'Unable to remove' page (UnableToRemovePageId)" when {
         "there is less than two business type in the model" in new Fixture {
 
-          val model = RemoveBusinessTypeFlowModel(
+          val model  = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing))
           )
           val result = await(router.getRoute("internalId", UnableToRemovePageId, model))
@@ -211,9 +216,9 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
       }
     }
 
-    //***********************************    Edit tests  *******************************************************************
+    // ***********************************    Edit tests  *******************************************************************
 
-    //edit Date of change
+    // edit Date of change
     "return the 'Check your answers' page (RemoveBusinessTypesSummaryController)" when {
       "editing the 'date of change' page (WhatDateRemovedPageId)" in new Fixture {
 

@@ -37,7 +37,15 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
     lazy val summaryView: SummaryView = app.injector.instanceOf[SummaryView]
-    val controller = new SummaryController(mockCacheConnector, mockServiceFlow, mockStatusService, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc, summaryView)
+    val controller                    = new SummaryController(
+      mockCacheConnector,
+      mockServiceFlow,
+      mockStatusService,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      summaryView
+    )
 
     mockCacheSave[Asp]
 
@@ -69,7 +77,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
   "Post" must {
     "load the Asp model and set hasAccepted to true" in new Fixture {
-      val postRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.SummaryController.post().url).withFormUrlEncodedBody("" -> "")
+      val postRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+        FakeRequest(POST, routes.SummaryController.post().url).withFormUrlEncodedBody("" -> "")
 
       val model: Asp = Asp(None, None)
       mockCacheFetch(Some(model))

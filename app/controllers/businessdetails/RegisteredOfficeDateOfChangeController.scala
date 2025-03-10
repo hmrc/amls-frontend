@@ -31,51 +31,59 @@ import views.html.DateOfChangeView
 
 import scala.concurrent.Future
 
-class RegisteredOfficeDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                       val statusService: StatusService,
-                                                       val authAction: AuthAction,
-                                                       val ds: CommonPlayDependencies,
-                                                       val cc: MessagesControllerComponents,
-                                                       formProvider: DateOfChangeFormProvider,
-                                                       view: DateOfChangeView) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+class RegisteredOfficeDateOfChangeController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val statusService: StatusService,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: DateOfChangeFormProvider,
+  view: DateOfChangeView
+) extends AmlsBaseController(ds, cc)
+    with DateOfChangeHelper {
 
-
-
-  def get: Action[AnyContent] = authAction {
-    implicit request => Ok(getView(formProvider()))
+  def get: Action[AnyContent] = authAction { implicit request =>
+    Ok(getView(formProvider()))
   }
 
-  def post: Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post: Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(getView(formWithErrors))),
-        doc => {
+        doc =>
           dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key).flatMap { details =>
             details.activityStartDate match {
               case Some(date) if !doc.dateOfChange.isBefore(date.startDate) =>
-                dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
+                dataCacheConnector.save[BusinessDetails](
+                  request.credId,
+                  BusinessDetails.key,
                   details.registeredOffice(details.registeredOffice match {
-                    case Some(office: RegisteredOfficeUK) => office.copy(dateOfChange = Some(doc))
+                    case Some(office: RegisteredOfficeUK)    => office.copy(dateOfChange = Some(doc))
                     case Some(office: RegisteredOfficeNonUK) => office.copy(dateOfChange = Some(doc))
-                    case _ => throw new Exception("An exception has occurred")
-                  })) map { _ =>
+                    case _                                   => throw new Exception("An exception has occurred")
+                  })
+                ) map { _ =>
                   Redirect(routes.SummaryController.get)
                 }
-              case Some(date) =>
-                Future.successful(BadRequest(getView(
-                  formProvider().withError(
-                    "dateOfChange",
-                    messages(
-                      "error.expected.dateofchange.date.after.activitystartdate",
-                      DateHelper.formatDate(date.startDate)
+              case Some(date)                                               =>
+                Future.successful(
+                  BadRequest(
+                    getView(
+                      formProvider().withError(
+                        "dateOfChange",
+                        messages(
+                          "error.expected.dateofchange.date.after.activitystartdate",
+                          DateHelper.formatDate(date.startDate)
+                        )
+                      )
                     )
                   )
-                )))
-              case None =>
+                )
+              case None                                                     =>
                 Future.failed(new Exception("Could not retrieve start date"))
             }
           }
-        }
       )
   }
 

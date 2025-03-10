@@ -46,7 +46,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
           messages("title.amls") + " - " + messages("title.gov")
 
         val result: Future[Result] = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(pageTitle)
       }
     }

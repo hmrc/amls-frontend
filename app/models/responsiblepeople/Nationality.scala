@@ -35,36 +35,34 @@ object Nationality {
     (__ \ "nationality").read[String].flatMap[Nationality] {
       case "01" => British
       case "02" => (JsPath \ "otherCountry").read[Country] map OtherCountry.apply
-      case _ => play.api.libs.json.JsonValidationError("error.invalid")
+      case _    => play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 
   implicit val jsonWrites: Writes[Nationality] = Writes[Nationality] {
-    case British => Json.obj("nationality" -> "01")
-    case OtherCountry(value) => Json.obj(
-      "nationality" -> "02",
-      "otherCountry" -> value
-    )
+    case British             => Json.obj("nationality" -> "01")
+    case OtherCountry(value) =>
+      Json.obj(
+        "nationality"  -> "02",
+        "otherCountry" -> value
+      )
   }
 
-  implicit def getNationality(country: Option[Country]): Option[Nationality] = {
+  implicit def getNationality(country: Option[Country]): Option[Nationality] =
     country match {
-      case Some(countryType)=> Some(countryType)
-      case _ => None
+      case Some(countryType) => Some(countryType)
+      case _                 => None
     }
-  }
 
-  implicit def getNationality(country: Country): Nationality = {
+  implicit def getNationality(country: Country): Nationality =
     country match {
       case Country("United Kingdom", "GB") => British
-      case someCountry => OtherCountry(someCountry)
+      case someCountry                     => OtherCountry(someCountry)
     }
-  }
 
-  implicit def getCountry(nationality: Nationality): Country = {
+  implicit def getCountry(nationality: Nationality): Country =
     nationality match {
-      case British =>Country("United Kingdom", "GB")
+      case British                   => Country("United Kingdom", "GB")
       case OtherCountry(someCountry) => someCountry
     }
-  }
 }

@@ -35,10 +35,14 @@ class TaxTypeSpec extends AmlsSpec {
       TaxType.jsonReadsTaxType.reads(Json.obj(("taxType", Json.toJson("01")))) mustEqual JsSuccess(TaxTypeSelfAssesment)
     }
     "convert valid JSON to TaxTypeCorporationTax" in {
-      TaxType.jsonReadsTaxType.reads(Json.obj(("taxType", Json.toJson("02")))) mustEqual JsSuccess(TaxTypeCorporationTax)
+      TaxType.jsonReadsTaxType.reads(Json.obj(("taxType", Json.toJson("02")))) mustEqual JsSuccess(
+        TaxTypeCorporationTax
+      )
     }
     "return error for invalid JSON" in {
-      TaxType.jsonReadsTaxType.reads(Json.obj(("taxType", Json.toJson("03")))) mustEqual JsError(JsonValidationError("error.invalid"))
+      TaxType.jsonReadsTaxType.reads(Json.obj(("taxType", Json.toJson("03")))) mustEqual JsError(
+        JsonValidationError("error.invalid")
+      )
     }
   }
 }

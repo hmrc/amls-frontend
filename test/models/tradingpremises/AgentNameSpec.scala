@@ -26,18 +26,20 @@ class AgentNameSpec extends AmlsSpec {
 
   "Json Validation" must {
     "Successfully read/write Json data" in {
-      AgentName.format.reads(AgentName.format.writes(
-        AgentName("test", Some(DateOfChange(LocalDate.of(2017, 1, 1)))))) must be(
-        JsSuccess(
-          AgentName("test", Some(DateOfChange(LocalDate.of(2017, 1, 1))))))
+      AgentName.format.reads(
+        AgentName.format.writes(AgentName("test", Some(DateOfChange(LocalDate.of(2017, 1, 1)))))
+      ) must be(JsSuccess(AgentName("test", Some(DateOfChange(LocalDate.of(2017, 1, 1))))))
     }
 
     "Succesfully read/write Json data with agent dob" in {
 
-      AgentName.format.reads(AgentName.format.writes(
-        AgentName("test", Some(DateOfChange(LocalDate.of(2017, 1, 1))), Some(LocalDate.of(2015, 10, 10))))) must be(
-        JsSuccess(
-          AgentName("test", Some(DateOfChange(LocalDate.of(2017, 1, 1))), Some(LocalDate.of(2015, 10, 10)))))
+      AgentName.format.reads(
+        AgentName.format.writes(
+          AgentName("test", Some(DateOfChange(LocalDate.of(2017, 1, 1))), Some(LocalDate.of(2015, 10, 10)))
+        )
+      ) must be(
+        JsSuccess(AgentName("test", Some(DateOfChange(LocalDate.of(2017, 1, 1))), Some(LocalDate.of(2015, 10, 10))))
+      )
 
     }
 

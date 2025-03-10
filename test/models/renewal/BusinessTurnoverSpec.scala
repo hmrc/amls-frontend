@@ -48,7 +48,6 @@ class BusinessTurnoverSpec extends PlaySpec with MockitoSugar {
         be(JsSuccess(BusinessTurnover.Seventh, JsPath))
     }
 
-
     "write the correct value" in {
       Json.toJson(BusinessTurnover.First.asInstanceOf[BusinessTurnover]) must
         be(Json.obj("businessTurnover" -> "01"))

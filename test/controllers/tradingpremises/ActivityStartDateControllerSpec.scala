@@ -40,14 +40,14 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
   val address = Address("1", None, None, None, "AA1 1BB", None)
 
-  trait Fixture  {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
-    val authAction: AuthAction = SuccessfulAuthAction
-    lazy val view = inject[ActivityStartDateView]
-    val controller = new ActivityStartDateController(
+    val authAction: AuthAction    = SuccessfulAuthAction
+    lazy val view                 = inject[ActivityStartDateView]
+    val controller                = new ActivityStartDateController(
       messagesApi,
       authAction,
       commonDependencies,
@@ -55,12 +55,13 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
       cc = mockMcc,
       formProvider = inject[ActivityStartDateFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
   }
 
   "ActivityStartDateController" must {
     val ytpModel = YourTradingPremises("foo", address, None, Some(LocalDate.of(2010, 10, 10)), None)
-    val ytp = Some(ytpModel)
+    val ytp      = Some(ytpModel)
 
     val emptyCache = Cache.empty
     "GET:" must {
@@ -68,7 +69,9 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
       "successfully load activity start page with empty form" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel.copy(startDate = None)))))))
+          .thenReturn(
+            Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(ytpModel.copy(startDate = None))))))
+          )
 
         val result = controller.get(1, false)(request)
         status(result) must be(OK)
@@ -91,20 +94,20 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
         status(result) must be(OK)
         val document: Document = Jsoup.parse(contentAsString(result))
         document.getElementsByTag("p").asScala.count(e => e.text.contains(address.postcode)) mustEqual 1
-        document.select("input[name=startDate.day]").`val` must include("10")
+        document.select("input[name=startDate.day]").`val`   must include("10")
         document.select("input[name=startDate.month]").`val` must include("10")
-        document.select("input[name=startDate.year]").`val` must include("2010")
+        document.select("input[name=startDate.year]").`val`  must include("2010")
       }
     }
 
     "POST:" must {
       "successfully redirect to next page on valid input" in new Fixture {
         val postRequest = FakeRequest(POST, routes.ActivityStartDateController.post(1, false).url)
-        .withFormUrlEncodedBody(
-          "startDate.day" -> "20",
-          "startDate.month" -> "5",
-          "startDate.year" -> "2014"
-        )
+          .withFormUrlEncodedBody(
+            "startDate.day"   -> "20",
+            "startDate.month" -> "5",
+            "startDate.year"  -> "2014"
+          )
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = ytp)))))
 
@@ -112,19 +115,26 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(1, false)(postRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.IsResidentialController.get(1, false).url))
       }
 
       "successfully redirect to next page on valid input in edit mode" in new Fixture {
         val postRequest = FakeRequest(POST, routes.ActivityStartDateController.post(1, true).url)
-        .withFormUrlEncodedBody(
-          "startDate.day" -> "20",
-          "startDate.month" -> "5",
-          "startDate.year" -> "2014"
+          .withFormUrlEncodedBody(
+            "startDate.day"   -> "20",
+            "startDate.month" -> "5",
+            "startDate.year"  -> "2014"
+          )
+        val updatedYtp  = Some(
+          YourTradingPremises(
+            "foo",
+            Address("1", None, None, None, "AA1 1BB", None),
+            None,
+            Some(LocalDate.of(2014, 5, 20)),
+            None
+          )
         )
-        val updatedYtp = Some(YourTradingPremises("foo",
-          Address("1",None,None,None,"AA1 1BB",None), None, Some(LocalDate.of(2014, 5, 20)), None))
 
         val updatedTp = TradingPremises(yourTradingPremises = updatedYtp, hasChanged = true)
 
@@ -135,18 +145,18 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(1, true)(postRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
       }
 
       "throw error on missing required field" in new Fixture {
         val postRequest = FakeRequest(POST, routes.ActivityStartDateController.post(1, false).url)
-        .withFormUrlEncodedBody(
-          "startDate.day" -> "",
-          "startDate.month" -> "5",
-          "startDate.year" -> "2014"
-        )
+          .withFormUrlEncodedBody(
+            "startDate.day"   -> "",
+            "startDate.month" -> "5",
+            "startDate.year"  -> "2014"
+          )
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = ytp)))))

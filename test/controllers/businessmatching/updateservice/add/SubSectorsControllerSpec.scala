@@ -49,10 +49,11 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
     val config = mock[ApplicationConfig]
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
-    lazy val view = app.injector.instanceOf[MsbSubSectorsView]
-    val controller = new SubSectorsController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+    val mockUpdateServiceHelper     = mock[AddBusinessTypeHelper]
+    lazy val view                   = app.injector.instanceOf[MsbSubSectorsView]
+    val controller                  = new SubSectorsController(
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
       router = createRouter[AddBusinessTypeFlowModel],
@@ -62,20 +63,22 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       view = view
     )
 
-
     val cacheMapT = OptionT.liftF(Future.successful(mockCacheMap))
 
     when {
       controller.businessMatchingService.getModel(any())
-    } thenReturn OptionT.liftF(Future.successful(BusinessMatching(
-      activities = Some(BusinessActivities(Set(AccountancyServices)))
-    )))
+    } thenReturn OptionT.liftF(
+      Future.successful(
+        BusinessMatching(
+          activities = Some(BusinessActivities(Set(AccountancyServices)))
+        )
+      )
+    )
 
     when {
       controller.businessMatchingService.updateModel(any(), any())(any())
     } thenReturn cacheMapT
   }
-
 
   "SubServicesController" when {
 
@@ -99,8 +102,14 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       "return OK with 'msb_subservices' populated view and FXtoggle is enabled" in new Fixture {
 
         when(config.fxEnabledToggle) thenReturn true
-        mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
-          subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
+        mockCacheFetch(
+          Some(
+            AddBusinessTypeFlowModel(
+              activity = Some(MoneyServiceBusiness),
+              subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal)))
+            )
+          )
+        )
         val result = controller.get()(request)
 
         status(result) must be(OK)
@@ -115,8 +124,14 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       "return OK with 'msb_subservices' populated view and FXtoggle is not enabled" in new Fixture {
 
         when(config.fxEnabledToggle) thenReturn false
-        mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
-          subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
+        mockCacheFetch(
+          Some(
+            AddBusinessTypeFlowModel(
+              activity = Some(MoneyServiceBusiness),
+              subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal)))
+            )
+          )
+        )
         val result = controller.get()(request)
 
         status(result) must be(OK)
@@ -150,7 +165,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness), subSectors = None)))
       val result = controller.get()(request)
 
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(Messages("businessmatching.updateservice.msb.services.heading"))
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[type=checkbox]").size mustBe 5
@@ -158,13 +173,13 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       document.getElementsByClass("govuk-list govuk-error-summary__list").size mustBe 0
     }
 
-
     "post is called" must {
 
       "return a bad request when no data has been posted" in new Fixture {
 
-        val result = controller.post()(FakeRequest(POST, routes.SubSectorsController.post().url)
-          .withFormUrlEncodedBody("" -> "")
+        val result = controller.post()(
+          FakeRequest(POST, routes.SubSectorsController.post().url)
+            .withFormUrlEncodedBody("" -> "")
         )
 
         status(result) mustBe BAD_REQUEST
@@ -172,8 +187,10 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 
       "return the 'Does Your Business ... PSR ...' page in the flow" when {
         "money transfer has been posted" in new Fixture {
-          mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
-            hasChanged = true))
+          mockCacheUpdate(
+            Some(AddBusinessTypeFlowModel.key),
+            AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness), hasChanged = true)
+          )
 
           val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
             "value[1]" -> TransmittingMoney.toString
@@ -182,17 +199,23 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify("internalId", SubSectorsPageId,
-            AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+          controller.router.verify(
+            "internalId",
+            SubSectorsPageId,
+            AddBusinessTypeFlowModel(
+              activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-              hasChanged = true))
+              hasChanged = true
+            )
+          )
         }
       }
 
       "return the 'Responsible people' page in the flow" when {
         "anything other than money transfer has been posted" in new Fixture {
-          mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
-            hasChanged = true)
+          mockCacheUpdate(
+            Some(AddBusinessTypeFlowModel.key),
+            AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness), hasChanged = true)
           )
 
           val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
@@ -203,18 +226,27 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify("internalId", SubSectorsPageId,
-            AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+          controller.router.verify(
+            "internalId",
+            SubSectorsPageId,
+            AddBusinessTypeFlowModel(
+              activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
-              hasChanged = true))
+              hasChanged = true
+            )
+          )
         }
       }
 
       "return the 'Responsible people' page in the flow" when {
         "anything other than money transfer has been posted when editing existing full flow with only money transfer" in new Fixture {
-          mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
-            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-            hasChanged = true)
+          mockCacheUpdate(
+            Some(AddBusinessTypeFlowModel.key),
+            AddBusinessTypeFlowModel(
+              activity = Some(MoneyServiceBusiness),
+              subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+              hasChanged = true
+            )
           )
 
           val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
@@ -225,18 +257,27 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify("internalId", SubSectorsPageId,
-            AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+          controller.router.verify(
+            "internalId",
+            SubSectorsPageId,
+            AddBusinessTypeFlowModel(
+              activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
-              hasChanged = true))
+              hasChanged = true
+            )
+          )
         }
       }
 
       "return the 'Responsible people' page in the flow" when {
         "anything other than money transfer has been posted when editing existing full flow with money transfer and others" in new Fixture {
-          mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
-            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-            hasChanged = true)
+          mockCacheUpdate(
+            Some(AddBusinessTypeFlowModel.key),
+            AddBusinessTypeFlowModel(
+              activity = Some(MoneyServiceBusiness),
+              subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+              hasChanged = true
+            )
           )
 
           val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
@@ -247,18 +288,27 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify("internalId", SubSectorsPageId,
-            AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+          controller.router.verify(
+            "internalId",
+            SubSectorsPageId,
+            AddBusinessTypeFlowModel(
+              activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
-              hasChanged = true))
+              hasChanged = true
+            )
+          )
         }
       }
 
       "return the 'Responsible people' page in the flow" when {
         "anything other than money transfer has been posted when completely changing selected services" in new Fixture {
-          mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
-            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))),
-            hasChanged = true)
+          mockCacheUpdate(
+            Some(AddBusinessTypeFlowModel.key),
+            AddBusinessTypeFlowModel(
+              activity = Some(MoneyServiceBusiness),
+              subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))),
+              hasChanged = true
+            )
           )
 
           val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
@@ -269,10 +319,15 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify("internalId", SubSectorsPageId,
-            AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+          controller.router.verify(
+            "internalId",
+            SubSectorsPageId,
+            AddBusinessTypeFlowModel(
+              activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
-              hasChanged = true))
+              hasChanged = true
+            )
+          )
         }
       }
 

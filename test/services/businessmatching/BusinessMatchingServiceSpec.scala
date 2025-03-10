@@ -39,13 +39,14 @@ import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
 
-class BusinessMatchingServiceSpec extends PlaySpec
-  with AmlsSpec
-  with MockitoSugar
-  with ScalaFutures
-  with FutureAssertions
-  with TradingPremisesGenerator
-  with BusinessMatchingGenerator {
+class BusinessMatchingServiceSpec
+    extends PlaySpec
+    with AmlsSpec
+    with MockitoSugar
+    with ScalaFutures
+    with FutureAssertions
+    with TradingPremisesGenerator
+    with BusinessMatchingGenerator {
 
   trait Fixture extends DependencyMocks {
     val service = new BusinessMatchingService(mockCacheConnector)
@@ -80,15 +81,19 @@ class BusinessMatchingServiceSpec extends PlaySpec
   "getAdditionalBusinessActivities" must {
     "return saved activities not found in view response" in new Fixture {
       val api5BusinessMatching = BusinessMatching(
-        activities = Some(BMActivities(
-          Set(BillPaymentServices)
-        ))
+        activities = Some(
+          BMActivities(
+            Set(BillPaymentServices)
+          )
+        )
       )
 
       val newBusinessMatching = BusinessMatching(
-        activities = Some(BMActivities(
-          Set(BillPaymentServices, HighValueDealing)
-        ))
+        activities = Some(
+          BMActivities(
+            Set(BillPaymentServices, HighValueDealing)
+          )
+        )
       )
 
       val viewResponse = ViewResponse(
@@ -119,17 +124,21 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
     "return an empty set if saved business activities are the same as view response" in new Fixture {
       val businessMatching = BusinessMatching(
-        activities = Some(BMActivities(
-          Set(BillPaymentServices)
-        ))
+        activities = Some(
+          BMActivities(
+            Set(BillPaymentServices)
+          )
+        )
       )
 
       val viewResponse = ViewResponse(
         "",
         businessMatchingSection = BusinessMatching(
-          activities = Some(BMActivities(
-            Set(BillPaymentServices)
-          ))
+          activities = Some(
+            BMActivities(
+              Set(BillPaymentServices)
+            )
+          )
         ),
         businessDetailsSection = BusinessDetails(),
         bankDetailsSection = Seq.empty,
@@ -158,9 +167,11 @@ class BusinessMatchingServiceSpec extends PlaySpec
     "return none if all business activities cannot be retrieved" in new Fixture {
 
       val businessMatching = BusinessMatching(
-        activities = Some(BMActivities(
-          Set(BillPaymentServices)
-        ))
+        activities = Some(
+          BMActivities(
+            Set(BillPaymentServices)
+          )
+        )
       )
 
       mockApplicationStatus(SubmissionDecisionApproved)
@@ -179,23 +190,44 @@ class BusinessMatchingServiceSpec extends PlaySpec
   "getRemainingBusinessActivities" must {
     "return the activities that the user has not yet added or previously submitted" in new Fixture {
       val businessMatching = BusinessMatching(
-        activities = Some(BMActivities(
-          Set(BillPaymentServices, HighValueDealing, AccountancyServices)
-        ))
+        activities = Some(
+          BMActivities(
+            Set(BillPaymentServices, HighValueDealing, AccountancyServices)
+          )
+        )
       )
 
       mockCacheFetch(Some(businessMatching), Some(BusinessMatching.key))
 
       whenReady(service.getRemainingBusinessActivities("internalId").value) { result =>
-        result mustBe Some(Set(TelephonePaymentService, ArtMarketParticipant, EstateAgentBusinessService,TrustAndCompanyServices, MoneyServiceBusiness))
+        result mustBe Some(
+          Set(
+            TelephonePaymentService,
+            ArtMarketParticipant,
+            EstateAgentBusinessService,
+            TrustAndCompanyServices,
+            MoneyServiceBusiness
+          )
+        )
       }
     }
 
     "return an empty set if all the available activities have been added" in new Fixture {
       val businessMatching = BusinessMatching(
-        activities = Some(BMActivities(
-          Set(BillPaymentServices, ArtMarketParticipant, HighValueDealing, AccountancyServices, TelephonePaymentService, EstateAgentBusinessService, TrustAndCompanyServices, MoneyServiceBusiness)
-        ))
+        activities = Some(
+          BMActivities(
+            Set(
+              BillPaymentServices,
+              ArtMarketParticipant,
+              HighValueDealing,
+              AccountancyServices,
+              TelephonePaymentService,
+              EstateAgentBusinessService,
+              TrustAndCompanyServices,
+              MoneyServiceBusiness
+            )
+          )
+        )
       )
 
       mockCacheFetch(Some(businessMatching), Some(BusinessMatching.key))
@@ -209,23 +241,29 @@ class BusinessMatchingServiceSpec extends PlaySpec
   "getOriginalBusinessActivities" must {
     "return the activities that are present only in the view response" in new Fixture {
       val existing = BusinessMatching(
-        activities = Some(BMActivities(
-          Set(BillPaymentServices)
-        ))
+        activities = Some(
+          BMActivities(
+            Set(BillPaymentServices)
+          )
+        )
       )
 
       val current = BusinessMatching(
-        activities = Some(BMActivities(
-          Set(BillPaymentServices, HighValueDealing)
-        ))
+        activities = Some(
+          BMActivities(
+            Set(BillPaymentServices, HighValueDealing)
+          )
+        )
       )
 
       val viewResponse = ViewResponse(
         "",
         businessMatchingSection = BusinessMatching(
-          activities = Some(BMActivities(
-            Set(BillPaymentServices)
-          ))
+          activities = Some(
+            BMActivities(
+              Set(BillPaymentServices)
+            )
+          )
         ),
         businessDetailsSection = BusinessDetails(),
         bankDetailsSection = Seq.empty,
@@ -256,9 +294,11 @@ class BusinessMatchingServiceSpec extends PlaySpec
     "return none if all business activities cannot be retrieved" in new Fixture {
 
       val businessMatching = BusinessMatching(
-        activities = Some(BMActivities(
-          Set(BillPaymentServices)
-        ))
+        activities = Some(
+          BMActivities(
+            Set(BillPaymentServices)
+          )
+        )
       )
 
       mockApplicationStatus(SubmissionDecisionApproved)
@@ -280,7 +320,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
       await(result)
 
       verify(mockCacheConnector).removeByKey(
-        eqTo("internalId"), eqTo(Asp.key)
+        eqTo("internalId"),
+        eqTo(Asp.key)
       )
 
     }
@@ -291,7 +332,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
       await(result)
 
       verify(mockCacheConnector).removeByKey(
-        eqTo("internalId"), eqTo(Hvd.key)
+        eqTo("internalId"),
+        eqTo(Hvd.key)
       )
 
     }
@@ -302,7 +344,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
       await(result)
 
       verify(mockCacheConnector).removeByKey(
-        eqTo("internalId"), eqTo(Msb.key)
+        eqTo("internalId"),
+        eqTo(Msb.key)
       )
 
     }
@@ -313,7 +356,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
       await(result)
 
       verify(mockCacheConnector).removeByKey(
-        eqTo("internalId"), eqTo(Tcsp.key)
+        eqTo("internalId"),
+        eqTo(Tcsp.key)
       )
 
     }
@@ -324,7 +368,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
       await(result)
 
       verify(mockCacheConnector).removeByKey(
-        eqTo("internalId"), eqTo(Eab.key)
+        eqTo("internalId"),
+        eqTo(Eab.key)
       )
 
     }

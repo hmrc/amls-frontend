@@ -27,22 +27,21 @@ import views.html.businessmatching.updateservice.add.SelectActivitiesView
 class SelectActivitiesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val select_activities = inject[SelectActivitiesView]
-  lazy val fp = inject[SelectActivitiesFormProvider]
+  lazy val fp                = inject[SelectActivitiesFormProvider]
 
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
 
-    override def view = select_activities(fp(),
-      edit = true,
-      BusinessActivities.all.toSeq,
-    )
+    override def view = select_activities(fp(), edit = true, BusinessActivities.all.toSeq)
   }
 
   "SelectActivitiesView" must {
 
     "have the correct title" in new ViewFixture {
-      doc.title must startWith(messages("businessmatching.updateservice.selectactivities.title") + " - " + messages("summary.updateservice"))
+      doc.title must startWith(
+        messages("businessmatching.updateservice.selectactivities.title") + " - " + messages("summary.updateservice")
+      )
     }
 
     "have correct heading" in new ViewFixture {
@@ -57,15 +56,12 @@ class SelectActivitiesViewSpec extends AmlsViewSpec with Matchers {
 
       val addedActivities = BusinessActivities.all.toSeq
 
-      override def view = select_activities(fp(),
-        edit = true,
-        addedActivities,
-      )
+      override def view = select_activities(fp(), edit = true, addedActivities)
 
       doc.body().text() must not include messages("link.return.registration.progress")
 
       addedActivities foreach { a =>
-        doc.body().text must include(messages(s"businessmatching.registerservices.servicename.lbl.${a.value}"))
+        doc.body().text   must include(messages(s"businessmatching.registerservices.servicename.lbl.${a.value}"))
         doc.body().html() must include(messages(s"businessmatching.registerservices.servicename.details.${a.value}"))
       }
     }
@@ -80,7 +76,8 @@ class SelectActivitiesViewSpec extends AmlsViewSpec with Matchers {
         true,
         BusinessActivities.all.toSeq
       ),
-      "businessActivities", "error.required.bm.register.service"
+      "businessActivities",
+      "error.required.bm.register.service"
     )
 
     behave like pageWithBackLink(select_activities(fp(), true, BusinessActivities.all.toSeq))

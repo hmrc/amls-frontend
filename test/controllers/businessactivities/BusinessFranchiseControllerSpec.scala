@@ -36,22 +36,29 @@ import views.html.businessactivities.BusinessFranchiseNameView
 
 import scala.concurrent.Future
 
-class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting with BeforeAndAfterEach {
+class BusinessFranchiseControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with ScalaFutures
+    with Injecting
+    with BeforeAndAfterEach {
 
   val mockService: BusinessFranchiseService = mock[BusinessFranchiseService]
 
   trait Fixture {
-    self => val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    self =>
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
     lazy val view: BusinessFranchiseNameView = inject[BusinessFranchiseNameView]
 
-    val controller = new BusinessFranchiseController (
+    val controller = new BusinessFranchiseController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       service = mockService,
       formProvider = inject[BusinessFranchiseFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   val emptyCache: Cache = Cache.empty
@@ -65,14 +72,14 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
         when(mockService.getBusinessFranchise(any()))
           .thenReturn(Future.successful(None))
         val result: Future[Result] = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("businessactivities.businessfranchise.title"))
 
         val htmlValue: Document = Jsoup.parse(contentAsString(result))
 
-        htmlValue.getElementById("businessFranchise-true").hasAttr("checked") must be(false)
+        htmlValue.getElementById("businessFranchise-true").hasAttr("checked")  must be(false)
         htmlValue.getElementById("businessFranchise-false").hasAttr("checked") must be(false)
-        htmlValue.select("input[name=franchiseName]").`val` must be("")
+        htmlValue.select("input[name=franchiseName]").`val`                    must be("")
       }
 
       "on get display the is your business a franchise page with pre populated data" in new Fixture {
@@ -83,9 +90,9 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
         val htmlValue: Document = Jsoup.parse(contentAsString(result))
 
-        htmlValue.getElementById("businessFranchise-true").hasAttr("checked") must be(true)
+        htmlValue.getElementById("businessFranchise-true").hasAttr("checked")  must be(true)
         htmlValue.getElementById("businessFranchise-false").hasAttr("checked") must be(false)
-        htmlValue.select("input[name=franchiseName]").`val` must be("test test")
+        htmlValue.select("input[name=franchiseName]").`val`                    must be("test test")
 
       }
     }
@@ -97,39 +104,42 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
       "respond with SEE_OTHER" when {
         "edit is false and given valid data" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BusinessFranchiseController.post().url).withFormUrlEncodedBody(
-            "businessFranchise" -> "true",
-            "franchiseName" -> franchiseName
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BusinessFranchiseController.post().url).withFormUrlEncodedBody(
+              "businessFranchise" -> "true",
+              "franchiseName"     -> franchiseName
+            )
 
           when(mockService.updateBusinessFranchise(any(), eqTo(BusinessFranchiseYes(franchiseName))))
             .thenReturn(Future.successful(emptyCache))
 
           val result: Future[Result] = controller.post(false)(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.EmployeeCountAMLSSupervisionController.get().url))
         }
 
         "edit is true and given valid data" in new Fixture {
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BusinessFranchiseController.post(true).url).withFormUrlEncodedBody(
-            "businessFranchise" -> "true",
-            "franchiseName" -> franchiseName
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BusinessFranchiseController.post(true).url).withFormUrlEncodedBody(
+              "businessFranchise" -> "true",
+              "franchiseName"     -> franchiseName
+            )
 
           when(mockService.updateBusinessFranchise(any(), eqTo(BusinessFranchiseYes(franchiseName))))
             .thenReturn(Future.successful(emptyCache))
 
           val result: Future[Result] = controller.post(true)(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get.url))
         }
       }
 
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BusinessFranchiseController.post().url).withFormUrlEncodedBody(
-            "businessFranchise" -> "test"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BusinessFranchiseController.post().url).withFormUrlEncodedBody(
+              "businessFranchise" -> "test"
+            )
 
           val result: Future[Result] = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)

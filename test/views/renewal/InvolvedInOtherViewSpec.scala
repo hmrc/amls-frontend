@@ -26,8 +26,8 @@ import views.html.renewal.InvolvedInOtherView
 
 class InvolvedInOtherViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val involved_in_other: InvolvedInOtherView = inject[InvolvedInOtherView]
-  lazy val fp: InvolvedInOtherFormProvider = inject[InvolvedInOtherFormProvider]
+  lazy val involved_in_other: InvolvedInOtherView                = inject[InvolvedInOtherView]
+  lazy val fp: InvolvedInOtherFormProvider                       = inject[InvolvedInOtherFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -44,14 +44,15 @@ class InvolvedInOtherViewSpec extends AmlsViewSpec with Matchers {
 
       def view: HtmlFormat.Appendable = involved_in_other(fp().fill(false), edit = true, None)
 
-      heading.html must be(messages("renewal.involvedinother.title"))
+      heading.html    must be(messages("renewal.involvedinother.title"))
       subHeading.html must include(messages("summary.renewal"))
 
     }
 
     "correctly list business activities" in new ViewFixture {
 
-      def view: HtmlFormat.Appendable = involved_in_other(fp().fill(false), edit = true, Some(List("test activities string")))
+      def view: HtmlFormat.Appendable =
+        involved_in_other(fp().fill(false), edit = true, Some(List("test activities string")))
 
       html must include(messages("businessactivities.confirm-activities.subtitle_4"))
       html must include("test activities string")
@@ -59,7 +60,9 @@ class InvolvedInOtherViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       involved_in_other(
-        fp().withError("involvedInOther", "error.required.renewal.ba.involved.in.other"), edit = false, None
+        fp().withError("involvedInOther", "error.required.renewal.ba.involved.in.other"),
+        edit = false,
+        None
       ),
       "involvedInOther",
       "error.required.renewal.ba.involved.in.other"

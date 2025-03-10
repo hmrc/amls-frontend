@@ -39,7 +39,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
   )
 
   val businessTypes = ProfessionalBodies.all.map { x =>
-    if(x.value == Other("").value) {
+    if (x.value == Other("").value) {
       Other("Business details")
     } else {
       x
@@ -97,9 +97,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     "Another body is present" must {
 
       "render the correct content for 'No'" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(anotherBody = Some(AnotherBodyNo))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(anotherBody = Some(AnotherBodyNo))
+          )
+          .rows
 
         assertRowMatches(
           0,
@@ -127,7 +129,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           1,
-        "supervision.another_body.lbl.supervisor",
+          "supervision.another_body.lbl.supervisor",
           anotherBody.supervisorName,
           controllers.supervision.routes.AnotherBodyController.get(true).url,
           "supervisionanotherbody-edit-previous-name"
@@ -174,9 +176,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     "Professional body member is present" must {
 
       "render the correct content for 'No'" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(professionalBodyMember = Some(ProfessionalBodyMemberNo))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(professionalBodyMember = Some(ProfessionalBodyMemberNo))
+          )
+          .rows
 
         assertRowMatches(
           5,
@@ -203,9 +207,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     "Professional Bodies is present" must {
 
       "render the correct content for a single type" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians))))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians))))
+          )
+          .rows
 
         assertRowMatches(
           6,
@@ -232,9 +238,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     "Professional Body is present" must {
 
       "render the correct content for 'No'" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(professionalBody = Some(ProfessionalBodyNo))
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(professionalBody = Some(ProfessionalBodyNo))
+          )
+          .rows
 
         assertRowMatches(
           7,

@@ -22,11 +22,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 
 class WhatDoesYourBusinessDoSpec extends AnyWordSpec with Matchers {
-  val model = WhatDoesYourBusinessDo(
-    Set(
-      BillPaymentServices,
-      EstateAgentBusinessService,
-      MoneyServiceBusiness))
+  val model = WhatDoesYourBusinessDo(Set(BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
 
   "WhatDoesYourBusinessDo" must {
 

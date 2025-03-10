@@ -37,74 +37,85 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class PaymentConfirmationController @Inject()(authAction: AuthAction,
-                                              val ds: CommonPlayDependencies,
-                                              private[controllers] implicit val dataCacheConnector: DataCacheConnector,
-                                              private[controllers] implicit val amlsConnector: AmlsConnector,
-                                              private[controllers] implicit val statusService: StatusService,
-                                              private[controllers] val feeResponseService: FeeResponseService,
-                                              private[controllers] val enrolmentService: AuthEnrolmentsService,
-                                              private[controllers] val auditConnector: AuditConnector,
-                                              val cc: MessagesControllerComponents,
-                                              val feeHelper: FeeHelper,
-                                              paymentConfirmationRenewalView: PaymentConfirmationRenewalView,
-                                              paymentConfirmationAmendVariationView: PaymentConfirmationAmendVariationView,
-                                              paymentConfirmationTransitionalRenewalView: PaymentConfirmationTransitionalRenewalView,
-                                              paymentConfirmationView: PaymentConfirmationView,
-                                              paymentFailureView: PaymentFailureView
-                                             ) extends AmlsBaseController(ds, cc) {
+class PaymentConfirmationController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  private[controllers] implicit val dataCacheConnector: DataCacheConnector,
+  private[controllers] implicit val amlsConnector: AmlsConnector,
+  private[controllers] implicit val statusService: StatusService,
+  private[controllers] val feeResponseService: FeeResponseService,
+  private[controllers] val enrolmentService: AuthEnrolmentsService,
+  private[controllers] val auditConnector: AuditConnector,
+  val cc: MessagesControllerComponents,
+  val feeHelper: FeeHelper,
+  paymentConfirmationRenewalView: PaymentConfirmationRenewalView,
+  paymentConfirmationAmendVariationView: PaymentConfirmationAmendVariationView,
+  paymentConfirmationTransitionalRenewalView: PaymentConfirmationTransitionalRenewalView,
+  paymentConfirmationView: PaymentConfirmationView,
+  paymentFailureView: PaymentFailureView
+) extends AmlsBaseController(ds, cc) {
 
   val prefix = "[PaymentConfirmationController]"
 
-  def paymentConfirmation(reference: String): Action[AnyContent] = authAction.async {
-      implicit request =>
+  def paymentConfirmation(reference: String): Action[AnyContent] = authAction.async { implicit request =>
+    def companyName(maybeStatus: Option[ReadStatusResponse]): OptionT[Future, String] =
+      maybeStatus.fold[OptionT[Future, String]](OptionT.some("")) { r =>
+        BusinessName.getName(request.credId, r.safeId, request.accountTypeId)
+      }
 
-        def companyName(maybeStatus: Option[ReadStatusResponse]): OptionT[Future, String] =
-          maybeStatus.fold[OptionT[Future, String]](OptionT.some("")) { r => BusinessName.getName(request.credId, r.safeId, request.accountTypeId) }
+    val msgFromPaymentStatus = Map[String, String](
+      "Failed"    -> "confirmation.payment.failed.reason.failure",
+      "Cancelled" -> "confirmation.payment.failed.reason.cancelled"
+    )
 
-        val msgFromPaymentStatus = Map[String, String](
-          "Failed" -> "confirmation.payment.failed.reason.failure",
-          "Cancelled" -> "confirmation.payment.failed.reason.cancelled"
-        )
+    val paymentStatusFromQueryString = request.getQueryString("paymentStatus")
 
-        val paymentStatusFromQueryString = request.getQueryString("paymentStatus")
+    val isPaymentSuccessful = !request.queryString.contains("paymentStatus")
 
-        val isPaymentSuccessful = !request.queryString.contains("paymentStatus")
-
-        val result = for {
-          (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
-          businessName <- companyName(detailedStatus) orElse OptionT.some("")
-          renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](request.credId, Renewal.key))
-          paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference, request.accountTypeId))
-          payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference, request.accountTypeId))
-          businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key))
-          _ <- doAudit(paymentStatus.currentStatus, request.amlsRefNumber, request.accountTypeId, request.groupIdentifier)
-        } yield if (isPaymentSuccessful) {
-          (status, businessDetails.previouslyRegistered) match {
-            case (ReadyForRenewal(_), _) if renewalData.isDefined =>
-              Ok(paymentConfirmationRenewalView(businessName, reference))
-            case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_) | ReadyForRenewal(_), _) =>
-              Ok(paymentConfirmationAmendVariationView(businessName, reference))
-            case (_, Some(PreviouslyRegisteredYes(_))) =>
-              Ok(paymentConfirmationTransitionalRenewalView(businessName, reference))
-            case _ => Ok(paymentConfirmationView(businessName, reference))
-          }
-        } else {
-          Ok(paymentFailureView(
-            msgFromPaymentStatus(paymentStatusFromQueryString.getOrElse(paymentStatus.currentStatus.toString)),
-            Currency(payment.amountInPence.toDouble / 100), reference))
+    val result = for {
+      (status, detailedStatus) <-
+        OptionT.liftF(statusService.getDetailedStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
+      businessName             <- companyName(detailedStatus) orElse OptionT.some("")
+      renewalData              <- OptionT.liftF(dataCacheConnector.fetch[Renewal](request.credId, Renewal.key))
+      paymentStatus            <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference, request.accountTypeId))
+      payment                  <- OptionT(amlsConnector.getPaymentByPaymentReference(reference, request.accountTypeId))
+      businessDetails          <- OptionT(dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key))
+      _                        <- doAudit(paymentStatus.currentStatus, request.amlsRefNumber, request.accountTypeId, request.groupIdentifier)
+    } yield
+      if (isPaymentSuccessful) {
+        (status, businessDetails.previouslyRegistered) match {
+          case (ReadyForRenewal(_), _) if renewalData.isDefined                                                      =>
+            Ok(paymentConfirmationRenewalView(businessName, reference))
+          case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_) | ReadyForRenewal(_), _) =>
+            Ok(paymentConfirmationAmendVariationView(businessName, reference))
+          case (_, Some(PreviouslyRegisteredYes(_)))                                                                 =>
+            Ok(paymentConfirmationTransitionalRenewalView(businessName, reference))
+          case _                                                                                                     => Ok(paymentConfirmationView(businessName, reference))
         }
+      } else {
+        Ok(
+          paymentFailureView(
+            msgFromPaymentStatus(paymentStatusFromQueryString.getOrElse(paymentStatus.currentStatus.toString)),
+            Currency(payment.amountInPence.toDouble / 100),
+            reference
+          )
+        )
+      }
 
-        result getOrElse InternalServerError("There was a problem trying to show the confirmation page")
+    result getOrElse InternalServerError("There was a problem trying to show the confirmation page")
   }
 
-
-  private def doAudit(paymentStatus: PaymentStatus, amlsRegistrationNumber: Option[String], accountTypeId: (String, String), groupIdentifier: Option[String])
-                     (implicit hc: HeaderCarrier): OptionT[Future, AuditResult] = {
+  private def doAudit(
+    paymentStatus: PaymentStatus,
+    amlsRegistrationNumber: Option[String],
+    accountTypeId: (String, String),
+    groupIdentifier: Option[String]
+  )(implicit hc: HeaderCarrier): OptionT[Future, AuditResult] =
     for {
-      fees <- OptionT(feeHelper.retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier, prefix))
+      fees   <- OptionT(feeHelper.retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier, prefix))
       payRef <- OptionT.fromOption[Future](fees.paymentReference)
-      result <- OptionT.liftF(auditConnector.sendEvent(PaymentConfirmationEvent(fees.amlsReferenceNumber, payRef, paymentStatus)))
+      result <- OptionT.liftF(
+                  auditConnector.sendEvent(PaymentConfirmationEvent(fees.amlsReferenceNumber, payRef, paymentStatus))
+                )
     } yield result
-  }
 }

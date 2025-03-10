@@ -30,46 +30,43 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class ExpectToReceiveCashPaymentsController @Inject()(val authAction: AuthAction,
-                                                      val ds: CommonPlayDependencies,
-                                                      implicit val cacheConnector: DataCacheConnector,
-                                                      implicit val statusService: StatusService,
-                                                      implicit val serviceFlow: ServiceFlow,
-                                                      val cc: MessagesControllerComponents,
-                                                      formProvider: ExpectToReceiveFormProvider,
-                                                      view: ExpectToReceiveView) extends AmlsBaseController(ds, cc) {
+class ExpectToReceiveCashPaymentsController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val cacheConnector: DataCacheConnector,
+  implicit val statusService: StatusService,
+  implicit val serviceFlow: ServiceFlow,
+  val cc: MessagesControllerComponents,
+  formProvider: ExpectToReceiveFormProvider,
+  view: ExpectToReceiveView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      cacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
-        response =>
-          val form = (for {
-            hvd <- response
-            receivePayments <- hvd.cashPaymentMethods
-          } yield {
-            formProvider().fill(receivePayments)
-          }).getOrElse(formProvider())
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    cacheConnector.fetch[Hvd](request.credId, Hvd.key) map { response =>
+      val form = (for {
+        hvd             <- response
+        receivePayments <- hvd.cashPaymentMethods
+      } yield formProvider().fill(receivePayments)).getOrElse(formProvider())
 
-          Ok(view(form, edit))
-      }
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           for {
             hvd <- cacheConnector.fetch[Hvd](request.credId, Hvd.key)
-            _ <- cacheConnector.save[Hvd](request.credId, Hvd.key,
-              hvd.cashPaymentMethods(data)
-            )
-          } yield if (edit) {
-            Redirect(routes.SummaryController.get)
-          } else {
-            Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-          }
+            _   <- cacheConnector.save[Hvd](request.credId, Hvd.key, hvd.cashPaymentMethods(data))
+          } yield
+            if (edit) {
+              Redirect(routes.SummaryController.get)
+            } else {
+              Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+            }
       )
   }
 }

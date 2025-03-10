@@ -44,11 +44,13 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UpdateMongoCacheService @Inject()(http: HttpClientV2, val cacheConnector: DataCacheConnector, val applicationConfig: ApplicationConfig) {
+class UpdateMongoCacheService @Inject() (
+  http: HttpClientV2,
+  val cacheConnector: DataCacheConnector,
+  val applicationConfig: ApplicationConfig
+) {
 
-  def update(credId: String, response: UpdateMongoCacheResponse)
-            (implicit ex: ExecutionContext): Future[Any] = {
-
+  def update(credId: String, response: UpdateMongoCacheResponse)(implicit ex: ExecutionContext): Future[Any] =
     for {
       _ <- fn(credId, ViewResponse.key, response.view)
       _ <- fn(credId, BusinessMatching.key, response.businessMatching)
@@ -69,22 +71,25 @@ class UpdateMongoCacheService @Inject()(http: HttpClientV2, val cacheConnector: 
       _ <- fn(credId, AmendVariationRenewalResponse.key, response.amendVariationResponse)
       _ <- fn(credId, DataImport.key, response.dataImport)
     } yield true
-  }
 
   def fn[T](credId: String, key: String, m: Option[T])(implicit fmt: Format[T]): Future[Cache] = m match {
     case Some(model) => cacheConnector.save[T](credId, key, model)
-    case _ => Future.successful(Cache.empty)
+    case _           => Future.successful(Cache.empty)
   }
 
-  def getMongoCacheData(fileName: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Option[UpdateMongoCacheResponse]] = {
+  def getMongoCacheData(
+    fileName: String
+  )(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Option[UpdateMongoCacheResponse]] = {
     val requestUrl = url"${applicationConfig.amlsStubBaseUrl}/anti-money-laundering/update-mongoCache/$fileName"
-    http.get(requestUrl).execute[UpdateMongoCacheResponse]
+    http
+      .get(requestUrl)
+      .execute[UpdateMongoCacheResponse]
       .map { r =>
-        Some(r.copy(dataImport = Some(DataImport(fileName)))) }
+        Some(r.copy(dataImport = Some(DataImport(fileName))))
+      }
       .recover {
         case e: UpstreamErrorResponse if e.statusCode == 404 => None
-        case e => throw e
+        case e                                               => throw e
       }
   }
 }
-

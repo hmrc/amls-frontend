@@ -24,27 +24,27 @@ import models.businessdetails.{ActivityStartDate, BusinessDetails}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ServicesOfBusinessDateOfChangeService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) {
+class ServicesOfBusinessDateOfChangeService @Inject() (val dataCacheConnector: DataCacheConnector)(implicit
+  ec: ExecutionContext
+) {
 
-  def getModelWithDate(cacheId: String): Future[(Asp, Option[ActivityStartDate])] = {
-    dataCacheConnector.fetchAll(cacheId) map {
-      optionalCache =>
-        (for {
-          cache <- optionalCache
-          businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
-          asp <- cache.getEntry[Asp](Asp.key)
-        } yield (asp, businessDetails.activityStartDate)) match {
-          case Some((asp, Some(activityStartDate))) => (asp, Some(activityStartDate))
-          case Some((asp, _)) => (asp, None)
-          case _ => (Asp(), None)
-        }
+  def getModelWithDate(cacheId: String): Future[(Asp, Option[ActivityStartDate])] =
+    dataCacheConnector.fetchAll(cacheId) map { optionalCache =>
+      (for {
+        cache           <- optionalCache
+        businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
+        asp             <- cache.getEntry[Asp](Asp.key)
+      } yield (asp, businessDetails.activityStartDate)) match {
+        case Some((asp, Some(activityStartDate))) => (asp, Some(activityStartDate))
+        case Some((asp, _))                       => (asp, None)
+        case _                                    => (Asp(), None)
+      }
     }
-  }
 
   def updateAsp(asp: Asp, dateOfChange: DateOfChange, credId: String): Future[Option[Asp]] = {
     val updatedAsp = asp.services match {
       case Some(sob) => asp.copy(services = Some(sob.copy(dateOfChange = Some(dateOfChange))))
-      case None => asp
+      case None      => asp
     }
 
     if (updatedAsp != asp) {

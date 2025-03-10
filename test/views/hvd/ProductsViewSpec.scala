@@ -29,7 +29,7 @@ import views.html.hvd.ProductsView
 class ProductsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val products = inject[ProductsView]
-  lazy val fp = inject[ProductsFormProvider]
+  lazy val fp       = inject[ProductsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -49,7 +49,7 @@ class ProductsViewSpec extends AmlsViewSpec with Matchers {
     "have correct headings" in new ViewFixture {
 
       def view = products(fp().fill(Products(Set(OtherMotorVehicles))), true)
-      heading.html must be(messages("hvd.products.title"))
+      heading.html    must be(messages("hvd.products.title"))
       subHeading.html must include(messages("summary.hvd"))
     }
 

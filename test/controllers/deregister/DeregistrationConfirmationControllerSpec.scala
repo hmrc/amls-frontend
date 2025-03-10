@@ -45,11 +45,10 @@ class DeregistrationConfirmationControllerSpec extends AmlsSpec with Injecting {
 
     val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
-    val amlsConnector: AmlsConnector = mock[AmlsConnector]
+    val amlsConnector: AmlsConnector                 = mock[AmlsConnector]
     val authEnrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
-    val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-    val statusService: StatusService = mock[StatusService]
-
+    val dataCacheConnector: DataCacheConnector       = mock[DataCacheConnector]
+    val statusService: StatusService                 = mock[StatusService]
 
     lazy val view = inject[DeregistrationConfirmationView]
 
@@ -59,9 +58,10 @@ class DeregistrationConfirmationControllerSpec extends AmlsSpec with Injecting {
       statusService = statusService,
       enrolmentService = authEnrolmentsService,
       cc = mockMcc,
-      view = view)(
+      view = view
+    )(
       dataCacheConnector = dataCacheConnector,
-      amlsConnector = amlsConnector,
+      amlsConnector = amlsConnector
     )
   }
 
@@ -86,9 +86,13 @@ class DeregistrationConfirmationControllerSpec extends AmlsSpec with Injecting {
     when(amlsConnector.registrationDetails(any, any)(any, any)).thenReturn(Future.successful(registrationDetails))
 
     when(dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any())).thenReturn(
-      Future.successful(Some(BusinessMatching(
-        reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
-      )))
+      Future.successful(
+        Some(
+          BusinessMatching(
+            reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
+          )
+        )
+      )
     )
 
     val result: Future[Result] = controller.get()(request)

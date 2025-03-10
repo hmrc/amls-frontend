@@ -19,7 +19,6 @@ package models.businessactivities
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
-
 class AccountantForAMLSRegulationsSpec extends PlaySpec {
 
   "JSON validation" must {

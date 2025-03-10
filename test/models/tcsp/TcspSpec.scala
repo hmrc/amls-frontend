@@ -30,50 +30,46 @@ trait TcspValues {
 
     val DefaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
 
-    val DefaultCompanyServiceProviders = TcspTypes(Set(
-      NomineeShareholdersProvider,
-      TrusteeProvider,
-      CompanyDirectorEtc,
-      CompanyFormationAgent))
-    val DefaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes(Some("12345678"))
+    val DefaultCompanyServiceProviders = TcspTypes(
+      Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc, CompanyFormationAgent)
+    )
+    val DefaultServicesOfAnotherTCSP   = ServicesOfAnotherTCSPYes(Some("12345678"))
 
-    val DefaultCompanyServiceProvidersNoFormationAgent = TcspTypes(Set(
-      NomineeShareholdersProvider,
-      TrusteeProvider,
-      CompanyDirectorEtc))
+    val DefaultCompanyServiceProvidersNoFormationAgent = TcspTypes(
+      Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc)
+    )
 
   }
 
   object NewValues {
 
-    val NewProvidedServices = ProvidedServices(Set(EmailHandling))
-    val NewCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider,
-      CompanyFormationAgent))
-    val NewServicesOfAnotherTCSP = ServicesOfAnotherTCSPNo
+    val NewProvidedServices        = ProvidedServices(Set(EmailHandling))
+    val NewCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider, CompanyFormationAgent))
+    val NewServicesOfAnotherTCSP   = ServicesOfAnotherTCSPNo
 
   }
 
   val completeJson = Json.obj(
-    "tcspTypes" -> Json.obj(
+    "tcspTypes"                    -> Json.obj(
       "serviceProviders" -> Seq("01", "02", "04", "05")
     ),
-    "onlyOffTheShelfCompsSold" -> Json.obj(
+    "onlyOffTheShelfCompsSold"     -> Json.obj(
       "onlyOffTheShelfCompsSold" -> true
     ),
     "complexCorpStructureCreation" -> Json.obj(
       "complexCorpStructureCreation" -> false
     ),
-    "providedServices" -> Json.obj(
+    "providedServices"             -> Json.obj(
       "services" -> Seq("01", "08"),
-      "details" -> "other service"
+      "details"  -> "other service"
     ),
-    "doesServicesOfAnotherTCSP" -> true,
-    "servicesOfAnotherTCSP" -> Json.obj(
+    "doesServicesOfAnotherTCSP"    -> true,
+    "servicesOfAnotherTCSP"        -> Json.obj(
       "servicesOfAnotherTCSP" -> true,
-      "mlrRefNumber" -> "12345678"
+      "mlrRefNumber"          -> "12345678"
     ),
-    "hasChanged" -> false,
-    "hasAccepted" -> true
+    "hasChanged"                   -> false,
+    "hasAccepted"                  -> true
   )
 
   val completeModel = Tcsp(
@@ -115,7 +111,11 @@ class TcspSpec extends AmlsSpec with TcspValues {
       "returns a Not Started task row when model is empty" in {
 
         val notStartedTaskRow = TaskRow(
-          "tcsp", controllers.tcsp.routes.WhatYouNeedController.get().url, false, NotStarted, TaskRow.notStartedTag
+          "tcsp",
+          controllers.tcsp.routes.WhatYouNeedController.get().url,
+          false,
+          NotStarted,
+          TaskRow.notStartedTag
         )
 
         when(cache.getEntry[Tcsp]("tcsp")) thenReturn None
@@ -125,9 +125,13 @@ class TcspSpec extends AmlsSpec with TcspValues {
 
       "returns a Completed task row when model is complete" in {
 
-        val complete = mock[Tcsp]
+        val complete         = mock[Tcsp]
         val completedTaskRow = TaskRow(
-          "tcsp", controllers.tcsp.routes.SummaryController.get().url, false, Completed, TaskRow.completedTag
+          "tcsp",
+          controllers.tcsp.routes.SummaryController.get().url,
+          false,
+          Completed,
+          TaskRow.completedTag
         )
 
         when(complete.isComplete) thenReturn true
@@ -138,9 +142,13 @@ class TcspSpec extends AmlsSpec with TcspValues {
 
       "returns an Updated task row when model is complete" in {
 
-        val complete = mock[Tcsp]
+        val complete         = mock[Tcsp]
         val completedTaskRow = TaskRow(
-          "tcsp", controllers.tcsp.routes.SummaryController.get().url, true, Updated, TaskRow.updatedTag
+          "tcsp",
+          controllers.tcsp.routes.SummaryController.get().url,
+          true,
+          Updated,
+          TaskRow.updatedTag
         )
 
         when(complete.isComplete) thenReturn true
@@ -152,9 +160,13 @@ class TcspSpec extends AmlsSpec with TcspValues {
 
       "returns an Incomplete task row when model is incomplete" in {
 
-        val incompleteTcsp = mock[Tcsp]
+        val incompleteTcsp    = mock[Tcsp]
         val incompleteTaskRow = TaskRow(
-          "tcsp", controllers.tcsp.routes.WhatYouNeedController.get().url, false, Started, TaskRow.incompleteTag
+          "tcsp",
+          controllers.tcsp.routes.WhatYouNeedController.get().url,
+          false,
+          Started,
+          TaskRow.incompleteTag
         )
 
         when(incompleteTcsp.isComplete) thenReturn false
@@ -175,25 +187,25 @@ class TcspSpec extends AmlsSpec with TcspValues {
       "doesServicesOfAnotherTCSP is absent" in {
 
         val completeJson = Json.obj(
-          "tcspTypes" -> Json.obj(
+          "tcspTypes"                    -> Json.obj(
             "serviceProviders" -> Seq("01", "02", "04", "05")
           ),
-          "onlyOffTheShelfCompsSold" -> Json.obj(
+          "onlyOffTheShelfCompsSold"     -> Json.obj(
             "onlyOffTheShelfCompsSold" -> true
           ),
           "complexCorpStructureCreation" -> Json.obj(
             "complexCorpStructureCreation" -> false
           ),
-          "providedServices" -> Json.obj(
+          "providedServices"             -> Json.obj(
             "services" -> Seq("01", "08"),
-            "details" -> "other service"
+            "details"  -> "other service"
           ),
-          "servicesOfAnotherTCSP" -> Json.obj(
+          "servicesOfAnotherTCSP"        -> Json.obj(
             "servicesOfAnotherTCSP" -> true,
-            "mlrRefNumber" -> "12345678"
+            "mlrRefNumber"          -> "12345678"
           ),
-          "hasChanged" -> false,
-          "hasAccepted" -> true
+          "hasChanged"                   -> false,
+          "hasAccepted"                  -> true
         )
 
         completeJson.as[Tcsp] must be(completeModel)
@@ -207,22 +219,22 @@ class TcspSpec extends AmlsSpec with TcspValues {
       "doesServicesOfAnotherTCSP is absent" in {
 
         val completeJson = Json.obj(
-          "tcspTypes" -> Json.obj(
-            "serviceProviders" -> Seq("01", "02", "04", "05"),
-            "onlyOffTheShelfCompsSold" -> true,
+          "tcspTypes"                 -> Json.obj(
+            "serviceProviders"             -> Seq("01", "02", "04", "05"),
+            "onlyOffTheShelfCompsSold"     -> true,
             "complexCorpStructureCreation" -> false
           ),
-          "providedServices" -> Json.obj(
+          "providedServices"          -> Json.obj(
             "services" -> Seq("01", "08"),
-            "details" -> "other service"
+            "details"  -> "other service"
           ),
           "doesServicesOfAnotherTCSP" -> true,
-          "servicesOfAnotherTCSP" -> Json.obj(
+          "servicesOfAnotherTCSP"     -> Json.obj(
             "servicesOfAnotherTCSP" -> true,
-            "mlrRefNumber" -> "12345678"
+            "mlrRefNumber"          -> "12345678"
           ),
-          "hasChanged" -> false,
-          "hasAccepted" -> true
+          "hasChanged"                -> false,
+          "hasAccepted"               -> true
         )
 
         completeJson.as[Tcsp] must be(completeModel)
@@ -239,7 +251,7 @@ class TcspSpec extends AmlsSpec with TcspValues {
         }
       }
 
-      "Merged with Provided Services" must {
+      "Merged with Provided Services"        must {
         "return Tcsp with correct Provided Services" in {
           val result = initial.providedServices(NewValues.NewProvidedServices)
           result must be(Tcsp(providedServices = Some(NewValues.NewProvidedServices), hasChanged = true))
@@ -392,7 +404,7 @@ class TcspSpec extends AmlsSpec with TcspValues {
         "leave the object unchanged" in {
           val res = completeModel.tcspTypes(DefaultValues.DefaultCompanyServiceProviders)
           res.hasChanged must be(false)
-          res must be(completeModel)
+          res            must be(completeModel)
         }
       }
 
@@ -400,7 +412,7 @@ class TcspSpec extends AmlsSpec with TcspValues {
         "set the hasChanged & previouslyRegisterd Properties" in {
           val res = completeModel.tcspTypes(NewValues.NewCompanyServiceProviders)
           res.hasChanged must be(true)
-          res.tcspTypes must be(Some(NewValues.NewCompanyServiceProviders))
+          res.tcspTypes  must be(Some(NewValues.NewCompanyServiceProviders))
         }
       }
     }
@@ -409,14 +421,14 @@ class TcspSpec extends AmlsSpec with TcspValues {
         "leave the object unchanged" in {
           val res = completeModel.providedServices(DefaultValues.DefaultProvidedServices)
           res.hasChanged must be(false)
-          res must be(completeModel)
+          res            must be(completeModel)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
           val res = completeModel.providedServices(NewValues.NewProvidedServices)
-          res.hasChanged must be(true)
+          res.hasChanged       must be(true)
           res.providedServices must be(Some(NewValues.NewProvidedServices))
         }
       }
@@ -426,14 +438,14 @@ class TcspSpec extends AmlsSpec with TcspValues {
         "leave the object unchanged" in {
           val res = completeModel.servicesOfAnotherTCSP(DefaultValues.DefaultServicesOfAnotherTCSP)
           res.hasChanged must be(false)
-          res must be(completeModel)
+          res            must be(completeModel)
         }
       }
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
           val res = completeModel.servicesOfAnotherTCSP(NewValues.NewServicesOfAnotherTCSP)
-          res.hasChanged must be(true)
+          res.hasChanged            must be(true)
           res.servicesOfAnotherTCSP must be(Some(NewValues.NewServicesOfAnotherTCSP))
         }
       }

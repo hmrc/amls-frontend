@@ -19,13 +19,13 @@ package utils
 import org.apache.commons.codec.binary.Base64.encodeBase64String
 import org.apache.commons.codec.digest.DigestUtils
 
-
 class UrlHelperSpec extends AmlsSpec {
   "UrlHelper" should {
     "return a url safe encoded string when invalid chars in string" in {
       val sha1: Array[Byte] = DigestUtils.sha1("foo=bar//=safe+")
-      val encoded = encodeBase64String(sha1)
-      val res = encoded.replace("=", "")
+      val encoded           = encodeBase64String(sha1)
+      val res               = encoded
+        .replace("=", "")
         .replace("/", "_")
         .replace("+", "-")
 

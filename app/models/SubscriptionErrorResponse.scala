@@ -26,10 +26,9 @@ case class SubscriptionErrorResponse(amlsRegNumber: String, message: String)
 object SubscriptionErrorResponse {
   implicit val format: OFormat[SubscriptionErrorResponse] = Json.format[SubscriptionErrorResponse]
 
-  def from(ex: UpstreamErrorResponse): Option[SubscriptionErrorResponse] = {
+  def from(ex: UpstreamErrorResponse): Option[SubscriptionErrorResponse] =
     Try {
       val json = ex.message.substring(ex.message.indexOf("{"), ex.message.lastIndexOf("}") + 1)
       Json.parse(json).asOpt[SubscriptionErrorResponse]
     }.getOrElse(None)
-  }
 }

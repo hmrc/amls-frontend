@@ -22,7 +22,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class AMPTurnoverFormProvider @Inject()() extends Mappings {
+class AMPTurnoverFormProvider @Inject() () extends Mappings {
 
   private val error = "error.required.renewal.amp.percentage"
 

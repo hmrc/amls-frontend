@@ -38,14 +38,14 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
   val currencies: Seq[String] = Seq("GBP", "USD", "JPY")
 
-  val ipspName = "John Smith"
+  val ipspName      = "John Smith"
   val ipspRefNumber = "ASDFGH123456789"
 
-  val transactions = "123"
+  val transactions   = "123"
   val ceTransactions = "456"
   val fxTransactions = "789"
 
-  val bankName = "A Big Bank"
+  val bankName       = "A Big Bank"
   val wholesalerName = "Some Large Wholesaler"
 
   val fullMoneySourcesModel: MoneySources = MoneySources(
@@ -58,17 +58,21 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     throughput = Some(ExpectedThroughput.Second),
     businessUseAnIPSP = Some(BusinessUseAnIPSPYes(ipspName, ipspRefNumber)),
     identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
-    whichCurrencies = Some(WhichCurrencies(
-      currencies,
-      Some(UsesForeignCurrenciesYes),
-      Some(fullMoneySourcesModel)
-    )),
+    whichCurrencies = Some(
+      WhichCurrencies(
+        currencies,
+        Some(UsesForeignCurrenciesYes),
+        Some(fullMoneySourcesModel)
+      )
+    ),
     sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
     fundsTransfer = Some(FundsTransfer(true)),
-    branchesOrAgents = Some(BranchesOrAgents(
-      BranchesOrAgentsHasCountries(true),
-      Some(BranchesOrAgentsWhichCountries(countries))
-    )),
+    branchesOrAgents = Some(
+      BranchesOrAgents(
+        BranchesOrAgentsHasCountries(true),
+        Some(BranchesOrAgentsWhichCountries(countries))
+      )
+    ),
     sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(countries)),
     mostTransactions = Some(MostTransactions(countries)),
     transactionsInNext12Months = Some(TransactionsInNext12Months(transactions)),
@@ -93,9 +97,8 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
       checkChangeLink(result, changeUrl, changeId)
     }
 
-    def assertRowIsNotPresent(title: String): Assertion = {
+    def assertRowIsNotPresent(title: String): Assertion =
       summaryListRows.exists(_.key.content.asHtml.body == title) mustBe false
-    }
 
     def checkChangeLink(slr: SummaryListRow, href: String, id: String): Assertion = {
       val changeLink = slr.actions.flatMap(_.items.headOption).getOrElse(fail("No edit link present"))
@@ -126,12 +129,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
       "for the Expected Throughput row" must {
 
         ExpectedThroughput.all foreach { throughput =>
-
           s"display for ${throughput.toString} radio" in new RowFixture {
-            override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-              model.copy(throughput = Some(throughput)),
-              bmMsbServices
-            ).rows
+            override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+              .getSummaryList(
+                model.copy(throughput = Some(throughput)),
+                bmMsbServices
+              )
+              .rows
 
             assertRowMatches(
               0,
@@ -159,9 +163,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         }
 
         "display correctly for 'No'" in new RowFixture {
-          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-            model.copy(branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(false), None))),
-            bmMsbServices).rows
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+            .getSummaryList(
+              model.copy(branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(false), None))),
+              bmMsbServices
+            )
+            .rows
 
           assertRowMatches(
             1,
@@ -187,12 +194,19 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
           }
 
           "display correctly for a single country" in new RowFixture {
-            override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-              model.copy(branchesOrAgents = Some(BranchesOrAgents(
-                BranchesOrAgentsHasCountries(true), Some(BranchesOrAgentsWhichCountries(Seq(countries.head))))
-              )),
-              bmMsbServices
-            ).rows
+            override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+              .getSummaryList(
+                model.copy(branchesOrAgents =
+                  Some(
+                    BranchesOrAgents(
+                      BranchesOrAgentsHasCountries(true),
+                      Some(BranchesOrAgentsWhichCountries(Seq(countries.head)))
+                    )
+                  )
+                ),
+                bmMsbServices
+              )
+              .rows
 
             assertRowMatches(
               2,
@@ -214,16 +228,18 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             3,
             "msb.linked.txn.title",
             booleanToLabel(true),
-              controllers.msb.routes.IdentifyLinkedTransactionsController.get(true).url,
-              "msblinkedtransactions-edit"
+            controllers.msb.routes.IdentifyLinkedTransactionsController.get(true).url,
+            "msblinkedtransactions-edit"
           )
         }
 
         "display correctly for 'No'" in new RowFixture {
-          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-            model.copy(identifyLinkedTransactions = Some(IdentifyLinkedTransactions(false))),
-            bmMsbServices
-          ).rows
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+            .getSummaryList(
+              model.copy(identifyLinkedTransactions = Some(IdentifyLinkedTransactions(false))),
+              bmMsbServices
+            )
+            .rows
 
           assertRowMatches(
             3,
@@ -250,10 +266,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         }
 
         "display correctly for 'No'" in new RowFixture {
-          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-            model.copy(businessUseAnIPSP = Some(BusinessUseAnIPSPNo)),
-            bmMsbServices
-          ).rows
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+            .getSummaryList(
+              model.copy(businessUseAnIPSP = Some(BusinessUseAnIPSPNo)),
+              bmMsbServices
+            )
+            .rows
 
           assertRowMatches(
             4,
@@ -310,10 +328,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         }
 
         "display correctly for 'No'" in new RowFixture {
-          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-            model.copy(fundsTransfer = Some(FundsTransfer(false))),
-            bmMsbServices
-          ).rows
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+            .getSummaryList(
+              model.copy(fundsTransfer = Some(FundsTransfer(false))),
+              bmMsbServices
+            )
+            .rows
 
           assertRowMatches(
             7,
@@ -355,10 +375,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         }
 
         "display correctly for 'No'" in new RowFixture {
-          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-            model.copy(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))),
-            bmMsbServices
-          ).rows
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+            .getSummaryList(
+              model.copy(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))),
+              bmMsbServices
+            )
+            .rows
 
           assertRowMatches(
             9,
@@ -385,10 +407,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         }
 
         "display correctly for a single country" in new RowFixture {
-          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-            model.copy(sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(countries.head)))),
-            bmMsbServices
-          ).rows
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+            .getSummaryList(
+              model.copy(sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(countries.head)))),
+              bmMsbServices
+            )
+            .rows
 
           assertRowMatches(
             10,
@@ -415,10 +439,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         }
 
         "display correctly for a single country" in new RowFixture {
-          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-            model.copy(mostTransactions = Some(MostTransactions(Seq(countries.head)))),
-            bmMsbServices
-          ).rows
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+            .getSummaryList(
+              model.copy(mostTransactions = Some(MostTransactions(Seq(countries.head)))),
+              bmMsbServices
+            )
+            .rows
 
           assertRowMatches(
             11,
@@ -460,10 +486,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         }
 
         "display correctly for a single currency" in new RowFixture {
-          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-            model.copy(whichCurrencies = Some(WhichCurrencies(Seq(currencies.head)))),
-            bmMsbServices
-          ).rows
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+            .getSummaryList(
+              model.copy(whichCurrencies = Some(WhichCurrencies(Seq(currencies.head)))),
+              bmMsbServices
+            )
+            .rows
 
           assertRowMatches(
             13,
@@ -490,10 +518,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         }
 
         "display correctly for 'No'" in new RowFixture {
-          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-            model.copy(whichCurrencies = Some(WhichCurrencies(currencies, Some(UsesForeignCurrenciesNo)))),
-            bmMsbServices
-          ).rows
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+            .getSummaryList(
+              model.copy(whichCurrencies = Some(WhichCurrencies(currencies, Some(UsesForeignCurrenciesNo)))),
+              bmMsbServices
+            )
+            .rows
 
           assertRowMatches(
             14,
@@ -523,11 +553,14 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           val moneySourcesModel = MoneySources(None, None, Some(true))
 
-          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-            model.copy(whichCurrencies = Some(WhichCurrencies(
-              currencies, Some(UsesForeignCurrenciesYes), Some(moneySourcesModel)))),
-            bmMsbServices
-          ).rows
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+            .getSummaryList(
+              model.copy(whichCurrencies =
+                Some(WhichCurrencies(currencies, Some(UsesForeignCurrenciesYes), Some(moneySourcesModel)))
+              ),
+              bmMsbServices
+            )
+            .rows
 
           assertRowMatches(
             15,
@@ -573,10 +606,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     "not display Transmitting Money Rows" when {
 
       "Transmitting Money was not selected in MSB services" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model,
-          bmMsbServices.copy(BusinessMatchingMsbServices.all.filterNot(_ == TransmittingMoney).toSet)
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model,
+            bmMsbServices.copy(BusinessMatchingMsbServices.all.filterNot(_ == TransmittingMoney).toSet)
+          )
+          .rows
 
         assertRowIsNotPresent("msb.ipsp.title")
         assertRowIsNotPresent("msb.summary.ipsp-name")
@@ -592,10 +627,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     "not display Currency Exchange Rows" when {
 
       "Currency Exchange was not selected in MSB services" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model,
-          bmMsbServices.copy(BusinessMatchingMsbServices.all.filterNot(_ == CurrencyExchange).toSet)
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model,
+            bmMsbServices.copy(BusinessMatchingMsbServices.all.filterNot(_ == CurrencyExchange).toSet)
+          )
+          .rows
 
         assertRowIsNotPresent("msb.ce.transactions.expected.in.12.months.title")
         assertRowIsNotPresent("msb.which_currencies.title")
@@ -609,31 +646,37 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
     "not display the Foreign Exchange Row" when {
 
       "Foreign Exchange was not selected in MSB services" in new RowFixture {
-        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
-          model,
-          bmMsbServices.copy(BusinessMatchingMsbServices.all.filterNot(_ == ForeignExchange).toSet)
-        ).rows
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model,
+            bmMsbServices.copy(BusinessMatchingMsbServices.all.filterNot(_ == ForeignExchange).toSet)
+          )
+          .rows
 
         assertRowIsNotPresent("msb.fx.transactions.expected.in.12.months.title")
       }
     }
 
-
     "not display Money Sources rows" when {
 
       "uses foreign currencies is false" in new RowFixture {
-        override val summaryListRows: Seq[Aliases.SummaryListRow] = cyaHelper.getSummaryList(
-          model.copy(whichCurrencies = Some(WhichCurrencies(
-            currencies,
-            Some(UsesForeignCurrenciesNo),
-            Some(fullMoneySourcesModel)
-          ))),
-          bmMsbServices
-        ).rows
+        override val summaryListRows: Seq[Aliases.SummaryListRow] = cyaHelper
+          .getSummaryList(
+            model.copy(whichCurrencies =
+              Some(
+                WhichCurrencies(
+                  currencies,
+                  Some(UsesForeignCurrenciesNo),
+                  Some(fullMoneySourcesModel)
+                )
+              )
+            ),
+            bmMsbServices
+          )
+          .rows
 
         assertRowIsNotPresent("msb.supply_foreign_currencies.title")
       }
     }
   }
 }
-

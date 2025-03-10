@@ -18,8 +18,7 @@ package models.businessactivities
 
 import play.api.libs.json.{Json, OFormat}
 
-case class HowManyEmployees(employeeCount: Option[String] = None,
-                            employeeCountAMLSSupervision: Option[String] = None)
+case class HowManyEmployees(employeeCount: Option[String] = None, employeeCountAMLSSupervision: Option[String] = None)
 
 object HowManyEmployees {
   implicit val formats: OFormat[HowManyEmployees] = Json.format[HowManyEmployees]

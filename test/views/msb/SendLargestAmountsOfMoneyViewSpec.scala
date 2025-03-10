@@ -29,7 +29,7 @@ import views.html.msb.SendLargestAmountsOfMoneyView
 class SendLargestAmountsOfMoneyViewSpec extends AmlsViewSpec with Matchers with AutoCompleteServiceMocks {
 
   lazy val moneyView = inject[SendLargestAmountsOfMoneyView]
-  lazy val fp = inject[SendLargestAmountsFormProvider]
+  lazy val fp        = inject[SendLargestAmountsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,22 +42,28 @@ class SendLargestAmountsOfMoneyViewSpec extends AmlsViewSpec with Matchers with 
     "have correct title" in new ViewFixture {
 
       def view = moneyView(
-        fp().fill(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))), true, mockAutoComplete.formOptions
+        fp().fill(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
+        true,
+        mockAutoComplete.formOptions
       )
 
-      doc.title must be(messages("msb.send.the.largest.amounts.of.money.title") +
-        " - " + messages("summary.msb") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("msb.send.the.largest.amounts.of.money.title") +
+          " - " + messages("summary.msb") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = moneyView(
-        fp().fill(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))), true, mockAutoComplete.formOptions
+        fp().fill(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
+        true,
+        mockAutoComplete.formOptions
       )
 
-      heading.html must be(messages("msb.send.the.largest.amounts.of.money.title"))
+      heading.html    must be(messages("msb.send.the.largest.amounts.of.money.title"))
       subHeading.html must include(messages("summary.msb"))
     }
 

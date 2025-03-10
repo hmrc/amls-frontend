@@ -27,42 +27,42 @@ import views.html.msb.BusinessUseAnIPSPView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class BusinessUseAnIPSPController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                             authAction: AuthAction,
-                                             val ds: CommonPlayDependencies,
-                                             val cc: MessagesControllerComponents,
-                                             formProvider: BusinessUseAnIPSPFormProvider,
-                                             view: BusinessUseAnIPSPView) extends AmlsBaseController(ds, cc) {
+class BusinessUseAnIPSPController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: BusinessUseAnIPSPFormProvider,
+  view: BusinessUseAnIPSPView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
-        response =>
-          val form = (for {
-            msb <- response
-            businessUseAnIPSP <- msb.businessUseAnIPSP
-          } yield formProvider().fill(businessUseAnIPSP)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map { response =>
+      val form = (for {
+        msb               <- response
+        businessUseAnIPSP <- msb.businessUseAnIPSP
+      } yield formProvider().fill(businessUseAnIPSP)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           for {
             msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
-            _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
-              msb.businessUseAnIPSP(data))
+            _   <- dataCacheConnector
+                     .save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key, msb.businessUseAnIPSP(data))
 
           } yield edit match {
             case true if msb.fundsTransfer.isDefined =>
               Redirect(routes.SummaryController.get)
-            case _ =>
+            case _                                   =>
               Redirect(routes.FundsTransferController.get(edit))
           }
       )
-    }
   }
 }

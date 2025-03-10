@@ -30,7 +30,9 @@ class ExpectedBusinessTurnoverFormProviderSpec extends FieldBehaviours {
   "ExpectedTurnoverFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, field, Gen.oneOf(ExpectedBusinessTurnover.all.map(_.toString))
+      form,
+      field,
+      Gen.oneOf(ExpectedBusinessTurnover.all.map(_.toString))
     )
 
     behave like mandatoryField(form, field, FormError(field, "error.required.ba.business.turnover"))
@@ -41,7 +43,7 @@ class ExpectedBusinessTurnoverFormProviderSpec extends FieldBehaviours {
 
         val result = form.bind(Map(field -> "foo"))
 
-        result.value shouldBe None
+        result.value        shouldBe None
         result.error(field) shouldBe Some(FormError(field, "error.invalid"))
 
       }

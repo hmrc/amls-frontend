@@ -26,10 +26,12 @@ class ComplexCorpStructureCreationSpec extends PlaySpec with Matchers {
 
     "round trip through JSON" in {
 
-      Json.toJson[ComplexCorpStructureCreation](ComplexCorpStructureCreationYes)
+      Json
+        .toJson[ComplexCorpStructureCreation](ComplexCorpStructureCreationYes)
         .as[ComplexCorpStructureCreation] mustBe ComplexCorpStructureCreationYes
 
-      Json.toJson[ComplexCorpStructureCreation](ComplexCorpStructureCreationNo)
+      Json
+        .toJson[ComplexCorpStructureCreation](ComplexCorpStructureCreationNo)
         .as[ComplexCorpStructureCreation] mustBe ComplexCorpStructureCreationNo
     }
   }

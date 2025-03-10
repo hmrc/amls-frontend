@@ -22,13 +22,14 @@ import play.api.data.Form
 
 class FundsTransferFormProviderSpec extends BooleanFieldBehaviours[FundsTransfer] {
   override val form: Form[FundsTransfer] = new FundsTransferFormProvider()()
-  override val fieldName: String = "transferWithoutFormalSystems"
-  override val errorMessage: String = "error.required.msb.fundsTransfer"
+  override val fieldName: String         = "transferWithoutFormalSystems"
+  override val errorMessage: String      = "error.required.msb.fundsTransfer"
 
   "FundsTransferFormProvider" must {
 
     behave like booleanFieldWithModel(
-      FundsTransfer(true), FundsTransfer(false)
+      FundsTransfer(true),
+      FundsTransfer(false)
     )
   }
 }

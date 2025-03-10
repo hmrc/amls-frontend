@@ -34,7 +34,7 @@ class RegistrationAmendmentViewSpec extends AmlsViewSpec with MockitoSugar with 
   val taskList = TaskList(
     Seq(
       TaskRow("section1", "/foo", true, Completed, TaskRow.updatedTag),
-      TaskRow("section2", "/bar", true, Started, TaskRow.incompleteTag),
+      TaskRow("section2", "/bar", true, Started, TaskRow.incompleteTag)
     )
   )
 
@@ -60,7 +60,7 @@ class RegistrationAmendmentViewSpec extends AmlsViewSpec with MockitoSugar with 
 
         val statuses = doc.getElementsByClass("registration-status-tag")
 
-        statuses.first.text must include(messages("progress.visuallyhidden.view.updated"))
+        statuses.first.text  must include(messages("progress.visuallyhidden.view.updated"))
         statuses.get(1).text must include(messages("progress.visuallyhidden.view.started"))
       }
     }
@@ -76,7 +76,8 @@ class RegistrationAmendmentViewSpec extends AmlsViewSpec with MockitoSugar with 
         Seq.empty,
         true,
         hasCompleteNominatedOfficer = true,
-        nominatedOfficerName = Some(officerName))
+        nominatedOfficerName = Some(officerName)
+      )
 
       val element = doc.getElementsByClass("govuk-summary-list__row").get(1).text()
 
@@ -92,7 +93,8 @@ class RegistrationAmendmentViewSpec extends AmlsViewSpec with MockitoSugar with 
         Seq.empty,
         true,
         hasCompleteNominatedOfficer = false,
-        nominatedOfficerName = None)
+        nominatedOfficerName = None
+      )
 
       val element = Option(doc.getElementById("nominated-officer"))
 

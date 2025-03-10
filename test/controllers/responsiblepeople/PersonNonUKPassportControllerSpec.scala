@@ -39,13 +39,14 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with 
 
   trait Fixture {
     self =>
-    val request = addToken(authRequest)
+    val request            = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
 
     lazy val view = inject[PersonNonUKPassportView]
 
     val mockApplicationConfig = mock[ApplicationConfig]
-    val controller = new PersonNonUKPassportController(messagesApi = messagesApi,
+    val controller            = new PersonNonUKPassportController(
+      messagesApi = messagesApi,
       dataCacheConnector,
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -55,7 +56,7 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with 
       error = errorView
     )
 
-    val emptyCache = Cache.empty
+    val emptyCache   = Cache.empty
     val mockCacheMap = mock[Cache]
 
     val personName = PersonName("firstname", None, "lastname")
@@ -80,8 +81,8 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with 
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("input[name=nonUKPassportNumber]").`val` must be("")
-          document.getElementById("nonUKPassport-true").hasAttr("checked") must be(false)
+          document.select("input[name=nonUKPassportNumber]").`val`          must be("")
+          document.getElementById("nonUKPassport-true").hasAttr("checked")  must be(false)
           document.getElementById("nonUKPassport-false").hasAttr("checked") must be(false)
 
         }
@@ -102,7 +103,7 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with 
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("input[name=nonUKPassportNumber]").`val` must be(passportNumber)
+          document.select("input[name=nonUKPassportNumber]").`val`         must be(passportNumber)
           document.getElementById("nonUKPassport-true").hasAttr("checked") must be(true)
 
         }
@@ -127,12 +128,13 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with 
         "go to CountryofBirthController" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.PersonNonUKPassportController.post(1).url)
-          .withFormUrlEncodedBody(
-            "nonUKPassport" -> "true",
-            "nonUKPassportNumber" -> passportNumber
-          )
+            .withFormUrlEncodedBody(
+              "nonUKPassport"       -> "true",
+              "nonUKPassportNumber" -> passportNumber
+            )
 
-          val responsiblePeople = ResponsiblePerson(personName = Some(personName), dateOfBirth = Some(DateOfBirth(LocalDate.now())))
+          val responsiblePeople =
+            ResponsiblePerson(personName = Some(personName), dateOfBirth = Some(DateOfBirth(LocalDate.now())))
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
@@ -144,8 +146,10 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with 
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CountryOfBirthController.get(1).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.responsiblepeople.routes.CountryOfBirthController.get(1).url)
+          )
 
         }
       }
@@ -154,10 +158,10 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with 
         "go to CountryofBirthController" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.PersonNonUKPassportController.post(1).url)
-          .withFormUrlEncodedBody(
-            "nonUKPassport" -> "true",
-            "nonUKPassportNumber" -> passportNumber
-          )
+            .withFormUrlEncodedBody(
+              "nonUKPassport"       -> "true",
+              "nonUKPassportNumber" -> passportNumber
+            )
 
           val responsiblePeople = ResponsiblePerson(personName = Some(personName))
 
@@ -171,7 +175,7 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with 
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DateOfBirthController.get(1).url))
 
         }
@@ -181,14 +185,22 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with 
         "go to DetailedAnswersController" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.PersonNonUKPassportController.post(1).url)
-          .withFormUrlEncodedBody(
-            "nonUKPassport" -> "true",
-            "nonUKPassportNumber" -> passportNumber
-          )
+            .withFormUrlEncodedBody(
+              "nonUKPassport"       -> "true",
+              "nonUKPassportNumber" -> passportNumber
+            )
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePerson(personName = Some(personName),
-              dateOfBirth = Some(DateOfBirth(LocalDate.of(1990, 1,22)))))))
+            .thenReturn(
+              Some(
+                Seq(
+                  ResponsiblePerson(
+                    personName = Some(personName),
+                    dateOfBirth = Some(DateOfBirth(LocalDate.of(1990, 1, 22)))
+                  )
+                )
+              )
+            )
 
           when(controller.dataCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -197,8 +209,10 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with 
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url)
+          )
 
         }
       }
@@ -207,9 +221,9 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with 
         "respond with BAD_REQUEST" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.PersonNonUKPassportController.post(1).url)
-          .withFormUrlEncodedBody(
-            "nonUKPassport" -> "true"
-          )
+            .withFormUrlEncodedBody(
+              "nonUKPassport" -> "true"
+            )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
@@ -224,9 +238,9 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with 
         "respond with NOT_FOUND" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.PersonNonUKPassportController.post(1).url)
-          .withFormUrlEncodedBody(
-            "nonUKPassport" -> "false"
-          )
+            .withFormUrlEncodedBody(
+              "nonUKPassport" -> "false"
+            )
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(ResponsiblePerson(personName = Some(personName)))))

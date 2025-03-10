@@ -24,18 +24,18 @@ trait AddressMappings extends Mappings {
 
   val countryErrorKey: String
 
-  val length: Int = 35
-  val addressTypeRegex: String = "^[A-Za-z0-9 !'‘’\"“”(),./\u2014\u2013\u2010\u002d]{1,35}$"
+  val length: Int                         = 35
+  val addressTypeRegex: String            = "^[A-Za-z0-9 !'‘’\"“”(),./\u2014\u2013\u2010\u002d]{1,35}$"
   private def requiredError(line: String) = s"error.required.address.$line"
 
   private def maxLengthError(line: String) = s"error.max.length.address.$line"
 
   private def regexError(line: String) = s"error.text.validation.address.$line"
 
-  private def normalizePostcode(postcode: String): String = if (postcode.matches(postcodeRegex)) postcode else postcode.replaceAll("\\s+", "")
+  private def normalizePostcode(postcode: String): String =
+    if (postcode.matches(postcodeRegex)) postcode else postcode.replaceAll("\\s+", "")
 
-
-  protected def addressLineMapping(line: String): Mapping[String] = {
+  protected def addressLineMapping(line: String): Mapping[String] =
     text(requiredError(line))
       .verifying(
         firstError(
@@ -43,40 +43,36 @@ trait AddressMappings extends Mappings {
           regexp(addressTypeRegex, regexError(line))
         )
       )
-  }
 
-
-
-  protected def postcodeOrCountryMapping(isUKAddress: Boolean): (String, Mapping[String]) = {
+  protected def postcodeOrCountryMapping(isUKAddress: Boolean): (String, Mapping[String]) =
     if (isUKAddress) {
       "postCode" -> text("error.required.postcode")
-        .transform[String](normalizePostcode,identity)
+        .transform[String](normalizePostcode, identity)
         .verifying(regexp(postcodeRegex, "error.invalid.postcode"))
 
     } else {
       "country" -> text("error.required.country").verifying(countryConstraintExcludeUK())
     }
-  }
 
-  protected def parseCountry(input: String): Country = {
+  protected def parseCountry(input: String): Country =
+    models.countries
+      .collectFirst {
+        case e @ Country(_, c) if c == input => e
+      }
+      .getOrElse(throw new IllegalArgumentException(s"Invalid country code submitted: $input"))
+
+  protected def parseCountryOpt(input: String): Option[Country] =
     models.countries.collectFirst {
       case e @ Country(_, c) if c == input => e
-    }.getOrElse(throw new IllegalArgumentException(s"Invalid country code submitted: $input"))
-  }
-
-  protected def parseCountryOpt(input: String): Option[Country] = {
-    models.countries.collectFirst {
-      case e@Country(_, c) if c == input => e
     }
-  }
 
   protected def countryConstraintExcludeUK(errorMsg: String = "error.invalid.country"): Constraint[String] =
     Constraint {
-      case str if ukOpt.contains(str) =>
+      case str if ukOpt.contains(str)                        =>
         Invalid(countryErrorKey)
       case str if models.countries.map(_.code).contains(str) =>
         Valid
-      case _ =>
+      case _                                                 =>
         Invalid(errorMsg)
     }
 
@@ -84,7 +80,7 @@ trait AddressMappings extends Mappings {
     Constraint {
       case str if parseCountryOpt(str).isDefined =>
         Valid
-      case _ =>
+      case _                                     =>
         Invalid(errorMsg)
     }
 

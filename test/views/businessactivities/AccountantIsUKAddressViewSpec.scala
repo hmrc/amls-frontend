@@ -28,7 +28,7 @@ import views.html.businessactivities.AccountantIsUKAddressView
 class AccountantIsUKAddressViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val address = inject[AccountantIsUKAddressView]
-  lazy val fp = inject[AccountantIsUKAddressFormProvider]
+  lazy val fp      = inject[AccountantIsUKAddressFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -36,9 +36,9 @@ class AccountantIsUKAddressViewSpec extends AmlsViewSpec with Matchers {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
-  val defaultName = WhoIsYourAccountantName("accountantName",Some("tradingName"))
-  val defaultIsUkTrue = WhoIsYourAccountantIsUk(true)
-  val defaultUkAddress = UkAccountantsAddress("line1",Some("line2"),None,None,"AB12CD")
+  val defaultName      = WhoIsYourAccountantName("accountantName", Some("tradingName"))
+  val defaultIsUkTrue  = WhoIsYourAccountantIsUk(true)
+  val defaultUkAddress = UkAccountantsAddress("line1", Some("line2"), None, None, "AB12CD")
 
   "AccountantIsUKAddressView view" must {
 
@@ -53,7 +53,9 @@ class AccountantIsUKAddressViewSpec extends AmlsViewSpec with Matchers {
 
       def view = address(fp().fill(defaultIsUkTrue), true, defaultName.accountantsName)
 
-      heading.html must be(messages("businessactivities.whoisyouraccountant.location.header", defaultName.accountantsName))
+      heading.html    must be(
+        messages("businessactivities.whoisyouraccountant.location.header", defaultName.accountantsName)
+      )
       subHeading.html must include(messages("summary.businessactivities"))
 
     }

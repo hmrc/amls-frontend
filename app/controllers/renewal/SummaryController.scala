@@ -32,34 +32,37 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                  val authAction: AuthAction,
-                                  val ds: CommonPlayDependencies,
-                                  val renewalService: RenewalService,
-                                  val progressService: ProgressService,
-                                  val cc: MessagesControllerComponents,
-                                  cyaHelper: CheckYourAnswersHelper,
-                                  view: CheckYourAnswersView) extends AmlsBaseController(ds, cc) {
+class SummaryController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val renewalService: RenewalService,
+  val progressService: ProgressService,
+  val cc: MessagesControllerComponents,
+  cyaHelper: CheckYourAnswersHelper,
+  view: CheckYourAnswersView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetchAll(request.credId) flatMap {
-        optionalCache =>
-          (for {
-            cache <- OptionT.fromOption[Future](optionalCache)
-            businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
-            renewal <- OptionT.fromOption[Future](cache.getEntry[Renewal](Renewal.key))
-          } yield {
-            val summaryList = cyaHelper.getSummaryList(renewal, businessMatching)
-            Ok(view(summaryList))
-          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetchAll(request.credId) flatMap { optionalCache =>
+      (for {
+        cache            <- OptionT.fromOption[Future](optionalCache)
+        businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+        renewal          <- OptionT.fromOption[Future](cache.getEntry[Renewal](Renewal.key))
+      } yield {
+        val summaryList = cyaHelper.getSummaryList(renewal, businessMatching)
+        Ok(view(summaryList))
+      }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+    }
   }
 
-  def post: Action[AnyContent] = authAction.async {
-    implicit request => (for {
+  def post: Action[AnyContent] = authAction.async { implicit request =>
+    (for {
       renewal <- OptionT(dataCacheConnector.fetch[Renewal](request.credId, Renewal.key))
-      _ <- OptionT.liftF(dataCacheConnector.save[Renewal](request.credId, Renewal.key, renewal.copy(hasAccepted = true)))
-    } yield Redirect(controllers.renewal.routes.RenewalProgressController.get)) getOrElse InternalServerError("Could not update renewal")
+      _       <-
+        OptionT.liftF(dataCacheConnector.save[Renewal](request.credId, Renewal.key, renewal.copy(hasAccepted = true)))
+    } yield Redirect(controllers.renewal.routes.RenewalProgressController.get)) getOrElse InternalServerError(
+      "Could not update renewal"
+    )
   }
 }

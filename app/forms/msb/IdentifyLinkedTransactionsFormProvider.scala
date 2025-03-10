@@ -22,9 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class IdentifyLinkedTransactionsFormProvider @Inject()() extends BooleanFormProvider {
+class IdentifyLinkedTransactionsFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[IdentifyLinkedTransactions] = createForm[IdentifyLinkedTransactions](
-    "linkedTxn", "error.required.msb.linked.txn"
+    "linkedTxn",
+    "error.required.msb.linked.txn"
   )(IdentifyLinkedTransactions.apply, _.linkedTxn)
 }

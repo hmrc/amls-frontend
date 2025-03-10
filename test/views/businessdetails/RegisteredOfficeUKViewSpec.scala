@@ -26,8 +26,7 @@ import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.businessdetails.RegisteredOfficeUKView
 
-
-class RegisteredOfficeUKViewSpec extends AmlsViewSpec with Matchers  {
+class RegisteredOfficeUKViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val registered_office_uk: RegisteredOfficeUKView = app.injector.instanceOf[RegisteredOfficeUKView]
   lazy val formProvider: RegisteredOfficeUKFormProvider = app.injector.instanceOf[RegisteredOfficeUKFormProvider]
@@ -41,35 +40,37 @@ class RegisteredOfficeUKViewSpec extends AmlsViewSpec with Matchers  {
   "registered_office view" must {
     "have correct title" in new ViewFixture {
 
-      val formWithData = formProvider().fill(RegisteredOfficeUK("line1",Some("line2"),None,None,"AB12CD"))
+      val formWithData = formProvider().fill(RegisteredOfficeUK("line1", Some("line2"), None, None, "AB12CD"))
 
       def view = registered_office_uk(formWithData, true)
 
-      doc.title must startWith(messages("businessdetails.registeredoffice.where.title") + " - " + messages("summary.businessdetails"))
+      doc.title must startWith(
+        messages("businessdetails.registeredoffice.where.title") + " - " + messages("summary.businessdetails")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
-      val formWithData = formProvider().fill(RegisteredOfficeUK("line1",Some("line2"),None,None,"AB12CD"))
+      val formWithData = formProvider().fill(RegisteredOfficeUK("line1", Some("line2"), None, None, "AB12CD"))
 
       def view = registered_office_uk(formWithData, true)
 
-      heading.html must be(messages("businessdetails.registeredoffice.where.title"))
+      heading.html    must be(messages("businessdetails.registeredoffice.where.title"))
       subHeading.html must include(messages("summary.businessdetails"))
 
     }
 
     "show errors in the correct locations" in new ViewFixture {
 
-      val line1 = "addressLine1"
+      val line1    = "addressLine1"
       val postcode = "postCode"
 
-      val line1ErrorMessage = "error.required.address.line1"
+      val line1ErrorMessage    = "error.required.address.line1"
       val postcodeErrorMessage = "error.required.postcode"
 
       val invalidForm = formProvider().bind(
         Map(
-          line1 -> "",
+          line1    -> "",
           postcode -> ""
         )
       )
@@ -81,7 +82,7 @@ class RegisteredOfficeUKViewSpec extends AmlsViewSpec with Matchers  {
       errorSummaryList must include(messages(line1ErrorMessage))
       errorSummaryList must include(messages(postcodeErrorMessage))
 
-      doc.getElementById(s"$line1-error").text() must include(messages(line1ErrorMessage))
+      doc.getElementById(s"$line1-error").text()    must include(messages(line1ErrorMessage))
       doc.getElementById(s"$postcode-error").text() must include(messages(postcodeErrorMessage))
     }
 

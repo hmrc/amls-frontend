@@ -24,11 +24,10 @@ case class SupervisionStart(startDate: LocalDate)
 
 object SupervisionStart {
 
-  implicit val jsonReads: Reads[SupervisionStart] = {
+  implicit val jsonReads: Reads[SupervisionStart] =
     (__ \ "supervisionStartDate").read[LocalDate].map(SupervisionStart.apply)
-  }
 
-  implicit val jsonWrites: Writes[SupervisionStart] = Writes[SupervisionStart] {
-    case a: SupervisionStart => Json.obj("supervisionStartDate" -> a.startDate)
+  implicit val jsonWrites: Writes[SupervisionStart] = Writes[SupervisionStart] { case a: SupervisionStart =>
+    Json.obj("supervisionStartDate" -> a.startDate)
   }
 }

@@ -19,23 +19,28 @@ package utils.withdrawal
 import models.withdrawal.WithdrawalReason
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Key, SummaryListRow, Text, Value}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem,Actions,SummaryList}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, SummaryList}
 
 object CheckYourAnswersHelper {
 
-  def createSummaryList(withdrawalReason: WithdrawalReason)(implicit messages: Messages): SummaryList = {
-    SummaryList(rows = Seq(
-      SummaryListRow(
-        Key(Text(messages("withdrawal.cya.question"))),
-        Value(Text(messages(s"withdrawal.reason.lbl.${withdrawalReason.value}"))),
-        actions = Some(Actions(
-          items = Seq(ActionItem(
-            href = controllers.withdrawal.routes.WithdrawalReasonController.get.url,
-            content = Text(messages("button.change")),
-            attributes = Map("id" -> "cya-change-link")
-          ))
-        ))
+  def createSummaryList(withdrawalReason: WithdrawalReason)(implicit messages: Messages): SummaryList =
+    SummaryList(rows =
+      Seq(
+        SummaryListRow(
+          Key(Text(messages("withdrawal.cya.question"))),
+          Value(Text(messages(s"withdrawal.reason.lbl.${withdrawalReason.value}"))),
+          actions = Some(
+            Actions(
+              items = Seq(
+                ActionItem(
+                  href = controllers.withdrawal.routes.WithdrawalReasonController.get.url,
+                  content = Text(messages("button.change")),
+                  attributes = Map("id" -> "cya-change-link")
+                )
+              )
+            )
+          )
+        )
       )
-    ))
-  }
+    )
 }

@@ -22,9 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class TimeAtAddressFormProvider @Inject()() extends Mappings {
+class TimeAtAddressFormProvider @Inject() () extends Mappings {
 
-  val errorMessage = "error.required.timeAtAddress"
+  val errorMessage                 = "error.required.timeAtAddress"
   def apply(): Form[TimeAtAddress] = Form(
     "timeAtAddress" -> enumerable[TimeAtAddress](errorMessage, errorMessage)
   )

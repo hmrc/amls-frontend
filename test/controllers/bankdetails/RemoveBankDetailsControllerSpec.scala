@@ -33,15 +33,16 @@ import scala.concurrent.Future
 class RemoveBankDetailsControllerSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks { self =>
-    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    val request: Request[AnyContentAsEmpty.type]      = addToken(authRequest)
     lazy val removeBankDetails: RemoveBankDetailsView = app.injector.instanceOf[RemoveBankDetailsView]
-    val controller = new RemoveBankDetailsController (
-      dataCacheConnector =  mockCacheConnector,
+    val controller                                    = new RemoveBankDetailsController(
+      dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       mcc = mockMcc,
       view = removeBankDetails,
-      error = errorView)
+      error = errorView
+    )
   }
 
   "Get" must {
@@ -56,11 +57,12 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec {
 
     "show bank account details on the remove bank account page" in new Fixture {
 
-      val bankAccount: BankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("12345678")))
+      val bankAccount: BankAccount =
+        BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("12345678")))
 
       mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, Some("Account Name"), Some(bankAccount)))))
 
-      val result: Future[Result] = controller.get(1) (request)
+      val result: Future[Result] = controller.get(1)(request)
 
       val contentString: String = contentAsString(result)
 
@@ -75,35 +77,40 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec {
     "remove bank account from YourBankAccounts" in new Fixture {
 
       val accountType1: BankAccountType.PersonalAccount.type = PersonalAccount
-      val bankAccount1: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("111111", "11-11-11")))
+      val bankAccount1: BankAccount                          =
+        BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("111111", "11-11-11")))
 
       val accountType2: BankAccountType.PersonalAccount.type = PersonalAccount
-      val bankAccount2: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("222222", "22-22-22")))
+      val bankAccount2: BankAccount                          =
+        BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("222222", "22-22-22")))
 
       val accountType3: BankAccountType.PersonalAccount.type = PersonalAccount
-      val bankAccount3: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("333333", "33-33-33")))
+      val bankAccount3: BankAccount                          =
+        BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("333333", "33-33-33")))
 
       val accountType4: BankAccountType.PersonalAccount.type = PersonalAccount
-      val bankAccount4: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("444444", "44-44-44")))
+      val bankAccount4: BankAccount                          =
+        BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("444444", "44-44-44")))
 
-      val completeModel1: BankDetails = BankDetails(Some(accountType1), None, Some(bankAccount1), true, false, Some(StatusConstants.Deleted))
+      val completeModel1: BankDetails =
+        BankDetails(Some(accountType1), None, Some(bankAccount1), true, false, Some(StatusConstants.Deleted))
       val completeModel2: BankDetails = BankDetails(Some(accountType2), None, Some(bankAccount2))
       val completeModel3: BankDetails = BankDetails(Some(accountType3), None, Some(bankAccount3))
       val completeModel4: BankDetails = BankDetails(Some(accountType4), None, Some(bankAccount4))
 
-      val bankAccounts: Seq[BankDetails] = Seq(completeModel1,completeModel2,completeModel3,completeModel4)
+      val bankAccounts: Seq[BankDetails] = Seq(completeModel1, completeModel2, completeModel3, completeModel4)
 
       mockCacheFetch[Seq[BankDetails]](Some(bankAccounts))
       mockCacheSave[Seq[BankDetails]]
 
       val result: Future[Result] = controller.remove(1)(request)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be (Some(controllers.bankdetails.routes.YourBankAccountsController.get().url))
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.bankdetails.routes.YourBankAccountsController.get().url))
 
       verify(controller.dataCacheConnector).save[Seq[BankDetails]](
         any(),
         any(),
-        meq(Seq(completeModel1, completeModel2,completeModel3,completeModel4))
+        meq(Seq(completeModel1, completeModel2, completeModel3, completeModel4))
       )(any())
     }
   }

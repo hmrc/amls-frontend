@@ -39,16 +39,18 @@ import scala.concurrent.Future
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[CheckYourAnswersView]
-    val controller = new SummaryController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[CheckYourAnswersView]
+    val controller = new SummaryController(
       dataCache = mock[DataCacheConnector],
       statusService = mock[StatusService],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       cyaHelper = inject[CheckYourAnswersHelper],
-      view = view)
+      view = view
+    )
 
     val testBusinessName = "Ubunchews Accountancy Services"
 
@@ -70,13 +72,16 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
     "load the summary page when section data is available" in new Fixture {
 
-      when(controller.dataCache.fetch[BusinessMatching](any(), meq(BusinessMatching.key))
-        (any())).thenReturn(Future.successful(Some(testBusinessMatch)))
+      when(controller.dataCache.fetch[BusinessMatching](any(), meq(BusinessMatching.key))(any()))
+        .thenReturn(Future.successful(Some(testBusinessMatch)))
 
-      when(controller.dataCache.fetch[BusinessDetails](any(), meq(BusinessDetails.key))
-        (any())).thenReturn(Future.successful(Some(model)))
+      when(controller.dataCache.fetch[BusinessDetails](any(), meq(BusinessDetails.key))(any()))
+        .thenReturn(Future.successful(Some(model)))
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
+      when(
+        controller.statusService
+          .getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
+      )
         .thenReturn(Future.successful(SubmissionReady))
 
       val result = controller.get()(request)
@@ -85,13 +90,16 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.dataCache.fetch[BusinessDetails](any(), meq(BusinessDetails.key))
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCache.fetch[BusinessDetails](any(), meq(BusinessDetails.key))(any()))
+        .thenReturn(Future.successful(None))
 
-      when(controller.dataCache.fetch[BusinessMatching](any(), meq(BusinessMatching.key))
-        (any())).thenReturn(Future.successful(Some(testBusinessMatch)))
+      when(controller.dataCache.fetch[BusinessMatching](any(), meq(BusinessMatching.key))(any()))
+        .thenReturn(Future.successful(Some(testBusinessMatch)))
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
+      when(
+        controller.statusService
+          .getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
+      )
         .thenReturn(Future.successful(SubmissionReady))
 
       val result = controller.get()(request)
@@ -107,7 +115,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
         val emptyCache = Cache.empty
 
-        val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
+        val newRequest = requestWithUrlEncodedBody("hasAccepted" -> "true")
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(model.copy(hasAccepted = false))))
@@ -117,7 +125,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
         val result = controller.post()(newRequest)
 
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
       }
     }

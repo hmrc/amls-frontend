@@ -26,15 +26,15 @@ class SaRegisteredSpec extends PlaySpec with MockitoSugar {
     "successfully validate given an enum value" in {
 
       Json.fromJson[SaRegistered](Json.obj("saRegistered" -> false)) must
-        be(JsSuccess(SaRegisteredNo, JsPath ))
+        be(JsSuccess(SaRegisteredNo, JsPath))
     }
 
     "successfully validate given an `Yes` value" in {
 
-      val json = Json.obj("saRegistered" -> true, "utrNumber" ->"0123456789")
+      val json = Json.obj("saRegistered" -> true, "utrNumber" -> "0123456789")
 
       Json.fromJson[SaRegistered](json) must
-        be(JsSuccess(SaRegisteredYes("0123456789"), JsPath  \ "utrNumber"))
+        be(JsSuccess(SaRegisteredYes("0123456789"), JsPath \ "utrNumber"))
     }
 
     "fail to validate when given an empty `Yes` value" in {
@@ -42,7 +42,7 @@ class SaRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("saRegistered" -> true)
 
       Json.fromJson[SaRegistered](json) must
-        be(JsError((JsPath  \ "utrNumber") -> play.api.libs.json.JsonValidationError("error.path.missing")))
+        be(JsError((JsPath \ "utrNumber") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
 
     "write the correct value" in {
@@ -51,10 +51,12 @@ class SaRegisteredSpec extends PlaySpec with MockitoSugar {
         be(Json.obj("saRegistered" -> false))
 
       Json.toJson(SaRegisteredYes("0123456789").asInstanceOf[SaRegistered]) must
-        be(Json.obj(
-          "saRegistered" -> true,
-          "utrNumber" -> "0123456789"
-        ))
+        be(
+          Json.obj(
+            "saRegistered" -> true,
+            "utrNumber"    -> "0123456789"
+          )
+        )
     }
   }
 

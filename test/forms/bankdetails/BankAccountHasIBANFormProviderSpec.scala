@@ -23,13 +23,14 @@ import play.api.data.Form
 class BankAccountHasIBANFormProviderSpec extends BooleanFieldBehaviours[BankAccountHasIban] {
 
   override val form: Form[BankAccountHasIban] = new BankAccountHasIBANFormProvider()()
-  override val fieldName: String = "hasIBAN"
-  override val errorMessage: String = "error.required.bankdetails.isiban"
+  override val fieldName: String              = "hasIBAN"
+  override val errorMessage: String           = "error.required.bankdetails.isiban"
 
   "AccountantIsUKAddressFormProvider" must {
 
     behave like booleanFieldWithModel(
-      BankAccountHasIban(true), BankAccountHasIban(false)
+      BankAccountHasIban(true),
+      BankAccountHasIban(false)
     )
   }
 }

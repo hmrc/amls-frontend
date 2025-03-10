@@ -44,7 +44,7 @@ class FitAndProperNoticeViewSpec extends AmlsViewSpec with Matchers {
     "have the correct headings" in new ViewFixture {
       def view = noticeView(true, 1, None)
 
-      heading.html must be(messages("responsiblepeople.fit_and_proper.notice.title"))
+      heading.html    must be(messages("responsiblepeople.fit_and_proper.notice.title"))
       subHeading.html must include(messages("summary.responsiblepeople"))
     }
 
@@ -62,4 +62,3 @@ class FitAndProperNoticeViewSpec extends AmlsViewSpec with Matchers {
     behave like pageWithBackLink(noticeView(false, 1, None))
   }
 }
-

@@ -28,8 +28,8 @@ class MoneySourcesViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture
 
-  lazy val money_sources = inject[MoneySourcesView]
-  lazy val fp = inject[MoneySourcesFormProvider]
+  lazy val money_sources                                         = inject[MoneySourcesView]
+  lazy val fp                                                    = inject[MoneySourcesFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   "money sources view" must {
@@ -44,7 +44,7 @@ class MoneySourcesViewSpec extends AmlsViewSpec with Matchers {
 
       def view = money_sources(fp().fill(MoneySources(None, None, None)), true)
 
-      heading.html must be(messages("renewal.msb.money_sources.header"))
+      heading.html    must be(messages("renewal.msb.money_sources.header"))
       subHeading.html must include(messages("summary.renewal"))
     }
 
@@ -52,11 +52,11 @@ class MoneySourcesViewSpec extends AmlsViewSpec with Matchers {
 
       def view = money_sources(fp().fill(MoneySources(None, None, None)), true)
 
-      Option(doc.getElementById("moneySources_1")).isDefined must be(true)
-      Option(doc.getElementById("bankNames")).isDefined must be(true)
-      Option(doc.getElementById("moneySources_2")).isDefined must be(true)
+      Option(doc.getElementById("moneySources_1")).isDefined  must be(true)
+      Option(doc.getElementById("bankNames")).isDefined       must be(true)
+      Option(doc.getElementById("moneySources_2")).isDefined  must be(true)
       Option(doc.getElementById("wholesalerNames")).isDefined must be(true)
-      Option(doc.getElementById("moneySources_3")).isDefined must be(true)
+      Option(doc.getElementById("moneySources_3")).isDefined  must be(true)
     }
 
     behave like pageWithErrors(

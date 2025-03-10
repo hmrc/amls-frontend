@@ -25,10 +25,10 @@ import views.html.confirmation.PaymentConfirmationTransitionalRenewalView
 class PaymentConfirmedTransitionalRenewalViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val payment_confirmation_transitional_renewal = inject[PaymentConfirmationTransitionalRenewalView]
+    lazy val payment_confirmation_transitional_renewal             = inject[PaymentConfirmationTransitionalRenewalView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
-    val businessName = "Test Business Ltd"
+    val businessName     = "Test Business Ltd"
     val paymentReference = "XMHSG000000000"
 
     override def view = payment_confirmation_transitional_renewal(businessName, paymentReference)

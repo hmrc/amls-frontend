@@ -36,13 +36,16 @@ import scala.concurrent.Future
 class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     lazy val mockRenewalService = mock[RenewalService]
-    lazy val view = inject[FXTransactionsInLast12MonthsView]
-    val controller = new FXTransactionsInLast12MonthsController (
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc,
+    lazy val view               = inject[FXTransactionsInLast12MonthsView]
+    val controller              = new FXTransactionsInLast12MonthsController(
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      renewalService = mockRenewalService,
+      cc = mockMcc,
       formProvider = inject[FXTransactionsInLast12MonthsFormProvider],
       view = view
     )
@@ -65,39 +68,41 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
     "load the page 'How many foreign exchange transactions'" in new Fixture {
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("renewal.msb.fx.transactions.expected.title"))
     }
 
-    "load the page 'How many foreign exchange transactions' with pre populated data" in new Fixture  {
+    "load the page 'How many foreign exchange transactions' with pre populated data" in new Fixture {
 
       when(mockRenewalService.getRenewal(any()))
-        .thenReturn(Future.successful(
-          Some(Renewal(fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("12345678963")))))
+        .thenReturn(
+          Future.successful(
+            Some(Renewal(fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("12345678963"))))
+          )
         )
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include("12345678963")
     }
 
-    "Show error message when user has not filled the mandatory fields" in new Fixture  {
+    "Show error message when user has not filled the mandatory fields" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.FXTransactionsInLast12MonthsController.post().url)
-      .withFormUrlEncodedBody(
-        "fxTransaction" -> ""
-      )
+        .withFormUrlEncodedBody(
+          "fxTransaction" -> ""
+        )
 
       val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include (messages("error.required.renewal.fx.transactions.in.12months"))
+      status(result)          must be(BAD_REQUEST)
+      contentAsString(result) must include(messages("error.required.renewal.fx.transactions.in.12months"))
     }
 
     trait FlowFixture extends Fixture {
       val newRequest = FakeRequest(POST, routes.FXTransactionsInLast12MonthsController.post().url)
-      .withFormUrlEncodedBody(
-        "fxTransaction" -> "12345678963"
-      )
+        .withFormUrlEncodedBody(
+          "fxTransaction" -> "12345678963"
+        )
     }
 
     "return 500" when {
@@ -116,28 +121,28 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       "business activities does not contain HVD or ASP" in new FlowFixture {
         setupBusinessMatching(activities = Set(MoneyServiceBusiness))
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
       }
 
       "business activities contains HVD" in new FlowFixture {
         setupBusinessMatching(activities = Set(MoneyServiceBusiness, HighValueDealing))
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url))
       }
 
       "business activities contains ASP" in new FlowFixture {
         setupBusinessMatching(activities = Set(MoneyServiceBusiness, AccountancyServices))
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url))
       }
 
       "business activities contains HVD and ASP" in new FlowFixture {
         setupBusinessMatching(activities = Set(MoneyServiceBusiness, HighValueDealing, AccountancyServices))
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url))
       }
     }
@@ -146,28 +151,28 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       "business activities does not contain HVD or ASP" in new FlowFixture {
         setupBusinessMatching(activities = Set(MoneyServiceBusiness))
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
       }
 
       "business activities contains HVD" in new FlowFixture {
         setupBusinessMatching(activities = Set(MoneyServiceBusiness, HighValueDealing))
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
       }
 
       "business activities contains ASP" in new FlowFixture {
         setupBusinessMatching(activities = Set(MoneyServiceBusiness, AccountancyServices))
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
       }
 
       "business activities contains HVD and ASP" in new FlowFixture {
         setupBusinessMatching(activities = Set(MoneyServiceBusiness, HighValueDealing, AccountancyServices))
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
       }
     }

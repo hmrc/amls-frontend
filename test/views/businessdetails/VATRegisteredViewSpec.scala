@@ -26,11 +26,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.VATRegisteredView
 
+class VATRegisteredViewSpec extends AmlsViewSpec with Matchers {
 
-class VATRegisteredViewSpec extends AmlsViewSpec with Matchers  {
-
-  lazy val vat_registered = app.injector.instanceOf[VATRegisteredView]
-  lazy val formProvider = app.injector.instanceOf[VATRegisteredFormProvider]
+  lazy val vat_registered                                        = app.injector.instanceOf[VATRegisteredView]
+  lazy val formProvider                                          = app.injector.instanceOf[VATRegisteredFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -42,7 +41,9 @@ class VATRegisteredViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = vat_registered(formWithData, true)
 
-      doc.title must startWith(Messages("businessdetails.registeredforvat.title") + " - " + Messages("summary.businessdetails"))
+      doc.title must startWith(
+        Messages("businessdetails.registeredforvat.title") + " - " + Messages("summary.businessdetails")
+      )
     }
 
     "have correct headings" in new ViewFixture {
@@ -51,7 +52,7 @@ class VATRegisteredViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = vat_registered(formWithData, true)
 
-      heading.html must be(Messages("businessdetails.registeredforvat.title"))
+      heading.html    must be(Messages("businessdetails.registeredforvat.title"))
       subHeading.html must include(Messages("summary.businessdetails"))
 
     }
@@ -64,10 +65,9 @@ class VATRegisteredViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = vat_registered(filledForm, edit = false)
 
-      doc.getElementsByClass("govuk-list govuk-error-summary__list")
-        .first.text() mustBe messages(messageKey)
+      doc.getElementsByClass("govuk-list govuk-error-summary__list").first.text() mustBe messages(messageKey)
 
-      doc.getElementById("registeredForVAT-error").text() mustBe (s"Error: ${messages(messageKey)}")
+      doc.getElementById("registeredForVAT-error").text() mustBe s"Error: ${messages(messageKey)}"
 
     }
 
@@ -79,10 +79,9 @@ class VATRegisteredViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = vat_registered(filledForm, edit = false)
 
-      doc.getElementsByClass("govuk-list govuk-error-summary__list")
-        .first.text() mustBe messages(messageKey)
+      doc.getElementsByClass("govuk-list govuk-error-summary__list").first.text() mustBe messages(messageKey)
 
-      doc.getElementById("vrnNumber-error").text() mustBe (s"Error: ${messages(messageKey)}")
+      doc.getElementById("vrnNumber-error").text() mustBe s"Error: ${messages(messageKey)}"
     }
 
     behave like pageWithBackLink(vat_registered(formProvider(), true))

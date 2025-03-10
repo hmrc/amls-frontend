@@ -32,42 +32,44 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class BankAccountIsUKController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                          val authAction: AuthAction,
-                                          val ds: CommonPlayDependencies,
-                                          val auditConnector: AuditConnector,
-                                          val statusService: StatusService,
-                                          val mcc: MessagesControllerComponents,
-                                          formProvider: BankAccountIsUKFormProvider,
-                                          view: BankAccountIsUKView,
-                                          implicit val error: views.html.ErrorView) extends BankDetailsController(ds, mcc) {
+class BankAccountIsUKController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val auditConnector: AuditConnector,
+  val statusService: StatusService,
+  val mcc: MessagesControllerComponents,
+  formProvider: BankAccountIsUKFormProvider,
+  view: BankAccountIsUKView,
+  implicit val error: views.html.ErrorView
+) extends BankDetailsController(ds, mcc) {
 
-  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async{
-      implicit request =>
-        for {
-          bankDetails <- getData[BankDetails](request.credId, index)
-          status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-        } yield bankDetails match {
-          case Some(x@BankDetails(_, _, Some(data), _, _, _, _)) if x.canEdit(status) =>
-            val form = data.isUk.fold(formProvider())(formProvider().fill)
-            Ok(view(form, edit, index))
-          case Some(x) if x.canEdit(status) =>
-            Ok(view(formProvider(), edit, index))
-          case _ => NotFound(notFoundView)
-        }
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    for {
+      bankDetails <- getData[BankDetails](request.credId, index)
+      status      <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+    } yield bankDetails match {
+      case Some(x @ BankDetails(_, _, Some(data), _, _, _, _)) if x.canEdit(status) =>
+        val form = data.isUk.fold(formProvider())(formProvider().fill)
+        Ok(view(form, edit, index))
+      case Some(x) if x.canEdit(status)                                             =>
+        Ok(view(formProvider(), edit, index))
+      case _                                                                        => NotFound(notFoundView)
+    }
   }
 
-  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
-      implicit request => {
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    {
 
-        for {
-          details <- OptionT(getData[BankDetails](request.credId, index))
-          result <- OptionT.liftF(auditConnector.sendEvent(audit.AddBankAccountEvent(details)))
-        } yield result
+      for {
+        details <- OptionT(getData[BankDetails](request.credId, index))
+        result  <- OptionT.liftF(auditConnector.sendEvent(audit.AddBankAccountEvent(details)))
+      } yield result
 
-        formProvider().bindFromRequest().fold(
-          formWithError =>
-            Future.successful(BadRequest(view(formWithError, edit, index))),
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithError => Future.successful(BadRequest(view(formWithError, edit, index))),
           data =>
             updateDataStrict[BankDetails](request.credId, index) { bd =>
               bd.copy(
@@ -79,16 +81,16 @@ class BankAccountIsUKController @Inject()(val dataCacheConnector: DataCacheConne
                 })
               )
             }.map { _ =>
-                if (data.isUk) {
-                  Redirect(routes.BankAccountUKController.get(index))
-                } else {
-                  Redirect(routes.BankAccountHasIbanController.get(index))
-                }
+              if (data.isUk) {
+                Redirect(routes.BankAccountUKController.get(index))
+              } else {
+                Redirect(routes.BankAccountHasIbanController.get(index))
+              }
             }
         )
-      }.recoverWith {
-        case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-      }
+    }.recoverWith { case _: IndexOutOfBoundsException =>
+      Future.successful(NotFound(notFoundView))
+    }
   }
 
 }

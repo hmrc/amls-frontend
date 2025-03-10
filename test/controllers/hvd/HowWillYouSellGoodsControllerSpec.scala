@@ -35,7 +35,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec with Injecting {
     self =>
     val request = addToken(authRequest)
 
-    lazy val view = inject[HowWillYouSellGoodsView]
+    lazy val view  = inject[HowWillYouSellGoodsView]
     val controller = new HowWillYouSellGoodsController(
       mockCacheConnector,
       mockStatusService,
@@ -58,7 +58,9 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec with Injecting {
     val result = controller.get()(request)
     status(result) must be(OK)
     val htmlValue = Jsoup.parse(contentAsString(result))
-    htmlValue.title mustBe messages("hvd.how-will-you-sell-goods.title") + " - " + messages("summary.hvd") + " - " + messages("title.amls") + " - " + messages("title.gov")
+    htmlValue.title mustBe messages("hvd.how-will-you-sell-goods.title") + " - " + messages(
+      "summary.hvd"
+    ) + " - " + messages("title.amls") + " - " + messages("title.gov")
   }
 
   "load UI from mongoCache" in new Fixture {
@@ -69,7 +71,9 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec with Injecting {
     status(result) must be(OK)
 
     val htmlValue = Jsoup.parse(contentAsString(result))
-    htmlValue.title mustBe messages("hvd.how-will-you-sell-goods.title") + " - " + messages("summary.hvd") + " - " + messages("title.amls") + " - " + messages("title.gov")
+    htmlValue.title mustBe messages("hvd.how-will-you-sell-goods.title") + " - " + messages(
+      "summary.hvd"
+    ) + " - " + messages("title.amls") + " - " + messages("title.gov")
     htmlValue.getElementById("salesChannels_1").`val`() mustBe Retail.toString
   }
 
@@ -77,34 +81,34 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec with Injecting {
     "submitted with valid data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.HowWillYouSellGoodsController.post().url)
-      .withFormUrlEncodedBody("salesChannels[0]" -> Retail.toString)
+        .withFormUrlEncodedBody("salesChannels[0]" -> Retail.toString)
 
       mockApplicationStatus(SubmissionDecisionRejected)
 
       val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.hvd.routes.CashPaymentController.get().url))
     }
 
     "submitted with valid data in edit mode" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.HowWillYouSellGoodsController.post().url)
-      .withFormUrlEncodedBody("salesChannels[0]" -> Retail.toString)
+        .withFormUrlEncodedBody("salesChannels[0]" -> Retail.toString)
 
       mockApplicationStatus(SubmissionDecisionRejected)
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
     }
   }
 
   "fail with validation error when mandatory field is missing" in new Fixture {
     val newRequest = FakeRequest(POST, routes.HowWillYouSellGoodsController.post().url)
-    .withFormUrlEncodedBody("" -> "")
+      .withFormUrlEncodedBody("" -> "")
 
     val result = controller.post()(newRequest)
-    status(result) must be(BAD_REQUEST)
+    status(result)          must be(BAD_REQUEST)
     contentAsString(result) must include(messages("error.required.hvd.how-will-you-sell-goods"))
   }
 
@@ -116,42 +120,50 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec with Injecting {
 
       "application is approved" in new Fixture with DateOfChangeHelper {
         val newRequest = FakeRequest(POST, routes.HowWillYouSellGoodsController.post().url)
-        .withFormUrlEncodedBody("salesChannels[0]" -> Retail.toString)
+          .withFormUrlEncodedBody("salesChannels[0]" -> Retail.toString)
         mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch(Some(hvd))
-        val result = controller.post(false)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.cashPayment).url))
+        val result     = controller.post(false)(newRequest)
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.cashPayment).url)
+        )
       }
 
       "application is approved and in edit mode" in new Fixture with DateOfChangeHelper {
         val newRequest = FakeRequest(POST, routes.HowWillYouSellGoodsController.post().url)
-        .withFormUrlEncodedBody("salesChannels[0]" -> Retail.toString)
+          .withFormUrlEncodedBody("salesChannels[0]" -> Retail.toString)
         mockApplicationStatus(ReadyForRenewal(None))
         mockCacheFetch(Some(hvd))
-        val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
+        val result     = controller.post(true)(newRequest)
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url)
+        )
       }
 
       "application is ready for renewal" in new Fixture with DateOfChangeHelper {
         val newRequest = FakeRequest(POST, routes.HowWillYouSellGoodsController.post().url)
-        .withFormUrlEncodedBody("salesChannels[0]" -> Retail.toString)
+          .withFormUrlEncodedBody("salesChannels[0]" -> Retail.toString)
         mockApplicationStatus(ReadyForRenewal(None))
         mockCacheFetch(Some(hvd))
-        val result = controller.post(false)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.cashPayment).url))
+        val result     = controller.post(false)(newRequest)
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.cashPayment).url)
+        )
       }
 
       "application is ready for renewal and in edit mode" in new Fixture with DateOfChangeHelper {
         val newRequest = FakeRequest(POST, routes.HowWillYouSellGoodsController.post().url)
-        .withFormUrlEncodedBody("salesChannels[0]" -> Retail.toString)
+          .withFormUrlEncodedBody("salesChannels[0]" -> Retail.toString)
         mockApplicationStatus(ReadyForRenewal(None))
         mockCacheFetch(Some(hvd))
-        val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
+        val result     = controller.post(true)(newRequest)
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url)
+        )
       }
     }
   }
@@ -161,13 +173,13 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec with Injecting {
       "the service has just been added" must {
         "redirect to the next page in the flow" in new Fixture {
           val newRequest = FakeRequest(POST, routes.HowWillYouSellGoodsController.post().url)
-          .withFormUrlEncodedBody("salesChannels[0]" -> Retail.toString)
+            .withFormUrlEncodedBody("salesChannels[0]" -> Retail.toString)
 
           mockApplicationStatus(SubmissionDecisionApproved)
           mockIsNewActivityNewAuth(true, Some(HighValueDealing))
 
           val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.hvd.routes.CashPaymentController.get().url))
         }
       }

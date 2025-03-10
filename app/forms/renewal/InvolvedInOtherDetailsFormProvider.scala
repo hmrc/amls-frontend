@@ -22,7 +22,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class InvolvedInOtherDetailsFormProvider @Inject()() extends Mappings {
+class InvolvedInOtherDetailsFormProvider @Inject() () extends Mappings {
 
   val detailsMaxLength = 255
 
@@ -33,6 +33,7 @@ class InvolvedInOtherDetailsFormProvider @Inject()() extends Mappings {
           maxLength(detailsMaxLength, "error.invalid.maxlength.255.renewal.ba.involved.in.other"),
           regexp(basicPunctuationRegex, "error.text.validation.renewal.ba.involved.in.other")
         )
-      ).transform[InvolvedInOtherYes](InvolvedInOtherYes.apply, _.details)
+      )
+      .transform[InvolvedInOtherYes](InvolvedInOtherYes.apply, _.details)
   )
 }

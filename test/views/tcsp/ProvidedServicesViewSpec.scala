@@ -27,7 +27,7 @@ import views.html.tcsp.ProvidedServicesView
 class ProvidedServicesViewSpec extends AmlsViewSpec with Matchers with Injecting {
 
   lazy val provided_services: ProvidedServicesView = inject[ProvidedServicesView]
-  lazy val fp: ProvidedServicesFormProvider = inject[ProvidedServicesFormProvider]
+  lazy val fp: ProvidedServicesFormProvider        = inject[ProvidedServicesFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -41,10 +41,10 @@ class ProvidedServicesViewSpec extends AmlsViewSpec with Matchers with Injecting
       def view = provided_services(fp(), true)
 
       val title = messages("tcsp.provided_services.title") + " - " + messages("summary.tcsp") + " - " +
-                  messages("title.amls") + " - " + messages("title.gov")
+        messages("title.amls") + " - " + messages("title.gov")
 
-      doc.title must be(title)
-      heading.html must be(messages("tcsp.provided_services.title"))
+      doc.title       must be(title)
+      heading.html    must be(messages("tcsp.provided_services.title"))
       subHeading.html must include(messages("summary.tcsp"))
     }
 

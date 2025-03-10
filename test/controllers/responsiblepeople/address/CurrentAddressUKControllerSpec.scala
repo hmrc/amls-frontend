@@ -22,7 +22,7 @@ import forms.responsiblepeople.address.CurrentAddressUKFormProvider
 import models.businessactivities.BusinessActivities
 import models.businessdetails.BusinessDetails
 import models.businessmatching.BusinessActivity.BillPaymentServices
-import models.businessmatching.{BusinessMatching, BusinessActivities => BMActivities}
+import models.businessmatching.{BusinessActivities => BMActivities, BusinessMatching}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
@@ -54,38 +54,41 @@ import scala.concurrent.Future
 class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with Injecting {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
-  val mockDataCacheConnector = mock[DataCacheConnector]
-  val RecordId = 1
+  val mockDataCacheConnector     = mock[DataCacheConnector]
+  val RecordId                   = 1
 
   trait Fixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
-  val viewResponse = ViewResponse(
-    "",
-    businessMatchingSection = BusinessMatching(
-      activities = Some(BMActivities(
-        Set(BillPaymentServices)
-      ))
-    ),
-    businessDetailsSection = BusinessDetails(),
-    bankDetailsSection = Seq.empty,
-    businessActivitiesSection = BusinessActivities(),
-    eabSection = None,
-    aspSection = None,
-    tcspSection = None,
-    responsiblePeopleSection = None,
-    tradingPremisesSection = None,
-    msbSection = None,
-    hvdSection = None,
-    ampSection = None,
-    supervisionSection = None,
-    aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
-  )
+    val viewResponse = ViewResponse(
+      "",
+      businessMatchingSection = BusinessMatching(
+        activities = Some(
+          BMActivities(
+            Set(BillPaymentServices)
+          )
+        )
+      ),
+      businessDetailsSection = BusinessDetails(),
+      bankDetailsSection = Seq.empty,
+      businessActivitiesSection = BusinessActivities(),
+      eabSection = None,
+      aspSection = None,
+      tcspSection = None,
+      responsiblePeopleSection = None,
+      tradingPremisesSection = None,
+      msbSection = None,
+      hvdSection = None,
+      ampSection = None,
+      supervisionSection = None,
+      aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
+    )
 
-    val auditConnector = mock[AuditConnector]
-    val statusService = mock[StatusService]
-    lazy val view = inject[CurrentAddressUKView]
-    val currentAddressController = new CurrentAddressUKController (
+    val auditConnector           = mock[AuditConnector]
+    val statusService            = mock[StatusService]
+    lazy val view                = inject[CurrentAddressUKView]
+    val currentAddressController = new CurrentAddressUKController(
       dataCacheConnector = mockDataCacheConnector,
       auditConnector = auditConnector,
       authAction = SuccessfulAuthAction,
@@ -102,7 +105,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
     } thenReturn Future.successful(Success)
   }
 
-  val emptyCache = Cache.empty
+  val emptyCache  = Cache.empty
   val outOfBounds = 99
 
   "CurrentAddressUKController" when {
@@ -118,8 +121,8 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
       "respond with NOT_FOUND when called with an index that is out of bounds" in new Fixture {
         val responsiblePeople = ResponsiblePerson()
 
-        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = currentAddressController.get(40)(request)
         status(result) must be(NOT_FOUND)
@@ -129,46 +132,46 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
 
         val responsiblePeople = ResponsiblePerson(personName)
 
-        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = currentAddressController.get(RecordId)(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
-        document.select("input[name=addressLine1]").`val` must be("")
-        document.select("input[name=addressLine2]").`val` must be("")
-        document.select("input[name=addressLine3]").`val` must be("")
-        document.select("input[name=addressLine4]").`val` must be("")
+        document.title                                         must be(pageTitle)
+        document.select("input[name=addressLine1]").`val`      must be("")
+        document.select("input[name=addressLine2]").`val`      must be("")
+        document.select("input[name=addressLine3]").`val`      must be("")
+        document.select("input[name=addressLine4]").`val`      must be("")
         document.select("input[name=addressLineNonUK1]").`val` must be("")
         document.select("input[name=addressLineNonUK2]").`val` must be("")
         document.select("input[name=addressLineNonUK3]").`val` must be("")
         document.select("input[name=addressLineNonUK4]").`val` must be("")
-        document.select("input[name=postcode]").`val` must be("")
-        document.select("input[name=country]").`val` must be("")
+        document.select("input[name=postcode]").`val`          must be("")
+        document.select("input[name=country]").`val`           must be("")
       }
 
       "display the home address with UK fields populated" in new Fixture {
 
-        val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+        val ukAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
         val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-        val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-        val responsiblePeople = ResponsiblePerson(personName = personName,addressHistory = Some(history))
+        val history           = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+        val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
-        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = currentAddressController.get(RecordId)(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
+        document.title                                    must be(pageTitle)
         document.select("input[name=addressLine1]").`val` must be("Line 1")
         document.select("input[name=addressLine2]").`val` must be("Line 2")
         document.select("input[name=addressLine3]").`val` must be("Line 3")
         document.select("input[name=addressLine4]").`val` must be("")
-        document.select("input[name=postcode]").`val` must be("AA1 1AA")
+        document.select("input[name=postcode]").`val`     must be("AA1 1AA")
       }
     }
 
@@ -177,13 +180,13 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
         "all the mandatory UK parameters are supplied" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.CurrentAddressUKController.post(1).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "Line 1",
-            "postCode" -> "AA1 1AA"
-          )
-          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "Line 1",
+              "postCode"     -> "AA1 1AA"
+            )
+          val ukAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
           when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -200,7 +203,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(RecordId).url))
 
           val captor = ArgumentCaptor.forClass(classOf[DataEvent])
@@ -217,14 +220,14 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
       "redirect to CurrentAddressDateOfChangeController" when {
         "address changed and in approved state" in new Fixture {
           val requestWithParams = FakeRequest(POST, routes.CurrentAddressUKController.post(1).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "New line 1",
-            "addressLine2" -> "New line 2",
-            "postCode" -> "TE1 1ET"
-          )
-          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "New line 1",
+              "addressLine2" -> "New line 2",
+              "postCode"     -> "TE1 1ET"
+            )
+          val ukAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
 
           when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -236,12 +239,18 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
 
           when {
             currentAddressController.dataCacheConnector.fetch[ViewResponse](any(), eqTo(ViewResponse.key))(any())
-          } thenReturn Future.successful(Some(viewResponse.copy(responsiblePeopleSection = Some(Seq(responsiblePeople)))))
+          } thenReturn Future.successful(
+            Some(viewResponse.copy(responsiblePeopleSection = Some(Seq(responsiblePeople))))
+          )
 
           val result = currentAddressController.post(RecordId, true)(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.get(RecordId,true).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(
+              controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.get(RecordId, true).url
+            )
+          )
 
           val captor = ArgumentCaptor.forClass(classOf[DataEvent])
           verify(auditConnector).sendEvent(captor.capture())(any(), any())
@@ -261,14 +270,14 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
       "redirect to CurrentAddressDateOfChangeController" when {
         "address changed and in ready for renewal state" in new Fixture {
           val requestWithParams = FakeRequest(POST, routes.CurrentAddressUKController.post(1).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
-            "postCode" -> "AA1 1AA"
-          )
-          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "Line 1",
+              "addressLine2" -> "Line 2",
+              "postCode"     -> "AA1 1AA"
+            )
+          val ukAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
 
           when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -284,8 +293,12 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
 
           val result = currentAddressController.post(RecordId, true)(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.get(RecordId,true).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(
+              controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.get(RecordId, true).url
+            )
+          )
 
         }
       }
@@ -293,14 +306,11 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
       "redirect to CurrentAddressDateOfChangeController" when {
         "address changed and in eligible state for date of change and not in edit mode" in new Fixture {
           val requestWithParams = FakeRequest(POST, routes.CurrentAddressUKController.post(1).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
-            "postCode" -> "AA1 1AA")
+            .withFormUrlEncodedBody("addressLine1" -> "Line 1", "addressLine2" -> "Line 2", "postCode" -> "AA1 1AA")
 
-          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+          val ukAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
 
           when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -312,26 +322,27 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
 
           when {
             currentAddressController.dataCacheConnector.fetch[ViewResponse](any(), eqTo(ViewResponse.key))(any())
-          } thenReturn Future.successful(Some(viewResponse.copy(responsiblePeopleSection = Some(Seq(responsiblePeople)))))
+          } thenReturn Future.successful(
+            Some(viewResponse.copy(responsiblePeopleSection = Some(Seq(responsiblePeople))))
+          )
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.get(RecordId).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.get(RecordId).url)
+          )
         }
       }
 
       "redirect to CurrentAddressDateOfChangeController" when {
         "changed address from non-uk to uk and in eligible state for date of change and not in edit mode" in new Fixture {
           val requestWithParams = FakeRequest(POST, routes.CurrentAddressUKController.post(1).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
-            "postCode" -> "AA1 1AA")
+            .withFormUrlEncodedBody("addressLine1" -> "Line 1", "addressLine2" -> "Line 2", "postCode" -> "AA1 1AA")
 
-          val ukAddress = PersonAddressNonUK("", None, None, None, Country("", ""))
+          val ukAddress         = PersonAddressNonUK("", None, None, None, Country("", ""))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
 
           when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -343,26 +354,27 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
 
           when {
             currentAddressController.dataCacheConnector.fetch[ViewResponse](any(), eqTo(ViewResponse.key))(any())
-          } thenReturn Future.successful(Some(viewResponse.copy(responsiblePeopleSection = Some(Seq(responsiblePeople)))))
+          } thenReturn Future.successful(
+            Some(viewResponse.copy(responsiblePeopleSection = Some(Seq(responsiblePeople))))
+          )
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.get(RecordId).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.get(RecordId).url)
+          )
         }
       }
 
       "redirect to TimeAtCurrentAddressController" when {
         "not in edit mode and no line id defined" in new Fixture {
           val requestWithParams = FakeRequest(POST, routes.CurrentAddressUKController.post(1).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
-            "postCode" -> "AA1 1AA")
+            .withFormUrlEncodedBody("addressLine1" -> "Line 1", "addressLine2" -> "Line 2", "postCode" -> "AA1 1AA")
 
-          val ukAddress = PersonAddressNonUK("", None, None, None, Country("", ""))
+          val ukAddress         = PersonAddressNonUK("", None, None, None, Country("", ""))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
           when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -378,8 +390,10 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(RecordId).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(RecordId).url)
+          )
         }
       }
 
@@ -387,14 +401,14 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
         "edit is true" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.CurrentAddressUKController.post(1).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
-            "postCode" -> "AA1 1AA"
-          )
-          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "Line 1",
+              "addressLine2" -> "Line 2",
+              "postCode"     -> "AA1 1AA"
+            )
+          val ukAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
           when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -410,8 +424,10 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
 
           val result = currentAddressController.post(RecordId, true)(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url)
+          )
 
         }
       }
@@ -424,11 +440,11 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             .withFormUrlEncodedBody(
               "addressLine1" -> "Line &1",
               "addressLine2" -> "Line *2",
-              "postCode" -> "AA1 1AA"
+              "postCode"     -> "AA1 1AA"
             )
-          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+          val ukAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
           when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -440,9 +456,9 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
           status(result) must be(BAD_REQUEST)
-          val document: Document = Jsoup.parse(contentAsString(result))
+          val document: Document          = Jsoup.parse(contentAsString(result))
           document.title mustBe s"Error: $pageTitle"
-          val errorCount = 2
+          val errorCount                  = 2
           val elementsWithError: Elements = document.getElementsByClass("govuk-error-message")
           elementsWithError.size() must be(errorCount)
           val elements = elementsWithError.asScala.map(_.text())
@@ -455,7 +471,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
           val requestWithMissingParams = FakeRequest(POST, routes.CurrentAddressUKController.post(1).url)
             .withFormUrlEncodedBody(
               "addressLine1" -> "",
-              "postCode" -> ""
+              "postCode"     -> ""
             )
 
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
@@ -469,7 +485,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
 
           val document: Document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#addressLine1]").html() must include(messages("error.required.address.line1"))
-          document.select("a[href=#postcode]").html() must include(messages("error.required.postcode"))
+          document.select("a[href=#postcode]").html()     must include(messages("error.required.postcode"))
         }
       }
 
@@ -477,14 +493,14 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
         "given an out of bounds index" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.CurrentAddressUKController.post(1).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
-            "postCode" -> "AA1 1AA"
-          )
-          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "Line 1",
+              "addressLine2" -> "Line 2",
+              "postCode"     -> "AA1 1AA"
+            )
+          val ukAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
           when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -502,5 +518,3 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
     }
   }
 }
-
-

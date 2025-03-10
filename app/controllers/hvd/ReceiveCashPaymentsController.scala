@@ -29,45 +29,45 @@ import views.html.hvd.ReceiveCashView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class ReceiveCashPaymentsController @Inject()(val authAction: AuthAction,
-                                              val ds: CommonPlayDependencies,
-                                              implicit val cacheConnector: DataCacheConnector,
-                                              implicit val serviceFlow: ServiceFlow,
-                                              implicit val statusService: StatusService,
-                                              val cc: MessagesControllerComponents,
-                                              formProvider: ReceiveCashPaymentsFormProvider,
-                                              view: ReceiveCashView) extends AmlsBaseController(ds, cc) {
+class ReceiveCashPaymentsController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val cacheConnector: DataCacheConnector,
+  implicit val serviceFlow: ServiceFlow,
+  implicit val statusService: StatusService,
+  val cc: MessagesControllerComponents,
+  formProvider: ReceiveCashPaymentsFormProvider,
+  view: ReceiveCashView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      cacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
-        response =>
-          val form = (for {
-            hvd <- response
-            receivePayments <- hvd.receiveCashPayments
-          } yield formProvider().fill(receivePayments)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    cacheConnector.fetch[Hvd](request.credId, Hvd.key) map { response =>
+      val form = (for {
+        hvd             <- response
+        receivePayments <- hvd.receiveCashPayments
+      } yield formProvider().fill(receivePayments)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
-        data => {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             hvd <- cacheConnector.fetch[Hvd](request.credId, Hvd.key)
-            _ <- cacheConnector.save[Hvd](request.credId, Hvd.key, {
-              (hvd.flatMap(h => h.receiveCashPayments).contains(true), data) match {
-                case (true, false) => hvd.receiveCashPayments(data).copy(cashPaymentMethods = None)
-                case _ => hvd.receiveCashPayments(data)
-              }
-            })
+            _   <- cacheConnector.save[Hvd](
+                     request.credId,
+                     Hvd.key,
+                     (hvd.flatMap(h => h.receiveCashPayments).contains(true), data) match {
+                       case (true, false) => hvd.receiveCashPayments(data).copy(cashPaymentMethods = None)
+                       case _             => hvd.receiveCashPayments(data)
+                     }
+                   )
           } yield redirectTo(data, hvd, edit)
-        }
       )
-    }
   }
 
   def redirectTo(data: Boolean, hvd: Hvd, edit: Boolean): Result =

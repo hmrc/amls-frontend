@@ -22,16 +22,17 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class ComplexCorpStructureCreationFormProvider @Inject()() extends BooleanFormProvider {
+class ComplexCorpStructureCreationFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[ComplexCorpStructureCreation] = createForm[ComplexCorpStructureCreation](
-    "complexCorpStructureCreation", "error.required.tcsp.complex.corporate.structures"
+    "complexCorpStructureCreation",
+    "error.required.tcsp.complex.corporate.structures"
   )(apply, unapply)
 
   private def apply(boolean: Boolean): ComplexCorpStructureCreation =
-    if(boolean) ComplexCorpStructureCreationYes else ComplexCorpStructureCreationNo
-  private def unapply(obj: ComplexCorpStructureCreation) = obj match {
+    if (boolean) ComplexCorpStructureCreationYes else ComplexCorpStructureCreationNo
+  private def unapply(obj: ComplexCorpStructureCreation)            = obj match {
     case ComplexCorpStructureCreationYes => true
-    case ComplexCorpStructureCreationNo => false
+    case ComplexCorpStructureCreationNo  => false
   }
 }

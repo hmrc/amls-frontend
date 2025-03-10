@@ -28,7 +28,7 @@ import views.html.msb.FxTransactionInNext12MonthsView
 class FxTransactionInNext12MonthsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val monthsView = inject[FxTransactionInNext12MonthsView]
-  lazy val fp = inject[FxTransactionsInNext12MonthsFormProvider]
+  lazy val fp         = inject[FxTransactionsInNext12MonthsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,23 +42,26 @@ class FxTransactionInNext12MonthsViewSpec extends AmlsViewSpec with Matchers {
 
       def view = monthsView(fp().fill(FXTransactionsInNext12Months("1")), true)
 
-      doc.title must be(messages("msb.fx.transactions.expected.in.12.months.title") +
-        " - " + messages("summary.msb") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("msb.fx.transactions.expected.in.12.months.title") +
+          " - " + messages("summary.msb") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = monthsView(fp().fill(FXTransactionsInNext12Months("1")), true)
 
-      heading.html must include(messages("msb.fx.transactions.expected.in.12.months.title"))
+      heading.html    must include(messages("msb.fx.transactions.expected.in.12.months.title"))
       subHeading.html must include(messages("summary.msb"))
     }
 
     behave like pageWithErrors(
       monthsView(fp().withError("fxTransaction", "error.required.msb.fx.transactions.in.12months"), false),
-      "fxTransaction", "error.required.msb.fx.transactions.in.12months"
+      "fxTransaction",
+      "error.required.msb.fx.transactions.in.12months"
     )
 
     behave like pageWithBackLink(monthsView(fp(), false))

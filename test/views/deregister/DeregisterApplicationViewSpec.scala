@@ -26,7 +26,7 @@ import views.html.deregister.DeregisterApplicationView
 class DeregisterApplicationViewSpec extends AmlsViewSpec with Matchers with AmlsReferenceNumberGenerator {
 
   trait ViewFixture extends Fixture {
-    lazy val deregisterView = inject[DeregisterApplicationView]
+    lazy val deregisterView                                        = inject[DeregisterApplicationView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val businessName = "Test Business"
@@ -40,7 +40,7 @@ class DeregisterApplicationViewSpec extends AmlsViewSpec with Matchers with Amls
       val title = s"${messages("status.deregister.empty.title")} - ${messages("title.amls")} - ${messages("title.gov")}"
 
       doc.title mustBe title
-      heading.html must be(messages("status.deregister.title", businessName))
+      heading.html    must be(messages("status.deregister.title", businessName))
       subHeading.html must include(messages("summary.status"))
     }
 

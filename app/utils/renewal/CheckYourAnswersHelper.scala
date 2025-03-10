@@ -27,34 +27,41 @@ import utils.CheckYourAnswersHelperFunctions
 
 import javax.inject.Inject
 
-class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions {
+class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunctions {
 
   def getSummaryList(model: Renewal, businessMatching: BusinessMatching)(implicit messages: Messages): SummaryList = {
 
     val containsASPOrHVD = businessMatching.activities.exists { activities =>
-      activities.businessActivities.contains(AccountancyServices) || activities.businessActivities.contains(HighValueDealing)
+      activities.businessActivities.contains(AccountancyServices) || activities.businessActivities.contains(
+        HighValueDealing
+      )
     }
 
     SummaryList(
       involvedInOtherActivitiesRows(model).getOrElse(Seq.empty) ++
-      Seq(
-        businessTurnoverRow(model),
-        turnoverRow(model, businessMatching.alphabeticalBusinessActivitiesLowerCase()),
-        ampTurnoverRow(model)
-      ).flatten ++
-      msbServicesRows(model).getOrElse(Seq.empty) ++
-        businessMatching.msbServices.fold(Seq.empty[SummaryListRow]){ services =>
-        (if (services.msbServices.contains(TransmittingMoney)) getTransmittingMoneyRows(model) else None).getOrElse(Seq.empty) ++
-        (if (services.msbServices.contains(CurrencyExchange)) getCurrencyExchangeRows(model) else None).getOrElse(Seq.empty) ++
-        (if (services.msbServices.contains(ForeignExchange)) getForeignExchangeRow(model) else None).getOrElse(Seq.empty)
-      } ++
-      getCustomersOutsideUKRows(model, containsASPOrHVD).getOrElse(Seq.empty) ++
-      Seq(getPercentageOfCashRow(model)).flatten ++
-      getCashPaymentRows(model).getOrElse(Seq.empty)
+        Seq(
+          businessTurnoverRow(model),
+          turnoverRow(model, businessMatching.alphabeticalBusinessActivitiesLowerCase()),
+          ampTurnoverRow(model)
+        ).flatten ++
+        msbServicesRows(model).getOrElse(Seq.empty) ++
+        businessMatching.msbServices.fold(Seq.empty[SummaryListRow]) { services =>
+          (if (services.msbServices.contains(TransmittingMoney)) getTransmittingMoneyRows(model) else None)
+            .getOrElse(Seq.empty) ++
+            (if (services.msbServices.contains(CurrencyExchange)) getCurrencyExchangeRows(model) else None)
+              .getOrElse(Seq.empty) ++
+            (if (services.msbServices.contains(ForeignExchange)) getForeignExchangeRow(model) else None)
+              .getOrElse(Seq.empty)
+        } ++
+        getCustomersOutsideUKRows(model, containsASPOrHVD).getOrElse(Seq.empty) ++
+        Seq(getPercentageOfCashRow(model)).flatten ++
+        getCashPaymentRows(model).getOrElse(Seq.empty)
     )
   }
 
-  private def involvedInOtherActivitiesRows(model: Renewal)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def involvedInOtherActivitiesRows(
+    model: Renewal
+  )(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
 
     def booleanRow(bool: Boolean): SummaryListRow =
       row(
@@ -81,13 +88,12 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             )
           )
         )
-      case InvolvedInOtherNo =>
+      case InvolvedInOtherNo           =>
         Seq(booleanRow(false))
     }
   }
 
-  private def businessTurnoverRow(model: Renewal)(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def businessTurnoverRow(model: Renewal)(implicit messages: Messages): Option[SummaryListRow] =
     model.businessTurnover.map { businessTurnover =>
       row(
         "renewal.business-turnover.title",
@@ -99,9 +105,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def turnoverRow(model: Renewal, activities: Option[List[String]])(implicit messages: Messages): Option[SummaryListRow] = {
+  private def turnoverRow(model: Renewal, activities: Option[List[String]])(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
 
     def turnoverRow(title: String, answer: String): SummaryListRow =
       row(
@@ -116,16 +123,17 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
 
     model.turnover flatMap { turnover =>
       activities map {
-        case activity :: Nil => turnoverRow(
-          messages("renewal.turnover.title", activity), turnover.value
-        )
-        case _ => turnoverRow("renewal.turnover.title", turnover.value)
+        case activity :: Nil =>
+          turnoverRow(
+            messages("renewal.turnover.title", activity),
+            turnover.value
+          )
+        case _               => turnoverRow("renewal.turnover.title", turnover.value)
       }
     }
   }
 
-  private def ampTurnoverRow(model: Renewal)(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def ampTurnoverRow(model: Renewal)(implicit messages: Messages): Option[SummaryListRow] =
     model.ampTurnover.map { ampTurnover =>
       row(
         "renewal.amp.turnover.title",
@@ -137,7 +145,6 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
   private def msbServicesRows(model: Renewal)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
 
@@ -166,7 +173,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
       }
     ).flatten
 
-    if(seq.nonEmpty) Some(seq) else None
+    if (seq.nonEmpty) Some(seq) else None
   }
 
   private def getTransmittingMoneyRows(model: Renewal)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
@@ -214,12 +221,12 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
       }
     ).flatten
 
-    if(seq.nonEmpty) Some(seq) else None
+    if (seq.nonEmpty) Some(seq) else None
   }
 
   private def getCurrencyExchangeRows(model: Renewal)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
 
-    def getMoneySourcesRow(value: Value) = {
+    def getMoneySourcesRow(value: Value) =
       SummaryListRow(
         Key(Text(messages("renewal.msb.money_sources.header"))),
         value,
@@ -229,7 +236,6 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           "msbmoneysources-edit"
         )
       )
-    }
 
     model.whichCurrencies map { wc =>
       Seq(
@@ -264,7 +270,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             "renewal.msb.foreign_currencies.header",
             ufc match {
               case UsesForeignCurrenciesYes => booleanToLabel(true)
-              case UsesForeignCurrenciesNo => booleanToLabel(false)
+              case UsesForeignCurrenciesNo  => booleanToLabel(false)
             },
             editAction(
               controllers.renewal.routes.UsesForeignCurrenciesController.get(true).url,
@@ -274,40 +280,42 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           )
         }
       ).flatten ++
-        wc.moneySources.map { ms =>
-          Seq(ms match {
-            case ms if ms.size == 1 => Some(getMoneySourcesRow(Value(Text(ms.toMessages.mkString))))
-            case ms if ms.size > 1 => Some(getMoneySourcesRow(toBulletList(ms.toMessages)))
-            case _ => None
-          }).flatten ++ Seq(
-            ms.bankMoneySource map { source =>
-              row(
-                "msb.which_currencies.source.which_banks",
-                source.bankNames,
-                editAction(
-                  controllers.renewal.routes.MoneySourcesController.get(true).url,
-                  "renewal.checkYourAnswers.change.whoSuppliedFCurrency",
-                  "msbbankmoneysources-edit"
+        wc.moneySources
+          .map { ms =>
+            Seq(ms match {
+              case ms if ms.size == 1 => Some(getMoneySourcesRow(Value(Text(ms.toMessages.mkString))))
+              case ms if ms.size > 1  => Some(getMoneySourcesRow(toBulletList(ms.toMessages)))
+              case _                  => None
+            }).flatten ++ Seq(
+              ms.bankMoneySource map { source =>
+                row(
+                  "msb.which_currencies.source.which_banks",
+                  source.bankNames,
+                  editAction(
+                    controllers.renewal.routes.MoneySourcesController.get(true).url,
+                    "renewal.checkYourAnswers.change.whoSuppliedFCurrency",
+                    "msbbankmoneysources-edit"
+                  )
                 )
-              )
-            },
-            ms.wholesalerMoneySource map { source =>
-              row(
-                "msb.which_currencies.source.which_wholesalers",
-                source.wholesalerNames,
-                editAction(
-                  controllers.renewal.routes.MoneySourcesController.get(true).url,
-                  "renewal.checkYourAnswers.change.whoSuppliedFCurrency",
-                  "msbwholesalermoneysources-edit"
+              },
+              ms.wholesalerMoneySource map { source =>
+                row(
+                  "msb.which_currencies.source.which_wholesalers",
+                  source.wholesalerNames,
+                  editAction(
+                    controllers.renewal.routes.MoneySourcesController.get(true).url,
+                    "renewal.checkYourAnswers.change.whoSuppliedFCurrency",
+                    "msbwholesalermoneysources-edit"
+                  )
                 )
-              )
-            }
-          ).flatten
-        }.getOrElse(Seq.empty[SummaryListRow])
+              }
+            ).flatten
+          }
+          .getOrElse(Seq.empty[SummaryListRow])
     }
   }
 
-  private def getForeignExchangeRow(model: Renewal)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getForeignExchangeRow(model: Renewal)(implicit messages: Messages): Option[Seq[SummaryListRow]] =
     model.fxTransactionsInLast12Months.map { transactions =>
       Seq(
         row(
@@ -321,9 +329,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def getCustomersOutsideUKRows(model: Renewal, showOutsideUKRow: Boolean)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getCustomersOutsideUKRows(model: Renewal, showOutsideUKRow: Boolean)(implicit
+    messages: Messages
+  ): Option[Seq[SummaryListRow]] = {
     val seq = Seq(
       model.customersOutsideIsUK.map { boa =>
         row(
@@ -337,7 +346,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       },
       model.customersOutsideUK.flatMap { boa =>
-        def makeRow(value: Value) = {
+        def makeRow(value: Value) =
           SummaryListRow(
             Key(Text(messages("renewal.customer.outside.uk.countries.title"))),
             value,
@@ -347,19 +356,19 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               "customersoutsideuk-edit"
             )
           )
-        }
         boa.countries match {
-          case Some(countries) if showOutsideUKRow && countries.length == 1 => Some(makeRow(Value(Text(countries.head.name))))
-          case Some(countries) if showOutsideUKRow => Some(makeRow(toBulletList(countries.map(_.name))))
-          case _ => None
+          case Some(countries) if showOutsideUKRow && countries.length == 1 =>
+            Some(makeRow(Value(Text(countries.head.name))))
+          case Some(countries) if showOutsideUKRow                          => Some(makeRow(toBulletList(countries.map(_.name))))
+          case _                                                            => None
         }
       }
     ).flatten
 
-    if(seq.nonEmpty) Some(seq) else None
+    if (seq.nonEmpty) Some(seq) else None
   }
 
-  private def getPercentageOfCashRow(model: Renewal)(implicit messages: Messages): Option[SummaryListRow] = {
+  private def getPercentageOfCashRow(model: Renewal)(implicit messages: Messages): Option[SummaryListRow] =
     model.percentageOfCashPaymentOver15000.map { percentage =>
       row(
         "renewal.hvd.percentage.title",
@@ -371,21 +380,18 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  def getCashPaymentRows(model: Renewal)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  def getCashPaymentRows(model: Renewal)(implicit messages: Messages): Option[Seq[SummaryListRow]] =
     model.receiveCashPayments.map { rcp =>
       Seq(
         Some(
           row(
             "renewal.receiving.title",
             rcp.cashPaymentsCustomerNotMet match {
-              case CashPaymentsCustomerNotMet(false) => {
+              case CashPaymentsCustomerNotMet(false) =>
                 booleanToLabel(false)
-              }
-              case CashPaymentsCustomerNotMet(true) => {
+              case CashPaymentsCustomerNotMet(true)  =>
                 booleanToLabel(true)
-              }
             },
             editAction(
               controllers.renewal.routes.CashPaymentsCustomersNotMetController.get(true).url,
@@ -399,7 +405,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             Key(Text(messages("renewal.cash.payments.received.title"))),
             hcpr.paymentMethods.getSummaryMessages match {
               case message :: Nil => Value(Text(message))
-              case messageList => toBulletList(messageList)
+              case messageList    => toBulletList(messageList)
             },
             actions = editAction(
               controllers.renewal.routes.HowCashPaymentsReceivedController.get(true).url,
@@ -410,5 +416,4 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         }
       ).flatten
     }
-  }
 }

@@ -32,7 +32,7 @@ import scala.concurrent.Future
 class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach with IntegrationPatience {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[Cache]
+  val mockCacheMap       = mock[Cache]
 
   val service = new ExpectedAMLSTurnoverService(mockCacheConnector)
 
@@ -156,16 +156,24 @@ class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach w
         when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
           .thenReturn(Future.successful(Some(ba)))
 
-        when(mockCacheConnector.save[BusinessActivities](
-          eqTo(credId), eqTo(BusinessActivities.key), eqTo(ba.expectedAMLSTurnover(First)))(any()))
+        when(
+          mockCacheConnector.save[BusinessActivities](
+            eqTo(credId),
+            eqTo(BusinessActivities.key),
+            eqTo(ba.expectedAMLSTurnover(First))
+          )(any())
+        )
           .thenReturn(Future.successful(mockCacheMap))
 
         service.updateBusinessActivities(credId, First).futureValue mustBe Some(mockCacheMap)
 
         verify(mockCacheConnector).save[BusinessActivities](
-          eqTo(credId), eqTo(BusinessActivities.key), eqTo(ba.expectedAMLSTurnover(First)))(any())
+          eqTo(credId),
+          eqTo(BusinessActivities.key),
+          eqTo(ba.expectedAMLSTurnover(First))
+        )(any())
       }
-      
+
       "not save model if business activities cannot be retrieved from cache" in {
 
         when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))

@@ -35,13 +35,13 @@ import scala.concurrent.Future
 
 class RecoverActivitiesServiceSpec extends AmlsSpec with MockitoSugar {
 
-  val mockAmlsConnector: AmlsConnector = mock[AmlsConnector]
-  val mockDataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap: Cache = mock[Cache]
-  val service = new RecoverActivitiesService(mockAmlsConnector, mockDataCacheConnector)
-  val emptyBusinessMatching: BusinessMatching = BusinessMatching()
-  val emptyBusinessActivities: BusinessActivities = BusinessActivities(Set())
-  val viewResponse: ViewResponse = ViewResponse(
+  val mockAmlsConnector: AmlsConnector                   = mock[AmlsConnector]
+  val mockDataCacheConnector: DataCacheConnector         = mock[DataCacheConnector]
+  val mockCacheMap: Cache                                = mock[Cache]
+  val service                                            = new RecoverActivitiesService(mockAmlsConnector, mockDataCacheConnector)
+  val emptyBusinessMatching: BusinessMatching            = BusinessMatching()
+  val emptyBusinessActivities: BusinessActivities        = BusinessActivities(Set())
+  val viewResponse: ViewResponse                         = ViewResponse(
     etmpFormBundleNumber = "FORMBUNDLENUMBER",
     businessMatchingSection = emptyBusinessMatching,
     eabSection = None,
@@ -49,7 +49,10 @@ class RecoverActivitiesServiceSpec extends AmlsSpec with MockitoSugar {
     businessDetailsSection = None,
     bankDetailsSection = Seq(None),
     aboutYouSection = AddPerson(
-      "FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))
+      "FirstName",
+      None,
+      "LastName",
+      RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))
     ),
     businessActivitiesSection = None,
     responsiblePeopleSection = None,
@@ -61,15 +64,22 @@ class RecoverActivitiesServiceSpec extends AmlsSpec with MockitoSugar {
     supervisionSection = None
   )
   val request: AuthorisedRequest[AnyContentAsEmpty.type] = AuthorisedRequest(
-    addToken(authRequest), Some("REF"), "CREDID", Individual, Enrolments(Set()), ("TYPE", "ID"), Some("GROUPID"), Some(User)
+    addToken(authRequest),
+    Some("REF"),
+    "CREDID",
+    Individual,
+    Enrolments(Set()),
+    ("TYPE", "ID"),
+    Some("GROUPID"),
+    Some(User)
   )
 
   ".recover" must {
 
     "return true if business types were successfully retrieved from DES and updated" in {
       val businessActivities = emptyBusinessActivities.copy(businessActivities = Set(ArtMarketParticipant))
-      val businessMatching = emptyBusinessMatching.copy(activities = Some(businessActivities))
-      val desResponse = viewResponse.copy(businessMatchingSection = businessMatching)
+      val businessMatching   = emptyBusinessMatching.copy(activities = Some(businessActivities))
+      val desResponse        = viewResponse.copy(businessMatchingSection = businessMatching)
 
       when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
         .thenReturn(Future.successful(Some(emptyBusinessMatching)))
@@ -84,7 +94,7 @@ class RecoverActivitiesServiceSpec extends AmlsSpec with MockitoSugar {
 
     "return false if DES returns an empty list of business types" in {
       val businessMatching = emptyBusinessMatching.copy(activities = Some(emptyBusinessActivities))
-      val desResponse = viewResponse.copy(businessMatchingSection = businessMatching)
+      val desResponse      = viewResponse.copy(businessMatchingSection = businessMatching)
 
       when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
         .thenReturn(Future.successful(Some(emptyBusinessMatching)))

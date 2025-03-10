@@ -24,17 +24,20 @@ import services.cache.Cache
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class EmployeeCountAMLSSupervisionService @Inject() (val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) {
+class EmployeeCountAMLSSupervisionService @Inject() (val dataCacheConnector: DataCacheConnector)(implicit
+  ec: ExecutionContext
+) {
 
-  def getEmployeeCountAMLSSupervision(credId: String): Future[Option[String]] = {
-    dataCacheConnector.fetch[BusinessActivities](credId, BusinessActivities.key)
-      .map(_.map(_.howManyEmployees)
-        .flatMap(_.flatMap(_.employeeCountAMLSSupervision)))
-  }
+  def getEmployeeCountAMLSSupervision(credId: String): Future[Option[String]] =
+    dataCacheConnector
+      .fetch[BusinessActivities](credId, BusinessActivities.key)
+      .map(
+        _.map(_.howManyEmployees)
+          .flatMap(_.flatMap(_.employeeCountAMLSSupervision))
+      )
 
   def updateHowManyEmployees(credId: String, data: EmployeeCountAMLSSupervision): Future[Option[Cache]] = {
     dataCacheConnector.fetch[BusinessActivities](credId, BusinessActivities.key) map { baOpt =>
-
       baOpt flatMap { ba =>
         ba.howManyEmployees map { employees =>
           dataCacheConnector.save[BusinessActivities](
@@ -45,5 +48,5 @@ class EmployeeCountAMLSSupervisionService @Inject() (val dataCacheConnector: Dat
         }
       }
     }
-  } flatMap(_.sequence)
+  } flatMap (_.sequence)
 }

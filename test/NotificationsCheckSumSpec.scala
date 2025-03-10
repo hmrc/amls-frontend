@@ -24,72 +24,91 @@ import scala.io.Source
 
 class NotificationsCheckSumSpec extends AmlsSpec with Matchers {
 
-    trait NotificationsCheckSumFixture extends AuthorisedFixture {
-        val versionNumbers: Seq[String] = Seq(
-            "v1m0", "v2m0", "v3m0", "v4m0","v5m0","v6m0"
+  trait NotificationsCheckSumFixture extends AuthorisedFixture {
+    val versionNumbers: Seq[String]         = Seq(
+      "v1m0",
+      "v2m0",
+      "v3m0",
+      "v4m0",
+      "v5m0",
+      "v6m0"
+    )
+    val checkSumRoute: String               = "./conf/notifications/"
+    def generateCheckSum(s: String): String =
+      String.format("%032x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(s.getBytes)))
+  }
+
+  trait ServicesRouteFixture extends NotificationsCheckSumFixture {
+    val route: String        = "./app/services/notifications/"
+    val suffix: String       = ".scala"
+    val files: Seq[String]   = Seq(
+      "MessageDetails"
+    )
+    val checkSumName: String = "services.txt"
+  }
+
+  trait ViewsRouteFixture extends NotificationsCheckSumFixture {
+    val route: String        = "./app/views/notifications/"
+    val suffix: String       = ".scala.html"
+    val files: Seq[String]   = Seq(
+      "message_details",
+      "minded_to_reject",
+      "minded_to_revoke",
+      "no_longer_minded_to_reject",
+      "no_longer_minded_to_revoke",
+      "rejection_reasons",
+      "revocation_reasons"
+    )
+    val checkSumName: String = "views.txt"
+  }
+
+  "Checksums must be equal - services" ignore new ServicesRouteFixture {
+    versionNumbers.foreach { versionNumber =>
+      val checkSumSource                 = Source.fromFile(s"$checkSumRoute$versionNumber/$checkSumName")
+      val checkSums: Map[String, String] = checkSumSource
+        .getLines()
+        .map { line =>
+          val kv = line.split("=")
+          s"$versionNumber/${kv(0)}" -> kv(1)
+        }
+        .toMap
+      checkSumSource.close()
+      files.foreach { fileName =>
+        val source           = Source.fromFile(s"$route$versionNumber/$fileName$suffix")
+        val lines: String    =
+          try source.mkString
+          finally source.close()
+        val checkSum: String = generateCheckSum(lines)
+        assert(
+          checkSum == checkSums(s"$versionNumber/$fileName"),
+          s"Replace checksum for $versionNumber/$fileName with $checkSum"
         )
-        val checkSumRoute: String = "./conf/notifications/"
-        def generateCheckSum(s: String): String =
-            String.format("%032x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(s.getBytes)))
+      }
     }
+  }
 
-    trait ServicesRouteFixture extends NotificationsCheckSumFixture {
-        val route: String = "./app/services/notifications/"
-        val suffix: String = ".scala"
-        val files: Seq[String] = Seq(
-            "MessageDetails"
+  "Checksums must be equal - views" ignore new ViewsRouteFixture {
+    versionNumbers.foreach { versionNumber =>
+      val checkSumSource                 = Source.fromFile(s"$checkSumRoute$versionNumber/$checkSumName")
+      val checkSums: Map[String, String] = checkSumSource
+        .getLines()
+        .map { line =>
+          val kv = line.split("=")
+          s"$versionNumber/${kv(0)}" -> kv(1)
+        }
+        .toMap
+      checkSumSource.close()
+      files.foreach { fileName =>
+        val source           = Source.fromFile(s"$route$versionNumber/$fileName$suffix")
+        val lines: String    =
+          try source.mkString
+          finally source.close()
+        val checkSum: String = generateCheckSum(lines)
+        assert(
+          checkSum == checkSums(s"$versionNumber/$fileName"),
+          s"Replace checksum for $versionNumber/$fileName with $checkSum"
         )
-        val checkSumName: String = "services.txt"
+      }
     }
-
-    trait ViewsRouteFixture extends NotificationsCheckSumFixture {
-        val route: String = "./app/views/notifications/"
-        val suffix: String = ".scala.html"
-        val files: Seq[String] = Seq(
-            "message_details",
-            "minded_to_reject",
-            "minded_to_revoke",
-            "no_longer_minded_to_reject",
-            "no_longer_minded_to_revoke",
-            "rejection_reasons",
-            "revocation_reasons"
-        )
-        val checkSumName: String = "views.txt"
-    }
-
-    "Checksums must be equal - services" ignore new ServicesRouteFixture {
-        versionNumbers.foreach(versionNumber => {
-            val checkSumSource = Source.fromFile(s"${ checkSumRoute }${ versionNumber }/${ checkSumName }")
-            val checkSums: Map[String, String] = checkSumSource.getLines().map(line => {
-                val kv = line.split("=")
-                s"${ versionNumber }/${ kv(0) }" -> kv(1)
-            }).toMap
-            checkSumSource.close()
-            files.foreach(fileName => {
-                val source = Source.fromFile(s"${ route }${ versionNumber }/${ fileName }${ suffix }")
-                val lines: String = try source.mkString finally source.close()
-                val checkSum: String = generateCheckSum(lines)
-                assert(checkSum == checkSums(s"${ versionNumber }/${ fileName }"),
-                    s"Replace checksum for ${ versionNumber }/${ fileName } with ${ checkSum }")
-            })
-        })
-    }
-
-    "Checksums must be equal - views" ignore new ViewsRouteFixture {
-        versionNumbers.foreach(versionNumber => {
-            val checkSumSource = Source.fromFile(s"${ checkSumRoute }${ versionNumber }/${ checkSumName }")
-            val checkSums: Map[String, String] = checkSumSource.getLines().map(line => {
-                val kv = line.split("=")
-                s"${ versionNumber }/${ kv(0) }" -> kv(1)
-            }).toMap
-            checkSumSource.close()
-            files.foreach(fileName => {
-                val source = Source.fromFile(s"${ route }${ versionNumber }/${ fileName }${ suffix }")
-                val lines: String = try source.mkString finally source.close()
-                val checkSum: String = generateCheckSum(lines)
-                assert(checkSum == checkSums(s"${ versionNumber }/${ fileName }"),
-                    s"Replace checksum for ${ versionNumber }/${ fileName } with ${ checkSum }")
-            })
-        })
-    }
+  }
 }

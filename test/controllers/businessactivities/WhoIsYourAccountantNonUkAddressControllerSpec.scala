@@ -34,17 +34,18 @@ import views.html.businessactivities.AccountantNonUKAddressView
 
 import scala.concurrent.Future
 
-class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
-  with MockitoSugar
-  with ScalaFutures
-  with Injecting {
+class WhoIsYourAccountantNonUkAddressControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with ScalaFutures
+    with Injecting {
 
-  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks{
+  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks {
     self =>
     val request = addToken(authRequest)
 
-    lazy val view = inject[AccountantNonUKAddressView]
-    val controller = new WhoIsYourAccountantNonUkAddressController (
+    lazy val view  = inject[AccountantNonUKAddressView]
+    val controller = new WhoIsYourAccountantNonUkAddressController(
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       autoCompleteService = mockAutoComplete,
@@ -82,13 +83,29 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
       "show the who is your accountant page when there is existing data" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
-          .thenReturn(Future.successful(Some(BusinessActivities(
-            whoIsYourAccountant = Some(WhoIsYourAccountant(
-              Some(WhoIsYourAccountantName("testname", Some("testtradingName"))),
-              Some(WhoIsYourAccountantIsUk(false)),
-              Some(NonUkAccountantsAddress("line1",Some("line2"),Some("line3"),Some("line4"), Country("Albania", "AL")))
-            ))
-          ))))
+          .thenReturn(
+            Future.successful(
+              Some(
+                BusinessActivities(
+                  whoIsYourAccountant = Some(
+                    WhoIsYourAccountant(
+                      Some(WhoIsYourAccountantName("testname", Some("testtradingName"))),
+                      Some(WhoIsYourAccountantIsUk(false)),
+                      Some(
+                        NonUkAccountantsAddress(
+                          "line1",
+                          Some("line2"),
+                          Some("line3"),
+                          Some("line4"),
+                          Country("Albania", "AL")
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -109,13 +126,21 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
         "respond with BAD_REQUEST" in new Fixture {
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
-            .thenReturn(Future.successful(Some(BusinessActivities(
-              whoIsYourAccountant = Some(WhoIsYourAccountant(
-                Some(WhoIsYourAccountantName("testname", Some("testtradingName"))),
-                None,
-                None
-              ))
-            ))))
+            .thenReturn(
+              Future.successful(
+                Some(
+                  BusinessActivities(
+                    whoIsYourAccountant = Some(
+                      WhoIsYourAccountant(
+                        Some(WhoIsYourAccountantName("testname", Some("testtradingName"))),
+                        None,
+                        None
+                      )
+                    )
+                  )
+                )
+              )
+            )
 
           val result = controller.post()(request)
           status(result) must be(BAD_REQUEST)
@@ -126,13 +151,13 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
         "respond with SEE_OTHER and redirect to the SummaryController" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.WhoIsYourAccountantNonUkAddressController.post(true).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "line1",
-            "addressLine2" -> "line2",
-            "addressLine3" -> "line3",
-            "addressLine4" -> "line4",
-            "country" -> "AL"
-          )
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "line1",
+              "addressLine2" -> "line2",
+              "addressLine3" -> "line3",
+              "addressLine4" -> "line4",
+              "country"      -> "AL"
+            )
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
@@ -151,13 +176,13 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
         "respond with SEE_OTHER and redirect to the TaxMattersController" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.WhoIsYourAccountantNonUkAddressController.post(false).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "line1",
-            "addressLine2" -> "line2",
-            "addressLine3" -> "line3",
-            "addressLine4" -> "line4",
-            "country" -> "AL"
-          )
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "line1",
+              "addressLine2" -> "line2",
+              "addressLine3" -> "line3",
+              "addressLine4" -> "line4",
+              "country"      -> "AL"
+            )
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))

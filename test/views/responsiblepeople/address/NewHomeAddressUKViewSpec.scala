@@ -26,7 +26,7 @@ import views.html.responsiblepeople.address.NewHomeAddressUKView
 class NewHomeAddressUKViewSpec extends AmlsViewSpec {
 
   lazy val addressUKView = inject[NewHomeAddressUKView]
-  lazy val fp = inject[NewHomeAddressUKFormProvider]
+  lazy val fp            = inject[NewHomeAddressUKFormProvider]
 
   val name = "firstName lastName"
 
@@ -41,24 +41,28 @@ class NewHomeAddressUKViewSpec extends AmlsViewSpec {
 
       def view = addressUKView(fp(), 1, name)
 
-      doc.title must be(messages("responsiblepeople.new.home.title") +
-        " - " + messages("summary.responsiblepeople") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
-      heading.html must be(messages("responsiblepeople.new.home.heading", name))
+      doc.title       must be(
+        messages("responsiblepeople.new.home.title") +
+          " - " + messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
+      heading.html    must be(messages("responsiblepeople.new.home.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "addressLine1") must not be empty
       doc.getElementsByAttributeValue("name", "addressLine2") must not be empty
       doc.getElementsByAttributeValue("name", "addressLine3") must not be empty
       doc.getElementsByAttributeValue("name", "addressLine4") must not be empty
-      doc.getElementsByAttributeValue("name", "postCode") must not be empty
+      doc.getElementsByAttributeValue("name", "postCode")     must not be empty
     }
 
     Seq(1, 2, 3, 4) foreach { line =>
       behave like pageWithErrors(
         addressUKView(
-          fp().withError(s"addressLine$line", s"error.text.validation.address.line$line"), 1, name
+          fp().withError(s"addressLine$line", s"error.text.validation.address.line$line"),
+          1,
+          name
         ),
         s"addressLine$line",
         s"error.text.validation.address.line$line"
@@ -67,7 +71,9 @@ class NewHomeAddressUKViewSpec extends AmlsViewSpec {
 
     behave like pageWithErrors(
       addressUKView(
-        fp().withError("postCode", "error.required.postcode"), 1, name
+        fp().withError("postCode", "error.required.postcode"),
+        1,
+        name
       ),
       "postCode",
       "error.required.postcode"

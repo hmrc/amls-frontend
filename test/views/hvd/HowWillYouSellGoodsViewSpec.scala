@@ -26,10 +26,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.hvd.HowWillYouSellGoodsView
 
-class HowWillYouSellGoodsViewSpec extends AmlsViewSpec with Matchers  {
+class HowWillYouSellGoodsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val goodsView = inject[HowWillYouSellGoodsView]
-  lazy val fp = inject[SalesChannelFormProvider]
+  lazy val fp        = inject[SalesChannelFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -50,7 +50,7 @@ class HowWillYouSellGoodsViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = goodsView(fp().fill(HowWillYouSellGoods(Set(Wholesale))), true)
 
-      heading.html must be(messages(messages("hvd.how-will-you-sell-goods.title")))
+      heading.html    must be(messages(messages("hvd.how-will-you-sell-goods.title")))
       subHeading.html must include(messages(messages("summary.hvd")))
 
     }

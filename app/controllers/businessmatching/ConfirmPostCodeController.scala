@@ -30,41 +30,43 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class ConfirmPostCodeController @Inject()(authAction: AuthAction,
-                                          val ds: CommonPlayDependencies,
-                                          val dataCacheConnector: DataCacheConnector,
-                                          val cc: MessagesControllerComponents,
-                                          formProvider: ConfirmPostcodeFormProvider,
-                                          view: ConfirmPostcodeView) extends AmlsBaseController(ds, cc) {
+class ConfirmPostCodeController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val dataCacheConnector: DataCacheConnector,
+  val cc: MessagesControllerComponents,
+  formProvider: ConfirmPostcodeFormProvider,
+  view: ConfirmPostcodeView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(): Action[AnyContent] = authAction {
-    implicit request =>
-      Ok(view(formProvider()))
+  def get(): Action[AnyContent] = authAction { implicit request =>
+    Ok(view(formProvider()))
   }
 
-  private def updateReviewDetails(reviewDetails: Option[ReviewDetails], postCodeModel: ConfirmPostcode): Option[ReviewDetails] = {
+  private def updateReviewDetails(
+    reviewDetails: Option[ReviewDetails],
+    postCodeModel: ConfirmPostcode
+  ): Option[ReviewDetails] =
     reviewDetails.fold[Option[ReviewDetails]](None) { dtls =>
-      val updatedAddr = dtls.businessAddress.copy(postcode = Some(postCodeModel.postCode), country = Country("United Kingdom", "GB"))
+      val updatedAddr =
+        dtls.businessAddress.copy(postcode = Some(postCodeModel.postCode), country = Country("United Kingdom", "GB"))
       Some(dtls.copy(businessAddress = updatedAddr))
     }
-  }
 
-  def post(): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors))),
+  def post(): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         data =>
           for {
             bm <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-            _ <- dataCacheConnector.save[BusinessMatching](request.credId, BusinessMatching.key,
-              bm.copy(reviewDetails = updateReviewDetails(bm.reviewDetails, data)))
-          } yield {
-            Redirect(routes.BusinessTypeController.get())
-          }
+            _  <- dataCacheConnector.save[BusinessMatching](
+                    request.credId,
+                    BusinessMatching.key,
+                    bm.copy(reviewDetails = updateReviewDetails(bm.reviewDetails, data))
+                  )
+          } yield Redirect(routes.BusinessTypeController.get())
       )
-    }
   }
 }
-
-

@@ -24,15 +24,15 @@ import play.api.i18n.Messages
 import scala.jdk.CollectionConverters._
 
 trait HtmlAssertions extends MockitoSugar {
-  self:Matchers =>
+  self: Matchers =>
 
-  def checkListContainsItems(parent:Element, keysToFind:Set[String])(implicit messages: Messages) = {
-    val texts = parent.select("li").asScala.map((el:Element) => el.text())
-    texts must be (keysToFind.map(k => Messages(k)))
+  def checkListContainsItems(parent: Element, keysToFind: Set[String])(implicit messages: Messages) = {
+    val texts = parent.select("li").asScala.map((el: Element) => el.text())
+    texts must be(keysToFind.map(k => Messages(k)))
     true
   }
 
-  def checkElementTextIncludes(el:Element, keys : String*)(implicit messages: Messages) = {
+  def checkElementTextIncludes(el: Element, keys: String*)(implicit messages: Messages) = {
     val t = el.text()
     val l = el.getElementsByTag("a").attr("href")
     val p = l.substring(l.indexOf("?"))
@@ -43,7 +43,7 @@ trait HtmlAssertions extends MockitoSugar {
     true
   }
 
-  def checkElementTextOnlyIncludes(el:Element, keys : String*)(implicit messages: Messages) = {
+  def checkElementTextOnlyIncludes(el: Element, keys: String*)(implicit messages: Messages) = {
     val t = el.text()
     keys.foreach { k =>
       t must include(Messages(k))
@@ -51,4 +51,3 @@ trait HtmlAssertions extends MockitoSugar {
     true
   }
 }
-

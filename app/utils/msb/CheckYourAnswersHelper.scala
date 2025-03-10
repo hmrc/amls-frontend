@@ -27,22 +27,24 @@ import utils.CheckYourAnswersHelperFunctions
 
 import javax.inject.Inject
 
-class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions {
+class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunctions {
 
-  def getSummaryList(model: MoneyServiceBusiness, bmMsbServices: BusinessMatchingMsbServices)(implicit messages: Messages): SummaryList = {
+  def getSummaryList(model: MoneyServiceBusiness, bmMsbServices: BusinessMatchingMsbServices)(implicit
+    messages: Messages
+  ): SummaryList = {
 
-    val transmittingMoneyRows = if(bmMsbServices.msbServices.contains(TransmittingMoney)) {
+    val transmittingMoneyRows = if (bmMsbServices.msbServices.contains(TransmittingMoney)) {
       businessUseAnIPSPRows(model).getOrElse(Seq.empty[SummaryListRow]) ++
-      Seq(
-        fundsTransferRow(model),
-        transactionsInNext12MonthsRow(model)
-      ).flatten ++
-      sendMoneyToOtherCountryRows(model).getOrElse(Seq.empty[SummaryListRow])
+        Seq(
+          fundsTransferRow(model),
+          transactionsInNext12MonthsRow(model)
+        ).flatten ++
+        sendMoneyToOtherCountryRows(model).getOrElse(Seq.empty[SummaryListRow])
     } else {
       Seq.empty[SummaryListRow]
     }
 
-    val currencyExchangeRows = if(bmMsbServices.msbServices.contains(CurrencyExchange)) {
+    val currencyExchangeRows = if (bmMsbServices.msbServices.contains(CurrencyExchange)) {
       Seq(
         ceTransactionsInNext12MonthsRow(model)
       ).flatten ++
@@ -51,7 +53,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
       Seq.empty[SummaryListRow]
     }
 
-    val foreignExchangeRow = if(bmMsbServices.msbServices.contains(ForeignExchange)) {
+    val foreignExchangeRow = if (bmMsbServices.msbServices.contains(ForeignExchange)) {
       Seq(fxTransactionsInNext12MonthsRow(model)).flatten
     } else {
       Seq.empty[SummaryListRow]
@@ -60,15 +62,14 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
     SummaryList(
       Seq(expectedThroughputRow(model)).flatten ++
         branchesOrAgentsRows(model).getOrElse(Seq.empty[SummaryListRow]) ++
-      Seq(identifyLinkedTransactionsRow(model)).flatten ++
+        Seq(identifyLinkedTransactionsRow(model)).flatten ++
         transmittingMoneyRows ++
         currencyExchangeRows ++
         foreignExchangeRow
     )
   }
 
-  private def expectedThroughputRow(model: MoneyServiceBusiness)(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def expectedThroughputRow(model: MoneyServiceBusiness)(implicit messages: Messages): Option[SummaryListRow] =
     model.throughput.map { expectedThroughput =>
       row(
         "msb.throughput.title",
@@ -80,10 +81,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def branchesOrAgentsRows(model: MoneyServiceBusiness)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
-
+  private def branchesOrAgentsRows(
+    model: MoneyServiceBusiness
+  )(implicit messages: Messages): Option[Seq[SummaryListRow]] =
     model.branchesOrAgents.map {
       case BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(branches)) =>
         Seq(
@@ -100,7 +101,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             Key(Text(messages("msb.branchesoragents.countries.title"))),
             branches.branches match {
               case branch :: Nil => Value(Text(branch.name))
-              case branches => toBulletList(branches)
+              case branches      => toBulletList(branches)
             },
             actions = editAction(
               controllers.msb.routes.BranchesOrAgentsWhichCountriesController.get(true).url,
@@ -109,7 +110,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             )
           )
         )
-      case BranchesOrAgents(BranchesOrAgentsHasCountries(false), _) =>
+      case BranchesOrAgents(BranchesOrAgentsHasCountries(false), _)             =>
         Seq(
           row(
             "msb.branchesoragents.title",
@@ -122,9 +123,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           )
         )
     }
-  }
 
-  private def identifyLinkedTransactionsRow(model: MoneyServiceBusiness)(implicit messages: Messages): Option[SummaryListRow] = {
+  private def identifyLinkedTransactionsRow(
+    model: MoneyServiceBusiness
+  )(implicit messages: Messages): Option[SummaryListRow] =
     model.identifyLinkedTransactions.map { ilt =>
       row(
         "msb.linked.txn.title",
@@ -136,12 +138,12 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def businessUseAnIPSPRows(model: MoneyServiceBusiness)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
-
+  private def businessUseAnIPSPRows(
+    model: MoneyServiceBusiness
+  )(implicit messages: Messages): Option[Seq[SummaryListRow]] =
     model.businessUseAnIPSP.map {
-      case BusinessUseAnIPSPNo =>
+      case BusinessUseAnIPSPNo                   =>
         Seq(
           row(
             "msb.ipsp.title",
@@ -184,9 +186,8 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           )
         )
     }
-  }
 
-  private def fundsTransferRow(model: MoneyServiceBusiness)(implicit messages: Messages): Option[SummaryListRow] = {
+  private def fundsTransferRow(model: MoneyServiceBusiness)(implicit messages: Messages): Option[SummaryListRow] =
     model.fundsTransfer.map { ft =>
       row(
         "msb.fundstransfer.title",
@@ -198,9 +199,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def transactionsInNext12MonthsRow(model: MoneyServiceBusiness)(implicit messages: Messages): Option[SummaryListRow] = {
+  private def transactionsInNext12MonthsRow(
+    model: MoneyServiceBusiness
+  )(implicit messages: Messages): Option[SummaryListRow] =
     model.transactionsInNext12Months.map { transactions =>
       row(
         "msb.transactions.expected.title",
@@ -212,10 +214,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def sendMoneyToOtherCountryRows(model: MoneyServiceBusiness)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
-
+  private def sendMoneyToOtherCountryRows(
+    model: MoneyServiceBusiness
+  )(implicit messages: Messages): Option[Seq[SummaryListRow]] =
     model.sendMoneyToOtherCountry.map {
       case SendMoneyToOtherCountry(money) if !money =>
         Seq(
@@ -229,23 +231,25 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
             )
           )
         )
-      case SendMoneyToOtherCountry(money) if money =>
+      case SendMoneyToOtherCountry(money) if money  =>
         Seq(
-          Some(row(
-            "msb.send.money.title",
-            booleanToLabel(true),
-            editAction(
-              controllers.msb.routes.SendMoneyToOtherCountryController.get(true).url,
-              "msb.checkYourAnswers.change.sendToOtherCountry",
-              "msbsendmoneytoothercountries-edit"
+          Some(
+            row(
+              "msb.send.money.title",
+              booleanToLabel(true),
+              editAction(
+                controllers.msb.routes.SendMoneyToOtherCountryController.get(true).url,
+                "msb.checkYourAnswers.change.sendToOtherCountry",
+                "msbsendmoneytoothercountries-edit"
+              )
             )
-          )),
+          ),
           model.sendTheLargestAmountsOfMoney.map { amount =>
             SummaryListRow(
               Key(Text(messages("msb.send.the.largest.amounts.of.money.title"))),
               amount.countries match {
                 case country :: Nil => Value(Text(country.name))
-                case countries => toBulletList(countries)
+                case countries      => toBulletList(countries)
               },
               actions = editAction(
                 controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).url,
@@ -259,7 +263,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
               Key(Text(messages("msb.most.transactions.title"))),
               mt.countries match {
                 case country :: Nil => Value(Text(country.name))
-                case countries => toBulletList(countries)
+                case countries      => toBulletList(countries)
               },
               actions = editAction(
                 controllers.msb.routes.MostTransactionsController.get(true).url,
@@ -270,9 +274,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           }
         ).flatten
     }
-  }
 
-  private def ceTransactionsInNext12MonthsRow(model: MoneyServiceBusiness)(implicit messages: Messages): Option[SummaryListRow] = {
+  private def ceTransactionsInNext12MonthsRow(
+    model: MoneyServiceBusiness
+  )(implicit messages: Messages): Option[SummaryListRow] =
     model.ceTransactionsInNext12Months.map { transactions =>
       row(
         "msb.ce.transactions.expected.in.12.months.title",
@@ -284,53 +289,56 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 
-  private def whichCurrenciesRows(model: MoneyServiceBusiness)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
-
-    model.whichCurrencies.map {
-      case WhichCurrencies(currencies, usesForeignCurrencies, moneySources) =>
-        Seq(
-          Some(SummaryListRow(
+  private def whichCurrenciesRows(model: MoneyServiceBusiness)(implicit
+    messages: Messages
+  ): Option[Seq[SummaryListRow]] =
+    model.whichCurrencies.map { case WhichCurrencies(currencies, usesForeignCurrencies, moneySources) =>
+      Seq(
+        Some(
+          SummaryListRow(
             Key(Text(messages("msb.which_currencies.title"))),
             currencies match {
               case currency :: Nil => Value(Text(currency))
-              case currencies => toBulletList(currencies)
+              case currencies      => toBulletList(currencies)
             },
             actions = editAction(
               controllers.msb.routes.WhichCurrenciesController.get(true).url,
               "msb.checkYourAnswers.change.currenciesExpectToSupply",
               "whichCurrencies-edit"
             )
-          )),
-          usesForeignCurrencies map { foreignCurrencies =>
-            row(
-              "msb.deal_foreign_currencies.title",
-              booleanToLabel(foreignCurrencies.value),
-              editAction(
-                controllers.msb.routes.UsesForeignCurrenciesController.get(true).url,
-                "msb.checkYourAnswers.change.physicalForeignCurrencies",
-                "usesForeignCurrencies-edit"
-              )
+          )
+        ),
+        usesForeignCurrencies map { foreignCurrencies =>
+          row(
+            "msb.deal_foreign_currencies.title",
+            booleanToLabel(foreignCurrencies.value),
+            editAction(
+              controllers.msb.routes.UsesForeignCurrenciesController.get(true).url,
+              "msb.checkYourAnswers.change.physicalForeignCurrencies",
+              "usesForeignCurrencies-edit"
             )
-          }
-        ).flatten ++
+          )
+        }
+      ).flatten ++
         moneySources.fold(Seq.empty[SummaryListRow]) { sources =>
           Seq(
             usesForeignCurrencies flatMap { foreignCurrencies =>
-              if(foreignCurrencies.value) {
-                Some(SummaryListRow(
-                  Key(Text(messages("msb.supply_foreign_currencies.title"))),
-                  sources.toMessages match {
-                    case source :: Nil => Value(Text(source))
-                    case sources => toBulletList(sources)
-                  },
-                  actions = editAction(
-                    controllers.msb.routes.MoneySourcesController.get(true).url,
-                    "msb.checkYourAnswers.change.whoSupplyForeignCurrency",
-                    "moneysources-edit"
+              if (foreignCurrencies.value) {
+                Some(
+                  SummaryListRow(
+                    Key(Text(messages("msb.supply_foreign_currencies.title"))),
+                    sources.toMessages match {
+                      case source :: Nil => Value(Text(source))
+                      case sources       => toBulletList(sources)
+                    },
+                    actions = editAction(
+                      controllers.msb.routes.MoneySourcesController.get(true).url,
+                      "msb.checkYourAnswers.change.whoSupplyForeignCurrency",
+                      "moneysources-edit"
+                    )
                   )
-                ))
+                )
               } else None
             },
             sources.bankMoneySource map { bms =>
@@ -358,9 +366,10 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           ).flatten
         }
     }
-  }
 
-  private def fxTransactionsInNext12MonthsRow(model: MoneyServiceBusiness)(implicit messages: Messages): Option[SummaryListRow] = {
+  private def fxTransactionsInNext12MonthsRow(
+    model: MoneyServiceBusiness
+  )(implicit messages: Messages): Option[SummaryListRow] =
     model.fxTransactionsInNext12Months.map { transactions =>
       row(
         "msb.fx.transactions.expected.in.12.months.title",
@@ -372,5 +381,4 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         )
       )
     }
-  }
 }

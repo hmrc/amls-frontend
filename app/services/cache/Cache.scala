@@ -26,20 +26,17 @@ import java.time.{LocalDateTime, ZoneOffset}
 import scala.util.{Failure, Success, Try}
 
 case class Cache(
-                  id: String,
-                  data: Map[String, JsValue],
-                  lastUpdated: LocalDateTime = LocalDateTime.now(ZoneOffset.UTC)
-                ) {
+  id: String,
+  data: Map[String, JsValue],
+  lastUpdated: LocalDateTime = LocalDateTime.now(ZoneOffset.UTC)
+) {
 
-  /**
-    * Upsert a value into the cache given its key.
-    * If the data to be inserted is null then remove the entry by key
+  /** Upsert a value into the cache given its key. If the data to be inserted is null then remove the entry by key
     */
   def upsert(key: String, data: JsValue, hasValue: Boolean): Cache = {
     val updated = if (hasValue) {
       this.data + (key -> data)
-    }
-    else {
+    } else {
       this.data - key
     }
 
@@ -61,16 +58,23 @@ case class Cache(
           )
       )
 
-  /**
-    * Construct a new cache containing decrypted data or re-encrypted data based on a switch
-    * Must only be called on a cache that contains encrypted data only
+  /** Construct a new cache containing decrypted data or re-encrypted data based on a switch Must only be called on a
+    * cache that contains encrypted data only
     *
-    * @param applyEncryption Whether to apply encryption
-    * @param decryptFn       The decryption function to apply
-    * @param encryptFn       The encryption function to apply
-    * @return A newly constructed cache containing the decrypted data or the re-encrypted data
+    * @param applyEncryption
+    *   Whether to apply encryption
+    * @param decryptFn
+    *   The decryption function to apply
+    * @param encryptFn
+    *   The encryption function to apply
+    * @return
+    *   A newly constructed cache containing the decrypted data or the re-encrypted data
     */
-  def decryptReEncrypt(applyEncryption: Boolean, decryptFn: String => PlainText, encryptFn: PlainText => Crypted): Cache = {
+  def decryptReEncrypt(
+    applyEncryption: Boolean,
+    decryptFn: String => PlainText,
+    encryptFn: PlainText => Crypted
+  ): Cache = {
     val rebuiltCache: Map[String, JsValue] = this.data.foldLeft(Map.empty[String, JsValue]) { (newCache, keyValue) =>
       val plainText: PlainText = decryptFn(keyValue._2.toString())
 
@@ -84,42 +88,42 @@ case class Cache(
     Cache(this.id, rebuiltCache)
   }
 
-  def tryDecrypt[T](key: String)(implicit reads: Reads[T]): Try[Option[T]] = {
+  def tryDecrypt[T](key: String)(implicit reads: Reads[T]): Try[Option[T]] =
     Try(getEntry(key))
-  }
 
-  def sanitiseDoubleDecrypt[T](key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Option[T] = {
+  def sanitiseDoubleDecrypt[T](key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Option[T] =
     tryDecrypt(key)(reads) match {
-      case Success(value) => value
-      case Failure(_: Exception) => {
-        val sensitiveDecrypter: Reads[SensitiveT[T]] = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
-        val sensitiveStringDecrypter: Reads[SensitiveT[String]] = JsonEncryption.sensitiveDecrypter[String, SensitiveT[String]](SensitiveT.apply)
+      case Success(value)        => value
+      case Failure(_: Exception) =>
+        val sensitiveDecrypter: Reads[SensitiveT[T]]            =
+          JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
+        val sensitiveStringDecrypter: Reads[SensitiveT[String]] =
+          JsonEncryption.sensitiveDecrypter[String, SensitiveT[String]](SensitiveT.apply)
 
-        data.get(key)
+        data
+          .get(key)
           .map {
-            case jsStr@JsString(str) if str.startsWith("{") | str.startsWith("[") => reads.reads(jsStr).asOpt.getOrElse(throw new Exception("error reading"))
-            case JsString(doubleEncStr) => {
+            case jsStr @ JsString(str) if str.startsWith("{") | str.startsWith("[") =>
+              reads.reads(jsStr).asOpt.getOrElse(throw new Exception("error reading"))
+            case JsString(doubleEncStr)                                             =>
               val sanitisedDoubleEncryptedStr = doubleEncStr.stripPrefix("'").stripSuffix("'")
               Try(sensitiveDecrypter.reads(JsString(sanitisedDoubleEncryptedStr))) match {
-                case Success(jsResult) => jsResult.get.decryptedValue
-                case Failure(ex) => throw ex
-                case Failure(_: JsResultException) => {
-                  sensitiveStringDecrypter.reads(JsString(sanitisedDoubleEncryptedStr))
+                case Success(jsResult)             => jsResult.get.decryptedValue
+                case Failure(ex)                   => throw ex
+                case Failure(_: JsResultException) =>
+                  sensitiveStringDecrypter
+                    .reads(JsString(sanitisedDoubleEncryptedStr))
                     .flatMap(decryptedStr => sensitiveDecrypter.reads(JsString(decryptedStr.decryptedValue)))
                     .map(_.decryptedValue)
                     .getOrElse(throw new Exception("unable to double decrypt value"))
-                }
               }
-            }
           }
-      }
     }
-  }
 }
 
 object Cache {
   implicit val dateFormat: Format[LocalDateTime] = Format(localDateTimeReads, localDateTimeWrites)
-  implicit val format: OFormat[Cache] = Json.format[Cache]
+  implicit val format: OFormat[Cache]            = Json.format[Cache]
 
   val empty: Cache = Cache("", Map())
 }

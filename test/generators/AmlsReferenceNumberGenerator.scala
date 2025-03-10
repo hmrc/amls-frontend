@@ -21,12 +21,11 @@ import org.scalacheck.Gen
 //noinspection ScalaStyle
 trait AmlsReferenceNumberGenerator {
 
-  def amlsRefNoGen = {
+  def amlsRefNoGen =
     for {
       a <- Gen.listOfN(1, Gen.alphaUpperChar).map(x => x.mkString)
       b <- Gen.listOfN(6, Gen.numChar).map(x => x.mkString)
     } yield s"X${a}ML00000$b"
-  }
 
   lazy val amlsRegistrationNumber = amlsRefNoGen.sample.get
 }

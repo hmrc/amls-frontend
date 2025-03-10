@@ -26,22 +26,31 @@ trait BankDetailsGenerator extends BaseGenerator {
 
   val accountGen: Gen[BankAccount] = for {
     accountNumber <- numSequence(10)
-    sortCode <- numSequence(6)
-    iban <- numSequence(15)
-    account <- Gen.oneOf(Seq(
-      BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount(accountNumber, sortCode))),
-      BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber(accountNumber))),
-      BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some( NonUKIBANNumber(iban)))
-    ))
+    sortCode      <- numSequence(6)
+    iban          <- numSequence(15)
+    account       <- Gen.oneOf(
+                       Seq(
+                         BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount(accountNumber, sortCode))),
+                         BankAccount(
+                           Some(BankAccountIsUk(false)),
+                           Some(BankAccountHasIban(false)),
+                           Some(NonUKAccountNumber(accountNumber))
+                         ),
+                         BankAccount(
+                           Some(BankAccountIsUk(false)),
+                           Some(BankAccountHasIban(true)),
+                           Some(NonUKIBANNumber(iban))
+                         )
+                       )
+                     )
   } yield account
 
-  val accountTypeGenerator: Gen[BankAccountType] = Gen.oneOf(Seq(PersonalAccount, BelongsToBusiness, BelongsToOtherBusiness, NoBankAccountUsed))
+  val accountTypeGenerator: Gen[BankAccountType] =
+    Gen.oneOf(Seq(PersonalAccount, BelongsToBusiness, BelongsToOtherBusiness, NoBankAccountUsed))
 
   val bankDetailsGen: Gen[BankDetails] = for {
     accountType <- accountTypeGenerator
-    name <- stringOfLengthGen(10)
-    account <- accountGen
-  } yield {
-    BankDetails(Some(accountType), Some(name), Some(account), hasAccepted = true)
-  }
+    name        <- stringOfLengthGen(10)
+    account     <- accountGen
+  } yield BankDetails(Some(accountType), Some(name), Some(account), hasAccepted = true)
 }

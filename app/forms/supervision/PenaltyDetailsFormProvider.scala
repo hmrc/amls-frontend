@@ -22,16 +22,18 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class PenaltyDetailsFormProvider @Inject()() extends Mappings {
+class PenaltyDetailsFormProvider @Inject() () extends Mappings {
 
   val length = 255
 
   def apply(): Form[ProfessionalBodyYes] = Form[ProfessionalBodyYes](
-    "professionalBody" -> text("error.required.penaltydetails.info.about.penalty").verifying(
-      firstError(
-        maxLength(length, "error.invalid.penaltydetails.info.about.penalty.length.255"),
-        regexp(basicPunctuationRegex, "error.invalid.penaltydetails.info.about.penalty")
+    "professionalBody" -> text("error.required.penaltydetails.info.about.penalty")
+      .verifying(
+        firstError(
+          maxLength(length, "error.invalid.penaltydetails.info.about.penalty.length.255"),
+          regexp(basicPunctuationRegex, "error.invalid.penaltydetails.info.about.penalty")
+        )
       )
-    ).transform[ProfessionalBodyYes](ProfessionalBodyYes.apply, _.value)
+      .transform[ProfessionalBodyYes](ProfessionalBodyYes.apply, _.value)
   )
 }

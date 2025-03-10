@@ -24,11 +24,9 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AuditHelper
 
 object ESEnrolEvent {
-  def apply
-  (enrolment: TaxEnrolment, response: HttpResponse, key: EnrolmentKey)
-  (implicit
-   hc: HeaderCarrier,
-   reqW: Writes[TaxEnrolment]
+  def apply(enrolment: TaxEnrolment, response: HttpResponse, key: EnrolmentKey)(implicit
+    hc: HeaderCarrier,
+    reqW: Writes[TaxEnrolment]
   ): DataEvent =
     DataEvent(
       auditSource = AuditHelper.appName,
@@ -36,18 +34,16 @@ object ESEnrolEvent {
       tags = hc.toAuditTags("Enrolment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
         "enrolment" -> Json.toJson(enrolment).toString,
-        "key" -> key.key,
-        "response" -> response.body,
-        "status" -> response.status.toString
+        "key"       -> key.key,
+        "response"  -> response.body,
+        "status"    -> response.status.toString
       )
     )
 }
 
 object ESDeEnrolEvent {
-  def apply
-  (response: HttpResponse, enrolmentKey: String)
-  (implicit
-   hc: HeaderCarrier
+  def apply(response: HttpResponse, enrolmentKey: String)(implicit
+    hc: HeaderCarrier
   ): DataEvent =
     DataEvent(
       auditSource = AuditHelper.appName,
@@ -55,17 +51,15 @@ object ESDeEnrolEvent {
       tags = hc.toAuditTags("DeEnrolment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
         "enrolment" -> enrolmentKey,
-        "response" -> response.body,
-        "status" -> response.status.toString
+        "response"  -> response.body,
+        "status"    -> response.status.toString
       )
     )
 }
 
 object ESRemoveKnownFactsEvent {
-  def apply
-  (response: HttpResponse, enrolmentKey: String)
-  (implicit
-   hc: HeaderCarrier
+  def apply(response: HttpResponse, enrolmentKey: String)(implicit
+    hc: HeaderCarrier
   ): DataEvent =
     DataEvent(
       auditSource = AuditHelper.appName,
@@ -73,19 +67,16 @@ object ESRemoveKnownFactsEvent {
       tags = hc.toAuditTags("RemoveKnownFacts", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
         "enrolment" -> enrolmentKey,
-        "response" -> response.body,
-        "status" -> response.status.toString
+        "response"  -> response.body,
+        "status"    -> response.status.toString
       )
     )
 }
 
-
 object ESEnrolFailureEvent {
-  def apply
-  (enrolment: TaxEnrolment, exception: Throwable, key: EnrolmentKey)
-  (implicit
-   hc: HeaderCarrier,
-   reqW: Writes[TaxEnrolment]
+  def apply(enrolment: TaxEnrolment, exception: Throwable, key: EnrolmentKey)(implicit
+    hc: HeaderCarrier,
+    reqW: Writes[TaxEnrolment]
   ): DataEvent =
     DataEvent(
       auditSource = AuditHelper.appName,
@@ -93,7 +84,7 @@ object ESEnrolFailureEvent {
       tags = hc.toAuditTags("Enrolment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
         "enrolment" -> Json.toJson(enrolment).toString,
-        "key" -> key.key,
+        "key"       -> key.key,
         "exception" -> exception.getMessage
       )
     )

@@ -23,7 +23,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class ActivityStartDateFormProvider @Inject()() extends Mappings {
+class ActivityStartDateFormProvider @Inject() () extends Mappings {
 
   def apply(): Form[ActivityStartDate] = Form[ActivityStartDate](
     "startDate" -> localDate(
@@ -37,7 +37,8 @@ class ActivityStartDateFormProvider @Inject()() extends Mappings {
       minDate(ActivityStartDateFormProvider.minDate, "error.invalid.date.tp.after.1700"),
       maxDate(ActivityStartDateFormProvider.maxDate, "error.invalid.date.tp.before.2100")
     ).transform[ActivityStartDate](
-      ActivityStartDate(_), _.startDate
+      ActivityStartDate(_),
+      _.startDate
     )
   )
 

@@ -25,16 +25,13 @@ trait AuthorisedFixture extends MockitoSugar {
 
   val authConnector = mock[AuthConnector]
 
-  val authRequest = FakeRequest().withSession(
+  val authRequest              = FakeRequest().withSession(
     SessionKeys.sessionId -> "SessionId",
     SessionKeys.authToken -> ""
   )
-  def authRequest(uri :String) = FakeRequest("GET" ,uri).withSession(
+  def authRequest(uri: String) = FakeRequest("GET", uri).withSession(
     SessionKeys.sessionId -> "SessionId",
     SessionKeys.authToken -> ""
   )
 
 }
-
-
-

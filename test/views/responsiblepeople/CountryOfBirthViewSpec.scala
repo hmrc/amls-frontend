@@ -28,7 +28,7 @@ import views.html.responsiblepeople.CountryOfBirthView
 class CountryOfBirthViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val country_of_birth = inject[CountryOfBirthView]
-  lazy val fp = inject[CountryOfBirthFormProvider]
+  lazy val fp               = inject[CountryOfBirthFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -48,15 +48,20 @@ class CountryOfBirthViewSpec extends AmlsViewSpec with Matchers {
 
       def view = country_of_birth(fp(), edit = true, 1, None, name, locations)
 
-      doc.title must startWith(messages("responsiblepeople.country.of.birth.title"))
-      heading.html must be(messages("responsiblepeople.country.of.birth.heading", "Person Name"))
+      doc.title       must startWith(messages("responsiblepeople.country.of.birth.title"))
+      heading.html    must be(messages("responsiblepeople.country.of.birth.heading", "Person Name"))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
     }
 
     behave like pageWithErrors(
       country_of_birth(
-        fp().withError("bornInUk", "error.required.rp.select.country.of.birth"), false, 1, None, name, locations
+        fp().withError("bornInUk", "error.required.rp.select.country.of.birth"),
+        false,
+        1,
+        None,
+        name,
+        locations
       ),
       "bornInUk",
       "error.required.rp.select.country.of.birth"
@@ -64,7 +69,12 @@ class CountryOfBirthViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       country_of_birth(
-        fp().withError("country", "error.required.rp.birth.country"), false, 1, None, name, locations
+        fp().withError("country", "error.required.rp.birth.country"),
+        false,
+        1,
+        None,
+        name,
+        locations
       ),
       "location-autocomplete",
       "error.required.rp.birth.country"

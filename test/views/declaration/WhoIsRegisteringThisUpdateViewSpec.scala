@@ -31,7 +31,7 @@ import views.html.declaration.WhoIsRegisteringThisUpdateView
 class WhoIsRegisteringThisUpdateViewSpec extends AmlsViewSpec with Matchers with ResponsiblePersonGenerator {
 
   lazy val updateView = inject[WhoIsRegisteringThisUpdateView]
-  lazy val fp = inject[WhoIsRegisteringFormProvider]
+  lazy val fp         = inject[WhoIsRegisteringFormProvider]
   lazy val updateForm = fp("update")
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
@@ -48,12 +48,12 @@ class WhoIsRegisteringThisUpdateViewSpec extends AmlsViewSpec with Matchers with
       def view = updateView(updateForm.fill(WhoIsRegistering("PersonName")), people)
 
       doc.title mustBe s"${messages("declaration.who.is.registering.amendment.title")} - ${messages("title.amls")} - ${messages("title.gov")}"
-      heading.html must be(messages("declaration.who.is.registering.amendment.title"))
+      heading.html    must be(messages("declaration.who.is.registering.amendment.title"))
       subHeading.html must include(messages("submit.amendment.application"))
 
       people.zipWithIndex.foreach { case (p, i) =>
         val id = s"person-$i"
-        doc.getElementById(id).`val`() must be(i.toString)
+        doc.getElementById(id).`val`()     must be(i.toString)
         doc.getElementById(id).parent.text must include(p.personName.get.fullName)
       }
 
@@ -66,7 +66,8 @@ class WhoIsRegisteringThisUpdateViewSpec extends AmlsViewSpec with Matchers with
         updateForm.withError("person", "error.required.declaration.who.is.declaring.this.update"),
         Seq(ResponsiblePerson())
       ),
-      "person", "error.required.declaration.who.is.declaring.this.update"
+      "person",
+      "error.required.declaration.who.is.declaring.this.update"
     )
 
     behave like pageWithBackLink(updateView(updateForm, Seq(ResponsiblePerson())))

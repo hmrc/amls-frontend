@@ -27,8 +27,8 @@ import views.html.msb.WhatYouNeedView
 
 class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
-  private val call = ExpectedThroughputController.get()
-  lazy val what_you_need = inject[WhatYouNeedView]
+  private val call                                               = ExpectedThroughputController.get()
+  lazy val what_you_need                                         = inject[WhatYouNeedView]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
@@ -41,14 +41,14 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       doc.title must startWith(messages("title.wyn"))
     }
 
-    "have the correct Headings" in new ViewFixture{
-      heading.html must be (messages("title.wyn"))
-      subHeading.html must include (messages("summary.msb"))
+    "have the correct Headings" in new ViewFixture {
+      heading.html    must be(messages("title.wyn"))
+      subHeading.html must include(messages("summary.msb"))
     }
 
     behave like pageWithBackLink(what_you_need(call))
 
-    "have an introduction to the list of information needed" in new ViewFixture{
+    "have an introduction to the list of information needed" in new ViewFixture {
       html must include(messages("msb.whatyouneed.requiredinfo.heading"))
     }
 
@@ -64,14 +64,22 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
     }
 
     "not display info that will not be needed" in new ViewFixture {
-      html must not include messages("your Intermediary Payment Service Provider’s name and Money Laundering Regulations number, if you use one")
+      html must not include messages(
+        "your Intermediary Payment Service Provider’s name and Money Laundering Regulations number, if you use one"
+      )
       html must not include messages("if you transfer money without using formal banking systems")
       html must not include messages("the number of money transfers you expect to make in the next 12 months")
-      html must not include messages("which countries you expect to send the largest amounts of money to, if you send money to other countries")
-      html must not include messages("which countries you expect to send the most transactions to, if you send money to other countries")
+      html must not include messages(
+        "which countries you expect to send the largest amounts of money to, if you send money to other countries"
+      )
+      html must not include messages(
+        "which countries you expect to send the most transactions to, if you send money to other countries"
+      )
       html must not include messages("the number of currency exchange transactions you expect in the next 12 months")
       html must not include messages("which currencies you expect to supply the most to your customers")
-      html must not include messages("who will supply your foreign currency, if you expect to deal in physical foreign currencies")
+      html must not include messages(
+        "who will supply your foreign currency, if you expect to deal in physical foreign currencies"
+      )
       html must not include messages("the number foreign exchange transactions you expect in the next 12 months")
     }
 
@@ -81,11 +89,21 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       }
 
       "provide correct content for TM" in new TMViewFixture {
-        html must include(messages("your Intermediary Payment Service Provider’s name and Money Laundering Regulations number, if you use one"))
+        html must include(
+          messages(
+            "your Intermediary Payment Service Provider’s name and Money Laundering Regulations number, if you use one"
+          )
+        )
         html must include(messages("if you transfer money without using formal banking systems"))
         html must include(messages("the number of money transfers you expect to make in the next 12 months"))
-        html must include(messages("which countries you expect to send the largest amounts of money to, if you send money to other countries"))
-        html must include(messages("which countries you expect to send the most transactions to, if you send money to other countries"))
+        html must include(
+          messages(
+            "which countries you expect to send the largest amounts of money to, if you send money to other countries"
+          )
+        )
+        html must include(
+          messages("which countries you expect to send the most transactions to, if you send money to other countries")
+        )
       }
     }
 
@@ -97,7 +115,9 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       "provide correct content for currencyExchange" in new CXViewFixture {
         html must include(messages("the number of currency exchange transactions you expect in the next 12 months"))
         html must include(messages("which currencies you expect to supply the most to your customers"))
-        html must include(messages("who will supply your foreign currency, if you expect to deal in physical foreign currencies"))
+        html must include(
+          messages("who will supply your foreign currency, if you expect to deal in physical foreign currencies")
+        )
       }
     }
 

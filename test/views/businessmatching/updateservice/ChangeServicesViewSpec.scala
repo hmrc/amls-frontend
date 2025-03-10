@@ -28,8 +28,8 @@ class ChangeServicesViewSpec extends AmlsViewSpec with Matchers {
 
   val allowAdd = true
 
-  lazy val change_services = inject[ChangeServicesView]
-  lazy val fp = inject[ChangeBusinessTypesFormProvider]
+  lazy val change_services                                       = inject[ChangeServicesView]
+  lazy val fp                                                    = inject[ChangeBusinessTypesFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
@@ -39,7 +39,9 @@ class ChangeServicesViewSpec extends AmlsViewSpec with Matchers {
   "ChangeServicesView" must {
 
     "have the correct title" in new ViewFixture {
-      doc.title must startWith(messages("businessmatching.updateservice.changeservices.title") + " - " + messages("summary.updateservice"))
+      doc.title must startWith(
+        messages("businessmatching.updateservice.changeservices.title") + " - " + messages("summary.updateservice")
+      )
     }
 
     "have correct heading" in new ViewFixture {
@@ -60,9 +62,11 @@ class ChangeServicesViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       change_services(
-        fp().withError("changeServices", "error.businessmatching.updateservice.changeservices"), allowAdd
+        fp().withError("changeServices", "error.businessmatching.updateservice.changeservices"),
+        allowAdd
       ),
-      "changeServices", "error.businessmatching.updateservice.changeservices"
+      "changeServices",
+      "error.businessmatching.updateservice.changeservices"
     )
 
     behave like pageWithBackLink(change_services(fp(), allowAdd))

@@ -35,9 +35,7 @@ class NameValuePairSpec extends PlaySpec {
       | ]
     """.stripMargin
 
-  val exampleModel = Seq(
-    NameValuePair("Country 1", "country:1"),
-    NameValuePair("Country 2", "country:2"))
+  val exampleModel = Seq(NameValuePair("Country 1", "country:1"), NameValuePair("Country 2", "country:2"))
 
   "The location list" must {
     "deserialise correctly into the model" in {

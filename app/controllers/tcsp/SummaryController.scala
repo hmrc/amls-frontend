@@ -32,32 +32,34 @@ import views.html.tcsp.CheckYourAnswersView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class SummaryController @Inject()(
-                                   val dataCache: DataCacheConnector,
-                                   val authAction: AuthAction,
-                                   val ds: CommonPlayDependencies,
-                                   val serviceFlow: ServiceFlow,
-                                   val statusService: StatusService,
-                                   val cc: MessagesControllerComponents,
-                                   cyaHelper: CheckYourAnswersHelper,
-                                   val view: CheckYourAnswersView,
-                                   implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with Logging {
+class SummaryController @Inject() (
+  val dataCache: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val serviceFlow: ServiceFlow,
+  val statusService: StatusService,
+  val cc: MessagesControllerComponents,
+  cyaHelper: CheckYourAnswersHelper,
+  val view: CheckYourAnswersView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with Logging {
 
-  def get: Action[AnyContent] = authAction.async {
-      implicit request =>
-        fetchModel(request.credId) map {
-          case Some(data) if data.copy(hasAccepted = true).isComplete =>
-            Ok(view(cyaHelper.getSummaryList(data)))
-          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-        }
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    fetchModel(request.credId) map {
+      case Some(data) if data.copy(hasAccepted = true).isComplete =>
+        Ok(view(cyaHelper.getSummaryList(data)))
+      case _                                                      => Redirect(controllers.routes.RegistrationProgressController.get())
+    }
   }
 
-  def post: Action[AnyContent] = authAction.async {
-      implicit request =>
-        (for {
-          model <- OptionT(fetchModel(request.credId))
-          _ <- OptionT.liftF(dataCache.save[Tcsp](request.credId, Tcsp.key, model.copy(hasAccepted = true)))
-        } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Cannot update Tcsp")
+  def post: Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      model <- OptionT(fetchModel(request.credId))
+      _     <- OptionT.liftF(dataCache.save[Tcsp](request.credId, Tcsp.key, model.copy(hasAccepted = true)))
+    } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError(
+      "Cannot update Tcsp"
+    )
   }
 
   private def fetchModel(credId: String): Future[Option[Tcsp]] = dataCache.fetch[Tcsp](credId, Tcsp.key)

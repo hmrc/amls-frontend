@@ -22,13 +22,14 @@ import play.api.data.Form
 
 class SendMoneyToOtherCountryFormProviderSpec extends BooleanFieldBehaviours[SendMoneyToOtherCountry] {
   override val form: Form[SendMoneyToOtherCountry] = new SendMoneyToOtherCountryFormProvider()()
-  override val fieldName: String = "money"
-  override val errorMessage: String = "error.required.msb.send.money"
+  override val fieldName: String                   = "money"
+  override val errorMessage: String                = "error.required.msb.send.money"
 
   "BranchesOrAgentsFormProvider" must {
 
     behave like booleanFieldWithModel(
-      SendMoneyToOtherCountry(true), SendMoneyToOtherCountry(false)
+      SendMoneyToOtherCountry(true),
+      SendMoneyToOtherCountry(false)
     )
   }
 }

@@ -35,17 +35,16 @@ import views.html.declaration.RegisterPartnersView
 import java.time.LocalDate
 import scala.concurrent.Future
 
-
 class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
-    val dataCacheConnector = mock[DataCacheConnector]
-    val statusService = mockStatusService
-    val progressService = mock[ProgressService]
+    val request              = addToken(authRequest)
+    val dataCacheConnector   = mock[DataCacheConnector]
+    val statusService        = mockStatusService
+    val progressService      = mock[ProgressService]
     val mockSectionsProvider = mock[SectionsProvider]
-    val renewalService = mock[RenewalService]
+    val renewalService       = mock[RenewalService]
     when(renewalService.isRenewalFlow(any(), any(), any())(any(), any())).thenReturn(Future.successful(false))
 
     val controller = new RegisterPartnersController(
@@ -63,21 +62,22 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
 
     val emptyCache = Cache.empty
 
-    val personName = PersonName("firstName", Some("middleName"), "lastName")
-    val personName1 = PersonName("firstName1", Some("middleName1"), "lastName1")
-    val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(LocalDate.now())))
-    val positions1 = Positions(Set(BeneficialOwner, InternalAccountant, Partner), Some(PositionStartDate(LocalDate.now())))
-    val rp = ResponsiblePerson (
+    val personName         = PersonName("firstName", Some("middleName"), "lastName")
+    val personName1        = PersonName("firstName1", Some("middleName1"), "lastName1")
+    val positions          = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(LocalDate.now())))
+    val positions1         =
+      Positions(Set(BeneficialOwner, InternalAccountant, Partner), Some(PositionStartDate(LocalDate.now())))
+    val rp                 = ResponsiblePerson(
       personName = Some(personName),
       positions = Some(positions),
       status = None
     )
-    val rp2 = ResponsiblePerson (
+    val rp2                = ResponsiblePerson(
       personName = Some(personName1),
       positions = Some(positions1),
       status = None
     )
-    val rp1 = ResponsiblePerson(
+    val rp1                = ResponsiblePerson(
       personName = Some(personName),
       positions = Some(positions),
       status = Some(StatusConstants.Deleted)
@@ -139,17 +139,23 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
         "selected option is a valid responsible person" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.RegisterPartnersController.post().url)
-          .withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
+            .withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
           mockApplicationStatus(SubmissionReady)
 
-          val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
-            = Set(BeneficialOwner, InternalAccountant, Partner)))), rp2)
+          val updatedList = Seq(
+            rp.copy(positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, Partner)))),
+            rp2
+          )
 
-          when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePerson]]](any(), any(), meq(Some(updatedList)))(any()))
+          when(
+            controller.dataCacheConnector.save[Option[Seq[ResponsiblePerson]]](any(), any(), meq(Some(updatedList)))(
+              any()
+            )
+          )
             .thenReturn(Future.successful(emptyCache))
 
           when(controller.progressService.getSubmitRedirect(Some(any()), any(), any())(any(), any(), any()))
@@ -163,56 +169,56 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
       "fail validation" when {
         "no option is selected on the UI and status is submissionready" in new Fixture {
           val newRequest = FakeRequest(POST, routes.RegisterPartnersController.post().url)
-          .withFormUrlEncodedBody("" -> "")
+            .withFormUrlEncodedBody("" -> "")
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
           mockApplicationStatus(SubmissionReady)
 
           val result = controller.post()(newRequest)
-          status(result) must be(BAD_REQUEST)
+          status(result)          must be(BAD_REQUEST)
           contentAsString(result) must include(messages("error.required.declaration.partners"))
           contentAsString(result) must include(messages("submit.registration"))
         }
 
         "no option is selected on the UI and status is SubmissionReadyForReview" in new Fixture {
           val newRequest = FakeRequest(POST, routes.RegisterPartnersController.post().url)
-          .withFormUrlEncodedBody("" -> "")
+            .withFormUrlEncodedBody("" -> "")
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
           mockApplicationStatus(SubmissionReadyForReview)
 
           val result = controller.post()(newRequest)
-          status(result) must be(BAD_REQUEST)
+          status(result)          must be(BAD_REQUEST)
           contentAsString(result) must include(messages("error.required.declaration.partners"))
           contentAsString(result) must include(messages("submit.amendment.application"))
         }
 
         "no option is selected on the UI and status is ReadyForRenewal" in new Fixture {
           val newRequest = FakeRequest(POST, routes.RegisterPartnersController.post().url)
-          .withFormUrlEncodedBody("" -> "")
+            .withFormUrlEncodedBody("" -> "")
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
           mockApplicationStatus(ReadyForRenewal(Some(LocalDate.now())))
 
           val result = controller.post()(newRequest)
-          status(result) must be(BAD_REQUEST)
+          status(result)          must be(BAD_REQUEST)
           contentAsString(result) must include(messages("error.required.declaration.partners"))
           contentAsString(result) must include(messages("submit.renewal.application"))
         }
 
         "no option is selected on the UI and no responsible people returned" in new Fixture {
           val newRequest = FakeRequest(POST, routes.RegisterPartnersController.post().url)
-          .withFormUrlEncodedBody("" -> "")
+            .withFormUrlEncodedBody("" -> "")
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
           mockApplicationStatus(SubmissionReadyForReview)
 
           val result = controller.post()(newRequest)
-          status(result) must be(BAD_REQUEST)
+          status(result)          must be(BAD_REQUEST)
           contentAsString(result) must include(messages("error.required.declaration.partners"))
         }
       }

@@ -27,10 +27,10 @@ import java.time.LocalDateTime
 class WithdrawApplicationViewSpec extends AmlsViewSpec with MockitoSugar {
 
   trait ViewFixture extends Fixture {
-    lazy val withdraw_application = inject[WithdrawApplicationView]
+    lazy val withdraw_application                                  = inject[WithdrawApplicationView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
-    //noinspection ScalaStyle
+    // noinspection ScalaStyle
     val date = LocalDateTime.of(2001, 1, 1, 12, 0, 0)
 
     def view = withdraw_application("The Business", date)
@@ -38,14 +38,18 @@ class WithdrawApplicationViewSpec extends AmlsViewSpec with MockitoSugar {
 
   "The withdraw application view" must {
     "show the correct titles and headings" in new ViewFixture {
-      doc.title must be(s"${messages("status.withdraw.empty.title")} - ${messages("title.amls")} - ${messages("title.gov")}")
-      heading.html must be(messages("Withdraw your application for The Business"))
+      doc.title       must be(
+        s"${messages("status.withdraw.empty.title")} - ${messages("title.amls")} - ${messages("title.gov")}"
+      )
+      heading.html    must be(messages("Withdraw your application for The Business"))
       subHeading.html must include(messages("summary.status"))
     }
 
     "show the correct informational content" in new ViewFixture {
       doc.text() must include(messages("status.withdraw.body-content"))
-      doc.text() must include("If you carry out activities covered by the Money Laundering Regulations, you need to be registered with an appropriate supervisory body.")
+      doc.text() must include(
+        "If you carry out activities covered by the Money Laundering Regulations, you need to be registered with an appropriate supervisory body."
+      )
     }
   }
 }

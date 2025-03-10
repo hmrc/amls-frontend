@@ -27,68 +27,64 @@ import views.html.confirmation.ConfirmationNewView
 class ConfirmationNewViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val newView = app.injector.instanceOf[ConfirmationNewView]
+    lazy val newView                                               = app.injector.instanceOf[ConfirmationNewView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
-    implicit val config: ApplicationConfig = app.injector.instanceOf[ApplicationConfig]
+    implicit val config: ApplicationConfig                         = app.injector.instanceOf[ApplicationConfig]
 
-    val totalAmount = Currency(BigDecimal(215))
+    val totalAmount     = Currency(BigDecimal(215))
     val referenceNumber = "XA1000000000001"
-    val href = "/foo"
+    val href            = "/foo"
 
-    override def view = newView(
-      Some(referenceNumber),
-      totalAmount,
-      href)(requestWithToken, messages, config)
+    override def view = newView(Some(referenceNumber), totalAmount, href)(requestWithToken, messages, config)
   }
 
-    "ConfirmationNewView" must {
+  "ConfirmationNewView" must {
 
-      "display the correct title" in new ViewFixture {
-        doc.title() must startWith(messages("confirmation.header") + " - " + messages("submit.registration"))
-      }
+    "display the correct title" in new ViewFixture {
+      doc.title() must startWith(messages("confirmation.header") + " - " + messages("submit.registration"))
+    }
 
-      "display the correct heading" in new ViewFixture {
-        heading.text() mustBe messages("confirmation.header")
-      }
+    "display the correct heading" in new ViewFixture {
+      heading.text() mustBe messages("confirmation.header")
+    }
 
-      "display the correct subtitle" in new ViewFixture {
-        subHeading.text() mustBe messages("submit.registration")
-      }
+    "display the correct subtitle" in new ViewFixture {
+      subHeading.text() mustBe messages("submit.registration")
+    }
 
-      "display the correct guidance content" in new ViewFixture {
+    "display the correct guidance content" in new ViewFixture {
 
-        doc.text() must include(messages("confirmation.submission.info"))
-        doc.text() must include(messages("confirmation.timelimit"))
-      }
+      doc.text() must include(messages("confirmation.submission.info"))
+      doc.text() must include(messages("confirmation.timelimit"))
+    }
 
-      "display the total" in new ViewFixture {
-        val total = doc.getElementById("total")
+    "display the total" in new ViewFixture {
+      val total = doc.getElementById("total")
 
-        total.text() mustBe totalAmount.toString
-      }
+      total.text() mustBe totalAmount.toString
+    }
 
-      "display the reference number" in new ViewFixture {
-        val reference = doc.getElementById("reference")
+    "display the reference number" in new ViewFixture {
+      val reference = doc.getElementById("reference")
 
-        reference.text() mustBe referenceNumber
-      }
+      reference.text() mustBe referenceNumber
+    }
 
-      "display the print link" in new ViewFixture {
+    "display the print link" in new ViewFixture {
 
-        val button = doc.getElementById("confirmation-print")
+      val button = doc.getElementById("confirmation-print")
 
-        button.text() mustBe messages("link.print")
-        button.attr("data-journey-click") mustBe "fee-reference:click:print"
-        button.attr("href") mustBe "javascript:window.print()"
-      }
+      button.text() mustBe messages("link.print")
+      button.attr("data-journey-click") mustBe "fee-reference:click:print"
+      button.attr("href") mustBe "javascript:window.print()"
+    }
 
-      "display the continue button" in new ViewFixture {
+    "display the continue button" in new ViewFixture {
 
-        val button = doc.getElementById("payfee")
+      val button = doc.getElementById("payfee")
 
-        button.text() mustBe messages("button.continuetopayment")
-        button.attr("href") mustBe href
-      }
+      button.text() mustBe messages("button.continuetopayment")
+      button.attr("href") mustBe href
     }
   }
-
+}

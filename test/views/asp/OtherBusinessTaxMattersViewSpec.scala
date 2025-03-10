@@ -25,10 +25,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.asp.OtherBusinessTaxMattersView
 
-class OtherBusinessTaxMattersViewSpec extends AmlsViewSpec with Matchers  {
+class OtherBusinessTaxMattersViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val taxMatters = inject[OtherBusinessTaxMattersView]
-  lazy val fp = inject[OtherBusinessTaxMattersFormProvider]
+  lazy val fp         = inject[OtherBusinessTaxMattersFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -49,7 +49,7 @@ class OtherBusinessTaxMattersViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = taxMatters(fp().fill(OtherBusinessTaxMattersNo), true)
 
-      heading.html must be(messages("asp.other.business.tax.matters.title"))
+      heading.html    must be(messages("asp.other.business.tax.matters.title"))
       subHeading.html must include(messages("summary.asp"))
 
     }

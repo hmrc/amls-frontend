@@ -23,13 +23,15 @@ import play.api.data.{Form, FormError}
 
 class SendLargestAmountsOfMoneyFormProviderSpec extends FieldBehaviours {
   val form: Form[SendTheLargestAmountsOfMoney] = new SendLargestAmountsOfMoneyFormProvider()()
-  val fieldName: String = "largestAmountsOfMoney"
-  val errorMessage: String = "error.required.renewal.largest.amounts.country"
+  val fieldName: String                        = "largestAmountsOfMoney"
+  val errorMessage: String                     = "error.required.renewal.largest.amounts.country"
 
   "SendLargestAmountsFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, fieldName, Gen.oneOf(models.countries.map(_.code))
+      form,
+      fieldName,
+      Gen.oneOf(models.countries.map(_.code))
     )
 
     "not bind when key is not present at all" in {

@@ -28,8 +28,7 @@ import views.html.businessactivities.InvolvedInOtherNameView
 
 class InvolvedInOtherNameViewSpec extends AmlsViewSpec with Matchers {
 
-
-  lazy val name = inject[InvolvedInOtherNameView]
+  lazy val name         = inject[InvolvedInOtherNameView]
   lazy val formProvider = inject[InvolvedInOtherFormProvider]
 
   trait ViewFixture extends Fixture {
@@ -41,17 +40,19 @@ class InvolvedInOtherNameViewSpec extends AmlsViewSpec with Matchers {
 
       def view = name(formProvider(), true, None, formProvider.length)
 
-      doc.title must be(messages("businessactivities.involved.other.title") + " - " +
-        messages("summary.businessactivities") +
-      " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("businessactivities.involved.other.title") + " - " +
+          messages("summary.businessactivities") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = name(formProvider(), true, None, formProvider.length)
 
-      heading.html must be(messages("businessactivities.involved.other.title"))
+      heading.html    must be(messages("businessactivities.involved.other.title"))
       subHeading.html must include(messages("summary.businessactivities"))
 
     }
@@ -60,7 +61,7 @@ class InvolvedInOtherNameViewSpec extends AmlsViewSpec with Matchers {
 
       "one business activity has been selected" in new ViewFixture {
 
-        val msg = s"an ${messages("businessactivities.registerservices.servicename.lbl.01")}"
+        val msg           = s"an ${messages("businessactivities.registerservices.servicename.lbl.01")}"
         override def view = name(formProvider(), false, Some(List(msg)), formProvider.length)
 
         val pTags = doc.select("p.govuk-body")
@@ -110,7 +111,7 @@ class InvolvedInOtherNameViewSpec extends AmlsViewSpec with Matchers {
       def view = name(formProvider(), true, None, formProvider.length)
 
       doc.getElementsByAttributeValue("name", "involvedInOther") must not be empty
-      doc.getElementsByAttributeValue("name", "details") must not be empty
+      doc.getElementsByAttributeValue("name", "details")         must not be empty
 
     }
 
@@ -119,12 +120,16 @@ class InvolvedInOtherNameViewSpec extends AmlsViewSpec with Matchers {
         formProvider().withError(
           FormError("details", "error.invalid.maxlength.255.renewal.ba.involved.in.other", Seq(formProvider.length))
         ),
-        true, None, formProvider.length
+        true,
+        None,
+        formProvider.length
       )(FakeRequest(), messages, appConfig),
       "details",
       "error.invalid.maxlength.255.renewal.ba.involved.in.other"
     )
 
-    behave like pageWithBackLink(name(formProvider(), true, None, formProvider.length)(FakeRequest(), messages, appConfig))
+    behave like pageWithBackLink(
+      name(formProvider(), true, None, formProvider.length)(FakeRequest(), messages, appConfig)
+    )
   }
 }

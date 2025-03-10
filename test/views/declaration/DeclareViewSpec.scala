@@ -23,7 +23,7 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.declaration.DeclareView
 
-class DeclareViewSpec extends AmlsViewSpec with Matchers  {
+class DeclareViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val declare = app.injector.instanceOf[DeclareView]
 
@@ -44,7 +44,7 @@ class DeclareViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = declare("string1", "string2", "Name", isAmendment = false)
 
-      heading.html must be(messages("declaration.declaration.title"))
+      heading.html    must be(messages("declaration.declaration.title"))
       subHeading.html must include(messages("string2"))
     }
 
@@ -78,7 +78,7 @@ class DeclareViewSpec extends AmlsViewSpec with Matchers  {
 
     "have a form with the disable-on-submit attribute" in new ViewFixture {
       def view = declare("string1", "string2", "Name", isAmendment = false)
-      
+
       doc.select("form").attr("disable-on-submit") mustBe "true"
     }
 

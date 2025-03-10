@@ -28,8 +28,8 @@ import views.html.businessmatching.updateservice.add.MsbSubSectorsView
 
 class MsbSubSectorsViewSpec extends AmlsViewSpec {
 
-  lazy val msb_subservices = inject[MsbSubSectorsView]
-  lazy val formProvider = inject[MsbSubSectorsFormProvider]
+  lazy val msb_subservices                                       = inject[MsbSubSectorsView]
+  lazy val formProvider                                          = inject[MsbSubSectorsFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
@@ -44,8 +44,10 @@ class MsbSubSectorsViewSpec extends AmlsViewSpec {
 
       override def view = msb_subservices(filledForm, edit = false)
 
-      doc.title must startWith(Messages("businessmatching.updateservice.msb.services.title") + " - " + Messages("summary.updateservice"))
-      heading.html must be(Messages("businessmatching.updateservice.msb.services.title"))
+      doc.title       must startWith(
+        Messages("businessmatching.updateservice.msb.services.title") + " - " + Messages("summary.updateservice")
+      )
+      heading.html    must be(Messages("businessmatching.updateservice.msb.services.title"))
       subHeading.html must include(Messages("summary.updateservice"))
     }
 
@@ -58,7 +60,7 @@ class MsbSubSectorsViewSpec extends AmlsViewSpec {
     }
 
     "show the correct number of checkboxes when fxToggle is disabled" in new ViewFixture {
-      override def view = msb_subservices(formProvider(), edit=false)
+      override def view = msb_subservices(formProvider(), edit = false)
       doc.body().getElementsByAttributeValue("type", "checkbox").size() mustEqual 4
     }
 
@@ -73,7 +75,8 @@ class MsbSubSectorsViewSpec extends AmlsViewSpec {
 
     behave like pageWithErrors(
       msb_subservices(formProvider().withError("value", "error.required.msb.services"), false),
-      "value", "error.required.msb.services"
+      "value",
+      "error.required.msb.services"
     )
 
     behave like pageWithBackLink(msb_subservices(formProvider(), false))

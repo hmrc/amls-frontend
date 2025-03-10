@@ -27,10 +27,10 @@ class BusinessUseAnIPSPFormProviderSpec extends BooleanFieldBehaviours[BusinessU
   val formProvider: BusinessUseAnIPSPFormProvider = new BusinessUseAnIPSPFormProvider()
 
   override val form: Form[BusinessUseAnIPSP] = formProvider()
-  override val fieldName: String = "useAnIPSP"
-  override val errorMessage: String = "error.required.msb.ipsp"
+  override val fieldName: String             = "useAnIPSP"
+  override val errorMessage: String          = "error.required.msb.ipsp"
 
-  val inputFieldName: String = "name"
+  val inputFieldName: String       = "name"
   val secondInputFieldName: String = "referenceNumber"
 
   private val refNoLength = 15
@@ -45,21 +45,22 @@ class BusinessUseAnIPSPFormProviderSpec extends BooleanFieldBehaviours[BusinessU
 
         val boundForm = form.bind(Map(fieldName -> "false"))
 
-        boundForm.value shouldBe Some(BusinessUseAnIPSPNo)
+        boundForm.value  shouldBe Some(BusinessUseAnIPSPNo)
         boundForm.errors shouldBe Nil
       }
 
       "'Yes' is submitted and details are given" in {
 
         forAll(stringOfLengthGen(formProvider.length).suchThat(_.nonEmpty), refNoGen) { (name, refNo) =>
+          val boundForm = form.bind(
+            Map(
+              fieldName            -> "true",
+              inputFieldName       -> name,
+              secondInputFieldName -> refNo
+            )
+          )
 
-          val boundForm = form.bind(Map(
-            fieldName -> "true",
-            inputFieldName -> name,
-            secondInputFieldName -> refNo
-          ))
-
-          boundForm.value shouldBe Some(BusinessUseAnIPSPYes(name, refNo))
+          boundForm.value  shouldBe Some(BusinessUseAnIPSPYes(name, refNo))
           boundForm.errors shouldBe Nil
         }
       }
@@ -89,7 +90,7 @@ class BusinessUseAnIPSPFormProviderSpec extends BooleanFieldBehaviours[BusinessU
 
         boundForm.errors shouldBe Seq(
           FormError(inputFieldName, "error.required.msb.ipsp.name"),
-          FormError(secondInputFieldName, "error.invalid.mlr.number"),
+          FormError(secondInputFieldName, "error.invalid.mlr.number")
         )
       }
 
@@ -97,11 +98,13 @@ class BusinessUseAnIPSPFormProviderSpec extends BooleanFieldBehaviours[BusinessU
         "is too long" in {
 
           forAll(stringsLongerThan(formProvider.length + 1), refNoGen) { (longName, refNo) =>
-            val boundForm = form.bind(Map(
-              fieldName -> "true",
-              inputFieldName -> longName,
-              secondInputFieldName -> refNo
-            ))
+            val boundForm = form.bind(
+              Map(
+                fieldName            -> "true",
+                inputFieldName       -> longName,
+                secondInputFieldName -> refNo
+              )
+            )
             boundForm.errors.headOption shouldBe Some(
               FormError(inputFieldName, "error.invalid.msb.ipsp.name", Seq(formProvider.length))
             )
@@ -109,11 +112,13 @@ class BusinessUseAnIPSPFormProviderSpec extends BooleanFieldBehaviours[BusinessU
         }
 
         "is invalid" in {
-          val boundForm = form.bind(Map(
-            fieldName -> "true",
-            inputFieldName -> "Busines§ Name",
-            secondInputFieldName -> "ASDFGH1234567890"
-          ))
+          val boundForm = form.bind(
+            Map(
+              fieldName            -> "true",
+              inputFieldName       -> "Busines§ Name",
+              secondInputFieldName -> "ASDFGH1234567890"
+            )
+          )
           boundForm.errors.headOption shouldBe Some(
             FormError(inputFieldName, "error.invalid.msb.ipsp.format", Seq(basicPunctuationRegex))
           )
@@ -126,14 +131,15 @@ class BusinessUseAnIPSPFormProviderSpec extends BooleanFieldBehaviours[BusinessU
           forAll(
             stringOfLengthGen(formProvider.length).suchThat(_.nonEmpty),
             invalidCharForNames,
-            stringOfLengthGen(14).suchThat(_.nonEmpty),
+            stringOfLengthGen(14).suchThat(_.nonEmpty)
           ) { (name, invalid, refNo) =>
-
-            val boundForm = form.bind(Map(
-              fieldName -> "true",
-              inputFieldName -> name,
-              secondInputFieldName -> (refNo  + invalid)
-            ))
+            val boundForm = form.bind(
+              Map(
+                fieldName            -> "true",
+                inputFieldName       -> name,
+                secondInputFieldName -> (refNo + invalid)
+              )
+            )
             boundForm.errors.headOption shouldBe Some(
               FormError(secondInputFieldName, "error.invalid.mlr.number", Seq("""^[0-9]{8}|[a-zA-Z0-9]{15}$"""))
             )

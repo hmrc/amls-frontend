@@ -22,66 +22,132 @@ import play.api.libs.json.{Json, OWrites, Reads}
 import services.cache.Cache
 
 case class BusinessDetails(
-                             previouslyRegistered: Option[PreviouslyRegistered] = None,
-                             activityStartDate: Option[ActivityStartDate] = None,
-                             vatRegistered: Option[VATRegistered] = None,
-                             corporationTaxRegistered: Option[CorporationTaxRegistered] = None,
-                             contactingYou: Option[ContactingYou] = None,
-                             registeredOfficeIsUK: Option[RegisteredOfficeIsUK] = None,
-                             registeredOffice: Option[RegisteredOffice] = None,
-                             altCorrespondenceAddress: Option[Boolean] = None,
-                             correspondenceAddressIsUk: Option[CorrespondenceAddressIsUk] = None,
-                             correspondenceAddress: Option[CorrespondenceAddress] = None,
-                             hasChanged: Boolean = false,
-                             hasAccepted: Boolean = false
-                           ) {
+  previouslyRegistered: Option[PreviouslyRegistered] = None,
+  activityStartDate: Option[ActivityStartDate] = None,
+  vatRegistered: Option[VATRegistered] = None,
+  corporationTaxRegistered: Option[CorporationTaxRegistered] = None,
+  contactingYou: Option[ContactingYou] = None,
+  registeredOfficeIsUK: Option[RegisteredOfficeIsUK] = None,
+  registeredOffice: Option[RegisteredOffice] = None,
+  altCorrespondenceAddress: Option[Boolean] = None,
+  correspondenceAddressIsUk: Option[CorrespondenceAddressIsUk] = None,
+  correspondenceAddress: Option[CorrespondenceAddress] = None,
+  hasChanged: Boolean = false,
+  hasAccepted: Boolean = false
+) {
 
-  def previouslyRegistered(v: PreviouslyRegistered): BusinessDetails = {
-    this.copy(previouslyRegistered = Some(v), hasChanged = hasChanged || !this.previouslyRegistered.contains(v), hasAccepted = hasAccepted && this.previouslyRegistered.contains(v))
-  }
+  def previouslyRegistered(v: PreviouslyRegistered): BusinessDetails =
+    this.copy(
+      previouslyRegistered = Some(v),
+      hasChanged = hasChanged || !this.previouslyRegistered.contains(v),
+      hasAccepted = hasAccepted && this.previouslyRegistered.contains(v)
+    )
 
   def activityStartDate(v: ActivityStartDate): BusinessDetails =
-    this.copy(activityStartDate = Some(v), hasChanged = hasChanged || !this.activityStartDate.contains(v), hasAccepted = hasAccepted && this.activityStartDate.contains(v))
+    this.copy(
+      activityStartDate = Some(v),
+      hasChanged = hasChanged || !this.activityStartDate.contains(v),
+      hasAccepted = hasAccepted && this.activityStartDate.contains(v)
+    )
 
   def vatRegistered(v: VATRegistered): BusinessDetails =
-    this.copy(vatRegistered = Some(v), hasChanged = hasChanged || !this.vatRegistered.contains(v), hasAccepted = hasAccepted && this.vatRegistered.contains(v))
+    this.copy(
+      vatRegistered = Some(v),
+      hasChanged = hasChanged || !this.vatRegistered.contains(v),
+      hasAccepted = hasAccepted && this.vatRegistered.contains(v)
+    )
 
   def corporationTaxRegistered(c: CorporationTaxRegistered): BusinessDetails =
-    this.copy(corporationTaxRegistered = Some(c), hasChanged = hasChanged || !this.corporationTaxRegistered.contains(c), hasAccepted = hasAccepted && this.corporationTaxRegistered.contains(c))
+    this.copy(
+      corporationTaxRegistered = Some(c),
+      hasChanged = hasChanged || !this.corporationTaxRegistered.contains(c),
+      hasAccepted = hasAccepted && this.corporationTaxRegistered.contains(c)
+    )
 
   def registeredOfficeIsUK(v: RegisteredOfficeIsUK): BusinessDetails =
-    this.copy(registeredOfficeIsUK = Some(v), hasChanged = hasChanged || !this.registeredOfficeIsUK.contains(v), hasAccepted = hasAccepted && this.registeredOfficeIsUK.contains(v))
+    this.copy(
+      registeredOfficeIsUK = Some(v),
+      hasChanged = hasChanged || !this.registeredOfficeIsUK.contains(v),
+      hasAccepted = hasAccepted && this.registeredOfficeIsUK.contains(v)
+    )
 
   def registeredOffice(v: RegisteredOffice): BusinessDetails =
-    this.copy(registeredOffice = Some(v), hasChanged = hasChanged || !this.registeredOffice.contains(v), hasAccepted = hasAccepted && this.registeredOffice.contains(v))
+    this.copy(
+      registeredOffice = Some(v),
+      hasChanged = hasChanged || !this.registeredOffice.contains(v),
+      hasAccepted = hasAccepted && this.registeredOffice.contains(v)
+    )
 
   def contactingYou(v: ContactingYou): BusinessDetails =
-    this.copy(contactingYou = Some(v), hasChanged = hasChanged || !this.contactingYou.contains(v), hasAccepted = hasAccepted && this.contactingYou.contains(v))
+    this.copy(
+      contactingYou = Some(v),
+      hasChanged = hasChanged || !this.contactingYou.contains(v),
+      hasAccepted = hasAccepted && this.contactingYou.contains(v)
+    )
 
   def altCorrespondenceAddress(v: Boolean): BusinessDetails =
     this.copy(altCorrespondenceAddress = Some(v), hasChanged = hasChanged || !this.altCorrespondenceAddress.contains(v))
 
   def correspondenceAddress(v: CorrespondenceAddress): BusinessDetails =
     v match {
-      case CorrespondenceAddress(None, None) => this.copy(correspondenceAddress = None, hasChanged = hasChanged || !this.correspondenceAddress.contains(v), hasAccepted = hasAccepted && this.correspondenceAddress.contains(v))
-      case _ => this.copy(correspondenceAddress = Some(v), hasChanged = hasChanged || !this.correspondenceAddress.contains(v), hasAccepted = hasAccepted && this.correspondenceAddress.contains(v))
+      case CorrespondenceAddress(None, None) =>
+        this.copy(
+          correspondenceAddress = None,
+          hasChanged = hasChanged || !this.correspondenceAddress.contains(v),
+          hasAccepted = hasAccepted && this.correspondenceAddress.contains(v)
+        )
+      case _                                 =>
+        this.copy(
+          correspondenceAddress = Some(v),
+          hasChanged = hasChanged || !this.correspondenceAddress.contains(v),
+          hasAccepted = hasAccepted && this.correspondenceAddress.contains(v)
+        )
     }
 
   def correspondenceAddressIsUk(v: CorrespondenceAddressIsUk): BusinessDetails =
-    this.copy(correspondenceAddressIsUk = Some(v), hasChanged = hasChanged || !this.correspondenceAddressIsUk.contains(v), hasAccepted = hasAccepted && this.correspondenceAddressIsUk.contains(v))
-
+    this.copy(
+      correspondenceAddressIsUk = Some(v),
+      hasChanged = hasChanged || !this.correspondenceAddressIsUk.contains(v),
+      hasAccepted = hasAccepted && this.correspondenceAddressIsUk.contains(v)
+    )
 
   def isComplete: Boolean =
     this match {
       case BusinessDetails(Some(PreviouslyRegisteredYes(None)), None, _, _, _, _, _, _, _, _, _, _) =>
         false
-      case BusinessDetails(Some(PreviouslyRegisteredNo), None, _, _, _, _, _, _, _, _, _, _) =>
+      case BusinessDetails(Some(PreviouslyRegisteredNo), None, _, _, _, _, _, _, _, _, _, _)        =>
         false
-      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), _, Some(_), Some(true), _, None, _, true) =>
+      case BusinessDetails(
+            Some(_),
+            _,
+            _,
+            _,
+            Some(ContactingYou(Some(_), Some(_))),
+            _,
+            Some(_),
+            Some(true),
+            _,
+            None,
+            _,
+            true
+          ) =>
         false
-      case BusinessDetails(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), _, Some(_), Some(_),_, _, _, true) =>
+      case BusinessDetails(
+            Some(_),
+            _,
+            _,
+            _,
+            Some(ContactingYou(Some(_), Some(_))),
+            _,
+            Some(_),
+            Some(_),
+            _,
+            _,
+            _,
+            true
+          ) =>
         true
-      case _ =>
+      case _                                                                                        =>
         false
     }
 }
@@ -100,7 +166,7 @@ object BusinessDetails {
     )
 
     cache.getEntry[BusinessDetails](key).fold(notStarted) {
-      case model if model.isComplete =>
+      case model if model.isComplete                                                      =>
         TaskRow(
           messageKey,
           controllers.businessdetails.routes.SummaryController.get.url,
@@ -110,7 +176,7 @@ object BusinessDetails {
         )
       case BusinessDetails(None, None, None, None, None, _, None, None, None, None, _, _) =>
         notStarted
-      case model =>
+      case model                                                                          =>
         TaskRow(
           messageKey,
           controllers.businessdetails.routes.WhatYouNeedController.get.url,
@@ -147,12 +213,10 @@ object BusinessDetails {
         (__ \ "hasAccepted").readNullable[Boolean].map {
           _.getOrElse(false)
         }
-      ).apply(BusinessDetails.apply _)
+    ).apply(BusinessDetails.apply _)
 
   }
 
   implicit def default(businessDetails: Option[BusinessDetails]): BusinessDetails =
     businessDetails.getOrElse(BusinessDetails())
 }
-
-

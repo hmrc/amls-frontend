@@ -27,7 +27,7 @@ import views.html.responsiblepeople.LegalNameChangeDateView
 class LegalNameChangeDateViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val legal_name_change_date = inject[LegalNameChangeDateView]
-  lazy val fp = inject[LegalNameChangeDateFormProvider]
+  lazy val fp                     = inject[LegalNameChangeDateFormProvider]
 
   val name = "firstName lastName"
 
@@ -42,13 +42,13 @@ class LegalNameChangeDateViewSpec extends AmlsViewSpec with Matchers {
 
       def view = legal_name_change_date(fp(), true, 1, None, name)
 
-      doc.title must startWith(messages("responsiblepeople.legalnamechangedate.title"))
-      heading.html must be(messages("responsiblepeople.legalnamechangedate.heading", name))
+      doc.title       must startWith(messages("responsiblepeople.legalnamechangedate.title"))
+      heading.html    must be(messages("responsiblepeople.legalnamechangedate.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
-      doc.getElementsByAttributeValue("name", "date.day") must not be empty
+      doc.getElementsByAttributeValue("name", "date.day")   must not be empty
       doc.getElementsByAttributeValue("name", "date.month") must not be empty
-      doc.getElementsByAttributeValue("name", "date.year") must not be empty
+      doc.getElementsByAttributeValue("name", "date.year")  must not be empty
 
     }
 

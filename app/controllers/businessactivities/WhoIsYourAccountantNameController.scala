@@ -28,45 +28,47 @@ import views.html.businessactivities.WhoIsYourAccountantNameView
 
 import scala.concurrent.Future
 
-class WhoIsYourAccountantNameController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                  val autoCompleteService: AutoCompleteService,
-                                                  val authAction: AuthAction,
-                                                  val ds: CommonPlayDependencies,
-                                                  val cc: MessagesControllerComponents,
-                                                  formProvider: WhoIsYourAccountantNameFormProvider,
-                                                  view: WhoIsYourAccountantNameView) extends AmlsBaseController(ds, cc) {
+class WhoIsYourAccountantNameController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val autoCompleteService: AutoCompleteService,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: WhoIsYourAccountantNameFormProvider,
+  view: WhoIsYourAccountantNameView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-        response =>
-          val form = (for {
-            businessActivities <- response
-            whoIsYourAccountant <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.names)
-          } yield {
-            formProvider().fill(whoIsYourAccountant)
-          }).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { response =>
+      val form = (for {
+        businessActivities  <- response
+        whoIsYourAccountant <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.names)
+      } yield formProvider().fill(whoIsYourAccountant)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
-        data => {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivity.whoIsYourAccountant(businessActivity.flatMap(ba => ba.whoIsYourAccountant).map(acc => acc.copy(names = Option(data))))
-            )
-          } yield if (edit) {
-            Redirect(routes.SummaryController.get)
-          } else {
-            Redirect(routes.WhoIsYourAccountantIsUkController.get())
-          }
-        }
+            _                <- dataCacheConnector.save[BusinessActivities](
+                                  request.credId,
+                                  BusinessActivities.key,
+                                  businessActivity.whoIsYourAccountant(
+                                    businessActivity.flatMap(ba => ba.whoIsYourAccountant).map(acc => acc.copy(names = Option(data)))
+                                  )
+                                )
+          } yield
+            if (edit) {
+              Redirect(routes.SummaryController.get)
+            } else {
+              Redirect(routes.WhoIsYourAccountantIsUkController.get())
+            }
       )
   }
 }

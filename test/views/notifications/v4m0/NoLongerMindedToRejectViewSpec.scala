@@ -26,7 +26,7 @@ import views.html.notifications.v4m0.NoLongerMindedToRejectView
 class NoLongerMindedToRejectViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val no_longer_minded_to_reject = app.injector.instanceOf[NoLongerMindedToRejectView]
+    lazy val no_longer_minded_to_reject                            = app.injector.instanceOf[NoLongerMindedToRejectView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val notificationParams = NotificationParams(safeId = Some("reference"))
@@ -38,17 +38,19 @@ class NoLongerMindedToRejectViewSpec extends AmlsViewSpec with Matchers {
 
       def view = no_longer_minded_to_reject(notificationParams)
 
-      doc.title must be("No longer considering refusal" +
-        " - " + "Your registration" +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        "No longer considering refusal" +
+          " - " + "Your registration" +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = no_longer_minded_to_reject(notificationParams)
 
-      heading.html must be("No longer considering refusal")
+      heading.html    must be("No longer considering refusal")
       subHeading.html must include("Your registration")
     }
 
@@ -63,7 +65,9 @@ class NoLongerMindedToRejectViewSpec extends AmlsViewSpec with Matchers {
 
       def view = no_longer_minded_to_reject(notificationParams)
 
-      doc.getElementById("return-to-messages").attr("href") mustBe controllers.routes.NotificationController.getMessages().url
+      doc.getElementById("return-to-messages").attr("href") mustBe controllers.routes.NotificationController
+        .getMessages()
+        .url
     }
   }
 }

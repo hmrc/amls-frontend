@@ -22,9 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class FundsTransferFormProvider @Inject()() extends BooleanFormProvider {
+class FundsTransferFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[FundsTransfer] = createForm[FundsTransfer](
-    "transferWithoutFormalSystems", "error.required.msb.fundsTransfer"
+    "transferWithoutFormalSystems",
+    "error.required.msb.fundsTransfer"
   )(FundsTransfer.apply, _.transferWithoutFormalSystems)
 }

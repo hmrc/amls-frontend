@@ -22,9 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class AccountantForAMLSRegulationsFormProvider @Inject()() extends Mappings {
+class AccountantForAMLSRegulationsFormProvider @Inject() () extends Mappings {
 
-  private val errorMessage = "error.required.ba.business.use.accountant"
+  private val errorMessage                        = "error.required.ba.business.use.accountant"
   def apply(): Form[AccountantForAMLSRegulations] = Form[AccountantForAMLSRegulations](
     "accountantForAMLSRegulations" -> boolean(errorMessage, errorMessage)
       .transform[AccountantForAMLSRegulations](AccountantForAMLSRegulations.apply, _.accountantForAMLSRegulations)

@@ -24,7 +24,7 @@ import play.api.data.validation.{Constraint, Invalid, Valid}
 
 import javax.inject.Inject
 
-class WhichCurrenciesFormProvider @Inject()() extends Mappings {
+class WhichCurrenciesFormProvider @Inject() () extends Mappings {
 
   private val emptyErrorKey = "error.invalid.msb.wc.currencies"
 
@@ -40,7 +40,7 @@ class WhichCurrenciesFormProvider @Inject()() extends Mappings {
   private val isCurrencyConstraint: Constraint[String] = Constraint {
     case str if models.currencies.contains(str) =>
       Valid
-    case _ =>
+    case _                                      =>
       Invalid(s"$emptyErrorKey.format")
   }
 }

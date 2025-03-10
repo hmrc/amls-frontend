@@ -31,19 +31,19 @@ class AMPTurnoverSpec extends PlaySpec {
       "successfully validate given an enum value" in {
 
         Json.fromJson[AMPTurnover](Json.obj("percentageExpectedTurnover" -> "01")) must
-          be(JsSuccess(AMPTurnover.First, JsPath ))
+          be(JsSuccess(AMPTurnover.First, JsPath))
 
         Json.fromJson[AMPTurnover](Json.obj("percentageExpectedTurnover" -> "02")) must
-          be(JsSuccess(AMPTurnover.Second, JsPath ))
+          be(JsSuccess(AMPTurnover.Second, JsPath))
 
         Json.fromJson[AMPTurnover](Json.obj("percentageExpectedTurnover" -> "03")) must
-          be(JsSuccess(AMPTurnover.Third, JsPath ))
+          be(JsSuccess(AMPTurnover.Third, JsPath))
 
         Json.fromJson[AMPTurnover](Json.obj("percentageExpectedTurnover" -> "04")) must
-          be(JsSuccess(AMPTurnover.Fourth, JsPath ))
+          be(JsSuccess(AMPTurnover.Fourth, JsPath))
 
         Json.fromJson[AMPTurnover](Json.obj("percentageExpectedTurnover" -> "05")) must
-          be(JsSuccess(AMPTurnover.Fifth, JsPath ))
+          be(JsSuccess(AMPTurnover.Fifth, JsPath))
 
       }
 
@@ -68,24 +68,26 @@ class AMPTurnoverSpec extends PlaySpec {
 
       "throw error for invalid data" in {
         Json.fromJson[AMPTurnover](Json.obj("percentageExpectedTurnover" -> "20")) must
-          be(JsError(JsPath , play.api.libs.json.JsonValidationError("error.invalid")))
+          be(JsError(JsPath, play.api.libs.json.JsonValidationError("error.invalid")))
       }
     }
 
     "Convert amp section data" in {
-      val ampData = Amp(Json.obj(
-        "typeOfParticipant"      -> Seq("artGalleryOwner"),
-        "soldOverThreshold"             -> true,
-        "dateTransactionOverThreshold"  -> LocalDate.now.toString,
-        "identifyLinkedTransactions"    -> true,
-        "percentageExpectedTurnover"    -> "zeroToTwenty"
-      ))
+      val ampData    = Amp(
+        Json.obj(
+          "typeOfParticipant"            -> Seq("artGalleryOwner"),
+          "soldOverThreshold"            -> true,
+          "dateTransactionOverThreshold" -> LocalDate.now.toString,
+          "identifyLinkedTransactions"   -> true,
+          "percentageExpectedTurnover"   -> "zeroToTwenty"
+        )
+      )
       val newAmpData = Json.obj(
-        "typeOfParticipant"      -> Seq("artGalleryOwner"),
-        "soldOverThreshold"             -> true,
-        "dateTransactionOverThreshold"  -> LocalDate.now.toString,
-        "identifyLinkedTransactions"    -> true,
-        "percentageExpectedTurnover"    -> "twentyOneToForty"
+        "typeOfParticipant"            -> Seq("artGalleryOwner"),
+        "soldOverThreshold"            -> true,
+        "dateTransactionOverThreshold" -> LocalDate.now.toString,
+        "identifyLinkedTransactions"   -> true,
+        "percentageExpectedTurnover"   -> "twentyOneToForty"
       )
 
       AMPTurnover.convert(Some(AMPTurnover.Second), ampData) must be(Amp(newAmpData))

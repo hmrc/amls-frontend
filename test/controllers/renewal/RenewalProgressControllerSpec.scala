@@ -48,13 +48,13 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     self =>
     val request = addToken(authRequest)
 
-    val dataCacheConnector = mock[DataCacheConnector]
-    val progressService = mock[ProgressService]
-    val renewalService = mock[RenewalService]
-    val statusService = mock[StatusService]
-    val sectionsProvider = mock[SectionsProvider]
+    val dataCacheConnector      = mock[DataCacheConnector]
+    val progressService         = mock[ProgressService]
+    val renewalService          = mock[RenewalService]
+    val statusService           = mock[StatusService]
+    val sectionsProvider        = mock[SectionsProvider]
     val businessMatchingService = mock[BusinessMatchingService]
-    val authAction = SuccessfulAuthAction
+    val authAction              = SuccessfulAuthAction
 
     lazy val app = new GuiceApplicationBuilder()
       .configure(
@@ -89,8 +89,10 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
       renewalService.getTaskRow(any())(any())
     } thenReturn Future.successful(renewalTaskRow)
 
-    val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-    val bm = Some(businessMatchingGen.sample.get.copy(activities = Some(businessActivitiesModel)))
+    val businessActivitiesModel = BusinessActivities(
+      Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)
+    )
+    val bm                      = Some(businessMatchingGen.sample.get.copy(activities = Some(businessActivitiesModel)))
 
     when {
       cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
@@ -98,8 +100,8 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
     val renewalDate = LocalDate.now().plusDays(15)
 
-    val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
-      Some(renewalDate), false)
+    val readStatusResponse =
+      ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None, Some(renewalDate), false)
 
     when(businessMatchingService.getAdditionalBusinessActivities(any())(any()))
       .thenReturn(OptionT.none[Future, Set[BusinessActivity]])
@@ -151,7 +153,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
     }
 
-    "load the page when status is ReadyForRenewal and one of the section is modified" in new Fixture  {
+    "load the page when status is ReadyForRenewal and one of the section is modified" in new Fixture {
 
       when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
@@ -162,14 +164,20 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
         .thenReturn(bmWithoutTCSPOrMSB)
 
       val sections = Seq(
-        TaskRow("supervision", controllers.supervision.routes.SummaryController.get().url, false, Completed, TaskRow.completedTag),
+        TaskRow(
+          "supervision",
+          controllers.supervision.routes.SummaryController.get().url,
+          false,
+          Completed,
+          TaskRow.completedTag
+        ),
         TaskRow("asp", controllers.asp.routes.SummaryController.get.url, true, Completed, TaskRow.updatedTag)
       )
 
       when(controller.sectionsProvider.taskRowsForRenewal(eqTo(cacheMap))(any()))
         .thenReturn(sections)
 
-      when(controller.renewals.canSubmit(any(),any()))
+      when(controller.renewals.canSubmit(any(), any()))
         .thenReturn(true)
 
       val result = controller.get()(request)
@@ -177,7 +185,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
       status(result) mustBe OK
 
       val html = Jsoup.parse(contentAsString(result))
-      html.getElementsByTag("h1").text() must include(messages("renewal.progress.title"))
+      html.getElementsByTag("h1").text()                     must include(messages("renewal.progress.title"))
       html.select("button[name=submit]").hasAttr("disabled") must be(false)
 
       val elements = html.getElementsMatchingOwnText(messages("progress.visuallyhidden.view.updated"))

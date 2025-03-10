@@ -46,11 +46,12 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
   trait Fixture extends DependencyMocks {
     self =>
 
-    val request = addToken(authRequest)
-    lazy val view = inject[AddPersonView]
-    val addPersonController = new AddPersonController (
+    val request             = addToken(authRequest)
+    lazy val view           = inject[AddPersonView]
+    val addPersonController = new AddPersonController(
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = mockStatusService,
       cc = mockMcc,
       formProvider = inject[AddPersonFormProvider],
@@ -60,24 +61,25 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
     val emptyCache = Cache.empty
 
     val defaultReviewDetails = ReviewDetails(
-          businessName = "",
-          businessType = Some(LimitedCompany),
-          businessAddress = Address (
-            line_1 = "",
-            line_2 = None,
-            line_3 = None,
-            line_4 = None,
-            postcode = None,
-            country = Country(
-              name = "",
-              code = ""
-            )),
-          safeId=""
+      businessName = "",
+      businessType = Some(LimitedCompany),
+      businessAddress = Address(
+        line_1 = "",
+        line_2 = None,
+        line_3 = None,
+        line_4 = None,
+        postcode = None,
+        country = Country(
+          name = "",
+          code = ""
         )
+      ),
+      safeId = ""
+    )
 
     val defaultBM = BusinessMatching(reviewDetails = Some(defaultReviewDetails))
-    when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
-      (any())).thenReturn(Future.successful(Some(defaultBM)))
+    when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
+      .thenReturn(Future.successful(Some(defaultBM)))
     when(addPersonController.dataCacheConnector.save[AddPerson](any(), any(), any())(any()))
       .thenReturn(Future.successful(emptyCache))
     mockApplicationStatus(SubmissionReady)
@@ -90,14 +92,14 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
         "status is pre-submission" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.AddPersonController.post().url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName",
-            "roleWithinBusiness[]" -> "ExternalAccountant"
-          )
+            .withFormUrlEncodedBody(
+              "firstName"            -> "firstName",
+              "lastName"             -> "lastName",
+              "roleWithinBusiness[]" -> "ExternalAccountant"
+            )
 
           val result = addPersonController.get()(requestWithParams)
-          status(result) must be(OK)
+          status(result)          must be(OK)
           contentAsString(result) must include(messages("submit.registration"))
 
         }
@@ -105,32 +107,32 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
         "status is pending" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.AddPersonController.post().url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName",
-            "roleWithinBusiness[]" -> "ExternalAccountant"
-          )
+            .withFormUrlEncodedBody(
+              "firstName"            -> "firstName",
+              "lastName"             -> "lastName",
+              "roleWithinBusiness[]" -> "ExternalAccountant"
+            )
 
           mockApplicationStatus(SubmissionReadyForReview)
 
           val result = addPersonController.get()(requestWithParams)
-          status(result) must be(OK)
+          status(result)          must be(OK)
           contentAsString(result) must include(messages("submit.amendment.application"))
         }
 
         "status is ready for renewal" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.AddPersonController.post().url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName",
-            "roleWithinBusiness[]" -> "ExternalAccountant"
-          )
+            .withFormUrlEncodedBody(
+              "firstName"            -> "firstName",
+              "lastName"             -> "lastName",
+              "roleWithinBusiness[]" -> "ExternalAccountant"
+            )
 
           mockApplicationStatus(ReadyForRenewal(Some(LocalDate.now())))
 
           val result = addPersonController.get()(requestWithParams)
-          status(result) must be(OK)
+          status(result)          must be(OK)
           contentAsString(result) must include(messages("submit.renewal.application"))
         }
       }
@@ -141,12 +143,11 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[name=firstName]").`val` must be("")
-        document.select("input[name=middleName]").`val` must be("")
-        document.select("input[name=lastName]").`val` must be("")
+        document.select("input[name=firstName]").`val`                   must be("")
+        document.select("input[name=middleName]").`val`                  must be("")
+        document.select("input[name=lastName]").`val`                    must be("")
         document.select("input[name=roleWithinBusiness][checked]").`val` must be("")
       }
-
 
       "on getWithAmendment display the persons page with blank fields" in new Fixture {
 
@@ -154,9 +155,9 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[name=firstName]").`val` must be("")
-        document.select("input[name=middleName]").`val` must be("")
-        document.select("input[name=lastName]").`val` must be("")
+        document.select("input[name=firstName]").`val`                   must be("")
+        document.select("input[name=middleName]").`val`                  must be("")
+        document.select("input[name=lastName]").`val`                    must be("")
         document.select("input[name=roleWithinBusiness][checked]").`val` must be("")
       }
     }
@@ -166,11 +167,11 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
         "the role type selected is Director" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.AddPersonController.post().url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName",
-            "positions[0]" -> Director.toString
-          )
+            .withFormUrlEncodedBody(
+              "firstName"    -> "firstName",
+              "lastName"     -> "lastName",
+              "positions[0]" -> Director.toString
+            )
 
           val result = addPersonController.post()(requestWithParams)
           status(result) must be(SEE_OTHER)
@@ -182,11 +183,11 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
         "status is pending" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.AddPersonController.post().url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName",
-            "positions[0]" -> ExternalAccountant.toString
-          )
+            .withFormUrlEncodedBody(
+              "firstName"    -> "firstName",
+              "lastName"     -> "lastName",
+              "positions[0]" -> ExternalAccountant.toString
+            )
 
           mockApplicationStatus(SubmissionReadyForReview)
 
@@ -198,11 +199,11 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
         "status is pre-submission" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.AddPersonController.post().url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName",
-            "positions[0]" -> ExternalAccountant.toString
-          )
+            .withFormUrlEncodedBody(
+              "firstName"    -> "firstName",
+              "lastName"     -> "lastName",
+              "positions[0]" -> ExternalAccountant.toString
+            )
 
           val result = addPersonController.post()(requestWithParams)
           status(result) must be(SEE_OTHER)
@@ -214,10 +215,10 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
         "first name not supplied" in new Fixture {
 
           val firstNameMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
-          .withFormUrlEncodedBody(
-            "lastName" -> "lastName",
-            "positions[0]" -> ExternalAccountant.toString
-          )
+            .withFormUrlEncodedBody(
+              "lastName"     -> "lastName",
+              "positions[0]" -> ExternalAccountant.toString
+            )
 
           val result = addPersonController.post()(firstNameMissingInRequest)
           status(result) must be(BAD_REQUEST)
@@ -228,10 +229,10 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
         "last name not supplied" in new Fixture {
 
           val lastNameNissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "positions[0]" -> ExternalAccountant.toString
-          )
+            .withFormUrlEncodedBody(
+              "firstName"    -> "firstName",
+              "positions[0]" -> ExternalAccountant.toString
+            )
 
           val result = addPersonController.post()(lastNameNissingInRequest)
           status(result) must be(BAD_REQUEST)
@@ -243,14 +244,14 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
         "business type is LimitedCompany and position is not filled" in new Fixture {
           val rd = defaultReviewDetails.copy(businessType = Some(LimitedCompany))
           val bm = BusinessMatching(reviewDetails = Some(rd))
-          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any())).thenReturn(Future.successful(Some(bm)))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
+            .thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName"
-          )
+            .withFormUrlEncodedBody(
+              "firstName" -> "firstName",
+              "lastName"  -> "lastName"
+            )
 
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
@@ -259,14 +260,14 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
         "business type is SoleProprietor and position is not filled" in new Fixture {
           val rd = defaultReviewDetails.copy(businessType = Some(SoleProprietor))
           val bm = BusinessMatching(reviewDetails = Some(rd))
-          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any())).thenReturn(Future.successful(Some(bm)))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
+            .thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName"
-          )
+            .withFormUrlEncodedBody(
+              "firstName" -> "firstName",
+              "lastName"  -> "lastName"
+            )
 
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
@@ -275,14 +276,14 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
         "business type is Partnership and position is not filled" in new Fixture {
           val rd = defaultReviewDetails.copy(businessType = Some(Partnership))
           val bm = BusinessMatching(reviewDetails = Some(rd))
-          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any())).thenReturn(Future.successful(Some(bm)))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
+            .thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName"
-          )
+            .withFormUrlEncodedBody(
+              "firstName" -> "firstName",
+              "lastName"  -> "lastName"
+            )
 
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
@@ -291,14 +292,14 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
         "business type is LPrLLP and position is not filled" in new Fixture {
           val rd = defaultReviewDetails.copy(businessType = Some(LPrLLP))
           val bm = BusinessMatching(reviewDetails = Some(rd))
-          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any())).thenReturn(Future.successful(Some(bm)))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
+            .thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName"
-          )
+            .withFormUrlEncodedBody(
+              "firstName" -> "firstName",
+              "lastName"  -> "lastName"
+            )
 
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
@@ -307,14 +308,14 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
         "business type is UnincorporatedBody and position is not filled" in new Fixture {
           val rd = defaultReviewDetails.copy(businessType = Some(UnincorporatedBody))
           val bm = BusinessMatching(reviewDetails = Some(rd))
-          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any())).thenReturn(Future.successful(Some(bm)))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
+            .thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
-          .withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName"
-          )
+            .withFormUrlEncodedBody(
+              "firstName" -> "firstName",
+              "lastName"  -> "lastName"
+            )
 
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
@@ -326,15 +327,17 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
 
 class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar with Injecting {
 
-  val userId = s"user-${UUID.randomUUID()}"
+  val userId                 = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
 
   trait Fixture extends DependencyMocks {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[AddPersonView]
-    val addPersonController = new AddPersonController (
+    self =>
+    val request             = addToken(authRequest)
+    lazy val view           = inject[AddPersonView]
+    val addPersonController = new AddPersonController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = mockStatusService,
       cc = mockMcc,
       formProvider = inject[AddPersonFormProvider],
@@ -349,8 +352,8 @@ class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar
       "on get display the persons page" when {
         "status is pending" in new Fixture {
 
-          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any())).thenReturn(Future.successful(None))
+          when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
+            .thenReturn(Future.successful(None))
 
           mockApplicationStatus(SubmissionReadyForReview)
 
@@ -358,7 +361,9 @@ class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.title() must be(messages("declaration.addperson.title") + " - " + messages("title.amls") + " - " + messages("title.gov"))
+          document.title() must be(
+            messages("declaration.addperson.title") + " - " + messages("title.amls") + " - " + messages("title.gov")
+          )
 
           contentAsString(result) must include(messages("submit.amendment.application"))
         }

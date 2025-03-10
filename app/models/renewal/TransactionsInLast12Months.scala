@@ -24,8 +24,7 @@ object TransactionsInLast12Months {
 
   implicit val format: OFormat[TransactionsInLast12Months] = Json.format[TransactionsInLast12Months]
 
-  implicit def convert(model: TransactionsInLast12Months): models.moneyservicebusiness.TransactionsInNext12Months = {
+  implicit def convert(model: TransactionsInLast12Months): models.moneyservicebusiness.TransactionsInNext12Months =
     models.moneyservicebusiness.TransactionsInNext12Months(model.transfers)
-  }
 
 }

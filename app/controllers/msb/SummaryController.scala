@@ -29,37 +29,36 @@ import views.html.msb.CheckYourAnswersView
 
 import javax.inject.Inject
 
-class SummaryController @Inject()(authAction: AuthAction,
-                                  val ds: CommonPlayDependencies,
-                                  implicit val dataCache: DataCacheConnector,
-                                  implicit val statusService: StatusService,
-                                  implicit val serviceFlow: ServiceFlow,
-                                  val cc: MessagesControllerComponents,
-                                  cyaHelper: CheckYourAnswersHelper,
-                                  view: CheckYourAnswersView) extends AmlsBaseController(ds, cc) {
+class SummaryController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val dataCache: DataCacheConnector,
+  implicit val statusService: StatusService,
+  implicit val serviceFlow: ServiceFlow,
+  val cc: MessagesControllerComponents,
+  cyaHelper: CheckYourAnswersHelper,
+  view: CheckYourAnswersView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCache.fetchAll(request.credId) map {
-        optionalCache =>
-          (for {
-            cache <- optionalCache
-            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-            msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            businessMatchingMsb <- businessMatching.msbServices
-          } yield {
-            Ok(view(cyaHelper.getSummaryList(msb, businessMatchingMsb)))
-          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    dataCache.fetchAll(request.credId) map { optionalCache =>
+      (for {
+        cache               <- optionalCache
+        businessMatching    <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+        msb                 <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+        businessMatchingMsb <- businessMatching.msbServices
+      } yield Ok(view(cyaHelper.getSummaryList(msb, businessMatchingMsb)))) getOrElse Redirect(
+        controllers.routes.RegistrationProgressController.get()
+      )
+    }
   }
 
-
-  def post(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      for {
-        model <- dataCache.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
-        _ <- dataCache.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key, model.copy(hasAccepted = true))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())
+  def post(): Action[AnyContent] = authAction.async { implicit request =>
+    for {
+      model <- dataCache.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+      _     <-
+        dataCache.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key, model.copy(hasAccepted = true))
+    } yield Redirect(controllers.routes.RegistrationProgressController.get())
   }
 
 }

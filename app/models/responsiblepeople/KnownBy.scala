@@ -18,9 +18,7 @@ package models.responsiblepeople
 
 import play.api.libs.json._
 
-case class KnownBy(
-                    hasOtherNames: Option[Boolean] = None,
-                    otherNames: Option[String]) {
+case class KnownBy(hasOtherNames: Option[Boolean] = None, otherNames: Option[String]) {
 
   val otherName: String = Seq(otherNames).flatten[String].mkString(" ")
 
@@ -28,7 +26,7 @@ case class KnownBy(
 
 object KnownBy {
 
-  implicit val jsonReads : Reads[KnownBy] = {
+  implicit val jsonReads: Reads[KnownBy] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
 

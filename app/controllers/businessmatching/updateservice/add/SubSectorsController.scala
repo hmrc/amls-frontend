@@ -34,42 +34,46 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class SubSectorsController @Inject()(authAction: AuthAction,
-                                     val ds: CommonPlayDependencies,
-                                     implicit val dataCacheConnector: DataCacheConnector,
-                                     val businessMatchingService: BusinessMatchingService,
-                                     val router: Router[AddBusinessTypeFlowModel],
-                                     val config:ApplicationConfig,
-                                     val cc: MessagesControllerComponents,
-                                     formProvider: MsbSubSectorsFormProvider,
-                                     view: MsbSubSectorsView) extends AmlsBaseController(ds, cc) {
+class SubSectorsController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val dataCacheConnector: DataCacheConnector,
+  val businessMatchingService: BusinessMatchingService,
+  val router: Router[AddBusinessTypeFlowModel],
+  val config: ApplicationConfig,
+  val cc: MessagesControllerComponents,
+  formProvider: MsbSubSectorsFormProvider,
+  view: MsbSubSectorsView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-      implicit request =>
-        (for {
-          model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)) orElse OptionT.some(AddBusinessTypeFlowModel())
-        } yield {
-          val flowSubServices: Set[BusinessMatchingMsbService] = model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices
-          val form = formProvider().fill(flowSubServices.toSeq)
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      model <- OptionT(
+                 dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)
+               ) orElse OptionT.some(AddBusinessTypeFlowModel())
+    } yield {
+      val flowSubServices: Set[BusinessMatchingMsbService] =
+        model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices
+      val form                                             = formProvider().fill(flowSubServices.toSeq)
 
-          Ok(view(form, edit, config.fxEnabledToggle))
-        }) getOrElse InternalServerError("Get: Unable to show Sub-Services page. Failed to retrieve data")
+      Ok(view(form, edit, config.fxEnabledToggle))
+    }) getOrElse InternalServerError("Get: Unable to show Sub-Services page. Failed to retrieve data")
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-      implicit request =>
-        formProvider().bindFromRequest().fold(
-          formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, edit, config.fxEnabledToggle))),
-          data =>
-            dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
-              case Some(model) =>
-                model.msbServices(BusinessMatchingMsbServices(data.toSet))
-              case _ => throw new Exception("An Unknown Exception has occurred")
-            } flatMap {
-              case Some(model) => router.getRoute(request.credId, SubSectorsPageId, model, edit)
-              case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: SubServicesController"))
-            }
-        )
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, config.fxEnabledToggle))),
+        data =>
+          dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
+            case Some(model) =>
+              model.msbServices(BusinessMatchingMsbServices(data.toSet))
+            case _           => throw new Exception("An Unknown Exception has occurred")
+          } flatMap {
+            case Some(model) => router.getRoute(request.credId, SubSectorsPageId, model, edit)
+            case _           => Future.successful(InternalServerError("Post: Cannot retrieve data: SubServicesController"))
+          }
+      )
   }
 }

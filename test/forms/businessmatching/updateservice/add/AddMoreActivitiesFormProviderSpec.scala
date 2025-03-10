@@ -21,8 +21,8 @@ import play.api.data.{Form, FormError}
 
 class AddMoreActivitiesFormProviderSpec extends BooleanFieldBehaviours[Boolean] {
 
-  override val form: Form[Boolean] = new AddMoreActivitiesFormProvider()()
-  override val fieldName: String = "addmoreactivities"
+  override val form: Form[Boolean]  = new AddMoreActivitiesFormProvider()()
+  override val fieldName: String    = "addmoreactivities"
   override val errorMessage: String = "error.businessmatching.updateservice.addmoreactivities"
 
   "AddMoreActivitiesFormProvider" must {

@@ -23,6 +23,7 @@ import play.api.data.Form
 class LinkedCashPaymentsFormProvider extends BooleanFormProvider {
 
   def apply(): Form[LinkedCashPayments] = createForm[LinkedCashPayments](
-    "linkedCashPayments", "error.required.hvd.linked.cash.payment"
+    "linkedCashPayments",
+    "error.required.hvd.linked.cash.payment"
   )(LinkedCashPayments.apply, _.linkedCashPayments)
 }

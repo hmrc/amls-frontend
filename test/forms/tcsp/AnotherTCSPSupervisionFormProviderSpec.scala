@@ -26,8 +26,8 @@ class AnotherTCSPSupervisionFormProviderSpec extends BooleanFieldBehaviours[Serv
   val formProvider: AnotherTCSPSupervisionFormProvider = new AnotherTCSPSupervisionFormProvider()
 
   override val form: Form[ServicesOfAnotherTCSP] = formProvider()
-  override val fieldName: String = "servicesOfAnotherTCSP"
-  override val errorMessage: String = "error.required.tcsp.services.another.tcsp.registered"
+  override val fieldName: String                 = "servicesOfAnotherTCSP"
+  override val errorMessage: String              = "error.required.tcsp.services.another.tcsp.registered"
 
   val inputFieldName: String = "mlrRefNumber"
 
@@ -39,17 +39,16 @@ class AnotherTCSPSupervisionFormProviderSpec extends BooleanFieldBehaviours[Serv
 
         val boundForm = form.bind(Map(fieldName -> "false"))
 
-        boundForm.value shouldBe Some(ServicesOfAnotherTCSPNo)
+        boundForm.value  shouldBe Some(ServicesOfAnotherTCSPNo)
         boundForm.errors shouldBe Nil
       }
 
       "'Yes' is submitted and details are given" in {
 
         forAll(stringOfLengthGen(formProvider.maxLength).suchThat(_.nonEmpty)) { details =>
-
           val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> details))
 
-          boundForm.value shouldBe Some(ServicesOfAnotherTCSPYes(Some(details)))
+          boundForm.value  shouldBe Some(ServicesOfAnotherTCSPYes(Some(details)))
           boundForm.errors shouldBe Nil
         }
       }
@@ -57,16 +56,16 @@ class AnotherTCSPSupervisionFormProviderSpec extends BooleanFieldBehaviours[Serv
       "'Yes' is submitted and the value contains whitespace" in {
 
         val dataWithWhitespace = " 1 2 34 5 6 78  A B CDE "
-        val dataNoWhitespace = "12345678ABCDE"
+        val dataNoWhitespace   = "12345678ABCDE"
 
         val data = Map(
-          fieldName -> "true",
+          fieldName      -> "true",
           inputFieldName -> dataWithWhitespace
         )
 
         val result = form.bind(data)
 
-        result.value  shouldBe Some(ServicesOfAnotherTCSPYes(Some(dataNoWhitespace)))
+        result.value shouldBe Some(ServicesOfAnotherTCSPYes(Some(dataNoWhitespace)))
       }
     }
 
@@ -120,4 +119,3 @@ class AnotherTCSPSupervisionFormProviderSpec extends BooleanFieldBehaviours[Serv
     }
   }
 }
-

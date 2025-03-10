@@ -26,8 +26,8 @@ import views.html.businessdetails.ConfirmRegisteredOfficeOrMainPlaceView
 
 class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val place = app.injector.instanceOf[ConfirmRegisteredOfficeOrMainPlaceView]
-  lazy val formProvider = app.injector.instanceOf[ConfirmRegisteredOfficeFormProvider]
+  lazy val place                                                 = app.injector.instanceOf[ConfirmRegisteredOfficeOrMainPlaceView]
+  lazy val formProvider                                          = app.injector.instanceOf[ConfirmRegisteredOfficeFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -38,11 +38,13 @@ class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with Match
       val formWithData = formProvider().fill(ConfirmRegisteredOffice(true))
 
       def view = {
-        val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
+        val address = RegisteredOfficeUK("line1", None, None, None, "AB12CD")
         place(formWithData, address, true)
       }
 
-      doc.title must startWith(messages("businessdetails.confirmingyouraddress.title") + " - " + messages("summary.businessdetails"))
+      doc.title must startWith(
+        messages("businessdetails.confirmingyouraddress.title") + " - " + messages("summary.businessdetails")
+      )
     }
 
     "have correct headings" in new ViewFixture {
@@ -50,11 +52,11 @@ class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with Match
       val formWithData = formProvider().fill(ConfirmRegisteredOffice(true))
 
       def view = {
-        val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
+        val address = RegisteredOfficeUK("line1", None, None, None, "AB12CD")
         place(formWithData, address, true)
       }
 
-      heading.html must be(messages("businessdetails.confirmingyouraddress.title"))
+      heading.html    must be(messages("businessdetails.confirmingyouraddress.title"))
       subHeading.html must include(messages("summary.businessdetails"))
     }
 
@@ -68,7 +70,7 @@ class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with Match
       )
 
       def view = {
-        val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
+        val address = RegisteredOfficeUK("line1", None, None, None, "AB12CD")
         place(formWithErrors, address, true)
       }
 
@@ -77,7 +79,7 @@ class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with Match
       doc.getElementById("isRegOfficeOrMainPlaceOfBusiness-error").text() must include(messages(errorKey))
     }
 
-    val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
+    val address = RegisteredOfficeUK("line1", None, None, None, "AB12CD")
 
     behave like pageWithBackLink(place(formProvider(), address, true))
 

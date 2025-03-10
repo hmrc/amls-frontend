@@ -21,8 +21,8 @@ import play.api.data.{Form, FormError}
 
 class ApprovalCheckFormProviderSpec extends BooleanFieldBehaviours[Boolean] {
 
-  override val form: Form[Boolean] = new ApprovalCheckFormProvider()()
-  override val fieldName: String = "hasAlreadyPaidApprovalCheck"
+  override val form: Form[Boolean]  = new ApprovalCheckFormProvider()()
+  override val fieldName: String    = "hasAlreadyPaidApprovalCheck"
   override val errorMessage: String = "error.required.rp.approval_check"
 
   val formError: FormError = FormError(fieldName, errorMessage)
@@ -33,12 +33,14 @@ class ApprovalCheckFormProviderSpec extends BooleanFieldBehaviours[Boolean] {
 
     s"fail to bind when $fieldName is empty" in {
 
-      val result = form.bind(Map(
-        fieldName -> ""
-      ))
+      val result = form.bind(
+        Map(
+          fieldName -> ""
+        )
+      )
 
-      result.value shouldBe None
-      result.errors shouldBe(Seq(formError))
+      result.value  shouldBe None
+      result.errors shouldBe (Seq(formError))
     }
   }
 }

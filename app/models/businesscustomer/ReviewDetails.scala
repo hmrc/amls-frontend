@@ -25,20 +25,20 @@ import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership
 import play.api.libs.json.{Json, OWrites, Reads}
 
 case class ReviewDetails(
-                          businessName: String,
-                          businessType: Option[BusinessType],
-                          businessAddress: Address,
-                          safeId: String,
-                          utr: Option[String] = None
-                        )
+  businessName: String,
+  businessType: Option[BusinessType],
+  businessAddress: Address,
+  safeId: String,
+  utr: Option[String] = None
+)
 
 object ReviewDetails {
 
   private val toBusinessType: PartialFunction[String, BusinessType] = {
-    case s if s matches "(?i)Sole Trader" => SoleProprietor
-    case s if s matches "(?i)Corporate Body" => LimitedCompany
-    case s if s matches "(?i)Partnership" => Partnership
-    case s if s matches "(?i)LLP" => LPrLLP
+    case s if s matches "(?i)Sole Trader"         => SoleProprietor
+    case s if s matches "(?i)Corporate Body"      => LimitedCompany
+    case s if s matches "(?i)Partnership"         => Partnership
+    case s if s matches "(?i)LLP"                 => LPrLLP
     case s if s matches "(?i)Unincorporated Body" => UnincorporatedBody
   }
 
@@ -50,26 +50,31 @@ object ReviewDetails {
       (__ \ "businessName").read[String] and
         (__ \ "businessType").readNullable[String].map[Option[BusinessType]] {
           case Some(bt) if toBusinessType.isDefinedAt(bt) => Some(toBusinessType(bt))
-          case _ => None
+          case _                                          => None
         } and
         (__ \ "businessAddress").read[Address] and
         (__ \ "safeId").read[String] and
         (__ \ "utr").readNullable[String]
-      ) (ReviewDetails.apply _)
+    )(ReviewDetails.apply _)
   }
 
   implicit val writes: OWrites[ReviewDetails] = Json.writes[ReviewDetails]
 
   implicit def convert(addr: BusinessMatchingAddress): Address = {
-      val country = models.countries collectFirst {
-        case country@Country(_, code) if code == addr.country => country
-      } getOrElse Country("", addr.country)
+    val country = models.countries collectFirst {
+      case country @ Country(_, code) if code == addr.country => country
+    } getOrElse Country("", addr.country)
 
-      Address(addr.line_1, addr.line_2, addr.line_3, addr.line_4, addr.postcode, country)
-    }
-
-  implicit def convert(details: BusinessMatchingReviewDetails): ReviewDetails = {
-    ReviewDetails(details.businessName, Functor[Option].lift(toBusinessType)(details.businessType), details.businessAddress, details.safeId, details.utr)
+    Address(addr.line_1, addr.line_2, addr.line_3, addr.line_4, addr.postcode, country)
   }
+
+  implicit def convert(details: BusinessMatchingReviewDetails): ReviewDetails =
+    ReviewDetails(
+      details.businessName,
+      Functor[Option].lift(toBusinessType)(details.businessType),
+      details.businessAddress,
+      details.safeId,
+      details.utr
+    )
 
 }

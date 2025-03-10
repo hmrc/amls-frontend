@@ -23,29 +23,29 @@ import models.businessmatching.{BusinessMatching, BusinessType}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class BusinessTypeService @Inject()(
-                                   val cacheConnector: DataCacheConnector
-                                   ) {
+class BusinessTypeService @Inject() (
+  val cacheConnector: DataCacheConnector
+) {
 
   def getBusinessType(credId: String)(implicit ec: ExecutionContext): Future[Option[BusinessType]] =
     cacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key) map { bmOpt =>
       for {
-        bm <- bmOpt
+        bm            <- bmOpt
         reviewDetails <- bm.reviewDetails
-        businessType <- reviewDetails.businessType
-      } yield {
-        businessType
-      }
+        businessType  <- reviewDetails.businessType
+      } yield businessType
     }
 
-  def updateBusinessType(credId: String, businessType: BusinessType)(implicit ec: ExecutionContext): Future[Option[BusinessType]] = {
+  def updateBusinessType(credId: String, businessType: BusinessType)(implicit
+    ec: ExecutionContext
+  ): Future[Option[BusinessType]] = {
     cacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key) map { bm =>
       bm.reviewDetails map { rd =>
         cacheConnector.save[BusinessMatching](
           credId,
           BusinessMatching.key,
           bm.reviewDetails(rd.copy(businessType = Some(businessType)))
-        ) map(_ => businessType)
+        ) map (_ => businessType)
       }
     }
   } flatMap (_.sequence)

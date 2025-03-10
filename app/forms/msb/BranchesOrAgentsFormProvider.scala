@@ -22,9 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class BranchesOrAgentsFormProvider @Inject()() extends BooleanFormProvider {
+class BranchesOrAgentsFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[BranchesOrAgentsHasCountries] = createForm[BranchesOrAgentsHasCountries](
-    "hasCountries", "error.required.hasCountries.msb.branchesOrAgents"
+    "hasCountries",
+    "error.required.hasCountries.msb.branchesOrAgents"
   )(BranchesOrAgentsHasCountries.apply, _.hasCountries)
 }

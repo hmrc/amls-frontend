@@ -30,38 +30,41 @@ import utils.AuthAction
 import utils.businessactivities.CheckYourAnswersHelper
 import views.html.businessactivities.CheckYourAnswersView
 
-class SummaryController @Inject()(val dataCache: DataCacheConnector,
-                                  implicit val statusService: StatusService,
-                                  val authAction: AuthAction,
-                                  val ds: CommonPlayDependencies,
-                                  val cc: MessagesControllerComponents,
-                                  cyaHelper: CheckYourAnswersHelper,
-                                  view: CheckYourAnswersView) extends AmlsBaseController(ds, cc) {
+class SummaryController @Inject() (
+  val dataCache: DataCacheConnector,
+  implicit val statusService: StatusService,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  cyaHelper: CheckYourAnswersHelper,
+  view: CheckYourAnswersView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCache.fetchAll(request.credId) map {
-        optionalCache =>
-          (for {
-            cache <- optionalCache
-            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-            businessActivity <- cache.getEntry[BusinessActivities](BusinessActivities.key)
-            bmActivities <- businessMatching.activities
-            needsAccountancyQuestions = !bmActivities.businessActivities.contains(AccountancyServices)
-          } yield {
-              val summaryList = cyaHelper.createSummaryList(businessActivity, needsAccountancyQuestions)
-              Ok(view(summaryList))
-          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    dataCache.fetchAll(request.credId) map { optionalCache =>
+      (for {
+        cache                    <- optionalCache
+        businessMatching         <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+        businessActivity         <- cache.getEntry[BusinessActivities](BusinessActivities.key)
+        bmActivities             <- businessMatching.activities
+        needsAccountancyQuestions = !bmActivities.businessActivities.contains(AccountancyServices)
+      } yield {
+        val summaryList = cyaHelper.createSummaryList(businessActivity, needsAccountancyQuestions)
+        Ok(view(summaryList))
+      }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+    }
   }
 
-  def post: Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        businessActivity <- OptionT(dataCache.fetch[BusinessActivities](request.credId, BusinessActivities.key))
-        _ <- OptionT.liftF(dataCache.save[BusinessActivities](request.credId, BusinessActivities.key,
-          businessActivity.copy(hasAccepted = true))
+  def post: Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      businessActivity <- OptionT(dataCache.fetch[BusinessActivities](request.credId, BusinessActivities.key))
+      _                <-
+        OptionT.liftF(
+          dataCache
+            .save[BusinessActivities](request.credId, BusinessActivities.key, businessActivity.copy(hasAccepted = true))
         )
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update HVD")
+    } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError(
+      "Could not update HVD"
+    )
   }
 }

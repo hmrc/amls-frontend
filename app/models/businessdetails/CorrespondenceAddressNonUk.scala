@@ -19,14 +19,14 @@ package models.businessdetails
 import models.Country
 
 case class CorrespondenceAddressNonUk(
-                                     yourName: String,
-                                     businessName: String,
-                                     addressLineNonUK1: String,
-                                     addressLineNonUK2: Option[String],
-                                     addressLineNonUK3: Option[String],
-                                     addressLineNonUK4: Option[String],
-                                     country: Country
-                                     ) {
+  yourName: String,
+  businessName: String,
+  addressLineNonUK1: String,
+  addressLineNonUK2: Option[String],
+  addressLineNonUK3: Option[String],
+  addressLineNonUK4: Option[String],
+  country: Country
+) {
 
   def toLines: Seq[String] =
     Seq(
@@ -41,4 +41,3 @@ case class CorrespondenceAddressNonUk(
 }
 
 object CorrespondenceAddressNonUk
-

@@ -22,10 +22,9 @@ import play.api.data.Form
 
 class PreviouslyRegisteredFormProviderSpec extends BooleanFieldBehaviours[PreviouslyRegistered] {
 
-
   override val form: Form[PreviouslyRegistered] = new PreviouslyRegisteredFormProvider()()
-  override val fieldName: String = "value"
-  override val errorMessage: String = "error.required.atb.previously.registered"
+  override val fieldName: String                = "value"
+  override val errorMessage: String             = "error.required.atb.previously.registered"
 
   "PreviouslyRegistered form" must {
     behave like booleanFieldWithModel(PreviouslyRegisteredYes(None), PreviouslyRegisteredNo)

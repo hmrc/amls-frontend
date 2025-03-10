@@ -45,16 +45,17 @@ import java.time.LocalDateTime
 import scala.concurrent.Future
 
 // scalastyle:off magic.number
-class ConfirmationControllerSpec extends AmlsSpec
-  with AmlsReferenceNumberGenerator
-  with PaymentGenerator
-  with SubscriptionResponseGenerator
-  with Injecting {
+class ConfirmationControllerSpec
+    extends AmlsSpec
+    with AmlsReferenceNumberGenerator
+    with PaymentGenerator
+    with SubscriptionResponseGenerator
+    with Injecting {
 
   trait Fixture {
     self =>
-    val baseUrl = "http://localhost"
-    val request = addToken(authRequest(uri = baseUrl))
+    val baseUrl    = "http://localhost"
+    val request    = addToken(authRequest(uri = baseUrl))
     val controller = new ConfirmationController(
       authAction = SuccessfulAuthAction,
       statusService = mock[StatusService],
@@ -67,14 +68,15 @@ class ConfirmationControllerSpec extends AmlsSpec
       confirmationRenewal = inject[ConfirmationRenewalView],
       confirmationAmendment = inject[ConfirmationAmendmentView],
       confirmationNew = inject[ConfirmationNewView],
-      confirmationNoFee = inject[ConfirmationNoFeeView])
+      confirmationNoFee = inject[ConfirmationNoFeeView]
+    )
 
     val amlsRegistrationNumber = "amlsRefNumber"
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
 
-    protected val mockCacheMap = mock[Cache]
-    val companyNameFromCache = "My Test Company Name From Cache"
+    protected val mockCacheMap      = mock[Cache]
+    val companyNameFromCache        = "My Test Company Name From Cache"
     val companyNameFromRegistration = "My Test Company Name From Registration"
 
     setupBusinessMatching(companyNameFromCache)
@@ -124,7 +126,8 @@ class ConfirmationControllerSpec extends AmlsSpec
 
     val applicationConfig = inject[ApplicationConfig]
 
-    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
+    def paymentsReturnLocation(ref: String) =
+      ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
 
     def setupBusinessMatching(companyName: String) = {
 
@@ -164,7 +167,7 @@ class ConfirmationControllerSpec extends AmlsSpec
       val result = controller.get()(request)
       status(result) mustBe OK
       Jsoup.parse(contentAsString(result)).title must include("Your fee and payment reference")
-      contentAsString(result) must include(paymentReferenceNumber)
+      contentAsString(result)                    must include(paymentReferenceNumber)
     }
 
     "notify the user that there is a fee" when {
@@ -184,7 +187,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.title must include(messages("confirmation.header"))
+          doc.title               must include(messages("confirmation.header"))
           contentAsString(result) must include(messages("confirmation.submission.info"))
         }
 
@@ -202,7 +205,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.title must include(messages("confirmation.header"))
+          doc.title               must include(messages("confirmation.header"))
           contentAsString(result) must include(messages("confirmation.submission.info"))
         }
       }
@@ -223,7 +226,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.title must include(messages("confirmation.amendment.header"))
+          doc.title               must include(messages("confirmation.amendment.header"))
           contentAsString(result) must include(messages("confirmation.amendment.info"))
         }
 
@@ -241,7 +244,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.title must include(messages("confirmation.amendment.header"))
+          doc.title               must include(messages("confirmation.amendment.header"))
           contentAsString(result) must include(messages("confirmation.amendment.info"))
         }
       }
@@ -259,7 +262,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.title must include(messages("confirmation.amendment.header"))
+          doc.title               must include(messages("confirmation.amendment.header"))
           contentAsString(result) must include(messages("confirmation.amendment.info"))
         }
       }
@@ -280,8 +283,8 @@ class ConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.title must include(messages("confirmation.renewal.title"))
-        contentAsString(result) must include(messages("confirmation.renewal.header"))
+        doc.title                        must include(messages("confirmation.renewal.title"))
+        contentAsString(result)          must include(messages("confirmation.renewal.header"))
         doc.getElementById("total").text must include(Currency(200d).toString)
       }
     }
@@ -300,8 +303,8 @@ class ConfirmationControllerSpec extends AmlsSpec
         status(result) mustBe OK
 
         Jsoup.parse(contentAsString(result)).title must include(messages("confirmation.variation.title"))
-        contentAsString(result) must include(messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyNameFromRegistration)
+        contentAsString(result)                    must include(messages("confirmation.no.fee"))
+        contentAsString(result)                    must include(companyNameFromRegistration)
       }
 
       "has no payment reference" in new Fixture {
@@ -316,8 +319,8 @@ class ConfirmationControllerSpec extends AmlsSpec
         status(result) mustBe OK
 
         Jsoup.parse(contentAsString(result)).title must include(messages("confirmation.variation.title"))
-        contentAsString(result) must include(messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyNameFromRegistration)
+        contentAsString(result)                    must include(messages("confirmation.no.fee"))
+        contentAsString(result)                    must include(companyNameFromRegistration)
       }
     }
   }

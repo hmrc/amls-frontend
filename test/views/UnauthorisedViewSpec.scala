@@ -27,10 +27,10 @@ import views.html.UnauthorisedView
 class UnauthorisedViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val unauthorisedView: UnauthorisedView = app.injector.instanceOf[UnauthorisedView]
+    lazy val unauthorisedView: UnauthorisedView                    = app.injector.instanceOf[UnauthorisedView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
-    implicit val config: ApplicationConfig = app.injector.instanceOf[ApplicationConfig]
-    def view: HtmlFormat.Appendable = unauthorisedView()(requestWithToken, config, messages)
+    implicit val config: ApplicationConfig                         = app.injector.instanceOf[ApplicationConfig]
+    def view: HtmlFormat.Appendable                                = unauthorisedView()(requestWithToken, config, messages)
   }
 
   "UnauthorisedView" must {

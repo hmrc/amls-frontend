@@ -28,19 +28,28 @@ import utils.AmlsSpec
 
 class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySupport[Cache] {
 
-  val configNoEncryption: Configuration = Configuration(
+  val configNoEncryption: Configuration         = Configuration(
     ConfigFactory.load().withValue("appCache.mongo.encryptionEnabled", ConfigValueFactory.fromAnyRef(false))
   )
-  val configWithEncryption: Configuration = Configuration(
+  val configWithEncryption: Configuration       = Configuration(
     ConfigFactory.load().withValue("appCache.mongo.encryptionEnabled", ConfigValueFactory.fromAnyRef(true))
   )
-  val appConfigNoEncryption = new ApplicationConfig(configNoEncryption, app.injector.instanceOf[ServicesConfig])
-  val appConfigWithEncryption = new ApplicationConfig(configWithEncryption, app.injector.instanceOf[ServicesConfig])
-  override val repository = new MongoCacheClient(appConfigNoEncryption, app.injector.instanceOf[ApplicationCrypto],
-    mongoComponent, app.injector.instanceOf[CryptoService])
-  val encryptedRepository =
-    new MongoCacheClient(appConfigWithEncryption, app.injector.instanceOf[ApplicationCrypto], mongoComponent, app.injector.instanceOf[CryptoService])
-  val testCache: Cache = Cache("123", Map("fieldName" -> JsString("valueName")))
+  val appConfigNoEncryption                     = new ApplicationConfig(configNoEncryption, app.injector.instanceOf[ServicesConfig])
+  val appConfigWithEncryption                   = new ApplicationConfig(configWithEncryption, app.injector.instanceOf[ServicesConfig])
+  override val repository                       = new MongoCacheClient(
+    appConfigNoEncryption,
+    app.injector.instanceOf[ApplicationCrypto],
+    mongoComponent,
+    app.injector.instanceOf[CryptoService]
+  )
+  val encryptedRepository                       =
+    new MongoCacheClient(
+      appConfigWithEncryption,
+      app.injector.instanceOf[ApplicationCrypto],
+      mongoComponent,
+      app.injector.instanceOf[CryptoService]
+    )
+  val testCache: Cache                          = Cache("123", Map("fieldName" -> JsString("valueName")))
   val encryptedCacheData: Map[String, JsString] = Map("fieldName" -> JsString("Q2NYiC4W49rMPxfI+soQ2g=="))
 
   ".saveAll" must {
@@ -93,7 +102,10 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
     "create and return a cache when one does not exist" in {
       repository.createOrUpdate("123", JsString("valueName"), "fieldName").futureValue.data mustBe testCache.data
 
-      encryptedRepository.createOrUpdate("123", JsString("valueName"), "fieldName").futureValue.data mustBe encryptedCacheData
+      encryptedRepository
+        .createOrUpdate("123", JsString("valueName"), "fieldName")
+        .futureValue
+        .data mustBe encryptedCacheData
     }
 
     "update and return a cache when one already exists" in {
@@ -103,7 +115,10 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
 
       encryptedRepository.saveAll(testCache, "123").futureValue
       val newEncryptedData = Map("fieldName" -> JsString("lb6PR82vFARAM8u3kHMtKA=="))
-      encryptedRepository.createOrUpdate("123", JsString("newValueName"), "fieldName").futureValue.data mustBe newEncryptedData
+      encryptedRepository
+        .createOrUpdate("123", JsString("newValueName"), "fieldName")
+        .futureValue
+        .data mustBe newEncryptedData
     }
   }
 
@@ -152,27 +167,43 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
   ".upsert" must {
 
     "create and return a cache when one does not exist" in {
-      repository.upsert(
-        Cache("123", testCache.data), JsString("valueName"), "fieldName"
-      ).data mustBe testCache.data
+      repository
+        .upsert(
+          Cache("123", testCache.data),
+          JsString("valueName"),
+          "fieldName"
+        )
+        .data mustBe testCache.data
 
-      encryptedRepository.upsert(
-        Cache("123", testCache.data), JsString("valueName"), "fieldName"
-      ).data mustBe encryptedCacheData
+      encryptedRepository
+        .upsert(
+          Cache("123", testCache.data),
+          JsString("valueName"),
+          "fieldName"
+        )
+        .data mustBe encryptedCacheData
     }
 
     "update and return a cache when one already exists" in {
       repository.saveAll(testCache, "123").futureValue
       val newData = Map("fieldName" -> JsString("newValueName"))
-      repository.upsert(
-        Cache("123", testCache.data), JsString("newValueName"), "fieldName"
-      ).data mustBe newData
+      repository
+        .upsert(
+          Cache("123", testCache.data),
+          JsString("newValueName"),
+          "fieldName"
+        )
+        .data mustBe newData
 
       encryptedRepository.saveAll(testCache, "123").futureValue
       val newEncryptedData = Map("fieldName" -> JsString("lb6PR82vFARAM8u3kHMtKA=="))
-      encryptedRepository.upsert(
-        Cache("123", testCache.data), JsString("newValueName"), "fieldName"
-      ).data mustBe newEncryptedData
+      encryptedRepository
+        .upsert(
+          Cache("123", testCache.data),
+          JsString("newValueName"),
+          "fieldName"
+        )
+        .data mustBe newEncryptedData
     }
   }
 

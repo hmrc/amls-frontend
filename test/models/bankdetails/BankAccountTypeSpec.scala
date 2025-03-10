@@ -26,33 +26,33 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
   "BankAccountType" must {
 
     "return the correct type id" in {
-      PersonalAccount.getBankAccountTypeID must be("01")
-      BelongsToBusiness.getBankAccountTypeID must be("02")
+      PersonalAccount.getBankAccountTypeID        must be("01")
+      BelongsToBusiness.getBankAccountTypeID      must be("02")
       BelongsToOtherBusiness.getBankAccountTypeID must be("03")
-      NoBankAccountUsed.getBankAccountTypeID must be("04")
+      NoBankAccountUsed.getBankAccountTypeID      must be("04")
     }
 
     "validate Json read" in {
       Json.fromJson[BankAccountType](Json.obj("bankAccountType" -> "01")) must
-        be (JsSuccess(PersonalAccount, JsPath))
+        be(JsSuccess(PersonalAccount, JsPath))
       Json.fromJson[BankAccountType](Json.obj("bankAccountType" -> "02")) must
-        be (JsSuccess(BelongsToBusiness, JsPath))
+        be(JsSuccess(BelongsToBusiness, JsPath))
       Json.fromJson[BankAccountType](Json.obj("bankAccountType" -> "03")) must
-        be (JsSuccess(BelongsToOtherBusiness, JsPath))
+        be(JsSuccess(BelongsToOtherBusiness, JsPath))
       Json.fromJson[BankAccountType](Json.obj("bankAccountType" -> "04")) must
-        be (JsSuccess(NoBankAccountUsed, JsPath))
+        be(JsSuccess(NoBankAccountUsed, JsPath))
     }
 
-    "fail Json read on invalid data" in  {
-      Json.fromJson[BankAccountType](Json.obj("bankAccountType" ->"10")) must
-        be (JsError(JsPath, play.api.libs.json.JsonValidationError("error.invalid")))
+    "fail Json read on invalid data" in {
+      Json.fromJson[BankAccountType](Json.obj("bankAccountType" -> "10")) must
+        be(JsError(JsPath, play.api.libs.json.JsonValidationError("error.invalid")))
     }
 
-    "write correct Json value" in  {
-      Json.toJson(PersonalAccount.asInstanceOf[BankAccountType]) must be (Json.obj("bankAccountType" -> "01"))
-      Json.toJson(BelongsToBusiness.asInstanceOf[BankAccountType]) must be (Json.obj("bankAccountType" -> "02"))
-      Json.toJson(BelongsToOtherBusiness.asInstanceOf[BankAccountType]) must be (Json.obj("bankAccountType" -> "03"))
-      Json.toJson(NoBankAccountUsed.asInstanceOf[BankAccountType]) must be (Json.obj("bankAccountType" -> "04"))
+    "write correct Json value" in {
+      Json.toJson(PersonalAccount.asInstanceOf[BankAccountType])        must be(Json.obj("bankAccountType" -> "01"))
+      Json.toJson(BelongsToBusiness.asInstanceOf[BankAccountType])      must be(Json.obj("bankAccountType" -> "02"))
+      Json.toJson(BelongsToOtherBusiness.asInstanceOf[BankAccountType]) must be(Json.obj("bankAccountType" -> "03"))
+      Json.toJson(NoBankAccountUsed.asInstanceOf[BankAccountType])      must be(Json.obj("bankAccountType" -> "04"))
     }
   }
 }

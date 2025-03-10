@@ -47,10 +47,9 @@ class ServiceFlowSpec extends PlaySpec with Matchers with MockitoSugar with Scal
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
     val businessMatchingService = mock[BusinessMatchingService]
-    val service = new ServiceFlow(businessMatchingService)
-    val businessMatching = mock[BusinessMatching]
+    val service                 = new ServiceFlow(businessMatchingService)
+    val businessMatching        = mock[BusinessMatching]
     mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
-
 
     when(businessMatching.msbServices) thenReturn Some(
       BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))

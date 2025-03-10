@@ -30,24 +30,24 @@ import views.html.businessmatching.updateservice.add.CannotAddServicesView
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class NoPsrController @Inject()(
-                                 authAction: AuthAction,
-                                 val ds: CommonPlayDependencies,
-                                 implicit val dataCacheConnector: DataCacheConnector,
-                                 val helper: AddBusinessTypeHelper,
-                                 val router: Router[AddBusinessTypeFlowModel],
-                                 val cc: MessagesControllerComponents,
-                                 view: CannotAddServicesView) extends AmlsBaseController(ds, cc) {
+class NoPsrController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val dataCacheConnector: DataCacheConnector,
+  val helper: AddBusinessTypeHelper,
+  val router: Router[AddBusinessTypeFlowModel],
+  val cc: MessagesControllerComponents,
+  view: CannotAddServicesView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction {
-    implicit request => Ok(view())
+  def get: Action[AnyContent] = authAction { implicit request =>
+    Ok(view())
   }
 
-  def post(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        _ <- helper.clearFlowModel(request.credId)
-        route <- OptionT.liftF(router.getRoute(request.credId, NoPSRPageId, AddBusinessTypeFlowModel()))
-      } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NoPsrController")
+  def post(): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      _     <- helper.clearFlowModel(request.credId)
+      route <- OptionT.liftF(router.getRoute(request.credId, NoPSRPageId, AddBusinessTypeFlowModel()))
+    } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NoPsrController")
   }
 }

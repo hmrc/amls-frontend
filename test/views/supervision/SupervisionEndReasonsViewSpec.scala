@@ -24,10 +24,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.supervision.SupervisionEndReasonsView
 
-class SupervisionEndReasonsViewSpec extends AmlsViewSpec with Matchers  {
+class SupervisionEndReasonsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val supervision_end_reasons = inject[SupervisionEndReasonsView]
-  lazy val fp = inject[SupervisionEndReasonsFormProvider]
+  lazy val fp                      = inject[SupervisionEndReasonsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -41,8 +41,8 @@ class SupervisionEndReasonsViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = supervision_end_reasons(fp(), edit = false)
 
-      doc.title must startWith(messages("supervision.supervision_end_reasons.title"))
-      heading.html must include(messages("supervision.supervision_end_reasons.title"))
+      doc.title       must startWith(messages("supervision.supervision_end_reasons.title"))
+      heading.html    must include(messages("supervision.supervision_end_reasons.title"))
       subHeading.html must include(messages("summary.supervision"))
     }
 

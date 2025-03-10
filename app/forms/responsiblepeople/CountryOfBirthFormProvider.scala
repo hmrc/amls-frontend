@@ -25,17 +25,17 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfFalse
 
 import javax.inject.Inject
 
-class CountryOfBirthFormProvider @Inject()() extends AddressMappings {
+class CountryOfBirthFormProvider @Inject() () extends AddressMappings {
 
   private val booleanFieldName = "bornInUk"
-  private val emptyError = "error.required.rp.select.country.of.birth"
+  private val emptyError       = "error.required.rp.select.country.of.birth"
 
   override val countryErrorKey: String = "error.required.enter.valid.non.uk"
 
   def apply(): Form[CountryOfBirth] = Form[CountryOfBirth](
     mapping(
       booleanFieldName -> boolean(emptyError, emptyError),
-      "country" -> mandatoryIfFalse(
+      "country"        -> mandatoryIfFalse(
         booleanFieldName,
         text("error.required.rp.birth.country")
           .verifying(countryConstraintExcludeUK("error.invalid.rp.birth.country"))
@@ -45,9 +45,9 @@ class CountryOfBirthFormProvider @Inject()() extends AddressMappings {
   )
 
   private def apply(bornInUk: Boolean, country: Option[Country]): CountryOfBirth = (bornInUk, country) match {
-    case (true, None) => CountryOfBirth(bornInUk = true, None)
+    case (true, None)               => CountryOfBirth(bornInUk = true, None)
     case (false, country @ Some(_)) => CountryOfBirth(bornInUk = false, country)
-    case _ => throw new IllegalArgumentException(s"Invalid combination of answers")
+    case _                          => throw new IllegalArgumentException(s"Invalid combination of answers")
   }
 
   private def unapply(obj: CountryOfBirth): Option[(Boolean, Option[Country])] = Some((obj.bornInUk, obj.country))

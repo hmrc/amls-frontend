@@ -30,7 +30,7 @@ import java.time.LocalDate
 
 class RemoveActivitiesSummaryViewSpec extends AmlsViewSpec {
 
-  lazy val removeView = inject[RemoveActivitiesSummaryView]
+  lazy val removeView                                                = inject[RemoveActivitiesSummaryView]
   implicit val requestWithToken: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   val model = RemoveBusinessTypeFlowModel(
@@ -47,7 +47,7 @@ class RemoveActivitiesSummaryViewSpec extends AmlsViewSpec {
     }
 
     "have correct headings" in new ViewFixture {
-      heading.html must be(messages("title.cya"))
+      heading.html    must be(messages("title.cya"))
       subHeading.html must include(messages("summary.updateinformation"))
     }
 
@@ -56,7 +56,6 @@ class RemoveActivitiesSummaryViewSpec extends AmlsViewSpec {
       val rows = doc.getElementsByClass("govuk-summary-list__row")
 
       model.activitiesToRemove foreach { activities =>
-
         activities.foreach { activity =>
           rows.first().text() must include(activity.getMessage())
         }

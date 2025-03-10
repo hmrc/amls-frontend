@@ -39,28 +39,28 @@ trait AspValues {
     val NewServices = ServicesOfBusiness(Set(Accountancy, PayrollServices, FinancialOrTaxAdvice))
   }
 
-  val completeJson = Json.obj(
-    "services" -> Json.obj(
+  val completeJson        = Json.obj(
+    "services"                -> Json.obj(
       "services" -> Seq("01", "04", "05")
     ),
     "otherBusinessTaxMatters" -> Json.obj(
       "otherBusinessTaxMatters" -> true
     ),
-    "hasChanged" -> false,
-    "hasAccepted" -> true
+    "hasChanged"              -> false,
+    "hasAccepted"             -> true
   )
   val completeJsonWithReg = Json.obj(
-    "services" -> Json.obj(
+    "services"                -> Json.obj(
       "services" -> Seq("01", "04", "05")
     ),
     "otherBusinessTaxMatters" -> Json.obj(
       "otherBusinessTaxMatters" -> true,
-      "agentRegNo" -> "123456789"
+      "agentRegNo"              -> "123456789"
     ),
-    "hasChanged" -> false,
-    "hasAccepted" -> true
+    "hasChanged"              -> false,
+    "hasAccepted"             -> true
   )
-  val completeModel = Asp(
+  val completeModel       = Asp(
     Some(DefaultValues.DefaultServices),
     Some(DefaultValues.DefaultOtherBusinessTax),
     hasAccepted = true
@@ -117,7 +117,11 @@ class AspSpec extends AmlsSpec with AspValues {
       "return a NotStarted Task Row when model is empty" in {
 
         val notStartedRow = TaskRow(
-          "asp", controllers.asp.routes.WhatYouNeedController.get.url, false, NotStarted, TaskRow.notStartedTag
+          "asp",
+          controllers.asp.routes.WhatYouNeedController.get.url,
+          false,
+          NotStarted,
+          TaskRow.notStartedTag
         )
 
         when(cache.getEntry[Asp]("asp")) thenReturn None
@@ -130,7 +134,11 @@ class AspSpec extends AmlsSpec with AspValues {
         val complete = mock[Asp]
 
         val completedTaskRow = TaskRow(
-          "asp", controllers.asp.routes.SummaryController.get.url, false, Completed, TaskRow.completedTag
+          "asp",
+          controllers.asp.routes.SummaryController.get.url,
+          false,
+          Completed,
+          TaskRow.completedTag
         )
 
         when(complete.isComplete) thenReturn true
@@ -145,7 +153,11 @@ class AspSpec extends AmlsSpec with AspValues {
         val complete = mock[Asp]
 
         val updatedTaskRow = TaskRow(
-          "asp", controllers.asp.routes.SummaryController.get.url, true, Updated, TaskRow.updatedTag
+          "asp",
+          controllers.asp.routes.SummaryController.get.url,
+          true,
+          Updated,
+          TaskRow.updatedTag
         )
 
         when(complete.isComplete) thenReturn true
@@ -159,7 +171,11 @@ class AspSpec extends AmlsSpec with AspValues {
 
         val incompleteTcsp = mock[Asp]
         val startedSection = TaskRow(
-          "asp", controllers.asp.routes.WhatYouNeedController.get.url, false, Started, TaskRow.incompleteTag
+          "asp",
+          controllers.asp.routes.WhatYouNeedController.get.url,
+          false,
+          Started,
+          TaskRow.incompleteTag
         )
 
         when(incompleteTcsp.isComplete) thenReturn false
@@ -203,7 +219,7 @@ class AspSpec extends AmlsSpec with AspValues {
     "hasChanged field is missing from the Json" must {
       "Deserialise correctly" in {
         (completeJson - "hasChanged").as[Asp] must
-          be (completeModel)
+          be(completeModel)
       }
     }
   }
@@ -213,7 +229,7 @@ class AspSpec extends AmlsSpec with AspValues {
       "is the same as before" must {
         "leave the object unchanged" in {
           val res = completeModel.services(DefaultValues.DefaultServices)
-          res must be(completeModel)
+          res            must be(completeModel)
           res.hasChanged must be(false)
         }
       }
@@ -222,7 +238,7 @@ class AspSpec extends AmlsSpec with AspValues {
         "set the hasChanged & previouslyRegisterd Properties" in {
           val res = completeModel.services(ServicesOfBusiness(Set(BookKeeping)))
           res.hasChanged must be(true)
-          res.services must be(Some(ServicesOfBusiness(Set(BookKeeping))))
+          res.services   must be(Some(ServicesOfBusiness(Set(BookKeeping))))
         }
       }
     }
@@ -231,7 +247,7 @@ class AspSpec extends AmlsSpec with AspValues {
       "is the same as before" must {
         "leave the object unchanged" in {
           val res = completeModel.otherBusinessTaxMatters(DefaultValues.DefaultOtherBusinessTax)
-          res must be(completeModel)
+          res            must be(completeModel)
           res.hasChanged must be(false)
         }
       }
@@ -239,7 +255,7 @@ class AspSpec extends AmlsSpec with AspValues {
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
           val res = completeModel.otherBusinessTaxMatters(OtherBusinessTaxMattersNo)
-          res.hasChanged must be(true)
+          res.hasChanged              must be(true)
           res.otherBusinessTaxMatters must be(Some(OtherBusinessTaxMattersNo))
         }
       }

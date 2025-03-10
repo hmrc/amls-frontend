@@ -28,38 +28,38 @@ import views.html.supervision.PenaltyDetailsView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class PenaltyDetailsController @Inject()(
-                                          val dataCacheConnector: DataCacheConnector,
-                                          val authAction: AuthAction,
-                                          val ds: CommonPlayDependencies,
-                                          val cc: MessagesControllerComponents,
-                                          formProvider: PenaltyDetailsFormProvider,
-                                          view: PenaltyDetailsView) extends AmlsBaseController(ds, cc) {
+class PenaltyDetailsController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: PenaltyDetailsFormProvider,
+  view: PenaltyDetailsView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map { response =>
-        response.professionalBody match {
-          case Some(value @ ProfessionalBodyYes(_)) =>
-            Ok(view(formProvider().fill(value), edit))
-          case Some(ProfessionalBodyNo) =>
-            Redirect(routes.PenalisedByProfessionalController.get(edit))
-          case None =>
-            Ok(view(formProvider(), edit))
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map { response =>
+      response.professionalBody match {
+        case Some(value @ ProfessionalBodyYes(_)) =>
+          Ok(view(formProvider().fill(value), edit))
+        case Some(ProfessionalBodyNo)             =>
+          Redirect(routes.PenalisedByProfessionalController.get(edit))
+        case None                                 =>
+          Ok(view(formProvider(), edit))
       }
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest(cleanData(request.body, "professionalBody")).fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest(cleanData(request.body, "professionalBody"))
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           for {
             supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
-            _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key,
-              supervision.professionalBody(data))
+            _           <-
+              dataCacheConnector.save[Supervision](request.credId, Supervision.key, supervision.professionalBody(data))
           } yield Redirect(routes.SummaryController.get())
       )
   }

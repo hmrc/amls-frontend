@@ -39,13 +39,13 @@ object RiskAssessmentType extends Enumerable.Implicits {
     Reads {
       case JsString("01") => JsSuccess(PaperBased)
       case JsString("02") => JsSuccess(Digital)
-      case _ => JsError((JsPath \ "riskassessments") -> play.api.libs.json.JsonValidationError("error.invalid"))
+      case _              => JsError((JsPath \ "riskassessments") -> play.api.libs.json.JsonValidationError("error.invalid"))
     }
 
   implicit val jsonRiskAssessmentWrites: Writes[RiskAssessmentType] =
     Writes[RiskAssessmentType] {
       case PaperBased => JsString("01")
-      case Digital => JsString("02")
+      case Digital    => JsString("02")
     }
 
   val all: Seq[RiskAssessmentType] = Seq(PaperBased, Digital)

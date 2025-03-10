@@ -21,25 +21,23 @@ import play.api.libs.json._
 case class Country(name: String, code: String) {
   override def toString: String = name
 
-  def isUK = {
+  def isUK =
     this == Country("United Kingdom", "GB")
-  }
 
-  def isEmpty = {
+  def isEmpty =
     this == Country("", "")
-  }
 }
 
 object Country {
 
   val unitedKingdom: Country = Country("United Kingdom", "GB")
 
-  implicit val writes: Writes[Country] = Writes[Country] {
-    case Country(_, c) => JsString(c)
+  implicit val writes: Writes[Country] = Writes[Country] { case Country(_, c) =>
+    JsString(c)
   }
 
   implicit val reads: Reads[Country] = Reads[Country] {
-    case JsString("") => JsSuccess(Country("",""))
+    case JsString("")   => JsSuccess(Country("", ""))
     case JsString(code) =>
       countries collectFirst {
         case e @ Country(_, c) if c == code =>
@@ -47,7 +45,7 @@ object Country {
       } getOrElse {
         JsError(JsPath -> play.api.libs.json.JsonValidationError("error.invalid"))
       }
-    case _ =>
+    case _              =>
       JsError(JsPath -> play.api.libs.json.JsonValidationError("error.invalid"))
   }
 }

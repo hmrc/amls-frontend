@@ -27,37 +27,35 @@ import views.html.supervision.AnotherBodyView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class AnotherBodyController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                      val authAction: AuthAction,
-                                      val ds: CommonPlayDependencies,
-                                      val cc: MessagesControllerComponents,
-                                      formProvider: AnotherBodyFormProvider,
-                                      view: AnotherBodyView,
-                                      implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
+class AnotherBodyController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: AnotherBodyFormProvider,
+  view: AnotherBodyView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-
-      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
-        response =>
-          val form = (for {
-            supervision <- response
-            anotherBody <- supervision.anotherBody
-          } yield formProvider().fill(anotherBody)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map { response =>
+      val form = (for {
+        supervision <- response
+        anotherBody <- supervision.anotherBody
+      } yield formProvider().fill(anotherBody)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           for {
-            supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
-            _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key, updateData(supervision, data))
+            supervision        <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
+            _                  <- dataCacheConnector.save[Supervision](request.credId, Supervision.key, updateData(supervision, data))
             updatedSupervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
           } yield redirectTo(edit, updatedSupervision)
       )
@@ -65,10 +63,11 @@ class AnotherBodyController @Inject()(val dataCacheConnector: DataCacheConnector
 
   private def updateData(supervision: Supervision, data: AnotherBody): Supervision = {
     def updatedAnotherBody = (supervision.anotherBody, data) match {
-      case (_, d) if d.equals(AnotherBodyNo) => AnotherBodyNo
-      case (Some(ab), d: AnotherBodyYes) if ab.equals(AnotherBodyNo) => AnotherBodyYes(d.supervisorName, None, None, None)
-      case (Some(ab), d: AnotherBodyYes) => ab.asInstanceOf[AnotherBodyYes].supervisorName(d.supervisorName)
-      case (None, d: AnotherBodyYes) => AnotherBodyYes(d.supervisorName, None, None, None)
+      case (_, d) if d.equals(AnotherBodyNo)                         => AnotherBodyNo
+      case (Some(ab), d: AnotherBodyYes) if ab.equals(AnotherBodyNo) =>
+        AnotherBodyYes(d.supervisorName, None, None, None)
+      case (Some(ab), d: AnotherBodyYes)                             => ab.asInstanceOf[AnotherBodyYes].supervisorName(d.supervisorName)
+      case (None, d: AnotherBodyYes)                                 => AnotherBodyYes(d.supervisorName, None, None, None)
 
     }
 
@@ -80,16 +79,15 @@ class AnotherBodyController @Inject()(val dataCacheConnector: DataCacheConnector
     import utils.ControllerHelper.{anotherBodyComplete, isAnotherBodyYes}
 
     maybeSupervision match {
-      case Some(supervision) => {
+      case Some(supervision) =>
         val anotherBody = anotherBodyComplete(supervision)
 
         supervision.isComplete match {
           case false if isAnotherBodyYes(anotherBody) => Redirect(routes.SupervisionStartController.get())
-          case false => Redirect(routes.ProfessionalBodyMemberController.get())
-          case true => Redirect(routes.SummaryController.get())
+          case false                                  => Redirect(routes.ProfessionalBodyMemberController.get())
+          case true                                   => Redirect(routes.SummaryController.get())
         }
-      }
-      case _ => InternalServerError("Could not fetch the data")
+      case _                 => InternalServerError("Could not fetch the data")
     }
   }
 }

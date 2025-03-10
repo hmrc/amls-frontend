@@ -31,9 +31,9 @@ import java.time.LocalDate
 class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
 
   trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
-    val request = addToken(self.authRequest)
-    val RecordId = 1
-    lazy val view = inject[LegalNameChangeDateView]
+    val request         = addToken(self.authRequest)
+    val RecordId        = 1
+    lazy val view       = inject[LegalNameChangeDateView]
     lazy val controller = new LegalNameChangeDateController(
       mockCacheConnector,
       SuccessfulAuthAction,
@@ -41,7 +41,8 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures with 
       cc = mockMcc,
       formProvider = inject[LegalNameChangeDateFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
 
     val personName = PersonName("firstname", None, "lastname")
   }
@@ -72,7 +73,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures with 
 
         val responsiblePeople = ResponsiblePerson(
           personName = Some(personName),
-          legalNameChangeDate = Some(LocalDate.of(2001,10,14))
+          legalNameChangeDate = Some(LocalDate.of(2001, 10, 14))
         )
 
         mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePeople)), Some(ResponsiblePerson.key))
@@ -83,9 +84,9 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures with 
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.select("input[name=date.day]").`val` must be("14")
+        document.select("input[name=date.day]").`val`   must be("14")
         document.select("input[name=date.month]").`val` must be("10")
-        document.select("input[name=date.year]").`val` must be("2001")
+        document.select("input[name=date.year]").`val`  must be("2001")
       }
 
     }
@@ -96,17 +97,17 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures with 
           "edit is false" in new TestFixture {
 
             val newRequest = FakeRequest(POST, routes.LegalNameChangeDateController.post(1).url)
-            .withFormUrlEncodedBody(
-              "date.day" -> "1",
-              "date.month" -> "12",
-              "date.year" -> "1990"
-            )
+              .withFormUrlEncodedBody(
+                "date.day"   -> "1",
+                "date.month" -> "12",
+                "date.year"  -> "1990"
+              )
 
             mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[LegalNameChangeDate]
 
             val result = controller.post(RecordId)(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.KnownByController.get(RecordId).url))
           }
         }
@@ -115,17 +116,17 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures with 
           "edit is true" in new TestFixture {
 
             val newRequest = FakeRequest(POST, routes.LegalNameChangeDateController.post(1).url)
-            .withFormUrlEncodedBody(
-              "date.day" -> "1",
-              "date.month" -> "12",
-              "date.year" -> "1990"
-            )
+              .withFormUrlEncodedBody(
+                "date.day"   -> "1",
+                "date.month" -> "12",
+                "date.year"  -> "1990"
+              )
 
             mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[LegalNameChangeDate]
 
             val result = controller.post(RecordId, true)(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
           }
         }
@@ -135,9 +136,9 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures with 
         "return BAD_REQUEST" in new TestFixture {
 
           val NameMissingInRequest = FakeRequest(POST, routes.LegalNameChangeDateController.post(1).url)
-          .withFormUrlEncodedBody(
-            "date.day" -> "1"
-          )
+            .withFormUrlEncodedBody(
+              "date.day" -> "1"
+            )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[LegalNameChangeDate]
@@ -153,11 +154,11 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures with 
         "return NOT_FOUND" in new TestFixture {
 
           val newRequest = FakeRequest(POST, routes.LegalNameChangeDateController.post(1).url)
-          .withFormUrlEncodedBody(
-            "date.day" -> "1",
-            "date.month" -> "12",
-            "date.year" -> "1990"
-          )
+            .withFormUrlEncodedBody(
+              "date.day"   -> "1",
+              "date.month" -> "12",
+              "date.year"  -> "1990"
+            )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[LegalNameChangeDate]

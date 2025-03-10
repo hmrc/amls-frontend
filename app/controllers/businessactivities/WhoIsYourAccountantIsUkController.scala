@@ -26,56 +26,59 @@ import services.AutoCompleteService
 import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities.AccountantIsUKAddressView
 
-class WhoIsYourAccountantIsUkController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                  val autoCompleteService: AutoCompleteService,
-                                                  val authAction: AuthAction,
-                                                  val ds: CommonPlayDependencies,
-                                                  val cc: MessagesControllerComponents,
-                                                  formProvider: AccountantIsUKAddressFormProvider,
-                                                  view: AccountantIsUKAddressView) extends AmlsBaseController(ds, cc) {
+class WhoIsYourAccountantIsUkController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val autoCompleteService: AutoCompleteService,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: AccountantIsUKAddressFormProvider,
+  view: AccountantIsUKAddressView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-        response =>
-          val form = (for {
-            businessActivities <- response
-            isUk <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.isUk)
-          } yield {
-            formProvider().fill(isUk)
-          }).getOrElse(formProvider())
-          Ok(view(form, edit, ControllerHelper.accountantName(response)))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { response =>
+      val form = (for {
+        businessActivities <- response
+        isUk               <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.isUk)
+      } yield formProvider().fill(isUk)).getOrElse(formProvider())
+      Ok(view(form, edit, ControllerHelper.accountantName(response)))
+    }
   }
 
-  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors =>
-          dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-            response => BadRequest(view(formWithErrors, edit, ControllerHelper.accountantName(response)))
+          dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { response =>
+            BadRequest(view(formWithErrors, edit, ControllerHelper.accountantName(response)))
           },
         data =>
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, updateModel(businessActivity, data))
-          } yield if (data.isUk) {
-            Redirect(routes.WhoIsYourAccountantUkAddressController.get(edit))
-          } else {
-            Redirect(routes.WhoIsYourAccountantNonUkAddressController.get(edit))
-          }
+            _                <-
+              dataCacheConnector
+                .save[BusinessActivities](request.credId, BusinessActivities.key, updateModel(businessActivity, data))
+          } yield
+            if (data.isUk) {
+              Redirect(routes.WhoIsYourAccountantUkAddressController.get(edit))
+            } else {
+              Redirect(routes.WhoIsYourAccountantNonUkAddressController.get(edit))
+            }
       )
   }
 
-  private def updateModel(ba: BusinessActivities, data: WhoIsYourAccountantIsUk): BusinessActivities = {
-    ba.copy(whoIsYourAccountant = ba.whoIsYourAccountant.map(accountant =>
-      if(changedIsUk(accountant, data)) {
-        accountant.isUk(data).address(None)
-      } else {
-        accountant.isUk(data)
-      })
+  private def updateModel(ba: BusinessActivities, data: WhoIsYourAccountantIsUk): BusinessActivities =
+    ba.copy(whoIsYourAccountant =
+      ba.whoIsYourAccountant.map(accountant =>
+        if (changedIsUk(accountant, data)) {
+          accountant.isUk(data).address(None)
+        } else {
+          accountant.isUk(data)
+        }
+      )
     )
-  }
 
   private def changedIsUk(accountant: WhoIsYourAccountant, newData: WhoIsYourAccountantIsUk): Boolean =
     accountant.address.map(add => add.isUk).exists(isUk => isUk != newData.isUk)

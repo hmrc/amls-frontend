@@ -24,7 +24,7 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.supervision.WhatYouNeedView
 
-class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers  {
+class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val what_you_need = inject[WhatYouNeedView]
 
@@ -41,10 +41,20 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers  {
     "contain the expected content elements" in new ViewFixture {
       def view = what_you_need(call)
 
-      html must include(Messages("if your business has been registered with another supervisory body under the Money Laundering Regulations"))
+      html must include(
+        Messages(
+          "if your business has been registered with another supervisory body under the Money Laundering Regulations"
+        )
+      )
       html must include(Messages("which professional bodies you’re a member of, if any"))
-      html must include(Messages("if your business, or anyone in your business, has been penalised for activities covered by the Money Laundering Regulations"))
-      html must include(Messages("If you have been registered with another supervisory body, you’ll need to tell us the:"))
+      html must include(
+        Messages(
+          "if your business, or anyone in your business, has been penalised for activities covered by the Money Laundering Regulations"
+        )
+      )
+      html must include(
+        Messages("If you have been registered with another supervisory body, you’ll need to tell us the:")
+      )
       html must include(Messages("name of your previous supervisory body"))
       html must include(Messages("dates your supervision started and ended"))
       html must include(Messages("reason why your supervision ended"))

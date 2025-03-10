@@ -29,7 +29,7 @@ import java.time.LocalDate
 class DateOfChangeViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val date_of_change = inject[DateOfChangeView]
-  lazy val fp = inject[DateOfChangeFormProvider]
+  lazy val fp             = inject[DateOfChangeFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -49,18 +49,18 @@ class DateOfChangeViewSpec extends AmlsViewSpec with Matchers {
       doc.title must startWith(messages("dateofchange.title"))
     }
 
-    "Have the correct Headings" in new ViewFixture{
+    "Have the correct Headings" in new ViewFixture {
       def view = date_of_change(
         fp(),
         "testSubheadingMessage",
         controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
       )
 
-      heading.html must be (messages("dateofchange.title"))
-      subHeading.html must include ("testSubheadingMessage")
+      heading.html    must be(messages("dateofchange.title"))
+      subHeading.html must include("testSubheadingMessage")
     }
 
-    "contain the expected content elements" in new ViewFixture{
+    "contain the expected content elements" in new ViewFixture {
       def view = date_of_change(
         fp(),
         "testSubheadingMessage",
@@ -76,7 +76,8 @@ class DateOfChangeViewSpec extends AmlsViewSpec with Matchers {
         "testSubheadingMessage",
         controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
       ),
-      "dateOfChange", "error.future.date"
+      "dateOfChange",
+      "error.future.date"
     )
 
     behave like pageWithBackLink(

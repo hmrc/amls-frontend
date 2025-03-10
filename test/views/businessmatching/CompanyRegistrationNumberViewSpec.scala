@@ -25,15 +25,14 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.CompanyRegistrationNumberView
 
-
-class CompanyRegistrationNumberViewSpec extends AmlsViewSpec with Matchers  {
+class CompanyRegistrationNumberViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val viewUnderTest = app.injector.instanceOf[CompanyRegistrationNumberView]
+    lazy val viewUnderTest                                         = app.injector.instanceOf[CompanyRegistrationNumberView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
-  val formProvider = new CompanyRegistrationNumberFormProvider()()
+  val formProvider                                  = new CompanyRegistrationNumberFormProvider()()
   val formWithData: Form[CompanyRegistrationNumber] = formProvider.fill(CompanyRegistrationNumber("12345678"))
 
   "CompanyRegistrationNumberView view" must {
@@ -41,7 +40,9 @@ class CompanyRegistrationNumberViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = viewUnderTest(formWithData, edit = false, isPreSubmission = true)
 
-      doc.title must startWith(messages("businessmatching.registrationnumber.title") + " - " + messages("summary.businessmatching"))
+      doc.title    must startWith(
+        messages("businessmatching.registrationnumber.title") + " - " + messages("summary.businessmatching")
+      )
       heading.html must include(messages("businessmatching.registrationnumber.title"))
       caption.html must include(messages("summary.businessmatching"))
 
@@ -51,12 +52,13 @@ class CompanyRegistrationNumberViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = viewUnderTest(formWithData, edit = true, isPreSubmission = false)
 
-      doc.title must startWith(messages("businessmatching.registrationnumber.title") + " - " + messages("summary.updateinformation"))
+      doc.title    must startWith(
+        messages("businessmatching.registrationnumber.title") + " - " + messages("summary.updateinformation")
+      )
       heading.html must include(messages("businessmatching.registrationnumber.title"))
       caption.html must include(messages("summary.updateinformation"))
 
     }
-
 
     "show errors in the correct locations" in new ViewFixture {
 

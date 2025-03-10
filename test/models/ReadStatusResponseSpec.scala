@@ -24,30 +24,31 @@ import java.time.{LocalDate, LocalDateTime, ZoneOffset}
 
 class ReadStatusResponseSpec extends PlaySpec with MockitoSugar {
 
-  private val processingDateTime: LocalDateTime = LocalDateTime.parse("2019-12-30T00:00:00.000").atOffset(ZoneOffset.UTC).toLocalDateTime
+  private val processingDateTime: LocalDateTime =
+    LocalDateTime.parse("2019-12-30T00:00:00.000").atOffset(ZoneOffset.UTC).toLocalDateTime
 
   val mandatoryJson: JsObject = Json.obj(
-    "processingDate" -> "2019-12-30T00:00:00Z",
-    "formBundleStatus" -> "bundle",
-    "statusReason" -> "status",
-    "deRegistrationDate" -> "2017-01-01",
+    "processingDate"          -> "2019-12-30T00:00:00Z",
+    "formBundleStatus"        -> "bundle",
+    "statusReason"            -> "status",
+    "deRegistrationDate"      -> "2017-01-01",
     "currentRegYearStartDate" -> "2018-02-02",
-    "currentRegYearEndDate" -> "2019-03-03",
-    "renewalConFlag" -> true
+    "currentRegYearEndDate"   -> "2019-03-03",
+    "renewalConFlag"          -> true
   )
 
   val fullJson: JsObject = Json.obj(
-    "processingDate" -> "2019-12-30T00:00:00Z",
-    "formBundleStatus" -> "bundle",
-    "statusReason" -> "status",
-    "deRegistrationDate" -> "2017-01-01",
-    "currentRegYearStartDate" -> "2018-02-02",
-    "currentRegYearEndDate" -> "2019-03-03",
-    "renewalConFlag" -> true,
-    "renewalSubmissionFlag" -> true,
+    "processingDate"                -> "2019-12-30T00:00:00Z",
+    "formBundleStatus"              -> "bundle",
+    "statusReason"                  -> "status",
+    "deRegistrationDate"            -> "2017-01-01",
+    "currentRegYearStartDate"       -> "2018-02-02",
+    "currentRegYearEndDate"         -> "2019-03-03",
+    "renewalConFlag"                -> true,
+    "renewalSubmissionFlag"         -> true,
     "currentAMLSOutstandingBalance" -> "balance",
-    "businessContactNumber" -> "number",
-    "safeId" -> "idNumber"
+    "businessContactNumber"         -> "number",
+    "safeId"                        -> "idNumber"
   )
 
   val mandatoryResponse = ReadStatusResponse(

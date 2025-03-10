@@ -23,8 +23,8 @@ import play.api.data.Form
 class CorrespondenceAddressIsUKFormProviderSpec extends BooleanFieldBehaviours[CorrespondenceAddressIsUk] {
 
   override val form: Form[CorrespondenceAddressIsUk] = new CorrespondenceAddressIsUKFormProvider()()
-  override val fieldName: String = "isUk"
-  override val errorMessage = "businessdetails.correspondenceaddress.isuk.error"
+  override val fieldName: String                     = "isUk"
+  override val errorMessage                          = "businessdetails.correspondenceaddress.isuk.error"
 
   "CorrespondenceAddressIsUKFormProvider" must {
 

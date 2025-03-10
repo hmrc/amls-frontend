@@ -18,8 +18,8 @@ package models.responsiblepeople
 
 import play.api.libs.json.{Json, OFormat}
 
-case class SoleProprietorOfAnotherBusiness (soleProprietorOfAnotherBusiness: Boolean)
+case class SoleProprietorOfAnotherBusiness(soleProprietorOfAnotherBusiness: Boolean)
 
 object SoleProprietorOfAnotherBusiness {
-  implicit val format: OFormat[SoleProprietorOfAnotherBusiness] =  Json.format[SoleProprietorOfAnotherBusiness]
+  implicit val format: OFormat[SoleProprietorOfAnotherBusiness] = Json.format[SoleProprietorOfAnotherBusiness]
 }

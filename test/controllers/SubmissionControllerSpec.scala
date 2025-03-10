@@ -42,7 +42,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     val request = addToken(authRequest)
 
     val mockSectionsProvider = mock[SectionsProvider]
-    val renewalService = mock[RenewalService]
+    val renewalService       = mock[RenewalService]
     when(renewalService.isRenewalFlow(any(), any(), any())(any(), any())).thenReturn(Future.successful(false))
 
     val controller = new SubmissionController(
@@ -58,16 +58,20 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
   val response = SubscriptionResponse(
     etmpFormBundleNumber = "",
-    amlsRefNo = "", Some(SubscriptionFees(
-      registrationFee = 0,
-      fpFee = None,
-      fpFeeRate = None,
-      approvalCheckFee = None,
-      approvalCheckFeeRate = None,
-      premiseFee = 0,
-      premiseFeeRate = None,
-      totalFees = 0,
-      paymentReference = ""))
+    amlsRefNo = "",
+    Some(
+      SubscriptionFees(
+        registrationFee = 0,
+        fpFee = None,
+        fpFeeRate = None,
+        approvalCheckFee = None,
+        approvalCheckFeeRate = None,
+        premiseFee = 0,
+        premiseFeeRate = None,
+        totalFees = 0,
+        paymentReference = ""
+      )
+    )
   )
 
   val amendmentResponse = AmendVariationRenewalResponse(
@@ -172,7 +176,8 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get().url)
     }
 
-    "redirect to the correct help page when a duplicate enrolment error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
+    "redirect to the correct help page when a duplicate enrolment error is encountered while trying to enrol the user" in new Fixture
+      with ParagraphHelpers {
       val msg = "HMRC-MLR-ORG duplicate enrolment"
       when {
         mockSectionsProvider.taskRows(any[String])(any(), any())
@@ -192,7 +197,8 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       redirectLocation(result) mustBe Some(routes.SubmissionErrorController.duplicateEnrolment().url)
     }
 
-    "redirect to the correct help page when a duplicate subscription error is encountered" in new Fixture with ParagraphHelpers {
+    "redirect to the correct help page when a duplicate subscription error is encountered" in new Fixture
+      with ParagraphHelpers {
       val msg = "HMRC-MLR-ORG duplicate subscription"
       when {
         mockSectionsProvider.taskRows(any[String])(any(), any())
@@ -212,7 +218,8 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       redirectLocation(result) mustBe Some(routes.SubmissionErrorController.duplicateSubmission().url)
     }
 
-    "redirect to the correct help page when an error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
+    "redirect to the correct help page when an error is encountered while trying to enrol the user" in new Fixture
+      with ParagraphHelpers {
       val msg = "invalid credentials"
       when {
         mockSectionsProvider.taskRows(any[String])(any(), any())
@@ -224,7 +231,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       when {
         controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any())
-      } thenReturn Future.failed(InvalidEnrolmentCredentialsException(msg, UpstreamErrorResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
+      } thenReturn Future.failed(
+        InvalidEnrolmentCredentialsException(msg, UpstreamErrorResponse(msg, BAD_GATEWAY, BAD_GATEWAY))
+      )
 
       val result = controller.post()(request)
 
@@ -239,7 +248,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       when {
         controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any())
-      } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
+      } thenReturn Future.failed(
+        new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400")
+      )
 
       when {
         controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())
@@ -273,7 +284,6 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         }
       }
 
-
       "Redirect to the correct confirmation page" in new Fixture {
         when {
           mockSectionsProvider.taskRows(any[String])(any(), any())
@@ -299,7 +309,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
         when {
           controller.subscriptionService.variation(any[String](), any(), any())(any(), any())
-        } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
+        } thenReturn Future.failed(
+          new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400")
+        )
 
         when {
           controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())
@@ -355,7 +367,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
           controller.renewalService.getRenewal(any[String]())
         } thenReturn Future.successful(None)
 
-       await(controller.post()(request))
+        await(controller.post()(request))
         verify(controller.subscriptionService).variation(any[String](), any(), any())(any(), any())
         verify(controller.subscriptionService, never()).renewal(any(), any(), any(), any())(any(), any())
       }
@@ -367,7 +379,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
         when {
           controller.subscriptionService.variation(any[String](), any(), any())(any(), any())
-        } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
+        } thenReturn Future.failed(
+          new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400")
+        )
 
         when {
           controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())
@@ -415,7 +429,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
         when {
           controller.subscriptionService.renewalAmendment(any(), any(), any(), any())(any(), any())
-        } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
+        } thenReturn Future.failed(
+          new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400")
+        )
 
         when {
           controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())

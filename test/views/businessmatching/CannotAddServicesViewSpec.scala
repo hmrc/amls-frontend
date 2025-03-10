@@ -24,7 +24,7 @@ import views.html.businessmatching.CannotAddServicesView
 
 class CannotAddServicesViewSpec extends AmlsViewSpec {
 
-  lazy val cannotAddServicesView = inject[CannotAddServicesView]
+  lazy val cannotAddServicesView                            = inject[CannotAddServicesView]
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   "CannotAddServicesView" must {

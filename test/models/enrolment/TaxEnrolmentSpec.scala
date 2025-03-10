@@ -24,8 +24,8 @@ import play.api.libs.json.Json
 class TaxEnrolmentSpec extends PlaySpec with Matchers with BaseGenerator with AmlsReferenceNumberGenerator {
 
   trait Fixture {
-    //noinspection ScalaStyle
-    val userId = numSequence(10).sample.get
+    // noinspection ScalaStyle
+    val userId   = numSequence(10).sample.get
     val postCode = postcodeGen.sample.get
   }
 
@@ -34,10 +34,10 @@ class TaxEnrolmentSpec extends PlaySpec with Matchers with BaseGenerator with Am
       val model = TaxEnrolment(userId, postCode)
 
       val expectedJson = Json.obj(
-        "userId" -> userId,
+        "userId"       -> userId,
         "friendlyName" -> "AMLS Enrolment",
-        "type" -> "principal",
-        "verifiers" -> Seq(
+        "type"         -> "principal",
+        "verifiers"    -> Seq(
           EnrolmentIdentifier("Postcode", postCode)
         )
       )

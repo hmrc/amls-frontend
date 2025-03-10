@@ -26,17 +26,18 @@ sealed trait CustomersOutsideUK0 {
   val jsonReads: Reads[CustomersOutsideUK] =
     (__ \ "countries").readNullable[Seq[Country]].map {
       case Some(countries) if countries.isEmpty => CustomersOutsideUK(None)
-      case c@Some(countries) => CustomersOutsideUK apply c
-      case None => CustomersOutsideUK(None)
+      case c @ Some(countries)                  => CustomersOutsideUK apply c
+      case None                                 => CustomersOutsideUK(None)
     }
 
   val jsonW = Writes[CustomersOutsideUK] { x =>
     val countries = x.countries.fold[Seq[String]](Seq.empty)(x => x.map(m => m.code))
     countries.nonEmpty match {
-      case true => Json.obj(
-        "isOutside" -> true,
-        "countries" -> countries
-      )
+      case true  =>
+        Json.obj(
+          "isOutside" -> true,
+          "countries" -> countries
+        )
       case false =>
         Json.obj(
           "isOutside" -> false
@@ -49,6 +50,6 @@ object CustomersOutsideUK {
 
   private object Cache extends CustomersOutsideUK0
 
-  implicit val jsonR: Reads[CustomersOutsideUK] = Cache.jsonReads
+  implicit val jsonR: Reads[CustomersOutsideUK]  = Cache.jsonReads
   implicit val jsonW: Writes[CustomersOutsideUK] = Cache.jsonW
 }

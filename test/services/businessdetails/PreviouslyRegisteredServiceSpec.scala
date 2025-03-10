@@ -29,7 +29,7 @@ import scala.concurrent.Future
 class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[Cache]
+  val mockCacheMap       = mock[Cache]
 
   val service = new PreviouslyRegisteredService(mockCacheConnector)
 
@@ -53,7 +53,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
         "previously registered is not present" in {
 
-        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
+          when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
             .thenReturn(Future.successful(Some(BusinessDetails())))
 
           service.getPreviouslyRegistered(credId).futureValue mustBe None
@@ -61,7 +61,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
         "business details is not present" in {
 
-        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
+          when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
             .thenReturn(Future.successful(None))
 
           service.getPreviouslyRegistered(credId).futureValue mustBe None
@@ -83,14 +83,18 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
           when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))
             .thenReturn(Some(bd))
 
-          when(mockCacheConnector.save[BusinessDetails](
-            eqTo(credId),
-            eqTo(BusinessDetails.key),
-            eqTo(bd.copy(previouslyRegistered = Some(PreviouslyRegisteredYes(None)), hasChanged = true))
-          )(any()))
+          when(
+            mockCacheConnector.save[BusinessDetails](
+              eqTo(credId),
+              eqTo(BusinessDetails.key),
+              eqTo(bd.copy(previouslyRegistered = Some(PreviouslyRegisteredYes(None)), hasChanged = true))
+            )(any())
+          )
             .thenReturn(Future.successful(mockCacheMap))
 
-          service.updatePreviouslyRegistered(credId, PreviouslyRegisteredYes(None)).futureValue mustBe Some(mockCacheMap)
+          service.updatePreviouslyRegistered(credId, PreviouslyRegisteredYes(None)).futureValue mustBe Some(
+            mockCacheMap
+          )
 
           verify(mockCacheConnector).save[BusinessDetails](
             eqTo(credId),
@@ -107,11 +111,13 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
           when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))
             .thenReturn(None)
 
-          when(mockCacheConnector.save[BusinessDetails](
-            eqTo(credId),
-            eqTo(BusinessDetails.key),
-            eqTo(BusinessDetails().copy(previouslyRegistered = Some(PreviouslyRegisteredNo), hasChanged = true))
-          )(any()))
+          when(
+            mockCacheConnector.save[BusinessDetails](
+              eqTo(credId),
+              eqTo(BusinessDetails.key),
+              eqTo(BusinessDetails().copy(previouslyRegistered = Some(PreviouslyRegisteredNo), hasChanged = true))
+            )(any())
+          )
             .thenReturn(Future.successful(mockCacheMap))
 
           service.updatePreviouslyRegistered(credId, PreviouslyRegisteredNo).futureValue mustBe Some(mockCacheMap)
@@ -150,11 +156,13 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
           when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))
             .thenReturn(Some(bd))
 
-          when(mockCacheConnector.save[BusinessDetails](
-            eqTo(credId),
-            eqTo(BusinessDetails.key),
-            eqTo(bd.copy(previouslyRegistered = Some(PreviouslyRegisteredNo), hasChanged = true))
-          )(any()))
+          when(
+            mockCacheConnector.save[BusinessDetails](
+              eqTo(credId),
+              eqTo(BusinessDetails.key),
+              eqTo(bd.copy(previouslyRegistered = Some(PreviouslyRegisteredNo), hasChanged = true))
+            )(any())
+          )
             .thenReturn(Future.failed(new Exception("Something went wrong")))
 
           service.updatePreviouslyRegistered(credId, PreviouslyRegisteredNo).futureValue mustBe None

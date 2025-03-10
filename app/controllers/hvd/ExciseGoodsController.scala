@@ -32,52 +32,51 @@ import views.html.hvd.ExciseGoodsView
 
 import scala.concurrent.Future
 
-class ExciseGoodsController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                       val statusService: StatusService,
-                                       val authAction: AuthAction,
-                                       val ds: CommonPlayDependencies,
-                                       val serviceFlow: ServiceFlow,
-                                       val cc: MessagesControllerComponents,
-                                       formProvider: ExciseGoodsFormProvider,
-                                       view: ExciseGoodsView) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+class ExciseGoodsController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val statusService: StatusService,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val serviceFlow: ServiceFlow,
+  val cc: MessagesControllerComponents,
+  formProvider: ExciseGoodsFormProvider,
+  view: ExciseGoodsView
+) extends AmlsBaseController(ds, cc)
+    with DateOfChangeHelper {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
-        response =>
-          val form = (for {
-            hvd <- response
-            exciseGoods <- hvd.exciseGoods
-          } yield formProvider().fill(exciseGoods)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map { response =>
+      val form = (for {
+        hvd         <- response
+        exciseGoods <- hvd.exciseGoods
+      } yield formProvider().fill(exciseGoods)).getOrElse(formProvider())
+      Ok(view(form, edit))
     }
+  }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           for {
-            hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
-            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-            _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, hvd.exciseGoods(data))
+            hvd           <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
+            status        <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+            _             <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, hvd.exciseGoods(data))
             isNewActivity <- serviceFlow.isNewActivity(request.credId, HighValueDealing)
           } yield {
             val redirect = !isNewActivity && redirectToDateOfChange[ExciseGoods](status, hvd.exciseGoods, data)
             Redirect(getNextPage(redirect, edit))
           }
       )
-    }
   }
 
-  private def getNextPage(redirect: Boolean, edit:Boolean): Call = {
-    (redirect,  edit) match {
+  private def getNextPage(redirect: Boolean, edit: Boolean): Call =
+    (redirect, edit) match {
       case (true, true)   => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers)
       case (true, false)  => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods)
       case (false, true)  => routes.SummaryController.get
       case (false, false) => routes.HowWillYouSellGoodsController.get()
     }
-  }
 }

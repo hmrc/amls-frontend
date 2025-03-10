@@ -30,30 +30,32 @@ import utils.AuthAction
 import utils.hvd.CheckYourAnswersHelper
 import views.html.hvd.CheckYourAnswersView
 
-class SummaryController @Inject() (val authAction: AuthAction,
-                                   val ds: CommonPlayDependencies,
-                                   implicit val dataCache: DataCacheConnector,
-                                   implicit val statusService: StatusService,
-                                   implicit val serviceFlow: ServiceFlow,
-                                   val cc: MessagesControllerComponents,
-                                   cyaHelper: CheckYourAnswersHelper,
-                                   view: CheckYourAnswersView) extends AmlsBaseController(ds, cc) {
+class SummaryController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val dataCache: DataCacheConnector,
+  implicit val statusService: StatusService,
+  implicit val serviceFlow: ServiceFlow,
+  val cc: MessagesControllerComponents,
+  cyaHelper: CheckYourAnswersHelper,
+  view: CheckYourAnswersView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-      for {
-        hvd <- dataCache.fetch[Hvd](request.credId, Hvd.key)
-      } yield hvd match {
-        case Some(data) => Ok(view(cyaHelper.getSummaryList(data)))
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    for {
+      hvd <- dataCache.fetch[Hvd](request.credId, Hvd.key)
+    } yield hvd match {
+      case Some(data) => Ok(view(cyaHelper.getSummaryList(data)))
+      case _          => Redirect(controllers.routes.RegistrationProgressController.get())
+    }
   }
 
-  def post: Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        hvd <- OptionT(dataCache.fetch[Hvd](request.credId, Hvd.key))
-        _ <- OptionT.liftF(dataCache.save[Hvd](request.credId, Hvd.key, hvd.copy(hasAccepted = true)))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update HVD")
+  def post: Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      hvd <- OptionT(dataCache.fetch[Hvd](request.credId, Hvd.key))
+      _   <- OptionT.liftF(dataCache.save[Hvd](request.credId, Hvd.key, hvd.copy(hasAccepted = true)))
+    } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError(
+      "Could not update HVD"
+    )
   }
 }

@@ -25,15 +25,14 @@ object OnlyOffTheShelfCompsSold {
   import play.api.libs.json._
   import play.api.libs.json.Reads._
 
-  implicit val jsonReads: Reads[OnlyOffTheShelfCompsSold] =  {
+  implicit val jsonReads: Reads[OnlyOffTheShelfCompsSold] =
     (__ \ "onlyOffTheShelfCompsSold").read[Boolean] map {
-      case true => OnlyOffTheShelfCompsSoldYes
-      case false  => OnlyOffTheShelfCompsSoldNo
+      case true  => OnlyOffTheShelfCompsSoldYes
+      case false => OnlyOffTheShelfCompsSoldNo
     }
-  }
 
   implicit val jsonWrite: Writes[OnlyOffTheShelfCompsSold] = Writes[OnlyOffTheShelfCompsSold] {
     case OnlyOffTheShelfCompsSoldYes => Json.obj("onlyOffTheShelfCompsSold" -> true)
-    case OnlyOffTheShelfCompsSoldNo => Json.obj("onlyOffTheShelfCompsSold" -> false)
+    case OnlyOffTheShelfCompsSoldNo  => Json.obj("onlyOffTheShelfCompsSold" -> false)
   }
 }

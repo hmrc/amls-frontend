@@ -26,11 +26,10 @@ import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.businessdetails.RegisteredOfficeNonUKView
 
-
 class RegisteredOfficeNonUKViewSpec extends AmlsViewSpec with Matchers with AutoCompleteServiceMocks {
 
   lazy val registered_office_non_uk = app.injector.instanceOf[RegisteredOfficeNonUKView]
-  lazy val formProvider = app.injector.instanceOf[RegisteredOfficeNonUkFormProvider]
+  lazy val formProvider             = app.injector.instanceOf[RegisteredOfficeNonUkFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -41,20 +40,24 @@ class RegisteredOfficeNonUKViewSpec extends AmlsViewSpec with Matchers with Auto
   "registered_office view" must {
     "have correct title" in new ViewFixture {
 
-      val formWithData: Form[RegisteredOffice] = formProvider().fill(RegisteredOfficeUK("line1",Some("line2"),None,None,"AB12CD"))
+      val formWithData: Form[RegisteredOffice] =
+        formProvider().fill(RegisteredOfficeUK("line1", Some("line2"), None, None, "AB12CD"))
 
       def view = registered_office_non_uk(formWithData, true, mockAutoComplete.formOptions)
 
-      doc.title must startWith(messages("businessdetails.registeredoffice.where.title") + " - " + messages("summary.businessdetails"))
+      doc.title must startWith(
+        messages("businessdetails.registeredoffice.where.title") + " - " + messages("summary.businessdetails")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
-      val formWithData: Form[RegisteredOffice] = formProvider().fill(RegisteredOfficeUK("line1",Some("line2"),None,None,"AB12CD"))
+      val formWithData: Form[RegisteredOffice] =
+        formProvider().fill(RegisteredOfficeUK("line1", Some("line2"), None, None, "AB12CD"))
 
       def view = registered_office_non_uk(formWithData, true, mockAutoComplete.formOptions)
 
-      heading.html must be(messages("businessdetails.registeredoffice.where.title"))
+      heading.html    must be(messages("businessdetails.registeredoffice.where.title"))
       subHeading.html must include(messages("summary.businessdetails"))
     }
 

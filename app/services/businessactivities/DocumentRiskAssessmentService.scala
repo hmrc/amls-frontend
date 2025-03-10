@@ -23,23 +23,25 @@ import models.businessmatching.BusinessMatching
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DocumentRiskAssessmentService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit val ec: ExecutionContext) {
+class DocumentRiskAssessmentService @Inject() (val dataCacheConnector: DataCacheConnector)(implicit
+  val ec: ExecutionContext
+) {
 
-  def getRiskAssessmentPolicy(credId: String): Future[Option[RiskAssessmentPolicy]] = {
+  def getRiskAssessmentPolicy(credId: String): Future[Option[RiskAssessmentPolicy]] =
     dataCacheConnector.fetch[BusinessActivities](credId, BusinessActivities.key).map(_.flatMap(_.riskAssessmentPolicy))
-  }
 
-  def updateRiskAssessmentType(credId: String, data: RiskAssessmentTypes): Future[Option[BusinessMatching]] = {
+  def updateRiskAssessmentType(credId: String, data: RiskAssessmentTypes): Future[Option[BusinessMatching]] =
     dataCacheConnector.fetchAll(credId).map { optCacheMap =>
       val businessMatchingAndActivities: Option[(BusinessMatching, BusinessActivities)] = for {
-        cacheMap <- optCacheMap
-        businessMatching <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+        cacheMap           <- optCacheMap
+        businessMatching   <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
         businessActivities <- cacheMap.getEntry[BusinessActivities](BusinessActivities.key)
       } yield (businessMatching, businessActivities)
 
       businessMatchingAndActivities
-        .map(bmba => dataCacheConnector.save[BusinessActivities](credId, BusinessActivities.key, bmba._2.riskAssessmentTypes(data)))
+        .map(bmba =>
+          dataCacheConnector.save[BusinessActivities](credId, BusinessActivities.key, bmba._2.riskAssessmentTypes(data))
+        )
         .flatMap(_ => businessMatchingAndActivities.map(_._1))
     }
-  }
 }

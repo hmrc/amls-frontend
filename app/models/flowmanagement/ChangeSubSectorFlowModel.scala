@@ -19,9 +19,10 @@ package models.flowmanagement
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessMatchingMsbService}
 import play.api.libs.json.{Json, OFormat}
 
-case class ChangeSubSectorFlowModel(subSectors: Option[Set[BusinessMatchingMsbService]] = None,
-                                    psrNumber: Option[BusinessAppliedForPSRNumber] = None
-                                   )
+case class ChangeSubSectorFlowModel(
+  subSectors: Option[Set[BusinessMatchingMsbService]] = None,
+  psrNumber: Option[BusinessAppliedForPSRNumber] = None
+)
 
 object ChangeSubSectorFlowModel {
   val key = "change-sub-sector-flow"

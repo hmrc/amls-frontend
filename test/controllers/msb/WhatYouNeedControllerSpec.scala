@@ -35,15 +35,17 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
-    lazy val view = inject[WhatYouNeedView]
+    val request                       = addToken(authRequest)
+    lazy val view                     = inject[WhatYouNeedView]
     implicit val ec: ExecutionContext = inject[ExecutionContext]
-    val controller = new WhatYouNeedController(
-      SuccessfulAuthAction, ds = commonDependencies,
+    val controller                    = new WhatYouNeedController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
       mockStatusService,
       mockCacheConnector,
       cc = mockMcc,
-      view = view)
+      view = view
+    )
 
     mockCacheFetch[ServiceChangeRegister](None)
     mockCacheFetchAll
@@ -84,7 +86,8 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
         mockCacheFetch(
           Some(ServiceChangeRegister(Some(Set(MoneyServiceBusiness, HighValueDealing)))),
-          Some(ServiceChangeRegister.key))
+          Some(ServiceChangeRegister.key)
+        )
 
         val result = controller.post(request)
         redirectLocation(result) mustBe Some(controllers.msb.routes.ExpectedThroughputController.get().url)
@@ -95,7 +98,6 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         when {
           mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(false)
-
 
         val result = controller.post(request)
         redirectLocation(result) mustBe Some(controllers.msb.routes.ExpectedThroughputController.get().url)

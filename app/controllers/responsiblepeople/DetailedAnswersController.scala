@@ -39,81 +39,106 @@ import views.html.responsiblepeople.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-class DetailedAnswersController @Inject () (
-                                             val dataCacheConnector: DataCacheConnector,
-                                             val recoverActivitiesService: RecoverActivitiesService,
-                                             authAction: AuthAction,
-                                             val ds: CommonPlayDependencies,
-                                             val statusService: StatusService,
-                                             val config: ApplicationConfig,
-                                             val cc: MessagesControllerComponents,
-                                             cyaHelper: CheckYourAnswersHelper,
-                                             view: CheckYourAnswersView,
-                                             amlsErrorHandler: AmlsErrorHandler,
-                                             implicit val error: views.html.ErrorView)
-  extends AmlsBaseController(ds, cc) with RepeatingSection with Logging {
+class DetailedAnswersController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val recoverActivitiesService: RecoverActivitiesService,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val statusService: StatusService,
+  val config: ApplicationConfig,
+  val cc: MessagesControllerComponents,
+  cyaHelper: CheckYourAnswersHelper,
+  view: CheckYourAnswersView,
+  amlsErrorHandler: AmlsErrorHandler,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection
+    with Logging {
 
-  private def showHideAddressMove(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, lineId: Option[Int])
-                                 (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
+  private def showHideAddressMove(
+    amlsRegistrationNo: Option[String],
+    accountTypeId: (String, String),
+    credId: String,
+    lineId: Option[Int]
+  )(implicit headerCarrier: HeaderCarrier): Future[Boolean] =
     statusService.getStatus(amlsRegistrationNo, accountTypeId, credId) map {
       case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) if lineId.isDefined => true
-      case _ => false
+      case _                                                                                         => false
+    }
+
+  def get(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetchAll(request.credId) flatMap { optionalCache =>
+      (for {
+        cache: Cache                       <- optionalCache
+        businessMatching: BusinessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+      } yield redirect(
+        request.amlsRefNumber,
+        request.accountTypeId,
+        request.credId,
+        cache,
+        index,
+        flow,
+        businessMatching
+      )) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+    } recoverWith { case _: NoSuchElementException =>
+      logger.warn("[DetailedAnswersController][get] - Business activities list was empty, attempting to recover")
+      recoverActivitiesService.recover(request).flatMap {
+        case true  => Future.successful(Redirect(routes.DetailedAnswersController.get(index, flow)))
+        case false =>
+          logger.warn("[DetailedAnswersController][get] - Unable to determine business types")
+          amlsErrorHandler.internalServerErrorTemplate.map { errorPage =>
+            InternalServerError(errorPage)
+          }
+      }
     }
   }
 
-  def get(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetchAll(request.credId) flatMap {
-        optionalCache =>
-          (for {
-            cache: Cache <- optionalCache
-            businessMatching: BusinessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-          } yield {
-            redirect(request.amlsRefNumber, request.accountTypeId, request.credId, cache, index, flow, businessMatching)
-          }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-      } recoverWith {
-        case _: NoSuchElementException =>
-          logger.warn("[DetailedAnswersController][get] - Business activities list was empty, attempting to recover")
-          recoverActivitiesService.recover(request).flatMap {
-            case true => Future.successful(Redirect(routes.DetailedAnswersController.get(index, flow)))
-            case false =>
-              logger.warn("[DetailedAnswersController][get] - Unable to determine business types")
-              amlsErrorHandler.internalServerErrorTemplate.map { errorPage =>
-                InternalServerError(errorPage)
-              }
-          }
-      }
-  }
-
-
-  private def redirect(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, cache: Cache, index: Int, flow: Option[String], businessMatching: BusinessMatching)
-                      (implicit request: Request[_]): Future[Result] =
+  private def redirect(
+    amlsRegistrationNo: Option[String],
+    accountTypeId: (String, String),
+    credId: String,
+    cache: Cache,
+    index: Int,
+    flow: Option[String],
+    businessMatching: BusinessMatching
+  )(implicit request: Request[_]): Future[Result] =
     (for {
       responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
     } yield responsiblePeople.lift(index - 1) match {
-      case Some(x) if x.copy(hasAccepted = true).isComplete => showHideAddressMove(amlsRegistrationNo, accountTypeId, credId, x.lineId) flatMap { showHide =>
-        isMsbOrTcsp(credId).map {
-          msbOrTcsp: Option[Boolean] =>
-            val shouldShowApprovalSection = !msbOrTcsp.contains(true) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
-            val personName = ControllerHelper.rpTitleName(Some(x))
-            val summaryList = cyaHelper.getHeadingsAndSummaryLists(x, businessMatching, personName, index, flow, showHide, shouldShowApprovalSection)
+      case Some(x) if x.copy(hasAccepted = true).isComplete =>
+        showHideAddressMove(amlsRegistrationNo, accountTypeId, credId, x.lineId) flatMap { showHide =>
+          isMsbOrTcsp(credId).map { msbOrTcsp: Option[Boolean] =>
+            val shouldShowApprovalSection =
+              !msbOrTcsp.contains(true) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
+            val personName                = ControllerHelper.rpTitleName(Some(x))
+            val summaryList               = cyaHelper.getHeadingsAndSummaryLists(
+              x,
+              businessMatching,
+              personName,
+              index,
+              flow,
+              showHide,
+              shouldShowApprovalSection
+            )
             Ok(view(summaryList, index, showHide, personName, flow))
+          }
         }
-      }
-      case Some(_) => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get()))
-      case _ => Future.successful(NotFound(notFoundView))
+      case Some(_)                                          =>
+        Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get()))
+      case _                                                => Future.successful(NotFound(notFoundView))
     }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
 
-  def post(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction.async{
-    implicit request =>
-      updateDataStrict[ResponsiblePerson](request.credId, index){ rp =>
-        rp.copy(hasAccepted = true)
-      } flatMap { _ =>
-        flow match {
-          case Some(`flowFromDeclaration`) => redirectFromDeclarationFlow(request.amlsRefNumber, request.accountTypeId, request.credId)
-          case _ => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get()))
-        }
+  def post(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction.async { implicit request =>
+    updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+      rp.copy(hasAccepted = true)
+    } flatMap { _ =>
+      flow match {
+        case Some(`flowFromDeclaration`) =>
+          redirectFromDeclarationFlow(request.amlsRefNumber, request.accountTypeId, request.credId)
+        case _                           =>
+          Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get()))
       }
+    }
   }
 
   private def isMsbOrTcsp(credId: String): Future[Option[Boolean]] =
@@ -121,19 +146,29 @@ class DetailedAnswersController @Inject () (
       businessmatching <- dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key)
     } yield businessmatching.map(_.msbOrTcsp)
 
-  private def redirectFromDeclarationFlow(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)(implicit hc: HeaderCarrier): Future[Result] =
+  private def redirectFromDeclarationFlow(
+    amlsRegistrationNo: Option[String],
+    accountTypeId: (String, String),
+    credId: String
+  )(implicit hc: HeaderCarrier): Future[Result] =
     (for {
-      model <- OptionT(fetchModel(credId))
-      _ <- OptionT.liftF(dataCacheConnector.save(credId, ResponsiblePerson.key, model.filterEmpty.map(_.copy(hasAccepted = true))))
-      hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key)))
-      businessmatching <- OptionT.liftF(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
-      reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
-      businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
-      status <- OptionT.liftF(statusService.getStatus(amlsRegistrationNo, accountTypeId, credId))
+      model               <- OptionT(fetchModel(credId))
+      _                   <- OptionT.liftF(
+                               dataCacheConnector.save(credId, ResponsiblePerson.key, model.filterEmpty.map(_.copy(hasAccepted = true)))
+                             )
+      hasNominatedOfficer <- OptionT.liftF(
+                               ControllerHelper.hasNominatedOfficer(
+                                 dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key)
+                               )
+                             )
+      businessmatching    <- OptionT.liftF(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
+      reviewDetails       <- OptionT.fromOption[Future](businessmatching.reviewDetails)
+      businessType        <- OptionT.fromOption[Future](reviewDetails.businessType)
+      status              <- OptionT.liftF(statusService.getStatus(amlsRegistrationNo, accountTypeId, credId))
     } yield businessType match {
       case Partnership if DeclarationHelper.numberOfPartners(model) < 2 =>
         Redirect(controllers.declaration.routes.RegisterPartnersController.get())
-      case _ =>
+      case _                                                            =>
         Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
     }) getOrElse InternalServerError("Cannot determine redirect")
 

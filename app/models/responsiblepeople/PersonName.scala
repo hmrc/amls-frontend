@@ -19,13 +19,13 @@ package models.responsiblepeople
 import play.api.libs.json._
 
 case class PersonName(
-                       firstName: String,
-                       middleName: Option[String],
-                       lastName: String
-                     ) {
+  firstName: String,
+  middleName: Option[String],
+  lastName: String
+) {
 
-  val fullName: String = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString(" ")
-  val titleName: String = Seq(Some(firstName), Some(lastName)).flatten[String].mkString(" ")
+  val fullName: String             = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString(" ")
+  val titleName: String            = Seq(Some(firstName), Some(lastName)).flatten[String].mkString(" ")
   val fullNameWithoutSpace: String = Seq(Some(firstName), middleName, Some(lastName)).flatten[String].mkString("")
 
 }

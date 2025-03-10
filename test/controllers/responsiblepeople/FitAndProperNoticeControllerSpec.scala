@@ -32,11 +32,15 @@ class FitAndProperNoticeControllerSpec extends AmlsSpec with MockitoSugar with S
   val recordId = 1
 
   trait Fixture extends DependencyMocks { self =>
-    val request = addToken(authRequest)
+    val request                    = addToken(authRequest)
     lazy val mockApplicationConfig = mock[ApplicationConfig]
 
     lazy val controller = new FitAndProperNoticeController(
-      mockCacheConnector, SuccessfulAuthAction, commonDependencies, mockMcc, inject[FitAndProperNoticeView]
+      mockCacheConnector,
+      SuccessfulAuthAction,
+      commonDependencies,
+      mockMcc,
+      inject[FitAndProperNoticeView]
     )
   }
 
@@ -61,7 +65,8 @@ class FitAndProperNoticeControllerSpec extends AmlsSpec with MockitoSugar with S
         val result = controller.get(recordId)(request)
         status(result) must be(OK)
         val page: Document = Jsoup.parse(contentAsString(result))
-        page.getElementsMatchingOwnText(messages("button.continue"))
+        page
+          .getElementsMatchingOwnText(messages("button.continue"))
           .attr("href") mustBe routes.FitAndProperController.get(recordId).url
       }
     }

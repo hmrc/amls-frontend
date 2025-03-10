@@ -25,29 +25,25 @@ import java.time.LocalDate
 
 object TradingPremisesSection {
 
-  val address = Address("Address 1", Some("Address 2"),None,None,"AA1 1AA")
-  val year = 2010
-  val month = 2
-  val day = 1
-  val date = LocalDate.of(year, month, day)
+  val address = Address("Address 1", Some("Address 2"), None, None, "AA1 1AA")
+  val year    = 2010
+  val month   = 2
+  val day     = 1
+  val date    = LocalDate.of(year, month, day)
 
-  val ytp = YourTradingPremises("tradingName1", address, Some(true), Some(date))
+  val ytp  = YourTradingPremises("tradingName1", address, Some(true), Some(date))
   val ytp1 = YourTradingPremises("tradingName2", address, Some(true), Some(date))
   val ytp2 = YourTradingPremises("tradingName3", address, Some(true), Some(date))
   val ytp3 = YourTradingPremises("tradingName3", address, Some(true), Some(date))
 
-
-  val businessStructure = SoleProprietor
-  val testAgentName = AgentName("test")
+  val businessStructure    = SoleProprietor
+  val testAgentName        = AgentName("test")
   val testAgentCompanyName = AgentCompanyDetails("test", Some("12345678"))
   val testAgentPartnership = AgentPartnership("test")
-  val wdbd = WhatDoesYourBusinessDo(
-    Set(
-      BillPaymentServices,
-      EstateAgentBusinessService,
-      MoneyServiceBusiness)
+  val wdbd                 = WhatDoesYourBusinessDo(
+    Set(BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness)
   )
-  val msbServices = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
+  val msbServices          = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
 
   val tradingPremisesWithHasChangedFalse = TradingPremises(
     Some(RegisteringAgentPremises(true)),

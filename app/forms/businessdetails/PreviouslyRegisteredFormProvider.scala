@@ -22,15 +22,14 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-
-class PreviouslyRegisteredFormProvider @Inject()() extends BooleanFormProvider {
+class PreviouslyRegisteredFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[PreviouslyRegistered] =
     createForm[PreviouslyRegistered]("value", "error.required.atb.previously.registered")(
       bool => if (bool) PreviouslyRegisteredYes(None) else PreviouslyRegisteredNo,
       {
         case PreviouslyRegisteredYes(_) => true
-        case PreviouslyRegisteredNo => false
+        case PreviouslyRegisteredNo     => false
       }
     )
 }

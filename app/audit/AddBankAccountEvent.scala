@@ -29,8 +29,7 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 
 object AddBankAccountEvent {
 
-  case class BankAccountAuditDetail
-  (
+  case class BankAccountAuditDetail(
     accountName: String,
     bankAccountType: Option[BankAccountType],
     isUKBankAccount: Boolean,
@@ -42,10 +41,10 @@ object AddBankAccountEvent {
   object BankAccountAuditDetail {
 
     implicit val accountTypeWrites: Writes[BankAccountType] = Writes[BankAccountType] {
-      case PersonalAccount => JsString("personal")
-      case BelongsToBusiness => JsString("business")
+      case PersonalAccount        => JsString("personal")
+      case BelongsToBusiness      => JsString("business")
       case BelongsToOtherBusiness => JsString("other business")
-      case NoBankAccountUsed => JsString("no bank account")
+      case NoBankAccountUsed      => JsString("no bank account")
     }
 
     implicit val writes: Writes[BankAccountAuditDetail] = {
@@ -58,22 +57,52 @@ object AddBankAccountEvent {
           (__ \ "sortCode").writeNullable[String] and
           (__ \ "accountNumber").writeNullable[String] and
           (__ \ "iban").writeNullable[String]
-        ) (unlift(BankAccountAuditDetail.unapply))
+      )(unlift(BankAccountAuditDetail.unapply))
     }
   }
 
-  implicit def convert(bankDetails: BankDetails): Option[BankAccountAuditDetail] = bankDetails.bankAccount.flatMap  { ba => ((ba.account, bankDetails.accountName) match {
-    case (Some(account: UKAccount), Some(name)) =>
-        Some(BankAccountAuditDetail(name, bankDetails.bankAccountType, isUKBankAccount = true, account.sortCode.some, account.accountNumber.some, None))
+  implicit def convert(bankDetails: BankDetails): Option[BankAccountAuditDetail] = bankDetails.bankAccount.flatMap {
+    ba =>
+      (ba.account, bankDetails.accountName) match {
+        case (Some(account: UKAccount), Some(name)) =>
+          Some(
+            BankAccountAuditDetail(
+              name,
+              bankDetails.bankAccountType,
+              isUKBankAccount = true,
+              account.sortCode.some,
+              account.accountNumber.some,
+              None
+            )
+          )
 
-    case (Some(account: NonUKIBANNumber), Some(name)) =>
-      Some(BankAccountAuditDetail(name, bankDetails.bankAccountType, isUKBankAccount = false, None, None, account.IBANNumber.some))
+        case (Some(account: NonUKIBANNumber), Some(name)) =>
+          Some(
+            BankAccountAuditDetail(
+              name,
+              bankDetails.bankAccountType,
+              isUKBankAccount = false,
+              None,
+              None,
+              account.IBANNumber.some
+            )
+          )
 
-    case (Some(account: NonUKAccountNumber), Some(name)) =>
-      Some(BankAccountAuditDetail(name, bankDetails.bankAccountType, isUKBankAccount = false, None, account.accountNumber.some, None))
+        case (Some(account: NonUKAccountNumber), Some(name)) =>
+          Some(
+            BankAccountAuditDetail(
+              name,
+              bankDetails.bankAccountType,
+              isUKBankAccount = false,
+              None,
+              account.accountNumber.some,
+              None
+            )
+          )
 
-    case _ => None
-  })}
+        case _ => None
+      }
+  }
 
   def apply(bankAccount: BankDetails)(implicit hc: HeaderCarrier, request: Request[_]) = DataEvent(
     auditSource = AuditHelper.appName,
@@ -81,7 +110,7 @@ object AddBankAccountEvent {
     tags = hc.toAuditTags("manualBankAccountSubmitted", request.path),
     detail = hc.toAuditDetails() ++ (convert(bankAccount) match {
       case Some(detail) => toMap(detail)
-      case _ => Map()
+      case _            => Map()
     })
   )
 

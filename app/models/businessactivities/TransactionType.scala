@@ -46,13 +46,12 @@ object TransactionTypes extends Enumerable.Implicits {
     override val value: String = "03"
   }
 
-  def formValues(conditional: Html)(implicit messages: Messages): Seq[CheckboxItem] = {
-
+  def formValues(conditional: Html)(implicit messages: Messages): Seq[CheckboxItem] =
     Seq(
       (1, Paper, None),
       (2, DigitalSpreadsheet, None),
       (3, DigitalOther, Some(conditional))
-    ).map( i =>
+    ).map(i =>
       CheckboxItem(
         content = Text(messages(s"businessactivities.transactiontype.lbl.${i._2.value}")),
         value = i._2.toString,
@@ -61,60 +60,62 @@ object TransactionTypes extends Enumerable.Implicits {
         conditionalHtml = i._3
       )
     )
-  }
 
   import utils.MappingUtils.constant
 
   implicit val jsonReads: Reads[TransactionTypes] = new Reads[TransactionTypes] {
     override def reads(json: JsValue) = {
-      val t = (json \ "types").asOpt[Set[String]]
-      val n = (json \ "software").asOpt[String]
+      val t           = (json \ "types").asOpt[Set[String]]
+      val n           = (json \ "software").asOpt[String]
       val validValues = Set("01", "02", "03")
 
       (t, n) match {
-        case (None, _) => JsError(__ \ "types" -> VE("error.missing"))
-        case (Some(types), None) if types.contains("03") => JsError(__ \ "software" -> VE("error.missing"))
+        case (None, _)                                            => JsError(__ \ "types" -> VE("error.missing"))
+        case (Some(types), None) if types.contains("03")          => JsError(__ \ "software" -> VE("error.missing"))
         case (Some(types), _) if types.diff(validValues).nonEmpty => JsError(__ \ "types" -> VE("error.invalid"))
-        case (Some(types), Some(name)) => JsSuccess(TransactionTypes(
-          types.map { `type` =>
-            val obj = toType(`type`)
-            if (obj == DigitalOther) DigitalSoftware(name) else obj
-          }
-        ))
-        case (Some(types), None) if !types.contains("03") => JsSuccess(TransactionTypes(types.map(toType)))
+        case (Some(types), Some(name))                            =>
+          JsSuccess(
+            TransactionTypes(
+              types.map { `type` =>
+                val obj = toType(`type`)
+                if (obj == DigitalOther) DigitalSoftware(name) else obj
+              }
+            )
+          )
+        case (Some(types), None) if !types.contains("03")         => JsSuccess(TransactionTypes(types.map(toType)))
       }
     }
   }
 
   val oldTransactionTypeReader: Reads[Option[TransactionTypes]] =
     (__ \ "isRecorded").read[Boolean] flatMap {
-      case true => (__ \ "transactions").read[Set[String]].flatMap {x:Set[String] =>
-        x.map {
-          case "01" => constant(Paper) map identity[TransactionType]
-          case "02" => constant(DigitalSpreadsheet) map identity[TransactionType]
-          case "03" =>
-            (__ \ "digitalSoftwareName").read[String].map (DigitalSoftware.apply  _) map identity[TransactionType]
-          case _ =>
-            Reads(_ => JsError((__ \ "transactions") -> play.api.libs.json.JsonValidationError("error.invalid")))
-        }.foldLeft[Reads[Set[TransactionType]]](
-          Reads[Set[TransactionType]](_ => JsSuccess(Set.empty))
-        ){
-          (result, data) =>
-            data flatMap {m =>
-              result.map {n =>
+      case true  =>
+        (__ \ "transactions").read[Set[String]].flatMap { x: Set[String] =>
+          x.map {
+            case "01" => constant(Paper) map identity[TransactionType]
+            case "02" => constant(DigitalSpreadsheet) map identity[TransactionType]
+            case "03" =>
+              (__ \ "digitalSoftwareName").read[String].map(DigitalSoftware.apply _) map identity[TransactionType]
+            case _    =>
+              Reads(_ => JsError((__ \ "transactions") -> play.api.libs.json.JsonValidationError("error.invalid")))
+          }.foldLeft[Reads[Set[TransactionType]]](
+            Reads[Set[TransactionType]](_ => JsSuccess(Set.empty))
+          ) { (result, data) =>
+            data flatMap { m =>
+              result.map { n =>
                 n + m
               }
             }
-        }
-      } map(t => Option(TransactionTypes(t)))
+          }
+        } map (t => Option(TransactionTypes(t)))
       case false => constant(None)
     }
 
   implicit val jsonWrites: Writes[TransactionTypes] = Writes[TransactionTypes] { t =>
     Json.obj(
       "types" -> t.types.map(_.value)
-    ) ++ (t.types.collectFirst {
-      case DigitalSoftware(name) => Json.obj("software" -> name)
+    ) ++ (t.types.collectFirst { case DigitalSoftware(name) =>
+      Json.obj("software" -> name)
     } getOrElse Json.obj())
   }
 

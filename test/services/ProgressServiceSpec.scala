@@ -42,13 +42,13 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
       .overrides(bind[StatusService].to(mockStatusService))
       .overrides(bind[AutoCompleteService].to(mockAutoComplete))
 
-    val builder = defaultBuilder
-    lazy val app = builder.build()
+    val builder      = defaultBuilder
+    lazy val app     = builder.build()
     lazy val service = app.injector.instanceOf[ProgressService]
 
-    val amlsRefNo = Some("REFNO")
+    val amlsRefNo     = Some("REFNO")
     val accountTypeId = ("accountType", "accountId")
-    val credId = "12341234"
+    val credId        = "12341234"
 
   }
 
@@ -56,19 +56,46 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
     "return fee guidance url" when {
       "business is a partnership and there are 2 partners and 1 nominated officer" in new Fixture {
 
-        val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(LocalDate.now())))
-        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None,None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val positions         =
+          Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(LocalDate.now())))
+        val rp1               = ResponsiblePerson(
+          Some(PersonName("first1", Some("middle"), "last1")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
+        val rp2               = ResponsiblePerson(
+          Some(PersonName("first2", None, "last2")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
         val responsiblePeople = Seq(rp1, rp2)
-        val businessMatching = BusinessMatching(reviewDetails = Some(
-          ReviewDetails(
-            "Business Name",
-            Some(models.businessmatching.BusinessType.Partnership),
-            mock[Address],
-            "safeId",
-            None
+        val businessMatching  = BusinessMatching(reviewDetails =
+          Some(
+            ReviewDetails(
+              "Business Name",
+              Some(models.businessmatching.BusinessType.Partnership),
+              mock[Address],
+              "safeId",
+              None
+            )
           )
-        ))
+        )
 
         mockApplicationStatus(SubmissionReady)
 
@@ -82,19 +109,48 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
       }
 
       "business is not a partnership and at least one of the person in responsible people is the nominated officer" in new Fixture {
-        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(PositionStartDate(LocalDate.now())))
-        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val positions         = Positions(
+          Set(BeneficialOwner, InternalAccountant, NominatedOfficer),
+          Some(PositionStartDate(LocalDate.now()))
+        )
+        val rp1               = ResponsiblePerson(
+          Some(PersonName("first1", Some("middle"), "last1")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
+        val rp2               = ResponsiblePerson(
+          Some(PersonName("first2", None, "last2")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
         val responsiblePeople = Seq(rp1, rp2)
-        val businessMatching = BusinessMatching(reviewDetails = Some(
-          ReviewDetails(
-            "Business Name",
-            Some(models.businessmatching.BusinessType.SoleProprietor),
-            mock[Address],
-            "safeId",
-            None
+        val businessMatching  = BusinessMatching(reviewDetails =
+          Some(
+            ReviewDetails(
+              "Business Name",
+              Some(models.businessmatching.BusinessType.SoleProprietor),
+              mock[Address],
+              "safeId",
+              None
+            )
           )
-        ))
+        )
 
         mockApplicationStatus(SubmissionReady)
 
@@ -102,26 +158,52 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
-          _ mustEqual Some( controllers.declaration.routes.WhoIsRegisteringController.get)
+          _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get)
         }
       }
     }
 
     "return register partners url" when {
       "business is a partnership and there are less than 2 partners" in new Fixture {
-        val positions = Positions(Set(BeneficialOwner, NominatedOfficer), Some(PositionStartDate(LocalDate.now())))
-        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val positions         = Positions(Set(BeneficialOwner, NominatedOfficer), Some(PositionStartDate(LocalDate.now())))
+        val rp1               = ResponsiblePerson(
+          Some(PersonName("first1", Some("middle"), "last1")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
+        val rp2               = ResponsiblePerson(
+          Some(PersonName("first2", None, "last2")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
         val responsiblePeople = Seq(rp1, rp2)
-        val businessMatching = BusinessMatching(reviewDetails = Some(
-          ReviewDetails(
-            "Business Name",
-            Some(models.businessmatching.BusinessType.Partnership),
-            mock[Address],
-            "safeId",
-            None
+        val businessMatching  = BusinessMatching(reviewDetails =
+          Some(
+            ReviewDetails(
+              "Business Name",
+              Some(models.businessmatching.BusinessType.Partnership),
+              mock[Address],
+              "safeId",
+              None
+            )
           )
-        ))
+        )
 
         mockApplicationStatus(SubmissionReady)
 
@@ -136,19 +218,48 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
 
     "return who is registering url" when {
       "status is amendment and there is a nominated officer" in new Fixture {
-        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(PositionStartDate(LocalDate.now())))
-        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val positions         = Positions(
+          Set(BeneficialOwner, InternalAccountant, NominatedOfficer),
+          Some(PositionStartDate(LocalDate.now()))
+        )
+        val rp1               = ResponsiblePerson(
+          Some(PersonName("first1", Some("middle"), "last1")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
+        val rp2               = ResponsiblePerson(
+          Some(PersonName("first2", None, "last2")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
         val responsiblePeople = Seq(rp1, rp2)
-        val businessMatching = BusinessMatching(reviewDetails = Some(
-          ReviewDetails(
-            "Business Name",
-            Some(models.businessmatching.BusinessType.SoleProprietor),
-            mock[Address],
-            "safeId",
-            None
+        val businessMatching  = BusinessMatching(reviewDetails =
+          Some(
+            ReviewDetails(
+              "Business Name",
+              Some(models.businessmatching.BusinessType.SoleProprietor),
+              mock[Address],
+              "safeId",
+              None
+            )
           )
-        ))
+        )
 
         mockApplicationStatus(SubmissionReadyForReview)
 
@@ -161,19 +272,48 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
       }
 
       "status is variation and there is a nominated officer" in new Fixture {
-        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(PositionStartDate(LocalDate.now())))
-        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val positions         = Positions(
+          Set(BeneficialOwner, InternalAccountant, NominatedOfficer),
+          Some(PositionStartDate(LocalDate.now()))
+        )
+        val rp1               = ResponsiblePerson(
+          Some(PersonName("first1", Some("middle"), "last1")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
+        val rp2               = ResponsiblePerson(
+          Some(PersonName("first2", None, "last2")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
         val responsiblePeople = Seq(rp1, rp2)
-        val businessMatching = BusinessMatching(reviewDetails = Some(
-          ReviewDetails(
-            "Business Name",
-            Some(models.businessmatching.BusinessType.SoleProprietor),
-            mock[Address],
-            "safeId",
-            None
+        val businessMatching  = BusinessMatching(reviewDetails =
+          Some(
+            ReviewDetails(
+              "Business Name",
+              Some(models.businessmatching.BusinessType.SoleProprietor),
+              mock[Address],
+              "safeId",
+              None
+            )
           )
-        ))
+        )
 
         mockApplicationStatus(SubmissionDecisionApproved)
 
@@ -186,19 +326,48 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
       }
 
       "status is renewal and there is a nominated officer" in new Fixture {
-        val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(PositionStartDate(LocalDate.now())))
-        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val positions         = Positions(
+          Set(BeneficialOwner, InternalAccountant, NominatedOfficer),
+          Some(PositionStartDate(LocalDate.now()))
+        )
+        val rp1               = ResponsiblePerson(
+          Some(PersonName("first1", Some("middle"), "last1")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
+        val rp2               = ResponsiblePerson(
+          Some(PersonName("first2", None, "last2")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
         val responsiblePeople = Seq(rp1, rp2)
-        val businessMatching = BusinessMatching(reviewDetails = Some(
-          ReviewDetails(
-            "Business Name",
-            Some(models.businessmatching.BusinessType.SoleProprietor),
-            mock[Address],
-            "safeId",
-            None
+        val businessMatching  = BusinessMatching(reviewDetails =
+          Some(
+            ReviewDetails(
+              "Business Name",
+              Some(models.businessmatching.BusinessType.SoleProprietor),
+              mock[Address],
+              "safeId",
+              None
+            )
           )
-        ))
+        )
 
         mockApplicationStatus(ReadyForRenewal(None))
 
@@ -213,19 +382,46 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
       "show fees is false" when {
         "business is a partnership and there are 2 partners and 1 nominated officer" in new Fixture {
 
-          val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(LocalDate.now())))
-          val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-          val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+          val positions         =
+            Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(LocalDate.now())))
+          val rp1               = ResponsiblePerson(
+            Some(PersonName("first1", Some("middle"), "last1")),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(positions)
+          )
+          val rp2               = ResponsiblePerson(
+            Some(PersonName("first2", None, "last2")),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(positions)
+          )
           val responsiblePeople = Seq(rp1, rp2)
-          val businessMatching = BusinessMatching(reviewDetails = Some(
-            ReviewDetails(
-              "Business Name",
-              Some(models.businessmatching.BusinessType.Partnership),
-              mock[Address],
-              "safeId",
-              None
+          val businessMatching  = BusinessMatching(reviewDetails =
+            Some(
+              ReviewDetails(
+                "Business Name",
+                Some(models.businessmatching.BusinessType.Partnership),
+                mock[Address],
+                "safeId",
+                None
+              )
             )
-          ))
+          )
 
           mockApplicationStatus(SubmissionReady)
 
@@ -240,19 +436,48 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
 
         "business is not a partnership and at least one of the person in responsible people is the nominated officer" in new Fixture {
 
-          val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(PositionStartDate(LocalDate.now())))
-          val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-          val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+          val positions         = Positions(
+            Set(BeneficialOwner, InternalAccountant, NominatedOfficer),
+            Some(PositionStartDate(LocalDate.now()))
+          )
+          val rp1               = ResponsiblePerson(
+            Some(PersonName("first1", Some("middle"), "last1")),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(positions)
+          )
+          val rp2               = ResponsiblePerson(
+            Some(PersonName("first2", None, "last2")),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(positions)
+          )
           val responsiblePeople = Seq(rp1, rp2)
-          val businessMatching = BusinessMatching(reviewDetails = Some(
-            ReviewDetails(
-              "Business Name",
-              Some(models.businessmatching.BusinessType.SoleProprietor),
-              mock[Address],
-              "safeId",
-              None
+          val businessMatching  = BusinessMatching(reviewDetails =
+            Some(
+              ReviewDetails(
+                "Business Name",
+                Some(models.businessmatching.BusinessType.SoleProprietor),
+                mock[Address],
+                "safeId",
+                None
+              )
             )
-          ))
+          )
 
           mockApplicationStatus(SubmissionReady)
 
@@ -269,19 +494,45 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
 
     "return Who is the business’s nominated officer? url" when {
       "there is no selected nominated officer" in new Fixture {
-        val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(LocalDate.now())))
-        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val positions         = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(LocalDate.now())))
+        val rp1               = ResponsiblePerson(
+          Some(PersonName("first1", Some("middle"), "last1")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
+        val rp2               = ResponsiblePerson(
+          Some(PersonName("first2", None, "last2")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
         val responsiblePeople = Seq(rp1, rp2)
-        val businessMatching = BusinessMatching(reviewDetails = Some(
-          ReviewDetails(
-            "Business Name",
-            Some(models.businessmatching.BusinessType.SoleProprietor),
-            mock[Address],
-            "safeId",
-            None
+        val businessMatching  = BusinessMatching(reviewDetails =
+          Some(
+            ReviewDetails(
+              "Business Name",
+              Some(models.businessmatching.BusinessType.SoleProprietor),
+              mock[Address],
+              "safeId",
+              None
+            )
           )
-        ))
+        )
 
         mockApplicationStatus(SubmissionReady)
 
@@ -294,19 +545,45 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
       }
 
       "there is no selected nominated officer and status is amendment" in new Fixture {
-        val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(LocalDate.now())))
-        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val positions         = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(LocalDate.now())))
+        val rp1               = ResponsiblePerson(
+          Some(PersonName("first1", Some("middle"), "last1")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
+        val rp2               = ResponsiblePerson(
+          Some(PersonName("first2", None, "last2")),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          Some(positions)
+        )
         val responsiblePeople = Seq(rp1, rp2)
-        val businessMatching = BusinessMatching(reviewDetails = Some(
-          ReviewDetails(
-            "Business Name",
-            Some(models.businessmatching.BusinessType.SoleProprietor),
-            mock[Address],
-            "safeId",
-            None
+        val businessMatching  = BusinessMatching(reviewDetails =
+          Some(
+            ReviewDetails(
+              "Business Name",
+              Some(models.businessmatching.BusinessType.SoleProprietor),
+              mock[Address],
+              "safeId",
+              None
+            )
           )
-        ))
+        )
 
         mockApplicationStatus(SubmissionDecisionApproved)
 
@@ -323,15 +600,17 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
 
     "respond with NOT_FOUND" when {
       "there are no responsible people" in new Fixture {
-        val businessMatching = BusinessMatching(reviewDetails = Some(
-          ReviewDetails(
-            "Business Name",
-            Some(models.businessmatching.BusinessType.SoleProprietor),
-            mock[Address],
-            "safeId",
-            None
+        val businessMatching = BusinessMatching(reviewDetails =
+          Some(
+            ReviewDetails(
+              "Business Name",
+              Some(models.businessmatching.BusinessType.SoleProprietor),
+              mock[Address],
+              "safeId",
+              None
+            )
           )
-        ))
+        )
 
         mockApplicationStatus(SubmissionReady)
 

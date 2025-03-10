@@ -27,7 +27,7 @@ import views.html.tcsp.OnlyOffTheShelfCompsSoldView
 class OnlyOffTheShelfCompsSoldViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val only_off_the_shelf_comps_sold = inject[OnlyOffTheShelfCompsSoldView]
-  lazy val fp = inject[OnlyOffTheShelfCompsSoldFormProvider]
+  lazy val fp                            = inject[OnlyOffTheShelfCompsSoldFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   trait ViewFixture extends Fixture {
@@ -42,16 +42,18 @@ class OnlyOffTheShelfCompsSoldViewSpec extends AmlsViewSpec with Matchers {
       val title = messages("tcsp.off-the-shelf.companies.lbl") + " - " + messages("summary.tcsp") + " - " +
         messages("title.amls") + " - " + messages("title.gov")
 
-      doc.title must be(title)
-      heading.html must be(messages("tcsp.off-the-shelf.companies.lbl"))
+      doc.title       must be(title)
+      heading.html    must be(messages("tcsp.off-the-shelf.companies.lbl"))
       subHeading.html must include(messages("summary.tcsp"))
     }
 
     behave like pageWithErrors(
       only_off_the_shelf_comps_sold(
-        fp().withError("onlyOffTheShelfCompsSold", "error.required.tcsp.off.the.shelf.companies"), true
+        fp().withError("onlyOffTheShelfCompsSold", "error.required.tcsp.off.the.shelf.companies"),
+        true
       ),
-      "onlyOffTheShelfCompsSold", "error.required.tcsp.off.the.shelf.companies"
+      "onlyOffTheShelfCompsSold",
+      "error.required.tcsp.off.the.shelf.companies"
     )
 
     behave like pageWithBackLink(only_off_the_shelf_comps_sold(fp(), false))

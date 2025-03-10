@@ -35,8 +35,9 @@ import scala.concurrent.Future
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks with SupervisionValues {
-    self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[CheckYourAnswersView]
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[CheckYourAnswersView]
     val controller = new SummaryController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
@@ -44,7 +45,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       cc = mockMcc,
       cyaHelper = inject[CheckYourAnswersHelper],
       view = view,
-      error = errorView)
+      error = errorView
+    )
 
     val model = Supervision(None)
   }
@@ -52,24 +54,23 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
   "Get" must {
     "load the summary page when section data is available and section is complete" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Supervision](any(), any())
-        (any())).thenReturn(Future.successful(Some(completeModel)))
+      when(controller.dataCacheConnector.fetch[Supervision](any(), any())(any()))
+        .thenReturn(Future.successful(Some(completeModel)))
 
       val result = controller.get()(request)
       status(result) must be(OK)
     }
 
     "redirect to the main summary page when section data is available but incomplete" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Supervision](any(), any())
-        (any())).thenReturn(Future.successful(Some(model)))
+      when(controller.dataCacheConnector.fetch[Supervision](any(), any())(any()))
+        .thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Asp](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Asp](any(), any())(any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)

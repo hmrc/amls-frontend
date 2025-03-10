@@ -28,29 +28,28 @@ class SalesChannelSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest
   import play.api.i18n._
   implicit val lang: Lang = Lang("en-US")
 
-  override def fakeApplication(): Application = {
+  override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .configure(
         "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
       )
       .build()
-  }
 
   "getMessage" must {
     "return correct text for Retail" in {
-      val cc = app.injector.instanceOf[ControllerComponents]
+      val cc                          = app.injector.instanceOf[ControllerComponents]
       implicit val messages: Messages = cc.messagesApi.preferred(Seq(lang))
       Retail.getMessage must be("Retail")
     }
 
     "return correct text for Wholesale" in {
-      val cc = app.injector.instanceOf[ControllerComponents]
+      val cc                          = app.injector.instanceOf[ControllerComponents]
       implicit val messages: Messages = cc.messagesApi.preferred(Seq(lang))
       Wholesale.getMessage must be("Wholesale")
     }
 
     "return correct text for Auction" in {
-      val cc = app.injector.instanceOf[ControllerComponents]
+      val cc                          = app.injector.instanceOf[ControllerComponents]
       implicit val messages: Messages = cc.messagesApi.preferred(Seq(lang))
       Auction.getMessage must be("Auction")
     }

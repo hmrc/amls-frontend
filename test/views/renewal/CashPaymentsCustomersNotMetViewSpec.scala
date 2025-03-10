@@ -23,12 +23,12 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.CashPaymentsCustomersNotMetView
 
-class CashPaymentsCustomersNotMetViewSpec extends AmlsViewSpec{
+class CashPaymentsCustomersNotMetViewSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture
 
-  lazy val cash_payments_customers_not_met = inject[CashPaymentsCustomersNotMetView]
-  lazy val fp = inject[CashPaymentsCustomersNotMetFormProvider]
+  lazy val cash_payments_customers_not_met                       = inject[CashPaymentsCustomersNotMetView]
+  lazy val fp                                                    = inject[CashPaymentsCustomersNotMetFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   val cashPaymentsCustomersNotMet = CashPaymentsCustomerNotMet(true)
@@ -46,7 +46,7 @@ class CashPaymentsCustomersNotMetViewSpec extends AmlsViewSpec{
 
       def view = cash_payments_customers_not_met(fp().fill(cashPaymentsCustomersNotMet), true)
 
-      heading.text() must be("Recent cash payments of over €10,000")
+      heading.text()    must be("Recent cash payments of over €10,000")
       subHeading.text() must include("Extend your supervision")
     }
 

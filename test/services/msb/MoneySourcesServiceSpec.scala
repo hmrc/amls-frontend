@@ -33,7 +33,7 @@ class MoneySourcesServiceSpec extends AmlsSpec with Results {
       "MSB Services contains Foreign Exchange and user answers for FX-Transactions is empty" in {
 
         val msb = Some(MoneyServiceBusiness())
-        val bm = Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))))
+        val bm  = Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))))
 
         service.redirectToNextPage(msb, bm, edit = true) mustBe Some(
           Redirect(controllers.msb.routes.FXTransactionsInNext12MonthsController.get(true))
@@ -43,7 +43,7 @@ class MoneySourcesServiceSpec extends AmlsSpec with Results {
       "MSB Services contains Foreign Exchange and edit is false" in {
 
         val msb = Some(MoneyServiceBusiness(fxTransactionsInNext12Months = Some(FXTransactionsInNext12Months("foo"))))
-        val bm = Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))))
+        val bm  = Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))))
 
         service.redirectToNextPage(msb, bm, edit = false) mustBe Some(
           Redirect(controllers.msb.routes.FXTransactionsInNext12MonthsController.get(false))
@@ -56,17 +56,21 @@ class MoneySourcesServiceSpec extends AmlsSpec with Results {
       "MoneyServiceBusiness contains Foreign Exchange and user answers for FX-Transactions is empty" in {
 
         val msb = Some(MoneyServiceBusiness(fxTransactionsInNext12Months = Some(FXTransactionsInNext12Months("foo"))))
-        val bm = Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))))
+        val bm  = Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))))
 
-        service.redirectToNextPage(msb, bm, edit = true) mustBe Some(Redirect(controllers.msb.routes.SummaryController.get))
+        service.redirectToNextPage(msb, bm, edit = true) mustBe Some(
+          Redirect(controllers.msb.routes.SummaryController.get)
+        )
       }
 
       "MSB Services does not contain Foreign Exchange" in {
 
         val msb = Some(MoneyServiceBusiness())
-        val bm = Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))))
+        val bm  = Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))))
 
-        service.redirectToNextPage(msb, bm, edit = true) mustBe Some(Redirect(controllers.msb.routes.SummaryController.get))
+        service.redirectToNextPage(msb, bm, edit = true) mustBe Some(
+          Redirect(controllers.msb.routes.SummaryController.get)
+        )
       }
     }
   }

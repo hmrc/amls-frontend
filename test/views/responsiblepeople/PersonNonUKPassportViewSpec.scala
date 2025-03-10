@@ -27,7 +27,7 @@ import views.html.responsiblepeople.PersonNonUKPassportView
 class PersonNonUKPassportViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val passportView = inject[PersonNonUKPassportView]
-  lazy val fp = inject[PersonNonUKPassportFormProvider]
+  lazy val fp           = inject[PersonNonUKPassportFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,11 +42,11 @@ class PersonNonUKPassportViewSpec extends AmlsViewSpec with Matchers {
 
       def view = passportView(fp(), true, 1, None, name)
 
-      doc.title must startWith(messages("responsiblepeople.non.uk.passport.title"))
-      heading.html must be(messages("responsiblepeople.non.uk.passport.heading", name))
+      doc.title       must startWith(messages("responsiblepeople.non.uk.passport.title"))
+      heading.html    must be(messages("responsiblepeople.non.uk.passport.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
-      doc.getElementsByAttributeValue("name", "nonUKPassport") must not be empty
+      doc.getElementsByAttributeValue("name", "nonUKPassport")       must not be empty
       doc.getElementsByAttributeValue("name", "nonUKPassportNumber") must not be empty
 
     }

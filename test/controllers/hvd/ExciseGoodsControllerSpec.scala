@@ -31,17 +31,20 @@ import views.html.hvd.ExciseGoodsView
 class ExciseGoodsControllerSpec extends AmlsSpec with Injecting {
 
   trait Fixture extends DependencyMocks {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
-    lazy val view = inject[ExciseGoodsView]
-    val controller = new ExciseGoodsController(mockCacheConnector,
-                                                mockStatusService,
-                                                SuccessfulAuthAction,
-                                                ds = commonDependencies,
-                                                mockServiceFlow,
-                                                cc = mockMcc,
-                                                formProvider = inject[ExciseGoodsFormProvider],
-                                                view = view)
+    lazy val view  = inject[ExciseGoodsView]
+    val controller = new ExciseGoodsController(
+      mockCacheConnector,
+      mockStatusService,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      mockServiceFlow,
+      cc = mockMcc,
+      formProvider = inject[ExciseGoodsFormProvider],
+      view = view
+    )
 
     mockCacheFetch[Hvd](None)
     mockCacheSave[Hvd]
@@ -58,7 +61,9 @@ class ExciseGoodsControllerSpec extends AmlsSpec with Injecting {
       status(result) must be(OK)
 
       val htmlValue = Jsoup.parse(contentAsString(result))
-      htmlValue.title mustBe messages("hvd.excise.goods.title") + " - " + messages("summary.hvd") + " - " + messages("title.amls") + " - " + messages("title.gov")
+      htmlValue.title mustBe messages("hvd.excise.goods.title") + " - " + messages("summary.hvd") + " - " + messages(
+        "title.amls"
+      ) + " - " + messages("title.gov")
     }
 
     "successfully load UI from mongoCache" in new Fixture {
@@ -69,7 +74,9 @@ class ExciseGoodsControllerSpec extends AmlsSpec with Injecting {
       status(result) must be(OK)
 
       val htmlValue = Jsoup.parse(contentAsString(result))
-      htmlValue.title mustBe messages("hvd.excise.goods.title") + " - " + messages("summary.hvd") + " - " + messages("title.amls") + " - " + messages("title.gov")
+      htmlValue.title mustBe messages("hvd.excise.goods.title") + " - " + messages("summary.hvd") + " - " + messages(
+        "title.amls"
+      ) + " - " + messages("title.gov")
       htmlValue.getElementById("exciseGoods").`val`() mustBe "true"
       htmlValue.getElementById("exciseGoods-2").`val`() mustBe "false"
     }
@@ -77,33 +84,33 @@ class ExciseGoodsControllerSpec extends AmlsSpec with Injecting {
     "successfully redirect to next page when submitted with valid data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.ExciseGoodsController.post().url)
-      .withFormUrlEncodedBody("exciseGoods" -> "true")
+        .withFormUrlEncodedBody("exciseGoods" -> "true")
 
       mockApplicationStatus(SubmissionDecisionRejected)
 
       val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.hvd.routes.HowWillYouSellGoodsController.get().url))
     }
 
     "successfully redirect to next page when submitted with valid data in edit mode" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.ExciseGoodsController.post().url)
-      .withFormUrlEncodedBody("exciseGoods" -> "false")
+        .withFormUrlEncodedBody("exciseGoods" -> "false")
 
       mockApplicationStatus(SubmissionDecisionRejected)
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
     }
 
     "fail with validation error when mandatory field is missing" in new Fixture {
       val newRequest = FakeRequest(POST, routes.ExciseGoodsController.post().url)
-      .withFormUrlEncodedBody("" -> "")
+        .withFormUrlEncodedBody("" -> "")
 
       val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
+      status(result)          must be(BAD_REQUEST)
       contentAsString(result) must include(messages("error.required.hvd.excise.goods"))
     }
 
@@ -111,35 +118,40 @@ class ExciseGoodsControllerSpec extends AmlsSpec with Injecting {
 
       "the model has been changed and application is approved and in edit mode" in new Fixture with DateOfChangeHelper {
 
-        val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
+        val hvd        = Hvd(exciseGoods = Some(ExciseGoods(true)))
         val newRequest = FakeRequest(POST, routes.ExciseGoodsController.post().url)
-        .withFormUrlEncodedBody("exciseGoods" -> "false")
+          .withFormUrlEncodedBody("exciseGoods" -> "false")
 
         mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch(Some(hvd))
 
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url)
+        )
       }
 
-      "the model has been changed and application is ready for renewal and in edit mode" in new Fixture with DateOfChangeHelper {
+      "the model has been changed and application is ready for renewal and in edit mode" in new Fixture
+        with DateOfChangeHelper {
 
-        val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
+        val hvd        = Hvd(exciseGoods = Some(ExciseGoods(true)))
         val newRequest = FakeRequest(POST, routes.ExciseGoodsController.post().url)
-        .withFormUrlEncodedBody("exciseGoods" -> "false")
+          .withFormUrlEncodedBody("exciseGoods" -> "false")
 
         mockApplicationStatus(ReadyForRenewal(None))
         mockCacheFetch(Some(hvd))
 
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url))
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers).url)
+        )
       }
 
-        "the model has been changed and application is approved" in new Fixture with DateOfChangeHelper {
+      "the model has been changed and application is approved" in new Fixture with DateOfChangeHelper {
 
-        val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
+        val hvd        = Hvd(exciseGoods = Some(ExciseGoods(true)))
         val newRequest = FakeRequest(POST, routes.ExciseGoodsController.post().url)
           .withFormUrlEncodedBody("exciseGoods" -> "false")
 
@@ -147,22 +159,26 @@ class ExciseGoodsControllerSpec extends AmlsSpec with Injecting {
         mockCacheFetch(Some(hvd))
 
         val result = controller.post(false)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url))
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url)
+        )
       }
 
       "the model has been changed and application is ready for renewal" in new Fixture with DateOfChangeHelper {
 
-        val hvd = Hvd(exciseGoods = Some(ExciseGoods(true)))
+        val hvd        = Hvd(exciseGoods = Some(ExciseGoods(true)))
         val newRequest = FakeRequest(POST, routes.ExciseGoodsController.post().url)
-        .withFormUrlEncodedBody("exciseGoods" -> "false")
+          .withFormUrlEncodedBody("exciseGoods" -> "false")
 
         mockApplicationStatus(ReadyForRenewal(None))
         mockCacheFetch(Some(hvd))
 
         val result = controller.post(false)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url))
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.hvd.routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods).url)
+        )
       }
     }
   }
@@ -172,14 +188,14 @@ class ExciseGoodsControllerSpec extends AmlsSpec with Injecting {
       "the sector has just been added" must {
         "progress to the next page" in new Fixture {
           val newRequest = FakeRequest(POST, routes.ExciseGoodsController.post().url)
-          .withFormUrlEncodedBody("exciseGoods" -> "true")
+            .withFormUrlEncodedBody("exciseGoods" -> "true")
 
           mockApplicationStatus(SubmissionDecisionApproved)
           mockIsNewActivityNewAuth(true, Some(HighValueDealing))
 
           val result = controller.post()(newRequest)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.hvd.routes.HowWillYouSellGoodsController.get().url))
         }
       }

@@ -35,37 +35,37 @@ import play.api.libs.json._
 
 import scala.collection.Seq
 
-case class UpdateMongoCacheResponse(dataImport: Option[DataImport],
-                                    view: Option[ViewResponse],
-                                    businessMatching: Option[BusinessMatching],
-                                    estateAgencyBusiness: Option[Eab],
-                                    tradingPremises: Option[Seq[TradingPremises]],
-                                    businessDetails: Option[BusinessDetails],
-                                    bankDetails: Option[Seq[BankDetails]],
-                                    addPerson: Option[AddPerson],
-                                    businessActivities: Option[BusinessActivities],
-                                    responsiblePeople: Option[Seq[ResponsiblePerson]],
-                                    tcsp: Option[Tcsp],
-                                    asp: Option[Asp],
-                                    msb: Option[MoneyServiceBusiness],
-                                    hvd: Option[Hvd],
-                                    amp: Option[Amp],
-                                    supervision: Option[Supervision],
-                                    Subscription: Option[SubscriptionResponse],
-                                    amendVariationResponse: Option[AmendVariationRenewalResponse]
-                                   )
+case class UpdateMongoCacheResponse(
+  dataImport: Option[DataImport],
+  view: Option[ViewResponse],
+  businessMatching: Option[BusinessMatching],
+  estateAgencyBusiness: Option[Eab],
+  tradingPremises: Option[Seq[TradingPremises]],
+  businessDetails: Option[BusinessDetails],
+  bankDetails: Option[Seq[BankDetails]],
+  addPerson: Option[AddPerson],
+  businessActivities: Option[BusinessActivities],
+  responsiblePeople: Option[Seq[ResponsiblePerson]],
+  tcsp: Option[Tcsp],
+  asp: Option[Asp],
+  msb: Option[MoneyServiceBusiness],
+  hvd: Option[Hvd],
+  amp: Option[Amp],
+  supervision: Option[Supervision],
+  Subscription: Option[SubscriptionResponse],
+  amendVariationResponse: Option[AmendVariationRenewalResponse]
+)
 
 object UpdateMongoCacheResponse {
 
   import utils.MappingUtils.constant
   implicit val writes: OWrites[UpdateMongoCacheResponse] = Json.writes[UpdateMongoCacheResponse]
 
-  def readLegacyField[T](key: String, oldKey: String)(implicit r: Reads[T]): Reads[Option[T]] =
-    {
-      (__ \ key).read[T] orElse (__ \ oldKey).read[T]
-      }.map(Option(_)) orElse constant[Option[T]](None)
+  def readLegacyField[T](key: String, oldKey: String)(implicit r: Reads[T]): Reads[Option[T]] = {
+    (__ \ key).read[T] orElse (__ \ oldKey).read[T]
+  }.map(Option(_)) orElse constant[Option[T]](None)
 
-  implicit val reads: Reads[UpdateMongoCacheResponse] = {
+  implicit val reads: Reads[UpdateMongoCacheResponse] =
     (
       (__ \ DataImport.key).readNullable[DataImport] ~
         readLegacyField[ViewResponse](ViewResponse.key, "view") ~
@@ -85,6 +85,5 @@ object UpdateMongoCacheResponse {
         (__ \ Supervision.key).readNullable[Supervision] ~
         (__ \ SubscriptionResponse.key).readNullable[SubscriptionResponse] ~
         (__ \ AmendVariationRenewalResponse.key).readNullable[AmendVariationRenewalResponse]
-      ) (UpdateMongoCacheResponse.apply _)
-  }
+    )(UpdateMongoCacheResponse.apply _)
 }

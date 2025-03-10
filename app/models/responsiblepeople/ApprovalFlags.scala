@@ -19,13 +19,12 @@ package models.responsiblepeople
 import play.api.libs.json.{Json, OFormat, Reads, Writes}
 
 final case class ApprovalFlags(
-                                hasAlreadyPassedFitAndProper: Option[Boolean] = None,
-                                hasAlreadyPaidApprovalCheck: Option[Boolean] = None
-                              ) {
-  def isComplete() = {
+  hasAlreadyPassedFitAndProper: Option[Boolean] = None,
+  hasAlreadyPaidApprovalCheck: Option[Boolean] = None
+) {
+  def isComplete() =
     hasAlreadyPassedFitAndProper.isDefined &
-    hasAlreadyPaidApprovalCheck.isDefined
-  }
+      hasAlreadyPaidApprovalCheck.isDefined
 
 }
 
@@ -36,9 +35,9 @@ object ApprovalFlags {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
     (
-    (__ \ "hasAlreadyPassedFitAndProper").readNullable[Boolean] and
-      (__ \ "hasAlreadyPaidApprovalCheck").readNullable[Boolean]
-      ) (ApprovalFlags.apply _)
+      (__ \ "hasAlreadyPassedFitAndProper").readNullable[Boolean] and
+        (__ \ "hasAlreadyPaidApprovalCheck").readNullable[Boolean]
+    )(ApprovalFlags.apply _)
   }
 
   implicit lazy val writes: Writes[ApprovalFlags] = {
@@ -48,7 +47,7 @@ object ApprovalFlags {
     (
       (__ \ "hasAlreadyPassedFitAndProper").writeNullable[Boolean] and
         (__ \ "hasAlreadyPaidApprovalCheck").writeNullable[Boolean]
-      ) (unlift(ApprovalFlags.unapply))
+    )(unlift(ApprovalFlags.unapply))
   }
 
   implicit val format: OFormat[ApprovalFlags] = Json.format[ApprovalFlags]

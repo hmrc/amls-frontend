@@ -27,24 +27,26 @@ import views.html.businessdetails.BusinessEmailAddressView
 
 import scala.concurrent.Future
 
-class BusinessEmailAddressController @Inject()(val authAction: AuthAction,
-                                               val ds: CommonPlayDependencies,
-                                               val cc: MessagesControllerComponents,
-                                               service: BusinessEmailAddressService,
-                                               formProvider: BusinessEmailAddressFormProvider,
-                                               view: BusinessEmailAddressView) extends AmlsBaseController(ds, cc) {
+class BusinessEmailAddressController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  service: BusinessEmailAddressService,
+  formProvider: BusinessEmailAddressFormProvider,
+  view: BusinessEmailAddressView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      service.getEmailAddress(request.credId) map { detailsOpt =>
-        val form = detailsOpt.fold(formProvider())(x => formProvider().fill(ContactingYouEmail(x)))
-        Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    service.getEmailAddress(request.credId) map { detailsOpt =>
+      val form = detailsOpt.fold(formProvider())(x => formProvider().fill(ContactingYouEmail(x)))
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data => service.updateEmailAddress(request.credId, data).map(_ => redirect(edit))
       )

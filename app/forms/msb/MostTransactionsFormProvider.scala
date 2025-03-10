@@ -22,13 +22,14 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class MostTransactionsFormProvider @Inject()() extends CountryListMappings {
+class MostTransactionsFormProvider @Inject() () extends CountryListMappings {
 
   private val emptyErrorKey = "error.required.countries.msb.most.transactions"
 
   def apply(): Form[MostTransactions] = Form[MostTransactions](
     "mostTransactionsCountries" -> countryListMapping[MostTransactions](emptyErrorKey)(
-      x => MostTransactions(x.flatten.distinct), _.countries.distinct.map(Some(_))
+      x => MostTransactions(x.flatten.distinct),
+      _.countries.distinct.map(Some(_))
     )
   )
 

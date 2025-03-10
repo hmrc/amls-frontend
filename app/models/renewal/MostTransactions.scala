@@ -26,8 +26,8 @@ private sealed trait MostTransactions0 {
   val jsonReads: Reads[MostTransactions] =
     (__ \ "mostTransactionsCountries").readNullable[Seq[Country]].map {
       case Some(countries) if countries.isEmpty => MostTransactions(Seq())
-      case Some(countries) => MostTransactions apply countries
-      case None => MostTransactions(Seq())
+      case Some(countries)                      => MostTransactions apply countries
+      case None                                 => MostTransactions(Seq())
     }
 
   val jsonW: Writes[MostTransactions] = {
@@ -40,10 +40,9 @@ object MostTransactions {
 
   private object Cache extends MostTransactions0
 
-  implicit val jsonR: Reads[MostTransactions] = Cache.jsonReads
+  implicit val jsonR: Reads[MostTransactions]  = Cache.jsonReads
   implicit val jsonW: Writes[MostTransactions] = Cache.jsonW
 
-  implicit def convert(model: MostTransactions): models.moneyservicebusiness.MostTransactions = {
+  implicit def convert(model: MostTransactions): models.moneyservicebusiness.MostTransactions =
     models.moneyservicebusiness.MostTransactions(model.countries)
-  }
 }

@@ -26,28 +26,29 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AddBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMatchingService,
-                                      val addMoreActivitiesPageRouter: AddMoreBusinessTypesPageRouter,
-                                      val businessAppliedForPSRNumberPageRouter: BusinessAppliedForPsrNumberPageRouter,
-                                      val newServicesInformationPageRouter: NeedMoreInformationPageRouter,
-                                      val noPSRPageRouter: NoPSRPageRouter,
-                                      val selectActivitiesPageRouter: SelectBusinessTypesPageRouter,
-                                      val subServicesPageRouter: SubSectorsPageRouter,
-                                      val updateServicesSummaryPageRouter: AddBusinessTypeSummaryPageRouter
-                                     ) extends Router[AddBusinessTypeFlowModel] {
+class AddBusinessTypeRouter @Inject() (
+  val businessMatchingService: BusinessMatchingService,
+  val addMoreActivitiesPageRouter: AddMoreBusinessTypesPageRouter,
+  val businessAppliedForPSRNumberPageRouter: BusinessAppliedForPsrNumberPageRouter,
+  val newServicesInformationPageRouter: NeedMoreInformationPageRouter,
+  val noPSRPageRouter: NoPSRPageRouter,
+  val selectActivitiesPageRouter: SelectBusinessTypesPageRouter,
+  val subServicesPageRouter: SubSectorsPageRouter,
+  val updateServicesSummaryPageRouter: AddBusinessTypeSummaryPageRouter
+) extends Router[AddBusinessTypeFlowModel] {
 
-
-  override def getRoute(credId: String, pageId: PageId, model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+  override def getRoute(credId: String, pageId: PageId, model: AddBusinessTypeFlowModel, edit: Boolean = false)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Result] =
     pageId match {
-      case AddMoreBusinessTypesPageId => addMoreActivitiesPageRouter.getRoute(credId, model, edit)
-      case PsrNumberPageId => businessAppliedForPSRNumberPageRouter.getRoute(credId, model, edit)
-      case NeedMoreInformationPageId => newServicesInformationPageRouter.getRoute(credId, model, edit)
-      case NoPSRPageId => noPSRPageRouter.getRoute(credId, model, edit)
-      case SelectBusinessTypesPageId => selectActivitiesPageRouter.getRoute(credId, model, edit)
-      case SubSectorsPageId => subServicesPageRouter.getRoute(credId, model, edit)
+      case AddMoreBusinessTypesPageId   => addMoreActivitiesPageRouter.getRoute(credId, model, edit)
+      case PsrNumberPageId              => businessAppliedForPSRNumberPageRouter.getRoute(credId, model, edit)
+      case NeedMoreInformationPageId    => newServicesInformationPageRouter.getRoute(credId, model, edit)
+      case NoPSRPageId                  => noPSRPageRouter.getRoute(credId, model, edit)
+      case SelectBusinessTypesPageId    => selectActivitiesPageRouter.getRoute(credId, model, edit)
+      case SubSectorsPageId             => subServicesPageRouter.getRoute(credId, model, edit)
       case AddBusinessTypeSummaryPageId => updateServicesSummaryPageRouter.getRoute(credId, model, edit)
-      case _ => throw new Exception("An Unknown Exception has occurred : AddBusinessTypeRouter")
+      case _                            => throw new Exception("An Unknown Exception has occurred : AddBusinessTypeRouter")
     }
-  }
 }

@@ -29,30 +29,32 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class AddMoreBusinessTypesController @Inject()(
-                                                authAction: AuthAction,
-                                                val ds: CommonPlayDependencies,
-                                                implicit val dataCacheConnector: DataCacheConnector,
-                                                val router: Router[AddBusinessTypeFlowModel],
-                                                val cc: MessagesControllerComponents,
-                                                formProvider: AddMoreActivitiesFormProvider,
-                                                view: AddMoreActivitiesView) extends AmlsBaseController(ds, cc) {
+class AddMoreBusinessTypesController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val dataCacheConnector: DataCacheConnector,
+  val router: Router[AddBusinessTypeFlowModel],
+  val cc: MessagesControllerComponents,
+  formProvider: AddMoreActivitiesFormProvider,
+  view: AddMoreActivitiesView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(): Action[AnyContent] = authAction {
-    implicit request => Ok(view(formProvider()))
+  def get(): Action[AnyContent] = authAction { implicit request =>
+    Ok(view(formProvider()))
   }
 
-  def post(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post(): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         data =>
           dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
             case Some(model) => model.copy(addMoreActivities = Some(data))
-            case None => throw new Exception("An UnknownException has occurred: AddMoreActivitiesController")
+            case None        => throw new Exception("An UnknownException has occurred: AddMoreActivitiesController")
           } flatMap {
             case Some(model) => router.getRoute(request.credId, AddMoreBusinessTypesPageId, model)
-            case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: AddMoreActivitiesController"))
+            case _           => Future.successful(InternalServerError("Post: Cannot retrieve data: AddMoreActivitiesController"))
           }
       )
   }

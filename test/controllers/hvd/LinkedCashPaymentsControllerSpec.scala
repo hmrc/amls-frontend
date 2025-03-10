@@ -32,16 +32,18 @@ import scala.concurrent.Future
 
 class LinkedCashPaymentsControllerSpec extends AmlsSpec with Injecting {
 
-  trait Fixture extends DependencyMocks{
-    self => val request = addToken(authRequest)
-    lazy val view = inject[LinkedCashPaymentsView]
-    val controller = new LinkedCashPaymentsController (
+  trait Fixture extends DependencyMocks {
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[LinkedCashPaymentsView]
+    val controller = new LinkedCashPaymentsController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[LinkedCashPaymentsFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   val emptyCache = Cache.empty
@@ -52,7 +54,7 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec with Injecting {
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
-      val title = messages("hvd.identify.linked.cash.payment.title") + " - " +
+      val title  = messages("hvd.identify.linked.cash.payment.title") + " - " +
         messages("summary.hvd") + " - " +
         messages("title.amls") + " - " + messages("title.gov")
       val result = controller.get()(request)
@@ -67,7 +69,7 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec with Injecting {
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
         .thenReturn(Future.successful(Some(Hvd(linkedCashPayment = Some(LinkedCashPayments(true))))))
 
-      val title = messages("hvd.identify.linked.cash.payment.title") + " - " +
+      val title  = messages("hvd.identify.linked.cash.payment.title") + " - " +
         messages("summary.hvd") + " - " +
         messages("title.amls") + " - " + messages("title.gov")
       val result = controller.get()(request)
@@ -82,7 +84,7 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec with Injecting {
     "successfully redirect to nex page when submitted with valida data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.LinkedCashPaymentsController.post().url)
-      .withFormUrlEncodedBody("linkedCashPayments" -> "true")
+        .withFormUrlEncodedBody("linkedCashPayments" -> "true")
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
         .thenReturn(Future.successful(None))
@@ -91,14 +93,14 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec with Injecting {
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.hvd.routes.ReceiveCashPaymentsController.get().url))
     }
 
     "successfully redirect to nex page when submitted with valida data in edit mode" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.LinkedCashPaymentsController.post().url)
-      .withFormUrlEncodedBody("linkedCashPayments" -> "false")
+        .withFormUrlEncodedBody("linkedCashPayments" -> "false")
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
         .thenReturn(Future.successful(None))
@@ -107,18 +109,18 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec with Injecting {
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
     }
 
     "fail with validation error when mandatory field is missing" in new Fixture {
       val newRequest = FakeRequest(POST, routes.LinkedCashPaymentsController.post().url)
-      .withFormUrlEncodedBody()
+        .withFormUrlEncodedBody()
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
+      status(result)          must be(BAD_REQUEST)
       contentAsString(result) must include(messages("error.required.hvd.linked.cash.payment"))
     }
 

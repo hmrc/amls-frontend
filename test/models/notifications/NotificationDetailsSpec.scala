@@ -39,7 +39,8 @@ class NotificationDetailsSpec extends PlaySpec with Matchers {
           Status(
             Some(StatusType.Revoked),
             Some(RevokedReason.RevokedCeasedTrading)
-          )),
+          )
+        ),
         Some("MessageText"),
         variation = false,
         dateTime
@@ -47,13 +48,13 @@ class NotificationDetailsSpec extends PlaySpec with Matchers {
 
       val json = Json.obj(
         "contactType" -> "MTRV",
-        "status" -> Json.obj(
-          "status_type" -> "08",
+        "status"      -> Json.obj(
+          "status_type"   -> "08",
           "status_reason" -> "02"
         ),
         "messageText" -> "MessageText",
-        "variation" -> false,
-        "receivedAt" -> Json.obj("$date" -> Json.obj("$numberLong" -> "1479730062573"))
+        "variation"   -> false,
+        "receivedAt"  -> Json.obj("$date" -> Json.obj("$numberLong" -> "1479730062573"))
       )
 
       json.as[NotificationDetails] mustBe model
@@ -115,16 +116,20 @@ class NotificationDetailsSpec extends PlaySpec with Matchers {
 
       val inputString = "parameter 1-31/07/2018|parameter 2- ABC1234"
 
-      //noinspection ScalaStyle
-      NotificationDetails.convertEndDateWithRefMessageText(inputString) mustBe Some(EndDateDetails(LocalDate.of(2018, 7, 31), Some("ABC1234")))
+      // noinspection ScalaStyle
+      NotificationDetails.convertEndDateWithRefMessageText(inputString) mustBe Some(
+        EndDateDetails(LocalDate.of(2018, 7, 31), Some("ABC1234"))
+      )
 
     }
 
     "convert the input message text into the model when there are special characters in the input string" in {
       val inputString = "<![CDATA[<P>parameter 1- 31/07/2018|parameter 2-ABC1234</P>]]>"
 
-      //noinspection ScalaStyle
-      NotificationDetails.convertEndDateWithRefMessageText(inputString) mustBe Some(EndDateDetails(LocalDate.of(2018, 7, 31), Some("ABC1234")))
+      // noinspection ScalaStyle
+      NotificationDetails.convertEndDateWithRefMessageText(inputString) mustBe Some(
+        EndDateDetails(LocalDate.of(2018, 7, 31), Some("ABC1234"))
+      )
 
     }
 
@@ -140,15 +145,19 @@ class NotificationDetailsSpec extends PlaySpec with Matchers {
 
       val inputString = "parameter 1-31/07/2018"
 
-      //noinspection ScalaStyle
-      NotificationDetails.convertEndDateMessageText(inputString) mustBe Some(EndDateDetails(LocalDate.of(2018, 7, 31), None))
+      // noinspection ScalaStyle
+      NotificationDetails.convertEndDateMessageText(inputString) mustBe Some(
+        EndDateDetails(LocalDate.of(2018, 7, 31), None)
+      )
     }
 
     "convert the input message text into the model when there are special characters in the input string" in {
       val inputString = "<![CDATA[<P>parameter 1-20/05/2009</P>]]>"
 
-      //noinspection ScalaStyle
-      NotificationDetails.convertEndDateMessageText(inputString) mustBe Some(EndDateDetails(LocalDate.of(2009, 5, 20), None))
+      // noinspection ScalaStyle
+      NotificationDetails.convertEndDateMessageText(inputString) mustBe Some(
+        EndDateDetails(LocalDate.of(2009, 5, 20), None)
+      )
     }
 
     "return none when supplied with an invalid string" in {

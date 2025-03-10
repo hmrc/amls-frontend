@@ -33,15 +33,16 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
   trait Fixture extends DependencyMocks {
     self =>
-    val request = addToken(authRequest)
-    lazy val view = inject[SupervisionEndView]
+    val request    = addToken(authRequest)
+    lazy val view  = inject[SupervisionEndView]
     val controller = new SupervisionEndController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[SupervisionEndFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   "SupervisionEndController" must {
@@ -51,111 +52,132 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
       mockCacheFetch[Supervision](None)
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("supervision.supervision_end.title"))
 
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("endDate.day").`val` must be("")
+      document.getElementById("endDate.day").`val`   must be("")
       document.getElementById("endDate.month").`val` must be("")
-      document.getElementById("endDate.year").`val` must be("")
+      document.getElementById("endDate.year").`val`  must be("")
     }
 
-
     "on get display the SupervisionEnd page with pre populated data" in new Fixture {
-      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) //scalastyle:off magic.number
-      val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) //scalastyle:off magic.number
+      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) // scalastyle:off magic.number
+      val end   = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) // scalastyle:off magic.number
 
-      mockCacheFetch[Supervision](Some(Supervision(
-        Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))),
-        None,
-        None,
-        Some(ProfessionalBodyYes("details"))
-      )))
+      mockCacheFetch[Supervision](
+        Some(
+          Supervision(
+            Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))),
+            None,
+            None,
+            Some(ProfessionalBodyYes("details"))
+          )
+        )
+      )
 
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("endDate.day").`val` must be("24")
+      document.getElementById("endDate.day").`val`   must be("24")
       document.getElementById("endDate.month").`val` must be("2")
-      document.getElementById("endDate.year").`val` must be("1998")
+      document.getElementById("endDate.year").`val`  must be("1998")
     }
 
     "on get display the SupervisionEnd page with empty form when there is no data" in new Fixture {
 
-      mockCacheFetch[Supervision](Some(Supervision(
-        Some(AnotherBodyNo),
-        None,
-        None,
-        Some(ProfessionalBodyYes("details"))
-      )))
+      mockCacheFetch[Supervision](
+        Some(
+          Supervision(
+            Some(AnotherBodyNo),
+            None,
+            None,
+            Some(ProfessionalBodyYes("details"))
+          )
+        )
+      )
 
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("endDate.day").`val` must be("")
+      document.getElementById("endDate.day").`val`   must be("")
       document.getElementById("endDate.month").`val` must be("")
-      document.getElementById("endDate.year").`val` must be("")
+      document.getElementById("endDate.year").`val`  must be("")
     }
 
     "on post with valid data" in new Fixture {
-      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) //scalastyle:off magic.number
-      val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) //scalastyle:off magic.number
+      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) // scalastyle:off magic.number
+      val end   = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) // scalastyle:off magic.number
 
       val newRequest = FakeRequest(POST, routes.SupervisionEndController.post().url)
-      .withFormUrlEncodedBody(
-        "anotherBody" -> "true",
-        "endDate.day" -> "24",
-        "endDate.month" -> "2",
-        "endDate.year" -> "1998")
+        .withFormUrlEncodedBody(
+          "anotherBody"   -> "true",
+          "endDate.day"   -> "24",
+          "endDate.month" -> "2",
+          "endDate.year"  -> "1998"
+        )
 
       mockCacheFetch[Supervision](Some(Supervision(Some(AnotherBodyYes("Name", start)))))
 
       mockCacheSave[Supervision]
 
-      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end)))), Supervision.key)
+      mockCacheGetEntry[Supervision](
+        Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end)))),
+        Supervision.key
+      )
 
       val result = controller.post()(newRequest)
 
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SupervisionEndReasonsController.get().url))
     }
 
     "on post with valid data in edit mode" in new Fixture {
-      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) //scalastyle:off magic.number
-      val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) //scalastyle:off magic.number
+      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24))) // scalastyle:off magic.number
+      val end   = Some(SupervisionEnd(LocalDate.of(1998, 2, 24))) // scalastyle:off magic.number
 
       val newRequest = FakeRequest(POST, routes.SupervisionEndController.post().url)
-      .withFormUrlEncodedBody(
-        "anotherBody" -> "true",
-        "endDate.day" -> "24",
-        "endDate.month" -> "2",
-        "endDate.year" -> "1998")
+        .withFormUrlEncodedBody(
+          "anotherBody"   -> "true",
+          "endDate.day"   -> "24",
+          "endDate.month" -> "2",
+          "endDate.year"  -> "1998"
+        )
 
       mockCacheFetch[Supervision](Some(Supervision(Some(AnotherBodyYes("Name", start)))))
 
       mockCacheSave[Supervision]
 
-      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))))), Supervision.key)
+      mockCacheGetEntry[Supervision](
+        Some(
+          Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))))
+        ),
+        Supervision.key
+      )
 
       val result = controller.post(true)(newRequest)
 
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SummaryController.get().url))
     }
 
     "on post with invalid data" in new Fixture {
 
-      mockCacheFetch[Supervision](Some(Supervision(
-        Some(AnotherBodyYes("Name", Some(SupervisionStart(LocalDate.of(2005, 2, 24))))),
-        None,
-        None,
-        Some(ProfessionalBodyYes("details"))
-      )))
+      mockCacheFetch[Supervision](
+        Some(
+          Supervision(
+            Some(AnotherBodyYes("Name", Some(SupervisionStart(LocalDate.of(2005, 2, 24))))),
+            None,
+            None,
+            Some(ProfessionalBodyYes("details"))
+          )
+        )
+      )
 
       val newRequest = FakeRequest(POST, routes.SupervisionEndController.post().url)
-      .withFormUrlEncodedBody("invalid" -> "data")
+        .withFormUrlEncodedBody("invalid" -> "data")
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)

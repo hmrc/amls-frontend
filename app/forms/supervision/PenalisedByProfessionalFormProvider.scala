@@ -22,18 +22,19 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class PenalisedByProfessionalFormProvider @Inject()() extends BooleanFormProvider {
+class PenalisedByProfessionalFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[ProfessionalBody] = createForm[ProfessionalBody](
-    "penalised", "error.required.professionalbody.penalised.by.professional.body"
+    "penalised",
+    "error.required.professionalbody.penalised.by.professional.body"
   )(apply, unapply)
 
   private def apply(boolean: Boolean): ProfessionalBody =
-    if(boolean) ProfessionalBodyYes("") else ProfessionalBodyNo
+    if (boolean) ProfessionalBodyYes("") else ProfessionalBodyNo
 
   private def unapply(obj: ProfessionalBody): Boolean = obj match {
     case ProfessionalBodyYes(_) => true
-    case ProfessionalBodyNo => false
+    case ProfessionalBodyNo     => false
   }
 
 }

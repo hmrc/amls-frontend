@@ -42,12 +42,13 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec with Injecting {
   sealed trait Fixture extends DependencyMocks with ResponsiblePersonGenerator {
     self =>
 
-    val request = addToken(authRequest)
+    val request                     = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
-    lazy val view = inject[SelectActivitiesView]
-    val controller = new SelectBusinessTypeController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+    val mockUpdateServiceHelper     = mock[AddBusinessTypeHelper]
+    lazy val view                   = inject[SelectActivitiesView]
+    val controller                  = new SelectBusinessTypeController(
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
       router = createRouter[AddBusinessTypeFlowModel],
@@ -59,15 +60,22 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec with Injecting {
 
     when {
       controller.businessMatchingService.getModel(any())
-    } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
-      activities = Some(BusinessActivities(Set(BillPaymentServices)))
-    )))
+    } thenReturn OptionT.liftF[Future, BusinessMatching](
+      Future.successful(
+        BusinessMatching(
+          activities = Some(BusinessActivities(Set(BillPaymentServices)))
+        )
+      )
+    )
 
     when {
       controller.businessMatchingService.getSubmittedBusinessActivities(any())(any())
     } thenReturn OptionT.liftF[Future, Set[BusinessActivity]](Future.successful(Set(BillPaymentServices)))
 
-    mockCacheFetch[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel(Some(BillPaymentServices), Some(true))), Some(AddBusinessTypeFlowModel.key))
+    mockCacheFetch[AddBusinessTypeFlowModel](
+      Some(AddBusinessTypeFlowModel(Some(BillPaymentServices), Some(true))),
+      Some(AddBusinessTypeFlowModel.key)
+    )
 
     mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePersonGen.sample.get)), Some(ResponsiblePerson.key))
     mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
@@ -84,8 +92,10 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec with Injecting {
 
         val result = controller.get()(request)
 
-        status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(messages("businessmatching.updateservice.selectactivities.title"))
+        status(result)                               must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(
+          messages("businessmatching.updateservice.selectactivities.title")
+        )
       }
 
       "return OK with select_activities view and filled form when activities are retrieved from cache" in new Fixture {
@@ -94,8 +104,10 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec with Injecting {
 
         val result = controller.get()(request)
 
-        status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(messages("businessmatching.updateservice.selectactivities.title"))
+        status(result)                               must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(
+          messages("businessmatching.updateservice.selectactivities.title")
+        )
       }
 
       "return 500 when cache is empty" in new Fixture {
@@ -112,8 +124,10 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec with Injecting {
     "post" must {
       "return a bad request when no data has been posted" in new Fixture {
 
-        val result = controller.post()(FakeRequest(POST,routes.SelectBusinessTypeController.post().url)
-        .withFormUrlEncodedBody("" -> ""))
+        val result = controller.post()(
+          FakeRequest(POST, routes.SelectBusinessTypeController.post().url)
+            .withFormUrlEncodedBody("" -> "")
+        )
 
         status(result) mustBe BAD_REQUEST
       }
@@ -124,8 +138,10 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec with Injecting {
           when(controller.businessMatchingService.getModel(any()))
             .thenReturn(OptionT.none[Future, BusinessMatching])
 
-          val result = controller.post()(FakeRequest(POST, routes.SelectBusinessTypeController.post().url)
-            .withFormUrlEncodedBody("" -> ""))
+          val result = controller.post()(
+            FakeRequest(POST, routes.SelectBusinessTypeController.post().url)
+              .withFormUrlEncodedBody("" -> "")
+          )
 
           status(result) mustBe INTERNAL_SERVER_ERROR
         }
@@ -135,10 +151,12 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec with Injecting {
           when(mockCacheConnector.update[AddBusinessTypeFlowModel](any(), any())(any())(any()))
             .thenReturn(Future.successful(None))
 
-          val result = controller.post()(FakeRequest(POST, routes.SelectBusinessTypeController.post().url)
-            .withFormUrlEncodedBody(
-              "businessActivities" -> HighValueDealing.toString
-            ))
+          val result = controller.post()(
+            FakeRequest(POST, routes.SelectBusinessTypeController.post().url)
+              .withFormUrlEncodedBody(
+                "businessActivities" -> HighValueDealing.toString
+              )
+          )
 
           status(result) mustBe INTERNAL_SERVER_ERROR
         }
@@ -146,12 +164,17 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec with Injecting {
 
       "return the next page in the flow when valid data has been posted" in new Fixture {
         mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
-        mockCacheSave[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel(Some(HighValueDealing)), Some(AddBusinessTypeFlowModel.key))
+        mockCacheSave[AddBusinessTypeFlowModel](
+          AddBusinessTypeFlowModel(Some(HighValueDealing)),
+          Some(AddBusinessTypeFlowModel.key)
+        )
 
-        val result = controller.post()(FakeRequest(POST,routes.SelectBusinessTypeController.post().url)
-        .withFormUrlEncodedBody(
-          "businessActivities" -> HighValueDealing.toString
-        ))
+        val result = controller.post()(
+          FakeRequest(POST, routes.SelectBusinessTypeController.post().url)
+            .withFormUrlEncodedBody(
+              "businessActivities" -> HighValueDealing.toString
+            )
+        )
 
         status(result) mustBe SEE_OTHER
       }

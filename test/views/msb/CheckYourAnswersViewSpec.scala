@@ -34,18 +34,29 @@ import scala.jdk.CollectionConverters._
 class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    lazy val summary = inject[CheckYourAnswersView]
-    lazy val helper = inject[CheckYourAnswersHelper]
+    lazy val summary                                               = inject[CheckYourAnswersView]
+    lazy val helper                                                = inject[CheckYourAnswersHelper]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView(FakeRequest())
 
     val fullMSB: MoneyServiceBusiness = MoneyServiceBusiness(
       Some(ExpectedThroughput.First),
       Some(BusinessUseAnIPSPNo),
       Some(IdentifyLinkedTransactions(false)),
-      Some(WhichCurrencies(Seq("USD", "GBP", "EUR"), Some(UsesForeignCurrenciesYes), Some(MoneySources(Some(BankMoneySource("Banks")), Some(WholesalerMoneySource("Wholesalers")), Some(true))))),
+      Some(
+        WhichCurrencies(
+          Seq("USD", "GBP", "EUR"),
+          Some(UsesForeignCurrenciesYes),
+          Some(MoneySources(Some(BankMoneySource("Banks")), Some(WholesalerMoneySource("Wholesalers")), Some(true)))
+        )
+      ),
       Some(SendMoneyToOtherCountry(true)),
       Some(FundsTransfer(false)),
-      Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))))),
+      Some(
+        BranchesOrAgents(
+          BranchesOrAgentsHasCountries(true),
+          Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB"))))
+        )
+      ),
       Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
       Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
       Some(TransactionsInNext12Months("10")),
@@ -61,43 +72,49 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
       def view = summary(helper.getSummaryList(fullMSB, bmMsbServices))
 
-      doc.title must be(messages("title.cya") +
-        " - " + messages("summary.msb") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("title.cya") +
+          " - " + messages("summary.msb") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = summary(helper.getSummaryList(fullMSB, bmMsbServices))
 
-      heading.html must be(messages("title.cya"))
+      heading.html    must be(messages("title.cya"))
       subHeading.html must include(messages("summary.msb"))
     }
 
     "include the provided data" in new ViewFixture {
 
       val list = helper.getSummaryList(
-        fullMSB, BusinessMatchingMsbServices(BusinessMatchingMsbServices.all.toSet)
+        fullMSB,
+        BusinessMatchingMsbServices(BusinessMatchingMsbServices.all.toSet)
       )
 
       def view = summary(list)
 
-      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
-        doc.getElementsByClass("govuk-summary-list__value").asScala
-      ).foreach { case (key, value) =>
+      doc
+        .getElementsByClass("govuk-summary-list__key")
+        .asScala
+        .zip(
+          doc.getElementsByClass("govuk-summary-list__value").asScala
+        )
+        .foreach { case (key, value) =>
+          val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
 
-        val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
+          maybeRow.key.content.asHtml.body must include(key.text())
 
-        maybeRow.key.content.asHtml.body must include(key.text())
+          val valueText = maybeRow.value.content.asHtml.body match {
+            case str if str.startsWith("<") => Jsoup.parse(str).text()
+            case str                        => str
+          }
 
-        val valueText = maybeRow.value.content.asHtml.body match {
-          case str if str.startsWith("<") => Jsoup.parse(str).text()
-          case str => str
+          valueText must include(value.text())
         }
-
-        valueText must include(value.text())
-      }
     }
 
     trait NoSubsectorsViewFixture extends ViewFixture {

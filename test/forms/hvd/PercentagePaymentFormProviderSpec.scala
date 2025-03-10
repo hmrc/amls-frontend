@@ -23,14 +23,16 @@ import play.api.data.FormError
 
 class PercentagePaymentFormProviderSpec extends FieldBehaviours {
 
-  val form = new PercentagePaymentFormProvider()()
+  val form      = new PercentagePaymentFormProvider()()
   val fieldName = "percentage"
-  val errorKey = "error.required.hvd.percentage"
+  val errorKey  = "error.required.hvd.percentage"
 
   "PercentagePaymentFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, fieldName, Gen.oneOf[String](PercentageOfCashPaymentOver15000.all.map(_.toString))
+      form,
+      fieldName,
+      Gen.oneOf[String](PercentageOfCashPaymentOver15000.all.map(_.toString))
     )
 
     behave like mandatoryField(form, fieldName, FormError(fieldName, errorKey))
@@ -40,7 +42,7 @@ class PercentagePaymentFormProviderSpec extends FieldBehaviours {
       forAll(Gen.alphaNumStr) { invalidAnswer =>
         val result = form.bind(Map(fieldName -> invalidAnswer))
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(fieldName, errorKey))
       }
     }

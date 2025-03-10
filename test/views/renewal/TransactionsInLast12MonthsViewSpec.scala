@@ -25,8 +25,8 @@ import views.html.renewal.TransactionsInLast12MonthsView
 
 class TransactionsInLast12MonthsViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val transactions_in_last_12_months = inject[TransactionsInLast12MonthsView]
-  lazy val fp = inject[TransactionsInLast12MonthsFormProvider]
+  lazy val transactions_in_last_12_months                        = inject[TransactionsInLast12MonthsView]
+  lazy val fp                                                    = inject[TransactionsInLast12MonthsFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
@@ -52,7 +52,8 @@ class TransactionsInLast12MonthsViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       transactions_in_last_12_months(
-        fp().withError("txnAmount", "error.required.msb.transactions.in.12months"), false
+        fp().withError("txnAmount", "error.required.msb.transactions.in.12months"),
+        false
       ),
       "txnAmount",
       "error.required.msb.transactions.in.12months"

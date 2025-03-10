@@ -31,17 +31,19 @@ import utils.AmlsSpec
 
 import scala.concurrent.Future
 
-class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyChecks with TradingPremisesGenerator{
+class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyChecks with TradingPremisesGenerator {
 
   trait Fixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
-    val controller = new TradingPremisesAddController (
+    val controller = new TradingPremisesAddController(
       mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      error = errorView)
+      error = errorView
+    )
   }
 
   "TradingPremisesAddController" should {
@@ -49,8 +51,9 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
 
     "load What You Need successfully when displayGuidance is true" in new Fixture {
 
-      val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-      val mockCacheMap = mock[Cache]
+      val BusinessActivitiesModel =
+        BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+      val mockCacheMap            = mock[Cache]
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
@@ -61,19 +64,18 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(),any(), any())( any()))
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.get(true)(request)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.WhatYouNeedController.get(1).url))
     }
 
     "load Where Are Trading Premises page successfully when user selects option other then MSB in business matching page" in new Fixture {
 
       val BusinessActivitiesModel = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-      val mockCacheMap = mock[Cache]
-
+      val mockCacheMap            = mock[Cache]
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(TradingPremises(), TradingPremises())))
@@ -91,15 +93,14 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.get(false)(request)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
     }
 
     "load confirm trading premises address page successfully when user selects option other then MSB in business matching page" in new Fixture {
 
       val BusinessActivitiesModel = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-      val mockCacheMap = mock[Cache]
-
+      val mockCacheMap            = mock[Cache]
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(tradingPremisesGen.sample.get)))
@@ -117,14 +118,15 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.get(false)(request)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.ConfirmAddressController.get(1).url))
     }
 
     "load Registering Agent Premises page successfully when user selects MSB in business matching page" in new Fixture {
 
-      val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-      val mockCacheMap = mock[Cache]
+      val BusinessActivitiesModel =
+        BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+      val mockCacheMap            = mock[Cache]
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
@@ -139,7 +141,7 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.get(false)(request)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.RegisteringAgentPremisesController.get(1, false).url))
     }
   }

@@ -25,9 +25,9 @@ import play.api.data.{Form, FormError}
 class WithdrawalReasonFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val formProvider: WithdrawalReasonFormProvider = new WithdrawalReasonFormProvider()
-  val form: Form[WithdrawalReason] = formProvider()
+  val form: Form[WithdrawalReason]               = formProvider()
 
-  val radio = "withdrawalReason"
+  val radio     = "withdrawalReason"
   val textField = "specifyOtherReason"
 
   "WithdrawalReasonFormProvider" when {
@@ -44,35 +44,42 @@ class WithdrawalReasonFormProviderSpec extends StringFieldBehaviours with Constr
       "bind valid strings" in {
 
         forAll(stringOfLengthGen(formProvider.length)) { reason =>
-          val result = form.bind(Map(
-            radio -> Other("").toString,
-            textField -> reason
-          )).apply(textField)
+          val result = form
+            .bind(
+              Map(
+                radio     -> Other("").toString,
+                textField -> reason
+              )
+            )
+            .apply(textField)
           result.value.value shouldBe reason
         }
       }
 
       "be mandatory if Other is selected" in {
 
-        val result = form.bind(Map(
-          radio -> Other("").toString,
-          textField -> ""
-        ))
+        val result = form.bind(
+          Map(
+            radio     -> Other("").toString,
+            textField -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value            shouldBe None
         result.error(textField) shouldBe Some(FormError(textField, "error.required.withdrawal.reason.input"))
       }
 
       s"not bind strings that are longer that ${formProvider.length}" in {
 
         forAll(stringsLongerThan(formProvider.length).suchThat(_.nonEmpty)) { longString =>
+          val result = form.bind(
+            Map(
+              radio     -> Other("").toString,
+              textField -> longString
+            )
+          )
 
-          val result = form.bind(Map(
-            radio -> Other("").toString,
-            textField -> longString
-          ))
-
-          result.value shouldBe None
+          result.value            shouldBe None
           result.error(textField) shouldBe Some(
             FormError(textField, "error.required.withdrawal.reason.length", Seq(formProvider.length))
           )
@@ -81,17 +88,19 @@ class WithdrawalReasonFormProviderSpec extends StringFieldBehaviours with Constr
 
       "not bind invalid strings" in {
 
-        forAll(stringsShorterThan(formProvider.length).suchThat(_.nonEmpty), invalidCharForNames) { (software, invalidChar) =>
+        forAll(stringsShorterThan(formProvider.length).suchThat(_.nonEmpty), invalidCharForNames) {
+          (software, invalidChar) =>
+            val result = form.bind(
+              Map(
+                radio     -> Other("").toString,
+                textField -> (software + invalidChar)
+              )
+            )
 
-          val result = form.bind(Map(
-            radio -> Other("").toString,
-            textField -> (software + invalidChar)
-          ))
-
-          result.value shouldBe None
-          result.error(textField) shouldBe Some(
-            FormError(textField, "error.required.withdrawal.reason.format", Seq(basicPunctuationRegex))
-          )
+            result.value            shouldBe None
+            result.error(textField) shouldBe Some(
+              FormError(textField, "error.required.withdrawal.reason.format", Seq(basicPunctuationRegex))
+            )
         }
       }
     }

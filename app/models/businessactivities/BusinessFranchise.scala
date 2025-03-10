@@ -31,7 +31,6 @@ case object BusinessFranchiseNo extends BusinessFranchise
 object BusinessFranchise {
 
   def formValues(html: Html)(implicit messages: Messages): Seq[RadioItem] = HmrcYesNoRadioItems().map { radioItem =>
-
     if (radioItem.value.contains("true")) {
       radioItem.copy(
         id = Some("businessFranchise-true"),
@@ -46,17 +45,17 @@ object BusinessFranchise {
 
   implicit val jsonReads: Reads[BusinessFranchise] =
     (__ \ "businessFranchise").read[Boolean] flatMap {
-      case true => (__ \ "franchiseName").read[String] map BusinessFranchiseYes.apply
+      case true  => (__ \ "franchiseName").read[String] map BusinessFranchiseYes.apply
       case false => Reads(_ => JsSuccess(BusinessFranchiseNo))
     }
 
   implicit val jsonWrites: Writes[BusinessFranchise] = Writes[BusinessFranchise] {
-    case BusinessFranchiseYes(value) => Json.obj(
-      "businessFranchise" -> true,
-      "franchiseName" -> value
-    )
-    case BusinessFranchiseNo => Json.obj("businessFranchise" -> false)
+    case BusinessFranchiseYes(value) =>
+      Json.obj(
+        "businessFranchise" -> true,
+        "franchiseName"     -> value
+      )
+    case BusinessFranchiseNo         => Json.obj("businessFranchise" -> false)
   }
 
 }
-

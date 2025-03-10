@@ -29,56 +29,58 @@ import views.html.responsiblepeople.TrainingView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class TrainingController @Inject()(
-                                    override val messagesApi: MessagesApi,
-                                    val dataCacheConnector: DataCacheConnector,
-                                    authAction: AuthAction,
-                                    val ds: CommonPlayDependencies,
-                                    val cc: MessagesControllerComponents,
-                                    formProvider: TrainingFormProvider,
-                                    view: TrainingView,
-                                    implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class TrainingController @Inject() (
+  override val messagesApi: MessagesApi,
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: TrainingFormProvider,
+  view: TrainingView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
-    authAction.async {
-      implicit request =>
-        getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
-          responsiblePerson.fold(NotFound(notFoundView)) { person =>
-            (person.personName, person.training) match {
-              case (Some(name), Some(training)) => Ok(view(formProvider().fill(training), edit, index, flow, name.titleName))
-              case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
-              case _ => NotFound(notFoundView)
-            }
+    authAction.async { implicit request =>
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.training) match {
+            case (Some(name), Some(training)) =>
+              Ok(view(formProvider().fill(training), edit, index, flow, name.titleName))
+            case (Some(name), _)              => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _                            => NotFound(notFoundView)
           }
         }
+      }
     }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
-    authAction.async {
-      implicit request => {
-        formProvider().bindFromRequest(cleanData(request.body, "information")).fold(
+    authAction.async { implicit request =>
+      formProvider()
+        .bindFromRequest(cleanData(request.body, "information"))
+        .fold(
           formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             },
-          data => {
-            for {
-              _ <- fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
-                rp.training(data)
-              }
-            } yield identifyRoutingTarget(index, edit, flow)
-          }.recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-          }
+          data =>
+            {
+              for {
+                _ <- fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
+                       rp.training(data)
+                     }
+              } yield identifyRoutingTarget(index, edit, flow)
+            }.recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
+            }
         )
-      }
     }
 
-  private def identifyRoutingTarget(index: Int, edit: Boolean, flow: Option[String]): Result = {
+  private def identifyRoutingTarget(index: Int, edit: Boolean, flow: Option[String]): Result =
     if (edit) {
       Redirect(routes.DetailedAnswersController.get(index, flow))
     } else {
       Redirect(routes.FitAndProperNoticeController.get(index, edit, flow))
     }
-  }
 }

@@ -30,7 +30,8 @@ import services.cache.Cache
 import java.time.LocalDate
 
 sealed trait HvdTestFixture {
-  val DefaultCashPayment = CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(1956, 2, 15))))
+  val DefaultCashPayment     =
+    CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(1956, 2, 15))))
   private val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
 
   val NewCashPayment = CashPayment(CashPaymentOverTenThousandEuros(false), None)
@@ -44,7 +45,8 @@ sealed trait HvdTestFixture {
     Some(true),
     Some(paymentMethods),
     Some(LinkedCashPayments(false)),
-    Some(DateOfChange(LocalDate.of(2016,2,24))))
+    Some(DateOfChange(LocalDate.of(2016, 2, 24)))
+  )
 }
 
 class HvdSpec extends PlaySpec with MockitoSugar {
@@ -52,31 +54,27 @@ class HvdSpec extends PlaySpec with MockitoSugar {
   "hvd" must {
 
     val completeJson = Json.obj(
-      "cashPayment" -> Json.obj(
+      "cashPayment"                      -> Json.obj(
         "acceptedAnyPayment" -> true,
-        "paymentDate" -> LocalDate.of(1956, 2, 15)
+        "paymentDate"        -> LocalDate.of(1956, 2, 15)
       ),
-      "products" -> Json.obj(
+      "products"                         -> Json.obj(
         "products" -> Seq("04")
       ),
-      "howWillYouSellGoods" -> Json.obj(
+      "howWillYouSellGoods"              -> Json.obj(
         "salesChannels" -> Seq("Retail")
       ),
       "percentageOfCashPaymentOver15000" -> Json.obj(
         "percentage" -> "01"
       ),
-      "receiveCashPayments" -> true,
-      "cashPaymentMethods" -> Json.obj(
-        "courier" -> true,
-        "direct" -> true,
-        "other" -> true,
-        "details" -> "foo"),
-      "linkedCashPayment" -> Json.obj(
+      "receiveCashPayments"              -> true,
+      "cashPaymentMethods"               -> Json.obj("courier" -> true, "direct" -> true, "other" -> true, "details" -> "foo"),
+      "linkedCashPayment"                -> Json.obj(
         "linkedCashPayments" -> false
       ),
-      "dateOfChange" -> "2016-02-24",
-      "hasChanged" -> false,
-      "hasAccepted" -> false
+      "dateOfChange"                     -> "2016-02-24",
+      "hasChanged"                       -> false,
+      "hasAccepted"                      -> false
     )
 
     "Serialise" in new HvdTestFixture {
@@ -90,33 +88,29 @@ class HvdSpec extends PlaySpec with MockitoSugar {
         "receiveCashPayments is in old format json" in new HvdTestFixture {
 
           val completeJson = Json.obj(
-            "cashPayment" -> Json.obj(
+            "cashPayment"                      -> Json.obj(
               "acceptedAnyPayment" -> true,
-              "paymentDate" -> LocalDate.of(1956, 2, 15)
+              "paymentDate"        -> LocalDate.of(1956, 2, 15)
             ),
-            "products" -> Json.obj(
+            "products"                         -> Json.obj(
               "products" -> Seq("04")
             ),
-            "howWillYouSellGoods" -> Json.obj(
+            "howWillYouSellGoods"              -> Json.obj(
               "salesChannels" -> Seq("Retail")
             ),
             "percentageOfCashPaymentOver15000" -> Json.obj(
               "percentage" -> "01"
             ),
-            "receiveCashPayments" -> Json.obj(
+            "receiveCashPayments"              -> Json.obj(
               "receivePayments" -> true,
-              "paymentMethods" -> Json.obj(
-                "courier" -> true,
-                "direct" -> true,
-                "other" -> true,
-                "details" -> "foo")
+              "paymentMethods"  -> Json.obj("courier" -> true, "direct" -> true, "other" -> true, "details" -> "foo")
             ),
-            "linkedCashPayment" -> Json.obj(
+            "linkedCashPayment"                -> Json.obj(
               "linkedCashPayments" -> false
             ),
-            "dateOfChange" -> "2016-02-24",
-            "hasChanged" -> false,
-            "hasAccepted" -> false
+            "dateOfChange"                     -> "2016-02-24",
+            "hasChanged"                       -> false,
+            "hasAccepted"                      -> false
           )
 
           completeJson.as[Hvd] must be(completeModel)
@@ -126,7 +120,8 @@ class HvdSpec extends PlaySpec with MockitoSugar {
     }
 
     "Update how will you sell goods correctly" in new HvdTestFixture {
-      val sut = Hvd(cashPayment = Some(DefaultCashPayment), howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Retail))))
+      val sut           =
+        Hvd(cashPayment = Some(DefaultCashPayment), howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Retail))))
       val expectedModel = Hvd(
         cashPayment = Some(DefaultCashPayment),
         howWillYouSellGoods = Some(HowWillYouSellGoods(Set(Wholesale))),
@@ -155,12 +150,16 @@ class HvdSpec extends PlaySpec with MockitoSugar {
     "have a section function that" must {
 
       implicit val messages = Helpers.stubMessages()
-      implicit val cache = mock[Cache]
+      implicit val cache    = mock[Cache]
 
       "return a Not Started Task Row when model is empty" in new HvdTestFixture {
 
         val notStartedTaskRow = TaskRow(
-          "hvd", controllers.hvd.routes.WhatYouNeedController.get.url, false, NotStarted, TaskRow.notStartedTag
+          "hvd",
+          controllers.hvd.routes.WhatYouNeedController.get.url,
+          false,
+          NotStarted,
+          TaskRow.notStartedTag
         )
 
         when(cache.getEntry[Hvd]("hvd")) thenReturn None
@@ -170,9 +169,9 @@ class HvdSpec extends PlaySpec with MockitoSugar {
 
       "return a Completed Task Row when model is complete" in new HvdTestFixture {
 
-        val complete = mock[Hvd]
-        val completedTaskRow = TaskRow(
-          "hvd", controllers.hvd.routes.SummaryController.get.url, false, Completed, TaskRow.completedTag)
+        val complete         = mock[Hvd]
+        val completedTaskRow =
+          TaskRow("hvd", controllers.hvd.routes.SummaryController.get.url, false, Completed, TaskRow.completedTag)
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Hvd]("hvd")) thenReturn Some(complete)
@@ -182,9 +181,13 @@ class HvdSpec extends PlaySpec with MockitoSugar {
 
       "return a Updated Task Row when model is complete and has changed" in new HvdTestFixture {
 
-        val updated = mock[Hvd]
+        val updated        = mock[Hvd]
         val updatedTaskRow = TaskRow(
-          "hvd", controllers.hvd.routes.SummaryController.get.url, true, Updated, TaskRow.updatedTag
+          "hvd",
+          controllers.hvd.routes.SummaryController.get.url,
+          true,
+          Updated,
+          TaskRow.updatedTag
         )
 
         when(updated.isComplete) thenReturn true
@@ -198,7 +201,11 @@ class HvdSpec extends PlaySpec with MockitoSugar {
 
         val incompleteTcsp = mock[Hvd]
         val startedTaskRow = TaskRow(
-          "hvd", controllers.hvd.routes.WhatYouNeedController.get.url, false, Started, TaskRow.incompleteTag
+          "hvd",
+          controllers.hvd.routes.WhatYouNeedController.get.url,
+          false,
+          Started,
+          TaskRow.incompleteTag
         )
 
         when(incompleteTcsp.isComplete) thenReturn false

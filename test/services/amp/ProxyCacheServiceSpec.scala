@@ -26,42 +26,40 @@ import play.api.libs.json.Json
 import services.ProxyCacheService
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-class ProxyCacheServiceSpec extends AmlsSpec with MockitoSugar
-  with ScalaFutures
-  with IntegrationPatience {
+class ProxyCacheServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures with IntegrationPatience {
 
   val dateVal = LocalDateTime.now
 
-  //AMP
+  // AMP
   val completeAmpData = Json.obj(
-    "typeOfParticipant"             -> Seq("artGalleryOwner"),
-    "soldOverThreshold"             -> true,
-    "dateTransactionOverThreshold"  -> LocalDate.now,
-    "identifyLinkedTransactions"    -> true,
-    "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    "typeOfParticipant"            -> Seq("artGalleryOwner"),
+    "soldOverThreshold"            -> true,
+    "dateTransactionOverThreshold" -> LocalDate.now,
+    "identifyLinkedTransactions"   -> true,
+    "percentageExpectedTurnover"   -> "fortyOneToSixty"
   )
 
   val completeAmpJson = Json.obj(
-    "data"           -> completeAmpData,
-    "hasChanged"     -> false,
-    "hasAccepted"    -> false
+    "data"        -> completeAmpData,
+    "hasChanged"  -> false,
+    "hasAccepted" -> false
   )
 
   val completeAmpModel = Amp(completeAmpData)
 
-  //EAB
+  // EAB
   val completeEstateAgencyActPenalty = Json.obj(
-    "penalisedEstateAgentsAct" -> true,
+    "penalisedEstateAgentsAct"       -> true,
     "penalisedEstateAgentsActDetail" -> "details"
   )
 
   val completePenalisedProfessionalBody = Json.obj(
-    "penalisedProfessionalBody" -> true,
+    "penalisedProfessionalBody"       -> true,
     "penalisedProfessionalBodyDetail" -> "details"
   )
 
   val completeRedressScheme = Json.obj(
-    "redressScheme" -> "propertyRedressScheme",
+    "redressScheme"       -> "propertyRedressScheme",
     "redressSchemeDetail" -> "null"
   )
 
@@ -79,9 +77,10 @@ class ProxyCacheServiceSpec extends AmlsSpec with MockitoSugar
     "lettings",
     "relocation",
     "residential",
-    "socialHousingProvision")
+    "socialHousingProvision"
+  )
 
-  val completeServices = Json.obj("eabServicesProvided" -> completeServiceList )
+  val completeServices = Json.obj("eabServicesProvided" -> completeServiceList)
 
   val completeEabData = completeServices ++
     completeEstateAgencyActPenalty ++
@@ -90,19 +89,19 @@ class ProxyCacheServiceSpec extends AmlsSpec with MockitoSugar
     completeMoneyProtectionScheme
 
   val completeEabJson = Json.obj(
-    "data"           -> completeEabData,
-    "hasChanged"     -> false,
-    "hasAccepted"    -> false
+    "data"        -> completeEabData,
+    "hasChanged"  -> false,
+    "hasAccepted" -> false
   )
 
   val completeEabModel = Eab(completeEabData)
 
-  val credId        = "someId"
+  val credId = "someId"
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    val svc = new ProxyCacheService(mockCacheConnector)
+    val svc     = new ProxyCacheService(mockCacheConnector)
   }
 
   "AMP" when {

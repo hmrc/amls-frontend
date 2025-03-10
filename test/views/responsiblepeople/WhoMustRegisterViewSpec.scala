@@ -38,20 +38,22 @@ class WhoMustRegisterViewSpec extends AmlsViewSpec with Matchers {
     "Have the correct title" in new ViewFixture {
       def view = who_must_register(1)
 
-      doc.title must be(messages("responsiblepeople.whomustregister.ymr") +
-        " - " + messages("summary.responsiblepeople") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("responsiblepeople.whomustregister.ymr") +
+          " - " + messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
-    "Have the correct Headings" in new ViewFixture{
+    "Have the correct Headings" in new ViewFixture {
       def view = who_must_register(1)
 
-      heading.html must be (messages("responsiblepeople.whomustregister.ymr"))
-      subHeading.html must include (messages("summary.responsiblepeople"))
+      heading.html    must be(messages("responsiblepeople.whomustregister.ymr"))
+      subHeading.html must include(messages("summary.responsiblepeople"))
     }
 
-    "contain the expected content elements" in new ViewFixture{
+    "contain the expected content elements" in new ViewFixture {
       def view = who_must_register(1)
 
       html must include(messages("declaration.register.responsible.person.line_1"))

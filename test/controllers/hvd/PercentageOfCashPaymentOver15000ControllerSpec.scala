@@ -36,22 +36,28 @@ import views.html.hvd.PercentageView
 
 import scala.concurrent.Future
 
-class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
+class PercentageOfCashPaymentOver15000ControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with ScalaFutures
+    with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
-    lazy val view = inject[PercentageView]
+    lazy val view  = inject[PercentageView]
     val controller =
-      new PercentageOfCashPaymentOver15000Controller(SuccessfulAuthAction,
+      new PercentageOfCashPaymentOver15000Controller(
+        SuccessfulAuthAction,
         ds = commonDependencies,
         mockCacheConnector,
         mockServiceFlow,
         mockStatusService,
         cc = mockMcc,
         formProvider = inject[PercentagePaymentFormProvider],
-        view = view)
+        view = view
+      )
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, None)
@@ -62,23 +68,30 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
   "PercentageOfCashPaymentOver15000Controller" must {
 
     "on get display the Percentage Of CashPayment Over 15000 page" in new Fixture {
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
+      when(
+        controller.statusService
+          .getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
+      )
         .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("hvd.percentage.title"))
     }
 
     "on get display the Percentage Of CashPayment Over 15000 page with pre populated data" in new Fixture {
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
+      when(
+        controller.statusService
+          .getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
+      )
         .thenReturn(Future.successful(NotCompleted))
 
-      when(controller.dataCacheConnector.fetch[Hvd](any(), any())
-        (any())).thenReturn(Future.successful(Some(Hvd(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First)))))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any())).thenReturn(
+        Future.successful(Some(Hvd(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First))))
+      )
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -89,7 +102,10 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
     "continue to show the correct view" when {
       "application is in variation mode but the service has just been added" in new Fixture {
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
+        when(
+          controller.statusService
+            .getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
+        )
           .thenReturn(Future.successful(NotCompleted))
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
@@ -98,7 +114,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
         mockIsNewActivityNewAuth(true, Some(HighValueDealing))
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("hvd.percentage.title"))
       }
     }
@@ -106,52 +122,49 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
     "on post with invalid data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.PercentageOfCashPaymentOver15000Controller.post().url)
-      .withFormUrlEncodedBody()
+        .withFormUrlEncodedBody()
 
-      when(controller.dataCacheConnector.fetch[Hvd](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
+      status(result)          must be(BAD_REQUEST)
       contentAsString(result) must include(messages("error.required.hvd.percentage"))
     }
 
     "on post with valid data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.PercentageOfCashPaymentOver15000Controller.post().url)
-      .withFormUrlEncodedBody(
-        "percentage" -> PercentageOfCashPaymentOver15000.First.toString
-      )
+        .withFormUrlEncodedBody(
+          "percentage" -> PercentageOfCashPaymentOver15000.First.toString
+        )
 
-      when(controller.dataCacheConnector.fetch[Hvd](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
     }
 
     "on post with valid data in edit mode" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.PercentageOfCashPaymentOver15000Controller.post().url)
-      .withFormUrlEncodedBody(
-        "percentage" -> PercentageOfCashPaymentOver15000.First.toString
-      )
+        .withFormUrlEncodedBody(
+          "percentage" -> PercentageOfCashPaymentOver15000.First.toString
+        )
 
-      when(controller.dataCacheConnector.fetch[Hvd](any(), any())
-        (any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
-        (any())).thenReturn(Future.successful(emptyCache))
+      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
     }
   }

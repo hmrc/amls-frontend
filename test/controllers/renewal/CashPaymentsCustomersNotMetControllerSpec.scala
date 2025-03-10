@@ -35,19 +35,24 @@ import scala.concurrent.Future
 class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec with Injecting {
 
   lazy val mockDataCacheConnector = mock[DataCacheConnector]
-  lazy val mockRenewalService = mock[RenewalService]
+  lazy val mockRenewalService     = mock[RenewalService]
 
-  val receiveCashPayments = CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))
+  val receiveCashPayments      = CashPayments(
+    CashPaymentsCustomerNotMet(true),
+    Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+  )
   val doNotreceiveCashPayments = CashPayments(CashPaymentsCustomerNotMet(false), None)
 
-
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[CashPaymentsCustomersNotMetView]
-    val controller = new CashPaymentsCustomersNotMetController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[CashPaymentsCustomersNotMetView]
+    val controller = new CashPaymentsCustomersNotMetController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      renewalService = mockRenewalService,
+      cc = mockMcc,
       formProvider = inject[CashPaymentsCustomersNotMetFormProvider],
       view = view
     )
@@ -60,24 +65,26 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec with Injecting 
   "CashPaymentsCustomersNotMet controller" when {
     "get is called" must {
       "load the page if business is receiving payments from customers not met in person" in new Fixture {
-          when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
-
-          val result = controller.get()(request)
-          status(result) mustEqual OK
-
-          val page = Jsoup.parse(contentAsString(result))
-          page.select("input[type=radio][name=receiveCashPayments][value=true]").hasAttr("checked") must be(true)
-          page.select("input[type=radio][name=receiveCashPayments][value=false]").hasAttr("checked") must be(false)
-        }
-
-      "load the page if business is not receiving payments from customers not met in person" in new Fixture {
-        when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(doNotreceiveCashPayments)))))
+        when(mockRenewalService.getRenewal(any()))
+          .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
 
         val result = controller.get()(request)
         status(result) mustEqual OK
 
         val page = Jsoup.parse(contentAsString(result))
-        page.select("input[type=radio][name=receiveCashPayments][value=true]").hasAttr("checked") must be(false)
+        page.select("input[type=radio][name=receiveCashPayments][value=true]").hasAttr("checked")  must be(true)
+        page.select("input[type=radio][name=receiveCashPayments][value=false]").hasAttr("checked") must be(false)
+      }
+
+      "load the page if business is not receiving payments from customers not met in person" in new Fixture {
+        when(mockRenewalService.getRenewal(any()))
+          .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(doNotreceiveCashPayments)))))
+
+        val result = controller.get()(request)
+        status(result) mustEqual OK
+
+        val page = Jsoup.parse(contentAsString(result))
+        page.select("input[type=radio][name=receiveCashPayments][value=true]").hasAttr("checked")  must be(false)
         page.select("input[type=radio][name=receiveCashPayments][value=false]").hasAttr("checked") must be(true)
       }
 
@@ -86,7 +93,7 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec with Injecting 
         status(result) mustEqual OK
 
         val page = Jsoup.parse(contentAsString(result))
-        page.select("input[type=radio][name=receiveCashPayments][value=true]").hasAttr("checked") must be(false)
+        page.select("input[type=radio][name=receiveCashPayments][value=true]").hasAttr("checked")  must be(false)
         page.select("input[type=radio][name=receiveCashPayments][value=false]").hasAttr("checked") must be(false)
       }
     }
@@ -103,9 +110,9 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec with Injecting 
       "a valid request is made" must {
         "redirect to summary page if false is passed in the form" in new Fixture {
           val newRequest = FakeRequest(POST, routes.CashPaymentsCustomersNotMetController.post().url)
-          .withFormUrlEncodedBody(
-            "receiveCashPayments" -> "false"
-          )
+            .withFormUrlEncodedBody(
+              "receiveCashPayments" -> "false"
+            )
 
           val result = controller.post()(newRequest)
 
@@ -117,9 +124,9 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec with Injecting 
       "a valid request is made" must {
         "redirect to HowCashPaymentsReceivedController if true is passed in the form" in new Fixture {
           val newRequest = FakeRequest(POST, routes.CashPaymentsCustomersNotMetController.post().url)
-          .withFormUrlEncodedBody(
-            "receiveCashPayments" -> "true"
-          )
+            .withFormUrlEncodedBody(
+              "receiveCashPayments" -> "true"
+            )
 
           val result = controller.post()(newRequest)
 

@@ -22,9 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class CashPaymentsCustomersNotMetFormProvider @Inject()() extends BooleanFormProvider {
+class CashPaymentsCustomersNotMetFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[CashPaymentsCustomerNotMet] = createForm[CashPaymentsCustomerNotMet](
-    "receiveCashPayments", "error.required.renewal.hvd.receive.cash.payments"
+    "receiveCashPayments",
+    "error.required.renewal.hvd.receive.cash.payments"
   )(CashPaymentsCustomerNotMet.apply, _.receiveCashPayments)
 }

@@ -27,9 +27,11 @@ class ReceiveCashPaymentsSpec extends PlaySpec {
 
     "roundtrip through json" in {
       val data = ReceiveCashPayments(Some(paymentMethods))
-      ReceiveCashPayments.jsonR.reads(ReceiveCashPayments.jsonW.writes(data)) mustEqual JsSuccess(data, JsPath \"paymentMethods")
+      ReceiveCashPayments.jsonR.reads(ReceiveCashPayments.jsonW.writes(data)) mustEqual JsSuccess(
+        data,
+        JsPath \ "paymentMethods"
+      )
     }
-
 
     "roundtrip through json1" in {
       val data = ReceiveCashPayments(None)
@@ -43,7 +45,7 @@ class ReceiveCashPaymentsSpec extends PlaySpec {
         val res = Json.toJson(ReceiveCashPayments(None))
         res mustBe Json.obj(
           "receivePayments" -> false,
-          "paymentMethods" -> Json.obj()
+          "paymentMethods"  -> Json.obj()
         )
       }
     }

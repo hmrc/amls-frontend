@@ -31,36 +31,48 @@ import views.html.payments.TypeOfBankView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class TypeOfBankController @Inject()(val authAction: AuthAction,
-                                     val ds: CommonPlayDependencies,
-                                     val auditConnector: AuditConnector,
-                                     val authEnrolmentsService: AuthEnrolmentsService,
-                                     val feeResponseService: FeeResponseService,
-                                     val paymentsService: PaymentsService,
-                                     val cc: MessagesControllerComponents,
-                                     val statusService: StatusService,
-                                     val renewalService: RenewalService,
-                                     formProvider: TypeOfBankFormProvider,
-                                     view: TypeOfBankView) extends AmlsBaseController(ds, cc) {
+class TypeOfBankController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val auditConnector: AuditConnector,
+  val authEnrolmentsService: AuthEnrolmentsService,
+  val feeResponseService: FeeResponseService,
+  val paymentsService: PaymentsService,
+  val cc: MessagesControllerComponents,
+  val statusService: StatusService,
+  val renewalService: RenewalService,
+  formProvider: TypeOfBankFormProvider,
+  view: TypeOfBankView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
-      } yield {
-        Ok(view(formProvider(), subHeading))
-      }) getOrElse InternalServerError("Failed to retrieve data.")
+  def get(): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(
+                      request.credId,
+                      request.amlsRefNumber,
+                      request.accountTypeId,
+                      statusService,
+                      renewalService
+                    )
+    } yield Ok(view(formProvider(), subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
   }
 
-  def post(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post(): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors =>
           (for {
-            subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
-          } yield {
-            BadRequest(view(formWithErrors, subHeading))
-          }) getOrElse InternalServerError("Failed to retrieve data."),
+            subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(
+                            request.credId,
+                            request.amlsRefNumber,
+                            request.accountTypeId,
+                            statusService,
+                            renewalService
+                          )
+          } yield BadRequest(view(formWithErrors, subHeading))) getOrElse InternalServerError(
+            "Failed to retrieve data."
+          ),
         data =>
           doAudit(data.isUK, request.amlsRefNumber, request.accountTypeId).map { _ =>
             Redirect(controllers.payments.routes.BankDetailsController.get(data.isUK).url)
@@ -68,14 +80,15 @@ class TypeOfBankController @Inject()(val authAction: AuthAction,
       )
   }
 
-  private def doAudit(ukBank: Boolean, amlsRefNumber: Option[String], accountTypeId: (String, String))(implicit hc: HeaderCarrier): Future[Option[AuditResult]] = {
+  private def doAudit(ukBank: Boolean, amlsRefNumber: Option[String], accountTypeId: (String, String))(implicit
+    hc: HeaderCarrier
+  ): Future[Option[AuditResult]] =
     (for {
-      ref <- OptionT(Future(amlsRefNumber))
-      fees <- OptionT(feeResponseService.getFeeResponse(ref, accountTypeId))
+      ref    <- OptionT(Future(amlsRefNumber))
+      fees   <- OptionT(feeResponseService.getFeeResponse(ref, accountTypeId))
       payRef <- OptionT.fromOption[Future](fees.paymentReference)
       amount <- OptionT.fromOption[Future](paymentsService.amountFromSubmissionData(fees))
       result <- OptionT.liftF(auditConnector.sendEvent(BacsPaymentEvent(ukBank, ref, payRef, amount)))
     } yield result).value
-  }
 
 }

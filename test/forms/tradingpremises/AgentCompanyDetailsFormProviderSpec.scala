@@ -24,9 +24,9 @@ import play.api.data.{Form, FormError}
 class AgentCompanyDetailsFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val formProvider: AgentCompanyDetailsFormProvider = new AgentCompanyDetailsFormProvider()
-  val form: Form[AgentCompanyDetails] = formProvider()
+  val form: Form[AgentCompanyDetails]               = formProvider()
 
-  val companyNameFieldName = "agentCompanyName"
+  val companyNameFieldName   = "agentCompanyName"
   val companyNumberFieldName = "companyRegistrationNumber"
 
   "AgentCompanyDetailsFormProvider" when {
@@ -54,13 +54,16 @@ class AgentCompanyDetailsFormProviderSpec extends StringFieldBehaviours with Con
 
       "fail to bind strings with special characters" in {
 
-        forAll(alphaStringsShorterThan(formProvider.companyNameLength).suchThat(_.nonEmpty), invalidCharForNames) { (str, invalidStr) =>
-          val result = form.bind(Map(companyNameFieldName -> (str + invalidStr)))
+        forAll(alphaStringsShorterThan(formProvider.companyNameLength).suchThat(_.nonEmpty), invalidCharForNames) {
+          (str, invalidStr) =>
+            val result = form.bind(Map(companyNameFieldName -> (str + invalidStr)))
 
-          result.value shouldBe None
-          result.error(companyNameFieldName).value shouldBe FormError(
-            companyNameFieldName, "error.invalid.char.tp.agent.company.details", Seq(basicPunctuationRegex)
-          )
+            result.value                             shouldBe None
+            result.error(companyNameFieldName).value shouldBe FormError(
+              companyNameFieldName,
+              "error.invalid.char.tp.agent.company.details",
+              Seq(basicPunctuationRegex)
+            )
         }
       }
     }
@@ -83,14 +86,22 @@ class AgentCompanyDetailsFormProviderSpec extends StringFieldBehaviours with Con
         form,
         companyNumberFieldName,
         formProvider.companyNumberLength,
-        FormError(companyNumberFieldName, "error.size.to.agent.company.reg.number", Seq(formProvider.companyNumberLength))
+        FormError(
+          companyNumberFieldName,
+          "error.size.to.agent.company.reg.number",
+          Seq(formProvider.companyNumberLength)
+        )
       )
 
       behave like fieldWithMinLength(
         form,
         companyNumberFieldName,
         formProvider.companyNumberLength,
-        FormError(companyNumberFieldName, "error.size.to.agent.company.reg.number", Seq(formProvider.companyNumberLength))
+        FormError(
+          companyNumberFieldName,
+          "error.size.to.agent.company.reg.number",
+          Seq(formProvider.companyNumberLength)
+        )
       )
 
       "fail to bind strings with special characters" in {
@@ -98,9 +109,11 @@ class AgentCompanyDetailsFormProviderSpec extends StringFieldBehaviours with Con
         forAll(invalidCharForNames.suchThat(_.nonEmpty)) { invalidStr =>
           val result = form.bind(Map(companyNumberFieldName -> ("ASD1234" + invalidStr)))
 
-          result.value shouldBe None
+          result.value                               shouldBe None
           result.error(companyNumberFieldName).value shouldBe FormError(
-            companyNumberFieldName, "error.char.to.agent.company.reg.number", Seq(formProvider.crnNumberRegex)
+            companyNumberFieldName,
+            "error.char.to.agent.company.reg.number",
+            Seq(formProvider.crnNumberRegex)
           )
         }
       }

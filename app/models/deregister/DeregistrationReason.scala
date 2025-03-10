@@ -42,7 +42,9 @@ object DeregistrationReason extends Enumerable.Implicits {
     override val value: String = "04"
   }
 
-  case object HVDPolicyOfNotAcceptingHighValueCashPayments extends WithName("notAcceptingPayments") with DeregistrationReason {
+  case object HVDPolicyOfNotAcceptingHighValueCashPayments
+      extends WithName("notAcceptingPayments")
+      with DeregistrationReason {
     override val value: String = "05"
   }
 
@@ -66,30 +68,31 @@ object DeregistrationReason extends Enumerable.Implicits {
   implicit val jsonReads: Reads[DeregistrationReason] = {
     import play.api.libs.json.Reads.StringReads
     (__ \ "deregistrationReason").read[String].flatMap[DeregistrationReason] {
-      case "Out of scope" => OutOfScope
-      case "Not trading in own right" => NotTradingInOwnRight
-      case "Under another supervisor" => UnderAnotherSupervisor
-      case "Change of Legal Entity" => ChangeOfLegalEntity
+      case "Out of scope"                                           => OutOfScope
+      case "Not trading in own right"                               => NotTradingInOwnRight
+      case "Under another supervisor"                               => UnderAnotherSupervisor
+      case "Change of Legal Entity"                                 => ChangeOfLegalEntity
       case "HVD - policy of not accepting high value cash payments" => HVDPolicyOfNotAcceptingHighValueCashPayments
-      case "Other, please specify" =>
+      case "Other, please specify"                                  =>
         (JsPath \ "specifyOtherReason").read[String] map {
           Other
         }
-      case _ =>
+      case _                                                        =>
         play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 
   implicit val jsonRedressWrites: Writes[DeregistrationReason] = Writes[DeregistrationReason] {
-    case OutOfScope => Json.obj("deregistrationReason" -> "Out of scope")
-    case NotTradingInOwnRight => Json.obj("deregistrationReason" -> "Not trading in own right")
-    case UnderAnotherSupervisor => Json.obj("deregistrationReason" -> "Under another supervisor")
-    case ChangeOfLegalEntity => Json.obj("deregistrationReason" -> "Change of Legal Entity")
-    case HVDPolicyOfNotAcceptingHighValueCashPayments => Json.obj("deregistrationReason" -> "HVD - policy of not accepting high value cash payments")
-    case Other(reason) =>
+    case OutOfScope                                   => Json.obj("deregistrationReason" -> "Out of scope")
+    case NotTradingInOwnRight                         => Json.obj("deregistrationReason" -> "Not trading in own right")
+    case UnderAnotherSupervisor                       => Json.obj("deregistrationReason" -> "Under another supervisor")
+    case ChangeOfLegalEntity                          => Json.obj("deregistrationReason" -> "Change of Legal Entity")
+    case HVDPolicyOfNotAcceptingHighValueCashPayments =>
+      Json.obj("deregistrationReason" -> "HVD - policy of not accepting high value cash payments")
+    case Other(reason)                                =>
       Json.obj(
         "deregistrationReason" -> "Other, please specify",
-        "specifyOtherReason" -> reason
+        "specifyOtherReason"   -> reason
       )
   }
 }

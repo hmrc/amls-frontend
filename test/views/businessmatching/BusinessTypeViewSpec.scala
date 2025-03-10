@@ -28,7 +28,7 @@ import views.html.businessmatching.BusinessTypeView
 class BusinessTypeViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val business_type = inject[BusinessTypeView]
-  lazy val fp = inject[BusinessTypeFormProvider]
+  lazy val fp            = inject[BusinessTypeFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -39,8 +39,10 @@ class BusinessTypeViewSpec extends AmlsViewSpec with Matchers {
 
       def view = business_type(fp().fill(LimitedCompany))
 
-      doc.title must startWith(messages("businessmatching.businessType.title") + " - " + messages("summary.businessmatching"))
-      heading.html must be(messages("businessmatching.businessType.title"))
+      doc.title       must startWith(
+        messages("businessmatching.businessType.title") + " - " + messages("summary.businessmatching")
+      )
+      heading.html    must be(messages("businessmatching.businessType.title"))
       subHeading.html must include(messages("summary.businessmatching"))
     }
 

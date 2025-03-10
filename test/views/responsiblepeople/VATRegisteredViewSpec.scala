@@ -28,7 +28,7 @@ import views.html.responsiblepeople.VATRegisteredView
 class VATRegisteredViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val vat_registered = inject[VATRegisteredView]
-  lazy val fp = inject[VATRegisteredFormProvider]
+  lazy val fp             = inject[VATRegisteredFormProvider]
 
   val name = "Person Name"
 
@@ -51,23 +51,33 @@ class VATRegisteredViewSpec extends AmlsViewSpec with Matchers {
 
       def view = vat_registered(fp().fill(VATRegisteredYes("1234")), true, 1, None, name)
 
-      heading.html must be(messages("responsiblepeople.registeredforvat.heading", name))
+      heading.html    must be(messages("responsiblepeople.registeredforvat.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
     }
 
     behave like pageWithErrors(
       vat_registered(
-        fp().withError("registeredForVAT", "error.required.rp.registered.for.vat"), false, 1, None, name
+        fp().withError("registeredForVAT", "error.required.rp.registered.for.vat"),
+        false,
+        1,
+        None,
+        name
       ),
-      "registeredForVAT", "error.required.rp.registered.for.vat"
+      "registeredForVAT",
+      "error.required.rp.registered.for.vat"
     )
 
     behave like pageWithErrors(
       vat_registered(
-        fp().withError("vrnNumber", "error.invalid.vat.number"), false, 1, None, name
+        fp().withError("vrnNumber", "error.invalid.vat.number"),
+        false,
+        1,
+        None,
+        name
       ),
-      "vrnNumber", "error.invalid.vat.number"
+      "vrnNumber",
+      "error.invalid.vat.number"
     )
 
     behave like pageWithBackLink(vat_registered(fp(), true, 1, None, name))

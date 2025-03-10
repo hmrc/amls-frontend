@@ -30,15 +30,19 @@ import views.html.responsiblepeople.address.AdditionalAddressNonUKView
 import scala.concurrent.Future
 
 @Singleton
-class AdditionalAddressNonUKController @Inject()(override val dataCacheConnector: DataCacheConnector,
-                                                 authAction: AuthAction,
-                                                 implicit val auditConnector: AuditConnector,
-                                                 val autoCompleteService: AutoCompleteService,
-                                                 val ds: CommonPlayDependencies,
-                                                 val cc: MessagesControllerComponents,
-                                                 formProvider: AdditionalAddressNonUKFormProvider,
-                                                 view: AdditionalAddressNonUKView,
-                                                 implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper {
+class AdditionalAddressNonUKController @Inject() (
+  override val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  implicit val auditConnector: AuditConnector,
+  val autoCompleteService: AutoCompleteService,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: AdditionalAddressNonUKFormProvider,
+  view: AdditionalAddressNonUKView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection
+    with AddressHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
@@ -46,37 +50,56 @@ class AdditionalAddressNonUKController @Inject()(override val dataCacheConnector
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           (person.personName, person.addressHistory) match {
             case (Some(name), Some(ResponsiblePersonAddressHistory(_, Some(additionalAddress), _))) =>
-              Ok(view(formProvider().fill(additionalAddress), edit, index, flow, name.titleName, autoCompleteService.formOptionsExcludeUK))
-            case (Some(name), _) =>
+              Ok(
+                view(
+                  formProvider().fill(additionalAddress),
+                  edit,
+                  index,
+                  flow,
+                  name.titleName,
+                  autoCompleteService.formOptionsExcludeUK
+                )
+              )
+            case (Some(name), _)                                                                    =>
               Ok(view(formProvider(), edit, index, flow, name.titleName, autoCompleteService.formOptionsExcludeUK))
-            case _ => NotFound(notFoundView)
+            case _                                                                                  => NotFound(notFoundView)
           }
         }
       }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
-    authAction.async {
-      implicit request =>
-        formProvider().bindFromRequest().fold(
+    authAction.async { implicit request =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
           formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.formOptionsExcludeUK))
+              BadRequest(
+                view(
+                  formWithErrors,
+                  edit,
+                  index,
+                  flow,
+                  ControllerHelper.rpTitleName(rp),
+                  autoCompleteService.formOptionsExcludeUK
+                )
+              )
             },
-          data => {
+          data =>
             getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
               (for {
-                rp <- responsiblePerson
-                addressHistory <- rp.addressHistory
+                rp                <- responsiblePerson
+                addressHistory    <- rp.addressHistory
                 additionalAddress <- addressHistory.additionalAddress
               } yield {
                 val additionalAddressWithTime = data.copy(timeAtAddress = additionalAddress.timeAtAddress)
                 updateAdditionalAddressAndRedirect(request.credId, additionalAddressWithTime, index, edit, flow)
               }) getOrElse updateAdditionalAddressAndRedirect(request.credId, data, index, edit, flow)
             }
-          }
-        ).recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+        )
+        .recoverWith { case _: IndexOutOfBoundsException =>
+          Future.successful(NotFound(notFoundView))
         }
     }
 }

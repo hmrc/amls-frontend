@@ -28,7 +28,7 @@ import views.html.tradingpremises.WhatDoesYourBusinessDoView
 class WhatDoesYourBusinessDoViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val what_does_your_business_do = inject[WhatDoesYourBusinessDoView]
-  lazy val fp = inject[WhatDoesYourBusinessDoFormProvider]
+  lazy val fp                         = inject[WhatDoesYourBusinessDoFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -46,12 +46,10 @@ class WhatDoesYourBusinessDoViewSpec extends AmlsViewSpec with Matchers {
         messages("summary.tradingpremises") + " - " +
         messages("title.amls") + " - " + messages("title.gov")
 
+      def view = what_does_your_business_do(fp(), formValues, false, 1)
 
-
-      def view = what_does_your_business_do(fp(), formValues, false ,1 )
-
-      doc.title must be(pageTitle)
-      heading.html must be(messages("tradingpremises.whatdoesyourbusinessdo.title"))
+      doc.title       must be(pageTitle)
+      heading.html    must be(messages("tradingpremises.whatdoesyourbusinessdo.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
 
       doc.select("input[type=checkbox]").size mustEqual BusinessMatchingActivities.all.size
@@ -59,7 +57,10 @@ class WhatDoesYourBusinessDoViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       what_does_your_business_do(
-        fp().withError("value", "error.required.tp.activity.your.business.do"), formValues, true, 1
+        fp().withError("value", "error.required.tp.activity.your.business.do"),
+        formValues,
+        true,
+        1
       ),
       "value",
       "error.required.tp.activity.your.business.do"

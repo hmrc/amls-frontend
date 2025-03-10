@@ -21,14 +21,16 @@ import play.api.data.{Form, FormError}
 
 class ReceiveCashPaymentsFormProviderSpec extends BooleanFieldBehaviours[Boolean] {
 
-  override val form: Form[Boolean] = new ReceiveCashPaymentsFormProvider()()
-  override val fieldName: String = "receivePayments"
+  override val form: Form[Boolean]  = new ReceiveCashPaymentsFormProvider()()
+  override val fieldName: String    = "receivePayments"
   override val errorMessage: String = "error.required.hvd.receive.cash.payments"
 
   "ReceiveCashPaymentsFormProvider" must {
 
     behave like booleanField(
-      form, fieldName, FormError(fieldName, errorMessage)
+      form,
+      fieldName,
+      FormError(fieldName, errorMessage)
     )
   }
 }

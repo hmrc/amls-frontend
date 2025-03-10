@@ -26,17 +26,16 @@ sealed trait ExpectedThroughput {
 
 object ExpectedThroughput extends Enumerable.Implicits {
 
-  def convert(expectedThroughput: ExpectedThroughput): TotalThroughput = {
+  def convert(expectedThroughput: ExpectedThroughput): TotalThroughput =
     expectedThroughput match {
-      case First => TotalThroughput("01")
-      case Second => TotalThroughput("02")
-      case Third => TotalThroughput("03")
-      case Fourth => TotalThroughput( "04")
-      case Fifth => TotalThroughput("05")
-      case Sixth => TotalThroughput("06")
-      case Seventh=> TotalThroughput( "07")
+      case First   => TotalThroughput("01")
+      case Second  => TotalThroughput("02")
+      case Third   => TotalThroughput("03")
+      case Fourth  => TotalThroughput("04")
+      case Fifth   => TotalThroughput("05")
+      case Sixth   => TotalThroughput("06")
+      case Seventh => TotalThroughput("07")
     }
-  }
 
   case object First extends WithName("first") with ExpectedThroughput {
     override val value: String = "01"
@@ -84,18 +83,18 @@ object ExpectedThroughput extends Enumerable.Implicits {
       case "05" => Fifth
       case "06" => Sixth
       case "07" => Seventh
-      case _ =>
+      case _    =>
         play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 
   implicit val jsonWrites: Writes[ExpectedThroughput] = Writes[ExpectedThroughput] {
-    case First => Json.obj("throughput" -> "01")
-    case Second => Json.obj("throughput" -> "02")
-    case Third => Json.obj("throughput" -> "03")
-    case Fourth => Json.obj("throughput" -> "04")
-    case Fifth => Json.obj("throughput" -> "05")
-    case Sixth => Json.obj("throughput" -> "06")
+    case First   => Json.obj("throughput" -> "01")
+    case Second  => Json.obj("throughput" -> "02")
+    case Third   => Json.obj("throughput" -> "03")
+    case Fourth  => Json.obj("throughput" -> "04")
+    case Fifth   => Json.obj("throughput" -> "05")
+    case Sixth   => Json.obj("throughput" -> "06")
     case Seventh => Json.obj("throughput" -> "07")
   }
 }

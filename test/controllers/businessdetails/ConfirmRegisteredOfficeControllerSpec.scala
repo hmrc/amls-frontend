@@ -40,25 +40,34 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
   val mockService = mock[ConfirmRegisteredOfficeService]
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[ConfirmRegisteredOfficeOrMainPlaceView]
-    val controller = new ConfirmRegisteredOfficeController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[ConfirmRegisteredOfficeOrMainPlaceView]
+    val controller = new ConfirmRegisteredOfficeController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       service = mockService,
       formProvider = app.injector.instanceOf[ConfirmRegisteredOfficeFormProvider],
-      view = view)
+      view = view
+    )
   }
 
-  val address = Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB"))
+  val address           =
+    Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB"))
   private val ukAddress = RegisteredOfficeUK("line1", Some("line2"), Some("line3"), Some("line4"), "AA1 1AA")
-  val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-    Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "ghghg")
-  val reviewDtlsNonUk = reviewDtls.copy(
-    businessAddress = Address("line1", Some("line2"), Some("line3"), Some("line4"), None, Country("United States of America", "US")))
-  val bm = BusinessMatching(Some(reviewDtls))
-  val emptyCache = Cache.empty
+  val reviewDtls        = ReviewDetails(
+    "BusinessName",
+    Some(BusinessType.LimitedCompany),
+    Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")),
+    "ghghg"
+  )
+  val reviewDtlsNonUk   = reviewDtls.copy(
+    businessAddress =
+      Address("line1", Some("line2"), Some("line3"), Some("line4"), None, Country("United States of America", "US"))
+  )
+  val bm                = BusinessMatching(Some(reviewDtls))
+  val emptyCache        = Cache.empty
 
   override def beforeEach(): Unit = reset(mockService)
 
@@ -73,7 +82,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           .thenReturn(Future.successful(Some(address)))
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("businessdetails.confirmingyouraddress.title"))
       }
 
@@ -86,8 +95,10 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           .thenReturn(Future.successful(Some(address)))
 
         val result = controller.get()(request)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url)
+        )
       }
 
       "load Registered office or main place of business when Business Address from mongoCache returns None" in new Fixture {
@@ -99,8 +110,10 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url)
+        )
       }
 
       "load Registered office or main place of business when there is already a registered address in BusinessDetails" in new Fixture {
@@ -112,8 +125,10 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           .thenReturn(Future.successful(Some(address)))
 
         val result = controller.get()(request)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url)
+        )
       }
     }
 
@@ -127,8 +142,10 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           .thenReturn(Future.successful(Some(ukAddress)))
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessdetails.routes.BusinessEmailAddressController.get().url))
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.businessdetails.routes.BusinessEmailAddressController.get().url)
+        )
 
         verify(mockService).updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(true)))
       }
@@ -143,8 +160,10 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           .thenReturn(Future.successful(Some(ukAddress)))
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url)
+        )
 
         verify(mockService).updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(false)))
       }
@@ -159,12 +178,13 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url)
+        )
 
         verify(mockService).updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(true)))
       }
-
 
       "on post invalid data" in new Fixture {
 
@@ -176,7 +196,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           .thenReturn(Future.successful(Some(address)))
 
         val result = controller.post()(newRequest)
-        status(result) must be(BAD_REQUEST)
+        status(result)          must be(BAD_REQUEST)
         contentAsString(result) must include(messages("error.required.atb.confirm.office"))
 
         verify(mockService, times(0)).updateRegisteredOfficeAddress(any(), any())
@@ -191,7 +211,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar w
           .thenReturn(Future.successful(Some(address)))
 
         val result = controller.post()(newRequest)
-        status(result) must be(BAD_REQUEST)
+        status(result)          must be(BAD_REQUEST)
         contentAsString(result) must include(messages("err.summary"))
 
         verify(mockService, times(0)).updateRegisteredOfficeAddress(any(), any())

@@ -25,10 +25,9 @@ import play.api.test.FakeRequest
 import views.Fixture
 import views.html.businessactivities.RiskAssessmentPolicyView
 
-
 class RiskAssessmentPolicyViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val policy: RiskAssessmentPolicyView = inject[RiskAssessmentPolicyView]
+  lazy val policy: RiskAssessmentPolicyView         = inject[RiskAssessmentPolicyView]
   lazy val formProvider: RiskAssessmentFormProvider = inject[RiskAssessmentFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
@@ -49,7 +48,7 @@ class RiskAssessmentPolicyViewSpec extends AmlsViewSpec with Matchers {
 
       def view = policy(formProvider().fill(RiskAssessmentHasPolicy(false)), true)
 
-      heading.html must be(messages("businessactivities.riskassessment.policy.title"))
+      heading.html    must be(messages("businessactivities.riskassessment.policy.title"))
       subHeading.html must include(messages("summary.businessactivities"))
 
     }

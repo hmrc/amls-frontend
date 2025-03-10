@@ -35,18 +35,24 @@ import scala.concurrent.Future
 class HowCashPaymentsReceivedControllerSpec extends AmlsSpec with Injecting {
 
   lazy val mockDataCacheConnector = mock[DataCacheConnector]
-  lazy val mockRenewalService = mock[RenewalService]
+  lazy val mockRenewalService     = mock[RenewalService]
 
-  val receiveCashPayments = CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))
+  val receiveCashPayments      = CashPayments(
+    CashPaymentsCustomerNotMet(true),
+    Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+  )
   val doNotreceiveCashPayments = CashPayments(CashPaymentsCustomerNotMet(false), None)
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[HowCashPaymentsReceivedView]
-    val controller = new HowCashPaymentsReceivedController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[HowCashPaymentsReceivedView]
+    val controller = new HowCashPaymentsReceivedController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      renewalService = mockRenewalService,
+      cc = mockMcc,
       formProvider = inject[HowCashPaymentsReceivedFormProvider],
       view = view
     )
@@ -59,29 +65,30 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec with Injecting {
   "HowCashPaymentsReceived controller" when {
     "get is called" must {
       "load the page if renewal data is found" in new Fixture {
-          when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
+        when(mockRenewalService.getRenewal(any()))
+          .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
 
-          val result = controller.get()(request)
-          status(result) mustEqual OK
+        val result = controller.get()(request)
+        status(result) mustEqual OK
 
-          val page = Jsoup.parse(contentAsString(result))
+        val page = Jsoup.parse(contentAsString(result))
 
-          page.getElementById("paymentMethods_0").hasAttr("checked") must be(true)
-          page.getElementById("paymentMethods_1").hasAttr("checked") must be(true)
-          page.getElementById("paymentMethods_2").hasAttr("checked") must be(true)
-          page.getElementById("details").`val`() must be("other")
-        }
+        page.getElementById("paymentMethods_0").hasAttr("checked") must be(true)
+        page.getElementById("paymentMethods_1").hasAttr("checked") must be(true)
+        page.getElementById("paymentMethods_2").hasAttr("checked") must be(true)
+        page.getElementById("details").`val`()                     must be("other")
+      }
 
-        "show an empty form if no renewal data is found for this question" in new Fixture {
-          val result = controller.get()(request)
-          status(result) mustEqual OK
+      "show an empty form if no renewal data is found for this question" in new Fixture {
+        val result = controller.get()(request)
+        status(result) mustEqual OK
 
-          val page = Jsoup.parse(contentAsString(result))
-          page.getElementById("paymentMethods_0").hasAttr("checked") must be(false)
-          page.getElementById("paymentMethods_1").hasAttr("checked") must be(false)
-          page.getElementById("paymentMethods_2").hasAttr("checked") must be(false)
-          page.getElementById("details").`val`() must be("")
-        }
+        val page = Jsoup.parse(contentAsString(result))
+        page.getElementById("paymentMethods_0").hasAttr("checked") must be(false)
+        page.getElementById("paymentMethods_1").hasAttr("checked") must be(false)
+        page.getElementById("paymentMethods_2").hasAttr("checked") must be(false)
+        page.getElementById("details").`val`()                     must be("")
+      }
     }
 
     "post is called" when {
@@ -95,12 +102,13 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec with Injecting {
 
       "a valid request is made" must {
         "redirect to summary page" in new Fixture {
-          val newRequest = FakeRequest(POST, routes.HowCashPaymentsReceivedController.post().url).withFormUrlEncodedBody(
-            "paymentMethods[0]" -> "courier",
-            "paymentMethods[1]" -> "direct",
-            "paymentMethods[2]" -> "other",
-            "details" -> "other"
-          )
+          val newRequest =
+            FakeRequest(POST, routes.HowCashPaymentsReceivedController.post().url).withFormUrlEncodedBody(
+              "paymentMethods[0]" -> "courier",
+              "paymentMethods[1]" -> "direct",
+              "paymentMethods[2]" -> "other",
+              "details"           -> "other"
+            )
 
           val result = controller.post()(newRequest)
 

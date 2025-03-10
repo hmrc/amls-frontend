@@ -29,10 +29,10 @@ sealed trait BankAccountType {
     import models.bankdetails.BankAccountType._
 
     this match {
-      case a @ PersonalAccount => a.value
-      case a @ BelongsToBusiness => a.value
+      case a @ PersonalAccount        => a.value
+      case a @ BelongsToBusiness      => a.value
       case a @ BelongsToOtherBusiness => a.value
-      case a @ NoBankAccountUsed => a.value
+      case a @ NoBankAccountUsed      => a.value
     }
   }
 }
@@ -55,37 +55,34 @@ object BankAccountType extends Enumerable.Implicits {
     override val value: String = "04"
   }
 
-  def formItems(implicit messages: Messages): Seq[RadioItem] = {
-
+  def formItems(implicit messages: Messages): Seq[RadioItem] =
     Seq(BelongsToOtherBusiness, BelongsToBusiness, PersonalAccount) map { obj =>
-
       RadioItem(
         content = Text(messages(s"bankdetails.accounttype.lbl.${obj.value}")),
         id = Some(obj.toString),
         value = Some(obj.toString)
       )
     }
-  }
 
   import utils.MappingUtils.Implicits._
 
-  implicit val jsonReads : Reads[BankAccountType] = {
+  implicit val jsonReads: Reads[BankAccountType] = {
     import play.api.libs.json.Reads.StringReads
     (__ \ "bankAccountType").read[String] flatMap {
       case "01" => PersonalAccount
       case "02" => BelongsToBusiness
       case "03" => BelongsToOtherBusiness
       case "04" => NoBankAccountUsed
-      case _ =>
+      case _    =>
         play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 
   implicit val jsonWrites: Writes[BankAccountType] = Writes[BankAccountType] {
-    case PersonalAccount => Json.obj("bankAccountType"->"01")
-    case BelongsToBusiness => Json.obj("bankAccountType" -> "02")
+    case PersonalAccount        => Json.obj("bankAccountType" -> "01")
+    case BelongsToBusiness      => Json.obj("bankAccountType" -> "02")
     case BelongsToOtherBusiness => Json.obj("bankAccountType" -> "03")
-    case NoBankAccountUsed => Json.obj("bankAccountType" -> "04")
+    case NoBankAccountUsed      => Json.obj("bankAccountType" -> "04")
   }
 
   val all = Seq(

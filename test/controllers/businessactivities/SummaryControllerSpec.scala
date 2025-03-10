@@ -22,7 +22,7 @@ import models.Country
 import models.businessactivities.TransactionTypes.{DigitalSoftware, Paper}
 import models.businessactivities._
 import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
-import models.businessmatching.{BusinessMatching, BusinessActivities => BMBusinessActivities}
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessMatching}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{eq => eqTo, _}
@@ -42,11 +42,12 @@ import scala.concurrent.{ExecutionContext, Future}
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request                       = addToken(authRequest)
     implicit val ec: ExecutionContext = inject[ExecutionContext]
 
-    lazy val view = inject[CheckYourAnswersView]
-    val controller = new SummaryController (
+    lazy val view  = inject[CheckYourAnswersView]
+    val controller = new SummaryController(
       dataCache = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
@@ -79,7 +80,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   "Get" must {
 
-    val bmBusinessActivities = Some(BMBusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
+    val bmBusinessActivities =
+      Some(BMBusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
 
     "load the summary page when section data is available" in new Fixture {
 
@@ -129,7 +131,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
         when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
           .thenReturn(Some(completeModel))
 
-
         when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
@@ -137,9 +138,9 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        document.getElementById("involvedinother-edit").html() must include(Messages("button.edit"))
+        document.getElementById("involvedinother-edit").html()          must include(Messages("button.edit"))
         document.getElementById("expectedbusinessturnover-edit").html() must include(Messages("button.edit"))
-        document.getElementById("expectedamlsturnover-edit").html() must include(Messages("button.edit"))
+        document.getElementById("expectedamlsturnover-edit").html()     must include(Messages("button.edit"))
       }
     }
 
@@ -161,9 +162,9 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        document.getElementById("involvedinother-edit").html() must include(Messages("button.edit"))
+        document.getElementById("involvedinother-edit").html()          must include(Messages("button.edit"))
         document.getElementById("expectedbusinessturnover-edit").html() must include(Messages("button.edit"))
-        document.getElementById("expectedamlsturnover-edit").html() must include(Messages("button.edit"))
+        document.getElementById("expectedamlsturnover-edit").html()     must include(Messages("button.edit"))
       }
     }
   }
@@ -175,7 +176,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
         val emptyCache = Cache.empty
 
-        val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
+        val newRequest = requestWithUrlEncodedBody("hasAccepted" -> "true")
 
         when(controller.dataCache.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(Some(completeModel.copy(hasAccepted = false))))
@@ -185,7 +186,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
         val result = controller.post()(newRequest)
 
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
       }
 
@@ -194,25 +195,25 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 }
 
 object BusinessActivitiesValues {
-  val DefaultFranchiseName = "DEFAULT FRANCHISE NAME"
-  val DefaultSoftwareName = "DEFAULT SOFTWARE"
-  val DefaultBusinessTurnover = ExpectedBusinessTurnover.First
-  val DefaultAMLSTurnover = ExpectedAMLSTurnover.First
-  val DefaultInvolvedInOtherDetails = "DEFAULT INVOLVED"
-  val DefaultInvolvedInOther = InvolvedInOtherYes(DefaultInvolvedInOtherDetails)
-  val DefaultBusinessFranchise = BusinessFranchiseYes(DefaultFranchiseName)
-  val DefaultTransactionRecord = true
-  val DefaultTransactionRecordTypes = TransactionTypes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
-  val DefaultCustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
-  val DefaultNCARegistered = NCARegistered(true)
+  val DefaultFranchiseName                = "DEFAULT FRANCHISE NAME"
+  val DefaultSoftwareName                 = "DEFAULT SOFTWARE"
+  val DefaultBusinessTurnover             = ExpectedBusinessTurnover.First
+  val DefaultAMLSTurnover                 = ExpectedAMLSTurnover.First
+  val DefaultInvolvedInOtherDetails       = "DEFAULT INVOLVED"
+  val DefaultInvolvedInOther              = InvolvedInOtherYes(DefaultInvolvedInOtherDetails)
+  val DefaultBusinessFranchise            = BusinessFranchiseYes(DefaultFranchiseName)
+  val DefaultTransactionRecord            = true
+  val DefaultTransactionRecordTypes       = TransactionTypes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
+  val DefaultCustomersOutsideUK           = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
+  val DefaultNCARegistered                = NCARegistered(true)
   val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
-  val DefaultRiskAssessments = RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))
-  val DefaultHowManyEmployees = HowManyEmployees(Some("5"),Some("4"))
-  val DefaultWhoIsYourAccountant = WhoIsYourAccountant(
+  val DefaultRiskAssessments              = RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))
+  val DefaultHowManyEmployees             = HowManyEmployees(Some("5"), Some("4"))
+  val DefaultWhoIsYourAccountant          = WhoIsYourAccountant(
     Some(WhoIsYourAccountantName("Accountant's name", Some("Accountant's trading name"))),
     Some(WhoIsYourAccountantIsUk(true)),
     Some(UkAccountantsAddress("address1", Some("address2"), Some("address3"), Some("address4"), "POSTCODE"))
   )
-  val DefaultIdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
-  val DefaultTaxMatters = TaxMatters(false)
+  val DefaultIdentifySuspiciousActivity   = IdentifySuspiciousActivity(true)
+  val DefaultTaxMatters                   = TaxMatters(false)
 }

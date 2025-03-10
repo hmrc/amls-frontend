@@ -39,18 +39,18 @@ class SupervisionEndReasonsSpec extends PlaySpec with MockitoSugar {
 
     "Deserialise SupervisionEndReasons as expected" in new Fixture {
 
-      val input = Json.obj(
-        "anotherBody" -> true,
-        "supervisionEndingReason" -> "Reason")
+      val input = Json.obj("anotherBody" -> true, "supervisionEndingReason" -> "Reason")
 
       val expected = SupervisionEndReasons(reason)
 
-      Json.fromJson[SupervisionEndReasons](input) must be (JsSuccess(expected, JsPath \ "supervisionEndingReason"))
+      Json.fromJson[SupervisionEndReasons](input) must be(JsSuccess(expected, JsPath \ "supervisionEndingReason"))
     }
 
     "fail when data is missing" in {
       Json.fromJson[SupervisionEndReasons](Json.obj()) must
-        be(JsError((JsPath \ "supervisionEndingReason") -> play.api.libs.json.JsonValidationError("error.path.missing")))
+        be(
+          JsError((JsPath \ "supervisionEndingReason") -> play.api.libs.json.JsonValidationError("error.path.missing"))
+        )
     }
   }
 }

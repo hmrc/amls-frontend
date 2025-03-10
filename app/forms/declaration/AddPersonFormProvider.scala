@@ -26,34 +26,36 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import javax.inject.Inject
 import scala.jdk.CollectionConverters._
 
-class AddPersonFormProvider @Inject()() extends Mappings {
+class AddPersonFormProvider @Inject() () extends Mappings {
 
-  val nameLength = 35
+  val nameLength  = 35
   val otherLength = 255
 
   private val emptyError = "error.invalid.position.validation"
 
   def apply(): Form[AddPerson] = Form[AddPerson](
     mapping(
-      "firstName" -> text("error.required.declaration.first_name").verifying(
+      "firstName"     -> text("error.required.declaration.first_name").verifying(
         firstError(
           maxLength(nameLength, "error.invalid.firstname.length"),
           regexp(nameRegex, "error.invalid.firstname.validation")
         )
       ),
-      "middleName" -> optional(text().verifying(
-        firstError(
-          maxLength(nameLength, "error.invalid.middlename.length"),
-          regexp(nameRegex, "error.invalid.middlename.validation")
+      "middleName"    -> optional(
+        text().verifying(
+          firstError(
+            maxLength(nameLength, "error.invalid.middlename.length"),
+            regexp(nameRegex, "error.invalid.middlename.validation")
+          )
         )
-      )),
-      "lastName" -> text("error.required.declaration.last_name").verifying(
+      ),
+      "lastName"      -> text("error.required.declaration.last_name").verifying(
         firstError(
           maxLength(nameLength, "error.invalid.lastname.length"),
           regexp(nameRegex, "error.invalid.lastname.validation")
         )
       ),
-      "positions" -> seq(enumerable[RoleType](emptyError, emptyError)(RoleWithinBusinessRelease7.enumerable)).verifying(
+      "positions"     -> seq(enumerable[RoleType](emptyError, emptyError)(RoleWithinBusinessRelease7.enumerable)).verifying(
         nonEmptySeq(emptyError)
       ),
       "otherPosition" -> mandatoryIf(
@@ -68,22 +70,29 @@ class AddPersonFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  def apply(firstName: String, middleName: Option[String], lastName: String, positions: Seq[RoleType], otherPosition: Option[String]): AddPerson = {
+  def apply(
+    firstName: String,
+    middleName: Option[String],
+    lastName: String,
+    positions: Seq[RoleType],
+    otherPosition: Option[String]
+  ): AddPerson = {
     val role = (positions, otherPosition) match {
       case (pos, Some(other)) if pos.contains(Other("")) =>
         val modifiedTransactions = pos.map(role => if (role == Other("")) Other(other) else role)
         RoleWithinBusinessRelease7(modifiedTransactions.toSet)
-      case (pos, Some(_)) => throw new IllegalArgumentException("Role description requires the selection of Other")
-      case (pos, None) if pos.contains(Other("")) => throw new IllegalArgumentException("Selection of Other requires a role description")
-      case (pos, None) => RoleWithinBusinessRelease7(pos.toSet)
+      case (pos, Some(_))                                => throw new IllegalArgumentException("Role description requires the selection of Other")
+      case (pos, None) if pos.contains(Other(""))        =>
+        throw new IllegalArgumentException("Selection of Other requires a role description")
+      case (pos, None)                                   => RoleWithinBusinessRelease7(pos.toSet)
     }
     AddPerson(firstName, middleName, lastName, role)
   }
 
   def unapply(obj: AddPerson): Option[(String, Option[String], String, Seq[RoleType], Option[String])] = {
-    val roleSet = obj.roleWithinBusiness.items.map(x => if(x.value == Other("").value) Other("") else x)
-    val roleOther = obj.roleWithinBusiness.items.collectFirst {
-      case o: Other => o.details
+    val roleSet   = obj.roleWithinBusiness.items.map(x => if (x.value == Other("").value) Other("") else x)
+    val roleOther = obj.roleWithinBusiness.items.collectFirst { case o: Other =>
+      o.details
     }
     Some((obj.firstName, obj.middleName, obj.lastName, roleSet.toSeq, roleOther))
   }

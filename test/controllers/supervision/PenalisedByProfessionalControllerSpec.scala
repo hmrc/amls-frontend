@@ -30,18 +30,24 @@ import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.supervision.PenalisedByProfessionalView
 
-class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting with BeforeAndAfterEach {
+class PenalisedByProfessionalControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with ScalaFutures
+    with Injecting
+    with BeforeAndAfterEach {
 
   trait Fixture extends DependencyMocks { self =>
-    val request = addToken(authRequest)
-    lazy val view = inject[PenalisedByProfessionalView]
-    val controller = new PenalisedByProfessionalController (
+    val request    = addToken(authRequest)
+    lazy val view  = inject[PenalisedByProfessionalView]
+    val controller = new PenalisedByProfessionalController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[PenalisedByProfessionalFormProvider],
-      view = view)
+      view = view
+    )
 
     reset(mockCacheConnector)
     mockCacheSave[Supervision]
@@ -54,19 +60,22 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
       mockCacheFetch[Supervision](None)
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("supervision.penalisedbyprofessional.title"))
     }
 
-
     "on get display the Penalised By Professional Body page with pre populated data" in new Fixture {
 
-      mockCacheFetch[Supervision](Some(Supervision(
-        None,
-        None,
-        None,
-        Some(ProfessionalBodyYes(""))
-      )))
+      mockCacheFetch[Supervision](
+        Some(
+          Supervision(
+            None,
+            None,
+            None,
+            Some(ProfessionalBodyYes(""))
+          )
+        )
+      )
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -83,7 +92,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
         mockCacheFetch[Supervision](None)
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.supervision.routes.PenaltyDetailsController.get().url))
       }
 
@@ -95,7 +104,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
         mockCacheFetch[Supervision](None)
 
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.supervision.routes.PenaltyDetailsController.get(true).url))
       }
     }
@@ -110,7 +119,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
         mockCacheFetch[Supervision](None)
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
       }
 
@@ -122,7 +131,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
         mockCacheFetch[Supervision](None)
 
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
       }
 
@@ -134,7 +143,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
         mockCacheFetch[Supervision](Some(Supervision(None, None, None, Some(ProfessionalBodyYes("description")))))
 
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
 
         verify(mockCacheConnector, never()).save(any(), any(), any())(any())
@@ -144,7 +153,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
     "on post with invalid data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.PenalisedByProfessionalController.post().url)
-      .withFormUrlEncodedBody("penalised" -> "details")
+        .withFormUrlEncodedBody("penalised" -> "details")
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)

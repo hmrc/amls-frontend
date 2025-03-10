@@ -35,33 +35,35 @@ import views.html.businessmatching.MsbServicesView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class MsbSubSectorsController @Inject()(authAction: AuthAction,
-                                        val ds: CommonPlayDependencies,
-                                        val dataCacheConnector: DataCacheConnector,
-                                        val router: Router2[ChangeSubSectorFlowModel],
-                                        val businessMatchingService: BusinessMatchingService,
-                                        val statusService:StatusService,
-                                        val helper: ChangeSubSectorHelper,
-                                        val config: ApplicationConfig,
-                                        val cc: MessagesControllerComponents,
-                                        formProvider: MsbSubSectorsFormProvider,
-                                        services: MsbServicesView) extends AmlsBaseController(ds, cc) {
+class MsbSubSectorsController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val dataCacheConnector: DataCacheConnector,
+  val router: Router2[ChangeSubSectorFlowModel],
+  val businessMatchingService: BusinessMatchingService,
+  val statusService: StatusService,
+  val helper: ChangeSubSectorHelper,
+  val config: ApplicationConfig,
+  val cc: MessagesControllerComponents,
+  formProvider: MsbSubSectorsFormProvider,
+  services: MsbServicesView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-      implicit request =>
-        (for {
-          bm <- businessMatchingService.getModel(request.credId)
-          status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
-        } yield {
-          val form = bm.msbServices.fold(formProvider())(services => formProvider().fill(services.msbServices.toSeq))
-          Ok(services(form, edit, bm.preAppComplete, statusService.isPreSubmission(status), config.fxEnabledToggle))
-        }) getOrElse Ok(services(formProvider(), edit, fxEnabledToggle = config.fxEnabledToggle))
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      bm     <- businessMatchingService.getModel(request.credId)
+      status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
+    } yield {
+      val form = bm.msbServices.fold(formProvider())(services => formProvider().fill(services.msbServices.toSeq))
+      Ok(services(form, edit, bm.preAppComplete, statusService.isPreSubmission(status), config.fxEnabledToggle))
+    }) getOrElse Ok(services(formProvider(), edit, fxEnabledToggle = config.fxEnabledToggle))
   }
 
   def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = false): Action[AnyContent] = authAction.async {
-      implicit request =>
-
-        formProvider().bindFromRequest().fold(
+    implicit request =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
           formWithErrors =>
             Future.successful(BadRequest(services(formWithErrors, edit, fxEnabledToggle = config.fxEnabledToggle))),
           data =>
@@ -72,7 +74,7 @@ class MsbSubSectorsController @Inject()(authAction: AuthAction,
                 helper.updateSubSectors(request.credId, m) flatMap { _ =>
                   router.getRoute(request.credId, SubSectorsPageId, m, edit, includeCompanyNotRegistered)
                 }
-              case Some(updatedModel) =>
+              case Some(updatedModel)                                                                    =>
                 router.getRoute(request.credId, SubSectorsPageId, updatedModel, edit, includeCompanyNotRegistered)
             }
         )

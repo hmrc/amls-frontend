@@ -29,80 +29,80 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class FitAndProperController @Inject()(
-                                        val dataCacheConnector: DataCacheConnector,
-                                        authAction: AuthAction,
-                                        val ds: CommonPlayDependencies,
-                                        val cc: MessagesControllerComponents,
-                                        formProvider: FitAndProperFormProvider,
-                                        view: FitAndProperView,
-                                        implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class FitAndProperController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: FitAndProperFormProvider,
+  view: FitAndProperView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           (person.personName, person.approvalFlags.hasAlreadyPassedFitAndProper) match {
-            case (Some(name), Some(hasPassed)) => Ok(view(formProvider().fill(hasPassed), edit, index, flow, name.titleName))
-            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
-            case _ => NotFound(notFoundView)
+            case (Some(name), Some(hasPassed)) =>
+              Ok(view(formProvider().fill(hasPassed), edit, index, flow, name.titleName))
+            case (Some(name), _)               => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _                             => NotFound(notFoundView)
           }
         }
       }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = {
-    authAction.async {
-      implicit request =>
-        formProvider().bindFromRequest().fold(
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
+    authAction.async { implicit request =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
           formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(view(formWithErrors, edit, index, flow,
-                ControllerHelper.rpTitleName(rp)))
+              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             },
-          data => {
-            dataCacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
+          data =>
+            {
+              dataCacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
+                val businessMatching = for {
+                  cacheMap <- maybeCache
+                  bm       <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                } yield bm
 
-              val businessMatching = for {
-                cacheMap <- maybeCache
-                bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-              } yield bm
+                val msbOrTcsp = ControllerHelper.isMSBSelected(Some(businessMatching)) ||
+                  ControllerHelper.isTCSPSelected(Some(businessMatching))
 
-              val msbOrTcsp = ControllerHelper.isMSBSelected(Some(businessMatching)) ||
-                ControllerHelper.isTCSPSelected(Some(businessMatching))
-
-              for {
-                cacheMap <- fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
-                    rp.updateFitAndProperAndApproval(data, msbOrTcsp)
-                }
-              } yield identifyRoutingTarget(index, edit, data, msbOrTcsp, flow)
+                for {
+                  cacheMap <- fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
+                                rp.updateFitAndProperAndApproval(data, msbOrTcsp)
+                              }
+                } yield identifyRoutingTarget(index, edit, data, msbOrTcsp, flow)
+              }
+            } recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
             }
-          } recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-          }
         )
     }
-  }
 
-  private def identifyRoutingTarget(index: Int,
-                                    edit: Boolean,
-                                    fitAndProperAnswer: Boolean,
-                                    msbOrTscp: Boolean,
-                                    flow: Option[String]): Result = {
+  private def identifyRoutingTarget(
+    index: Int,
+    edit: Boolean,
+    fitAndProperAnswer: Boolean,
+    msbOrTscp: Boolean,
+    flow: Option[String]
+  ): Result =
     (edit, fitAndProperAnswer) match {
-      case (true, false) => routeMsbOrTcsb(index, msbOrTscp, flow)
+      case (true, false)  => routeMsbOrTcsb(index, msbOrTscp, flow)
       case (false, false) => routeMsbOrTcsb(index, msbOrTscp, flow)
-      case _ => Redirect(routes.DetailedAnswersController.get(index, flow))
+      case _              => Redirect(routes.DetailedAnswersController.get(index, flow))
     }
-  }
 
-  private def routeMsbOrTcsb(index: Int,
-                             msbOrTscp: Boolean,
-                             flow: Option[String]):Result = {
+  private def routeMsbOrTcsb(index: Int, msbOrTscp: Boolean, flow: Option[String]): Result =
     if (msbOrTscp) {
       Redirect(routes.DetailedAnswersController.get(index, flow))
     } else {
       Redirect(routes.ApprovalCheckController.get(index, false, flow))
     }
-  }
 }

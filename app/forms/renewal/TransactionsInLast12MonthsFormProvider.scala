@@ -22,10 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class TransactionsInLast12MonthsFormProvider @Inject()() extends Mappings {
+class TransactionsInLast12MonthsFormProvider @Inject() () extends Mappings {
 
   private val error = "error.required.msb.transactions.in.12months"
-  val length = 11
+  val length        = 11
 
   def apply(): Form[TransactionsInLast12Months] = Form(
     "txnAmount" -> text(error)
@@ -38,5 +38,5 @@ class TransactionsInLast12MonthsFormProvider @Inject()() extends Mappings {
       )
       .transform[TransactionsInLast12Months](TransactionsInLast12Months.apply, _.transfers)
   )
-  private def format(str: String): String = str.trim.replace(",", "")
+  private def format(str: String): String       = str.trim.replace(",", "")
 }

@@ -24,7 +24,7 @@ import views.html.UnauthorisedRoleView
 class UnauthorisedRoleViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val unauthorisedRoleView = app.injector.instanceOf[UnauthorisedRoleView]
+    lazy val unauthorisedRoleView                                  = app.injector.instanceOf[UnauthorisedRoleView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     def view = unauthorisedRoleView()

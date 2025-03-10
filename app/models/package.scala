@@ -16,8 +16,8 @@
 
 package object models {
 
-  //ISO 4217 currency codes
-  //http://www.iso.org/iso/home/standards/currency_codes.htm
+  // ISO 4217 currency codes
+  // http://www.iso.org/iso/home/standards/currency_codes.htm
 
   val currencies: Seq[String] = Seq(
     "AED",

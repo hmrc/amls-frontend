@@ -39,26 +39,26 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
   val dateVal: LocalDateTime = LocalDateTime.now
 
   val completeData: JsObject = Json.obj(
-    "typeOfParticipant"             -> Seq("artGalleryOwner"),
-    "soldOverThreshold"             -> true,
-    "dateTransactionOverThreshold"  -> LocalDate.now,
-    "identifyLinkedTransactions"    -> true,
-    "percentageExpectedTurnover"    -> "fortyOneToSixty"
+    "typeOfParticipant"            -> Seq("artGalleryOwner"),
+    "soldOverThreshold"            -> true,
+    "dateTransactionOverThreshold" -> LocalDate.now,
+    "identifyLinkedTransactions"   -> true,
+    "percentageExpectedTurnover"   -> "fortyOneToSixty"
   )
 
   val completeJson: JsObject = Json.obj(
-    "_id"            -> "someid",
-    "data"           -> completeData,
-    "lastUpdated"    -> Json.obj("$date" -> dateVal.atZone(ZoneOffset.UTC).toInstant.toEpochMilli),
-    "hasChanged"     -> false,
-    "hasAccepted"    -> false
+    "_id"         -> "someid",
+    "data"        -> completeData,
+    "lastUpdated" -> Json.obj("$date" -> dateVal.atZone(ZoneOffset.UTC).toInstant.toEpochMilli),
+    "hasChanged"  -> false,
+    "hasAccepted" -> false
   )
 
   trait Fixture extends AuthorisedFixture {
     self =>
     val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
-    val proxyCacheService: ProxyCacheService = mock[ProxyCacheService]
-    val credId          = "someId"
+    val proxyCacheService: ProxyCacheService     = mock[ProxyCacheService]
+    val credId                                   = "someId"
 
     lazy val app: Application = new GuiceApplicationBuilder()
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
@@ -75,8 +75,6 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
   "get returns 200" when {
     "no amp section in cache" in new Fixture {
       when(proxyCacheService.getAmp(any())).thenReturn(Future.successful(Some(Json.obj())))
-
-
 
       val result: Future[Result] = controller.get(credId)(request)
       status(result) must be(OK)
@@ -125,8 +123,8 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
       status(result) mustBe SEE_OTHER
       redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get().toString
 
-      verify(mockCacheConnector).save[Amp](any(), eqTo(Amp.key),
-        eqTo(completeJson.as[Amp].copy(hasAccepted = true)))(any())
+      verify(mockCacheConnector)
+        .save[Amp](any(), eqTo(Amp.key), eqTo(completeJson.as[Amp].copy(hasAccepted = true)))(any())
     }
   }
 }

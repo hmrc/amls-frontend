@@ -27,9 +27,8 @@ class ViewUtilsSpec extends AmlsSpec {
 
   val url = "/foo"
 
-  def taskRow(status: Status, tag: Tag = TaskRow.notStartedTag, hasChanged: Boolean = false): TaskRow = {
+  def taskRow(status: Status, tag: Tag = TaskRow.notStartedTag, hasChanged: Boolean = false): TaskRow =
     TaskRow("amp", url, hasChanged, status, tag)
-  }
 
   "ViewUtils" when {
 
@@ -58,7 +57,7 @@ class ViewUtilsSpec extends AmlsSpec {
             |""".stripMargin
         )
 
-        s"${ViewUtils.errorTitlePrefix(html)} Title" must not include("Error:")
+        s"${ViewUtils.errorTitlePrefix(html)} Title" must not include "Error:"
       }
     }
 

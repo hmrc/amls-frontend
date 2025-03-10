@@ -26,10 +26,10 @@ import views.html.confirmation.PaymentFailureView
 class PaymentFailureViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val payment_failure = inject[PaymentFailureView]
+    lazy val payment_failure                                       = inject[PaymentFailureView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
-    //noinspection ScalaStyle
+    // noinspection ScalaStyle
     override def view = payment_failure("confirmation.payment.failed.reason.failure", 100, "X123456789")
   }
 
@@ -42,7 +42,7 @@ class PaymentFailureViewSpec extends AmlsViewSpec with Matchers {
     }
 
     "show the fee and reference" in new ViewFixture {
-      //noinspection ScalaStyle
+      // noinspection ScalaStyle
       doc.body.select(".payment-amount").text() mustBe Currency(100).toString
       doc.body.select(".payment-ref").text() mustBe "X123456789"
     }

@@ -20,7 +20,7 @@ import models.responsiblepeople.{NewHomeAddress, PersonAddress}
 
 import javax.inject.Inject
 
-class NewHomeAddressFormProvider @Inject()() extends IsAddressUKFormProvider[NewHomeAddress] {
+class NewHomeAddressFormProvider @Inject() () extends IsAddressUKFormProvider[NewHomeAddress] {
 
   override val error = "error.required.uk.or.overseas.address.new.home"
 

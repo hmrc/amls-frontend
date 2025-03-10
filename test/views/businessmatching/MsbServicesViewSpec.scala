@@ -26,11 +26,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.MsbServicesView
 
+class MsbServicesViewSpec extends AmlsViewSpec with Matchers {
 
-class MsbServicesViewSpec extends AmlsViewSpec with Matchers  {
-
-  lazy val services = app.injector.instanceOf[MsbServicesView]
-  lazy val formProvider = app.injector.instanceOf[MsbSubSectorsFormProvider]
+  lazy val services                                              = app.injector.instanceOf[MsbServicesView]
+  lazy val formProvider                                          = app.injector.instanceOf[MsbSubSectorsFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -44,8 +43,8 @@ class MsbServicesViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = services(filledForm, edit = true, isPreSubmission = true)
 
-      doc.title must startWith(messages("msb.services.title") + " - " + messages("summary.businessmatching"))
-      heading.html must be(messages("msb.services.title"))
+      doc.title       must startWith(messages("msb.services.title") + " - " + messages("summary.businessmatching"))
+      heading.html    must be(messages("msb.services.title"))
       subHeading.html must include(messages("summary.businessmatching"))
     }
 
@@ -55,8 +54,8 @@ class MsbServicesViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = services(filledForm, edit = true, isPreSubmission = false)
 
-      doc.title must startWith(messages("msb.services.title") + " - " + messages("summary.updateinformation"))
-      heading.html must be(messages("msb.services.title"))
+      doc.title       must startWith(messages("msb.services.title") + " - " + messages("summary.updateinformation"))
+      heading.html    must be(messages("msb.services.title"))
       subHeading.html must include(messages("summary.updateinformation"))
     }
 
@@ -68,10 +67,9 @@ class MsbServicesViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = services(filledForm, edit = true)
 
-      doc.getElementsByClass("govuk-list govuk-error-summary__list")
-        .first.text() mustBe messages(messageKey)
+      doc.getElementsByClass("govuk-list govuk-error-summary__list").first.text() mustBe messages(messageKey)
 
-      doc.getElementById("value-error").text() mustBe(s"Error: ${messages(messageKey)}")
+      doc.getElementById("value-error").text() mustBe s"Error: ${messages(messageKey)}"
     }
 
     "hide the return to progress link" in new ViewFixture {
@@ -87,7 +85,7 @@ class MsbServicesViewSpec extends AmlsViewSpec with Matchers  {
     }
 
     "show the correct label for the checkboxes" in new ViewFixture {
-      def view = services(formProvider(), fxEnabledToggle = true, edit = false)
+      def view       = services(formProvider(), fxEnabledToggle = true, edit = false)
       val checkboxes = doc.body().getElementsByAttributeValue("type", "checkbox")
       (0 until checkboxes.size()) foreach { i =>
         checkboxes.get(i).`val`() mustEqual sortedServices(i).toString
@@ -97,21 +95,27 @@ class MsbServicesViewSpec extends AmlsViewSpec with Matchers  {
 
     "show selected checkboxes as checked" in new ViewFixture {
       val filledForm: Form[Seq[BusinessMatchingMsbService]] = formProvider().fill(Seq(TransmittingMoney))
-      def view = services(filledForm, edit = true)
-      val checkbox = doc.select("input[checked]").first()
+      def view                                              = services(filledForm, edit = true)
+      val checkbox                                          = doc.select("input[checked]").first()
       checkbox.`val`() mustBe TransmittingMoney.toString
     }
 
     "have a back link in pre-submission mode" in new ViewFixture {
       def view = services(formProvider(), edit = true, isPreSubmission = true)
 
-      assert(doc.getElementsByClass("govuk-back-link") != null, "\n\nElement " + "govuk-back-link" + " was not rendered on the page.\n")
+      assert(
+        doc.getElementsByClass("govuk-back-link") != null,
+        "\n\nElement " + "govuk-back-link" + " was not rendered on the page.\n"
+      )
     }
 
     "have a back link in non pre-submission mode" in new ViewFixture {
       def view = services(formProvider(), edit = true, isPreSubmission = false)
 
-      assert(doc.getElementsByClass("govuk-back-link") != null, "\n\nElement " + "govuk-back-link" + " was not rendered on the page.\n")
+      assert(
+        doc.getElementsByClass("govuk-back-link") != null,
+        "\n\nElement " + "govuk-back-link" + " was not rendered on the page.\n"
+      )
     }
   }
 

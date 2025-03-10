@@ -22,15 +22,17 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class SupervisionEndReasonsFormProvider @Inject()() extends Mappings {
+class SupervisionEndReasonsFormProvider @Inject() () extends Mappings {
 
-  val length = 255
+  val length                               = 255
   def apply(): Form[SupervisionEndReasons] = Form[SupervisionEndReasons](
-    "endingReason" -> text("error.required.supervision.reason").verifying(
-      firstError(
-        maxLength(length, "error.supervision.end.reason.invalid.maxlength.255"),
-        regexp(basicPunctuationRegex ,"error.supervision.end.reason.invalid")
+    "endingReason" -> text("error.required.supervision.reason")
+      .verifying(
+        firstError(
+          maxLength(length, "error.supervision.end.reason.invalid.maxlength.255"),
+          regexp(basicPunctuationRegex, "error.supervision.end.reason.invalid")
+        )
       )
-    ).transform[SupervisionEndReasons](SupervisionEndReasons.apply, _.endingReason)
+      .transform[SupervisionEndReasons](SupervisionEndReasons.apply, _.endingReason)
   )
 }

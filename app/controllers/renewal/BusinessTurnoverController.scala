@@ -29,41 +29,41 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class BusinessTurnoverController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                           val authAction: AuthAction,
-                                           val ds: CommonPlayDependencies,
-                                           val renewalService: RenewalService,
-                                           val cc: MessagesControllerComponents,
-                                           formProvider: BusinessTurnoverFormProvider,
-                                           view: BusinessTurnoverView) extends AmlsBaseController(ds, cc) {
+class BusinessTurnoverController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val renewalService: RenewalService,
+  val cc: MessagesControllerComponents,
+  formProvider: BusinessTurnoverFormProvider,
+  view: BusinessTurnoverView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      renewalService.getRenewal(request.credId).map {
-        response =>
-          val form = (for {
-            renewal <- response
-            businessTurnover <- renewal.businessTurnover
-          } yield formProvider().fill(businessTurnover)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    renewalService.getRenewal(request.credId).map { response =>
+      val form = (for {
+        renewal          <- response
+        businessTurnover <- renewal.businessTurnover
+      } yield formProvider().fill(businessTurnover)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           for {
             renewal <- dataCacheConnector.fetch[Renewal](request.credId, Renewal.key)
-            _ <- renewalService.updateRenewal(request.credId, renewal.businessTurnover(data))
-          } yield if (edit) {
-            Redirect(routes.SummaryController.get)
-          } else {
-            Redirect(routes.AMLSTurnoverController.get())
-          }
+            _       <- renewalService.updateRenewal(request.credId, renewal.businessTurnover(data))
+          } yield
+            if (edit) {
+              Redirect(routes.SummaryController.get)
+            } else {
+              Redirect(routes.AMLSTurnoverController.get())
+            }
       )
-    }
   }
 }

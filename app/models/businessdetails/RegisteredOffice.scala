@@ -22,16 +22,15 @@ import play.api.libs.json.{Json, Reads, Writes}
 
 sealed trait RegisteredOffice {
 
-  def isUK: Option[Boolean] = {
+  def isUK: Option[Boolean] =
     this match {
-      case registeredOffice: RegisteredOfficeUK => Some(true)
+      case registeredOffice: RegisteredOfficeUK    => Some(true)
       case registeredOffice: RegisteredOfficeNonUK => Some(false)
-      case _ => None
+      case _                                       => None
     }
-  }
 
   def toLines: Seq[String] = this match {
-    case a: RegisteredOfficeUK =>
+    case a: RegisteredOfficeUK    =>
       Seq(
         Some(a.addressLine1),
         a.addressLine2,
@@ -53,22 +52,22 @@ sealed trait RegisteredOffice {
 }
 
 case class RegisteredOfficeUK(
-                               addressLine1: String,
-                               addressLine2: Option[String] = None,
-                               addressLine3: Option[String] = None,
-                               addressLine4: Option[String] = None,
-                               postCode: String,
-                               dateOfChange: Option[DateOfChange] = None
-                             ) extends RegisteredOffice
+  addressLine1: String,
+  addressLine2: Option[String] = None,
+  addressLine3: Option[String] = None,
+  addressLine4: Option[String] = None,
+  postCode: String,
+  dateOfChange: Option[DateOfChange] = None
+) extends RegisteredOffice
 
 case class RegisteredOfficeNonUK(
-                                  addressLine1: String,
-                                  addressLine2: Option[String] = None,
-                                  addressLine3: Option[String] = None,
-                                  addressLine4: Option[String] = None,
-                                  country: Country,
-                                  dateOfChange: Option[DateOfChange] = None
-                                ) extends RegisteredOffice
+  addressLine1: String,
+  addressLine2: Option[String] = None,
+  addressLine3: Option[String] = None,
+  addressLine4: Option[String] = None,
+  country: Country,
+  dateOfChange: Option[DateOfChange] = None
+) extends RegisteredOffice
 
 object RegisteredOffice {
 
@@ -85,8 +84,8 @@ object RegisteredOffice {
             (__ \ "addressLine4").readNullable[String] and
             (__ \ "postCode").read[String] and
             (__ \ "dateOfChange").readNullable[DateOfChange]
-          ) (RegisteredOfficeUK.apply _) map identity[RegisteredOffice]
-      ) orElse
+        )(RegisteredOfficeUK.apply _) map identity[RegisteredOffice]
+    ) orElse
       (
         (__ \ "addressLineNonUK1").read[String] and
           (__ \ "addressLineNonUK2").readNullable[String] and
@@ -94,7 +93,7 @@ object RegisteredOffice {
           (__ \ "addressLineNonUK4").readNullable[String] and
           (__ \ "country").read[Country] and
           (__ \ "dateOfChange").readNullable[DateOfChange]
-        ) (RegisteredOfficeNonUK.apply _)
+      )(RegisteredOfficeNonUK.apply _)
   }
 
   implicit val jsonWrites: Writes[RegisteredOffice] = Writes[RegisteredOffice] {
@@ -105,7 +104,7 @@ object RegisteredOffice {
         "addressLine2" -> m.addressLine2,
         "addressLine3" -> m.addressLine3,
         "addressLine4" -> m.addressLine4,
-        "postCode" -> m.postCode,
+        "postCode"     -> m.postCode,
         "dateOfChange" -> m.dateOfChange
       )
 
@@ -115,23 +114,15 @@ object RegisteredOffice {
         "addressLineNonUK2" -> m.addressLine2,
         "addressLineNonUK3" -> m.addressLine3,
         "addressLineNonUK4" -> m.addressLine4,
-        "country" -> m.country.code,
-        "dateOfChange" -> m.dateOfChange
+        "country"           -> m.country.code,
+        "dateOfChange"      -> m.dateOfChange
       )
   }
 
-  implicit def convert(address: Address): RegisteredOffice = {
+  implicit def convert(address: Address): RegisteredOffice =
     address.postcode match {
-      case Some(data) => RegisteredOfficeUK(address.line_1,
-        address.line_2,
-        address.line_3,
-        address.line_4,
-        data)
-      case None => RegisteredOfficeNonUK(address.line_1,
-        address.line_2,
-        address.line_3,
-        address.line_4,
-        address.country)
+      case Some(data) => RegisteredOfficeUK(address.line_1, address.line_2, address.line_3, address.line_4, data)
+      case None       =>
+        RegisteredOfficeNonUK(address.line_1, address.line_2, address.line_3, address.line_4, address.country)
     }
-  }
 }

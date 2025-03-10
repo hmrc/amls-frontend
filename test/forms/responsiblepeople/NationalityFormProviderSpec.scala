@@ -26,9 +26,9 @@ class NationalityFormProviderSpec extends StringFieldBehaviours with Constraints
 
   val formProvider = new NationalityFormProvider()
 
-  val form: Form[Nationality] = formProvider()
+  val form: Form[Nationality]  = formProvider()
   val booleanFieldName: String = "nationality"
-  val stringFieldName: String = "country"
+  val stringFieldName: String  = "country"
 
   "NationalityFormProvider" must {
 
@@ -37,11 +37,12 @@ class NationalityFormProviderSpec extends StringFieldBehaviours with Constraints
       "false is submitted with a country" in {
 
         forAll(Gen.oneOf(models.countries)) { country =>
-
-          val result = form.bind(Map(
-            booleanFieldName -> "false",
-            stringFieldName -> country.code
-          ))
+          val result = form.bind(
+            Map(
+              booleanFieldName -> "false",
+              stringFieldName  -> country.code
+            )
+          )
 
           result.value shouldBe Some(OtherCountry(country))
           assert(result.errors.isEmpty)
@@ -50,9 +51,11 @@ class NationalityFormProviderSpec extends StringFieldBehaviours with Constraints
 
       "true is submitted" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> "true"
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> "true"
+          )
+        )
 
         result.value shouldBe Some(British)
         assert(result.errors.isEmpty)
@@ -64,46 +67,53 @@ class NationalityFormProviderSpec extends StringFieldBehaviours with Constraints
       s"$booleanFieldName is an invalid value" in {
 
         forAll(Gen.alphaNumStr.suchThat(_.nonEmpty)) { name =>
+          val result = form.bind(
+            Map(
+              booleanFieldName -> name
+            )
+          )
 
-          val result = form.bind(Map(
-            booleanFieldName -> name
-          ))
-
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(booleanFieldName, "error.required.nationality"))
         }
       }
 
       s"$booleanFieldName is empty" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(booleanFieldName, "error.required.nationality"))
       }
 
       s"$stringFieldName is empty when $booleanFieldName is false" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> "false",
-          stringFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> "false",
+            stringFieldName  -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(stringFieldName, "error.required.rp.nationality.country"))
       }
 
       s"$stringFieldName is not a valid country when $booleanFieldName is false" in {
 
-        forAll(stringsLongerThan(3).suchThat(_.nonEmpty)) {code =>
-          val result = form.bind(Map(
-            booleanFieldName -> "false",
-            stringFieldName -> code
-          ))
+        forAll(stringsLongerThan(3).suchThat(_.nonEmpty)) { code =>
+          val result = form.bind(
+            Map(
+              booleanFieldName -> "false",
+              stringFieldName  -> code
+            )
+          )
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(stringFieldName, "error.invalid.rp.nationality.country"))
         }
       }

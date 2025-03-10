@@ -24,15 +24,18 @@ class CorrespondenceAddressUKFormProvider extends CorrespondenceAddressFormProvi
 
   override val countryErrorKey: String = ""
 
-  override def toObject: (String, String, String, Option[String], Option[String], Option[String], String) => CorrespondenceAddressUk = {
+  override def toObject
+    : (String, String, String, Option[String], Option[String], Option[String], String) => CorrespondenceAddressUk = {
     case (yourName, businessName, line1, line2, line3, line4, postcode) =>
       CorrespondenceAddressUk(yourName, businessName, line1, line2, line3, line4, postcode)
   }
 
-  override def fromObject: CorrespondenceAddressUk => Option[(String, String, String, Option[String], Option[String], Option[String], String)] = {
+  override def fromObject: CorrespondenceAddressUk => Option[
+    (String, String, String, Option[String], Option[String], Option[String], String)
+  ] = {
     case CorrespondenceAddressUk(name, business, addressLine1, addressLine2, addressLine3, addressLine4, postcode) =>
       Some((name, business, addressLine1, addressLine2, addressLine3, addressLine4, postcode))
-    case _ => None
+    case _                                                                                                         => None
   }
 
   def apply(): Form[CorrespondenceAddressUk] = createForm(true)

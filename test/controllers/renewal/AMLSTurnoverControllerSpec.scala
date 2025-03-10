@@ -43,8 +43,8 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     val request = addToken(authRequest)
 
     lazy val mockRenewalService = mock[RenewalService]
-    lazy val view = inject[AMLSTurnoverView]
-    val controller = new AMLSTurnoverController(
+    lazy val view               = inject[AMLSTurnoverView]
+    val controller              = new AMLSTurnoverController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       renewalService = mockRenewalService,
@@ -76,7 +76,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       "display AMLS Turnover page" in new Fixture {
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("renewal.turnover.title"))
       }
 
@@ -92,7 +92,6 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       }
 
       Activities.all foreach { activity =>
-
         s"display the business type is $activity" in new Fixture {
 
           val bMatching = BusinessMatching(
@@ -102,7 +101,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           when(mockRenewalService.getBusinessMatching(any())).thenReturn(Future.successful(Some(bMatching)))
 
           val result = controller.get()(request)
-          status(result) must be(OK)
+          status(result)          must be(OK)
           contentAsString(result) must include(
             messages("renewal.turnover.title", bMatching.alphabeticalBusinessActivitiesLowerCase().head.mkString)
           )
@@ -133,7 +132,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             when(mockRenewalService.getBusinessMatching(any())).thenReturn(Future.successful(Some(bMatching)))
 
             val result = controller.post(true)(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
           }
 
@@ -153,7 +152,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
           }
         }
@@ -175,7 +174,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url))
           }
         }
@@ -198,7 +197,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.renewal.routes.TotalThroughputController.get().url))
           }
 
@@ -226,7 +225,8 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             when(controller.renewalService.getFirstBusinessActivityInLowercase(any())(any(), any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.renewalService.getBusinessMatching(any())).thenReturn(Future.successful(Some(businessMatching)))
+            when(controller.renewalService.getBusinessMatching(any()))
+              .thenReturn(Future.successful(Some(businessMatching)))
 
             val newRequest = FakeRequest(POST, routes.AMLSTurnoverController.post().url).withFormUrlEncodedBody(
               "turnover" -> ""
@@ -250,7 +250,8 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             when(controller.renewalService.getFirstBusinessActivityInLowercase(any())(any(), any()))
               .thenReturn(Future.successful(Some(expected)))
 
-            when(controller.renewalService.getBusinessMatching(any())).thenReturn(Future.successful(Some(businessMatching)))
+            when(controller.renewalService.getBusinessMatching(any()))
+              .thenReturn(Future.successful(Some(businessMatching)))
 
             val newRequest = FakeRequest(POST, routes.AMLSTurnoverController.post().url).withFormUrlEncodedBody(
               "turnover" -> ""
@@ -275,7 +276,8 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             when(controller.renewalService.getFirstBusinessActivityInLowercase(any())(any(), any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.renewalService.getBusinessMatching(any())).thenReturn(Future.successful(Some(businessMatching)))
+            when(controller.renewalService.getBusinessMatching(any()))
+              .thenReturn(Future.successful(Some(businessMatching)))
 
             val newRequest = FakeRequest(POST, routes.AMLSTurnoverController.post().url).withFormUrlEncodedBody(
               "turnover" -> ""

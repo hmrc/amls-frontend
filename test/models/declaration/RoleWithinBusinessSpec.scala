@@ -20,7 +20,6 @@ import models.CharacterSets
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 import utils.AmlsSpec
 
-
 class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
 
   "JSON" must {
@@ -32,14 +31,12 @@ class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
       RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(BeneficialShareholder, JsPath))
     }
 
-
     "Read the json and return the RoleWithinBusiness domain object successfully for the Director" in {
       val json = Json.obj(
         "roleWithinBusiness" -> "02"
       )
       RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(Director, JsPath))
     }
-
 
     "Read the json and return the RoleWithinBusiness domain object successfully for the ExternalAccountant" in {
       val json = Json.obj(
@@ -69,7 +66,6 @@ class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
       RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(Partner, JsPath))
     }
 
-
     "Read the json and return the RoleWithinBusiness domain object successfully for the SoleProprietor" in {
       val json = Json.obj(
         "roleWithinBusiness" -> "07"
@@ -77,11 +73,10 @@ class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
       RoleWithinBusiness.jsonReads.reads(json) must be(JsSuccess(SoleProprietor, JsPath))
     }
 
-
     "Read the json and return the given `other` value" in {
 
       val json = Json.obj(
-        "roleWithinBusiness" -> "08",
+        "roleWithinBusiness"      -> "08",
         "roleWithinBusinessOther" -> "any other value"
       )
 
@@ -93,25 +88,24 @@ class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
       val json = Json.obj(
         "roleWithinBusiness" -> "10"
       )
-      RoleWithinBusiness.jsonReads.reads(json) must be(JsError((JsPath) -> play.api.libs.json.JsonValidationError("error.invalid")))
+      RoleWithinBusiness.jsonReads.reads(json) must be(
+        JsError(JsPath -> play.api.libs.json.JsonValidationError("error.invalid"))
+      )
     }
-
-
 
     "Write the json successfully from the BeneficialShareholder domain object created" in {
 
       val roleWithinBusiness: RoleWithinBusiness = BeneficialShareholder
-      val json = Json.obj(
+      val json                                   = Json.obj(
         "roleWithinBusiness" -> "01"
       )
       RoleWithinBusiness.jsonWrites.writes(roleWithinBusiness) must be(json)
     }
 
-
     "Write the json successfully from the Director domain object created" in {
 
       val roleWithinBusiness: RoleWithinBusiness = Director
-      val json = Json.obj(
+      val json                                   = Json.obj(
         "roleWithinBusiness" -> "02"
       )
       RoleWithinBusiness.jsonWrites.writes(roleWithinBusiness) must be(json)
@@ -120,7 +114,7 @@ class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
     "Write the json successfully from the ExternalAccountant domain object created" in {
 
       val roleWithinBusiness: RoleWithinBusiness = ExternalAccountant
-      val json = Json.obj(
+      val json                                   = Json.obj(
         "roleWithinBusiness" -> "03"
       )
       RoleWithinBusiness.jsonWrites.writes(roleWithinBusiness) must be(json)
@@ -129,7 +123,7 @@ class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
     "Write the json successfully from the InternalAccountant domain object created" in {
 
       val roleWithinBusiness: RoleWithinBusiness = InternalAccountant
-      val json = Json.obj(
+      val json                                   = Json.obj(
         "roleWithinBusiness" -> "04"
       )
       RoleWithinBusiness.jsonWrites.writes(roleWithinBusiness) must be(json)
@@ -138,7 +132,7 @@ class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
     "Write the json successfully from the NominatedOfficer domain object created" in {
 
       val roleWithinBusiness: RoleWithinBusiness = NominatedOfficer
-      val json = Json.obj(
+      val json                                   = Json.obj(
         "roleWithinBusiness" -> "05"
       )
       RoleWithinBusiness.jsonWrites.writes(roleWithinBusiness) must be(json)
@@ -147,7 +141,7 @@ class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
     "Write the json successfully from the Partner domain object created" in {
 
       val roleWithinBusiness: RoleWithinBusiness = Partner
-      val json = Json.obj(
+      val json                                   = Json.obj(
         "roleWithinBusiness" -> "06"
       )
       RoleWithinBusiness.jsonWrites.writes(roleWithinBusiness) must be(json)
@@ -156,7 +150,7 @@ class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
     "Write the json successfully from the SoleProprietor domain object created" in {
 
       val roleWithinBusiness: RoleWithinBusiness = SoleProprietor
-      val json = Json.obj(
+      val json                                   = Json.obj(
         "roleWithinBusiness" -> "07"
       )
       RoleWithinBusiness.jsonWrites.writes(roleWithinBusiness) must be(json)
@@ -165,18 +159,13 @@ class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
     "Write the json successfully from the Other domain object created" in {
 
       val roleWithinBusiness: RoleWithinBusiness = Other("any other value")
-      val json = Json.obj(
-        "roleWithinBusiness" -> "08",
+      val json                                   = Json.obj(
+        "roleWithinBusiness"      -> "08",
         "roleWithinBusinessOther" -> "any other value"
-
       )
       RoleWithinBusiness.jsonWrites.writes(roleWithinBusiness) must be(json)
     }
 
-
   }
 
-
 }
-
-

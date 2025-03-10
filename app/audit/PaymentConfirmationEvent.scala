@@ -24,7 +24,7 @@ import utils.AuditHelper
 
 object PaymentConfirmationEvent {
   def apply(amlsRef: String, payRef: String, paymentStatus: PaymentStatus)(implicit
-                                                                           hc: HeaderCarrier
+    hc: HeaderCarrier
   ): DataEvent =
     DataEvent(
       auditSource = AuditHelper.appName,
@@ -32,16 +32,16 @@ object PaymentConfirmationEvent {
       tags = hc.toAuditTags("Payment Confirmation", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
         "amlsReferenceNumber" -> amlsRef,
-        "paymentReference" -> payRef,
-        "paymentStatus" -> msgFromPaymentStatus(paymentStatus)
+        "paymentReference"    -> payRef,
+        "paymentStatus"       -> msgFromPaymentStatus(paymentStatus)
       )
     )
 
   val msgFromPaymentStatus = Map[PaymentStatus, String](
-    PaymentStatuses.Failed -> "failed",
-    PaymentStatuses.Cancelled -> "cancelled",
+    PaymentStatuses.Failed     -> "failed",
+    PaymentStatuses.Cancelled  -> "cancelled",
     PaymentStatuses.Successful -> "successful",
-    PaymentStatuses.Sent -> "sent",
-    PaymentStatuses.Created -> "created"
+    PaymentStatuses.Sent       -> "sent",
+    PaymentStatuses.Created    -> "created"
   )
 }

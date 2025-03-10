@@ -28,12 +28,12 @@ import java.time.LocalDate
 class ApplicationSubmitViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val applicationSubmit = inject[ApplicationSubmitView]
+    lazy val applicationSubmit                                     = inject[ApplicationSubmitView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val renewalDate = LocalDate.now().plusDays(15)
 
-    val readyForRenewal = ReadyForRenewal(Some(renewalDate))
+    val readyForRenewal  = ReadyForRenewal(Some(renewalDate))
     val renewalSubmitted = RenewalSubmitted(Some(renewalDate))
   }
 

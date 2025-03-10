@@ -27,10 +27,13 @@ class SubscriptionErrorResponseSpec extends PlaySpec with Matchers with AmlsRefe
     "produce the correct model" in {
       val json = Json.obj(
         "amlsRegNumber" -> amlsRegistrationNumber,
-        "message" -> "There was an error during subscription"
+        "message"       -> "There was an error during subscription"
       )
 
-      json.as[SubscriptionErrorResponse] mustBe SubscriptionErrorResponse(amlsRegistrationNumber, "There was an error during subscription")
+      json.as[SubscriptionErrorResponse] mustBe SubscriptionErrorResponse(
+        amlsRegistrationNumber,
+        "There was an error during subscription"
+      )
     }
   }
 
@@ -40,7 +43,7 @@ class SubscriptionErrorResponseSpec extends PlaySpec with Matchers with AmlsRefe
 
       Json.toJson(model) mustBe Json.obj(
         "amlsRegNumber" -> amlsRegistrationNumber,
-        "message" -> "An error"
+        "message"       -> "An error"
       )
     }
   }

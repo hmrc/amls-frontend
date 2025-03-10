@@ -22,7 +22,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class BusinessStructureFormProvider @Inject()() extends Mappings {
+class BusinessStructureFormProvider @Inject() () extends Mappings {
 
   def apply(): Form[BusinessStructure] = Form[BusinessStructure](
     "agentsBusinessStructure" -> enumerable[BusinessStructure]("error.required.tp.select.business.structure")

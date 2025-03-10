@@ -26,33 +26,31 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
 
   "CashPayment" should {
 
-    val cashPaymentYes = CashPayment(
-      CashPaymentOverTenThousandEuros(true),
-      Some(CashPaymentFirstDate(LocalDate.of(1990, 2, 24))))
-    val cashPaymentYesJson = Json.obj("acceptedAnyPayment" -> true, "paymentDate" ->"1990-02-24")
+    val cashPaymentYes     =
+      CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(1990, 2, 24))))
+    val cashPaymentYesJson = Json.obj("acceptedAnyPayment" -> true, "paymentDate" -> "1990-02-24")
 
-    val cashPaymentNo = CashPayment(
-      CashPaymentOverTenThousandEuros(false),
-      None)
+    val cashPaymentNo     = CashPayment(CashPaymentOverTenThousandEuros(false), None)
     val cashPaymentNoJson = Json.obj("acceptedAnyPayment" -> false)
 
     "have isCashPaymentsComplete function which" must {
       "return true if CashPayments is complete" in {
-        val completeCashPayment = CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(1999, 1, 1))))
+        val completeCashPayment =
+          CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(1999, 1, 1))))
 
-        completeCashPayment.isCashPaymentsComplete mustBe(true)
+        completeCashPayment.isCashPaymentsComplete mustBe true
       }
 
       "return true if CashPaymentOverTenThousandEuros is false" in {
         val completeCashPayment = CashPayment(CashPaymentOverTenThousandEuros(false), None)
 
-        completeCashPayment.isCashPaymentsComplete mustBe(true)
+        completeCashPayment.isCashPaymentsComplete mustBe true
       }
 
       "return true if CashPaymentOverTenThousandEuros is true and no date" in {
         val inCompleteCashPayment = CashPayment(CashPaymentOverTenThousandEuros(true), None)
 
-        inCompleteCashPayment.isCashPaymentsComplete mustBe(false)
+        inCompleteCashPayment.isCashPaymentsComplete mustBe false
       }
     }
 
@@ -60,29 +58,39 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
 
       "return CashPayment with acceptedPayment:false and paymentDate:None when passed acceptedPayment:false" in {
 
-        CashPayment.update(cashPaymentYes, CashPaymentOverTenThousandEuros(false))
+        CashPayment
+          .update(cashPaymentYes, CashPaymentOverTenThousandEuros(false))
           .mustBe(CashPayment(CashPaymentOverTenThousandEuros(false), None))
 
-        CashPayment.update(cashPaymentNo, CashPaymentOverTenThousandEuros(false))
+        CashPayment
+          .update(cashPaymentNo, CashPaymentOverTenThousandEuros(false))
           .mustBe(CashPayment(CashPaymentOverTenThousandEuros(false), None))
       }
 
       "return CashPayment with acceptedPayment:true and paymentDate:None when passed acceptedPayment:true" in {
-        CashPayment.update(cashPaymentNo, CashPaymentOverTenThousandEuros(true))
+        CashPayment
+          .update(cashPaymentNo, CashPaymentOverTenThousandEuros(true))
           .mustBe(CashPayment(CashPaymentOverTenThousandEuros(true), None))
       }
 
       "return unchanged CashPayment when acceptedPayment:true and passed acceptedPayment:true" in {
-        CashPayment.update(cashPaymentYes, CashPaymentOverTenThousandEuros(true))
+        CashPayment
+          .update(cashPaymentYes, CashPaymentOverTenThousandEuros(true))
           .mustBe(cashPaymentYes)
       }
 
       "return CashPayment with acceptedPayment:true and paymentDate:Some when passed paymentDate" in {
-        CashPayment.update(cashPaymentYes, CashPaymentFirstDate(LocalDate.of(1980, 2, 24)))
-          .mustBe(CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(1980, 2, 24)))))
+        CashPayment
+          .update(cashPaymentYes, CashPaymentFirstDate(LocalDate.of(1980, 2, 24)))
+          .mustBe(
+            CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(1980, 2, 24))))
+          )
 
-        CashPayment.update(cashPaymentNo, CashPaymentFirstDate(LocalDate.of(1980, 2, 24)))
-          .mustBe(CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(1980, 2, 24)))))
+        CashPayment
+          .update(cashPaymentNo, CashPaymentFirstDate(LocalDate.of(1980, 2, 24)))
+          .mustBe(
+            CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(1980, 2, 24))))
+          )
       }
     }
 
@@ -101,8 +109,7 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
       }
 
       "Successfully read and write Json data" in {
-        CashPayment.jsonReads.reads(CashPayment.jsonWrites.writes(cashPaymentYes)) must be(
-          JsSuccess(cashPaymentYes))
+        CashPayment.jsonReads.reads(CashPayment.jsonWrites.writes(cashPaymentYes)) must be(JsSuccess(cashPaymentYes))
       }
 
       "write the correct value" in {
@@ -111,10 +118,12 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
           be(Json.obj("acceptedAnyPayment" -> false))
 
         Json.toJson(cashPaymentYes) must
-          be(Json.obj(
-            "acceptedAnyPayment" -> true,
-            "paymentDate" -> LocalDate.of(1990, 2, 24)
-          ))
+          be(
+            Json.obj(
+              "acceptedAnyPayment" -> true,
+              "paymentDate"        -> LocalDate.of(1990, 2, 24)
+            )
+          )
       }
     }
   }

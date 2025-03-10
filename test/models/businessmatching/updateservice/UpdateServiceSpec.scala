@@ -20,19 +20,21 @@ import models.businessmatching.BusinessActivity.HighValueDealing
 import play.api.libs.json.{JsSuccess, Json}
 import utils.AmlsSpec
 
-class UpdateServiceSpec extends AmlsSpec{
+class UpdateServiceSpec extends AmlsSpec {
 
   val json = Json.obj(
-    "areNewActivitiesAtTradingPremises" -> Json.toJson(NewActivitiesAtTradingPremisesNo.asInstanceOf[AreNewActivitiesAtTradingPremises]),
-    "tradingPremisesNewActivities" -> Json.toJson(TradingPremisesActivities(Set(4,5))),
+    "areNewActivitiesAtTradingPremises"  -> Json.toJson(
+      NewActivitiesAtTradingPremisesNo.asInstanceOf[AreNewActivitiesAtTradingPremises]
+    ),
+    "tradingPremisesNewActivities"       -> Json.toJson(TradingPremisesActivities(Set(4, 5))),
     "tradingPremisesSubmittedActivities" -> Json.toJson(TradingPremisesActivities(Set(2)))
   )
 
   val model = UpdateService(
     Some(NewActivitiesAtTradingPremisesNo),
     Some(TradingPremisesActivities(Set(4, 5))),
-    Some(TradingPremisesActivities(Set(2))
-    ))
+    Some(TradingPremisesActivities(Set(2)))
+  )
 
   "the json reader" must {
     "convert from json to model" in {
@@ -52,7 +54,7 @@ class UpdateServiceSpec extends AmlsSpec{
       "all properties are defined" in {
         UpdateService(
           Some(NewActivitiesAtTradingPremisesNo),
-          Some(TradingPremisesActivities(Set(4,5))),
+          Some(TradingPremisesActivities(Set(4, 5))),
           Some(TradingPremisesActivities(Set(2)))
         ).isComplete must be(true)
       }
@@ -71,7 +73,7 @@ class UpdateServiceSpec extends AmlsSpec{
       "areNewActivitiesAtTradingPremises is not defined" in {
         UpdateService(
           None,
-          Some(TradingPremisesActivities(Set(4,5))),
+          Some(TradingPremisesActivities(Set(4, 5))),
           Some(TradingPremisesActivities(Set(2)))
         ).isComplete must be(false)
       }
@@ -88,7 +90,7 @@ class UpdateServiceSpec extends AmlsSpec{
         "areSubmittedActivitiesAtTradingPremises is not defined" in {
           UpdateService(
             Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)),
-            Some(TradingPremisesActivities(Set(4,5))),
+            Some(TradingPremisesActivities(Set(4, 5))),
             None
           ).isComplete must be(false)
         }
@@ -96,7 +98,7 @@ class UpdateServiceSpec extends AmlsSpec{
       "tradingPremisesSubmittedActivities is not defined" in {
         UpdateService(
           Some(NewActivitiesAtTradingPremisesNo),
-          Some(TradingPremisesActivities(Set(4,5))),
+          Some(TradingPremisesActivities(Set(4, 5))),
           None
         ).isComplete must be(false)
       }

@@ -37,19 +37,18 @@ import views.html.businessmatching.updateservice.ChangeServicesView
 
 import scala.concurrent.Future
 
-
 class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   sealed trait Fixture extends DependencyMocks {
     self =>
 
-    val request = addToken(authRequest)
+    val request   = addToken(authRequest)
     val bmService = mock[BusinessMatchingService]
 
-
-    lazy val view = inject[ChangeServicesView]
+    lazy val view  = inject[ChangeServicesView]
     val controller = new ChangeBusinessTypesController(
-      SuccessfulAuthAction, ds = commonDependencies,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
       mockCacheConnector,
       bmService,
       createRouter[ChangeBusinessType],
@@ -60,9 +59,11 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with I
       view = view
     )
 
-    val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-    val businessMatching = BusinessMatching(activities = Some(businessActivitiesModel))
-    val emptyBusinessMatching = BusinessMatching()
+    val businessActivitiesModel = BusinessActivities(
+      Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)
+    )
+    val businessMatching        = BusinessMatching(activities = Some(businessActivitiesModel))
+    val emptyBusinessMatching   = BusinessMatching()
 
     when {
       bmService.getRemainingBusinessActivities(any())(any())
@@ -84,8 +85,10 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with I
 
         val result = controller.get()(request)
 
-        status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.changeservices.title"))
+        status(result)                               must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(
+          Messages("businessmatching.updateservice.changeservices.title")
+        )
       }
 
       "return OK with change_services view - no activities" in new Fixture {
@@ -104,7 +107,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with I
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.title() must include(Messages("businessmatching.updateservice.changeservices.title"))
+        doc.title()                                      must include(Messages("businessmatching.updateservice.changeservices.title"))
         Option(doc.getElementById("changeServices-add")) must not be defined
       }
     }
@@ -113,8 +116,10 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with I
       "verify the router is called correctly" when {
         "request is add" in new Fixture {
 
-          val result = controller.post()(FakeRequest(POST, routes.ChangeBusinessTypesController.post().url)
-          .withFormUrlEncodedBody("changeServices" -> "add"))
+          val result = controller.post()(
+            FakeRequest(POST, routes.ChangeBusinessTypesController.post().url)
+              .withFormUrlEncodedBody("changeServices" -> "add")
+          )
 
           status(result) must be(SEE_OTHER)
           controller.router.verify("internalId", ChangeBusinessTypesPageId, Add)
@@ -124,8 +129,10 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with I
       "verify the router is called correctly" when {
         "request is remove" in new Fixture {
 
-          val result = controller.post()(FakeRequest(POST, routes.ChangeBusinessTypesController.post().url)
-          .withFormUrlEncodedBody("changeServices" -> "remove"))
+          val result = controller.post()(
+            FakeRequest(POST, routes.ChangeBusinessTypesController.post().url)
+              .withFormUrlEncodedBody("changeServices" -> "remove")
+          )
 
           status(result) must be(SEE_OTHER)
           controller.router.verify("internalId", ChangeBusinessTypesPageId, Remove)

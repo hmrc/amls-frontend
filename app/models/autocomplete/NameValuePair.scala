@@ -23,11 +23,10 @@ case class NameValuePair(name: String, value: String)
 
 object NameValuePair {
 
-  implicit val jsonReads: Reads[NameValuePair] = {
-    __.read[Seq[String]] map {
-      case Seq(key, value) => NameValuePair(key, value)
+  implicit val jsonReads: Reads[NameValuePair] =
+    __.read[Seq[String]] map { case Seq(key, value) =>
+      NameValuePair(key, value)
     }
-  }
 
   implicit val jsonWrites: Writes[NameValuePair] = Writes[NameValuePair] { model =>
     JsArray(Seq(JsString(model.name), JsString(model.value)))

@@ -26,12 +26,12 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.deregister.DeregistrationReasonView
 
-class DeregistrationReasonViewSpec extends AmlsViewSpec with Matchers  {
+class DeregistrationReasonViewSpec extends AmlsViewSpec with Matchers {
 
   trait TestFixture extends Fixture
 
-  lazy val deregistration_reason = inject[DeregistrationReasonView]
-  lazy val fp = inject[DeregistrationReasonFormProvider]
+  lazy val deregistration_reason                                 = inject[DeregistrationReasonView]
+  lazy val fp                                                    = inject[DeregistrationReasonFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   "DeregistrationReasonView" must {
@@ -39,17 +39,19 @@ class DeregistrationReasonViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = deregistration_reason(fp())
 
-      doc.title must be(Messages("deregistration.reason.heading") +
-        " - " + Messages("title.yapp") +
-        " - " + Messages("title.amls") +
-        " - " + Messages("title.gov"))
+      doc.title must be(
+        Messages("deregistration.reason.heading") +
+          " - " + Messages("title.yapp") +
+          " - " + Messages("title.amls") +
+          " - " + Messages("title.gov")
+      )
     }
 
     "have correct headings" in new TestFixture {
 
       def view = deregistration_reason(fp())
 
-      heading.html must be(Messages("deregistration.reason.heading"))
+      heading.html    must be(Messages("deregistration.reason.heading"))
       subHeading.html must include(Messages("summary.status"))
 
     }
@@ -75,7 +77,7 @@ class DeregistrationReasonViewSpec extends AmlsViewSpec with Matchers  {
         }
 
         doc.getElementsByAttributeValue("for", HVDPolicyOfNotAcceptingHighValueCashPayments.toString) must be(empty)
-        doc.getElementsByAttributeValue("name", "specifyOtherReason") must not be empty
+        doc.getElementsByAttributeValue("name", "specifyOtherReason")                                 must not be empty
       }
 
     }
@@ -88,12 +90,14 @@ class DeregistrationReasonViewSpec extends AmlsViewSpec with Matchers  {
 
     behave like pageWithErrors(
       deregistration_reason(fp().withError("deregistrationReason", "error.required.deregistration.reason")),
-      "deregistrationReason", "error.required.deregistration.reason"
+      "deregistrationReason",
+      "error.required.deregistration.reason"
     )
 
     behave like pageWithErrors(
       deregistration_reason(fp().withError("specifyOtherReason", "error.required.deregistration.reason.format")),
-      "specifyOtherReason", "error.required.deregistration.reason.format"
+      "specifyOtherReason",
+      "error.required.deregistration.reason.format"
     )
 
     behave like pageWithBackLink(deregistration_reason(fp()))

@@ -81,25 +81,23 @@ object PositionWithinBusiness extends Enumerable.Implicits {
     Other("")
   )
 
-  def formValues(html: Html,
-                 businessType: BusinessType,
-                 displayNominatedOfficer: Boolean,
-                 isDeclaration: Boolean
-  )(implicit messages: Messages): Seq[CheckboxItem] = {
+  def formValues(html: Html, businessType: BusinessType, displayNominatedOfficer: Boolean, isDeclaration: Boolean)(
+    implicit messages: Messages
+  ): Seq[CheckboxItem] = {
 
     val optionsList = buildOptionsList(businessType, isDeclaration, displayNominatedOfficer)
 
     optionsList.zipWithIndex.map { case (position, index) =>
       val conditional = if (position.toString == Other("").toString) Some(html) else None
 
-      if(businessType == LimitedCompany && isDeclaration && index == 0) {
+      if (businessType == LimitedCompany && isDeclaration && index == 0) {
         CheckboxItem(
           content = Text(messages("declaration.addperson.lbl.01")),
           value = BeneficialOwner.toString,
           id = Some(s"positions_${BeneficialOwner.index}"),
           name = Some(s"positions[${BeneficialOwner.index}]")
         )
-      } else if(position == Other("")) {
+      } else if (position == Other("")) {
         CheckboxItem(
           content = Text(messages("responsiblepeople.position_within_business.lbl.09")),
           value = position.toString,
@@ -119,7 +117,11 @@ object PositionWithinBusiness extends Enumerable.Implicits {
     }
   }
 
-  def buildOptionsList(businessType: BusinessType, isDeclaration: Boolean, displayNominatedOfficer: Boolean): Seq[PositionWithinBusiness] = {
+  def buildOptionsList(
+    businessType: BusinessType,
+    isDeclaration: Boolean,
+    displayNominatedOfficer: Boolean
+  ): Seq[PositionWithinBusiness] = {
 
     val optionalCheckboxes = Seq(
       if (isDeclaration) Some(ExternalAccountant) else None,
@@ -127,56 +129,56 @@ object PositionWithinBusiness extends Enumerable.Implicits {
     ).flatten
 
     (businessType match {
-      case BTSoleProprietor => optionalCheckboxes :+ SoleProprietor
-      case Partnership => optionalCheckboxes :+ Partner
+      case BTSoleProprietor                         => optionalCheckboxes :+ SoleProprietor
+      case Partnership                              => optionalCheckboxes :+ Partner
       case LimitedCompany if businessType == LPrLLP =>
         Seq(BeneficialOwner, DesignatedMember, Director) ++ optionalCheckboxes
-      case LimitedCompany =>
+      case LimitedCompany                           =>
         Seq(BeneficialOwner, Director) ++ optionalCheckboxes
-      case LPrLLP => DesignatedMember +: optionalCheckboxes
-      case UnincorporatedBody => optionalCheckboxes
+      case LPrLLP                                   => DesignatedMember +: optionalCheckboxes
+      case UnincorporatedBody                       => optionalCheckboxes
     }) :+ Other("")
   }
 
   implicit val enumerable: Enumerable[PositionWithinBusiness] = Enumerable(all.map(v => v.toString -> v): _*)
 
-  def getPrettyName(position:PositionWithinBusiness)(implicit message: Messages): String = {
+  def getPrettyName(position: PositionWithinBusiness)(implicit message: Messages): String = {
     import play.api.i18n.Messages
 
     position match {
-      case BeneficialOwner => Messages("declaration.addperson.lbl.01")
-      case Director => Messages("responsiblepeople.position_within_business.lbl.02")
+      case BeneficialOwner    => Messages("declaration.addperson.lbl.01")
+      case Director           => Messages("responsiblepeople.position_within_business.lbl.02")
       case InternalAccountant => Messages("responsiblepeople.position_within_business.lbl.03")
-      case NominatedOfficer => Messages("responsiblepeople.position_within_business.lbl.04")
-      case Partner => Messages("responsiblepeople.position_within_business.lbl.05")
-      case SoleProprietor => Messages("responsiblepeople.position_within_business.lbl.06")
-      case DesignatedMember => Messages("responsiblepeople.position_within_business.lbl.07")
-      case Other(other) => other
-      case _ => ""
+      case NominatedOfficer   => Messages("responsiblepeople.position_within_business.lbl.04")
+      case Partner            => Messages("responsiblepeople.position_within_business.lbl.05")
+      case SoleProprietor     => Messages("responsiblepeople.position_within_business.lbl.06")
+      case DesignatedMember   => Messages("responsiblepeople.position_within_business.lbl.07")
+      case Other(other)       => other
+      case _                  => ""
     }
   }
 
   private[responsiblepeople] implicit val jsonWrites: Writes[PositionWithinBusiness] = Writes[PositionWithinBusiness] {
-    case BeneficialOwner => JsString("01")
-    case Director => JsString("02")
+    case BeneficialOwner    => JsString("01")
+    case Director           => JsString("02")
     case InternalAccountant => JsString("03")
-    case NominatedOfficer => JsString("04")
-    case Partner => JsString("05")
-    case SoleProprietor => JsString("06")
-    case DesignatedMember => JsString("07")
-    case Other(value) => Json.obj("other" -> value)
+    case NominatedOfficer   => JsString("04")
+    case Partner            => JsString("05")
+    case SoleProprietor     => JsString("06")
+    case DesignatedMember   => JsString("07")
+    case Other(value)       => Json.obj("other" -> value)
   }
 
   private[responsiblepeople] implicit val jsonReads: Reads[PositionWithinBusiness] =
     Reads {
-      case JsString("01") => JsSuccess(BeneficialOwner)
-      case JsString("02") => JsSuccess(Director)
-      case JsString("03") => JsSuccess(InternalAccountant)
-      case JsString("04") => JsSuccess(NominatedOfficer)
-      case JsString("05") => JsSuccess(Partner)
-      case JsString("06") => JsSuccess(SoleProprietor)
-      case JsString("07") => JsSuccess(DesignatedMember)
+      case JsString("01")                     => JsSuccess(BeneficialOwner)
+      case JsString("02")                     => JsSuccess(Director)
+      case JsString("03")                     => JsSuccess(InternalAccountant)
+      case JsString("04")                     => JsSuccess(NominatedOfficer)
+      case JsString("05")                     => JsSuccess(Partner)
+      case JsString("06")                     => JsSuccess(SoleProprietor)
+      case JsString("07")                     => JsSuccess(DesignatedMember)
       case JsObject(m) if m.contains("other") => JsSuccess(Other(m("other").as[String]))
-      case _ => JsError((JsPath \ "positions") -> play.api.libs.json.JsonValidationError("error.invalid"))
+      case _                                  => JsError((JsPath \ "positions") -> play.api.libs.json.JsonValidationError("error.invalid"))
     }
 }

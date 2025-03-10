@@ -27,15 +27,16 @@ object NonUKPassport {
 
   implicit val jsonReads: Reads[NonUKPassport] =
     (__ \ "nonUKPassport").read[Boolean] flatMap {
-      case true => (__ \ "nonUKPassportNumber").read[String] map (NonUKPassportYes apply _)
+      case true  => (__ \ "nonUKPassportNumber").read[String] map (NonUKPassportYes apply _)
       case false => Reads(_ => JsSuccess(NoPassport))
     }
 
   implicit val jsonWrites: Writes[NonUKPassport] = Writes[NonUKPassport] {
-    case NonUKPassportYes(value) => Json.obj(
-      "nonUKPassport" -> true,
-      "nonUKPassportNumber" -> value
-    )
-    case NoPassport => Json.obj("nonUKPassport" -> false)
+    case NonUKPassportYes(value) =>
+      Json.obj(
+        "nonUKPassport"       -> true,
+        "nonUKPassportNumber" -> value
+      )
+    case NoPassport              => Json.obj("nonUKPassport" -> false)
   }
 }

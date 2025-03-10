@@ -18,6 +18,6 @@ package models.responsiblepeople
 
 import models.Country
 
-case class CountryOfBirth (bornInUk: Boolean, country: Option[Country])
+case class CountryOfBirth(bornInUk: Boolean, country: Option[Country])
 
 object CountryOfBirth

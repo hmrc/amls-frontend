@@ -28,7 +28,7 @@ import views.html.businessactivities.DocumentRiskAssessmentPolicyView
 class DocumentRiskAssessmentPolicyViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val risk = inject[DocumentRiskAssessmentPolicyView]
-  lazy val fp = inject[DocumentRiskAssessmentPolicyFormProvider]
+  lazy val fp   = inject[DocumentRiskAssessmentPolicyFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   trait ViewFixture extends Fixture {
@@ -47,7 +47,7 @@ class DocumentRiskAssessmentPolicyViewSpec extends AmlsViewSpec with Matchers {
 
       def view = risk(fp().fill(RiskAssessmentTypes(Set(PaperBased))), true)
 
-      heading.html must be(messages("businessactivities.document.riskassessment.policy.title"))
+      heading.html    must be(messages("businessactivities.document.riskassessment.policy.title"))
       subHeading.html must include(messages("summary.businessactivities"))
 
     }

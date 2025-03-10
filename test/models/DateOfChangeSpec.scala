@@ -29,12 +29,12 @@ class DateOfChangeSpec extends PlaySpec {
       val json = JsString("2016-02-24")
 
       val result = Json.fromJson[DateOfChange](json)
-      result.get.dateOfChange must be(LocalDate.of(2016,2,24))
+      result.get.dateOfChange must be(LocalDate.of(2016, 2, 24))
     }
 
     "write to JSON correctly" in {
 
-      val date = DateOfChange(LocalDate.of(2016,2,24))
+      val date = DateOfChange(LocalDate.of(2016, 2, 24))
       val json = JsString("2016-02-24")
 
       val result = Json.toJson(date)

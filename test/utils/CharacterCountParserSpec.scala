@@ -26,18 +26,22 @@ class CharacterCountParserSpec extends PlaySpec {
   "CharacterCountParser" must {
 
     "remove all instances of the \\r special character when it is encountered as part of a new line" in {
-      val requestBody: AnyContent = FakeRequest(POST, "/test").withFormUrlEncodedBody(
-        "fieldName" -> "Paragraph one\r\nParagraph two\r\nParagraph three"
-      ).body
+      val requestBody: AnyContent = FakeRequest(POST, "/test")
+        .withFormUrlEncodedBody(
+          "fieldName" -> "Paragraph one\r\nParagraph two\r\nParagraph three"
+        )
+        .body
 
       CharacterCountParser.cleanData(requestBody, "fieldName") mustBe
         Map("fieldName" -> List("Paragraph one\nParagraph two\nParagraph three"))
     }
 
     "make no modifications to the request body when the specified field name is not found" in {
-      val requestBody: AnyContent = FakeRequest(POST, "/test").withFormUrlEncodedBody(
-        "fieldName" -> "Paragraph one\r\nParagraph two\r\nParagraph three"
-      ).body
+      val requestBody: AnyContent = FakeRequest(POST, "/test")
+        .withFormUrlEncodedBody(
+          "fieldName" -> "Paragraph one\r\nParagraph two\r\nParagraph three"
+        )
+        .body
 
       CharacterCountParser.cleanData(requestBody, "wrongName") mustBe
         Map("fieldName" -> List("Paragraph one\r\nParagraph two\r\nParagraph three"))

@@ -29,51 +29,48 @@ import views.html.responsiblepeople.address.MovedAddressView
 
 import scala.concurrent.Future
 
-class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
-                                       val dataCacheConnector: DataCacheConnector,
-                                       authAction: AuthAction,
-                                       val ds: CommonPlayDependencies,
-                                       val cc: MessagesControllerComponents,
-                                       formProvider: MovedAddressFormProvider,
-                                       view: MovedAddressView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class MovedAddressController @Inject() (
+  override val messagesApi: MessagesApi,
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: MovedAddressFormProvider,
+  view: MovedAddressView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
-
-  def get(index: Int): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetchAll(request.credId) map {
-        optionalCache =>
-          (for {
-            cache <- optionalCache
-            rp <- getData[ResponsiblePerson](cache, index)
-            addr <- rp.addressHistory
-          } yield {
-            addr.currentAddress match {
-              case Some(addr) => Ok(view(formProvider(), addr.personAddress, index, ControllerHelper.rpTitleName(Some(rp))))
-              case _ => Redirect(address.routes.CurrentAddressController.get(index, edit = true))
-            }
-          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+  def get(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
+      (for {
+        cache <- optionalCache
+        rp    <- getData[ResponsiblePerson](cache, index)
+        addr  <- rp.addressHistory
+      } yield addr.currentAddress match {
+        case Some(addr) => Ok(view(formProvider(), addr.personAddress, index, ControllerHelper.rpTitleName(Some(rp))))
+        case _          => Redirect(address.routes.CurrentAddressController.get(index, edit = true))
+      }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+    }
   }
 
-  def post(index: Int): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors =>
-          dataCacheConnector.fetchAll(request.credId) map {
-            optionalCache =>
-              (for {
-                cache <- optionalCache
-                rp <- getData[ResponsiblePerson](cache, index)
-                addr <- rp.addressHistory
-              } yield {
-                addr.currentAddress match {
-                  case Some(addr) => BadRequest(view(formWithErrors, addr.personAddress, index, ControllerHelper.rpTitleName(Some(rp))))
-                  case _ => Redirect(address.routes.CurrentAddressController.get(index, edit = true))
-                }
-              }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+          dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
+            (for {
+              cache <- optionalCache
+              rp    <- getData[ResponsiblePerson](cache, index)
+              addr  <- rp.addressHistory
+            } yield addr.currentAddress match {
+              case Some(addr) =>
+                BadRequest(view(formWithErrors, addr.personAddress, index, ControllerHelper.rpTitleName(Some(rp))))
+              case _          => Redirect(address.routes.CurrentAddressController.get(index, edit = true))
+            }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
           },
         {
-          case true => Future.successful(Redirect(address.routes.NewHomeAddressDateOfChangeController.get(index)))
+          case true  => Future.successful(Redirect(address.routes.NewHomeAddressDateOfChangeController.get(index)))
           case false => Future.successful(Redirect(address.routes.CurrentAddressController.get(index, edit = true)))
         }
       )

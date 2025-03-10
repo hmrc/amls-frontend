@@ -25,10 +25,10 @@ import views.html.confirmation.PaymentConfirmationView
 class PaymentConfirmedViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val payment_confirmation = app.injector.instanceOf[PaymentConfirmationView]
+    lazy val payment_confirmation                                  = app.injector.instanceOf[PaymentConfirmationView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
-    val businessName = "Test Business Ltd"
+    val businessName     = "Test Business Ltd"
     val paymentReference = "XMHSG000000000"
 
     override def view = payment_confirmation(businessName, paymentReference)

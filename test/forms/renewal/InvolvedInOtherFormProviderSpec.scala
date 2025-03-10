@@ -23,21 +23,21 @@ class InvolvedInOtherFormProviderSpec extends FieldBehaviours {
 
   val formProvider: InvolvedInOtherFormProvider = new InvolvedInOtherFormProvider()
 
-  val form: Form[Boolean] = formProvider()
-  val fieldName: String = "involvedInOther"
+  val form: Form[Boolean]  = formProvider()
+  val fieldName: String    = "involvedInOther"
   val errorMessage: String = "error.required.renewal.ba.involved.in.other"
 
   "form" must {
     "bind" when {
       "'No' is submitted" in {
         val boundForm = form.bind(Map(fieldName -> "false"))
-        boundForm.value shouldBe Some(false)
+        boundForm.value  shouldBe Some(false)
         boundForm.errors shouldBe Nil
       }
 
       "'Yes' is submitted" in {
         val boundForm = form.bind(Map(fieldName -> "true"))
-        boundForm.value shouldBe Some(true)
+        boundForm.value  shouldBe Some(true)
         boundForm.errors shouldBe Nil
       }
     }

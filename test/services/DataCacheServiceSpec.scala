@@ -35,7 +35,7 @@ class DataCacheServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures 
   }
 
   val cacheMap: Cache = Cache.empty
-  val credID = "12345678"
+  val credID          = "12345678"
 
   "getCache" must {
 
@@ -45,9 +45,8 @@ class DataCacheServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures 
         DataCacheService.cacheConnector.fetchAll(any())
       } thenReturn Future.successful(Some(cacheMap))
 
-      whenReady (DataCacheService.getCache(credID)) {
-        result =>
-          result mustEqual cacheMap
+      whenReady(DataCacheService.getCache(credID)) { result =>
+        result mustEqual cacheMap
       }
     }
 
@@ -57,9 +56,8 @@ class DataCacheServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures 
         DataCacheService.cacheConnector.fetchAll(any())
       } thenReturn Future.successful(None)
 
-      whenReady (DataCacheService.getCache(credID).failed) {
-        exception =>
-          exception mustBe a[NotFoundException]
+      whenReady(DataCacheService.getCache(credID).failed) { exception =>
+        exception mustBe a[NotFoundException]
       }
     }
   }

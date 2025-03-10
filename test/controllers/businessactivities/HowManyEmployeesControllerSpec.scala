@@ -40,16 +40,18 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
   val mockService: HowManyEmployeesService = mock[HowManyEmployeesService]
 
   trait Fixture {
-    self => val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    self =>
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
     lazy val view: BusinessEmployeesCountView = inject[BusinessEmployeesCountView]
-    val controller = new HowManyEmployeesController (
+    val controller                            = new HowManyEmployeesController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       service = mockService,
       formProvider = inject[EmployeeCountFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   val emptyCache: Cache = Cache.empty
@@ -87,41 +89,44 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
     "post is called" must {
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.HowManyEmployeesController.post().url)
-          .withFormUrlEncodedBody(
-          "employeeCount" -> ""
-        )
-        val result: Future[Result] = controller.post()(newRequest)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+          FakeRequest(POST, routes.HowManyEmployeesController.post().url)
+            .withFormUrlEncodedBody(
+              "employeeCount" -> ""
+            )
+        val result: Future[Result]                              = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
       }
 
       "redirect to the EmployeeCountAMLSSupervisionController when given valid data and edit is false" in new Fixture {
 
-        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test.FakeRequest(POST, routes.HowManyEmployeesController.post().url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test
+          .FakeRequest(POST, routes.HowManyEmployeesController.post().url)
           .withFormUrlEncodedBody(
-          "employeeCount" -> "456"
-        )
+            "employeeCount" -> "456"
+          )
 
         when(mockService.updateEmployeeCount(any(), any()))
           .thenReturn(Future.successful(Some(emptyCache)))
 
         val result: Future[Result] = controller.post(false)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.TransactionRecordController.get().url))
       }
 
       "redirect to the SummaryController when given valid data and edit is true" in new Fixture {
 
-        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test.FakeRequest(POST, routes.HowManyEmployeesController.post(true).url)
+        val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = test
+          .FakeRequest(POST, routes.HowManyEmployeesController.post(true).url)
           .withFormUrlEncodedBody(
-          "employeeCount" -> "54321"
-        )
+            "employeeCount" -> "54321"
+          )
 
         when(mockService.updateEmployeeCount(any(), any()))
           .thenReturn(Future.successful(Some(emptyCache)))
 
         val resultTrue: Future[Result] = controller.post(true)(newRequest)
-        status(resultTrue) must be(SEE_OTHER)
+        status(resultTrue)           must be(SEE_OTHER)
         redirectLocation(resultTrue) must be(Some(routes.SummaryController.get.url))
       }
     }

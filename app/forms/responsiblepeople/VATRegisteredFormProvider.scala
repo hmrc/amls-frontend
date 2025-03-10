@@ -24,17 +24,17 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class VATRegisteredFormProvider @Inject()() extends Mappings {
+class VATRegisteredFormProvider @Inject() () extends Mappings {
 
   val length = 9
 
   private val booleanFieldName = "registeredForVAT"
-  private val booleanError = "error.required.rp.registered.for.vat"
+  private val booleanError     = "error.required.rp.registered.for.vat"
 
   def apply(): Form[VATRegistered] = Form[VATRegistered](
     mapping(
       booleanFieldName -> boolean(booleanError, booleanError),
-      "vrnNumber" -> mandatoryIfTrue(
+      "vrnNumber"      -> mandatoryIfTrue(
         booleanFieldName,
         text("error.rp.invalid.vat.number").verifying(
           firstError(
@@ -46,14 +46,15 @@ class VATRegisteredFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  private def apply(registeredForVAT: Boolean, vrnNumber: Option[String]): VATRegistered = (registeredForVAT, vrnNumber) match {
-    case (true, Some(str)) => VATRegisteredYes(str)
-    case (false, None) => VATRegisteredNo
-    case _ => throw new IllegalArgumentException(s"Invalid combination of answers")
-  }
+  private def apply(registeredForVAT: Boolean, vrnNumber: Option[String]): VATRegistered =
+    (registeredForVAT, vrnNumber) match {
+      case (true, Some(str)) => VATRegisteredYes(str)
+      case (false, None)     => VATRegisteredNo
+      case _                 => throw new IllegalArgumentException(s"Invalid combination of answers")
+    }
 
   private def unapply(obj: VATRegistered): Option[(Boolean, Option[String])] = obj match {
     case VATRegisteredYes(vrnNumber) => Some((true, Some(vrnNumber)))
-    case VATRegisteredNo => Some((false, None))
+    case VATRegisteredNo             => Some((false, None))
   }
 }

@@ -25,14 +25,12 @@ import views.html.tcsp.WhatYouNeedView
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends DependencyMocks{
-    self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[WhatYouNeedView]
-    val controller = new WhatYouNeedController(
-      authAction = SuccessfulAuthAction,
-      ds = commonDependencies,
-      cc = mockMcc,
-      view = view)
+  trait Fixture extends DependencyMocks {
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[WhatYouNeedView]
+    val controller =
+      new WhatYouNeedController(authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc, view = view)
   }
 
   "WhatYouNeedController" when {
@@ -42,7 +40,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       "return OK and render the 'what you need' page" in new Fixture {
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(s"${messages("title.wyn")} - ${messages("summary.tcsp")}")
       }
     }

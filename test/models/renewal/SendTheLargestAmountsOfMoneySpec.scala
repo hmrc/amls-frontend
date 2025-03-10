@@ -22,7 +22,6 @@ import play.api.libs.json.{JsSuccess, Json}
 
 class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
 
-
   "SendTheLargestAmountsOfMoney" must {
 
     "roundtrip through json" in {
@@ -34,7 +33,7 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
     }
 
     "correctly parse the json if country_1 and country_3 fields provided" in {
-      val json = Json.obj("country_1" -> "GB", "country_3" -> "IN")
+      val json     = Json.obj("country_1" -> "GB", "country_3" -> "IN")
       val expected = SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"), Country("India", "IN")))
 
       Json.fromJson[SendTheLargestAmountsOfMoney](json) mustEqual JsSuccess(expected)

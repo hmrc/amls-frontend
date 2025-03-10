@@ -24,7 +24,7 @@ import views.html.businessdetails.WhatYouNeedView
 
 class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val what_you_need = app.injector.instanceOf[WhatYouNeedView]
+  lazy val what_you_need                                         = app.injector.instanceOf[WhatYouNeedView]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -39,15 +39,21 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
     "Have the correct Headings" in new ViewFixture {
       def view = what_you_need()
 
-      heading.html must be (messages("title.wyn"))
-      subHeading.html must include (messages("summary.businessdetails"))
+      heading.html    must be(messages("title.wyn"))
+      subHeading.html must include(messages("summary.businessdetails"))
     }
 
     "contain the expected content elements" in new ViewFixture {
       def view = what_you_need()
 
-      html must include(messages("if your business is currently registered with HMRC under the Money Laundering Regulations"))
-      html must include(messages("the date your business started or will start activities that need to be registered under the Money Laundering Regulations"))
+      html must include(
+        messages("if your business is currently registered with HMRC under the Money Laundering Regulations")
+      )
+      html must include(
+        messages(
+          "the date your business started or will start activities that need to be registered under the Money Laundering Regulations"
+        )
+      )
       html must include(messages("your VAT registration number, if you’re registered for VAT in the UK"))
       html must include(messages("the address for your registered office or main place of business"))
       html must include(messages("a contact email address, telephone number, and postal address"))

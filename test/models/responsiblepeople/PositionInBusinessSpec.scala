@@ -64,7 +64,9 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
         }
 
         "given an OtherSelection value" in {
-          Json.fromJson[PositionWithinBusiness](Json.obj("other" -> "some other role")) mustBe JsSuccess(Other("some other role"))
+          Json.fromJson[PositionWithinBusiness](Json.obj("other" -> "some other role")) mustBe JsSuccess(
+            Other("some other role")
+          )
         }
       }
 
@@ -106,7 +108,9 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
         }
 
         "given an Other" in {
-          Json.toJson(Other("some new role").asInstanceOf[PositionWithinBusiness]) mustBe Json.obj("other" -> "some new role")
+          Json.toJson(Other("some new role").asInstanceOf[PositionWithinBusiness]) mustBe Json.obj(
+            "other" -> "some new role"
+          )
         }
       }
     }

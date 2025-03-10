@@ -26,8 +26,8 @@ import views.html.renewal.CETransactionsInLast12MonthsView
 
 class CETransactionsInLast12MonthsViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val last12MonthsView = inject[CETransactionsInLast12MonthsView]
-  lazy val fp = inject[CETransactionsInLast12MonthsFormProvider]
+  lazy val last12MonthsView                                      = inject[CETransactionsInLast12MonthsView]
+  lazy val fp                                                    = inject[CETransactionsInLast12MonthsFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -40,21 +40,24 @@ class CETransactionsInLast12MonthsViewSpec extends AmlsViewSpec with Matchers {
 
       def view = last12MonthsView(fp().fill(ce), true)
 
-      doc.title must startWith(messages("renewal.msb.ce.transactions.expected.title") + " - " + messages("summary.renewal"))
+      doc.title must startWith(
+        messages("renewal.msb.ce.transactions.expected.title") + " - " + messages("summary.renewal")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = last12MonthsView(fp().fill(ce), true)
 
-      heading.text() must be(messages("renewal.msb.ce.transactions.expected.title"))
+      heading.text()    must be(messages("renewal.msb.ce.transactions.expected.title"))
       subHeading.text() must include(messages("summary.renewal"))
 
     }
 
     behave like pageWithErrors(
       last12MonthsView(
-        fp().withError("ceTransaction", "error.invalid.renewal.ce.transactions.in.12months"), false
+        fp().withError("ceTransaction", "error.invalid.renewal.ce.transactions.in.12months"),
+        false
       ),
       "ceTransaction",
       "error.invalid.renewal.ce.transactions.in.12months"

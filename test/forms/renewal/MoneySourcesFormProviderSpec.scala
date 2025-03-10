@@ -25,16 +25,16 @@ import play.api.data.FormError
 class MoneySourcesFormProviderSpec extends CheckboxFieldBehaviours with StringFieldBehaviours with Constraints {
 
   val formProvider = new MoneySourcesFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   "MoneySourcesFormProvider" must {
 
-    val checkboxFieldName = "moneySources"
-    val bankNameFieldName = "bankNames"
+    val checkboxFieldName       = "moneySources"
+    val bankNameFieldName       = "bankNames"
     val wholesalerNameFieldName = "wholesalerNames"
-    val requiredKey = "error.invalid.renewal.msb.wc.moneySources"
+    val requiredKey             = "error.invalid.renewal.msb.wc.moneySources"
 
-    val bankName = "A Bank Name"
+    val bankName       = "A Bank Name"
     val wholesalerName = "A Wholesaler Name"
 
     behave like checkboxFieldWithWrapper[MoneySource, MoneySources](
@@ -42,20 +42,22 @@ class MoneySourcesFormProviderSpec extends CheckboxFieldBehaviours with StringFi
       checkboxFieldName,
       validValues = MoneySources.all,
       {
-        case Banks => MoneySources(Some(BankMoneySource(bankName)), None, Some(false))
+        case Banks       => MoneySources(Some(BankMoneySource(bankName)), None, Some(false))
         case Wholesalers => MoneySources(None, Some(WholesalerMoneySource(wholesalerName)), Some(false))
-        case Customers => MoneySources(None, None, Some(true))
-        case _ => fail("Invalid Money Source")
+        case Customers   => MoneySources(None, None, Some(true))
+        case _           => fail("Invalid Money Source")
       },
-      x => x.toList match {
-        case b::w::c::Nil => MoneySources(
-          Some(BankMoneySource(bankName)),
-          Some(WholesalerMoneySource(wholesalerName)),
-          Some(true)
-        )
-      },
+      x =>
+        x.toList match {
+          case b :: w :: c :: Nil =>
+            MoneySources(
+              Some(BankMoneySource(bankName)),
+              Some(WholesalerMoneySource(wholesalerName)),
+              Some(true)
+            )
+        },
       invalidError = FormError(s"$checkboxFieldName[0]", requiredKey),
-      (bankNameFieldName -> bankName),
+      bankNameFieldName -> bankName,
       (wholesalerNameFieldName, wholesalerName)
     )
 
@@ -69,35 +71,41 @@ class MoneySourcesFormProviderSpec extends CheckboxFieldBehaviours with StringFi
 
       "the correct checkbox is checked" in {
 
-        val result = form.bind(Map(
-          s"$checkboxFieldName[0]" -> Banks.toString,
-          bankNameFieldName -> bankName
-        ))
+        val result = form.bind(
+          Map(
+            s"$checkboxFieldName[0]" -> Banks.toString,
+            bankNameFieldName        -> bankName
+          )
+        )
 
-        result.value shouldBe Some(MoneySources(Some(BankMoneySource(bankName)), None, Some(false)))
+        result.value          shouldBe Some(MoneySources(Some(BankMoneySource(bankName)), None, Some(false)))
         result.errors.isEmpty shouldBe true
       }
 
       s"the correct checkbox is checked BUT $bankNameFieldName is empty" in {
 
-        val result = form.bind(Map(
-          s"$checkboxFieldName[0]" -> Banks.toString,
-          bankNameFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            s"$checkboxFieldName[0]" -> Banks.toString,
+            bankNameFieldName        -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(bankNameFieldName, s"error.invalid.renewal.msb.wc.$bankNameFieldName"))
       }
 
       s"$bankNameFieldName is longer than ${formProvider.length}" in {
 
         forAll(stringsLongerThan(formProvider.length)) { longStr =>
-          val result = form.bind(Map(
-            s"$checkboxFieldName[0]" -> Banks.toString,
-            bankNameFieldName -> longStr
-          ))
+          val result = form.bind(
+            Map(
+              s"$checkboxFieldName[0]" -> Banks.toString,
+              bankNameFieldName        -> longStr
+            )
+          )
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(
             FormError(bankNameFieldName, s"error.invalid.maxlength.140.$bankNameFieldName", Seq(formProvider.length))
           )
@@ -105,14 +113,20 @@ class MoneySourcesFormProviderSpec extends CheckboxFieldBehaviours with StringFi
       }
 
       s"$bankNameFieldName violates regex" in {
-        val result = form.bind(Map(
-          s"$checkboxFieldName[0]" -> Banks.toString,
-          bankNameFieldName -> "§!@£$@$@£%"
-        ))
+        val result = form.bind(
+          Map(
+            s"$checkboxFieldName[0]" -> Banks.toString,
+            bankNameFieldName        -> "§!@£$@$@£%"
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(
-          FormError(bankNameFieldName, s"error.invalid.characters.renewal.msb.wc.$bankNameFieldName", Seq(basicPunctuationRegex))
+          FormError(
+            bankNameFieldName,
+            s"error.invalid.characters.renewal.msb.wc.$bankNameFieldName",
+            Seq(basicPunctuationRegex)
+          )
         )
       }
     }
@@ -121,50 +135,68 @@ class MoneySourcesFormProviderSpec extends CheckboxFieldBehaviours with StringFi
 
       "the correct checkbox is checked" in {
 
-        val result = form.bind(Map(
-          s"$checkboxFieldName[0]" -> Wholesalers.toString,
-          wholesalerNameFieldName -> wholesalerName
-        ))
+        val result = form.bind(
+          Map(
+            s"$checkboxFieldName[0]" -> Wholesalers.toString,
+            wholesalerNameFieldName  -> wholesalerName
+          )
+        )
 
-        result.value shouldBe Some(MoneySources(None, Some(WholesalerMoneySource(wholesalerName)), Some(false)))
+        result.value          shouldBe Some(MoneySources(None, Some(WholesalerMoneySource(wholesalerName)), Some(false)))
         result.errors.isEmpty shouldBe true
       }
 
       s"the correct checkbox is checked BUT $wholesalerNameFieldName is empty" in {
 
-        val result = form.bind(Map(
-          s"$checkboxFieldName[0]" -> Wholesalers.toString,
-          wholesalerNameFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            s"$checkboxFieldName[0]" -> Wholesalers.toString,
+            wholesalerNameFieldName  -> ""
+          )
+        )
 
-        result.value shouldBe None
-        result.errors shouldBe Seq(FormError(wholesalerNameFieldName, s"error.invalid.renewal.msb.wc.$wholesalerNameFieldName"))
+        result.value  shouldBe None
+        result.errors shouldBe Seq(
+          FormError(wholesalerNameFieldName, s"error.invalid.renewal.msb.wc.$wholesalerNameFieldName")
+        )
       }
 
       s"$wholesalerNameFieldName is longer than ${formProvider.length}" in {
 
         forAll(stringsLongerThan(formProvider.length)) { longStr =>
-          val result = form.bind(Map(
-            s"$checkboxFieldName[0]" -> Wholesalers.toString,
-            wholesalerNameFieldName -> longStr
-          ))
+          val result = form.bind(
+            Map(
+              s"$checkboxFieldName[0]" -> Wholesalers.toString,
+              wholesalerNameFieldName  -> longStr
+            )
+          )
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(
-            FormError(wholesalerNameFieldName, s"error.invalid.maxlength.140.$wholesalerNameFieldName", Seq(formProvider.length))
+            FormError(
+              wholesalerNameFieldName,
+              s"error.invalid.maxlength.140.$wholesalerNameFieldName",
+              Seq(formProvider.length)
+            )
           )
         }
       }
 
       s"$wholesalerNameFieldName violates regex" in {
-        val result = form.bind(Map(
-          s"$checkboxFieldName[0]" -> Wholesalers.toString,
-          wholesalerNameFieldName -> "§!@£$@$@£%"
-        ))
+        val result = form.bind(
+          Map(
+            s"$checkboxFieldName[0]" -> Wholesalers.toString,
+            wholesalerNameFieldName  -> "§!@£$@$@£%"
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(
-          FormError(wholesalerNameFieldName, s"error.invalid.characters.renewal.msb.wc.$wholesalerNameFieldName", Seq(basicPunctuationRegex))
+          FormError(
+            wholesalerNameFieldName,
+            s"error.invalid.characters.renewal.msb.wc.$wholesalerNameFieldName",
+            Seq(basicPunctuationRegex)
+          )
         )
       }
     }

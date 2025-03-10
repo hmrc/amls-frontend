@@ -41,36 +41,38 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       )
     )
 
-    val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-    val businessActivitiesWithouMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-    val businessAddress = Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB"))
-    val reviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor), businessAddress, "XE0000000000000")
-    val typeOfBusinessModel = TypeOfBusiness("test")
-    val companyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
+    val businessActivitiesModel          =
+      BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+    val businessActivitiesWithouMSB      = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
+    val businessAddress                  =
+      Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB"))
+    val reviewDetailsModel               =
+      ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor), businessAddress, "XE0000000000000")
+    val typeOfBusinessModel              = TypeOfBusiness("test")
+    val companyRegistrationNumberModel   = CompanyRegistrationNumber("12345678")
     val businessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberYes("123456")
 
     val jsonBusinessMatching = Json.obj(
-      "businessActivities" -> Seq("05", "06", "07"),
-      "msbServices" -> Seq("01", "02", "03", "04"),
-      "businessName" -> "BusinessName",
-      "businessType" -> "Sole Trader",
-      "businessAddress" -> Json.obj(
-        "line_1" -> "line1",
-        "line_2" -> "line2",
-        "line_3" -> "line3",
-        "line_4" -> "line4",
+      "businessActivities"        -> Seq("05", "06", "07"),
+      "msbServices"               -> Seq("01", "02", "03", "04"),
+      "businessName"              -> "BusinessName",
+      "businessType"              -> "Sole Trader",
+      "businessAddress"           -> Json.obj(
+        "line_1"   -> "line1",
+        "line_2"   -> "line2",
+        "line_3"   -> "line3",
+        "line_4"   -> "line4",
         "postcode" -> "AA11 1AA",
-        "country" -> "GB"
+        "country"  -> "GB"
       ),
-      "safeId" -> "XE0000000000000",
-      "typeOfBusiness" -> "test",
+      "safeId"                    -> "XE0000000000000",
+      "typeOfBusiness"            -> "test",
       "companyRegistrationNumber" -> "12345678",
-      "appliedFor" -> true,
-      "regNumber" -> "123456"
-      ,
-      "hasChanged" -> false,
-      "hasAccepted" -> true,
-      "preAppComplete" -> true
+      "appliedFor"                -> true,
+      "regNumber"                 -> "123456",
+      "hasChanged"                -> false,
+      "hasAccepted"               -> true,
+      "preAppComplete"            -> true
     )
 
     val businessMatching = BusinessMatching(
@@ -81,7 +83,8 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       Some(companyRegistrationNumberModel),
       Some(businessAppliedForPSRNumberModel),
       hasAccepted = true,
-      preAppComplete = true)
+      preAppComplete = true
+    )
 
     "createBusinessTypeOrderedList" must {
       "return the business activities ordered alphabetically" in {
@@ -93,7 +96,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
           )
         )
 
-        businessMatching.alphabeticalBusinessTypes() must be (expectedList)
+        businessMatching.alphabeticalBusinessTypes() must be(expectedList)
       }
     }
 
@@ -131,14 +134,18 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
     "Merged with CompanyRegistrationNumberModel" must {
       "return BusinessMatching with correct CompanyRegistrationNumberModel" in {
         val result = initial.companyRegistrationNumber(companyRegistrationNumberModel)
-        result must be(BusinessMatching(None, None, None, None, Some(companyRegistrationNumberModel), hasChanged = true))
+        result must be(
+          BusinessMatching(None, None, None, None, Some(companyRegistrationNumberModel), hasChanged = true)
+        )
       }
     }
 
     "Merged with BusinessAppliedForPSRNumberModel" must {
       "return BusinessMatching with correct BusinessAppliedForPSRNumberModel" in {
         val result = initial.businessAppliedForPSRNumber(Some(businessAppliedForPSRNumberModel))
-        result must be(BusinessMatching(None, None, None, None, None, Some(businessAppliedForPSRNumberModel), hasChanged = true))
+        result must be(
+          BusinessMatching(None, None, None, None, None, Some(businessAppliedForPSRNumberModel), hasChanged = true)
+        )
       }
     }
 
@@ -180,7 +187,8 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
         }
 
         "reviewDetails, activites and crn are set and BusinessType contains LimitedCompany" in {
-          val reviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany), businessAddress, "XE0000000000000")
+          val reviewDetailsModel =
+            ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany), businessAddress, "XE0000000000000")
 
           val businessMatching = BusinessMatching(
             Some(reviewDetailsModel),
@@ -198,7 +206,8 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
         }
 
         "reviewDetails, activites and crn are set and BusinessType contains LPrLLP" in {
-          val reviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP), businessAddress, "XE0000000000000")
+          val reviewDetailsModel =
+            ReviewDetails("BusinessName", Some(BusinessType.LPrLLP), businessAddress, "XE0000000000000")
 
           val businessMatching = BusinessMatching(
             Some(reviewDetailsModel),
@@ -284,7 +293,8 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
 
         "reviewDetails and activites are set, type is set and UnincorporatedBody is not set" in {
           val testModel = businessMatching.copy(
-            reviewDetails = Some(ReviewDetails("BusinessName", Some(BusinessType.LPrLLP), businessAddress, "XE0000000000000")),
+            reviewDetails =
+              Some(ReviewDetails("BusinessName", Some(BusinessType.LPrLLP), businessAddress, "XE0000000000000")),
             companyRegistrationNumber = None
           )
 
@@ -293,7 +303,9 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
 
         "reviewDetails and activites are set, crn is set, LimitedCompany and UnincorporatedBody are not set" in {
           val testModel = businessMatching.copy(
-            reviewDetails = Some(ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0000000000000")),
+            reviewDetails = Some(
+              ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0000000000000")
+            ),
             typeOfBusiness = None
           )
 
@@ -309,7 +321,8 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
             Some(typeOfBusinessModel),
             Some(companyRegistrationNumberModel),
             Some(businessAppliedForPSRNumberModel),
-            hasChanged = false)
+            hasChanged = false
+          )
 
           businessMatching.isComplete must be(false)
         }
@@ -323,7 +336,8 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
             Some(typeOfBusinessModel),
             Some(companyRegistrationNumberModel),
             None,
-            hasChanged = false)
+            hasChanged = false
+          )
 
           businessMatching.isComplete must be(false)
         }

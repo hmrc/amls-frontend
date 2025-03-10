@@ -18,11 +18,12 @@ package models.declaration
 
 import models.declaration.release7.{RoleType, RoleWithinBusinessRelease7}
 
-case class AddPerson(firstName: String,
-                     middleName: Option[String],
-                     lastName: String,
-                     roleWithinBusiness: RoleWithinBusinessRelease7
-                    )
+case class AddPerson(
+  firstName: String,
+  middleName: Option[String],
+  lastName: String,
+  roleWithinBusiness: RoleWithinBusinessRelease7
+)
 
 object AddPerson {
 
@@ -30,18 +31,17 @@ object AddPerson {
 
   val key = "add-person"
 
-  implicit def convert(role: RoleWithinBusiness): RoleType = {
+  implicit def convert(role: RoleWithinBusiness): RoleType =
     role match {
       case BeneficialShareholder => models.declaration.release7.BeneficialShareholder
-      case Director => models.declaration.release7.Director
-      case Partner => models.declaration.release7.Partner
-      case InternalAccountant => models.declaration.release7.InternalAccountant
-      case ExternalAccountant => models.declaration.release7.ExternalAccountant
-      case SoleProprietor => models.declaration.release7.SoleProprietor
-      case NominatedOfficer => models.declaration.release7.NominatedOfficer
-      case Other(x) => models.declaration.release7.Other(x)
+      case Director              => models.declaration.release7.Director
+      case Partner               => models.declaration.release7.Partner
+      case InternalAccountant    => models.declaration.release7.InternalAccountant
+      case ExternalAccountant    => models.declaration.release7.ExternalAccountant
+      case SoleProprietor        => models.declaration.release7.SoleProprietor
+      case NominatedOfficer      => models.declaration.release7.NominatedOfficer
+      case Other(x)              => models.declaration.release7.Other(x)
     }
-  }
 
   implicit val jsonReads: Reads[AddPerson] = {
     import play.api.libs.functional.syntax._
@@ -52,7 +52,7 @@ object AddPerson {
         (__ \ "middleName").readNullable[String] and
         (__ \ "lastName").read[String] and
         __.read[RoleWithinBusinessRelease7]
-      ) (AddPerson.apply _)
+    )(AddPerson.apply _)
 
   }
 
@@ -65,7 +65,7 @@ object AddPerson {
         (__ \ "middleName").write[Option[String]] and
         (__ \ "lastName").write[String] and
         __.write[RoleWithinBusinessRelease7]
-      ) (unlift(AddPerson.unapply))
+    )(unlift(AddPerson.unapply))
   }
 
 }

@@ -23,8 +23,8 @@ import play.api.data.Form
 class UsesForeignCurrenciesFormProviderSpec extends BooleanFieldBehaviours[UsesForeignCurrencies] {
 
   override val form: Form[UsesForeignCurrencies] = new UsesForeignCurrenciesFormProvider()()
-  override val fieldName: String = "usesForeignCurrencies"
-  override val errorMessage: String = "error.required.renewal.wc.foreign.currencies"
+  override val fieldName: String                 = "usesForeignCurrencies"
+  override val errorMessage: String              = "error.required.renewal.wc.foreign.currencies"
 
   "UsesForeignCurrenciesFormProvider" must {
     behave like booleanFieldWithModel(UsesForeignCurrenciesYes, UsesForeignCurrenciesNo)

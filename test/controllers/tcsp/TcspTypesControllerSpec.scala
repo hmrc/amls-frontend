@@ -39,21 +39,23 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
     self =>
     val request = addToken(self.authRequest)
 
-    val cache = mock[DataCacheConnector]
-    lazy val view = app.injector.instanceOf[ServiceProviderTypesView]
+    val cache           = mock[DataCacheConnector]
+    lazy val view       = app.injector.instanceOf[ServiceProviderTypesView]
     lazy val controller = new TcspTypesController(
       cache,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[ServiceProviderTypesFormProvider],
-      view = view)
+      view = view
+    )
 
-    val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
+    val defaultProvidedServices      = ProvidedServices(Set(PhonecallHandling, Other("other service")))
     val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes(Some("12345678"))
 
-    val defaultCompanyServiceProviders = TcspTypes(Set(RegisteredOfficeEtc,
-      CompanyFormationAgent, NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc))
+    val defaultCompanyServiceProviders = TcspTypes(
+      Set(RegisteredOfficeEtc, CompanyFormationAgent, NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc)
+    )
 
     val model = Tcsp(
       Some(defaultCompanyServiceProviders),
@@ -81,7 +83,6 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
 
         when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any())).thenReturn(Future.successful(None))
 
-
         val result = controller.get()(request)
         status(result) must be(OK)
       }
@@ -90,14 +91,15 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
 
         val tcspTypes = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc))
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any())).thenReturn(Future.successful(Some(Tcsp(Some(tcspTypes)))))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Tcsp(Some(tcspTypes)))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
         document.select(s"input[value=${NomineeShareholdersProvider.toString}]").hasAttr("checked") must be(true)
-        document.select(s"input[value=${TrusteeProvider.toString}]").hasAttr("checked") must be(true)
-        document.select(s"input[value=${CompanyDirectorEtc.toString}]").hasAttr("checked") must be(true)
+        document.select(s"input[value=${TrusteeProvider.toString}]").hasAttr("checked")             must be(true)
+        document.select(s"input[value=${CompanyDirectorEtc.toString}]").hasAttr("checked")          must be(true)
       }
     }
 
@@ -106,17 +108,18 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
       "successfully navigate to Which services does your business provide? page when the option Registered office is selected" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.TcspTypesController.post().url)
-        .withFormUrlEncodedBody(
-          "serviceProviders[0]" -> NomineeShareholdersProvider.toString,
-          "serviceProviders[1]" -> TrusteeProvider.toString,
-          "serviceProviders[2]" -> RegisteredOfficeEtc.toString
-        )
+          .withFormUrlEncodedBody(
+            "serviceProviders[0]" -> NomineeShareholdersProvider.toString,
+            "serviceProviders[1]" -> TrusteeProvider.toString,
+            "serviceProviders[2]" -> RegisteredOfficeEtc.toString
+          )
 
         when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any())).thenReturn(Future.successful(cacheMap))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any()))
+          .thenReturn(Future.successful(cacheMap))
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.tcsp.routes.ProvidedServicesController.get().url))
 
       }
@@ -124,29 +127,38 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
       "successfully navigate to services of another tcsp page when other than Registered office option is selected " in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.TcspTypesController.post().url)
-        .withFormUrlEncodedBody(
-          "serviceProviders[]" -> NomineeShareholdersProvider.toString
-        )
+          .withFormUrlEncodedBody(
+            "serviceProviders[]" -> NomineeShareholdersProvider.toString
+          )
 
         when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any())).thenReturn(Future.successful(cacheMap))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any()))
+          .thenReturn(Future.successful(cacheMap))
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.tcsp.routes.ServicesOfAnotherTCSPController.get().url))
       }
 
-      "successfully clear out the data"  when {
+      "successfully clear out the data" when {
         "full model present in mongo and removing CompanyFormationAgent and RegisteredOfficeEtc" in new Fixture {
           val newRequest = FakeRequest(POST, routes.TcspTypesController.post().url)
-          .withFormUrlEncodedBody(
-            "serviceProviders[0]" -> NomineeShareholdersProvider.toString,
-            "serviceProviders[1]" -> TrusteeProvider.toString,
-            "serviceProviders[2]" -> CompanyDirectorEtc.toString
-          )
+            .withFormUrlEncodedBody(
+              "serviceProviders[0]" -> NomineeShareholdersProvider.toString,
+              "serviceProviders[1]" -> TrusteeProvider.toString,
+              "serviceProviders[2]" -> CompanyDirectorEtc.toString
+            )
 
-          val expectedModel = Tcsp(Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc))),
-            None, None, None, Some(true), Some(ServicesOfAnotherTCSPYes(Some("12345678"))), true, false)
+          val expectedModel = Tcsp(
+            Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc))),
+            None,
+            None,
+            None,
+            Some(true),
+            Some(ServicesOfAnotherTCSPYes(Some("12345678"))),
+            true,
+            false
+          )
 
           val result = controller.post()(newRequest)
           status(result) mustBe SEE_OTHER
@@ -157,15 +169,16 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
       "successfully navigate to next page while storing data in in mongoCache in edit mode" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.TcspTypesController.post(true).url)
-        .withFormUrlEncodedBody(
-          "serviceProviders[]" -> NomineeShareholdersProvider.toString
-        )
+          .withFormUrlEncodedBody(
+            "serviceProviders[]" -> NomineeShareholdersProvider.toString
+          )
 
         when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any())).thenReturn(Future.successful(cacheMap))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any()))
+          .thenReturn(Future.successful(cacheMap))
 
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.tcsp.routes.SummaryController.get().url))
       }
 
@@ -175,9 +188,9 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
 
       "throw error an invalid data entry" in new Fixture {
         val newrequest = FakeRequest(POST, routes.TcspTypesController.post().url)
-        .withFormUrlEncodedBody(
-          "serviceProviders[]" -> "06"
-        )
+          .withFormUrlEncodedBody(
+            "serviceProviders[]" -> "06"
+          )
 
         val result = controller.post()(newrequest)
         status(result) must be(BAD_REQUEST)

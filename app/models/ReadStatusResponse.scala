@@ -22,18 +22,18 @@ import java.time.format.DateTimeFormatter
 import java.time.{LocalDate, LocalDateTime}
 
 case class ReadStatusResponse(
-                               processingDate: LocalDateTime,
-                               formBundleStatus: String,
-                               statusReason: Option[String],
-                               deRegistrationDate: Option[LocalDate],
-                               currentRegYearStartDate: Option[LocalDate],
-                               currentRegYearEndDate: Option[LocalDate],
-                               renewalConFlag: Boolean,
-                               renewalSubmissionFlag: Option[Boolean] = None,
-                               currentAMLSOutstandingBalance: Option[String] = None,
-                               businessContactNumber: Option[String] = None,
-                               safeId: Option[String] = None
-                             )
+  processingDate: LocalDateTime,
+  formBundleStatus: String,
+  statusReason: Option[String],
+  deRegistrationDate: Option[LocalDate],
+  currentRegYearStartDate: Option[LocalDate],
+  currentRegYearEndDate: Option[LocalDate],
+  renewalConFlag: Boolean,
+  renewalSubmissionFlag: Option[Boolean] = None,
+  currentAMLSOutstandingBalance: Option[String] = None,
+  businessContactNumber: Option[String] = None,
+  safeId: Option[String] = None
+)
 
 object ReadStatusResponse {
 
@@ -43,8 +43,8 @@ object ReadStatusResponse {
     js.validate[String].map[LocalDateTime](dtString => LocalDateTime.parse(dtString, dateTimeFormatter))
   }
 
-  implicit val localDateTimeWrite: Writes[LocalDateTime] = (dateTime: LocalDateTime) => JsString(dateTimeFormatter.format(dateTime))
+  implicit val localDateTimeWrite: Writes[LocalDateTime] = (dateTime: LocalDateTime) =>
+    JsString(dateTimeFormatter.format(dateTime))
 
   implicit val format: OFormat[ReadStatusResponse] = Json.format[ReadStatusResponse]
 }
-

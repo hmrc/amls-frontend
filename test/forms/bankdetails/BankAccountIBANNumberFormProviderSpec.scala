@@ -23,7 +23,7 @@ import play.api.data.{Form, FormError}
 
 class BankAccountIBANNumberFormProviderSpec extends StringFieldBehaviours with Constraints {
 
-  val fp = new BankAccountIBANNumberFormProvider()
+  val fp                          = new BankAccountIBANNumberFormProvider()
   val form: Form[NonUKIBANNumber] = fp()
 
   val fieldName = "IBANNumber"
@@ -36,12 +36,14 @@ class BankAccountIBANNumberFormProviderSpec extends StringFieldBehaviours with C
 
     "bind successfully when the value contains whitespaces" in {
 
-      val ibanNumber = " 123456 A B C "
+      val ibanNumber            = " 123456 A B C "
       val ibanNumberTransformed = "123456ABC"
 
-      val result = form.bind(Map(
-        "IBANNumber" -> ibanNumber
-      ))
+      val result = form.bind(
+        Map(
+          "IBANNumber" -> ibanNumber
+        )
+      )
 
       result.value shouldBe Some(NonUKIBANNumber(ibanNumberTransformed))
     }
@@ -51,10 +53,9 @@ class BankAccountIBANNumberFormProviderSpec extends StringFieldBehaviours with C
       "max length is exceeded" in {
 
         forAll(stringsLongerThan(fp.length)) { invalidNumber =>
-
           val result = form.bind(Map(fieldName -> invalidNumber))
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(fieldName, "error.max.length.bankdetails.iban", Seq(fp.length)))
         }
       }
@@ -62,10 +63,9 @@ class BankAccountIBANNumberFormProviderSpec extends StringFieldBehaviours with C
       "string is non-alphanumeric" in {
 
         forAll(stringsShorterThan(fp.length - 1), invalidCharForNames) { (number, invalidChar) =>
-
           val result = form.bind(Map(fieldName -> (number + invalidChar)))
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(fieldName, "error.invalid.bankdetails.iban", Seq(alphanumericRegex)))
         }
       }

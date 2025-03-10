@@ -25,29 +25,38 @@ class BusinessStructureSpec extends PlaySpec {
   "BusinessStructure" should {
 
     "Read JSON data successfully" in {
-      Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "01")) must be(JsSuccess(SoleProprietor,
-        JsPath))
+      Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "01")) must be(
+        JsSuccess(SoleProprietor, JsPath)
+      )
 
-      Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "02")) must be(JsSuccess(LimitedLiabilityPartnership,
-        JsPath))
+      Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "02")) must be(
+        JsSuccess(LimitedLiabilityPartnership, JsPath)
+      )
 
-      Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "03")) must be(JsSuccess(Partnership,
-        JsPath))
+      Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "03")) must be(
+        JsSuccess(Partnership, JsPath)
+      )
 
-      Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "04")) must be(JsSuccess(IncorporatedBody,
-        JsPath))
+      Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "04")) must be(
+        JsSuccess(IncorporatedBody, JsPath)
+      )
 
-      Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "05")) must be(JsSuccess(UnincorporatedBody,
-        JsPath))
+      Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "05")) must be(
+        JsSuccess(UnincorporatedBody, JsPath)
+      )
     }
 
     "Write JSON data successfully" in {
 
-      Json.toJson(SoleProprietor.asInstanceOf[BusinessStructure]) must be(Json.obj("agentsBusinessStructure" -> "01"))
-      Json.toJson(LimitedLiabilityPartnership.asInstanceOf[BusinessStructure]) must be(Json.obj("agentsBusinessStructure" -> "02"))
-      Json.toJson(Partnership.asInstanceOf[BusinessStructure]) must be(Json.obj("agentsBusinessStructure" -> "03"))
-      Json.toJson(IncorporatedBody.asInstanceOf[BusinessStructure]) must be(Json.obj("agentsBusinessStructure" -> "04"))
-      Json.toJson(UnincorporatedBody.asInstanceOf[BusinessStructure]) must be(Json.obj("agentsBusinessStructure" -> "05"))
+      Json.toJson(SoleProprietor.asInstanceOf[BusinessStructure])              must be(Json.obj("agentsBusinessStructure" -> "01"))
+      Json.toJson(LimitedLiabilityPartnership.asInstanceOf[BusinessStructure]) must be(
+        Json.obj("agentsBusinessStructure" -> "02")
+      )
+      Json.toJson(Partnership.asInstanceOf[BusinessStructure])                 must be(Json.obj("agentsBusinessStructure" -> "03"))
+      Json.toJson(IncorporatedBody.asInstanceOf[BusinessStructure])            must be(Json.obj("agentsBusinessStructure" -> "04"))
+      Json.toJson(UnincorporatedBody.asInstanceOf[BusinessStructure])          must be(
+        Json.obj("agentsBusinessStructure" -> "05")
+      )
     }
 
     "throw error for invalid data" in {

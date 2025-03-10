@@ -28,7 +28,7 @@ import views.html.responsiblepeople.address.AdditionalExtraAddressUKView
 class AdditionalExtraAddressUKViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val uKView = inject[AdditionalExtraAddressUKView]
-  lazy val fp = inject[AdditionalAddressFormProvider]
+  lazy val fp     = inject[AdditionalAddressFormProvider]
 
   val name = "firstName lastName"
 
@@ -43,19 +43,27 @@ class AdditionalExtraAddressUKViewSpec extends AmlsViewSpec with Matchers {
     "have correct title" in new ViewFixture {
 
       def view = uKView(
-        fp().fill(ResponsiblePersonAddress(PersonAddressUK("", None, None, None, ""), None)), true, 1, None, name
+        fp().fill(ResponsiblePersonAddress(PersonAddressUK("", None, None, None, ""), None)),
+        true,
+        1,
+        None,
+        name
       )
 
-      doc.title must startWith (messages("responsiblepeople.additional_extra_address_country.title", name))
+      doc.title must startWith(messages("responsiblepeople.additional_extra_address_country.title", name))
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = uKView(
-        fp().fill(ResponsiblePersonAddress(PersonAddressUK("", None, None, None, ""), None)), true, 1, None, name
+        fp().fill(ResponsiblePersonAddress(PersonAddressUK("", None, None, None, ""), None)),
+        true,
+        1,
+        None,
+        name
       )
 
-      heading.html must be(messages("responsiblepeople.additional_extra_address_country.heading", name))
+      heading.html    must be(messages("responsiblepeople.additional_extra_address_country.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
     }
@@ -63,7 +71,11 @@ class AdditionalExtraAddressUKViewSpec extends AmlsViewSpec with Matchers {
     Seq(1, 2, 3, 4) foreach { line =>
       behave like pageWithErrors(
         uKView(
-          fp().withError(s"addressLine$line", s"error.text.validation.address.line$line"), false, 1, None, name
+          fp().withError(s"addressLine$line", s"error.text.validation.address.line$line"),
+          false,
+          1,
+          None,
+          name
         ),
         s"addressLine$line",
         s"error.text.validation.address.line$line"
@@ -72,7 +84,11 @@ class AdditionalExtraAddressUKViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       uKView(
-        fp().withError("postCode", "error.required.postcode"), false, 1, None, name
+        fp().withError("postCode", "error.required.postcode"),
+        false,
+        1,
+        None,
+        name
       ),
       "postCode",
       "error.required.postcode"

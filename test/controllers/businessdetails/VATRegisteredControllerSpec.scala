@@ -38,15 +38,16 @@ import scala.concurrent.Future
 class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends DependencyMocks { self =>
-    val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[VATRegisteredView]
-    val controller = new VATRegisteredController (
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[VATRegisteredView]
+    val controller = new VATRegisteredController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = app.injector.instanceOf[VATRegisteredFormProvider],
-      vat_registered = view)
+      vat_registered = view
+    )
   }
 
   "BusinessRegisteredForVATController" when {
@@ -55,13 +56,13 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
       "display the registered for VAT page" in new Fixture {
 
-        when{
+        when {
           controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any())
         } thenReturn Future.successful(None)
 
         val result = controller.get()(request)
 
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("businessdetails.registeredforvat.title"))
       }
 
@@ -69,7 +70,9 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
         when {
           controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any())
-        } thenReturn Future.successful(Some(BusinessDetails(Some(PreviouslyRegisteredYes(Some(""))), None, Some(VATRegisteredYes("123456789")))))
+        } thenReturn Future.successful(
+          Some(BusinessDetails(Some(PreviouslyRegisteredYes(Some(""))), None, Some(VATRegisteredYes("123456789"))))
+        )
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -87,58 +90,97 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         "redirect to ConfirmRegisteredOfficeController" when {
           "customer is a Partnership" in new Fixture {
 
-            val partnership = ReviewDetails("BusinessName", Some(Partnership),
-              Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+            val partnership = ReviewDetails(
+              "BusinessName",
+              Some(Partnership),
+              Address(
+                "line1",
+                Some("line2"),
+                Some("line3"),
+                Some("line4"),
+                Some("AA11 1AA"),
+                Country("United Kingdom", "GB")
+              ),
+              "ghghg"
+            )
 
             mockCacheGetEntry(Some(BusinessMatching(Some(partnership))), BusinessMatching.key)
             mockCacheUpdate(Some(BusinessDetails.key), BusinessDetails())
 
             val newRequest = FakeRequest(POST, routes.VATRegisteredController.post().url).withFormUrlEncodedBody(
               "registeredForVAT" -> "true",
-              "vrnNumber" -> "123456789"
+              "vrnNumber"        -> "123456789"
             )
 
             val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessdetails.routes.ConfirmRegisteredOfficeController.get().url))
+            status(result)           must be(SEE_OTHER)
+            redirectLocation(result) must be(
+              Some(controllers.businessdetails.routes.ConfirmRegisteredOfficeController.get().url)
+            )
           }
         }
 
         "redirect to CorporationTaxRegistered" when {
           "customer is a LLP" in new Fixture {
 
-            val llp = ReviewDetails("BusinessName", Some(LPrLLP),
-              Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+            val llp = ReviewDetails(
+              "BusinessName",
+              Some(LPrLLP),
+              Address(
+                "line1",
+                Some("line2"),
+                Some("line3"),
+                Some("line4"),
+                Some("AA11 1AA"),
+                Country("United Kingdom", "GB")
+              ),
+              "ghghg"
+            )
 
             mockCacheGetEntry(Some(BusinessMatching(Some(llp))), BusinessMatching.key)
             mockCacheUpdate(Some(BusinessDetails.key), BusinessDetails())
 
             val newRequest = FakeRequest(POST, routes.VATRegisteredController.post().url).withFormUrlEncodedBody(
               "registeredForVAT" -> "true",
-              "vrnNumber" -> "123456789"
+              "vrnNumber"        -> "123456789"
             )
 
             val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorporationTaxRegisteredController.get().url))
+            status(result)           must be(SEE_OTHER)
+            redirectLocation(result) must be(
+              Some(controllers.businessdetails.routes.CorporationTaxRegisteredController.get().url)
+            )
           }
 
           "customer is a Limited Company" in new Fixture {
 
-            val details = ReviewDetails("BusinessName", Some(LimitedCompany),
-              Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+            val details = ReviewDetails(
+              "BusinessName",
+              Some(LimitedCompany),
+              Address(
+                "line1",
+                Some("line2"),
+                Some("line3"),
+                Some("line4"),
+                Some("AA11 1AA"),
+                Country("United Kingdom", "GB")
+              ),
+              "ghghg"
+            )
 
             mockCacheGetEntry(Some(BusinessMatching(Some(details))), BusinessMatching.key)
             mockCacheUpdate(Some(BusinessDetails.key), BusinessDetails())
 
             val newRequest = FakeRequest(POST, routes.VATRegisteredController.post().url).withFormUrlEncodedBody(
               "registeredForVAT" -> "true",
-              "vrnNumber" -> "123456789"
+              "vrnNumber"        -> "123456789"
             )
 
             val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorporationTaxRegisteredController.get().url))
+            status(result)           must be(SEE_OTHER)
+            redirectLocation(result) must be(
+              Some(controllers.businessdetails.routes.CorporationTaxRegisteredController.get().url)
+            )
           }
         }
 
@@ -147,17 +189,28 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
             val newRequest = FakeRequest(POST, routes.VATRegisteredController.post(true).url).withFormUrlEncodedBody(
               "registeredForVAT" -> "true",
-              "vrnNumber" -> "123456789"
+              "vrnNumber"        -> "123456789"
             )
 
-            val partnership = ReviewDetails("BusinessName", Some(LPrLLP),
-              Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+            val partnership = ReviewDetails(
+              "BusinessName",
+              Some(LPrLLP),
+              Address(
+                "line1",
+                Some("line2"),
+                Some("line3"),
+                Some("line4"),
+                Some("NE77 0QQ"),
+                Country("United Kingdom", "GB")
+              ),
+              "ghghg"
+            )
 
             mockCacheGetEntry(Some(BusinessMatching(Some(partnership))), BusinessMatching.key)
             mockCacheUpdate(Some(BusinessDetails.key), BusinessDetails())
 
             val result = controller.post(true)(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.businessdetails.routes.SummaryController.get.url))
           }
         }
@@ -185,5 +238,3 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
   }
 
 }
-
-

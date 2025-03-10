@@ -20,7 +20,7 @@ import cats.implicits._
 import config.ApplicationConfig
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessActivitiesGenerator
-import models.businessactivities.{AccountantForAMLSRegulations, InvolvedInOtherNo, TaxMatters, WhoIsYourAccountant, BusinessActivities => BABusinessActivities}
+import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities => BABusinessActivities, InvolvedInOtherNo, TaxMatters, WhoIsYourAccountant}
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching.updateservice.ServiceChangeRegister
@@ -36,23 +36,25 @@ import utils._
 import java.time.LocalDate
 
 //noinspection ScalaStyle
-class AddBusinessTypeHelperSpec extends AmlsSpec
-  with BusinessActivitiesGenerator
-  with ResponsiblePersonGenerator
-  with FutureAssertions {
+class AddBusinessTypeHelperSpec
+    extends AmlsSpec
+    with BusinessActivitiesGenerator
+    with ResponsiblePersonGenerator
+    with FutureAssertions {
 
   trait Fixture extends DependencyMocks { self =>
 
-    val tradingPremisesService = mock[TradingPremisesService]
-    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
+    val tradingPremisesService   = mock[TradingPremisesService]
+    val mockUpdateServiceHelper  = mock[AddBusinessTypeHelper]
     val responsiblePeopleService = mock[ResponsiblePeopleService]
-    val mockApplicationConfig = mock[ApplicationConfig]
+    val mockApplicationConfig    = mock[ApplicationConfig]
 
     val SUT = new AddBusinessTypeHelper()(
       mockCacheConnector,
       tradingPremisesService,
       responsiblePeopleService,
-      mockApplicationConfig)
+      mockApplicationConfig
+    )
 
     val businessActivitiesSection = BABusinessActivities(
       involvedInOther = Some(InvolvedInOtherNo),
@@ -65,22 +67,28 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
   "updateBusinessActivities" must {
     "remove the accountancy data from the 'business activities' section" in new Fixture {
-      mockCacheUpdate[BABusinessActivities](Some(models.businessactivities.BusinessActivities.key), businessActivitiesSection)
+      mockCacheUpdate[BABusinessActivities](
+        Some(models.businessactivities.BusinessActivities.key),
+        businessActivitiesSection
+      )
 
       val model = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
       for {
         result <- SUT.updateBusinessActivities("internalId", model)
       } yield {
         result.involvedInOther mustBe Some(InvolvedInOtherNo)
-        result.whoIsYourAccountant must not be defined
+        result.whoIsYourAccountant          must not be defined
         result.accountantForAMLSRegulations must not be defined
-        result.taxMatters must not be defined
+        result.taxMatters                   must not be defined
         result.hasAccepted mustBe true
       }
     }
 
     "not touch the accountancy data if the activity is not 'accountancy services'" in new Fixture {
-      mockCacheUpdate[BABusinessActivities](Some(models.businessactivities.BusinessActivities.key), businessActivitiesSection)
+      mockCacheUpdate[BABusinessActivities](
+        Some(models.businessactivities.BusinessActivities.key),
+        businessActivitiesSection
+      )
 
       val model = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
 
@@ -100,11 +108,13 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
       "the business doesn't have ASP or TSCP" in new Fixture {
         mockCacheFetch[Supervision](
           Some(Supervision(Some(AnotherBodyNo), Some(ProfessionalBodyMemberNo), None, Some(ProfessionalBodyNo))),
-          Some(Supervision.key))
+          Some(Supervision.key)
+        )
 
         mockCacheFetch[BusinessMatching](
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))))),
-          Some(BusinessMatching.key))
+          Some(BusinessMatching.key)
+        )
 
         mockCacheSave(Supervision(hasAccepted = true), Some(Supervision.key))
 
@@ -116,38 +126,58 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
     "leave the supervision section alone" when {
       "the business has ASP" in new Fixture {
-        val supervisionModel = Supervision(Some(AnotherBodyYes("Some supervisor", Some(SupervisionStart(LocalDate.now)), Some(SupervisionEnd(LocalDate.now)), Some(SupervisionEndReasons("no reason")))),
+        val supervisionModel = Supervision(
+          Some(
+            AnotherBodyYes(
+              "Some supervisor",
+              Some(SupervisionStart(LocalDate.now)),
+              Some(SupervisionEnd(LocalDate.now)),
+              Some(SupervisionEndReasons("no reason"))
+            )
+          ),
           Some(ProfessionalBodyMemberNo),
           None,
-          Some(ProfessionalBodyNo))
+          Some(ProfessionalBodyNo)
+        )
 
         mockCacheFetch[Supervision](Some(supervisionModel), Some(Supervision.key))
 
         mockCacheFetch[BusinessMatching](
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(AccountancyServices))))),
-          Some(BusinessMatching.key))
+          Some(BusinessMatching.key)
+        )
 
         SUT.updateSupervision("internalId").returnsSome(supervisionModel)
 
-        verify(mockCacheConnector, never).save(any(),any(), any())(any())
+        verify(mockCacheConnector, never).save(any(), any(), any())(any())
       }
     }
 
     "the business has TCSP" in new Fixture {
-      val supervisionModel = Supervision(Some(AnotherBodyYes("Some supervisor", Some(SupervisionStart(LocalDate.now)), Some(SupervisionEnd(LocalDate.now)), Some(SupervisionEndReasons("no reason")))),
+      val supervisionModel = Supervision(
+        Some(
+          AnotherBodyYes(
+            "Some supervisor",
+            Some(SupervisionStart(LocalDate.now)),
+            Some(SupervisionEnd(LocalDate.now)),
+            Some(SupervisionEndReasons("no reason"))
+          )
+        ),
         Some(ProfessionalBodyMemberNo),
         None,
-        Some(ProfessionalBodyNo))
+        Some(ProfessionalBodyNo)
+      )
 
       mockCacheFetch[Supervision](Some(supervisionModel), Some(Supervision.key))
 
       mockCacheFetch[BusinessMatching](
         Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
-        Some(BusinessMatching.key))
+        Some(BusinessMatching.key)
+      )
 
       SUT.updateSupervision("internalId").returnsSome(supervisionModel)
 
-      verify(mockCacheConnector, never).save(any(),any(), any())(any())
+      verify(mockCacheConnector, never).save(any(), any(), any())(any())
     }
   }
 
@@ -157,14 +187,23 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
         val model = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
 
-        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))), hasAccepted = true, hasChanged = true)
-        val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))), hasAccepted = true, hasChanged = true)
+        val startResultMatching = BusinessMatching(
+          activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))),
+          hasAccepted = true,
+          hasChanged = true
+        )
+        val endResultMatching   = BusinessMatching(
+          activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))),
+          hasAccepted = true,
+          hasChanged = true
+        )
 
         mockCacheFetch[BusinessMatching](
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
-          Some(BusinessMatching.key))
+          Some(BusinessMatching.key)
+        )
 
-        mockCacheUpdate(Some(BusinessMatching.key), startResultMatching )
+        mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
         SUT.updateBusinessMatching("internalId", model).returnsSome(endResultMatching)
       }
 
@@ -172,18 +211,23 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
         val model = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
 
-        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set())), hasAccepted = true, hasChanged = true)
+        val startResultMatching =
+          BusinessMatching(activities = Some(BMBusinessActivities(Set())), hasAccepted = true, hasChanged = true)
 
-        val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))), hasAccepted = true, hasChanged = true)
+        val endResultMatching = BusinessMatching(
+          activities = Some(BMBusinessActivities(Set(HighValueDealing))),
+          hasAccepted = true,
+          hasChanged = true
+        )
 
         mockCacheFetch[BusinessMatching](
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set())))),
-          Some(BusinessMatching.key))
+          Some(BusinessMatching.key)
+        )
 
-        mockCacheUpdate(Some(BusinessMatching.key), startResultMatching )
+        mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
         SUT.updateBusinessMatching("internalId", model).returnsSome(endResultMatching)
       }
-
 
       "there are additional msb services and the activity is MSB and there are existing activities" in new Fixture {
 
@@ -192,22 +236,31 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
           subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)))
         )
 
-        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
-                                  hasAccepted = true,
-                                  hasChanged = true,
-                                  msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))))
+        val startResultMatching = BusinessMatching(
+          activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+          hasAccepted = true,
+          hasChanged = true,
+          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
+        )
 
-        val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
-                                hasAccepted = true,
-                                hasChanged = true,
-                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))))
+        val endResultMatching = BusinessMatching(
+          activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+          hasAccepted = true,
+          hasChanged = true,
+          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)))
+        )
 
         mockCacheFetch[BusinessMatching](
-          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
-                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))))),
-          Some(BusinessMatching.key))
+          Some(
+            BusinessMatching(
+              activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+              msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
+            )
+          ),
+          Some(BusinessMatching.key)
+        )
 
-        mockCacheUpdate(Some(BusinessMatching.key),  startResultMatching )
+        mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
         SUT.updateBusinessMatching("internalId", model).returnsSome(endResultMatching)
       }
 
@@ -218,20 +271,22 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
           subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal)))
         )
 
-        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set())),
-                                  hasAccepted = true,
-                                  hasChanged = true)
+        val startResultMatching =
+          BusinessMatching(activities = Some(BMBusinessActivities(Set())), hasAccepted = true, hasChanged = true)
 
-        val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(MoneyServiceBusiness))),
-                                hasAccepted = true,
-                                hasChanged = true,
-                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
+        val endResultMatching = BusinessMatching(
+          activities = Some(BMBusinessActivities(Set(MoneyServiceBusiness))),
+          hasAccepted = true,
+          hasChanged = true,
+          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal)))
+        )
 
         mockCacheFetch[BusinessMatching](
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set())))),
-          Some(BusinessMatching.key))
+          Some(BusinessMatching.key)
+        )
 
-        mockCacheUpdate(Some(BusinessMatching.key),  startResultMatching )
+        mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
         SUT.updateBusinessMatching("internalId", model).returnsSome(endResultMatching)
       }
     }
@@ -251,7 +306,11 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
       await(SUT.updateHasAcceptedFlag("internalId", AddBusinessTypeFlowModel()).value)
 
-      verify(mockCacheConnector).save[AddBusinessTypeFlowModel](any(), eqTo(AddBusinessTypeFlowModel.key), eqTo(AddBusinessTypeFlowModel(hasAccepted = true)))(any())
+      verify(mockCacheConnector).save[AddBusinessTypeFlowModel](
+        any(),
+        eqTo(AddBusinessTypeFlowModel.key),
+        eqTo(AddBusinessTypeFlowModel(hasAccepted = true))
+      )(any())
     }
   }
 
@@ -260,14 +319,16 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
       "a ServicesRegister model is already available with pre-existing activities" in new Fixture {
         mockCacheUpdate(Some(ServiceChangeRegister.key), ServiceChangeRegister(Some(Set(MoneyServiceBusiness))))
 
-        SUT.updateServicesRegister("internalId", AddBusinessTypeFlowModel(Some(BillPaymentServices)))
+        SUT
+          .updateServicesRegister("internalId", AddBusinessTypeFlowModel(Some(BillPaymentServices)))
           .returnsSome(ServiceChangeRegister(Some(Set(MoneyServiceBusiness, BillPaymentServices))))
       }
 
       "a ServiceChangeRegister does not exist or has no pre-existing activities" in new Fixture {
         mockCacheUpdate(Some(ServiceChangeRegister.key), ServiceChangeRegister())
 
-        SUT.updateServicesRegister("internalId", AddBusinessTypeFlowModel(Some(MoneyServiceBusiness)))
+        SUT
+          .updateServicesRegister("internalId", AddBusinessTypeFlowModel(Some(MoneyServiceBusiness)))
           .returnsSome(ServiceChangeRegister(Some(Set(MoneyServiceBusiness))))
       }
     }

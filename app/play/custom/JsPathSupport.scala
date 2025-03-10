@@ -24,7 +24,8 @@ import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 object JsPathSupport {
 
   val localDateTimeReads: Reads[LocalDateTime] =
-    Reads.at[String](__ \ "$date" \ "$numberLong")
+    Reads
+      .at[String](__ \ "$date" \ "$numberLong")
       .map(dateTime => Instant.ofEpochMilli(dateTime.toLong).atZone(ZoneOffset.UTC).toLocalDateTime)
 
   val localDateTimeWrites: Writes[LocalDateTime] =
@@ -32,9 +33,9 @@ object JsPathSupport {
 
   implicit class RichJsPath(path: JsPath) {
 
-    val readLocalDateTime: Reads[LocalDateTime] = {
-      Reads.at[LocalDateTime](path)(localDateTimeReads)
+    val readLocalDateTime: Reads[LocalDateTime] =
+      Reads
+        .at[LocalDateTime](path)(localDateTimeReads)
         .orElse(Reads.at[String](path).map(dateTimeStr => LocalDateTime.parse(dateTimeStr, ISO_LOCAL_DATE_TIME)))
-    }
   }
 }

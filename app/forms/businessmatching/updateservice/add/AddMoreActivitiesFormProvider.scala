@@ -21,8 +21,8 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class AddMoreActivitiesFormProvider @Inject()() extends Mappings {
+class AddMoreActivitiesFormProvider @Inject() () extends Mappings {
 
-  private val error = "error.businessmatching.updateservice.addmoreactivities"
+  private val error          = "error.businessmatching.updateservice.addmoreactivities"
   def apply(): Form[Boolean] = Form[Boolean]("addmoreactivities" -> boolean(error, error))
 }

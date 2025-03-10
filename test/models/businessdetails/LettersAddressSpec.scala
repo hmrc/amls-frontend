@@ -24,7 +24,7 @@ class LettersAddressSpec extends PlaySpec with MockitoSugar {
   "LettersAddressSpec" must {
 
     "round trip through JSON" in {
-      val trueModel = LettersAddress(true)
+      val trueModel  = LettersAddress(true)
       val falseModel = LettersAddress(false)
 
       Json.toJson(trueModel).as[LettersAddress] mustBe trueModel

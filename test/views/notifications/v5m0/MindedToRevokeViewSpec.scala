@@ -27,11 +27,14 @@ import views.html.notifications.v5m0.MindedToRevokeView
 class MindedToRevokeViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val minded_to_revoke: MindedToRevokeView = app.injector.instanceOf[MindedToRevokeView]
+    lazy val minded_to_revoke: MindedToRevokeView                  = app.injector.instanceOf[MindedToRevokeView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val notificationParams: NotificationParams = NotificationParams(
-      msgContent = "msgContent", businessName = Some("Fake Name Ltd."), amlsRefNo = Some("amlsRegNo"))
+      msgContent = "msgContent",
+      businessName = Some("Fake Name Ltd."),
+      amlsRefNo = Some("amlsRegNo")
+    )
   }
 
   "MindedToRevokeView" must {
@@ -40,17 +43,19 @@ class MindedToRevokeViewSpec extends AmlsViewSpec with Matchers {
 
       def view: HtmlFormat.Appendable = minded_to_revoke(notificationParams)
 
-      doc.title must be("Revocation being considered" +
-        " - " + "Your registration" +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        "Revocation being considered" +
+          " - " + "Your registration" +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view: HtmlFormat.Appendable = minded_to_revoke(notificationParams)
 
-      heading.html must be("Revocation being considered")
+      heading.html    must be("Revocation being considered")
       subHeading.html must include("Your registration")
     }
 
@@ -61,12 +66,13 @@ class MindedToRevokeViewSpec extends AmlsViewSpec with Matchers {
       doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("amlsRegNo"))
     }
 
-
     "have a back link" in new ViewFixture {
 
       def view: HtmlFormat.Appendable = minded_to_revoke(notificationParams)
 
-      doc.getElementById("return-to-messages").attr("href") mustBe controllers.routes.NotificationController.getMessages().url
+      doc.getElementById("return-to-messages").attr("href") mustBe controllers.routes.NotificationController
+        .getMessages()
+        .url
     }
   }
 }

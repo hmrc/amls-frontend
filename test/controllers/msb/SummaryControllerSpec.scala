@@ -38,10 +38,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
-    self => val request = addToken(authRequest)
+    self =>
+    val request                       = addToken(authRequest)
     implicit val ec: ExecutionContext = inject[ExecutionContext]
-    lazy val view = inject[CheckYourAnswersView]
-    val controller = new SummaryController(
+    lazy val view                     = inject[CheckYourAnswersView]
+    val controller                    = new SummaryController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockCacheConnector,
@@ -50,16 +51,27 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       mockMcc,
       inject[CheckYourAnswersHelper],
       view
-      )
+    )
 
     val completeModel = MoneyServiceBusiness(
       throughput = Some(ExpectedThroughput.Second),
       businessUseAnIPSP = Some(BusinessUseAnIPSPYes("name", "123456789123456")),
       identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
-      whichCurrencies = Some(WhichCurrencies(Seq("USD", "GBP", "EUR"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, Some(true))))),
+      whichCurrencies = Some(
+        WhichCurrencies(
+          Seq("USD", "GBP", "EUR"),
+          Some(UsesForeignCurrenciesYes),
+          Some(MoneySources(None, None, Some(true)))
+        )
+      ),
       sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
       fundsTransfer = Some(FundsTransfer(true)),
-      branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))))),
+      branchesOrAgents = Some(
+        BranchesOrAgents(
+          BranchesOrAgentsHasCountries(true),
+          Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB"))))
+        )
+      ),
       sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
       mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
       transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
@@ -79,7 +91,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
     "load the summary page when section data is available" in new Fixture {
 
-      val model = MoneyServiceBusiness(None)
+      val model       = MoneyServiceBusiness(None)
       val msbServices = Some(
         BusinessMatchingMsbServices(
           Set(
@@ -95,11 +107,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       mockIsNewActivityNewAuth(false)
       mockCacheFetchAll
       mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
-      mockCacheGetEntry[MoneyServiceBusiness]((Some(model)), MoneyServiceBusiness.key)
+      mockCacheGetEntry[MoneyServiceBusiness](Some(model), MoneyServiceBusiness.key)
       mockApplicationStatus(NotCompleted)
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("summary.checkyouranswers.title"))
     }
 
@@ -119,7 +131,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       )
 
       mockApplicationStatus(NotCompleted)
-      mockCacheGetEntry[BusinessMatching]((Some(BusinessMatching(msbServices = msbServices))), BusinessMatching.key)
+      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
       mockCacheGetEntry[MoneyServiceBusiness](None, MoneyServiceBusiness.key)
 
       val result = controller.get()(request)
@@ -129,10 +141,21 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
     "show all edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
       "application in variation mode" in new Fixture {
 
-        val bm = Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney,CurrencyExchange,
-          ChequeCashingNotScrapMetal,
-          ChequeCashingScrapMetal,
-          ForeignExchange)))))
+        val bm = Some(
+          BusinessMatching(msbServices =
+            Some(
+              BusinessMatchingMsbServices(
+                Set(
+                  TransmittingMoney,
+                  CurrencyExchange,
+                  ChequeCashingNotScrapMetal,
+                  ChequeCashingScrapMetal,
+                  ForeignExchange
+                )
+              )
+            )
+          )
+        )
 
         mockIsNewActivityNewAuth(false)
         mockCacheFetchAll
@@ -145,17 +168,26 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
         val document = Jsoup.parse(contentAsString(result))
 
         (0 to 12) foreach { i =>
-          document.getElementsByClass("govuk-summary-list__actions")
-          .get(i).getElementsByTag("a").hasClass("govuk-link") must be(true)
+          document
+            .getElementsByClass("govuk-summary-list__actions")
+            .get(i)
+            .getElementsByTag("a")
+            .hasClass("govuk-link") must be(true)
         }
       }
     }
 
     "show edit link" when {
       "application not in variation mode" in new Fixture {
-        val bm = Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney,CurrencyExchange,
-          ChequeCashingNotScrapMetal,
-          ChequeCashingScrapMetal)))))
+        val bm = Some(
+          BusinessMatching(msbServices =
+            Some(
+              BusinessMatchingMsbServices(
+                Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)
+              )
+            )
+          )
+        )
 
         mockIsNewActivityNewAuth(false)
         mockCacheFetchAll
@@ -167,9 +199,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
         val elements = document.getElementsByClass("govuk-summary-list__actions").iterator
-        while(elements.hasNext){
+        while (elements.hasNext)
           elements.next().getElementsByTag("a").hasClass("govuk-link") must be(true)
-        }
       }
     }
   }
@@ -185,7 +216,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
-        verify(controller.dataCache).save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(completeModel.copy(hasAccepted = true)))(any())
+        verify(controller.dataCache).save[MoneyServiceBusiness](
+          any(),
+          eqTo(MoneyServiceBusiness.key),
+          eqTo(completeModel.copy(hasAccepted = true))
+        )(any())
       }
     }
   }

@@ -25,33 +25,34 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class SelfAssessmentRegisteredFormProvider @Inject()() extends Mappings {
+class SelfAssessmentRegisteredFormProvider @Inject() () extends Mappings {
 
   private val booleanFieldName = "saRegistered"
-  private val booleanError = "error.required.sa.registration"
+  private val booleanError     = "error.required.sa.registration"
 
   def apply(): Form[SaRegistered] = Form[responsiblepeople.SaRegistered](
     mapping(
       booleanFieldName -> boolean(booleanError, booleanError),
-      "utrNumber" -> mandatoryIfTrue(
+      "utrNumber"      -> mandatoryIfTrue(
         booleanFieldName,
         text("error.required.utr.number")
-          .transform[String](_.replace(" ","").trim, x => x)
+          .transform[String](_.replace(" ", "").trim, x => x)
           .verifying(
-          regexp(utrRegex, "error.invalid.length.utr.number")
-        )
+            regexp(utrRegex, "error.invalid.length.utr.number")
+          )
       )
     )(apply)(unapply)
   )
 
-  private def apply(registeredForSA: Boolean, vrnNumber: Option[String]): SaRegistered = (registeredForSA, vrnNumber) match {
-    case (true, Some(str)) => SaRegisteredYes(str)
-    case (false, None) => SaRegisteredNo
-    case _ => throw new IllegalArgumentException(s"Invalid combination of answers")
-  }
+  private def apply(registeredForSA: Boolean, vrnNumber: Option[String]): SaRegistered =
+    (registeredForSA, vrnNumber) match {
+      case (true, Some(str)) => SaRegisteredYes(str)
+      case (false, None)     => SaRegisteredNo
+      case _                 => throw new IllegalArgumentException(s"Invalid combination of answers")
+    }
 
   private def unapply(obj: SaRegistered): Option[(Boolean, Option[String])] = obj match {
     case SaRegisteredYes(vrnNumber) => Some((true, Some(vrnNumber)))
-    case SaRegisteredNo => Some((false, None))
+    case SaRegisteredNo             => Some((false, None))
   }
 }

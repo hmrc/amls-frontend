@@ -24,15 +24,21 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class YourResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) {
+class YourResponsiblePeopleService @Inject() (val dataCacheConnector: DataCacheConnector)(implicit
+  ec: ExecutionContext
+) {
 
-  def completeAndIncompleteRP(credId: String): Future[Option[(Seq[(ResponsiblePerson, Int)], Seq[(ResponsiblePerson, Int)])]] = {
+  def completeAndIncompleteRP(
+    credId: String
+  ): Future[Option[(Seq[(ResponsiblePerson, Int)], Seq[(ResponsiblePerson, Int)])]] = {
     val completeIncompleteRp: Future[Option[Seq[(ResponsiblePerson, Int)]]] =
       dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key).map { optResponsiblePeople =>
         optResponsiblePeople.map { rp =>
-          rp.zipWithIndex.reverse.filterNot(_._1.status.contains(StatusConstants.Deleted)).filterNot(_._1 == ResponsiblePerson())
+          rp.zipWithIndex.reverse
+            .filterNot(_._1.status.contains(StatusConstants.Deleted))
+            .filterNot(_._1 == ResponsiblePerson())
         }
-    }
+      }
 
     completeIncompleteRp.map(_.map(_.partition(_._1.isComplete)))
   }

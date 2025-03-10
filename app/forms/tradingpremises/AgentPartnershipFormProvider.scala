@@ -22,16 +22,18 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class AgentPartnershipFormProvider @Inject()() extends Mappings {
+class AgentPartnershipFormProvider @Inject() () extends Mappings {
 
   val length = 140
 
   def apply(): Form[AgentPartnership] = Form[AgentPartnership](
-    "agentPartnership" -> text("error.required.tp.agent.partnership").verifying(
-      firstError(
-        maxLength(length, "error.invalid.tp.agent.partnership"),
-        regexp(basicPunctuationRegex, "error.char.tp.agent.partnership")
+    "agentPartnership" -> text("error.required.tp.agent.partnership")
+      .verifying(
+        firstError(
+          maxLength(length, "error.invalid.tp.agent.partnership"),
+          regexp(basicPunctuationRegex, "error.char.tp.agent.partnership")
+        )
       )
-    ).transform[AgentPartnership](AgentPartnership.apply, _.agentPartnership)
+      .transform[AgentPartnership](AgentPartnership.apply, _.agentPartnership)
   )
 }

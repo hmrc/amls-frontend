@@ -24,29 +24,29 @@ import play.api.libs.json._
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Hint, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
-case class BusinessActivities(businessActivities: Set[BusinessActivity],
-                              additionalActivities: Option[Set[BusinessActivity]] = None,
-                              removeActivities: Option[Set[BusinessActivity]] = None,
-                              dateOfChange: Option[DateOfChange] = None) {
+case class BusinessActivities(
+  businessActivities: Set[BusinessActivity],
+  additionalActivities: Option[Set[BusinessActivity]] = None,
+  removeActivities: Option[Set[BusinessActivity]] = None,
+  dateOfChange: Option[DateOfChange] = None
+) {
 
-  def hasBusinessOrAdditionalActivity(activity: BusinessActivity) = {
+  def hasBusinessOrAdditionalActivity(activity: BusinessActivity) =
     businessActivities.union(additionalActivities.getOrElse(Set.empty)) contains activity
-  }
 
-  def hasOnlyOneBusinessActivity: Boolean = {
+  def hasOnlyOneBusinessActivity: Boolean =
     businessActivities.size == 1
-  }
 }
 
 sealed trait BusinessActivity extends CheckYourAnswersField {
 
   val value: String
 
-  def getMessage(usePhrasedMessage:Boolean = false)(implicit messages: Messages): String = {
-    val phrasedString = if(usePhrasedMessage) ".phrased" else ""
-    val message = s"businessmatching.registerservices.servicename.lbl."
+  def getMessage(usePhrasedMessage: Boolean = false)(implicit messages: Messages): String = {
+    val phrasedString = if (usePhrasedMessage) ".phrased" else ""
+    val message       = s"businessmatching.registerservices.servicename.lbl."
 
-    messages(s"${message}${value}${phrasedString}")
+    messages(s"$message$value$phrasedString")
   }
 }
 
@@ -72,7 +72,7 @@ object BusinessActivity extends Enumerable.Implicits {
     override val value: String = "05"
   }
 
-  case object MoneyServiceBusiness extends WithName("moneyServiceBusiness") with BusinessActivity  {
+  case object MoneyServiceBusiness extends WithName("moneyServiceBusiness") with BusinessActivity {
     override val value: String = "06"
   }
 
@@ -93,18 +93,18 @@ object BusinessActivity extends Enumerable.Implicits {
     case JsString("05") => JsSuccess(MoneyServiceBusiness)
     case JsString("06") => JsSuccess(TrustAndCompanyServices)
     case JsString("07") => JsSuccess(TelephonePaymentService)
-    case _ => JsError((JsPath \ "businessActivities") -> play.api.libs.json.JsonValidationError("error.invalid"))
+    case _              => JsError((JsPath \ "businessActivities") -> play.api.libs.json.JsonValidationError("error.invalid"))
   }
 
   implicit val jsonActivityWrite: Writes[BusinessActivity] = Writes[BusinessActivity] {
-    case AccountancyServices => JsString("01")
-    case ArtMarketParticipant => JsString("08")
-    case BillPaymentServices => JsString("02")
+    case AccountancyServices        => JsString("01")
+    case ArtMarketParticipant       => JsString("08")
+    case BillPaymentServices        => JsString("02")
     case EstateAgentBusinessService => JsString("03")
-    case HighValueDealing => JsString("04")
-    case MoneyServiceBusiness => JsString("05")
-    case TrustAndCompanyServices => JsString("06")
-    case TelephonePaymentService => JsString("07")
+    case HighValueDealing           => JsString("04")
+    case MoneyServiceBusiness       => JsString("05")
+    case TrustAndCompanyServices    => JsString("06")
+    case TelephonePaymentService    => JsString("07")
   }
 
   implicit val enumerable: Enumerable[BusinessActivity] =
@@ -127,73 +127,81 @@ object BusinessActivities extends Logging {
     TelephonePaymentService
   )
 
-  def formValues(filterValues: Option[Seq[BusinessActivity]] = None, hasHints: Boolean = true)(implicit messages: Messages): Seq[CheckboxItem] = {
+  def formValues(filterValues: Option[Seq[BusinessActivity]] = None, hasHints: Boolean = true)(implicit
+    messages: Messages
+  ): Seq[CheckboxItem] = {
 
     val filteredValues = filterValues.fold(all.toSeq)(all.toSeq diff _)
 
-    filteredValues.map { activity =>
-      val hintOpt = if(hasHints) {
-        Some(Hint(
-          id = Some(s"businessActivities-${activity.value}-hint"),
-          content = Text(messages(s"businessmatching.registerservices.servicename.details.${activity.value}"))
-        ))
-      } else {
-        None
+    filteredValues
+      .map { activity =>
+        val hintOpt = if (hasHints) {
+          Some(
+            Hint(
+              id = Some(s"businessActivities-${activity.value}-hint"),
+              content = Text(messages(s"businessmatching.registerservices.servicename.details.${activity.value}"))
+            )
+          )
+        } else {
+          None
+        }
+
+        val id = activity.value.substring(1)
+
+        CheckboxItem(
+          content = Text(messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}")),
+          value = activity.toString,
+          id = Some(s"value_$id"),
+          name = Some(s"value[$id]"),
+          hint = hintOpt
+        )
       }
-
-      val id = activity.value.substring(1)
-
-      CheckboxItem(
-        content = Text(messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}")),
-        value = activity.toString,
-        id = Some(s"value_$id"),
-        name = Some(s"value[$id]"),
-        hint = hintOpt
-      )
-    }.sortBy(_.content.mkString)
+      .sortBy(_.content.mkString)
   }
 
   implicit val format: OWrites[BusinessActivities] = Json.writes[BusinessActivities]
 
   implicit val jsonReads: Reads[BusinessActivities] = {
     import play.api.libs.json.Reads.StringReads
-    (
-      (__ \ "businessActivities").read[Set[String]].flatMap[Set[BusinessActivity]]{ ba =>
-        activitiesReader(ba, "businessActivities").foldLeft[Reads[Set[BusinessActivity]]](Reads[Set[BusinessActivity]](_ =>
-          JsSuccess(Set.empty))) { (result, data) =>
-          data flatMap { r =>
-            result.map{_ + r}
-          }
+    ((__ \ "businessActivities").read[Set[String]].flatMap[Set[BusinessActivity]] { ba =>
+      activitiesReader(ba, "businessActivities").foldLeft[Reads[Set[BusinessActivity]]](
+        Reads[Set[BusinessActivity]](_ => JsSuccess(Set.empty))
+      ) { (result, data) =>
+        data flatMap { r =>
+          result.map(_ + r)
         }
+      }
     } and
       (__ \ "additionalActivities").readNullable[Set[String]].flatMap[Option[Set[BusinessActivity]]] {
         case Some(a) =>
-          activitiesReader(a, "additionalActivities").foldLeft[Reads[Option[Set[BusinessActivity]]]](Reads[Option[Set[BusinessActivity]]](_ =>
-            JsSuccess(None))) { (result, data) =>
+          activitiesReader(a, "additionalActivities").foldLeft[Reads[Option[Set[BusinessActivity]]]](
+            Reads[Option[Set[BusinessActivity]]](_ => JsSuccess(None))
+          ) { (result, data) =>
             data flatMap { r =>
               result.map {
                 case Some(n) => Some(n + r)
-                case _ => Some(Set(r))
+                case _       => Some(Set(r))
               }
             }
           }
-        case _ => None
-    } and (__ \ "removeActivities").readNullable[Set[String]].flatMap[Option[Set[BusinessActivity]]] {
+        case _       => None
+      } and (__ \ "removeActivities").readNullable[Set[String]].flatMap[Option[Set[BusinessActivity]]] {
         case Some(a) =>
-          activitiesReader(a, "removeActivities").foldLeft[Reads[Option[Set[BusinessActivity]]]](Reads[Option[Set[BusinessActivity]]](_ =>
-            JsSuccess(None))) { (result, data) =>
+          activitiesReader(a, "removeActivities").foldLeft[Reads[Option[Set[BusinessActivity]]]](
+            Reads[Option[Set[BusinessActivity]]](_ => JsSuccess(None))
+          ) { (result, data) =>
             data flatMap { r =>
               result.map {
                 case Some(n) => Some(n + r)
-                case _ => Some(Set(r))
+                case _       => Some(Set(r))
               }
             }
           }
-        case _ => None
-    } and (__ \ "dateOfChange").readNullable[DateOfChange])((a,b,c,d) => BusinessActivities(a,b,c,d))
+        case _       => None
+      } and (__ \ "dateOfChange").readNullable[DateOfChange])((a, b, c, d) => BusinessActivities(a, b, c, d))
   }
 
-  private def activitiesReader(values: Set[String], path: String): Set[Reads[_ <: BusinessActivity]] = {
+  private def activitiesReader(values: Set[String], path: String): Set[Reads[_ <: BusinessActivity]] =
     values map {
       case "01" => Reads(_ => JsSuccess(AccountancyServices)) map identity[BusinessActivity]
       case "08" => Reads(_ => JsSuccess(ArtMarketParticipant)) map identity[BusinessActivity]
@@ -203,24 +211,23 @@ object BusinessActivities extends Logging {
       case "05" => Reads(_ => JsSuccess(MoneyServiceBusiness)) map identity[BusinessActivity]
       case "06" => Reads(_ => JsSuccess(TrustAndCompanyServices)) map identity[BusinessActivity]
       case "07" => Reads(_ => JsSuccess(TelephonePaymentService)) map identity[BusinessActivity]
-      case _ =>
+      case _    =>
         Reads(_ => JsError((JsPath \ path) -> play.api.libs.json.JsonValidationError("error.invalid")))
     }
-  }
 
-  def getValue(ba:BusinessActivity): String =
+  def getValue(ba: BusinessActivity): String =
     ba match {
-      case AccountancyServices => "01"
-      case ArtMarketParticipant => "02"
-      case BillPaymentServices => "03"
+      case AccountancyServices        => "01"
+      case ArtMarketParticipant       => "02"
+      case BillPaymentServices        => "03"
       case EstateAgentBusinessService => "04"
-      case HighValueDealing => "05"
-      case MoneyServiceBusiness => "06"
-      case TrustAndCompanyServices => "07"
-      case TelephonePaymentService => "08"
+      case HighValueDealing           => "05"
+      case MoneyServiceBusiness       => "06"
+      case TrustAndCompanyServices    => "07"
+      case TelephonePaymentService    => "08"
     }
 
-  def getBusinessActivity(ba:String): BusinessActivity =
+  def getBusinessActivity(ba: String): BusinessActivity =
     ba match {
       case "01" => AccountancyServices
       case "02" => ArtMarketParticipant

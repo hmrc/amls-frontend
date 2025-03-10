@@ -24,11 +24,14 @@ import utils.{AuthAction, RepeatingSection}
 import views.html.responsiblepeople.FitAndProperNoticeView
 
 @Singleton
-class FitAndProperNoticeController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                             authAction: AuthAction,
-                                             val ds: CommonPlayDependencies,
-                                             val cc: MessagesControllerComponents,
-                                             view: FitAndProperNoticeView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class FitAndProperNoticeController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  view: FitAndProperNoticeView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction {
     implicit request => Ok(view(edit, index, flow))

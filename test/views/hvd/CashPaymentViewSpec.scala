@@ -28,7 +28,7 @@ import views.html.hvd.CashPaymentView
 class CashPaymentViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val cash_payment = inject[CashPaymentView]
-  lazy val fp = inject[CashPaymentFormProvider]
+  lazy val fp           = inject[CashPaymentFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -49,14 +49,15 @@ class CashPaymentViewSpec extends AmlsViewSpec with Matchers {
 
       def view = cash_payment(fp().fill(CashPaymentOverTenThousandEuros(true)), true)
 
-      heading.html must be(messages("hvd.cash.payment.title"))
+      heading.html    must be(messages("hvd.cash.payment.title"))
       subHeading.html must include(messages("summary.hvd"))
 
     }
 
     behave like pageWithErrors(
       cash_payment(fp().withError("acceptedAnyPayment", "error.required.hvd.accepted.cash.payment"), false),
-      "acceptedAnyPayment", "error.required.hvd.accepted.cash.payment"
+      "acceptedAnyPayment",
+      "error.required.hvd.accepted.cash.payment"
     )
 
     behave like pageWithBackLink(cash_payment(fp(), false))

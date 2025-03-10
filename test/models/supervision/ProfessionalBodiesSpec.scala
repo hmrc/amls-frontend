@@ -26,25 +26,25 @@ class ProfessionalBodiesSpec extends PlaySpec with AmlsSpec {
   "JSON validation" must {
 
     "validate given values" in {
-      val json =  Json.obj("businessType" -> Seq("01","02"))
+      val json = Json.obj("businessType" -> Seq("01", "02"))
 
       Json.fromJson[ProfessionalBodies](json) must
         be(JsSuccess(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants)), JsPath))
     }
 
     "validate given values with option Digital software" in {
-      val json =  Json.obj(
-        "businessType" -> Seq("14", "12"),
+      val json = Json.obj(
+        "businessType"         -> Seq("14", "12"),
         "specifyOtherBusiness" -> "test"
       )
 
       Json.fromJson[ProfessionalBodies](json) must
-        be(JsSuccess(ProfessionalBodies(Set(Other("test"), AssociationOfBookkeepers)), JsPath ))
+        be(JsSuccess(ProfessionalBodies(Set(Other("test"), AssociationOfBookkeepers)), JsPath))
     }
 
     "fail when on path is missing" in {
       Json.fromJson[ProfessionalBodies](Json.obj("isAMember" -> true)) must
-        be(JsError((JsPath \"businessType") -> play.api.libs.json.JsonValidationError("error.path.missing")))
+        be(JsError((JsPath \ "businessType") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
 
     "fail when on invalid data" in {
@@ -57,7 +57,7 @@ class ProfessionalBodiesSpec extends PlaySpec with AmlsSpec {
   "JSON writers" must {
     "write valid data" in {
       Json.toJson[ProfessionalBodies](ProfessionalBodies(Set(AccountantsScotland, Other("test657")))) must
-        be (Json.obj("businessType" -> Seq("09", "14"), "specifyOtherBusiness" -> "test657"))
+        be(Json.obj("businessType" -> Seq("09", "14"), "specifyOtherBusiness" -> "test657"))
     }
   }
 

@@ -22,7 +22,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class ExpectedAMLSTurnoverFormProvider @Inject()() extends Mappings {
+class ExpectedAMLSTurnoverFormProvider @Inject() () extends Mappings {
 
   def apply(errorMsg: String = "error.required.ba.turnover.from.mlr"): Form[ExpectedAMLSTurnover] = Form(
     "expectedAMLSTurnover" -> enumerable[ExpectedAMLSTurnover](errorMsg)

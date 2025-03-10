@@ -26,10 +26,9 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.BusinessEmailAddressView
 
+class BusinessEmailAddressViewSpec extends AmlsViewSpec with Matchers {
 
-class BusinessEmailAddressViewSpec extends AmlsViewSpec with Matchers  {
-
-  lazy val you = app.injector.instanceOf[BusinessEmailAddressView]
+  lazy val you          = app.injector.instanceOf[BusinessEmailAddressView]
   lazy val formProvider = app.injector.instanceOf[BusinessEmailAddressFormProvider]
 
   implicit val request: Request[_] = FakeRequest()
@@ -43,19 +42,19 @@ class BusinessEmailAddressViewSpec extends AmlsViewSpec with Matchers  {
 
       val formWithData: Form[ContactingYouEmail] = formProvider().fill(ContactingYouEmail("test@test.com"))
 
-      def view = {
+      def view =
         you(formWithData, true)
-      }
 
-      doc.title must be(messages("businessdetails.contactingyou.email.title") +
-        " - " + messages("summary.businessdetails") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
-      heading.html must be(messages("businessdetails.contactingyou.email.title"))
+      doc.title       must be(
+        messages("businessdetails.contactingyou.email.title") +
+          " - " + messages("summary.businessdetails") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
+      heading.html    must be(messages("businessdetails.contactingyou.email.title"))
       subHeading.html must include(messages("summary.businessdetails"))
 
       doc.getElementsByAttributeValue("name", "email") must not be empty
-
 
     }
 

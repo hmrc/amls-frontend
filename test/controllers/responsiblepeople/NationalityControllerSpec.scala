@@ -41,12 +41,12 @@ import scala.concurrent.Future
 class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil with Injecting {
 
   trait Fixture {
-    //self =>
+    // self =>
     val request = addToken(authRequest)
 
     val autoCompleteService = mock[AutoCompleteService]
-    lazy val view = inject[NationalityView]
-    val controller = new NationalityController (
+    lazy val view           = inject[NationalityView]
+    val controller          = new NationalityController(
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
@@ -84,7 +84,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       contentAsString(result) must include(messages("responsiblepeople.nationality.title"))
 
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("input[type=radio][name=nationality][value=true]").hasAttr("checked") must be(false)
+      document.select("input[type=radio][name=nationality][value=true]").hasAttr("checked")  must be(false)
       document.select("input[type=radio][name=nationality][value=false]").hasAttr("checked") must be(false)
     }
 
@@ -107,7 +107,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "load nationality page when nationality is none" in new Fixture {
 
-      val pResidenceType = PersonResidenceType(UKResidence(Nino(nextNino)), Some(Country("United Kingdom", "GB")), None)
+      val pResidenceType    = PersonResidenceType(UKResidence(Nino(nextNino)), Some(Country("United Kingdom", "GB")), None)
       val responsiblePeople = ResponsiblePerson(personName, personResidenceType = Some(pResidenceType))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -126,13 +126,24 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
     "pre-populate UI with data from sav4later" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
-        .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(
-          personName,
-          personResidenceType = Some(PersonResidenceType(
-            NonUKResidence,
-            Some(Country("United Kingdom", "GB")),
-            Some(Country("France", "FR"))))
-        )))))
+        .thenReturn(
+          Future.successful(
+            Some(
+              Seq(
+                ResponsiblePerson(
+                  personName,
+                  personResidenceType = Some(
+                    PersonResidenceType(
+                      NonUKResidence,
+                      Some(Country("United Kingdom", "GB")),
+                      Some(Country("France", "FR"))
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
 
       val result = controller.get(1)(request)
       status(result) must be(OK)
@@ -144,7 +155,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
     "fail submission on error" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.NationalityController.post(1).url)
-      .withFormUrlEncodedBody("" -> "")
+        .withFormUrlEncodedBody("" -> "")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
@@ -153,16 +164,16 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
-      status(result) must be(BAD_REQUEST)
+      status(result)          must be(BAD_REQUEST)
       contentAsString(result) must include(messages("error.required.nationality"))
     }
 
     "submit with valid nationality data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.NationalityController.post(1).url)
-      .withFormUrlEncodedBody(
-        "nationality" -> "true"
-      )
+        .withFormUrlEncodedBody(
+          "nationality" -> "true"
+        )
 
       val responsiblePeople = ResponsiblePerson()
 
@@ -173,17 +184,17 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
     }
 
     "submit with valid nationality data (with other country)" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.NationalityController.post(1).url)
-      .withFormUrlEncodedBody(
-        "nationality" -> "false",
-        "country" -> "GB"
-      )
+        .withFormUrlEncodedBody(
+          "nationality" -> "false",
+          "country"     -> "GB"
+        )
 
       val responsiblePeople = ResponsiblePerson()
 
@@ -194,19 +205,19 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ContactDetailsController.get(1).url))
     }
 
     "submit with valid data in edit mode" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.NationalityController.post(1).url)
-      .withFormUrlEncodedBody(
-        "nationality" -> "false",
-        "country" -> "GB"
-      )
+        .withFormUrlEncodedBody(
+          "nationality" -> "false",
+          "country"     -> "GB"
+        )
 
-      val pResidenceType = PersonResidenceType(UKResidence(Nino(nextNino)), Some(Country("United Kingdom", "GB")), None)
+      val pResidenceType    = PersonResidenceType(UKResidence(Nino(nextNino)), Some(Country("United Kingdom", "GB")), None)
       val responsiblePeople = ResponsiblePerson(None, personResidenceType = Some(pResidenceType))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -214,23 +225,27 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
       val responsiblePeople1 = ResponsiblePerson(None, personResidenceType = Some(pResidenceType))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(responsiblePeople1)))(any()))
+      when(
+        controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(responsiblePeople1)))(any())
+      )
         .thenReturn(Future.successful(emptyCache))
 
       when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(
+        Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url)
+      )
     }
 
     "load NotFound page on exception" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.NationalityController.post(1).url)
-      .withFormUrlEncodedBody(
-        "nationality" -> "true"
-      )
+        .withFormUrlEncodedBody(
+          "nationality" -> "true"
+        )
 
       val responsiblePeople = ResponsiblePerson()
 

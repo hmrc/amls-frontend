@@ -24,32 +24,34 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class BusinessFranchiseFormProvider @Inject()() extends Mappings {
+class BusinessFranchiseFormProvider @Inject() () extends Mappings {
 
-  val length = 140
+  val length                           = 140
   def apply(): Form[BusinessFranchise] = Form[BusinessFranchise](
     mapping(
       "businessFranchise" -> boolean("error.required.ba.is.your.franchise", "error.required.ba.is.your.franchise"),
-      "franchiseName" -> mandatoryIfTrue("businessFranchise", text("error.required.ba.franchise.name")
-        .verifying(
-          firstError(
-            maxLength(length, "error.max.length.ba.franchise.name"),
-            regexp(basicPunctuationRegex, "error.invalid.characters.ba.franchise.name")
+      "franchiseName"     -> mandatoryIfTrue(
+        "businessFranchise",
+        text("error.required.ba.franchise.name")
+          .verifying(
+            firstError(
+              maxLength(length, "error.max.length.ba.franchise.name"),
+              regexp(basicPunctuationRegex, "error.invalid.characters.ba.franchise.name")
+            )
           )
-        )
       )
     )(apply)(unapply)
   )
 
   private def apply(b: Boolean, s: Option[String]): BusinessFranchise = (b, s) match {
-    case (false, _) => BusinessFranchiseNo
+    case (false, _)        => BusinessFranchiseNo
     case (true, Some(str)) => BusinessFranchiseYes(str)
-    case _ => throw new IllegalArgumentException("No franchise name available to bind from form")
+    case _                 => throw new IllegalArgumentException("No franchise name available to bind from form")
   }
 
   private def unapply(obj: BusinessFranchise): Option[(Boolean, Option[String])] = obj match {
-    case BusinessFranchiseNo => Some((false, None))
+    case BusinessFranchiseNo           => Some((false, None))
     case BusinessFranchiseYes(details) => Some((true, Some(details)))
-    case _ => None
+    case _                             => None
   }
 }
