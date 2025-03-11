@@ -38,7 +38,7 @@ class DeregistrationConfirmationViewSpec extends AmlsViewSpec {
     content must include("Your reference number")
     content must include("XBML00000567890")
     content must include("You have deregistered from your supervision with HMRC under the Anti-Money Laundering Supervision.")
-    content must include("Your given reason for doing so is: Business is not trading in its own right because it is now an agent of a money service business.")
+    content must include("Your given reason for doing so is: Business is out of scope as no longer carrying out activities covered by the Money Laundering Regulations")
     content must include("You can re-register for supervision from your registration page.")
     content must include("Print this page")
 
