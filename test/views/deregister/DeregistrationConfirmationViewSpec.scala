@@ -30,7 +30,7 @@ class DeregistrationConfirmationViewSpec extends AmlsViewSpec {
 
     val deregistrationConfirmationView = inject[DeregistrationConfirmationView]
     implicit val request: Request[AnyContentAsEmpty.type] = addTokenForView()
-    def view: Html = deregistrationConfirmationView("Acme Production LTD", "XBML00000567890")
+    def view: Html = deregistrationConfirmationView("01", "Acme Production LTD", "XBML00000567890")
 
     val content: String = doc.text()
     content must include("You have deregistered")
