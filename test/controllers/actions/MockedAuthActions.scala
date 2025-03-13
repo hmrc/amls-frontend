@@ -27,53 +27,82 @@ import scala.concurrent.{ExecutionContext, Future}
 object SuccessfulAuthAction extends AuthAction {
 
   val affinityGroup: AffinityGroup.Organisation.type = AffinityGroup.Organisation
-  val enrolments: Enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
+  val enrolments: Enrolments                         = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
 
   override def parser: BodyParser[AnyContent] = Helpers.stubControllerComponents().parsers.anyContent
 
   override protected def executionContext: ExecutionContext = Helpers.stubControllerComponents().executionContext
 
   val credentialId: String = "internalId"
-  val amlsRefNumber = "amlsRefNumber"
+  val amlsRefNumber        = "amlsRefNumber"
 
-  override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
-    Future.successful(Right(AuthorisedRequest(
-      request = request,
-      amlsRefNumber = Some(amlsRefNumber),
-      credId = credentialId,
-      affinityGroup = affinityGroup,
-      enrolments = enrolments,
-      accountTypeId = ("accType", "id"),
-      groupIdentifier = Some("GROUP_ID"),
-      credentialRole = Some(User)))
+  override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
+    Future.successful(
+      Right(
+        AuthorisedRequest(
+          request = request,
+          amlsRefNumber = Some(amlsRefNumber),
+          credId = credentialId,
+          affinityGroup = affinityGroup,
+          enrolments = enrolments,
+          accountTypeId = ("accType", "id"),
+          groupIdentifier = Some("GROUP_ID"),
+          credentialRole = Some(User)
+        )
+      )
     )
-  }
 }
 
 object SuccessfulAuthActionNoAmlsRefNo extends AuthAction {
 
   val affinityGroup: AffinityGroup.Organisation.type = AffinityGroup.Organisation
-  val enrolments: Enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
+  val enrolments: Enrolments                         = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
 
   override def parser: BodyParser[AnyContent] = Helpers.stubControllerComponents().parsers.anyContent
 
   override protected def executionContext: ExecutionContext = Helpers.stubControllerComponents().executionContext
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
-    Future.successful(Right(AuthorisedRequest(request, None, "internalId", affinityGroup, enrolments, ("accType", "id"), Some("GROUP_ID"), Some(User))))
+    Future.successful(
+      Right(
+        AuthorisedRequest(
+          request,
+          None,
+          "internalId",
+          affinityGroup,
+          enrolments,
+          ("accType", "id"),
+          Some("GROUP_ID"),
+          Some(User)
+        )
+      )
+    )
 }
 
 object SuccessfulAuthActionNoUserRole extends AuthAction {
 
   val affinityGroup: AffinityGroup.Organisation.type = AffinityGroup.Organisation
-  val enrolments: Enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
+  val enrolments: Enrolments                         = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
 
   override def parser: BodyParser[AnyContent] = Helpers.stubControllerComponents().parsers.anyContent
 
   override protected def executionContext: ExecutionContext = Helpers.stubControllerComponents().executionContext
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
-    Future.successful(Right(AuthorisedRequest(request, Some("amlsRefNumber"), "internalId", affinityGroup, enrolments, ("accType", "id"), Some("GROUP_ID"), Some(Assistant))))
+    Future.successful(
+      Right(
+        AuthorisedRequest(
+          request,
+          Some("amlsRefNumber"),
+          "internalId",
+          affinityGroup,
+          enrolments,
+          ("accType", "id"),
+          Some("GROUP_ID"),
+          Some(Assistant)
+        )
+      )
+    )
 }
 
 object FailedAuthAction extends AuthAction {

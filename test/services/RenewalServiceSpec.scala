@@ -36,14 +36,13 @@ import utils.AmlsSpec
 
 import scala.concurrent.Future
 
-
 class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   trait Fixture {
 
-    val dataCache = mock[DataCacheConnector]
+    val dataCache     = mock[DataCacheConnector]
     val statusService = mock[StatusService]
 
     val service = new RenewalService(dataCache, statusService)
@@ -57,15 +56,23 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
     when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
       .thenReturn(Some(BusinessMatching()))
 
-    def setupBusinessMatching(activities: Set[BusinessActivity] = Set(), msbServices: Set[BusinessMatchingMsbService] = Set()) = when {
+    def setupBusinessMatching(
+      activities: Set[BusinessActivity] = Set(),
+      msbServices: Set[BusinessMatchingMsbService] = Set()
+    ) = when {
       mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-    } thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(msbServices)), activities = Some(BusinessActivities(activities))))
+    } thenReturn Some(
+      BusinessMatching(
+        msbServices = Some(BusinessMatchingMsbServices(msbServices)),
+        activities = Some(BusinessActivities(activities))
+      )
+    )
 
     def setUpRenewal(renewalModel: Renewal) = when {
       dataCache.fetch[Renewal](any(), eqTo(Renewal.key))(any())
     } thenReturn Future.successful(Some(renewalModel))
 
-    def standardCompleteInvolvedInOtherActivities(): Renewal = {
+    def standardCompleteInvolvedInOtherActivities(): Renewal =
       Renewal(
         involvedInOtherActivities = Some(InvolvedInOtherYes("test")),
         turnover = Some(AMLSTurnover.First),
@@ -73,7 +80,6 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         hasAccepted = true,
         hasChanged = true
       )
-    }
   }
 
   "The renewal service" must {
@@ -106,7 +112,12 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           Some(CustomersOutsideIsUK(true)),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
-          Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other")))))),
+          Some(
+            CashPayments(
+              CashPaymentsCustomerNotMet(true),
+              Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+            )
+          ),
           Some(TotalThroughput("01")),
           Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
           Some(TransactionsInLast12Months("1500")),
@@ -246,8 +257,12 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           customersOutsideIsUK = Some(CustomersOutsideIsUK(true)),
           customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-          receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))))
-
+          receiveCashPayments = Some(
+            CashPayments(
+              CashPaymentsCustomerNotMet(true),
+              Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+            )
+          )
         )
         await(service.isRenewalComplete(model, credId)) mustBe true
       }
@@ -257,7 +272,12 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           customersOutsideIsUK = Some(CustomersOutsideIsUK(true)),
           customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-          receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))))
+          receiveCashPayments = Some(
+            CashPayments(
+              CashPaymentsCustomerNotMet(true),
+              Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+            )
+          )
         )
         await(service.isRenewalComplete(model, credId)) mustBe true
       }
@@ -746,11 +766,11 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
   }
 
   trait CanSubmitFixture extends Fixture {
-    val notStartedRenewal = TaskRow("renewal", "/foo", false, NotStarted, TaskRow.notStartedTag)
-    val startedRenewal = TaskRow("renewal", "/foo", true, Started, TaskRow.incompleteTag)
+    val notStartedRenewal         = TaskRow("renewal", "/foo", false, NotStarted, TaskRow.notStartedTag)
+    val startedRenewal            = TaskRow("renewal", "/foo", true, Started, TaskRow.incompleteTag)
     val completedUnchangedRenewal = TaskRow("renewal", "/foo", false, Completed, TaskRow.completedTag)
-    val completedChangedRenewal = TaskRow("renewal", "/foo", true, Completed, TaskRow.completedTag)
-    val updatedChangedRenewal = TaskRow("renewal", "/foo", true, Updated, TaskRow.updatedTag)
+    val completedChangedRenewal   = TaskRow("renewal", "/foo", true, Completed, TaskRow.completedTag)
+    val updatedChangedRenewal     = TaskRow("renewal", "/foo", true, Updated, TaskRow.updatedTag)
 
     val sectionsCompletedAndUpdated = Seq(
       TaskRow("", "/foo", false, Completed, TaskRow.completedTag),
@@ -994,10 +1014,12 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           dataCache.save(eqTo(credId), eqTo(Renewal.sectionKey), any())(any())
         } thenReturn Future.successful(mockCacheMap)
 
-        val result = service.fetchAndUpdateRenewal(
-          credId,
-          renewal => renewal.copy(hasAccepted = false)
-        ).futureValue
+        val result = service
+          .fetchAndUpdateRenewal(
+            credId,
+            renewal => renewal.copy(hasAccepted = false)
+          )
+          .futureValue
 
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
         verify(dataCache).save(eqTo(credId), eqTo(Renewal.sectionKey), captor.capture())(any())
@@ -1015,10 +1037,12 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           dataCache.fetch[Renewal](any(), any())(any())
         } thenReturn Future.successful(None)
 
-        val result = service.fetchAndUpdateRenewal(
-          credId,
-          renewal => renewal.copy(hasAccepted = false)
-        ).futureValue
+        val result = service
+          .fetchAndUpdateRenewal(
+            credId,
+            renewal => renewal.copy(hasAccepted = false)
+          )
+          .futureValue
 
         result mustBe None
       }
@@ -1028,8 +1052,8 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
   "createOrUpdate" must {
     "insert a new renewal when there isn't one" in {
       // Given
-      val cache = Cache("test", Map(Renewal.key -> Json.toJson(Renewal())))
-      val cacheId = "123456"
+      val cache     = Cache("test", Map(Renewal.key -> Json.toJson(Renewal())))
+      val cacheId   = "123456"
       val dataCache = mock[DataCacheConnector]
       when(dataCache.fetch[Renewal](eqTo(cacheId), eqTo(Renewal.key))(any[Format[Renewal]]))
         .thenReturn(Future.successful(None))
@@ -1039,31 +1063,43 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       val statusService = mock[StatusService]
 
       // When
-      val service = new RenewalService(dataCache, statusService)
-      val updatedCache = service.createOrUpdateRenewal(cacheId, r => r.copy(involvedInOtherActivities = None), Renewal()).futureValue
+      val service      = new RenewalService(dataCache, statusService)
+      val updatedCache =
+        service.createOrUpdateRenewal(cacheId, r => r.copy(involvedInOtherActivities = None), Renewal()).futureValue
 
       // Then
-      updatedCache.getEntry(Renewal.key)(Renewal.jsonReads).value mustBe Renewal(customersOutsideUK = Some(CustomersOutsideUK(None)))
+      updatedCache.getEntry(Renewal.key)(Renewal.jsonReads).value mustBe Renewal(customersOutsideUK =
+        Some(CustomersOutsideUK(None))
+      )
     }
 
     "update an existing renewal when there is one" in {
       // Given
-      val cache = Cache("test", Map(Renewal.key -> Json.toJson(Renewal(Some(InvolvedInOtherYes("selling software packages"))))))
-      val cacheId = "123456"
-      val dataCache = mock[DataCacheConnector]
+      val cache          =
+        Cache("test", Map(Renewal.key -> Json.toJson(Renewal(Some(InvolvedInOtherYes("selling software packages"))))))
+      val cacheId        = "123456"
+      val dataCache      = mock[DataCacheConnector]
       when(dataCache.fetch[Renewal](eqTo(cacheId), eqTo(Renewal.key))(any[Format[Renewal]]))
         .thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
-      when(dataCache
-        .save[Renewal](eqTo(cacheId), eqTo(Renewal.key), eqTo(Renewal(Some(InvolvedInOtherYes("selling software packages")))))(any[Format[Renewal]]))
+      when(
+        dataCache
+          .save[Renewal](
+            eqTo(cacheId),
+            eqTo(Renewal.key),
+            eqTo(Renewal(Some(InvolvedInOtherYes("selling software packages"))))
+          )(any[Format[Renewal]])
+      )
         .thenReturn(Future.successful(cache))
-      val statusService = mock[StatusService]
+      val statusService  = mock[StatusService]
       // When
       val renewalService = new RenewalService(dataCache, statusService)
-      val updatedCache = renewalService.createOrUpdateRenewal(
-        cacheId,
-        r => r.copy(involvedInOtherActivities = Some(InvolvedInOtherYes("selling software packages"))),
-        Renewal()
-      ).futureValue
+      val updatedCache   = renewalService
+        .createOrUpdateRenewal(
+          cacheId,
+          r => r.copy(involvedInOtherActivities = Some(InvolvedInOtherYes("selling software packages"))),
+          Renewal()
+        )
+        .futureValue
 
       // Then
       updatedCache.getEntry(Renewal.key)(Renewal.jsonReads).value mustBe
@@ -1078,57 +1114,85 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
     "return business and other activities" when {
       "there is an existing renewal & business matching" in {
         // Given
-        val cacheId = "123456"
+        val cacheId   = "123456"
         val dataCache = mock[DataCacheConnector]
         when(dataCache.fetch[Renewal](eqTo(cacheId), eqTo(Renewal.key))(any[Format[Renewal]]))
           .thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
-        when(dataCache.fetch[BusinessMatching](eqTo(cacheId), eqTo(BusinessMatching.key))(any[Format[BusinessMatching]]))
-          .thenReturn(Future.successful(Some(BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices, MoneyServiceBusiness)))))))
+        when(
+          dataCache.fetch[BusinessMatching](eqTo(cacheId), eqTo(BusinessMatching.key))(any[Format[BusinessMatching]])
+        )
+          .thenReturn(
+            Future.successful(
+              Some(
+                BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices, MoneyServiceBusiness))))
+              )
+            )
+          )
 
         val statusService = mock[StatusService]
 
         // When
-        val renewalService = new RenewalService(dataCache, statusService)
-        val businessOtherActivities = renewalService.updateOtherBusinessActivities(cacheId, InvolvedInOtherYes("selling software packages"))
+        val renewalService          = new RenewalService(dataCache, statusService)
+        val businessOtherActivities = renewalService
+          .updateOtherBusinessActivities(cacheId, InvolvedInOtherYes("selling software packages"))
           .futureValue
           .value
 
         // Then
-        businessOtherActivities mustBe BusinessAndOtherActivities(Set(AccountancyServices, MoneyServiceBusiness), InvolvedInOtherYes("selling software packages"))
+        businessOtherActivities mustBe BusinessAndOtherActivities(
+          Set(AccountancyServices, MoneyServiceBusiness),
+          InvolvedInOtherYes("selling software packages")
+        )
       }
 
       "there is no renewal" in {
         // Given
-        val cacheId = "123456"
-        val dataCache = mock[DataCacheConnector]
-        when(dataCache.fetch[Renewal](eqTo(cacheId), eqTo(Renewal.key))(any[Format[Renewal]])).thenReturn(Future.successful(None))
-        when(dataCache.fetch[BusinessMatching](eqTo(cacheId), eqTo(BusinessMatching.key))(any[Format[BusinessMatching]]))
-          .thenReturn(Future.successful(Some(BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices, MoneyServiceBusiness)))))))
+        val cacheId       = "123456"
+        val dataCache     = mock[DataCacheConnector]
+        when(dataCache.fetch[Renewal](eqTo(cacheId), eqTo(Renewal.key))(any[Format[Renewal]]))
+          .thenReturn(Future.successful(None))
+        when(
+          dataCache.fetch[BusinessMatching](eqTo(cacheId), eqTo(BusinessMatching.key))(any[Format[BusinessMatching]])
+        )
+          .thenReturn(
+            Future.successful(
+              Some(
+                BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices, MoneyServiceBusiness))))
+              )
+            )
+          )
         val statusService = mock[StatusService]
 
         // When
-        val renewalService = new RenewalService(dataCache, statusService)
-        val businessOtherActivities = renewalService.updateOtherBusinessActivities(cacheId, InvolvedInOtherYes("trading")).futureValue.value
+        val renewalService          = new RenewalService(dataCache, statusService)
+        val businessOtherActivities =
+          renewalService.updateOtherBusinessActivities(cacheId, InvolvedInOtherYes("trading")).futureValue.value
 
         // Then
-        businessOtherActivities mustBe BusinessAndOtherActivities(Set(AccountancyServices, MoneyServiceBusiness), InvolvedInOtherYes("trading"))
+        businessOtherActivities mustBe BusinessAndOtherActivities(
+          Set(AccountancyServices, MoneyServiceBusiness),
+          InvolvedInOtherYes("trading")
+        )
       }
     }
 
     "return nothing" when {
       "there is no business matching" in {
         // Given
-        val cacheId = "123456"
+        val cacheId   = "123456"
         val dataCache = mock[DataCacheConnector]
         when(dataCache.fetch[Renewal](eqTo(cacheId), eqTo(Renewal.key))(any[Format[Renewal]]))
-          .thenReturn(Future.successful((Some(Renewal(Some(InvolvedInOtherNo))))))
-        when(dataCache.fetch[BusinessMatching](eqTo(cacheId), eqTo(BusinessMatching.key))(any[Format[BusinessMatching]]))
+          .thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
+        when(
+          dataCache.fetch[BusinessMatching](eqTo(cacheId), eqTo(BusinessMatching.key))(any[Format[BusinessMatching]])
+        )
           .thenReturn(Future.successful(None))
 
-        val statusService = mock[StatusService]
+        val statusService           = mock[StatusService]
         // When
-        val renewalService = new RenewalService(dataCache, statusService)
-        val businessOtherActivities = renewalService.updateOtherBusinessActivities(cacheId, InvolvedInOtherYes("trading")).futureValue
+        val renewalService          = new RenewalService(dataCache, statusService)
+        val businessOtherActivities =
+          renewalService.updateOtherBusinessActivities(cacheId, InvolvedInOtherYes("trading")).futureValue
 
         // Then
         businessOtherActivities mustBe None

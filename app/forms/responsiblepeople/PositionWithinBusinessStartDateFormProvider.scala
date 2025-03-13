@@ -23,7 +23,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class PositionWithinBusinessStartDateFormProvider @Inject()() extends Mappings {
+class PositionWithinBusinessStartDateFormProvider @Inject() () extends Mappings {
 
   def apply(): Form[PositionStartDate] = Form[PositionStartDate](
     "startDate" -> localDate(
@@ -37,7 +37,8 @@ class PositionWithinBusinessStartDateFormProvider @Inject()() extends Mappings {
       minDate(PositionWithinBusinessStartDateFormProvider.minDate, "error.rp.position.invalid.date.after.1900"),
       maxDate(PositionWithinBusinessStartDateFormProvider.maxDate, "error.rp.position.invalid.date.future")
     ).transform[PositionStartDate](
-      PositionStartDate(_), _.startDate
+      PositionStartDate(_),
+      _.startDate
     )
   )
 
@@ -49,4 +50,3 @@ object PositionWithinBusinessStartDateFormProvider {
 
   def maxDate: LocalDate = LocalDate.now()
 }
-

@@ -28,7 +28,7 @@ import views.html.responsiblepeople.ContactDetailsView
 class ContactDetailsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val contact_details = inject[ContactDetailsView]
-  lazy val fp = inject[ContactDetailsFormProvider]
+  lazy val fp              = inject[ContactDetailsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -51,7 +51,7 @@ class ContactDetailsViewSpec extends AmlsViewSpec with Matchers {
 
       def view = contact_details(fp().fill(ContactDetails("0987654", "email.com")), true, 1, None, name)
 
-      heading.html must be(messages("responsiblepeople.contact_details.heading", name))
+      heading.html    must be(messages("responsiblepeople.contact_details.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
     }
 
@@ -64,7 +64,11 @@ class ContactDetailsViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       contact_details(
-        fp().withError("phoneNumber", "error.invalid.rp.contact.phone.number"), false, 1, None, name
+        fp().withError("phoneNumber", "error.invalid.rp.contact.phone.number"),
+        false,
+        1,
+        None,
+        name
       ),
       "phoneNumber",
       "error.invalid.rp.contact.phone.number"
@@ -72,7 +76,11 @@ class ContactDetailsViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       contact_details(
-        fp().withError("emailAddress", "error.invalid.rp.contact.email"), false, 1, None, name
+        fp().withError("emailAddress", "error.invalid.rp.contact.email"),
+        false,
+        1,
+        None,
+        name
       ),
       "emailAddress",
       "error.invalid.rp.contact.email"

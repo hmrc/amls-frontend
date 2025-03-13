@@ -25,10 +25,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.hvd.LinkedCashPaymentsView
 
-class LinkedCashPaymentsViewSpec extends AmlsViewSpec with Matchers  {
+class LinkedCashPaymentsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val paymentsView = inject[LinkedCashPaymentsView]
-  lazy val fp = inject[LinkedCashPaymentsFormProvider]
+  lazy val fp           = inject[LinkedCashPaymentsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -49,14 +49,15 @@ class LinkedCashPaymentsViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = paymentsView(fp().fill(LinkedCashPayments(false)), true)
 
-      heading.html must be(messages("hvd.identify.linked.cash.payment.title"))
+      heading.html    must be(messages("hvd.identify.linked.cash.payment.title"))
       subHeading.html must include(messages("summary.hvd"))
 
     }
 
     behave like pageWithErrors(
       paymentsView(fp().withError("linkedCashPayments", "error.required.hvd.linked.cash.payment"), false),
-      "linkedCashPayments", "error.required.hvd.linked.cash.payment"
+      "linkedCashPayments",
+      "error.required.hvd.linked.cash.payment"
     )
 
     behave like pageWithBackLink(paymentsView(fp(), false))

@@ -22,7 +22,7 @@ import play.twirl.api.Html
 object Strings {
 
   implicit class ConsoleHelpers(s: String) {
-    def in(colour: String) =s"$colour$s${Console.RESET}"
+    def in(colour: String) = s"$colour$s${Console.RESET}"
   }
 
   trait LineBreakConverter {
@@ -35,9 +35,9 @@ object Strings {
 
   implicit class TextHelpers(s: String) {
     def convertLineBreaks(implicit converter: LineBreakConverter): String = converter.convert(s)
-    def convertLineBreaksH(implicit converter: LineBreakConverter): Html = Html(converter.convert(s))
-    def paragraphize(implicit converter: LineBreakConverter) = s"<p>${converter.convert(s)}</p>"
-    def paragraphizeH(implicit converter: LineBreakConverter): Html = Html(s"<p>${converter.convert(s)}</p>")
+    def convertLineBreaksH(implicit converter: LineBreakConverter): Html  = Html(converter.convert(s))
+    def paragraphize(implicit converter: LineBreakConverter)              = s"<p>${converter.convert(s)}</p>"
+    def paragraphizeH(implicit converter: LineBreakConverter): Html       = Html(s"<p>${converter.convert(s)}</p>")
   }
 
 }

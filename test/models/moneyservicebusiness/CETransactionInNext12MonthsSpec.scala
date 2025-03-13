@@ -27,8 +27,9 @@ class CETransactionInNext12MonthsSpec extends PlaySpec {
 
       "Successfully read/write Json data" in {
 
-        CETransactionsInNext12Months.format.reads(CETransactionsInNext12Months.format.writes(
-          CETransactionsInNext12Months("12345678963"))) must be(JsSuccess(CETransactionsInNext12Months("12345678963"), JsPath))
+        CETransactionsInNext12Months.format.reads(
+          CETransactionsInNext12Months.format.writes(CETransactionsInNext12Months("12345678963"))
+        ) must be(JsSuccess(CETransactionsInNext12Months("12345678963"), JsPath))
 
       }
     }

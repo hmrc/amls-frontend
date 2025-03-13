@@ -24,12 +24,12 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.CustomersOutsideIsUKView
 
-class CustomersOutsideIsUKViewSpec extends AmlsViewSpec with Matchers  {
+class CustomersOutsideIsUKViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture
 
-  lazy val customers_outside_uk_isUK = inject[CustomersOutsideIsUKView]
-  lazy val fp = inject[CustomersOutsideIsUKFormProvider]
+  lazy val customers_outside_uk_isUK                             = inject[CustomersOutsideIsUKView]
+  lazy val fp                                                    = inject[CustomersOutsideIsUKFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   "CustomersOutsideIsUKView" must {
@@ -44,7 +44,7 @@ class CustomersOutsideIsUKViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = customers_outside_uk_isUK(fp().fill(CustomersOutsideIsUK(false)), true)
 
-      heading.html must be(messages("renewal.customer.outside.uk.title"))
+      heading.html    must be(messages("renewal.customer.outside.uk.title"))
       subHeading.html must include(messages("summary.renewal"))
     }
 

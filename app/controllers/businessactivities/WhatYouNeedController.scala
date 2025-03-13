@@ -27,26 +27,26 @@ import views.html.businessactivities.WhatYouNeedView
 
 import javax.inject.Inject
 
-class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                      val authConnector: AuthConnector,
-                                      authAction: AuthAction,
-                                      val ds: CommonPlayDependencies,
-                                      val cc: MessagesControllerComponents,
-                                      view: WhatYouNeedView) extends AmlsBaseController(ds, cc) with Logging {
+class WhatYouNeedController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authConnector: AuthConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  view: WhatYouNeedView
+) extends AmlsBaseController(ds, cc)
+    with Logging {
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
-        (for {
-          bm <- businessMatching
-          ba <- bm.activities
-        } yield {
-          Ok(view(Some(ba)))
-        }).getOrElse {
-            val errorMessage = "Unable to retrieve business activities in [businessactivities][WhatYouNeedController]"
-            logger.warn(errorMessage)
-            throw new Exception(errorMessage)
-          }
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
+      (for {
+        bm <- businessMatching
+        ba <- bm.activities
+      } yield Ok(view(Some(ba)))).getOrElse {
+        val errorMessage = "Unable to retrieve business activities in [businessactivities][WhatYouNeedController]"
+        logger.warn(errorMessage)
+        throw new Exception(errorMessage)
       }
+    }
   }
 }

@@ -26,34 +26,32 @@ case class Positions(positions: Set[PositionWithinBusiness], startDate: Option[P
 
 object Positions {
 
-  implicit val jsonWrites: Writes[Positions] = {
+  implicit val jsonWrites: Writes[Positions] =
     Writes[Positions] {
-      case Positions(positions, None) => Json.obj("positions" -> positions.map(p => PositionWithinBusiness.jsonWrites.writes(p)))
+      case Positions(positions, None)                               =>
+        Json.obj("positions" -> positions.map(p => PositionWithinBusiness.jsonWrites.writes(p)))
       case Positions(positions, Some(PositionStartDate(firstDate))) =>
         Json.obj(
           "positions" -> positions.map(p => PositionWithinBusiness.jsonWrites.writes(p)),
           "startDate" -> firstDate.toString
         )
     }
-  }
 
   implicit val jsonReads: Reads[Positions] = {
     import play.api.libs.functional.syntax._
     ((__ \ "positions").read[Set[PositionWithinBusiness]] and
       (__ \ "startDate").readNullable[LocalDate].map {
         case Some(date) => Some(PositionStartDate.apply(date))
-        case None => None
-      }) (Positions.apply _)
+        case None       => None
+      })(Positions.apply _)
   }
 
-  def update(positions: Positions, positionSet: Set[PositionWithinBusiness]): Positions = {
+  def update(positions: Positions, positionSet: Set[PositionWithinBusiness]): Positions =
     positions match {
       case Positions(_, Some(date)) => Positions(positionSet, Some(date))
-      case Positions(_, None) => Positions(positionSet, None)
+      case Positions(_, None)       => Positions(positionSet, None)
     }
-  }
 
-  def update(positions: Positions, startDate: PositionStartDate): Positions = {
+  def update(positions: Positions, startDate: PositionStartDate): Positions =
     Positions(positions.positions, Some(startDate))
-  }
 }

@@ -29,9 +29,9 @@ import views.html.responsiblepeople.KnownByView
 class KnownByControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
 
   trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
-    val request = addToken(self.authRequest)
-    val RecordId = 1
-    lazy val view = inject[KnownByView]
+    val request         = addToken(self.authRequest)
+    val RecordId        = 1
+    lazy val view       = inject[KnownByView]
     lazy val controller = new KnownByController(
       mockCacheConnector,
       SuccessfulAuthAction,
@@ -39,7 +39,8 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
       cc = mockMcc,
       formProvider = inject[KnownByFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
   }
 
   "The KnownByController" when {
@@ -98,16 +99,16 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
           "edit is false" in new TestFixture {
 
             val requestWithParams = FakeRequest(POST, routes.KnownByController.post(1).url)
-            .withFormUrlEncodedBody(
-              "hasOtherNames" -> "true",
-              "otherNames" -> "otherName"
-            )
+              .withFormUrlEncodedBody(
+                "hasOtherNames" -> "true",
+                "otherNames"    -> "otherName"
+              )
 
             mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[KnownBy]
 
             val result = controller.post(RecordId)(requestWithParams)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.DateOfBirthController.get(RecordId).url))
           }
         }
@@ -116,16 +117,16 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
           "edit is true" in new TestFixture {
 
             val requestWithParams = FakeRequest(POST, routes.KnownByController.post(1).url)
-            .withFormUrlEncodedBody(
-              "hasOtherNames" -> "true",
-              "otherNames" -> "otherName"
-            )
+              .withFormUrlEncodedBody(
+                "hasOtherNames" -> "true",
+                "otherNames"    -> "otherName"
+              )
 
             mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[KnownBy]
 
             val result = controller.post(RecordId, true)(requestWithParams)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
           }
         }
@@ -133,19 +134,19 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
         "go to DetailedAnswersController" when {
           "edit is true and does not have other names" in new TestFixture {
 
-          val requestWithParams = FakeRequest(POST, routes.KnownByController.post(1).url)
-            .withFormUrlEncodedBody(
-          "hasOtherNames" -> "false"
-          )
+            val requestWithParams = FakeRequest(POST, routes.KnownByController.post(1).url)
+              .withFormUrlEncodedBody(
+                "hasOtherNames" -> "false"
+              )
 
-          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
-          mockCacheSave[KnownBy]
+            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
+            mockCacheSave[KnownBy]
 
-          val result = controller.post(RecordId, true)(requestWithParams)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
+            val result = controller.post(RecordId, true)(requestWithParams)
+            status(result)           must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
           }
-          }
+        }
 
       }
 
@@ -153,9 +154,9 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
         "return BAD_REQUEST" in new TestFixture {
 
           val NameMissingInRequest = FakeRequest(POST, routes.KnownByController.post(1).url)
-          .withFormUrlEncodedBody(
-            "hasOtherNames" -> "true"
-          )
+            .withFormUrlEncodedBody(
+              "hasOtherNames" -> "true"
+            )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[KnownBy]
@@ -171,10 +172,10 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
         "return NOT_FOUND" in new TestFixture {
 
           val requestWithParams = FakeRequest(POST, routes.KnownByController.post(1).url)
-          .withFormUrlEncodedBody(
-            "hasOtherNames" -> "true",
-            "otherNames" -> "otherName"
-          )
+            .withFormUrlEncodedBody(
+              "hasOtherNames" -> "true",
+              "otherNames"    -> "otherName"
+            )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[KnownBy]
@@ -185,7 +186,7 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
       }
 
     }
-    
+
   }
 
 }

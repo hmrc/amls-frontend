@@ -27,7 +27,7 @@ import views.html.tradingpremises.WhereAreTradingPremisesView
 class WhereAreTradingPremisesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val where_are_trading_premises = inject[WhereAreTradingPremisesView]
-  lazy val fp = inject[TradingAddressFormProvider]
+  lazy val fp                         = inject[TradingAddressFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -37,7 +37,7 @@ class WhereAreTradingPremisesViewSpec extends AmlsViewSpec with Matchers {
 
   "WhereAreTradingPremisesView" must {
 
-      "have correct title, heading and load UI with empty form" in new ViewFixture {
+    "have correct title, heading and load UI with empty form" in new ViewFixture {
 
       val pageTitle = messages("tradingpremises.yourtradingpremises.title") + " - " +
         messages("summary.tradingpremises") + " - " +
@@ -45,21 +45,23 @@ class WhereAreTradingPremisesViewSpec extends AmlsViewSpec with Matchers {
 
       def view = where_are_trading_premises(fp(), false, 1)
 
-      doc.title must be(pageTitle)
-      heading.html must be(messages("tradingpremises.yourtradingpremises.title"))
+      doc.title       must be(pageTitle)
+      heading.html    must be(messages("tradingpremises.yourtradingpremises.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
 
-      doc.getElementById("tradingName").tagName() must be("input")
+      doc.getElementById("tradingName").tagName()  must be("input")
       doc.getElementById("addressLine1").tagName() must be("input")
       doc.getElementById("addressLine2").tagName() must be("input")
       doc.getElementById("addressLine3").tagName() must be("input")
       doc.getElementById("addressLine4").tagName() must be("input")
-      doc.getElementById("postCode").tagName() must be("input")
+      doc.getElementById("postCode").tagName()     must be("input")
     }
 
     behave like pageWithErrors(
       where_are_trading_premises(
-        fp().withError("tradingName", "error.invalid.char.tp.agent.company.details"), true, 1
+        fp().withError("tradingName", "error.invalid.char.tp.agent.company.details"),
+        true,
+        1
       ),
       "tradingName",
       "error.invalid.char.tp.agent.company.details"

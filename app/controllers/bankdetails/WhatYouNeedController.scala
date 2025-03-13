@@ -28,24 +28,25 @@ import views.html.bankdetails.WhatYouNeedView
 
 import javax.inject.Inject
 
-class WhatYouNeedController @Inject()(val authAction: AuthAction,
-                                      val ds: CommonPlayDependencies,
-                                      dataCacheConnector: DataCacheConnector,
-                                      val mcc: MessagesControllerComponents,
-                                      view: WhatYouNeedView) extends AmlsBaseController(ds, mcc) {
+class WhatYouNeedController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  dataCacheConnector: DataCacheConnector,
+  val mcc: MessagesControllerComponents,
+  view: WhatYouNeedView
+) extends AmlsBaseController(ds, mcc) {
 
-  def get: Action[AnyContent] = authAction.async {
-      implicit request =>
-        val result = for {
-            bankDetails <- OptionT(dataCacheConnector.fetch[Seq[BankDetails]](request.credId, BankDetails.key))
-          } yield {
-            if (bankDetails.exists(visibleAccountsFilter)) {
-              Ok(view(routes.BankAccountNameController.getNoIndex))
-            } else {
-              Ok(view(routes.HasBankAccountController.get))
-            }
-          }
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    val result = for {
+      bankDetails <- OptionT(dataCacheConnector.fetch[Seq[BankDetails]](request.credId, BankDetails.key))
+    } yield
+      if (bankDetails.exists(visibleAccountsFilter)) {
+        Ok(view(routes.BankAccountNameController.getNoIndex))
+      } else {
+        Ok(view(routes.HasBankAccountController.get))
+      }
 
-        result.map(_.removingFromSession("itemIndex")) getOrElse Ok(view(routes.HasBankAccountController.get)).removingFromSession("itemIndex")
+    result.map(_.removingFromSession("itemIndex")) getOrElse Ok(view(routes.HasBankAccountController.get))
+      .removingFromSession("itemIndex")
   }
 }

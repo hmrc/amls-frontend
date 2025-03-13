@@ -43,12 +43,14 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar with Inje
 
     val accountType: BankAccountType.PersonalAccount.type = PersonalAccount
 
-    val ukBankAccount: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
+    val ukBankAccount: BankAccount =
+      BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
 
     lazy val bankAccountTypes: BankAccountTypesView = inject[BankAccountTypesView]
 
     val controller = new BankAccountTypeController(
-      SuccessfulAuthAction, ds = commonDependencies,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
       mockCacheConnector,
       mockStatusService,
       mockMcc,
@@ -63,24 +65,31 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar with Inje
       "respond with OK and display the blank 'bank account type' page" when {
         "there is any number of bank accounts" in new Fixture {
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(
-              BankDetails(None, None, status = Some(StatusConstants.Deleted)),
-              BankDetails(Some(NoBankAccountUsed), None, status = Some(StatusConstants.Added))
-            )))
+          mockCacheFetch[Seq[BankDetails]](
+            Some(
+              Seq(
+                BankDetails(None, None, status = Some(StatusConstants.Deleted)),
+                BankDetails(Some(NoBankAccountUsed), None, status = Some(StatusConstants.Added))
+              )
+            )
+          )
           mockApplicationStatus(SubmissionReady)
 
           val result: Future[Result] = controller.get(1, false)(request)
-  
-          status(result) must be(OK)
+
+          status(result)          must be(OK)
           contentAsString(result) must include(Messages("bankdetails.accounttype.title"))
           val document: Document = Jsoup.parse(contentAsString(result))
 
-          document.select(s"input[type=radio][name=bankAccountType][value=${BelongsToOtherBusiness.toString}]")
-            .hasAttr("checked") must be(false)
-          document.select(s"input[type=radio][name=bankAccountType][value=${BelongsToBusiness.toString}]")
-            .hasAttr("checked") must be(false)
-          document.select(s"input[type=radio][name=bankAccountType][value=${PersonalAccount.toString}]")
-            .hasAttr("checked") must be(false)
+          document
+            .select(s"input[type=radio][name=bankAccountType][value=${BelongsToOtherBusiness.toString}]")
+            .hasAttr("checked")                                             must be(false)
+          document
+            .select(s"input[type=radio][name=bankAccountType][value=${BelongsToBusiness.toString}]")
+            .hasAttr("checked")                                             must be(false)
+          document
+            .select(s"input[type=radio][name=bankAccountType][value=${PersonalAccount.toString}]")
+            .hasAttr("checked")                                             must be(false)
           document.select("input[type=radio][name=bankAccountType]").size() must be(3)
         }
 
@@ -90,11 +99,13 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar with Inje
           mockApplicationStatus(SubmissionReady)
 
           val result: Future[Result] = controller.get(1)(request)
-          val document: Boolean = Jsoup.parse(contentAsString(result))
-            .select(s"input[value=${PersonalAccount.toString}]").hasAttr("checked")
+          val document: Boolean      = Jsoup
+            .parse(contentAsString(result))
+            .select(s"input[value=${PersonalAccount.toString}]")
+            .hasAttr("checked")
 
           status(result) must be(OK)
-          document must be(true)
+          document       must be(true)
         }
 
         "editing a bank account" which {
@@ -103,11 +114,13 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar with Inje
             mockApplicationStatus(SubmissionDecisionApproved)
 
             val result: Future[Result] = controller.get(1, edit = true)(request)
-            val document: Boolean = Jsoup.parse(contentAsString(result))
-              .select(s"input[value=${PersonalAccount.toString}]").hasAttr("checked")
+            val document: Boolean      = Jsoup
+              .parse(contentAsString(result))
+              .select(s"input[value=${PersonalAccount.toString}]")
+              .hasAttr("checked")
 
             status(result) must be(OK)
-            document must be(true)
+            document       must be(true)
           }
         }
       }
@@ -130,7 +143,8 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar with Inje
                 BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true),
                 BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true)
               )
-            ), Some(BankDetails.key)
+            ),
+            Some(BankDetails.key)
           )
 
           mockApplicationStatus(SubmissionReadyForReview)
@@ -148,7 +162,8 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar with Inje
                 BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true),
                 BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true)
               )
-            ), Some(BankDetails.key)
+            ),
+            Some(BankDetails.key)
           )
 
           mockApplicationStatus(SubmissionDecisionApproved)
@@ -164,78 +179,89 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar with Inje
       "respond with OK and redirect to the bank account details page" when {
 
         "not editing and there is valid account type" in new Fixture {
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountTypeController.post(1, false).url)
-          .withFormUrlEncodedBody(
-            "bankAccountType" -> PersonalAccount.toString
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BankAccountTypeController.post(1, false).url)
+              .withFormUrlEncodedBody(
+                "bankAccountType" -> PersonalAccount.toString
+              )
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))))
           mockCacheSave[Seq[BankDetails]]
 
           val result: Future[Result] = controller.post(1, false)(newRequest)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.BankAccountIsUKController.get(1, false).url))
         }
 
-          "not editing and there is no bank account" in new Fixture {
+        "not editing and there is no bank account" in new Fixture {
 
-            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountTypeController.post(1, false).url)
-            .withFormUrlEncodedBody(
-              "bankAccountType" -> NoBankAccountUsed.toString
-            )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BankAccountTypeController.post(1, false).url)
+              .withFormUrlEncodedBody(
+                "bankAccountType" -> NoBankAccountUsed.toString
+              )
 
-            mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))))
-            mockCacheSave[Seq[BankDetails]]
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))))
+          mockCacheSave[Seq[BankDetails]]
 
-            val result: Future[Result] = controller.post(1, false)(newRequest)
+          val result: Future[Result] = controller.post(1, false)(newRequest)
 
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
         }
 
         "editing and there is valid account type but no account details" in new Fixture {
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountTypeController.post(1, edit = true).url)
-          .withFormUrlEncodedBody(
-            "bankAccountType" -> PersonalAccount.toString
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BankAccountTypeController.post(1, edit = true).url)
+              .withFormUrlEncodedBody(
+                "bankAccountType" -> PersonalAccount.toString
+              )
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))))
           mockCacheSave[Seq[BankDetails]]
 
           val result: Future[Result] = controller.post(1, edit = true)(newRequest)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
         }
 
         "editing and there is both a valid account type and valid account details" in new Fixture {
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountTypeController.post(1, edit = true).url)
-          .withFormUrlEncodedBody(
-            "bankAccountType" -> PersonalAccount.toString
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BankAccountTypeController.post(1, edit = true).url)
+              .withFormUrlEncodedBody(
+                "bankAccountType" -> PersonalAccount.toString
+              )
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(
-            Some(PersonalAccount),
-            Some("AccountName"),
-            Some(ukBankAccount)
-          ))))
+          mockCacheFetch[Seq[BankDetails]](
+            Some(
+              Seq(
+                BankDetails(
+                  Some(PersonalAccount),
+                  Some("AccountName"),
+                  Some(ukBankAccount)
+                )
+              )
+            )
+          )
 
           mockCacheSave[Seq[BankDetails]]
 
           val result: Future[Result] = controller.post(1, edit = true)(newRequest)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
         }
       }
 
       "respond with BAD_REQUEST" when {
         "there is invalid data" in new Fixture {
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountTypeController.post(0, false).url)
-          .withFormUrlEncodedBody(
-            "bankAccountType" -> "foo"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BankAccountTypeController.post(0, false).url)
+              .withFormUrlEncodedBody(
+                "bankAccountType" -> "foo"
+              )
 
           mockCacheFetch[Seq[BankDetails]](None)
           mockCacheSave[Seq[BankDetails]]
@@ -248,17 +274,18 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar with Inje
 
       "respond with NOT_FOUND" when {
         "the given index is out of bounds" in new Fixture {
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountTypeController.post(1, false).url)
-            .withFormUrlEncodedBody(
-              "bankAccountType" -> PersonalAccount.toString
-            )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BankAccountTypeController.post(1, false).url)
+              .withFormUrlEncodedBody(
+                "bankAccountType" -> PersonalAccount.toString
+              )
 
           mockApplicationStatus(SubmissionDecisionApproved)
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
 
-          when(mockCacheConnector.save[Seq[BankDetails]](any(), any(), any())(any())
-          ).thenThrow(new IndexOutOfBoundsException("error"))
+          when(mockCacheConnector.save[Seq[BankDetails]](any(), any(), any())(any()))
+            .thenThrow(new IndexOutOfBoundsException("error"))
 
           val result: Future[Result] = controller.post(1, false)(newRequest)
 

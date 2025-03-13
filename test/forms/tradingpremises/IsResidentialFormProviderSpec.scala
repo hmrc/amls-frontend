@@ -23,13 +23,14 @@ import play.api.data.Form
 class IsResidentialFormProviderSpec extends BooleanFieldBehaviours[IsResidential] {
 
   override val form: Form[IsResidential] = new IsResidentialFormProvider()()
-  override val fieldName: String = "isResidential"
-  override val errorMessage: String = "tradingpremises.yourtradingpremises.isresidential.required"
+  override val fieldName: String         = "isResidential"
+  override val errorMessage: String      = "tradingpremises.yourtradingpremises.isresidential.required"
 
   "IsResidentialFormProvider" must {
 
     behave like booleanFieldWithModel(
-      IsResidential(true), IsResidential(false)
+      IsResidential(true),
+      IsResidential(false)
     )
   }
 }

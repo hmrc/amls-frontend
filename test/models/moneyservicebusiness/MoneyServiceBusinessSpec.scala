@@ -54,11 +54,11 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       "model has been updated" should {
         "return an Updated TaskRow" in {
 
-          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(
-            msbServices = Some(BusinessMatchingMsbServices(
-              Set(ChequeCashingScrapMetal))
+          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(
+            BusinessMatching(
+              msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal)))
             )
-          ))
+          )
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(
             completeMsb.copy(
               hasChanged = true,
@@ -95,10 +95,11 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 
       "model is incomplete" should {
         "return an Incomplete TaskRow" in {
-          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(
-            Set(ChequeCashingScrapMetal)))))
+          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(
+            BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
+          )
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn
-            Some(MoneyServiceBusiness( throughput = Some(ExpectedThroughput.Second)))
+            Some(MoneyServiceBusiness(throughput = Some(ExpectedThroughput.Second)))
           MoneyServiceBusiness.taskRow must be(
             TaskRow(
               MoneyServiceBusiness.key,
@@ -113,8 +114,9 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 
       "model is complete" should {
         "return a Completed TaskRow" in {
-          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(
-            Set(ChequeCashingScrapMetal)))))
+          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(
+            BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
+          )
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(completeMsb)
           MoneyServiceBusiness.taskRow must be(
             TaskRow(
@@ -160,21 +162,30 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 
 trait MoneyServiceBusinessTestData {
 
-  private val businessUseAnIPSP = BusinessUseAnIPSPYes("name", "123456789123456")
+  private val businessUseAnIPSP            = BusinessUseAnIPSPYes("name", "123456789123456")
   private val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))
 
   val completeMsb = MoneyServiceBusiness(
     throughput = Some(ExpectedThroughput.Second),
     businessUseAnIPSP = Some(businessUseAnIPSP),
     identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
-    Some(WhichCurrencies(
-      Seq("USD", "GBP", "EUR"),
-      Some(UsesForeignCurrenciesYes),
-      Some(MoneySources(Some(BankMoneySource("Bank Name")), Some(WholesalerMoneySource("Wholesaler Name")), Some(true)))
-    )),
+    Some(
+      WhichCurrencies(
+        Seq("USD", "GBP", "EUR"),
+        Some(UsesForeignCurrenciesYes),
+        Some(
+          MoneySources(Some(BankMoneySource("Bank Name")), Some(WholesalerMoneySource("Wholesaler Name")), Some(true))
+        )
+      )
+    ),
     sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
     fundsTransfer = Some(FundsTransfer(true)),
-    branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))))),
+    branchesOrAgents = Some(
+      BranchesOrAgents(
+        BranchesOrAgentsHasCountries(true),
+        Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB"))))
+      )
+    ),
     sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
     mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
     transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
@@ -191,32 +202,35 @@ trait MoneyServiceBusinessTestData {
   val emptyMsb = MoneyServiceBusiness(None)
 
   val completeJson = Json.obj(
-    "throughput" -> Json.obj("throughput" -> "02"),
-    "businessUseAnIPSP" -> Json.obj(
-      "useAnIPSP" -> true,
-      "name" -> "name",
+    "throughput"                   -> Json.obj("throughput" -> "02"),
+    "businessUseAnIPSP"            -> Json.obj(
+      "useAnIPSP"       -> true,
+      "name"            -> "name",
       "referenceNumber" -> "123456789123456"
     ),
-    "identifyLinkedTransactions" -> Json.obj("linkedTxn" -> true),
-    "whichCurrencies" -> Json.obj(
-      "currencies" -> Json.arr("USD", "GBP", "EUR"), "usesForeignCurrencies" -> UsesForeignCurrenciesYes.asInstanceOf[UsesForeignCurrencies], "moneySources" -> Json.obj(
-      "bankMoneySource" -> "Yes",
-      "bankNames" -> "Bank Name",
-      "wholesalerMoneySource" -> "Yes",
-      "wholesalerNames" -> "Wholesaler Name",
-      "customerMoneySource" -> "Yes"
-    )),
-    "sendMoneyToOtherCountry" -> Json.obj("money" -> true),
-    "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
-    "branchesOrAgents" -> Json.obj("hasCountries" -> true,"countries" ->Json.arr("GB")),
-    "transactionsInNext12Months" -> Json.obj("txnAmount" -> "12345678963"),
-    "fundsTransfer" -> Json.obj("transferWithoutFormalSystems" -> true),
-    "mostTransactions" -> Json.obj("mostTransactionsCountries" -> Seq("GB")),
+    "identifyLinkedTransactions"   -> Json.obj("linkedTxn" -> true),
+    "whichCurrencies"              -> Json.obj(
+      "currencies"            -> Json.arr("USD", "GBP", "EUR"),
+      "usesForeignCurrencies" -> UsesForeignCurrenciesYes.asInstanceOf[UsesForeignCurrencies],
+      "moneySources"          -> Json.obj(
+        "bankMoneySource"       -> "Yes",
+        "bankNames"             -> "Bank Name",
+        "wholesalerMoneySource" -> "Yes",
+        "wholesalerNames"       -> "Wholesaler Name",
+        "customerMoneySource"   -> "Yes"
+      )
+    ),
+    "sendMoneyToOtherCountry"      -> Json.obj("money" -> true),
+    "fundsTransfer"                -> Json.obj("transferWithoutFormalSystems" -> true),
+    "branchesOrAgents"             -> Json.obj("hasCountries" -> true, "countries" -> Json.arr("GB")),
+    "transactionsInNext12Months"   -> Json.obj("txnAmount" -> "12345678963"),
+    "fundsTransfer"                -> Json.obj("transferWithoutFormalSystems" -> true),
+    "mostTransactions"             -> Json.obj("mostTransactionsCountries" -> Seq("GB")),
     "sendTheLargestAmountsOfMoney" -> Json.obj("country_1" -> "GB"),
     "ceTransactionsInNext12Months" -> Json.obj("ceTransaction" -> "12345678963"),
     "fxTransactionsInNext12Months" -> Json.obj("fxTransaction" -> "12345678963"),
-    "hasChanged" -> false,
-    "hasAccepted" -> true
+    "hasChanged"                   -> false,
+    "hasAccepted"                  -> true
   )
 
   val emptyJson = Json.obj("msbServices" -> Json.arr())

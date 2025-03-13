@@ -23,4 +23,3 @@ case class TransactionsInNext12Months(txnAmount: String)
 object TransactionsInNext12Months {
   implicit val format: OFormat[TransactionsInNext12Months] = Json.format[TransactionsInNext12Months]
 }
-

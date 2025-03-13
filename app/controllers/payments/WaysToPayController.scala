@@ -33,76 +33,97 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class WaysToPayController @Inject()(val authAction: AuthAction,
-                                    val ds: CommonPlayDependencies,
-                                    val statusService: StatusService,
-                                    val paymentsService: PaymentsService,
-                                    val authEnrolmentsService: AuthEnrolmentsService,
-                                    val feeResponseService: FeeResponseService,
-                                    val cc: MessagesControllerComponents,
-                                    val renewalService: RenewalService,
-                                    formProvider: WaysToPayFormProvider,
-                                    view: WaysToPayView) extends AmlsBaseController(ds, cc) {
+class WaysToPayController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val statusService: StatusService,
+  val paymentsService: PaymentsService,
+  val authEnrolmentsService: AuthEnrolmentsService,
+  val feeResponseService: FeeResponseService,
+  val cc: MessagesControllerComponents,
+  val renewalService: RenewalService,
+  formProvider: WaysToPayFormProvider,
+  view: WaysToPayView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
-      } yield Ok(view(formProvider(), subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
+  def get(): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(
+                      request.credId,
+                      request.amlsRefNumber,
+                      request.accountTypeId,
+                      statusService,
+                      renewalService
+                    )
+    } yield Ok(view(formProvider(), subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
   }
 
-  def post(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post(): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors =>
           (for {
-            subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
-          } yield BadRequest(view(formWithErrors, subHeading))) getOrElse InternalServerError("Failed to retrieve data."),
+            subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(
+                            request.credId,
+                            request.amlsRefNumber,
+                            request.accountTypeId,
+                            statusService,
+                            renewalService
+                          )
+          } yield BadRequest(view(formWithErrors, subHeading))) getOrElse InternalServerError(
+            "Failed to retrieve data."
+          ),
         {
           case Card =>
             progressToPayment { (fees, paymentReference, safeId) =>
-              paymentsService.requestPaymentsUrl(
-                fees,
-                controllers.routes.PaymentConfirmationController.paymentConfirmation(paymentReference).url,
-                fees.amlsReferenceNumber,
-                safeId,
-                request.accountTypeId
-              ).map { nextUrl =>
-                Redirect(nextUrl.value)
-              }
+              paymentsService
+                .requestPaymentsUrl(
+                  fees,
+                  controllers.routes.PaymentConfirmationController.paymentConfirmation(paymentReference).url,
+                  fees.amlsReferenceNumber,
+                  safeId,
+                  request.accountTypeId
+                )
+                .map { nextUrl =>
+                  Redirect(nextUrl.value)
+                }
             }("Cannot retrieve payment information")
           case Bacs =>
             progressToPayment { (fees, paymentReference, safeId) =>
-              paymentsService.createBacsPayment(
-                CreateBacsPaymentRequest(
-                  fees.amlsReferenceNumber,
-                  paymentReference,
-                  safeId,
-                  paymentsService.amountFromSubmissionData(fees).fold(0)(_.map(_ * 100).value.toInt)),
-                request.accountTypeId
-              ).map { _ =>
-                Redirect(controllers.payments.routes.TypeOfBankController.get())
-              }
+              paymentsService
+                .createBacsPayment(
+                  CreateBacsPaymentRequest(
+                    fees.amlsReferenceNumber,
+                    paymentReference,
+                    safeId,
+                    paymentsService.amountFromSubmissionData(fees).fold(0)(_.map(_ * 100).value.toInt)
+                  ),
+                  request.accountTypeId
+                )
+                .map { _ =>
+                  Redirect(controllers.payments.routes.TypeOfBankController.get())
+                }
             }("Unable to save BACS info")
         }
       )
   }
 
-  def progressToPayment(fn: (FeeResponse, String, String) => Future[Result])
-                       (errorMessage: String)
-                       (implicit hc: HeaderCarrier, request: AuthorisedRequest[_]): Future[Result] = {
+  def progressToPayment(
+    fn: (FeeResponse, String, String) => Future[Result]
+  )(errorMessage: String)(implicit hc: HeaderCarrier, request: AuthorisedRequest[_]): Future[Result] = {
 
     val submissionDetails = for {
-      amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-      (_, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(Option(amlsRefNo), request.accountTypeId, request.credId))
-      fees <- OptionT(feeResponseService.getFeeResponse(amlsRefNo, request.accountTypeId))
+      amlsRefNo           <- OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+      (_, detailedStatus) <-
+        OptionT.liftF(statusService.getDetailedStatus(Option(amlsRefNo), request.accountTypeId, request.credId))
+      fees                <- OptionT(feeResponseService.getFeeResponse(amlsRefNo, request.accountTypeId))
     } yield (fees, detailedStatus)
 
     submissionDetails.value flatMap {
-      case Some((fees, Some(detailedStatus)))
-        if fees.paymentReference.isDefined & detailedStatus.safeId.isDefined =>
+      case Some((fees, Some(detailedStatus))) if fees.paymentReference.isDefined & detailedStatus.safeId.isDefined =>
         fn(fees, fees.paymentReference.get, detailedStatus.safeId.get)
-      case _ => Future.successful(InternalServerError(errorMessage))
+      case _                                                                                                       => Future.successful(InternalServerError(errorMessage))
     }
   }
 }

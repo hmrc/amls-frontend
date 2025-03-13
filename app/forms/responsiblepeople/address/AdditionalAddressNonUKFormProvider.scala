@@ -22,17 +22,22 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class AdditionalAddressNonUKFormProvider @Inject()() extends AddressFormProvider[ResponsiblePersonAddress]  {
+class AdditionalAddressNonUKFormProvider @Inject() () extends AddressFormProvider[ResponsiblePersonAddress] {
 
   override val countryErrorKey: String = "error.required.enter.non.uk.previous"
 
-  override def toObject: (String, Option[String], Option[String], Option[String], String) => ResponsiblePersonAddress = {
+  override def toObject
+    : (String, Option[String], Option[String], Option[String], String) => ResponsiblePersonAddress = {
     case (line1, line2, line3, line4, code) =>
       ResponsiblePersonAddress(PersonAddressNonUK(line1, line2, line3, line4, parseCountry(code)), None)
   }
 
-  override def fromObject: ResponsiblePersonAddress => Option[(String, Option[String], Option[String], Option[String], String)] = {
-    case ResponsiblePersonAddress(PersonAddressNonUK(addressLine1, addressLine2, addressLine3, addressLine4, country), _) =>
+  override def fromObject
+    : ResponsiblePersonAddress => Option[(String, Option[String], Option[String], Option[String], String)] = {
+    case ResponsiblePersonAddress(
+          PersonAddressNonUK(addressLine1, addressLine2, addressLine3, addressLine4, country),
+          _
+        ) =>
       Some((addressLine1, addressLine2, addressLine3, addressLine4, country.code))
     case _ => None
   }

@@ -24,10 +24,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.AMLSTurnoverView
 
-class AMLSTurnoverViewSpec extends AmlsViewSpec with Matchers  {
+class AMLSTurnoverViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val amls_turnover = inject[AMLSTurnoverView]
-  lazy val fp = inject[AMLSTurnoverFormProvider]
+  lazy val amls_turnover                    = inject[AMLSTurnoverView]
+  lazy val fp                               = inject[AMLSTurnoverFormProvider]
   implicit val requestWithToken: Request[_] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -44,7 +44,7 @@ class AMLSTurnoverViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = amls_turnover(fp().fill(AMLSTurnover.Third), true, Some(List("some provider")))
 
-      heading.html must be(messages("renewal.turnover.title", "some provider"))
+      heading.html    must be(messages("renewal.turnover.title", "some provider"))
       subHeading.html must include(messages("summary.renewal"))
     }
 
@@ -52,8 +52,8 @@ class AMLSTurnoverViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = amls_turnover(fp().fill(AMLSTurnover.Third), true, Some(List("some provider", "some other provider")))
 
-      heading.html must be(messages("renewal.turnover.title"))
-      subHeading.html must include( messages("summary.renewal"))
+      heading.html    must be(messages("renewal.turnover.title"))
+      subHeading.html must include(messages("summary.renewal"))
     }
 
     "correctly list business activities" in new ViewFixture {

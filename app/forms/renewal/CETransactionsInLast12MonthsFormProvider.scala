@@ -22,10 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class CETransactionsInLast12MonthsFormProvider @Inject()() extends Mappings {
+class CETransactionsInLast12MonthsFormProvider @Inject() () extends Mappings {
 
   val lengthAndRegexError = "error.invalid.renewal.ce.transactions.in.12months"
-  val length = 11
+  val length              = 11
 
   def apply(): Form[CETransactionsInLast12Months] = Form(
     "ceTransaction" -> text("error.required.renewal.ce.transactions.in.12months")

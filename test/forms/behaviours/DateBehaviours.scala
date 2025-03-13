@@ -23,92 +23,76 @@ import java.time.LocalDate
 
 class DateBehaviours extends FieldBehaviours {
 
-  def dateField(form: Form[_], key: String, validData: Gen[LocalDate]): Unit = {
-
+  def dateField(form: Form[_], key: String, validData: Gen[LocalDate]): Unit =
     "bind valid data" in {
 
-      forAll(validData -> "valid date") {
-        date =>
+      forAll(validData -> "valid date") { date =>
+        val data = Map(
+          s"$key.day"   -> date.getDayOfMonth.toString,
+          s"$key.month" -> date.getMonthValue.toString,
+          s"$key.year"  -> date.getYear.toString
+        )
 
-          val data = Map(
-            s"$key.day"   -> date.getDayOfMonth.toString,
-            s"$key.month" -> date.getMonthValue.toString,
-            s"$key.year"  -> date.getYear.toString
-          )
+        val result = form.bind(data)
 
-          val result = form.bind(data)
-
-          result.value.value shouldEqual date
+        result.value.value shouldEqual date
       }
     }
-  }
 
-  def dateFieldWithMax(form: Form[_], key: String, max: LocalDate, formError: FormError): Unit = {
-
+  def dateFieldWithMax(form: Form[_], key: String, max: LocalDate, formError: FormError): Unit =
     s"fail to bind a date greater than ${max.getDayOfMonth}/${max.getMonthValue}/${max.getYear}" in {
 
       val generator = datesBetween(max.plusDays(1), max.plusYears(10))
 
-      forAll(generator -> "invalid dates") {
-        date =>
+      forAll(generator -> "invalid dates") { date =>
+        val data = Map(
+          s"$key.day"   -> date.getDayOfMonth.toString,
+          s"$key.month" -> date.getMonthValue.toString,
+          s"$key.year"  -> date.getYear.toString
+        )
 
-          val data = Map(
-            s"$key.day"   -> date.getDayOfMonth.toString,
-            s"$key.month" -> date.getMonthValue.toString,
-            s"$key.year"  -> date.getYear.toString
-          )
+        val result = form.bind(data)
 
-          val result = form.bind(data)
-
-          result.errors should contain only formError
+        result.errors should contain only formError
       }
     }
-  }
 
-  def dateFieldWithMin(form: Form[_], key: String, min: LocalDate, formError: FormError): Unit = {
-
+  def dateFieldWithMin(form: Form[_], key: String, min: LocalDate, formError: FormError): Unit =
     s"fail to bind a date earlier than ${min.getDayOfMonth}/${min.getMonthValue}/${min.getYear}" in {
 
       val generator = datesBetween(min.minusYears(10), min.minusDays(1))
 
-      forAll(generator -> "invalid dates") {
-        date =>
+      forAll(generator -> "invalid dates") { date =>
+        val data = Map(
+          s"$key.day"   -> date.getDayOfMonth.toString,
+          s"$key.month" -> date.getMonthValue.toString,
+          s"$key.year"  -> date.getYear.toString
+        )
 
-          val data = Map(
-            s"$key.day"   -> date.getDayOfMonth.toString,
-            s"$key.month" -> date.getMonthValue.toString,
-            s"$key.year"  -> date.getYear.toString
-          )
+        val result = form.bind(data)
 
-          val result = form.bind(data)
-
-          result.errors should contain only formError
+        result.errors should contain only formError
       }
     }
-  }
 
-  def mandatoryDateField(form: Form[_], key: String, requiredAllKey: String, errorArgs: Seq[String] = Seq.empty): Unit = {
-
+  def mandatoryDateField(form: Form[_], key: String, requiredAllKey: String, errorArgs: Seq[String] = Seq.empty): Unit =
     "fail to bind an empty date" in {
 
       val result = form.bind(Map.empty[String, String])
 
       result.errors should contain only FormError(key, requiredAllKey, errorArgs)
     }
-  }
 
-  def realDateField(form: Form[_], key: String, realDateKey: String): Unit = {
-
+  def realDateField(form: Form[_], key: String, realDateKey: String): Unit =
     "fail to bind a date that does not exist" in {
       val data = Map(
-        s"$key.day" -> "31",
+        s"$key.day"   -> "31",
         s"$key.month" -> "2",
-        s"$key.year" -> "2000"
+        s"$key.year"  -> "2000"
       )
 
       val result = form.bind(data)
 
       result.errors should contain only FormError(key, realDateKey)
     }
-  }
 }

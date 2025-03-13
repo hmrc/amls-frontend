@@ -27,7 +27,7 @@ class BankAccountRegisteredSpec extends PlaySpec with MockitoSugar {
 
     "round trip through JSON" in {
 
-      val trueModel = BankAccountRegistered(true)
+      val trueModel  = BankAccountRegistered(true)
       val falseModel = BankAccountRegistered(false)
 
       Json.toJson(trueModel).as[BankAccountRegistered] mustBe trueModel

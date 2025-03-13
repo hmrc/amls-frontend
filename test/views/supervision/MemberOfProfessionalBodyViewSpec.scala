@@ -27,7 +27,7 @@ import views.html.supervision.MemberOfProfessionalBodyView
 class MemberOfProfessionalBodyViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val member_of_professional_body = inject[MemberOfProfessionalBodyView]
-  lazy val fp = app.injector.instanceOf[MemberOfProfessionalBodyFormProvider]
+  lazy val fp                          = app.injector.instanceOf[MemberOfProfessionalBodyFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -41,8 +41,8 @@ class MemberOfProfessionalBodyViewSpec extends AmlsViewSpec with Matchers {
 
       def view = member_of_professional_body(fp(), edit = false)
 
-      doc.title must startWith(messages("supervision.memberofprofessionalbody.title"))
-      heading.html must include(messages("supervision.memberofprofessionalbody.title"))
+      doc.title       must startWith(messages("supervision.memberofprofessionalbody.title"))
+      heading.html    must include(messages("supervision.memberofprofessionalbody.title"))
       subHeading.html must include(messages("summary.supervision"))
 
       doc.getElementById("isAMember").tag().getName mustBe "input"
@@ -51,7 +51,8 @@ class MemberOfProfessionalBodyViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       member_of_professional_body(
-        fp().withError("isAMember", "error.required.supervision.business.a.member"), true
+        fp().withError("isAMember", "error.required.supervision.business.a.member"),
+        true
       ),
       "isAMember",
       "error.required.supervision.business.a.member"

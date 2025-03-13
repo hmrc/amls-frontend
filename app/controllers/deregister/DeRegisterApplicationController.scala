@@ -29,27 +29,29 @@ import views.html.deregister.DeregisterApplicationView
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class DeRegisterApplicationController @Inject()(authAction: AuthAction,
-                                                val ds: CommonPlayDependencies,
-                                                val cache: DataCacheConnector,
-                                                val statusService: StatusService,
-                                                enrolments: AuthEnrolmentsService,
-                                                val amls: AmlsConnector,
-                                                val cc: MessagesControllerComponents,
-                                                view: DeregisterApplicationView) extends AmlsBaseController(ds, cc) {
+class DeRegisterApplicationController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cache: DataCacheConnector,
+  val statusService: StatusService,
+  enrolments: AuthEnrolmentsService,
+  val amls: AmlsConnector,
+  val cc: MessagesControllerComponents,
+  view: DeregisterApplicationView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-        id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId, request.credId))
-        name <- BusinessName.getName(request.credId, Some(id), request.accountTypeId)(
-          implicitly[HeaderCarrier], implicitly[ExecutionContext], cache, amls
-        )
-      } yield {
-        Ok(view(name))
-      }) getOrElse InternalServerError("Could not show the de-register page")
-    }
+  def get(): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+      id            <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId, request.credId))
+      name          <- BusinessName.getName(request.credId, Some(id), request.accountTypeId)(
+                         implicitly[HeaderCarrier],
+                         implicitly[ExecutionContext],
+                         cache,
+                         amls
+                       )
+    } yield Ok(view(name))) getOrElse InternalServerError("Could not show the de-register page")
+  }
 
   def post(): Action[AnyContent] = authAction {
     Redirect(routes.DeregistrationReasonController.get)

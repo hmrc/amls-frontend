@@ -29,7 +29,7 @@ import views.html.declaration.RegisterPartnersView
 class RegisterPartnersViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val partnersView: RegisterPartnersView = inject[RegisterPartnersView]
-  lazy val fp: BusinessPartnersFormProvider = inject[BusinessPartnersFormProvider]
+  lazy val fp: BusinessPartnersFormProvider   = inject[BusinessPartnersFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -43,7 +43,7 @@ class RegisterPartnersViewSpec extends AmlsViewSpec with Matchers {
       def view = partnersView("subheading", fp(), Seq.empty[ResponsiblePerson], Seq("partner1"))
 
       doc.title mustBe s"${messages("declaration.register.partners.title")} - ${messages("title.amls")} - ${messages("title.gov")}"
-      heading.html must include(messages("declaration.register.partners.title"))
+      heading.html    must include(messages("declaration.register.partners.title"))
       subHeading.html must include("subheading")
     }
 
@@ -56,9 +56,9 @@ class RegisterPartnersViewSpec extends AmlsViewSpec with Matchers {
 
       def view = partnersView("subheading", fp(), people, Seq("partner1"))
 
-      people map(_.personName.get) foreach { n =>
+      people map (_.personName.get) foreach { n =>
         val id = s"value-${n.fullNameWithoutSpace}"
-        val e = doc.getElementById(id)
+        val e  = doc.getElementById(id)
 
         Option(e) must be(defined)
         e.`val` mustBe s"${n.firstName}${n.lastName}"
@@ -68,7 +68,7 @@ class RegisterPartnersViewSpec extends AmlsViewSpec with Matchers {
       }
 
       val id = s"other"
-      val e = doc.getElementById(id)
+      val e  = doc.getElementById(id)
 
       Option(e) must be(defined)
       e.`val` mustBe "-1"

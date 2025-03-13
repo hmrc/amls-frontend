@@ -31,42 +31,50 @@ import cats.implicits._
 import cats.instances.future._
 import cats.data.EitherT
 
-class WithdrawalCheckYourAnswersController @Inject()(authAction: AuthAction,
-                                                     ds: CommonPlayDependencies,
-                                                     dataCacheConnector: DataCacheConnector,
-                                                     amlsConnector: AmlsConnector,
-                                                     authEnrolmentsService: AuthEnrolmentsService,
-                                                     cc: MessagesControllerComponents,
-                                                     view: WithdrawalCheckYourAnswersView) extends AmlsBaseController(ds, cc) {
+class WithdrawalCheckYourAnswersController @Inject() (
+  authAction: AuthAction,
+  ds: CommonPlayDependencies,
+  dataCacheConnector: DataCacheConnector,
+  amlsConnector: AmlsConnector,
+  authEnrolmentsService: AuthEnrolmentsService,
+  cc: MessagesControllerComponents,
+  view: WithdrawalCheckYourAnswersView
+) extends AmlsBaseController(ds, cc) {
 
   def get: Action[AnyContent] = authAction.async { implicit request =>
-    fetchWithdrawalReason().map { withdrawalReason =>
-      Ok(view(withdrawalReason = withdrawalReason))
-    }.value.map {
-      case Right(result) => result
-      case Left(error) => error
-    }
+    fetchWithdrawalReason()
+      .map { withdrawalReason =>
+        Ok(view(withdrawalReason = withdrawalReason))
+      }
+      .value
+      .map {
+        case Right(result) => result
+        case Left(error)   => error
+      }
   }
 
   def post: Action[AnyContent] = authAction.async { implicit request =>
     val eitherT: EitherT[Future, Result, Result] = for {
-      withdrawalReason <- fetchWithdrawalReason()
+      withdrawalReason           <- fetchWithdrawalReason()
       withdrawSubscriptionRequest = WithdrawSubscriptionRequest(
-        acknowledgementReference = AckRefGenerator(),
-        withdrawalDate = LocalDate.now(),
-        withdrawalReason = withdrawalReason,
-        withdrawalReasonOthers = withdrawalReasonOthers(withdrawalReason)
-      )
+                                      acknowledgementReference = AckRefGenerator(),
+                                      withdrawalDate = LocalDate.now(),
+                                      withdrawalReason = withdrawalReason,
+                                      withdrawalReasonOthers = withdrawalReasonOthers(withdrawalReason)
+                                    )
 
-      amlsRegistrationNumber <- EitherT.fromOptionF(
-        authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier),
-        redirectToLandingPage
-      )
-      _ <- EitherT.right(amlsConnector.withdraw(
-        amlsRegistrationNumber = amlsRegistrationNumber,
-        request = withdrawSubscriptionRequest,
-        accountTypeId = request.accountTypeId
-      ))
+      amlsRegistrationNumber <-
+        EitherT.fromOptionF(
+          authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier),
+          redirectToLandingPage
+        )
+      _                      <- EitherT.right(
+                                  amlsConnector.withdraw(
+                                    amlsRegistrationNumber = amlsRegistrationNumber,
+                                    request = withdrawSubscriptionRequest,
+                                    accountTypeId = request.accountTypeId
+                                  )
+                                )
 
     } yield Redirect(controllers.withdrawal.routes.WithdrawalConfirmationController.get)
 
@@ -75,15 +83,16 @@ class WithdrawalCheckYourAnswersController @Inject()(authAction: AuthAction,
 
   private val redirectToLandingPage = Redirect(controllers.routes.LandingController.start(true))
 
-  private def fetchWithdrawalReason()(implicit request: AuthorisedRequest[AnyContent]): EitherT[Future, Result, WithdrawalReason] = {
+  private def fetchWithdrawalReason()(implicit
+    request: AuthorisedRequest[AnyContent]
+  ): EitherT[Future, Result, WithdrawalReason] =
     EitherT.fromOptionF[Future, Result, WithdrawalReason](
       dataCacheConnector.fetch[WithdrawalReason](request.credId, WithdrawalReason.key),
       redirectToLandingPage
     )
-  }
 
   private def withdrawalReasonOthers(withdrawalReason: WithdrawalReason): Option[String] = withdrawalReason match {
     case WithdrawalReason.Other(reason) => Some(reason)
-    case _ => None
+    case _                              => None
   }
 }

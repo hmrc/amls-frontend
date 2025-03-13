@@ -22,7 +22,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class ExpectedThroughputFormProvider @Inject()() extends Mappings {
+class ExpectedThroughputFormProvider @Inject() () extends Mappings {
 
   private val errorKey: String = "error.required.msb.throughput"
 

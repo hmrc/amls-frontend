@@ -16,7 +16,7 @@
 
 package audit
 
-import uk.gov.hmrc.play.audit.model.{ExtendedDataEvent}
+import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import play.api.libs.json._
 import play.api.mvc.Request
@@ -28,8 +28,8 @@ object ServiceEntrantEvent {
   def apply(companyName: String, utr: String, safeId: String)(implicit hc: HeaderCarrier, request: Request[_]) = {
     val data = Json.toJson(hc.toAuditDetails()).as[JsObject] ++ Json.obj(
       "companyName" -> companyName,
-      "utr" -> utr,
-      "safeId"-> safeId
+      "utr"         -> utr,
+      "safeId"      -> safeId
     )
 
     ExtendedDataEvent(

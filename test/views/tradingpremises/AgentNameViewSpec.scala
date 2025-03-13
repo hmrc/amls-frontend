@@ -40,7 +40,9 @@ class AgentNameViewSpec extends AmlsViewSpec with Matchers {
     def view: _root_.play.twirl.api.HtmlFormat.Appendable =
       agent_name(fp(), 0, false)
 
-    doc.title() must startWith(messages("tradingpremises.agentname.title") + " - " + messages("summary.tradingpremises"))
+    doc.title()    must startWith(
+      messages("tradingpremises.agentname.title") + " - " + messages("summary.tradingpremises")
+    )
     heading.html() must be(messages("tradingpremises.agentname.title"))
   }
 
@@ -54,12 +56,14 @@ class AgentNameViewSpec extends AmlsViewSpec with Matchers {
 
   behave like pageWithErrors(
     agent_name(fp().withError("agentName", "error.char.tp.agent.name"), 1, true),
-    "agentName", "error.char.tp.agent.name"
+    "agentName",
+    "error.char.tp.agent.name"
   )
 
   behave like pageWithErrors(
     agent_name(fp().withError("agentDateOfBirth", "error.required.tp.agent.date.all"), 2, false),
-    "agentDateOfBirth", "error.required.tp.agent.date.all"
+    "agentDateOfBirth",
+    "error.required.tp.agent.date.all"
   )
 
   behave like pageWithBackLink(agent_name(fp(), 3, false))

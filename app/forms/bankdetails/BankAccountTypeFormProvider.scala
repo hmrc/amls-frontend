@@ -22,9 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class BankAccountTypeFormProvider @Inject()() extends Mappings {
+class BankAccountTypeFormProvider @Inject() () extends Mappings {
 
-  private val errorKey = "error.bankdetails.accounttype"
+  private val errorKey               = "error.bankdetails.accounttype"
   def apply(): Form[BankAccountType] = Form[BankAccountType](
     "bankAccountType" -> enumerable[BankAccountType](errorKey, errorKey)
   )

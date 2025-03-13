@@ -20,7 +20,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-
 class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
 
   "ProfessionalBodyMember" must {
@@ -28,20 +27,20 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
     "JSON validation" must {
 
       "successfully validate given values" in {
-        val json =  Json.obj("isAMember" -> true)
+        val json = Json.obj("isAMember" -> true)
 
         Json.fromJson[ProfessionalBodyMember](json) must be(JsSuccess(ProfessionalBodyMemberYes, JsPath))
       }
 
       "successfully validate given values with option No" in {
-        val json =  Json.obj("isAMember" -> false)
+        val json = Json.obj("isAMember" -> false)
 
         Json.fromJson[ProfessionalBodyMember](json) must be(JsSuccess(ProfessionalBodyMemberNo, JsPath))
       }
 
       "fail when on path is missing" in {
         Json.fromJson[ProfessionalBodyMember](Json.obj()) must
-          be(JsError((JsPath \"isAMember") -> play.api.libs.json.JsonValidationError("error.path.missing")))
+          be(JsError((JsPath \ "isAMember") -> play.api.libs.json.JsonValidationError("error.path.missing")))
       }
 
       "fail when on invalid data" in {
@@ -50,11 +49,11 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
       }
 
       "write valid data in using json write" in {
-        Json.toJson[ProfessionalBodyMember](ProfessionalBodyMemberYes) must be (Json.obj("isAMember" -> true))
+        Json.toJson[ProfessionalBodyMember](ProfessionalBodyMemberYes) must be(Json.obj("isAMember" -> true))
       }
 
       "write valid data in using json write with Option No" in {
-        Json.toJson[ProfessionalBodyMember](ProfessionalBodyMemberNo) must be (Json.obj("isAMember" -> false))
+        Json.toJson[ProfessionalBodyMember](ProfessionalBodyMemberNo) must be(Json.obj("isAMember" -> false))
       }
     }
   }

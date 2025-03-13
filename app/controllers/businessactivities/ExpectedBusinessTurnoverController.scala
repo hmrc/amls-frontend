@@ -28,40 +28,42 @@ import views.html.businessactivities.ExpectedBusinessTurnoverView
 
 import scala.concurrent.Future
 
+class ExpectedBusinessTurnoverController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  implicit val statusService: StatusService,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: ExpectedBusinessTurnoverFormProvider,
+  view: ExpectedBusinessTurnoverView
+) extends AmlsBaseController(ds, cc) {
 
-class ExpectedBusinessTurnoverController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                   implicit val statusService: StatusService,
-                                                   val authAction: AuthAction,
-                                                   val ds: CommonPlayDependencies,
-                                                   val cc: MessagesControllerComponents,
-                                                   formProvider: ExpectedBusinessTurnoverFormProvider,
-                                                   view: ExpectedBusinessTurnoverView) extends AmlsBaseController(ds, cc) {
-
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-        response =>
-          val form = response.expectedBusinessTurnover.fold(formProvider())(formProvider().fill)
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { response =>
+      val form = response.expectedBusinessTurnover.fold(formProvider())(formProvider().fill)
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithError =>
-          Future.successful(BadRequest(view(formWithError, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithError => Future.successful(BadRequest(view(formWithError, edit))),
         data =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivities.expectedBusinessTurnover(data)
-            )
-          } yield if (edit) {
-            Redirect(routes.SummaryController.get)
-          } else {
-            Redirect(routes.ExpectedAMLSTurnoverController.get())
-          }
+            _                  <- dataCacheConnector.save[BusinessActivities](
+                                    request.credId,
+                                    BusinessActivities.key,
+                                    businessActivities.expectedBusinessTurnover(data)
+                                  )
+          } yield
+            if (edit) {
+              Redirect(routes.SummaryController.get)
+            } else {
+              Redirect(routes.ExpectedAMLSTurnoverController.get())
+            }
       )
-    }
+  }
 }

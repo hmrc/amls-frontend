@@ -37,19 +37,20 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
-class FeeHelperSpec extends PlaySpec with MockitoSugar
-  with ScalaFutures
-  with GuiceOneAppPerSuite
-  with AmlsReferenceNumberGenerator
-  with SubscriptionResponseGenerator {
+class FeeHelperSpec
+    extends PlaySpec
+    with MockitoSugar
+    with ScalaFutures
+    with GuiceOneAppPerSuite
+    with AmlsReferenceNumberGenerator
+    with SubscriptionResponseGenerator {
 
-  override def fakeApplication(): Application = {
+  override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .configure(
         "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
       )
       .build()
-  }
 
   "FeeHelper" when {
     implicit val hc = HeaderCarrier()
@@ -75,38 +76,39 @@ class FeeHelperSpec extends PlaySpec with MockitoSugar
     val response = feeResponse(SubscriptionResponseType)
 
     "the user has fees" must {
-      "fetch fees" in  {
+      "fetch fees" in {
         when(feeHelper.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
         when {
-          feeHelper.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any())
+          feeHelper.feeResponseService
+            .getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any())
         } thenReturn Future.successful(Some(response))
 
         val result = Await.result(
-          feeHelper.retrieveFeeResponse(Some(amlsRegistrationNumber), ("foo", "bar"), None, "feeHelper"), 5 seconds
+          feeHelper.retrieveFeeResponse(Some(amlsRegistrationNumber), ("foo", "bar"), None, "feeHelper"),
+          5 seconds
         )
         result.isDefined mustBe true
       }
     }
 
     "the user has no fees" must {
-      "fetch fees" in  {
+      "fetch fees" in {
         when(feeHelper.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
         when {
-          feeHelper.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any())
+          feeHelper.feeResponseService
+            .getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any())
         } thenReturn Future.successful(None)
 
         val result = Await.result(
-          feeHelper.retrieveFeeResponse(Some(amlsRegistrationNumber), ("foo", "bar"), None, "feeHelper"), 5 seconds
+          feeHelper.retrieveFeeResponse(Some(amlsRegistrationNumber), ("foo", "bar"), None, "feeHelper"),
+          5 seconds
         )
         result.isDefined mustBe false
       }
     }
   }
 }
-
-
-

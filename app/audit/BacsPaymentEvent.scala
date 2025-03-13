@@ -24,17 +24,17 @@ import utils.AuditHelper
 
 object BacsPaymentEvent {
   def apply(ukBank: Boolean, amlsRef: String, payRef: String, amount: Currency)(implicit
-   hc: HeaderCarrier
+    hc: HeaderCarrier
   ): DataEvent =
     DataEvent(
       auditSource = AuditHelper.appName,
       auditType = "bacsPayment",
       tags = hc.toAuditTags("Bacs Payment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
-        "ukBank" -> ukBank.toString,
+        "ukBank"              -> ukBank.toString,
         "amlsReferenceNumber" -> amlsRef,
-        "paymentReference" -> payRef,
-        "amount" -> amount.value.toString
+        "paymentReference"    -> payRef,
+        "amount"              -> amount.value.toString
       )
     )
 }

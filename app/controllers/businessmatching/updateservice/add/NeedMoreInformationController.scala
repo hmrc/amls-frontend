@@ -33,42 +33,52 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NeedMoreInformationController @Inject()(authAction: AuthAction,
-                                              val ds: CommonPlayDependencies,
-                                              implicit val dataCacheConnector: DataCacheConnector,
-                                              val router: Router[AddBusinessTypeFlowModel],
-                                              val cc: MessagesControllerComponents,
-                                              view: NewServiceInformationView)(implicit ec: ExecutionContext) extends AmlsBaseController(ds, cc) {
+class NeedMoreInformationController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val dataCacheConnector: DataCacheConnector,
+  val router: Router[AddBusinessTypeFlowModel],
+  val cc: MessagesControllerComponents,
+  view: NewServiceInformationView
+)(implicit ec: ExecutionContext)
+    extends AmlsBaseController(ds, cc) {
 
-  def get(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        model <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](request.credId, ServiceChangeRegister.key))
-        activity <- OptionT.fromOption[Future](model.addedActivities)
-        cacheMap <- OptionT(dataCacheConnector.fetchAll(request.credId))
-      } yield {
-        val isTdiOrBpspPresent = activity exists {
-          case BillPaymentServices | TelephonePaymentService => true
-          case _ => false
-        }
+  def get(): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      model    <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](request.credId, ServiceChangeRegister.key))
+      activity <- OptionT.fromOption[Future](model.addedActivities)
+      cacheMap <- OptionT(dataCacheConnector.fetchAll(request.credId))
+    } yield {
+      val isTdiOrBpspPresent = activity exists {
+        case BillPaymentServices | TelephonePaymentService => true
+        case _                                             => false
+      }
 
-        val isAspOrTcspPresent = activity exists {
-          case AccountancyServices | TrustAndCompanyServices => true
-          case _ => false
-        }
+      val isAspOrTcspPresent = activity exists {
+        case AccountancyServices | TrustAndCompanyServices => true
+        case _                                             => false
+      }
 
-        val subSectors = model.addedSubSectors.fold(Set.empty[BusinessMatchingMsbService])(_.toList.sortBy(_.getMessage).toSet)
-        val sortedActivities = activity.toList.sortBy(_.getMessage(true)).toSet
+      val subSectors       =
+        model.addedSubSectors.fold(Set.empty[BusinessMatchingMsbService])(_.toList.sortBy(_.getMessage).toSet)
+      val sortedActivities = activity.toList.sortBy(_.getMessage(true)).toSet
 
-        Ok(view(sortedActivities, ControllerHelper.supervisionComplete(cacheMap), subSectors, isTdiOrBpspPresent, isAspOrTcspPresent))
-      }) getOrElse InternalServerError("Get: Unable to show New Service Information page")
+      Ok(
+        view(
+          sortedActivities,
+          ControllerHelper.supervisionComplete(cacheMap),
+          subSectors,
+          isTdiOrBpspPresent,
+          isAspOrTcspPresent
+        )
+      )
+    }) getOrElse InternalServerError("Get: Unable to show New Service Information page")
   }
 
-  def post(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        route <- OptionT.liftF(router.getRoute(request.credId, NeedMoreInformationPageId, new AddBusinessTypeFlowModel))
-        _ <- OptionT.liftF(dataCacheConnector.removeByKey(request.credId, ServiceChangeRegister.key))
-      } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: Add : NewServiceInformationController")
+  def post(): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      route <- OptionT.liftF(router.getRoute(request.credId, NeedMoreInformationPageId, new AddBusinessTypeFlowModel))
+      _     <- OptionT.liftF(dataCacheConnector.removeByKey(request.credId, ServiceChangeRegister.key))
+    } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: Add : NewServiceInformationController")
   }
 }

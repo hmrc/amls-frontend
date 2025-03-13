@@ -26,7 +26,7 @@ import views.html.businessmatching.updateservice.add.NewServiceInformationView
 
 class NewServiceInformationViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val new_service_information = app.injector.instanceOf[NewServiceInformationView]
+  lazy val new_service_information                               = app.injector.instanceOf[NewServiceInformationView]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
@@ -36,7 +36,11 @@ class NewServiceInformationViewSpec extends AmlsViewSpec with Matchers {
   "NewServiceInformationView" must {
 
     "have the correct title" in new ViewFixture {
-      doc.title must startWith(messages("businessmatching.updateservice.newserviceinformation.title") + " - " + messages("summary.updateservice"))
+      doc.title must startWith(
+        messages("businessmatching.updateservice.newserviceinformation.title") + " - " + messages(
+          "summary.updateservice"
+        )
+      )
     }
 
     "have correct heading" in new ViewFixture {
@@ -52,7 +56,9 @@ class NewServiceInformationViewSpec extends AmlsViewSpec with Matchers {
       "only ASP is selected" in new ViewFixture {
         doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.2"))
         doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.supervision"))
-        doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.6", AccountancyServices.getMessage(true)))
+        doc.text() must include(
+          messages("businessmatching.updateservice.newserviceinformation.info.6", AccountancyServices.getMessage(true))
+        )
       }
 
       "only TCSP is selected" in new ViewFixture {
@@ -60,26 +66,36 @@ class NewServiceInformationViewSpec extends AmlsViewSpec with Matchers {
 
         doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.2"))
         doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.supervision"))
-        doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.6", TrustAndCompanyServices.getMessage(true)))
+        doc.text() must include(
+          messages(
+            "businessmatching.updateservice.newserviceinformation.info.6",
+            TrustAndCompanyServices.getMessage(true)
+          )
+        )
       }
 
       "only BPSP is selected" in new ViewFixture {
         override def view = new_service_information(Set(BillPaymentServices), false, Set(), true)
 
-        doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.6", BillPaymentServices.getMessage(true)))
+        doc.text() must include(
+          messages("businessmatching.updateservice.newserviceinformation.info.6", BillPaymentServices.getMessage(true))
+        )
         doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.7"))
       }
 
       "only MSB is selected with MT" in new ViewFixture {
         override def view = new_service_information(Set(MoneyServiceBusiness), false, Set(TransmittingMoney))
 
-        doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.1", MoneyServiceBusiness.getMessage(true)))
+        doc.text() must include(
+          messages("businessmatching.updateservice.newserviceinformation.info.1", MoneyServiceBusiness.getMessage(true))
+        )
         doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.6.msb.single"))
 
       }
 
       "both ASP and TCSP are selected" in new ViewFixture {
-        override def view = new_service_information(Set(TrustAndCompanyServices, AccountancyServices), false, Set(), false, true)
+        override def view =
+          new_service_information(Set(TrustAndCompanyServices, AccountancyServices), false, Set(), false, true)
 
         doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.2"))
         doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.supervision"))
@@ -88,7 +104,8 @@ class NewServiceInformationViewSpec extends AmlsViewSpec with Matchers {
       }
 
       "both TCSP and TDI are selected" in new ViewFixture {
-        override def view = new_service_information(Set(TrustAndCompanyServices, TelephonePaymentService), false, Set(), true, true)
+        override def view =
+          new_service_information(Set(TrustAndCompanyServices, TelephonePaymentService), false, Set(), true, true)
 
         doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.2"))
         doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.supervision"))
@@ -97,7 +114,13 @@ class NewServiceInformationViewSpec extends AmlsViewSpec with Matchers {
       }
 
       "MSB, TCSP and TDI are selected" in new ViewFixture {
-        override def view = new_service_information(Set(TrustAndCompanyServices, TelephonePaymentService, MoneyServiceBusiness), false, Set(TransmittingMoney), true, true)
+        override def view = new_service_information(
+          Set(TrustAndCompanyServices, TelephonePaymentService, MoneyServiceBusiness),
+          false,
+          Set(TransmittingMoney),
+          true,
+          true
+        )
 
         doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.2"))
         doc.text() must include(messages("businessmatching.updateservice.newserviceinformation.info.supervision"))

@@ -26,8 +26,8 @@ class InvolvedInOtherFormProviderSpec extends BooleanFieldBehaviours[InvolvedInO
   val formProvider: InvolvedInOtherFormProvider = new InvolvedInOtherFormProvider()
 
   override val form: Form[InvolvedInOther] = formProvider()
-  override val fieldName: String = "involvedInOther"
-  override val errorMessage: String = "error.required.renewal.ba.involved.in.other"
+  override val fieldName: String           = "involvedInOther"
+  override val errorMessage: String        = "error.required.renewal.ba.involved.in.other"
 
   val inputFieldName: String = "details"
 
@@ -39,17 +39,16 @@ class InvolvedInOtherFormProviderSpec extends BooleanFieldBehaviours[InvolvedInO
 
         val boundForm = form.bind(Map(fieldName -> "false"))
 
-        boundForm.value shouldBe Some(InvolvedInOtherNo)
+        boundForm.value  shouldBe Some(InvolvedInOtherNo)
         boundForm.errors shouldBe Nil
       }
 
       "'Yes' is submitted and details are given" in {
 
         forAll(stringsShorterThan(formProvider.length).suchThat(_.nonEmpty)) { details =>
-
           val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> details))
 
-          boundForm.value shouldBe Some(InvolvedInOtherYes(details))
+          boundForm.value  shouldBe Some(InvolvedInOtherYes(details))
           boundForm.errors shouldBe Nil
         }
       }
@@ -77,7 +76,9 @@ class InvolvedInOtherFormProviderSpec extends BooleanFieldBehaviours[InvolvedInO
 
         val boundForm = form.bind(Map(fieldName -> "true"))
 
-        boundForm.errors.headOption shouldBe Some(FormError(inputFieldName, "error.required.renewal.ba.involved.in.other.text"))
+        boundForm.errors.headOption shouldBe Some(
+          FormError(inputFieldName, "error.required.renewal.ba.involved.in.other.text")
+        )
       }
 
       "'Yes' is submitted with details" which {
@@ -86,7 +87,11 @@ class InvolvedInOtherFormProviderSpec extends BooleanFieldBehaviours[InvolvedInO
           forAll(stringsLongerThan(formProvider.length + 1)) { longDetails =>
             val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> longDetails))
             boundForm.errors.headOption shouldBe Some(
-              FormError(inputFieldName, "error.invalid.maxlength.255.renewal.ba.involved.in.other", Seq(formProvider.length))
+              FormError(
+                inputFieldName,
+                "error.invalid.maxlength.255.renewal.ba.involved.in.other",
+                Seq(formProvider.length)
+              )
             )
           }
         }
@@ -95,7 +100,11 @@ class InvolvedInOtherFormProviderSpec extends BooleanFieldBehaviours[InvolvedInO
           forAll(stringsShorterThan(formProvider.length - 1), invalidCharForNames) { (details, char) =>
             val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> s"${details.dropRight(1)}$char"))
             boundForm.errors.headOption shouldBe Some(
-              FormError(inputFieldName, "error.text.validation.renewal.ba.involved.in.other", Seq(basicPunctuationRegex))
+              FormError(
+                inputFieldName,
+                "error.text.validation.renewal.ba.involved.in.other",
+                Seq(basicPunctuationRegex)
+              )
             )
           }
         }
@@ -103,4 +112,3 @@ class InvolvedInOtherFormProviderSpec extends BooleanFieldBehaviours[InvolvedInO
     }
   }
 }
-

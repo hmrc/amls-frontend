@@ -24,11 +24,18 @@ object EnumFormat {
   // $COVERAGE-OFF$
   def apply[T <: EnumEntry](e: Enum[T]): Format[T] = Format(
     Reads {
-      case JsString(value) => e.withNameOption(value).map(JsSuccess(_))
-        .getOrElse(JsError(JsonValidationError(
-          s"Unknown ${e.getClass.getSimpleName} value: $value", s"error.invalid.${e.getClass.getSimpleName.toLowerCase.replaceAllLiterally("$", "")}"
-        )))
-      case _ => JsError("Can only parse String")
+      case JsString(value) =>
+        e.withNameOption(value)
+          .map(JsSuccess(_))
+          .getOrElse(
+            JsError(
+              JsonValidationError(
+                s"Unknown ${e.getClass.getSimpleName} value: $value",
+                s"error.invalid.${e.getClass.getSimpleName.toLowerCase.replaceAllLiterally("$", "")}"
+              )
+            )
+          )
+      case _               => JsError("Can only parse String")
     },
     Writes(v => JsString(v.entryName))
   )

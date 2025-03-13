@@ -30,13 +30,15 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RemoveBusinessTypesSummaryPageRouter @Inject()(val statusService: StatusService,
-                                                     val businessMatchingService: BusinessMatchingService,
-                                                     val dataCacheConnector: DataCacheConnector) extends PageRouter[RemoveBusinessTypeFlowModel] {
+class RemoveBusinessTypesSummaryPageRouter @Inject() (
+  val statusService: StatusService,
+  val businessMatchingService: BusinessMatchingService,
+  val dataCacheConnector: DataCacheConnector
+) extends PageRouter[RemoveBusinessTypeFlowModel] {
 
-  override def getRoute(credId: String, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
-                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-
+  override def getRoute(credId: String, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Result] =
     Future.successful(Redirect(removeRoutes.NeedMoreInformationController.get()))
-  }
 }

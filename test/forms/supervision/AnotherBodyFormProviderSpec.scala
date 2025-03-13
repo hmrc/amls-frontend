@@ -26,8 +26,8 @@ class AnotherBodyFormProviderSpec extends BooleanFieldBehaviours[AnotherBody] wi
   val formProvider: AnotherBodyFormProvider = new AnotherBodyFormProvider()
 
   override val form: Form[AnotherBody] = formProvider()
-  override val fieldName: String = "anotherBody"
-  override val errorMessage: String = "error.required.supervision.anotherbody"
+  override val fieldName: String       = "anotherBody"
+  override val errorMessage: String    = "error.required.supervision.anotherbody"
 
   val inputFieldName: String = "supervisorName"
 
@@ -39,17 +39,16 @@ class AnotherBodyFormProviderSpec extends BooleanFieldBehaviours[AnotherBody] wi
 
         val boundForm = form.bind(Map(fieldName -> "false"))
 
-        boundForm.value shouldBe Some(AnotherBodyNo)
+        boundForm.value  shouldBe Some(AnotherBodyNo)
         boundForm.errors shouldBe Nil
       }
 
       "'Yes' is submitted and details are given" in {
 
         forAll(stringOfLengthGen(formProvider.length).suchThat(_.nonEmpty)) { name =>
-
           val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> name))
 
-          boundForm.value shouldBe Some(AnotherBodyYes(name))
+          boundForm.value  shouldBe Some(AnotherBodyYes(name))
           boundForm.errors shouldBe Nil
         }
       }
@@ -92,8 +91,7 @@ class AnotherBodyFormProviderSpec extends BooleanFieldBehaviours[AnotherBody] wi
         }
 
         "is invalid" in {
-          forAll(stringsShorterThan(formProvider.length -1), invalidCharForNames) { (name, invalid) =>
-
+          forAll(stringsShorterThan(formProvider.length - 1), invalidCharForNames) { (name, invalid) =>
             val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> (name + invalid)))
             boundForm.errors.headOption shouldBe Some(
               FormError(inputFieldName, "error.invalid.supervision.supervisor", Seq(basicPunctuationRegex))

@@ -33,40 +33,37 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class AddBusinessTypeSummaryController @Inject()(
-                                                  authAction: AuthAction,
-                                                  val ds: CommonPlayDependencies,
-                                                  implicit val dataCacheConnector: DataCacheConnector,
-                                                  val statusService: StatusService,
-                                                  val businessMatchingService: BusinessMatchingService,
-                                                  val helper: AddBusinessTypeHelper,
-                                                  val router: Router[AddBusinessTypeFlowModel],
-                                                  val tradingPremisesService: TradingPremisesService,
-                                                  val cc: MessagesControllerComponents,
-                                                  view: UpdateServicesSummaryView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class AddBusinessTypeSummaryController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val dataCacheConnector: DataCacheConnector,
+  val statusService: StatusService,
+  val businessMatchingService: BusinessMatchingService,
+  val helper: AddBusinessTypeHelper,
+  val router: Router[AddBusinessTypeFlowModel],
+  val tradingPremisesService: TradingPremisesService,
+  val cc: MessagesControllerComponents,
+  view: UpdateServicesSummaryView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
-  def get(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        flowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key))
-      } yield {
-        Ok(view(flowModel))
-      }) getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get())
+  def get(): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      flowModel <-
+        OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key))
+    } yield Ok(view(flowModel))) getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get())
   }
 
-  def post(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key))
-        activity <- OptionT.fromOption[Future](model.activity)
-                _ <- helper.updateSupervision(request.credId)
-                _ <- helper.updateBusinessMatching(request.credId, model)
-                _ <- helper.updateServicesRegister(request.credId, model)
-                _ <- helper.updateBusinessActivities(request.credId, model)
-                _ <- helper.updateHasAcceptedFlag(request.credId, model)
-        route <- OptionT.liftF(router.getRoute(request.credId, AddBusinessTypeSummaryPageId, model))
-      } yield {
-        route
-      }) getOrElse InternalServerError("Could not fetch the flow model")
+  def post(): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      model    <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key))
+      activity <- OptionT.fromOption[Future](model.activity)
+      _        <- helper.updateSupervision(request.credId)
+      _        <- helper.updateBusinessMatching(request.credId, model)
+      _        <- helper.updateServicesRegister(request.credId, model)
+      _        <- helper.updateBusinessActivities(request.credId, model)
+      _        <- helper.updateHasAcceptedFlag(request.credId, model)
+      route    <- OptionT.liftF(router.getRoute(request.credId, AddBusinessTypeSummaryPageId, model))
+    } yield route) getOrElse InternalServerError("Could not fetch the flow model")
   }
 }

@@ -42,13 +42,13 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
   )
 
   val paymentGen: Gen[Payment] = for {
-    _id <- stringOfLengthGen(refLength)
-    amlsRefNo <- amlsRefNoGen
-    safeId <- amlsRefNoGen
-    ref <- paymentRefGen
+    _id           <- stringOfLengthGen(refLength)
+    amlsRefNo     <- amlsRefNoGen
+    safeId        <- amlsRefNoGen
+    ref           <- paymentRefGen
     amountInPence <- numGen
     paymentStatus <- paymentStatusGen
-  } yield Payment (
+  } yield Payment(
     _id,
     amlsRefNo,
     safeId,
@@ -61,19 +61,19 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
 
   val paymentStatusResultGen: Gen[PaymentStatusResult] = for {
     paymentRef <- paymentRefGen
-    paymentId <- paymentIdGen
-    status <- paymentStatusGen
+    paymentId  <- paymentIdGen
+    status     <- paymentStatusGen
   } yield PaymentStatusResult(paymentRef, paymentId, status)
 
   val createBacsPaymentGen: Gen[CreateBacsPaymentRequest] = for {
     amlsRef <- amlsRefNoGen
-    safeId <- amlsRefNoGen
-    payRef <- paymentRefGen
-    amount <- numGen
+    safeId  <- amlsRefNoGen
+    payRef  <- paymentRefGen
+    amount  <- numGen
   } yield CreateBacsPaymentRequest(amlsRef, payRef, safeId, amount)
 
   val paymentResponseGen: Gen[CreatePaymentResponse] = for {
-    id <- Gen.listOfN(15, Gen.alphaNumChar)
+    id  <- Gen.listOfN(15, Gen.alphaNumChar)
     url <- stringOfLengthGen(10)
   } yield CreatePaymentResponse(NextUrl(s"/$url/${id.mkString}"), id.mkString)
 

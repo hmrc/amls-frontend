@@ -27,13 +27,18 @@ import scala.util.{Failure, Success, Try}
 
 trait CacheOps extends Logging {
 
-  /**
-    * Retrieves an encrypted value from the cache
-    * @param cache The cache to retrieve the value from
-    * @param key The cache key
-    * @return The decrypted item from the cache as T, or None if the value wasn't present
+  /** Retrieves an encrypted value from the cache
+    * @param cache
+    *   The cache to retrieve the value from
+    * @param key
+    *   The cache key
+    * @return
+    *   The decrypted item from the cache as T, or None if the value wasn't present
     */
-  private def decryptValue[T](cache: Cache, key: String)(implicit reads: Reads[T], crypto: Encrypter with Decrypter): Option[T] = {
+  private def decryptValue[T](cache: Cache, key: String)(implicit
+    reads: Reads[T],
+    crypto: Encrypter with Decrypter
+  ): Option[T] = {
     val sensitiveDecrypter: Reads[SensitiveT[T]] = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
 
     cache.data.get(key) flatMap { encryptedJson: JsValue =>
@@ -47,35 +52,42 @@ trait CacheOps extends Logging {
     }
   }
 
-  def catchDoubleEncryption[T](cache: Cache, key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Option[T] = {
+  def catchDoubleEncryption[T](cache: Cache, key: String)(implicit
+    reads: Reads[T],
+    c: Encrypter with Decrypter
+  ): Option[T] =
     Try(decryptValue[T](cache, key)(reads, c)) match {
       case Failure(_: JsResultException) =>
         logger.warn(s"performing double decryption")
         decryptValue[String](cache, key)(StringReads, c)
-          .map(hashedStr => JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply).reads(JsString(hashedStr)))
+          .map(hashedStr =>
+            JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply).reads(JsString(hashedStr))
+          )
           .map(result => result.map(protectedObj => protectedObj.decryptedValue))
           .map {
             case JsSuccess(value, _) => Option(value)
-            case JsError(errors) =>
+            case JsError(errors)     =>
               throw new Exception(s"Error trying to double decrypt: $errors")
           }
           .getOrElse(throw new Exception(s"Result of decryption returned nothing $key"))
-      case Failure(exception) => throw exception
-      case Success(value) => value
+      case Failure(exception)            => throw exception
+      case Success(value)                => value
     }
-  }
 
-  /**
-    * Gets an unencrypted value from the cache
-    * @param cache The cache to retrieve the value from
-    * @param key The cache key
-    * @return The value from the cache, or None if the value wasn't present
+  /** Gets an unencrypted value from the cache
+    * @param cache
+    *   The cache to retrieve the value from
+    * @param key
+    *   The cache key
+    * @return
+    *   The value from the cache, or None if the value wasn't present
     */
-  def getValue[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] = cache.data.get(key) flatMap { json =>
-    if (json.validate[T].isSuccess) {
-      Some(json.as[T])
-    } else {
-      None
-    }
+  def getValue[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] = cache.data.get(key) flatMap {
+    json =>
+      if (json.validate[T].isSuccess) {
+        Some(json.as[T])
+      } else {
+        None
+      }
   }
 }

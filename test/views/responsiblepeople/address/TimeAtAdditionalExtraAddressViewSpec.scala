@@ -26,10 +26,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.address.TimeAtAdditionalExtraAddressView
 
-class TimeAtAdditionalExtraAddressViewSpec extends AmlsViewSpec with Matchers  {
+class TimeAtAdditionalExtraAddressViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val addressView = inject[TimeAtAdditionalExtraAddressView]
-  lazy val fp = inject[TimeAtAddressFormProvider]
+  lazy val fp          = inject[TimeAtAddressFormProvider]
 
   val name = "FirstName LastName"
 
@@ -45,10 +45,12 @@ class TimeAtAdditionalExtraAddressViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = addressView(fp().fill(ZeroToFiveMonths), false, 0, None, name)
 
-      doc.title must be(Messages("responsiblepeople.timeataddress.address_history.title") +
-        " - " + Messages("summary.responsiblepeople") +
-        " - " + Messages("title.amls") +
-        " - " + Messages("title.gov"))
+      doc.title must be(
+        Messages("responsiblepeople.timeataddress.address_history.title") +
+          " - " + Messages("summary.responsiblepeople") +
+          " - " + Messages("title.amls") +
+          " - " + Messages("title.gov")
+      )
     }
 
     "have correct heading" in new ViewFixture {

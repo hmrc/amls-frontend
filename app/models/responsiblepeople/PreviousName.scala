@@ -18,17 +18,19 @@ package models.responsiblepeople
 
 import play.api.libs.json.{Json, OWrites, Reads}
 
-case class PreviousName(hasPreviousName: Option[Boolean] = None,
-                        firstName: Option[String],
-                        middleName: Option[String],
-                        lastName: Option[String]) {
+case class PreviousName(
+  hasPreviousName: Option[Boolean] = None,
+  firstName: Option[String],
+  middleName: Option[String],
+  lastName: Option[String]
+) {
 
   val fullName: String = Seq(firstName, middleName, lastName).flatten[String].mkString(" ")
 }
 
 object PreviousName {
 
-  implicit val jsonReads : Reads[PreviousName] = {
+  implicit val jsonReads: Reads[PreviousName] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
 

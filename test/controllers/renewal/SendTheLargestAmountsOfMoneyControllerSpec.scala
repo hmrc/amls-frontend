@@ -37,8 +37,12 @@ import views.html.renewal.SendLargestAmountsOfMoneyView
 
 import scala.concurrent.Future
 
-class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
-  with MockitoSugar with PatienceConfiguration with IntegrationPatience with Injecting {
+class SendTheLargestAmountsOfMoneyControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with PatienceConfiguration
+    with IntegrationPatience
+    with Injecting {
 
   trait Fixture extends AutoCompleteServiceMocks {
     self =>
@@ -49,13 +53,15 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
     val emptyCache = Cache.empty
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
-    lazy val mockStatusService = mock[StatusService]
-    lazy val mockRenewalService = mock[RenewalService]
-    lazy val view = inject[SendLargestAmountsOfMoneyView]
-    val controller = new SendTheLargestAmountsOfMoneyController(
+    lazy val mockStatusService      = mock[StatusService]
+    lazy val mockRenewalService     = mock[RenewalService]
+    lazy val view                   = inject[SendLargestAmountsOfMoneyView]
+    val controller                  = new SendTheLargestAmountsOfMoneyController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      renewalService = mockRenewalService,
+      cc = mockMcc,
       autoCompleteService = mockAutoComplete,
       formProvider = inject[SendLargestAmountsOfMoneyFormProvider],
       view = view
@@ -63,9 +69,10 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
   }
 
   trait FormSubmissionFixture extends Fixture {
-    def formData(valid: Boolean) = if (valid) "largestAmountsOfMoney[0]" -> "GB" else "largestAmountsOfMoney[0]" -> ""
+    def formData(valid: Boolean)    = if (valid) "largestAmountsOfMoney[0]" -> "GB" else "largestAmountsOfMoney[0]" -> ""
     def formRequest(valid: Boolean) =
-      FakeRequest(POST, routes.SendTheLargestAmountsOfMoneyController.post().url).withFormUrlEncodedBody(formData(valid))
+      FakeRequest(POST, routes.SendTheLargestAmountsOfMoneyController.post().url)
+        .withFormUrlEncodedBody(formData(valid))
 
     when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
@@ -89,15 +96,25 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title() must be(messages("renewal.msb.largest.amounts.title") + " - " + messages("summary.renewal") + " - " + messages("title.amls") + " - " + messages("title.gov"))
+        document.title() must be(
+          messages("renewal.msb.largest.amounts.title") + " - " + messages("summary.renewal") + " - " + messages(
+            "title.amls"
+          ) + " - " + messages("title.gov")
+        )
       }
 
       "pre-populate the 'Where to Send The Largest Amounts Of Money' Page" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Renewal](any(), any())(any()))
-          .thenReturn(Future.successful(Some(
-            Renewal(sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))))
-          )))
+          .thenReturn(
+            Future.successful(
+              Some(
+                Renewal(sendTheLargestAmountsOfMoney =
+                  Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"))))
+                )
+              )
+            )
+          )
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -110,8 +127,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
     "post is called" when {
       "edit is false" must {
         "redirect to the MostTransactionsController with valid data" in new FormSubmissionFixture {
-          post(){ result =>
-            status(result) must be (SEE_OTHER)
+          post() { result =>
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(routes.MostTransactionsController.get().url.some)
           }
         }
@@ -119,8 +136,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
 
       "edit is true" must {
         "redirect to the SummaryController" in new FormSubmissionFixture {
-          post(edit = true){ result =>
-            status(result) must be (SEE_OTHER)
+          post(edit = true) { result =>
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(routes.SummaryController.get.url.some)
           }
         }
@@ -129,10 +146,16 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
             "MostTransactions is None" in new FormSubmissionFixture {
 
               when(mockRenewalService.getRenewal(any()))
-                .thenReturn(Future.successful(Some(Renewal(
-                  customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB","GB"))))),
-                  mostTransactions = None
-                ))))
+                .thenReturn(
+                  Future.successful(
+                    Some(
+                      Renewal(
+                        customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB", "GB"))))),
+                        mostTransactions = None
+                      )
+                    )
+                  )
+                )
 
               post(edit = true) { result =>
                 status(result) mustBe SEE_OTHER
@@ -146,7 +169,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
       "given invalid data, must respond with BAD_REQUEST" in new FormSubmissionFixture {
 
         val newRequest = FakeRequest(POST, routes.SendTheLargestAmountsOfMoneyController.post().url)
-        .withFormUrlEncodedBody("largestAmountsOfMoney[0]" -> "")
+          .withFormUrlEncodedBody("largestAmountsOfMoney[0]" -> "")
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)

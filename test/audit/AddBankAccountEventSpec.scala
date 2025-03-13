@@ -27,24 +27,26 @@ import utils.AmlsSpec
 class AddBankAccountEventSpec extends AmlsSpec {
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/test-path")
-  implicit override val headerCarrier: HeaderCarrier = HeaderCarrier()
+  implicit override val headerCarrier: HeaderCarrier        = HeaderCarrier()
 
-  val ukBankAccount: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("ASD123", "1234567")))
-  val nonUkBankAccount: BankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("98374389hjk")))
-  val nonUkIban: BankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some( NonUKIBANNumber("9ds8ofidf")))
+  val ukBankAccount: BankAccount    = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("ASD123", "1234567")))
+  val nonUkBankAccount: BankAccount =
+    BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("98374389hjk")))
+  val nonUkIban: BankAccount        =
+    BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some(NonUKIBANNumber("9ds8ofidf")))
 
   "The bank account audit event" must {
     "serialize to the correct json" when {
       "bank account is a UK bank account" in {
         val account = BankDetails(Some(PersonalAccount), Some("Test account"), Some(ukBankAccount))
-        val result = AddBankAccountEvent(account)
+        val result  = AddBankAccountEvent(account)
 
         val expected = headerCarrier.toAuditDetails() ++ Map(
-          "accountName" -> "Test account",
+          "accountName"     -> "Test account",
           "isUkBankAccount" -> "true",
-          "accountType" -> "personal",
-          "sortCode" -> "1234567",
-          "accountNumber" -> "ASD123"
+          "accountType"     -> "personal",
+          "sortCode"        -> "1234567",
+          "accountNumber"   -> "ASD123"
         )
 
         result.detail mustBe expected
@@ -52,13 +54,13 @@ class AddBankAccountEventSpec extends AmlsSpec {
 
       "bank account is a non-UK bank account" in {
         val account = BankDetails(Some(PersonalAccount), Some("Test account"), Some(nonUkIban))
-        val result = AddBankAccountEvent(account)
+        val result  = AddBankAccountEvent(account)
 
         val expected = headerCarrier.toAuditDetails() ++ Map(
-          "accountName" -> "Test account",
+          "accountName"     -> "Test account",
           "isUkBankAccount" -> "false",
-          "accountType" -> "personal",
-          "iban" -> "9ds8ofidf"
+          "accountType"     -> "personal",
+          "iban"            -> "9ds8ofidf"
         )
 
         result.detail mustBe expected
@@ -67,21 +69,21 @@ class AddBankAccountEventSpec extends AmlsSpec {
 
       "bank account is a business account" in {
         val account = BankDetails(Some(BelongsToBusiness), Some("Test account"), Some(ukBankAccount))
-        val result = AddBankAccountEvent(account)
+        val result  = AddBankAccountEvent(account)
 
         result.detail("accountType") mustBe "business"
       }
 
       "bank account belongs to some other business" in {
         val account = BankDetails(Some(BelongsToOtherBusiness), Some("Test account"), Some(ukBankAccount))
-        val result = AddBankAccountEvent(account)
+        val result  = AddBankAccountEvent(account)
 
         result.detail("accountType") mustBe "other business"
       }
 
       "bank account uses a non-UK account number" in {
         val account = BankDetails(Some(PersonalAccount), Some("Test account"), Some(nonUkBankAccount))
-        val result = AddBankAccountEvent(account)
+        val result  = AddBankAccountEvent(account)
 
         result.detail("accountNumber") mustBe "98374389hjk"
       }

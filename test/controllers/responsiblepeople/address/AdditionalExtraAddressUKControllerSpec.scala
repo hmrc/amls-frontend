@@ -41,16 +41,15 @@ import scala.concurrent.Future
 class AdditionalExtraAddressUKControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
-  val RecordId = 1
+  val RecordId               = 1
 
   trait Fixture {
     self =>
     val request = addToken(authRequest)
 
-
-    val auditConnector = mock[AuditConnector]
-    lazy val view = inject[AdditionalExtraAddressUKView]
-    val additionalExtraAddressController = new AdditionalExtraAddressUKController (
+    val auditConnector                   = mock[AuditConnector]
+    lazy val view                        = inject[AdditionalExtraAddressUKView]
+    val additionalExtraAddressController = new AdditionalExtraAddressUKController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
       auditConnector = auditConnector,
@@ -91,7 +90,7 @@ class AdditionalExtraAddressUKControllerSpec extends AmlsSpec with MockitoSugar 
         document.select("input[name=addressLine2]").`val` must be("")
         document.select("input[name=addressLine3]").`val` must be("")
         document.select("input[name=addressLine4]").`val` must be("")
-        document.select("input[name=postCode]").`val` must be("")
+        document.select("input[name=postCode]").`val`     must be("")
 
       }
       "display the persons page with pre-populated data" in new Fixture {
@@ -106,11 +105,13 @@ class AdditionalExtraAddressUKControllerSpec extends AmlsSpec with MockitoSugar 
 
         val responsiblePeople = ResponsiblePerson(
           personName = personName,
-          addressHistory = Some(ResponsiblePersonAddressHistory(
-            None,
-            None,
-            Some(ResponsiblePersonAddress(address, None))
-          ))
+          addressHistory = Some(
+            ResponsiblePersonAddressHistory(
+              None,
+              None,
+              Some(ResponsiblePersonAddress(address, None))
+            )
+          )
         )
 
         when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -147,27 +148,34 @@ class AdditionalExtraAddressUKControllerSpec extends AmlsSpec with MockitoSugar 
         "edit is false" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.AdditionalExtraAddressUKController.post(1).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
-            "postCode" -> "AA1 1AA"
-          )
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "Line 1",
+              "addressLine2" -> "Line 2",
+              "postCode"     -> "AA1 1AA"
+            )
 
-          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), None, None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val ukAddress              = PersonAddressUK("Line 1", Some("Line 2"), None, None, "AA1 1AA")
+          val additionalAddress      = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val additionalExtraAddress = ResponsiblePersonAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress), additionalExtraAddress = Some(additionalExtraAddress))
-          val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
+          val history                = ResponsiblePersonAddressHistory(
+            currentAddress = Some(additionalAddress),
+            additionalExtraAddress = Some(additionalExtraAddress)
+          )
+          val responsiblePeople      = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
           when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+          when(
+            additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
+          )
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController.get(RecordId).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController.get(RecordId).url)
+          )
 
           val captor = ArgumentCaptor.forClass(classOf[DataEvent])
           verify(auditConnector).sendEvent(captor.capture())(any(), any())
@@ -182,27 +190,38 @@ class AdditionalExtraAddressUKControllerSpec extends AmlsSpec with MockitoSugar 
 
         "edit is true and timeAtAddress does not exist" in new Fixture {
           val requestWithParams = FakeRequest(POST, routes.AdditionalExtraAddressUKController.post(1).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
-            "postCode" -> "AA1 1AA"
-          )
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "Line 1",
+              "addressLine2" -> "Line 2",
+              "postCode"     -> "AA1 1AA"
+            )
 
-          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), None, None, "AA1 1AA")
-          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val ukAddress              = PersonAddressUK("Line 1", Some("Line 2"), None, None, "AA1 1AA")
+          val additionalAddress      = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val additionalExtraAddress = ResponsiblePersonAddress(ukAddress, None)
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress), additionalExtraAddress = Some(additionalExtraAddress))
-          val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
+          val history                = ResponsiblePersonAddressHistory(
+            currentAddress = Some(additionalAddress),
+            additionalExtraAddress = Some(additionalExtraAddress)
+          )
+          val responsiblePeople      = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
-          when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-            (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+          when(
+            additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
+          )
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = additionalExtraAddressController.post(RecordId, true)(requestWithParams)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController.get(RecordId, true).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(
+              controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController
+                .get(RecordId, true)
+                .url
+            )
+          )
         }
       }
 
@@ -210,26 +229,35 @@ class AdditionalExtraAddressUKControllerSpec extends AmlsSpec with MockitoSugar 
         "edit is true" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.AdditionalExtraAddressUKController.post(1).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "New line 1",
-            "addressLine2" -> "New line 2",
-            "postCode" -> "TE1 1ET"
-          )
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "New line 1",
+              "addressLine2" -> "New line 2",
+              "postCode"     -> "TE1 1ET"
+            )
 
-          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+          val UKAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
+          val history           = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
           when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+          when(
+            additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
+          )
             .thenReturn(Future.successful(mockCacheMap))
 
-          val result = additionalExtraAddressController.post(RecordId, true, Some(flowFromDeclaration))(requestWithParams)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url))
+          val result =
+            additionalExtraAddressController.post(RecordId, true, Some(flowFromDeclaration))(requestWithParams)
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(
+              controllers.responsiblepeople.routes.DetailedAnswersController
+                .get(RecordId, Some(flowFromDeclaration))
+                .url
+            )
+          )
 
           val captor = ArgumentCaptor.forClass(classOf[DataEvent])
           verify(auditConnector).sendEvent(captor.capture())(any(), any())
@@ -251,18 +279,20 @@ class AdditionalExtraAddressUKControllerSpec extends AmlsSpec with MockitoSugar 
     "respond with BAD_REQUEST" when {
       "form is invalid" in new Fixture {
         val requestWithParams = FakeRequest(POST, routes.AdditionalExtraAddressUKController.post(1).url)
-        .withFormUrlEncodedBody(
-          "addressLineNonUK1" -> "",
-          "addressLineNonUK2" -> "",
-          "country" -> ""
-        )
+          .withFormUrlEncodedBody(
+            "addressLineNonUK1" -> "",
+            "addressLineNonUK2" -> "",
+            "country"           -> ""
+          )
 
         val responsiblePeople = ResponsiblePerson(personName)
 
         when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+        when(
+          additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
+        )
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = additionalExtraAddressController.post(RecordId)(requestWithParams)
@@ -273,18 +303,20 @@ class AdditionalExtraAddressUKControllerSpec extends AmlsSpec with MockitoSugar 
     "respond with NOT_FOUND" when {
       "responsible person is not found for that index" in new Fixture {
         val requestWithParams = FakeRequest(POST, routes.AdditionalExtraAddressUKController.post(1).url)
-        .withFormUrlEncodedBody(
-          "addressLine1" -> "Line 1",
-          "addressLine2" -> "Line 2",
-          "postCode" -> "AA1 1AA"
-        )
+          .withFormUrlEncodedBody(
+            "addressLine1" -> "Line 1",
+            "addressLine2" -> "Line 2",
+            "postCode"     -> "AA1 1AA"
+          )
 
         val responsiblePeople = ResponsiblePerson(personName)
 
         when(additionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-        when(additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+        when(
+          additionalExtraAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
+        )
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = additionalExtraAddressController.post(0)(requestWithParams)

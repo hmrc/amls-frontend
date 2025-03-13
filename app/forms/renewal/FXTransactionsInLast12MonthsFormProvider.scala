@@ -22,10 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class FXTransactionsInLast12MonthsFormProvider @Inject()() extends Mappings {
+class FXTransactionsInLast12MonthsFormProvider @Inject() () extends Mappings {
 
   private val invalidError = "error.invalid.renewal.fx.transactions.in.12months"
-  val length = 11
+  val length               = 11
 
   def apply(): Form[FXTransactionsInLast12Months] = Form(
     "fxTransaction" -> text("error.required.renewal.fx.transactions.in.12months")

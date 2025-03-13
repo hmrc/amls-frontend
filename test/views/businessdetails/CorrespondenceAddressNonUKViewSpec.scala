@@ -27,11 +27,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.CorrespondenceAddressNonUKView
 
-
-class CorrespondenceAddressNonUKViewSpec extends AmlsViewSpec with Matchers  {
+class CorrespondenceAddressNonUKViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val correspondence_address_non_uk = app.injector.instanceOf[CorrespondenceAddressNonUKView]
-  lazy val formProvider = app.injector.instanceOf[CorrespondenceAddressNonUKFormProvider]
+  lazy val formProvider                  = app.injector.instanceOf[CorrespondenceAddressNonUKFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -46,36 +45,42 @@ class CorrespondenceAddressNonUKViewSpec extends AmlsViewSpec with Matchers  {
   "correspondence_address view" must {
     "have correct title" in new ViewFixture {
 
-      val formWithData = formProvider().fill(CorrespondenceAddressNonUk(
-        "Name",
-        "BusinessName",
-        "addressLine1",
-        Some("addressLine2"),
-        None,
-        None,
-        Country("AB12CD", "XX")
-      ))
+      val formWithData = formProvider().fill(
+        CorrespondenceAddressNonUk(
+          "Name",
+          "BusinessName",
+          "addressLine1",
+          Some("addressLine2"),
+          None,
+          None,
+          Country("AB12CD", "XX")
+        )
+      )
 
       def view = correspondence_address_non_uk(formWithData, true, countries)
 
-      doc.title must startWith(messages("businessdetails.correspondenceaddress.title") + " - " + messages("summary.businessdetails"))
+      doc.title must startWith(
+        messages("businessdetails.correspondenceaddress.title") + " - " + messages("summary.businessdetails")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
-      val formWithData = formProvider().fill(CorrespondenceAddressNonUk(
-        "Name",
-        "BusinessName",
-        "addressLine1",
-        Some("addressLine2"),
-        None,
-        None,
-        Country("Antarctica", "XX")
-      ))
+      val formWithData = formProvider().fill(
+        CorrespondenceAddressNonUk(
+          "Name",
+          "BusinessName",
+          "addressLine1",
+          Some("addressLine2"),
+          None,
+          None,
+          Country("Antarctica", "XX")
+        )
+      )
 
       def view = correspondence_address_non_uk(formWithData, true, countries)
 
-      heading.html must be(messages("businessdetails.correspondenceaddress.title"))
+      heading.html    must be(messages("businessdetails.correspondenceaddress.title"))
       subHeading.html must include(messages("summary.businessdetails"))
     }
 

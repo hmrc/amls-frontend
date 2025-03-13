@@ -41,11 +41,11 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with Injecting {
   trait TestFixture extends AuthorisedFixture {
     self =>
 
-    val request = addToken(authRequest)
-    val authService = mock[AuthEnrolmentsService]
+    val request            = addToken(authRequest)
+    val authService        = mock[AuthEnrolmentsService]
     val dataCacheConnector = mock[DataCacheConnector]
-    lazy val view = inject[DeregistrationReasonView]
-    lazy val controller = new DeregistrationReasonController(
+    lazy val view          = inject[DeregistrationReasonView]
+    lazy val controller    = new DeregistrationReasonController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       dataCacheConnector = dataCacheConnector,
@@ -62,12 +62,14 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with Injecting {
         activities = Some(BusinessActivities(Set(HighValueDealing)))
       )
 
-      when(dataCacheConnector.fetch[BusinessMatching](credId = any(), key = eqTo(BusinessMatching.key))(formats = any()))
+      when(
+        dataCacheConnector.fetch[BusinessMatching](credId = any(), key = eqTo(BusinessMatching.key))(formats = any())
+      )
         .thenReturn(Future.successful(Some(businessMatchingWithHvd)))
 
       val result: Future[Result] = controller.get()(request)
 
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("deregistration.reason.heading"))
       val document = Jsoup.parse(contentAsString(result))
       DeregistrationReason.all foreach { reason =>
@@ -87,7 +89,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with Injecting {
 
     val result: Future[Result] = controller.get()(request)
 
-    status(result) must be(OK)
+    status(result)          must be(OK)
     contentAsString(result) must include(messages("deregistration.reason.heading"))
     val document = Jsoup.parse(contentAsString(result))
     DeregistrationReason.all diff Seq(HVDPolicyOfNotAcceptingHighValueCashPayments) foreach { reason =>
@@ -99,7 +101,13 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with Injecting {
   "submitting should cache user selection and navigate to the CYA page" in new TestFixture {
     val deregistrationReason: DeregistrationReason = DeregistrationReason.OutOfScope
 
-    when(dataCacheConnector.save[DeregistrationReason](credId = any(), key = eqTo(DeregistrationReason.key), data = eqTo(deregistrationReason))(any()))
+    when(
+      dataCacheConnector.save[DeregistrationReason](
+        credId = any(),
+        key = eqTo(DeregistrationReason.key),
+        data = eqTo(deregistrationReason)
+      )(any())
+    )
       .thenReturn(Future.successful(mock[Cache]))
 
     val postRequest = FakeRequest(POST, routes.DeregistrationReasonController.post().url)
@@ -108,8 +116,10 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with Injecting {
       )
 
     val result = controller.post()(postRequest)
-    status(result) must be(SEE_OTHER)
-    redirectLocation(result) must be(Some(controllers.deregister.routes.DeregistrationCheckYourAnswersController.get.url))
+    status(result)           must be(SEE_OTHER)
+    redirectLocation(result) must be(
+      Some(controllers.deregister.routes.DeregistrationCheckYourAnswersController.get.url)
+    )
   }
 
   "submitting without selection results in bad request" in new TestFixture {
@@ -122,7 +132,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with Injecting {
 
     val postRequest = FakeRequest(POST, routes.DeregistrationReasonController.post().url)
       .withFormUrlEncodedBody(
-        //empty body
+        // empty body
       )
 
     val result = controller.post()(postRequest)

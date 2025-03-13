@@ -28,7 +28,7 @@ import views.html.responsiblepeople.SoleProprietorView
 class SoleProprietorViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val sole_proprietor = inject[SoleProprietorView]
-  lazy val fp = inject[SoleProprietorFormProvider]
+  lazy val fp              = inject[SoleProprietorFormProvider]
 
   val name = "Person Name"
 
@@ -44,10 +44,12 @@ class SoleProprietorViewSpec extends AmlsViewSpec with Matchers {
 
       def view = sole_proprietor(fp().fill(SoleProprietorOfAnotherBusiness(true)), true, 1, None, name)
 
-      doc.title must be(messages("responsiblepeople.sole.proprietor.another.business.title") +
-        " - " + messages("summary.responsiblepeople") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("responsiblepeople.sole.proprietor.another.business.title") +
+          " - " + messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
 
       doc.getElementsByAttributeValue("name", "soleProprietorOfAnotherBusiness") must not be empty
     }
@@ -56,7 +58,7 @@ class SoleProprietorViewSpec extends AmlsViewSpec with Matchers {
 
       def view = sole_proprietor(fp().fill(SoleProprietorOfAnotherBusiness(true)), true, 1, None, name)
 
-      heading.html must be(messages("responsiblepeople.sole.proprietor.another.business.heading", name))
+      heading.html    must be(messages("responsiblepeople.sole.proprietor.another.business.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
     }
 
@@ -68,7 +70,8 @@ class SoleProprietorViewSpec extends AmlsViewSpec with Matchers {
         None,
         name
       ),
-      "soleProprietorOfAnotherBusiness", "error.required.rp.sole_proprietor"
+      "soleProprietorOfAnotherBusiness",
+      "error.required.rp.sole_proprietor"
     )
 
     behave like pageWithBackLink(sole_proprietor(fp(), true, 1, None, name))

@@ -31,7 +31,9 @@ object BusinessName extends Logging {
 
   private val warn: String => Unit = msg => logger.warn(s"[BusinessName] $msg")
 
-  def getNameFromCache(credId: String)(implicit cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
+  def getNameFromCache(
+    credId: String
+  )(implicit cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
     for {
       bm <- OptionT(cache.fetch[BusinessMatching](credId, BusinessMatching.key))
       rd <- OptionT.fromOption[Future](bm.reviewDetails)
@@ -42,29 +44,40 @@ object BusinessName extends Logging {
       rd.businessName
     }
 
-  def getNameFromAmls(accountTypeId: (String, String), safeId: String)
-                     (implicit hc: HeaderCarrier, amlsConnector: AmlsConnector, ec: ExecutionContext): OptionT[Future, String] = {
+  def getNameFromAmls(accountTypeId: (String, String), safeId: String)(implicit
+    hc: HeaderCarrier,
+    amlsConnector: AmlsConnector,
+    ec: ExecutionContext
+  ): OptionT[Future, String] =
     OptionT(amlsConnector.registrationDetails(accountTypeId, safeId) map { r =>
       Option(r.companyName)
-    } recover {
-      case ex =>
-        warn(s"Call to registrationDetails failed: ${ex.getMessage}. Falling back to cache..")
-        None
+    } recover { case ex =>
+      warn(s"Call to registrationDetails failed: ${ex.getMessage}. Falling back to cache..")
+      None
     })
-  }
 
-  def getName(credId: String, safeId: Option[String], accountTypeId: (String, String))
-             (implicit hc: HeaderCarrier, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector): OptionT[Future, String] =
+  def getName(credId: String, safeId: Option[String], accountTypeId: (String, String))(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext,
+    cache: DataCacheConnector,
+    amls: AmlsConnector
+  ): OptionT[Future, String] =
     safeId.fold(getNameFromCache(credId))(v => getNameFromAmls(accountTypeId, v) orElse getNameFromCache(credId))
 
-  def getBusinessNameFromAmls(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
-                             (implicit hc: HeaderCarrier, amls: AmlsConnector, ec: ExecutionContext,
-                              dc: DataCacheConnector, statusService: StatusService, messages: Messages): OptionT[Future, String] = {
+  def getBusinessNameFromAmls(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)(
+    implicit
+    hc: HeaderCarrier,
+    amls: AmlsConnector,
+    ec: ExecutionContext,
+    dc: DataCacheConnector,
+    statusService: StatusService,
+    messages: Messages
+  ): OptionT[Future, String] =
     for {
-      (_, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(amlsRegistrationNumber, accountTypeId, cacheId))
-      businessName <- detailedStatus.fold[OptionT[Future, String]](OptionT.some("")) { r =>
-        BusinessName.getName(cacheId, r.safeId, accountTypeId)
-      } orElse OptionT.some("")
+      (_, detailedStatus) <-
+        OptionT.liftF(statusService.getDetailedStatus(amlsRegistrationNumber, accountTypeId, cacheId))
+      businessName        <- detailedStatus.fold[OptionT[Future, String]](OptionT.some("")) { r =>
+                               BusinessName.getName(cacheId, r.safeId, accountTypeId)
+                             } orElse OptionT.some("")
     } yield businessName
-  }
 }

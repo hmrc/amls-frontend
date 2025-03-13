@@ -23,12 +23,14 @@ import views.html.supervision.WhatYouNeedView
 
 import javax.inject.Inject
 
-class WhatYouNeedController @Inject() (val authAction: AuthAction,
-                                       val ds: CommonPlayDependencies,
-                                       val cc: MessagesControllerComponents,
-                                       view: WhatYouNeedView) extends AmlsBaseController(ds, cc) {
+class WhatYouNeedController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  view: WhatYouNeedView
+) extends AmlsBaseController(ds, cc) {
 
   def get(): Action[AnyContent] = authAction { implicit request =>
-      Ok(view(controllers.supervision.routes.AnotherBodyController.get()))
-    }
+    Ok(view(controllers.supervision.routes.AnotherBodyController.get()))
+  }
 }

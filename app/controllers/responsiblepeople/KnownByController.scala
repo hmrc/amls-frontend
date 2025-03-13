@@ -28,57 +28,66 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                  authAction: AuthAction,
-                                  val ds: CommonPlayDependencies,
-                                  val cc: MessagesControllerComponents,
-                                  formProvider: KnownByFormProvider,
-                                  view: KnownByView,
-                                  implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class KnownByController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: KnownByFormProvider,
+  view: KnownByView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           (person.personName, person.knownBy) match {
-            case (Some(name), Some(knownBy)) => Ok(view(formProvider().fill(knownBy), edit, index, flow, name.titleName))
-            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
-            case _ => NotFound(notFoundView)
+            case (Some(name), Some(knownBy)) =>
+              Ok(view(formProvider().fill(knownBy), edit, index, flow, name.titleName))
+            case (Some(name), _)             => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _                           => NotFound(notFoundView)
           }
         }
       }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          },
-        data => {
-          for {
-            _ <- {
-              data.hasOtherNames match {
-                case Some(true) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                  rp.knownBy(data)
+    implicit request =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
+              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            },
+          data =>
+            {
+              for {
+                _ <- {
+                  data.hasOtherNames match {
+                    case Some(true)  =>
+                      updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                        rp.knownBy(data)
+                      }
+                    case Some(false) =>
+                      updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                        rp.knownBy(KnownBy(Some(false), None))
+                      }
+                    case None        => throw new Exception("An UnknownException has occurred: KnownByController")
+                  }
                 }
-                case Some(false) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                  rp.knownBy(KnownBy(Some(false), None))
+              } yield
+                if (edit) {
+                  Redirect(routes.DetailedAnswersController.get(index, flow))
+                } else {
+                  Redirect(routes.DateOfBirthController.get(index, edit, flow))
                 }
-                case None => throw new Exception("An UnknownException has occurred: KnownByController")
-              }
+            }.recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
             }
-          } yield if (edit) {
-            Redirect(routes.DetailedAnswersController.get(index, flow))
-          } else {
-            Redirect(routes.DateOfBirthController.get(index, edit, flow))
-          }
-        }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
-      )
+        )
   }
-}
 
 }

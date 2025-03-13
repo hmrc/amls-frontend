@@ -26,15 +26,15 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import javax.inject.Inject
 import scala.jdk.CollectionConverters._
 
-class WhichProfessionalBodyFormProvider @Inject()() extends Mappings {
+class WhichProfessionalBodyFormProvider @Inject() () extends Mappings {
 
   private val checkboxError = "error.required.supervision.one.professional.body"
 
-  val length = 255 //TODO This looks way too long
+  val length = 255 // TODO This looks way too long
 
   def apply(): Form[ProfessionalBodies] = Form[ProfessionalBodies](
     mapping(
-      "businessType" -> seq(enumerable[BusinessType](checkboxError, checkboxError)(ProfessionalBodies.enumerable))
+      "businessType"         -> seq(enumerable[BusinessType](checkboxError, checkboxError)(ProfessionalBodies.enumerable))
         .verifying(nonEmptySeq(checkboxError)),
       "specifyOtherBusiness" -> mandatoryIf(
         _.values.asJavaCollection.contains(Other("").toString),
@@ -48,14 +48,17 @@ class WhichProfessionalBodyFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  private def apply(businessType: Seq[BusinessType], maybeDetails: Option[String]): ProfessionalBodies = (businessType, maybeDetails) match {
-    case (services, Some(detail)) if services.contains(Other("")) =>
-      val modifiedTransactions = services.map(service => if (service == Other("")) Other(detail) else service)
-      ProfessionalBodies(modifiedTransactions.toSet)
-    case (services, Some(_)) if !services.contains(Other("")) => throw new IllegalArgumentException("Cannot have service details without Other TCSP service")
-    case (services, None) if services.contains(Other("")) => throw new IllegalArgumentException("Cannot have Other TCSP service without service details")
-    case (services, None) if !services.contains(Other("")) => ProfessionalBodies(services.toSet)
-  }
+  private def apply(businessType: Seq[BusinessType], maybeDetails: Option[String]): ProfessionalBodies =
+    (businessType, maybeDetails) match {
+      case (services, Some(detail)) if services.contains(Other("")) =>
+        val modifiedTransactions = services.map(service => if (service == Other("")) Other(detail) else service)
+        ProfessionalBodies(modifiedTransactions.toSet)
+      case (services, Some(_)) if !services.contains(Other(""))     =>
+        throw new IllegalArgumentException("Cannot have service details without Other TCSP service")
+      case (services, None) if services.contains(Other(""))         =>
+        throw new IllegalArgumentException("Cannot have Other TCSP service without service details")
+      case (services, None) if !services.contains(Other(""))        => ProfessionalBodies(services.toSet)
+    }
 
   private def unapply(obj: ProfessionalBodies): Option[(Seq[BusinessType], Option[String])] = {
     val objTypes = obj.businessTypes.toSeq.map { x =>
@@ -64,7 +67,7 @@ class WhichProfessionalBodyFormProvider @Inject()() extends Mappings {
 
     val maybeName = obj.businessTypes.find(_.isInstanceOf[Other]).flatMap {
       case Other(details) => Some(details)
-      case _ => None
+      case _              => None
     }
 
     Some((objTypes, maybeName))

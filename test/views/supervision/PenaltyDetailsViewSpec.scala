@@ -24,10 +24,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.supervision.PenaltyDetailsView
 
-class PenaltyDetailsViewSpec extends AmlsViewSpec with Matchers  {
+class PenaltyDetailsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val viewUnderTest = inject[PenaltyDetailsView]
-  lazy val fp = inject[PenaltyDetailsFormProvider]
+  lazy val fp            = inject[PenaltyDetailsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,7 +42,7 @@ class PenaltyDetailsViewSpec extends AmlsViewSpec with Matchers  {
 
       doc.title() mustBe
         s"${messages("supervision.penaltydetails.title")} - ${messages("summary.supervision")}" +
-          s" - ${messages("title.amls")} - ${messages("title.gov")}"
+        s" - ${messages("title.amls")} - ${messages("title.gov")}"
     }
 
     "have the correct heading" in new ViewFixture {
@@ -53,7 +53,8 @@ class PenaltyDetailsViewSpec extends AmlsViewSpec with Matchers  {
 
     behave like pageWithErrors(
       viewUnderTest(
-        fp().withError("professionalBody", "error.invalid.penaltydetails.info.about.penalty"), true
+        fp().withError("professionalBody", "error.invalid.penaltydetails.info.about.penalty"),
+        true
       ),
       "professionalBody",
       "error.invalid.penaltydetails.info.about.penalty"

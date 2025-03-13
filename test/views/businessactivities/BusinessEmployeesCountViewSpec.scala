@@ -25,10 +25,9 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessactivities.BusinessEmployeesCountView
 
-
 class BusinessEmployeesCountViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val employees: BusinessEmployeesCountView = inject[BusinessEmployeesCountView]
+  lazy val employees: BusinessEmployeesCountView   = inject[BusinessEmployeesCountView]
   lazy val formProvider: EmployeeCountFormProvider = inject[EmployeeCountFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
@@ -42,14 +41,16 @@ class BusinessEmployeesCountViewSpec extends AmlsViewSpec with Matchers {
 
       def view = employees(formProvider().fill(EmployeeCount("11")), true)
 
-      doc.title must startWith(messages("businessactivities.employees.title") + " - " + messages("summary.businessactivities"))
+      doc.title must startWith(
+        messages("businessactivities.employees.title") + " - " + messages("summary.businessactivities")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = employees(formProvider().fill(EmployeeCount("222")), true)
 
-      heading.text() must be(messages("businessactivities.employees.title"))
+      heading.text()    must be(messages("businessactivities.employees.title"))
       subHeading.text() must include(messages("summary.businessactivities"))
 
     }

@@ -29,6 +29,3 @@ class TypeOfBusinessSpec extends PlaySpec {
     }
   }
 }
-
-
-

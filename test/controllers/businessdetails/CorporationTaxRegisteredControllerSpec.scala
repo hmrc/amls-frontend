@@ -18,13 +18,13 @@ package controllers.businessdetails
 
 import connectors.BusinessMatchingConnector
 import controllers.actions.SuccessfulAuthAction
-import models.{Country}
+import models.Country
 import models.businessdetails.{BusinessDetails, CorporationTaxRegisteredYes}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.businessmatching.BusinessType.{LimitedCompany, UnincorporatedBody}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify}
+import org.mockito.Mockito.verify
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
@@ -39,7 +39,7 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
 
     val request = addToken(authRequest)
 
-    val reviewDetails = ReviewDetails(
+    val reviewDetails    = ReviewDetails(
       "BusinessName",
       Some(LimitedCompany),
       Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
@@ -58,7 +58,8 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      errorView)
+      errorView
+    )
   }
 
   "CorporationTaxRegisteredController" when {
@@ -83,7 +84,14 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
         val reviewDtlsUtr = ReviewDetails(
           "BusinessName",
           Some(BusinessType.LimitedCompany),
-          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+          Address(
+            "line1",
+            Some("line2"),
+            Some("line3"),
+            Some("line4"),
+            Some("AA11 1AA"),
+            Country("United Kingdom", "GB")
+          ),
           "XE0000000000000",
           Some("1111111111")
         )
@@ -103,15 +111,22 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
 
-        verify(controller.dataCacheConnector).save(eqTo("internalId"), eqTo(BusinessDetails.key),
-          eqTo(data.corporationTaxRegistered(corpTax)))(any())
+        verify(controller.dataCacheConnector)
+          .save(eqTo("internalId"), eqTo(BusinessDetails.key), eqTo(data.corporationTaxRegistered(corpTax)))(any())
       }
 
       "business matching UTR NOT exists" in new Fixture {
         val reviewDtlsUtr = ReviewDetails(
           "BusinessName",
           Some(BusinessType.LimitedCompany),
-          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+          Address(
+            "line1",
+            Some("line2"),
+            Some("line3"),
+            Some("line4"),
+            Some("AA11 1AA"),
+            Country("United Kingdom", "GB")
+          ),
           "XE0000000000000",
           None
         )
@@ -134,11 +149,28 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
     "respond with NOT_FOUND" must {
       "business type is UnincorporatedBody" in new Fixture {
 
-        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(Some(ReviewDetails(
-          "BusinessName",
-          Some(UnincorporatedBody),
-          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
-        ))), BusinessMatching.key)
+        mockCacheGetEntry[BusinessMatching](
+          Some(
+            BusinessMatching(
+              Some(
+                ReviewDetails(
+                  "BusinessName",
+                  Some(UnincorporatedBody),
+                  Address(
+                    "line1",
+                    Some("line2"),
+                    Some("line3"),
+                    Some("line4"),
+                    Some("AA11 1AA"),
+                    Country("United Kingdom", "GB")
+                  ),
+                  "ghghg"
+                )
+              )
+            )
+          ),
+          BusinessMatching.key
+        )
 
         val data = BusinessDetails(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
 

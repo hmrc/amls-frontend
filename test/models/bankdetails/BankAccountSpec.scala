@@ -22,10 +22,17 @@ import play.api.libs.json.Json
 
 class BankAccountSpec extends PlaySpec with MockitoSugar {
 
-
-  val ukAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12341234", "000000")))
-  val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some( NonUKIBANNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
-  val nonUkAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some( NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
+  val ukAccount    = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12341234", "000000")))
+  val nonUkIban    = BankAccount(
+    Some(BankAccountIsUk(false)),
+    Some(BankAccountHasIban(true)),
+    Some(NonUKIBANNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD"))
+  )
+  val nonUkAccount = BankAccount(
+    Some(BankAccountIsUk(false)),
+    Some(BankAccountHasIban(false)),
+    Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD"))
+  )
 
   "BankAccount" must {
     "serialise and deserialise correctly" in {
@@ -64,7 +71,11 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
 
       "is non UK IBAN account and" when {
         "has IBAN is changed" in {
-          nonUkIban.hasIban(BankAccountHasIban(false)) mustBe BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), None)
+          nonUkIban.hasIban(BankAccountHasIban(false)) mustBe BankAccount(
+            Some(BankAccountIsUk(false)),
+            Some(BankAccountHasIban(false)),
+            None
+          )
         }
         "has IBAN is identical" in {
           nonUkIban.hasIban(BankAccountHasIban(true)) mustBe nonUkIban

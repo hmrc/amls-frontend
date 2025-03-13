@@ -32,32 +32,33 @@ import cats.instances.future._
 import cats.data.{EitherT, OptionT}
 import views.html.deregister.DeregistrationConfirmationView
 
-class WithdrawalConfirmationController @Inject()(
-                                                  authAction: AuthAction,
-                                                  ds: CommonPlayDependencies,
-                                                  statusService: StatusService,
-                                                  enrolmentService: AuthEnrolmentsService,
-                                                  cc: MessagesControllerComponents,
-                                                  view: WithdrawalConfirmationView)(implicit
-                                                  dataCacheConnector: DataCacheConnector,
-                                                  amlsConnector: AmlsConnector
-                                                ) extends AmlsBaseController(ds, cc) {
+class WithdrawalConfirmationController @Inject() (
+  authAction: AuthAction,
+  ds: CommonPlayDependencies,
+  statusService: StatusService,
+  enrolmentService: AuthEnrolmentsService,
+  cc: MessagesControllerComponents,
+  view: WithdrawalConfirmationView
+)(implicit
+  dataCacheConnector: DataCacheConnector,
+  amlsConnector: AmlsConnector
+) extends AmlsBaseController(ds, cc) {
 
   def get: Action[AnyContent] = authAction.async { implicit request =>
-
     val okResult = for {
       amlsRefNumber <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-      status <- OptionT.liftF(statusService.getReadStatus(amlsRefNumber, request.accountTypeId))
-      reason <- OptionT(dataCacheConnector.fetch[WithdrawalReason](request.credId, WithdrawalReason.key))
-      businessName <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
-    } yield Ok(view(
-      businessName = businessName,
-      amlsRefNumber = amlsRefNumber,
-      withdrawalReason = reason
-    ))
+      status        <- OptionT.liftF(statusService.getReadStatus(amlsRefNumber, request.accountTypeId))
+      reason        <- OptionT(dataCacheConnector.fetch[WithdrawalReason](request.credId, WithdrawalReason.key))
+      businessName  <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
+    } yield Ok(
+      view(
+        businessName = businessName,
+        amlsRefNumber = amlsRefNumber,
+        withdrawalReason = reason
+      )
+    )
 
     okResult getOrElse InternalServerError("Unable to get Withdrawal confirmation")
   }
-
 
 }

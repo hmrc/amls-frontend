@@ -24,18 +24,26 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnector) extends RepeatingSection {
+class ResponsiblePeopleService @Inject() (val dataCacheConnector: DataCacheConnector) extends RepeatingSection {
 
   def getAll(credId: String)(implicit ec: ExecutionContext): Future[Seq[ResponsiblePerson]] =
     dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key) map {
       _.getOrElse(Seq.empty)
     }
 
-  def updateFitAndProperFlag(responsiblePeople: Seq[ResponsiblePerson], indices: Set[Int], setApprovalFlag: Boolean): Seq[ResponsiblePerson] =
+  def updateFitAndProperFlag(
+    responsiblePeople: Seq[ResponsiblePerson],
+    indices: Set[Int],
+    setApprovalFlag: Boolean
+  ): Seq[ResponsiblePerson] =
     responsiblePeople.zipWithIndex.map { case (rp, index) =>
-      val updated = if(setApprovalFlag) {
-        rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(indices contains index),
-          hasAlreadyPaidApprovalCheck = Some(indices contains index)))
+      val updated = if (setApprovalFlag) {
+        rp.approvalFlags(
+          rp.approvalFlags.copy(
+            hasAlreadyPassedFitAndProper = Some(indices contains index),
+            hasAlreadyPaidApprovalCheck = Some(indices contains index)
+          )
+        )
       } else {
         rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(indices contains index)))
       }
@@ -45,26 +53,27 @@ class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnec
 
 object ResponsiblePeopleService {
 
-  def isActive(person: ResponsiblePerson): Boolean = !person.status.contains(StatusConstants.Deleted) && person.isComplete
+  def isActive(person: ResponsiblePerson): Boolean =
+    !person.status.contains(StatusConstants.Deleted) && person.isComplete
 
   def nonDeleted(person: ResponsiblePerson): Boolean = !person.status.contains(StatusConstants.Deleted)
 
   implicit class ResponsiblePeopleZipListHelpers(people: Seq[(ResponsiblePerson, Int)]) {
     def exceptInactive: Seq[(ResponsiblePerson, Int)] = people filter {
       case (person, _) if isActive(person) => true
-      case _ => false
+      case _                               => false
     }
 
     def exceptDeleted: Seq[(ResponsiblePerson, Int)] = people filter {
       case (person, _) if nonDeleted(person) => true
-      case _ => false
+      case _                                 => false
     }
   }
 
   implicit class ResponsiblePeopleListHelpers(people: Seq[ResponsiblePerson]) {
     def exceptInactive: Seq[ResponsiblePerson] = people filter {
       case person if isActive(person) => true
-      case _ => false
+      case _                          => false
     }
   }
 }

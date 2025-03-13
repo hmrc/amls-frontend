@@ -27,7 +27,7 @@ import views.html.tradingpremises.BusinessStructureView
 class BusinessStructureViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val business_structure = app.injector.instanceOf[BusinessStructureView]
-  lazy val fp = inject[BusinessStructureFormProvider]
+  lazy val fp                 = inject[BusinessStructureFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -44,8 +44,8 @@ class BusinessStructureViewSpec extends AmlsViewSpec with Matchers {
 
       def view = business_structure(fp(), 1, false)
 
-      doc.title must be(pageTitle)
-      heading.html must be(messages("tradingpremises.businessStructure.title"))
+      doc.title       must be(pageTitle)
+      heading.html    must be(messages("tradingpremises.businessStructure.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
 
       doc.select("input[type=radio]").size mustBe 5
@@ -53,7 +53,9 @@ class BusinessStructureViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       business_structure(
-        fp().withError("agentsBusinessStructure", "error.required.tp.select.business.structure"), 1, true
+        fp().withError("agentsBusinessStructure", "error.required.tp.select.business.structure"),
+        1,
+        true
       ),
       "agentsBusinessStructure",
       "error.required.tp.select.business.structure"

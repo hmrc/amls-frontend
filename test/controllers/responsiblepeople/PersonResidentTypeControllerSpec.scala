@@ -62,7 +62,7 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
     )
   }
 
-  val emptyCache = Cache.empty
+  val emptyCache   = Cache.empty
   val mockCacheMap = mock[Cache]
 
   "PersonResidentTypeController" when {
@@ -71,9 +71,9 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
       "return OK" when {
 
-        val personName = PersonName("firstname", None, "lastname")
-        val nino = nextNino
-        val residenceTypeUK = UKResidence(Nino(nino))
+        val personName         = PersonName("firstname", None, "lastname")
+        val nino               = nextNino
+        val residenceTypeUK    = UKResidence(Nino(nino))
         val residenceTypeNonUK = NonUKResidence
 
         "without pre-populated data" in new Fixture {
@@ -87,19 +87,22 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.getElementById("isUKResidence-true").hasAttr("checked") must be(false)
+          document.getElementById("isUKResidence-true").hasAttr("checked")  must be(false)
           document.getElementById("isUKResidence-false").hasAttr("checked") must be(false)
-          document.select("input[name=nino]").`val` must be("")
+          document.select("input[name=nino]").`val`                         must be("")
 
         }
 
         "with pre-populated data (uk)" in new Fixture {
           val responsiblePeople = ResponsiblePerson(
             personName = Some(personName),
-            personResidenceType = Some(PersonResidenceType(
-              isUKResidence = residenceTypeUK,
-              countryOfBirth = Some(Country("United Kingdom", "GB")),
-              nationality = Some(Country("United Kingdom", "GB"))))
+            personResidenceType = Some(
+              PersonResidenceType(
+                isUKResidence = residenceTypeUK,
+                countryOfBirth = Some(Country("United Kingdom", "GB")),
+                nationality = Some(Country("United Kingdom", "GB"))
+              )
+            )
           )
 
           when(mockService.getResponsiblePerson(any(), any()))
@@ -110,17 +113,20 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
           val document = Jsoup.parse(contentAsString(result))
           document.select("input[name=isUKResidence]").`val` must be("true")
-          document.select("input[name=nino]").`val` must be(nino)
+          document.select("input[name=nino]").`val`          must be(nino)
 
         }
 
         "with pre-populated data (non uk)" in new Fixture {
           val responsiblePeople = ResponsiblePerson(
             personName = Some(personName),
-            personResidenceType = Some(PersonResidenceType(
-              isUKResidence = residenceTypeNonUK,
-              countryOfBirth = Some(Country("United Kingdom", "GB")),
-              nationality = Some(Country("United Kingdom", "GB"))))
+            personResidenceType = Some(
+              PersonResidenceType(
+                isUKResidence = residenceTypeNonUK,
+                countryOfBirth = Some(Country("United Kingdom", "GB")),
+                nationality = Some(Country("United Kingdom", "GB"))
+              )
+            )
           )
 
           when(mockService.getResponsiblePerson(any(), any()))
@@ -130,7 +136,7 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.getElementById("isUKResidence-true").hasAttr("checked") must be(false)
+          document.getElementById("isUKResidence-true").hasAttr("checked")  must be(false)
           document.getElementById("isUKResidence-false").hasAttr("checked") must be(true)
         }
 
@@ -155,15 +161,15 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
       "submit with a valid form" which {
 
         "goes to CountryOfBirthController" when {
-          "uk residence" in new Fixture   {
+          "uk residence" in new Fixture {
 
             val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
               .withFormUrlEncodedBody(
-              "isUKResidence" -> "true",
-              "nino" -> nextNino,
-              "countryOfBirth" -> "GB",
-              "nationality" -> "GB"
-            )
+                "isUKResidence"  -> "true",
+                "nino"           -> nextNino,
+                "countryOfBirth" -> "GB",
+                "nationality"    -> "GB"
+              )
 
             val responsiblePeople = ResponsiblePerson(
               personResidenceType = Some(
@@ -181,8 +187,10 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               .thenReturn(Some(Seq(responsiblePeople)))
 
             val result = controller.post(1)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CountryOfBirthController.get(1).url))
+            status(result)           must be(SEE_OTHER)
+            redirectLocation(result) must be(
+              Some(controllers.responsiblepeople.routes.CountryOfBirthController.get(1).url)
+            )
           }
         }
 
@@ -191,11 +199,11 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
             val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
               .withFormUrlEncodedBody(
-              "isUKResidence" -> "false",
-              "nino" -> nextNino,
-              "countryOfBirth" -> "GB",
-              "nationality" -> "GB"
-            )
+                "isUKResidence"  -> "false",
+                "nino"           -> nextNino,
+                "countryOfBirth" -> "GB",
+                "nationality"    -> "GB"
+              )
 
             val responsiblePeople = ResponsiblePerson(
               personResidenceType = Some(
@@ -214,8 +222,10 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               .thenReturn(Some(Seq(responsiblePeople)))
 
             val result = controller.post(1)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonUKPassportController.get(1).url))
+            status(result)           must be(SEE_OTHER)
+            redirectLocation(result) must be(
+              Some(controllers.responsiblepeople.routes.PersonUKPassportController.get(1).url)
+            )
           }
 
           "in edit mode" when {
@@ -223,8 +233,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
               val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
                 .withFormUrlEncodedBody(
-                "isUKResidence" -> "false"
-              )
+                  "isUKResidence" -> "false"
+                )
 
               val responsiblePeople = ResponsiblePerson(
                 personResidenceType = Some(
@@ -243,8 +253,10 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
                 .thenReturn(Some(Seq(responsiblePeople)))
 
               val result = controller.post(1, true)(newRequest)
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonUKPassportController.get(1, true).url))
+              status(result)           must be(SEE_OTHER)
+              redirectLocation(result) must be(
+                Some(controllers.responsiblepeople.routes.PersonUKPassportController.get(1, true).url)
+              )
             }
           }
         }
@@ -255,11 +267,11 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
               val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
                 .withFormUrlEncodedBody(
-                "isUKResidence" -> "true",
-                "nino" -> nextNino,
-                "countryOfBirth" -> "GB",
-                "nationality" -> "GB"
-              )
+                  "isUKResidence"  -> "true",
+                  "nino"           -> nextNino,
+                  "countryOfBirth" -> "GB",
+                  "nationality"    -> "GB"
+                )
 
               val responsiblePeople = ResponsiblePerson(
                 personResidenceType = Some(
@@ -277,9 +289,13 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
                 .thenReturn(Some(Seq(responsiblePeople)))
 
-              val result = controller.post(1, true,Some(flowFromDeclaration))(newRequest)
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
+              val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
+              status(result)           must be(SEE_OTHER)
+              redirectLocation(result) must be(
+                Some(
+                  controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url
+                )
+              )
             }
           }
         }
@@ -290,11 +306,11 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
           val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
             .withFormUrlEncodedBody(
-            "isUKResidence" -> "true",
-            "nino" -> testNino.toLowerCase,
-            "countryOfBirth" -> "GB",
-            "nationality" -> "GB"
-          )
+              "isUKResidence"  -> "true",
+              "nino"           -> testNino.toLowerCase,
+              "countryOfBirth" -> "GB",
+              "nationality"    -> "GB"
+            )
 
           val responsiblePeople = ResponsiblePerson()
 
@@ -310,17 +326,18 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
         "accept spaces and dashes" in new Fixture {
 
-          val testNino = nextNino
+          val testNino   = nextNino
           val spacedNino = testNino.grouped(2).mkString(" ")
-          val withDashes = spacedNino.substring(0, 8) + "-" + spacedNino.substring(8, spacedNino.length) // ## ## ##- ## #
+          val withDashes =
+            spacedNino.substring(0, 8) + "-" + spacedNino.substring(8, spacedNino.length) // ## ## ##- ## #
 
           val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
             .withFormUrlEncodedBody(
-            "isUKResidence" -> "true",
-            "nino" -> withDashes,
-            "countryOfBirth" -> "GB",
-            "nationality" -> "GB"
-          )
+              "isUKResidence"  -> "true",
+              "nino"           -> withDashes,
+              "countryOfBirth" -> "GB",
+              "nationality"    -> "GB"
+            )
 
           val responsiblePeople = ResponsiblePerson()
 
@@ -341,7 +358,7 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
             val countryCode = "GB"
 
-            val dateOfBirth = DateOfBirth(LocalDate.of(2000,1,1))
+            val dateOfBirth = DateOfBirth(LocalDate.of(2000, 1, 1))
 
             val responsiblePeople = ResponsiblePerson(
               personResidenceType = Some(
@@ -358,11 +375,11 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
             val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
               .withFormUrlEncodedBody(
-              "isUKResidence" -> "true",
-              "nino" -> nino,
-              "countryOfBirth" -> countryCode,
-              "nationality" -> countryCode
-            )
+                "isUKResidence"  -> "true",
+                "nino"           -> nino,
+                "countryOfBirth" -> countryCode,
+                "nationality"    -> countryCode
+              )
 
             when(mockService.getCache(any(), any(), any()))
               .thenReturn(OptionT[Future, Cache](Future.successful(Some(mockCacheMap))))
@@ -379,10 +396,10 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
       "respond with BAD_REQUEST" when {
         "invalid form is submitted" in new Fixture {
 
-          val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+          val newRequest        = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
             .withFormUrlEncodedBody(
-            "ukPassportNumber" -> "12346464688"
-          )
+              "ukPassportNumber" -> "12346464688"
+            )
           val responsiblePeople = ResponsiblePerson(Some(PersonName("firstname", None, "lastname")))
 
           when(mockService.getResponsiblePerson(any(), any()))
@@ -399,11 +416,11 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
           val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
             .withFormUrlEncodedBody(
-            "isUKResidence" -> "true",
-            "nino" -> nextNino,
-            "countryOfBirth" -> "GB",
-            "nationality" -> "GB"
-          )
+              "isUKResidence"  -> "true",
+              "nino"           -> nextNino,
+              "countryOfBirth" -> "GB",
+              "nationality"    -> "GB"
+            )
 
           val responsiblePeople = ResponsiblePerson()
 

@@ -28,16 +28,17 @@ import views.html.responsiblepeople.NationalityView
 
 import scala.concurrent.Future
 
-class NationalityController @Inject () (
-                                         val dataCacheConnector: DataCacheConnector,
-                                         authAction: AuthAction,
-                                         val ds: CommonPlayDependencies,
-                                         val autoCompleteService: AutoCompleteService,
-                                         val cc: MessagesControllerComponents,
-                                         formProvider: NationalityFormProvider,
-                                         view: NationalityView,
-                                         implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
-
+class NationalityController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val autoCompleteService: AutoCompleteService,
+  val cc: MessagesControllerComponents,
+  formProvider: NationalityFormProvider,
+  view: NationalityView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
@@ -45,10 +46,19 @@ class NationalityController @Inject () (
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           (person.personName, person.personResidenceType) match {
             case (Some(name), Some(PersonResidenceType(_, _, Some(nationality)))) =>
-              Ok(view(formProvider().fill(nationality), edit, index, flow, name.titleName, autoCompleteService.formOptionsExcludeUK))
-            case (Some(name), _) =>
+              Ok(
+                view(
+                  formProvider().fill(nationality),
+                  edit,
+                  index,
+                  flow,
+                  name.titleName,
+                  autoCompleteService.formOptionsExcludeUK
+                )
+              )
+            case (Some(name), _)                                                  =>
               Ok(view(formProvider(), edit, index, flow, name.titleName, autoCompleteService.formOptionsExcludeUK))
-            case _ => NotFound(notFoundView)
+            case _                                                                => NotFound(notFoundView)
           }
         }
       }
@@ -56,25 +66,38 @@ class NationalityController @Inject () (
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.formOptionsExcludeUK))
-          },
-        data => {
-          for {
-            _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-              val residenceType = rp.personResidenceType.map(x => x.copy(nationality = Some(data)))
-              rp.personResidenceType(residenceType)
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
+              BadRequest(
+                view(
+                  formWithErrors,
+                  edit,
+                  index,
+                  flow,
+                  ControllerHelper.rpTitleName(rp),
+                  autoCompleteService.formOptionsExcludeUK
+                )
+              )
+            },
+          data =>
+            {
+              for {
+                _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                       val residenceType = rp.personResidenceType.map(x => x.copy(nationality = Some(data)))
+                       rp.personResidenceType(residenceType)
+                     }
+              } yield
+                if (edit) {
+                  Redirect(routes.DetailedAnswersController.get(index, flow))
+                } else {
+                  Redirect(routes.ContactDetailsController.get(index, edit, flow))
+                }
+            }.recoverWith { case _: IndexOutOfBoundsException =>
+              Future.successful(NotFound(notFoundView))
             }
-          } yield if (edit) {
-            Redirect(routes.DetailedAnswersController.get(index, flow))
-          } else {
-            Redirect(routes.ContactDetailsController.get(index, edit, flow))
-          }
-        }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
-      )
+        )
   }
 }

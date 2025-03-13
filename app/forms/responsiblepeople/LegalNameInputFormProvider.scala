@@ -23,13 +23,13 @@ import play.api.data.Forms.{mapping, optional}
 
 import javax.inject.Inject
 
-class LegalNameInputFormProvider @Inject()() extends Mappings {
+class LegalNameInputFormProvider @Inject() () extends Mappings {
 
   val length = 35
 
   def apply(): Form[PreviousName] = Form[PreviousName](
     mapping(
-      "firstName" -> text("error.rp.previous.first.invalid").verifying(
+      "firstName"  -> text("error.rp.previous.first.invalid").verifying(
         firstError(
           maxLength(length, "error.rp.previous.first.length.invalid"),
           regexp(nameRegex, "error.rp.previous.first.char.invalid")
@@ -43,7 +43,7 @@ class LegalNameInputFormProvider @Inject()() extends Mappings {
           )
         )
       ),
-      "lastName" -> text("error.rp.previous.last.invalid").verifying(
+      "lastName"   -> text("error.rp.previous.last.invalid").verifying(
         firstError(
           maxLength(length, "error.rp.previous.last.length.invalid"),
           regexp(nameRegex, "error.rp.previous.last.char.invalid")
@@ -52,12 +52,12 @@ class LegalNameInputFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  private def apply(first: String, middle: Option[String], last: String): PreviousName = {
+  private def apply(first: String, middle: Option[String], last: String): PreviousName =
     PreviousName(Some(true), Some(first), middle, Some(last))
-  }
 
-  private def unapply(obj: PreviousName): Option[(String, Option[String], String)] = (obj.firstName, obj.lastName) match {
-    case (Some(first), Some(last)) => Some((first, obj.middleName, last))
-    case _ => None
-  }
+  private def unapply(obj: PreviousName): Option[(String, Option[String], String)] =
+    (obj.firstName, obj.lastName) match {
+      case (Some(first), Some(last)) => Some((first, obj.middleName, last))
+      case _                         => None
+    }
 }

@@ -34,7 +34,8 @@ class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
             Status(
               Some(StatusType.Revoked),
               Some(RevokedReason.RevokedCeasedTrading)
-            )),
+            )
+          ),
           Some(ContactType.MindedToRevoke),
           None,
           false,
@@ -42,10 +43,14 @@ class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
           false,
           "XJML00000200000",
           "1",
-          new IDType("5832e38e01000001005ca3ff"
-          ))
+          new IDType("5832e38e01000001005ca3ff")
+        )
 
-        ContactTypeHelper.getContactType(model.status, model.contactType, model.variation) mustBe ContactType.MindedToRevoke
+        ContactTypeHelper.getContactType(
+          model.status,
+          model.contactType,
+          model.variation
+        ) mustBe ContactType.MindedToRevoke
       }
 
       "auto rejected" in {
@@ -54,7 +59,8 @@ class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
             Status(
               Some(StatusType.Rejected),
               Some(RejectedReason.FailedToPayCharges)
-            )),
+            )
+          ),
           None,
           None,
           false,
@@ -62,18 +68,24 @@ class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
           false,
           "XJML00000200000",
           "1",
-          new IDType("5832e38e01000001005ca3ff"
-          ))
+          new IDType("5832e38e01000001005ca3ff")
+        )
 
-        ContactTypeHelper.getContactType(model.status, model.contactType, model.variation) mustBe ContactType.ApplicationAutorejectionForFailureToPay
+        ContactTypeHelper.getContactType(
+          model.status,
+          model.contactType,
+          model.variation
+        ) mustBe ContactType.ApplicationAutorejectionForFailureToPay
       }
 
       "variation approved" in {
         val model = NotificationRow(
           Some(
             Status(
-              Some(StatusType.Approved), None
-            )),
+              Some(StatusType.Approved),
+              None
+            )
+          ),
           None,
           None,
           true,
@@ -81,18 +93,24 @@ class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
           false,
           "XJML00000200000",
           "1",
-          new IDType("5832e38e01000001005ca3ff"
-          ))
+          new IDType("5832e38e01000001005ca3ff")
+        )
 
-        ContactTypeHelper.getContactType(model.status, model.contactType, model.variation) mustBe ContactType.RegistrationVariationApproval
+        ContactTypeHelper.getContactType(
+          model.status,
+          model.contactType,
+          model.variation
+        ) mustBe ContactType.RegistrationVariationApproval
       }
 
       "DeRegistrationEffectiveDateChange" in {
         val model = NotificationRow(
           Some(
             Status(
-              Some(StatusType.DeRegistered), None
-            )),
+              Some(StatusType.DeRegistered),
+              None
+            )
+          ),
           None,
           None,
           true,
@@ -100,18 +118,24 @@ class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
           false,
           "XJML00000200000",
           "1",
-          new IDType("5832e38e01000001005ca3ff"
-          ))
+          new IDType("5832e38e01000001005ca3ff")
+        )
 
-        ContactTypeHelper.getContactType(model.status, model.contactType, model.variation) mustBe ContactType.DeRegistrationEffectiveDateChange
+        ContactTypeHelper.getContactType(
+          model.status,
+          model.contactType,
+          model.variation
+        ) mustBe ContactType.DeRegistrationEffectiveDateChange
       }
 
       "return NoSubject when ContactType not determined" in {
         val model = NotificationRow(
           status = Some(
             Status(
-              Some(StatusType.Approved), None
-            )),
+              Some(StatusType.Approved),
+              None
+            )
+          ),
           contactType = None,
           contactNumber = None,
           variation = false,
@@ -119,8 +143,8 @@ class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
           isRead = false,
           amlsRegistrationNumber = "XJML00000200000",
           templatePackageVersion = "v1m0",
-          _id = new IDType("5832e38e01000001005ca3ff"
-          ))
+          _id = new IDType("5832e38e01000001005ca3ff")
+        )
 
         ContactTypeHelper.getContactType(model.status, model.contactType, model.variation) mustBe NoSubject
         model.subject mustBe "notifications.subject.NoSubject"

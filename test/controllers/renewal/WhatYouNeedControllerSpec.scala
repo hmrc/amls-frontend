@@ -38,14 +38,15 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
     self =>
 
     val renewalService = mock[RenewalService]
-    lazy val view = app.injector.instanceOf[WhatYouNeedView]
-    val controller = new WhatYouNeedController(
+    lazy val view      = app.injector.instanceOf[WhatYouNeedView]
+    val controller     = new WhatYouNeedController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       renewalService = renewalService,
       cc = mock[MessagesControllerComponents],
-      view = view)
+      view = view
+    )
   }
 
   "WhatYouNeedController" must {
@@ -53,15 +54,25 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
     "get" must {
 
       "load the page" in new Fixture {
-        val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-        val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+        val BusinessActivitiesModel =
+          BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+        val bm                      = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
 
-        when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any())) thenReturn(Future.successful(bm))
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any())) thenReturn (Future.successful(
+          bm
+        ))
 
         when {
           renewalService.getTaskRow(any())(any())
         } thenReturn Future.successful(
-          TaskRow("renewal", controllers.renewal.routes.SummaryController.get.url, Renewal().hasChanged, NotStarted, TaskRow.notStartedTag))
+          TaskRow(
+            "renewal",
+            controllers.renewal.routes.SummaryController.get.url,
+            Renewal().hasChanged,
+            NotStarted,
+            TaskRow.notStartedTag
+          )
+        )
 
         val result = controller.get(requestWithToken)
         status(result) must be(OK)
@@ -74,15 +85,25 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
       }
 
       "redirect to progress page if renewal has been started" in new Fixture {
-        val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-        val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+        val BusinessActivitiesModel =
+          BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+        val bm                      = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
 
-        when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any())) thenReturn(Future.successful(bm))
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any())) thenReturn (Future.successful(
+          bm
+        ))
 
         when {
           renewalService.getTaskRow(meq("internalId"))(any())
         } thenReturn Future.successful(
-          TaskRow("renewal", controllers.renewal.routes.SummaryController.get.url, Renewal().hasChanged, Completed, TaskRow.completedTag))
+          TaskRow(
+            "renewal",
+            controllers.renewal.routes.SummaryController.get.url,
+            Renewal().hasChanged,
+            Completed,
+            TaskRow.completedTag
+          )
+        )
 
         val result = controller.get(requestWithToken)
         status(result) must be(SEE_OTHER)
@@ -90,16 +111,25 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
       }
 
       "throw an error when data cannot be fetched" in new Fixture {
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any())) thenReturn (Future.successful(None))
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any())) thenReturn (Future.successful(
+          None
+        ))
 
-          when {
-            renewalService.getTaskRow(meq("internalId"))(any())
-          } thenReturn Future.successful(
-            TaskRow("renewal", controllers.renewal.routes.SummaryController.get.url, Renewal().hasChanged, Completed, TaskRow.completedTag))
+        when {
+          renewalService.getTaskRow(meq("internalId"))(any())
+        } thenReturn Future.successful(
+          TaskRow(
+            "renewal",
+            controllers.renewal.routes.SummaryController.get.url,
+            Renewal().hasChanged,
+            Completed,
+            TaskRow.completedTag
+          )
+        )
 
-          a[Exception] must be thrownBy {
-            ScalaFutures.whenReady(controller.get(requestWithToken)) { x => x }
-          }
+        a[Exception] must be thrownBy {
+          ScalaFutures.whenReady(controller.get(requestWithToken))(x => x)
+        }
       }
 
     }

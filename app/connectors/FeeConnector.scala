@@ -28,14 +28,15 @@ import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
 import uk.gov.hmrc.http.client.HttpClientV2
 
-class FeeConnector @Inject()(
-                              http: HttpClientV2,
-                              appConfig: ApplicationConfig) extends Logging {
+class FeeConnector @Inject() (http: HttpClientV2, appConfig: ApplicationConfig) extends Logging {
 
   val feePaymentUrl = appConfig.feePaymentUrl
 
-  def feeResponse(amlsRegistrationNumber: String, accountTypeId: (String, String))
-                 (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[FeeResponse]): Future[FeeResponse] = {
+  def feeResponse(amlsRegistrationNumber: String, accountTypeId: (String, String))(implicit
+    headerCarrier: HeaderCarrier,
+    ec: ExecutionContext,
+    reqW: Writes[FeeResponse]
+  ): Future[FeeResponse] = {
 
     val (accountType, accountId) = accountTypeId
 
@@ -44,12 +45,11 @@ class FeeConnector @Inject()(
     // $COVERAGE-OFF$
     logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
     // $COVERAGE-ON$
-    http.get(getUrl).execute[FeeResponse] map {
-      response =>
-        // $COVERAGE-OFF$
-        logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
-        // $COVERAGE-ON$
-        response
+    http.get(getUrl).execute[FeeResponse] map { response =>
+      // $COVERAGE-OFF$
+      logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+      // $COVERAGE-ON$
+      response
     }
   }
 }

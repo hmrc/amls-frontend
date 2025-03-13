@@ -26,10 +26,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.bankdetails.BankAccountTypesView
 
-class BankAccountTypesViewSpec extends AmlsViewSpec with Matchers  {
+class BankAccountTypesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val bankTypes = inject[BankAccountTypesView]
-  lazy val fp = inject[BankAccountTypeFormProvider]
+  lazy val fp        = inject[BankAccountTypeFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   trait ViewFixture extends Fixture {

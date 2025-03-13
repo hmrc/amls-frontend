@@ -24,5 +24,5 @@ case class AgentCompanyName(agentCompanyName: String)
 object AgentCompanyName {
 
   implicit val mongoKey: MongoKey[AgentCompanyName] = () => "agent-company-name"
-  implicit val format: OFormat[AgentCompanyName] = Json.format[AgentCompanyName]
+  implicit val format: OFormat[AgentCompanyName]    = Json.format[AgentCompanyName]
 }

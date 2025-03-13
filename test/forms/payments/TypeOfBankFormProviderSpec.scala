@@ -22,13 +22,14 @@ import play.api.data.Form
 
 class TypeOfBankFormProviderSpec extends BooleanFieldBehaviours[TypeOfBank] {
   override val form: Form[TypeOfBank] = new TypeOfBankFormProvider()()
-  override val fieldName: String = "typeOfBank"
-  override val errorMessage: String = "payments.typeofbank.error"
+  override val fieldName: String      = "typeOfBank"
+  override val errorMessage: String   = "payments.typeofbank.error"
 
   "TypeOfBankFormProvider" must {
 
     behave like booleanFieldWithModel(
-      TypeOfBank(true), TypeOfBank(false)
+      TypeOfBank(true),
+      TypeOfBank(false)
     )
   }
 }

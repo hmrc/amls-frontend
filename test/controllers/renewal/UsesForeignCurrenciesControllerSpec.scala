@@ -42,19 +42,20 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
 
   trait Fixture {
     self =>
-    val renewalService = mock[RenewalService]
-    val request = addToken(authRequest)
+    val renewalService     = mock[RenewalService]
+    val request            = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
-    val cacheMap = mock[Cache]
-    lazy val view = inject[UsesForeignCurrenciesView]
-    lazy val controller = new UsesForeignCurrenciesController(
+    val cacheMap           = mock[Cache]
+    lazy val view          = inject[UsesForeignCurrenciesView]
+    lazy val controller    = new UsesForeignCurrenciesController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       renewalService,
       dataCacheConnector,
       cc = mockMcc,
       formProvider = inject[UsesForeignCurrenciesFormProvider],
-      view = view)
+      view = view
+    )
 
     when {
       renewalService.getRenewal(any())
@@ -66,20 +67,16 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
 
   trait FormSubmissionFixture extends Fixture {
     val validFormRequest = FakeRequest(POST, routes.UsesForeignCurrenciesController.post().url)
-    .withFormUrlEncodedBody("usesForeignCurrencies" -> "true")
+      .withFormUrlEncodedBody("usesForeignCurrencies" -> "true")
 
     when {
-      renewalService.updateRenewal(any(),any())
+      renewalService.updateRenewal(any(), any())
     } thenReturn Future.successful(mock[Cache])
   }
 
   trait RoutingFixture extends FormSubmissionFixture {
-    val whichCurrencies = WhichCurrencies(
-      Seq("USD"),
-      Some(UsesForeignCurrenciesYes),
-      Some(MoneySources(None,
-        None,
-        None)))
+    val whichCurrencies =
+      WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, None)))
 
     val renewal = Renewal(whichCurrencies = Some(whichCurrencies))
 
@@ -92,12 +89,12 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
     )
 
     val businessActivities = Some(
-      BusinessActivities(Set(HighValueDealing,  AccountancyServices))
+      BusinessActivities(Set(HighValueDealing, AccountancyServices))
     )
 
-
     val expectedRenewal = renewal.copy(
-      whichCurrencies = Some(whichCurrencies), hasChanged = true
+      whichCurrencies = Some(whichCurrencies),
+      hasChanged = true
     )
 
     when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
@@ -111,7 +108,12 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
 
     def setupBusinessMatching(activities: Set[BusinessActivity], msbServices: Set[BusinessMatchingMsbService]) = when {
       cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-    } thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(msbServices)), activities = Some(BusinessActivities(activities))))
+    } thenReturn Some(
+      BusinessMatching(
+        msbServices = Some(BusinessMatchingMsbServices(msbServices)),
+        activities = Some(BusinessActivities(activities))
+      )
+    )
   }
 
   "Calling the GET action" must {
@@ -134,7 +136,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
           setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
 
           val validFormRequest2 = FakeRequest(POST, routes.UsesForeignCurrenciesController.post().url)
-          .withFormUrlEncodedBody("usesForeignCurrencies" -> "false")
+            .withFormUrlEncodedBody("usesForeignCurrencies" -> "false")
 
           val result = controller.post(edit = true)(validFormRequest2)
 
@@ -160,13 +162,13 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
 
         verify(renewalService).updateRenewal(any(), captor.capture())
 
-        captor.getValue.whichCurrencies mustBe Some(WhichCurrencies(
-          Seq("USD"),
-          Some(UsesForeignCurrenciesYes),
-          Some(MoneySources(None,
-            None,
-            None))
-        ))
+        captor.getValue.whichCurrencies mustBe Some(
+          WhichCurrencies(
+            Seq("USD"),
+            Some(UsesForeignCurrenciesYes),
+            Some(MoneySources(None, None, None))
+          )
+        )
       }
     }
 
@@ -175,7 +177,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
         val result = controller.post()(request)
 
         status(result) mustBe BAD_REQUEST
-        verify(renewalService, never()).updateRenewal(any(),any())
+        verify(renewalService, never()).updateRenewal(any(), any())
       }
     }
   }

@@ -26,9 +26,8 @@ import utils.AmlsSpec
 
 import scala.concurrent.Future
 
-
 class DataCacheConnectorSpec
-  extends AmlsSpec
+    extends AmlsSpec
     with Conversions
     with ScalaFutures
     with ScalaCheckPropertyChecks
@@ -41,28 +40,28 @@ class DataCacheConnectorSpec
 
   trait Fixture {
 
-    val key = "key"
-    val oId = "oldId"
-    val credId = "12345678"
-    val cache: Cache = Cache(oId, referenceMap())
+    val key             = "key"
+    val oId             = "oldId"
+    val credId          = "12345678"
+    val cache: Cache    = Cache(oId, referenceMap())
     val newCache: Cache = cache.copy(id = credId)
 
     val factory: MongoCacheClientFactory = mock[MongoCacheClientFactory]
-    val client: MongoCacheClient = mock[MongoCacheClient]
+    val client: MongoCacheClient         = mock[MongoCacheClient]
 
     when(factory.createClient) thenReturn client
 
     val appConfig: ApplicationConfig = mock[ApplicationConfig]
 
     val dataCacheConnector: MongoCacheConnector = new MongoCacheConnector(factory) {
-      override lazy val mongoCache: MongoCacheClient =  mock[MongoCacheClient]
+      override lazy val mongoCache: MongoCacheClient = mock[MongoCacheClient]
     }
   }
 
   def referenceMap(str1: String = "", str2: String = ""): Map[String, JsValue] = Map(
     "dataKey" -> JsBoolean(true),
-    "name" -> JsString(str1),
-    "obj" -> Json.obj(
+    "name"    -> JsString(str1),
+    "obj"     -> Json.obj(
       "prop1" -> str2,
       "prop2" -> 12
     )
@@ -89,7 +88,7 @@ class DataCacheConnectorSpec
         dataCacheConnector.mongoCache.find[Model](credId, key)
       } thenReturn Future.successful(Some(model))
 
-      whenReady(dataCacheConnector.fetch[Model](credId, key)) { _ mustBe Some(model) }
+      whenReady(dataCacheConnector.fetch[Model](credId, key))(_ mustBe Some(model))
     }
 
     "fetch all data from Mongo" in new Fixture {
@@ -98,7 +97,7 @@ class DataCacheConnectorSpec
         dataCacheConnector.mongoCache.fetchAll(Some(credId))
       } thenReturn Future.successful(Some(newCache))
 
-      whenReady(dataCacheConnector.fetchAll(credId)) { _ mustBe Some(newCache) }
+      whenReady(dataCacheConnector.fetchAll(credId))(_ mustBe Some(newCache))
     }
 
     "remove data from Mongo for CredId" in new Fixture {

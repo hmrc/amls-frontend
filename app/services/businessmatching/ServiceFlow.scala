@@ -24,10 +24,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class NextService(url: String, activity: BusinessActivity)
 
-class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService) {
+class ServiceFlow @Inject() (businessMatchingService: BusinessMatchingService) {
 
   def isNewActivity(cacheId: String, activity: BusinessActivity)(implicit ec: ExecutionContext): Future[Boolean] =
-    businessMatchingService.getAdditionalBusinessActivities(cacheId)
+    businessMatchingService
+      .getAdditionalBusinessActivities(cacheId)
       .map {
         _.contains(activity)
       } getOrElse false

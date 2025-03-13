@@ -37,16 +37,15 @@ import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
 class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
-  implicit val statusService: StatusService = mock[StatusService]
+  implicit val statusService: StatusService   = mock[StatusService]
   implicit val renewalService: RenewalService = mock[RenewalService]
-  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
+  implicit val headerCarrier: HeaderCarrier   = mock[HeaderCarrier]
 
-  val amlsRegNo: Option[String] = Some("regNo")
+  val amlsRegNo: Option[String]       = Some("regNo")
   val accountTypeId: (String, String) = ("accountType", "accountId")
-  val credId = "12341234"
+  val credId                          = "12341234"
 
   private val completeRenewal = Renewal(
     Some(InvolvedInOtherYes("test")),
@@ -56,7 +55,12 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
     Some(CustomersOutsideIsUK(true)),
     Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
     Some(PercentageOfCashPaymentOver15000.First),
-    Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
+    Some(
+      CashPayments(
+        CashPaymentsCustomerNotMet(true),
+        Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+      )
+    ),
     Some(TotalThroughput("01")),
     Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
     Some(TransactionsInLast12Months("1500")),
@@ -75,20 +79,26 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
   "currentPartnersNames" must {
     "return a sequence of full names of only undeleted partners" in {
 
-      currentPartnersNames(Seq(
-        partnerWithName
-      )) mustBe Seq("FirstName1 LastName1")
+      currentPartnersNames(
+        Seq(
+          partnerWithName
+        )
+      ) mustBe Seq("FirstName1 LastName1")
 
-      currentPartnersNames(Seq(
-        partnerWithName,
-        deletedPartner,
-        nonPartnerWithName
-      )) mustBe Seq("FirstName1 LastName1")
+      currentPartnersNames(
+        Seq(
+          partnerWithName,
+          deletedPartner,
+          nonPartnerWithName
+        )
+      ) mustBe Seq("FirstName1 LastName1")
     }
     "return an empty sequence when there are no partners" in {
-      currentPartnersNames(Seq(
-        nonPartnerWithName
-      )) mustBe Seq.empty
+      currentPartnersNames(
+        Seq(
+          nonPartnerWithName
+        )
+      ) mustBe Seq.empty
     }
   }
 
@@ -101,50 +111,60 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
     "return the correct number when there are one or more partners" in {
 
-      numberOfPartners(Seq(
-        partnerWithName
-      )) mustBe 1
+      numberOfPartners(
+        Seq(
+          partnerWithName
+        )
+      ) mustBe 1
 
-      numberOfPartners(Seq(
-        partnerWithName,
-        partnerWithName
-      )) mustBe 2
+      numberOfPartners(
+        Seq(
+          partnerWithName,
+          partnerWithName
+        )
+      ) mustBe 2
     }
 
     "not count responsible people whose status is Deleted" in {
 
       numberOfPartners(Seq(deletedPartner)) mustBe 0
 
-      numberOfPartners(Seq(
-        deletedPartner,
-        deletedPartner,
-        partnerWithName
-      )) mustBe 1
+      numberOfPartners(
+        Seq(
+          deletedPartner,
+          deletedPartner,
+          partnerWithName
+        )
+      ) mustBe 1
     }
   }
 
   "nonPartners" must {
     "return a sequence of responsiblePeople containing no partners" in {
-      nonPartners(Seq(
-        partnerWithName,
-        deletedPartner,
-        nonPartnerWithName
-      )) mustBe Seq(nonPartnerWithName)
+      nonPartners(
+        Seq(
+          partnerWithName,
+          deletedPartner,
+          nonPartnerWithName
+        )
+      ) mustBe Seq(nonPartnerWithName)
     }
 
     "return an empty sequence when there are no non-partners" in {
-      nonPartners(Seq(
-        partnerWithName,
-        deletedPartner
-      )) mustBe Seq.empty
+      nonPartners(
+        Seq(
+          partnerWithName,
+          deletedPartner
+        )
+      ) mustBe Seq.empty
     }
   }
 
   "statusSubtitle(amlsRegNo, accountTypeId, credId" must {
     "return the correct message string given a SubmissionReady status" in {
 
-      when{
-        statusService.getStatus(any(),any(), any())(any(),any(), any())
+      when {
+        statusService.getStatus(any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(SubmissionReady)
 
       await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.registration"
@@ -152,8 +172,8 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
     "return the correct message string given a SubmissionReadyForReview status" in {
 
-      when{
-        statusService.getStatus(any(),any(), any())(any(),any(), any())
+      when {
+        statusService.getStatus(any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(SubmissionReadyForReview)
 
       await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.amendment.application"
@@ -161,8 +181,8 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
     "return the correct message string given a SubmissionDecisionApproved status" in {
 
-      when{
-        statusService.getStatus(any(),any(), any())(any(),any(), any())
+      when {
+        statusService.getStatus(any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(SubmissionDecisionApproved)
 
       await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.amendment.application"
@@ -170,8 +190,8 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
     "return the correct message string given a ReadyForRenewal status" in {
 
-      when{
-        statusService.getStatus(any(),any(), any())(any(),any(), any())
+      when {
+        statusService.getStatus(any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(ReadyForRenewal(None))
 
       await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.renewal.application"
@@ -179,8 +199,8 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
     "return the correct message string given a RenewalSubmitted status" in {
 
-      when{
-        statusService.getStatus(any(),any(), any())(any(),any(), any())
+      when {
+        statusService.getStatus(any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(RenewalSubmitted(None))
 
       await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.renewal.application"
@@ -188,8 +208,8 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
     "return an exception when any other status is given" in {
 
-      when{
-        statusService.getStatus(any(),any(), any())(any(),any(), any())
+      when {
+        statusService.getStatus(any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(SubmissionWithdrawn)
 
       a[Exception] mustBe thrownBy(await(statusSubtitle(amlsRegNo, accountTypeId, credId)))
@@ -201,7 +221,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
       "where renewal incomplete" must {
         "return true" in {
           when {
-            statusService.getStatus(any(),any(), any())(any(),any(), any())
+            statusService.getStatus(any(), any(), any())(any(), any(), any())
           } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
 
           when(renewalService.isRenewalComplete(any(), any())(any()))
@@ -209,14 +229,14 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
           when(renewalService.getRenewal(any())).thenReturn(Future.successful(Some(inCompleteRenewal)))
 
-          await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(true)
+          await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe true
         }
       }
 
       "where no renewal" must {
         "return true" in {
           when {
-            statusService.getStatus(any(),any(), any())(any(),any(), any())
+            statusService.getStatus(any(), any(), any())(any(), any(), any())
           } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
 
           when(renewalService.isRenewalComplete(any(), any())(any()))
@@ -224,14 +244,14 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
           when(renewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
-          await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(true)
+          await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe true
         }
       }
 
       "where renewal complete" must {
         "return false" in {
           when {
-            statusService.getStatus(any(),any(), any())(any(),any(), any())
+            statusService.getStatus(any(), any(), any())(any(), any(), any())
           } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
 
           when(renewalService.isRenewalComplete(any(), any())(any()))
@@ -239,15 +259,15 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
           when(renewalService.getRenewal(any())).thenReturn(Future.successful(Some(completeRenewal)))
 
-          await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(false)
+          await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe false
         }
       }
     }
 
     "where not in renewal window post renewal" must {
       "return false" in {
-        when{
-          statusService.getStatus(any(),any(), any())(any(),any(), any())
+        when {
+          statusService.getStatus(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(RenewalSubmitted(None))
 
         when(renewalService.isRenewalComplete(any(), any())(any()))
@@ -255,19 +275,19 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
         when(renewalService.getRenewal(any())).thenReturn(Future.successful(Some(completeRenewal)))
 
-        await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(false)
+        await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe false
       }
     }
 
     "where not in renewal window pre renewal" must {
       "return false" in {
-        when{
-          statusService.getStatus(any(),any(),any())(any(),any(), any())
+        when {
+          statusService.getStatus(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(SubmissionReady)
 
         when(renewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
-        await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(false)
+        await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe false
       }
     }
   }
@@ -276,25 +296,25 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
     "return the end date where there is a date" in {
       val date = LocalDate.now()
       when {
-        statusService.getStatus(any(),any(), any())(any(),any(), any())
+        statusService.getStatus(any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(ReadyForRenewal(Some(date)))
 
-      await(statusEndDate(amlsRegNo, accountTypeId, credId)) mustBe(Some(date))
+      await(statusEndDate(amlsRegNo, accountTypeId, credId)) mustBe (Some(date))
     }
 
     "return none where there is no date" in {
-      when{
-        statusService.getStatus(any(),any(),any())(any(),any(), any())
+      when {
+        statusService.getStatus(any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(SubmissionReady)
 
-      await(statusEndDate(amlsRegNo, accountTypeId, credId)) mustBe(None)
+      await(statusEndDate(amlsRegNo, accountTypeId, credId)) mustBe None
     }
   }
 
   "getSubheadingBasedOnStatus" must {
     "return renewal subheading if application is in renewal window and renewal is complete" in {
       when {
-        statusService.getStatus(any(),any(), any())(any(),any(), any())
+        statusService.getStatus(any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now())))
 
       when(renewalService.isRenewalComplete(any(), any())(any()))
@@ -306,7 +326,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
     "return submit application subheading if application is ready to submit" in {
       when {
-        statusService.getStatus(any(),any(), any())(any(),any(), any())
+        statusService.getStatus(any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(SubmissionReady)
 
       val result = getSubheadingBasedOnStatus(credId, amlsRegNo, accountTypeId, statusService, renewalService).value
@@ -315,7 +335,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
 
     "return update information subheading if application is in any other state" in {
       when {
-        statusService.getStatus(any(),any(), any())(any(),any(), any())
+        statusService.getStatus(any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(SubmissionReadyForReview)
 
       val result = getSubheadingBasedOnStatus(credId, amlsRegNo, accountTypeId, statusService, renewalService).value
@@ -324,7 +344,7 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
   }
 
   "sectionsComplete" must {
-    val sectionsProvider = mock[SectionsProvider]
+    val sectionsProvider  = mock[SectionsProvider]
     val completedSections = Seq(
       TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
       TaskRow("s2", "/bar", true, Completed, TaskRow.completedTag)
@@ -341,19 +361,19 @@ class DeclarationHelperSpec extends PlaySpec with Matchers with MockitoSugar {
     )
 
     "return false where one or more sections are incomplete" in {
-      when{
+      when {
         sectionsProvider.taskRows(eqTo(credId))(any(), any())
       }.thenReturn(Future.successful(incompleteSections))
 
-      await(sectionsComplete(credId, sectionsProvider, false)) mustBe(false)
+      await(sectionsComplete(credId, sectionsProvider, false)) mustBe false
     }
 
     "return true where all sections are complete" in {
-      when{
+      when {
         sectionsProvider.taskRows(eqTo(credId))(any(), any())
       }.thenReturn(Future.successful(completedSections))
 
-      await(sectionsComplete(credId, sectionsProvider, false)) mustBe(true)
+      await(sectionsComplete(credId, sectionsProvider, false)) mustBe true
     }
 
     "return true where sections are either complete or updated" in {

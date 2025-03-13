@@ -23,10 +23,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add.AddMoreActivitiesView
 
-class AddMoreActivitiesViewSpec extends AmlsViewSpec with Matchers  {
+class AddMoreActivitiesViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val activitiesView = app.injector.instanceOf[AddMoreActivitiesView]
-  lazy val fp = app.injector.instanceOf[AddMoreActivitiesFormProvider]
+  lazy val activitiesView                                        = app.injector.instanceOf[AddMoreActivitiesView]
+  lazy val fp                                                    = app.injector.instanceOf[AddMoreActivitiesFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
@@ -36,7 +36,9 @@ class AddMoreActivitiesViewSpec extends AmlsViewSpec with Matchers  {
   "The AddMoreActivitiesView view" must {
 
     "have the correct title" in new ViewFixture {
-      doc.title must startWith(messages("businessmatching.updateservice.addmoreactivities.title") + " - " + messages("summary.updateservice"))
+      doc.title must startWith(
+        messages("businessmatching.updateservice.addmoreactivities.title") + " - " + messages("summary.updateservice")
+      )
     }
 
     "have correct heading" in new ViewFixture {
@@ -60,7 +62,8 @@ class AddMoreActivitiesViewSpec extends AmlsViewSpec with Matchers  {
       activitiesView(
         fp().withError("addmoreactivities", "error.businessmatching.updateservice.addmoreactivities")
       ),
-      "addmoreactivities", "error.businessmatching.updateservice.addmoreactivities"
+      "addmoreactivities",
+      "error.businessmatching.updateservice.addmoreactivities"
     )
 
     behave like pageWithBackLink(activitiesView(fp()))

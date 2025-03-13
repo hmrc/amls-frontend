@@ -27,7 +27,7 @@ import views.html.renewal.WhatYouNeedView
 
 class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val what_you_need = inject[WhatYouNeedView]
+  lazy val what_you_need                                         = inject[WhatYouNeedView]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -39,56 +39,80 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       doc.title must startWith(messages("title.wyn"))
     }
 
-    "Have the correct Headings" in new ViewFixture{
+    "Have the correct Headings" in new ViewFixture {
       def view = what_you_need(None, None)
 
-      heading.html must be (messages("title.wyn"))
-      subHeading.html must include (messages("summary.renewal"))
+      heading.html    must be(messages("title.wyn"))
+      subHeading.html must include(messages("summary.renewal"))
     }
 
-    "contain the expected content elements for any renewal" in new ViewFixture{
+    "contain the expected content elements for any renewal" in new ViewFixture {
       def view = what_you_need(None, None)
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
-      html must include(messages("your total net profit for the last 12 months, if your business was involved in other activities"))
+      html must include(
+        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+      )
       html must include(messages("your total net profit for the last 12 months from the services you have registered"))
     }
 
-    "contain the expected content elements for AMP renewal" in new ViewFixture{
+    "contain the expected content elements for AMP renewal" in new ViewFixture {
       def view = what_you_need(Some(BusinessActivities(Set(ArtMarketParticipant))), None)
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
-      html must include(messages("your total net profit for the last 12 months, if your business was involved in other activities"))
+      html must include(
+        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+      )
       html must include(messages("your total net profit for the last 12 months from the services you have registered"))
       html must include(messages("the percentage of your turnover that came from sales of art for €10,000 or more"))
     }
 
-    "contain the expected content elements for MSB renewal" in new ViewFixture{
+    "contain the expected content elements for MSB renewal" in new ViewFixture {
       def view = what_you_need(Some(BusinessActivities(Set(MoneyServiceBusiness))), None)
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
-      html must include(messages("your total net profit for the last 12 months, if your business was involved in other activities"))
+      html must include(
+        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+      )
       html must include(messages("your total net profit for the last 12 months from the services you have registered"))
       html must include(messages("your total value of transactions in the last 12 months"))
     }
 
-    "contain the expected content elements for MSB renewal with MoneyTransmitting" in new ViewFixture{
-      def view = what_you_need(Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))
+    "contain the expected content elements for MSB renewal with MoneyTransmitting" in new ViewFixture {
+      def view = what_you_need(
+        Some(BusinessActivities(Set(MoneyServiceBusiness))),
+        Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+      )
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
-      html must include(messages("your total net profit for the last 12 months, if your business was involved in other activities"))
+      html must include(
+        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+      )
       html must include(messages("your total net profit for the last 12 months from the services you have registered"))
       html must include(messages("your total value of transactions in the last 12 months"))
       html must include(messages("the number of money transfers you made in the last 12 months"))
-      html must include(messages("which countries you sent the largest amounts of money to, if you sent money to other countries in the last 12 months"))
-      html must include(messages("which countries you sent the most transactions to, if you sent money to other countries in the last 12 months"))
+      html must include(
+        messages(
+          "which countries you sent the largest amounts of money to, if you sent money to other countries in the last 12 months"
+        )
+      )
+      html must include(
+        messages(
+          "which countries you sent the most transactions to, if you sent money to other countries in the last 12 months"
+        )
+      )
     }
 
-    "contain the expected content elements for MSB renewal with Currency Exchange" in new ViewFixture{
-      def view = what_you_need(Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(CurrencyExchange))))
+    "contain the expected content elements for MSB renewal with Currency Exchange" in new ViewFixture {
+      def view = what_you_need(
+        Some(BusinessActivities(Set(MoneyServiceBusiness))),
+        Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+      )
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
-      html must include(messages("your total net profit for the last 12 months, if your business was involved in other activities"))
+      html must include(
+        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+      )
       html must include(messages("your total net profit for the last 12 months from the services you have registered"))
       html must include(messages("your total value of transactions in the last 12 months"))
       html must include(messages("the number of currency exchange transactions you made in the last 12 months"))
@@ -96,34 +120,55 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       html must include(messages("who supplied your foreign currency, if you dealt in physical foreign currencies"))
     }
 
-    "contain the expected content elements for MSB renewal with Foreign Exchange" in new ViewFixture{
-      def view = what_you_need(Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(ForeignExchange))))
+    "contain the expected content elements for MSB renewal with Foreign Exchange" in new ViewFixture {
+      def view = what_you_need(
+        Some(BusinessActivities(Set(MoneyServiceBusiness))),
+        Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
+      )
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
-      html must include(messages("your total net profit for the last 12 months, if your business was involved in other activities"))
+      html must include(
+        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+      )
       html must include(messages("your total net profit for the last 12 months from the services you have registered"))
       html must include(messages("your total value of transactions in the last 12 months"))
       html must include(messages("the number of foreign exchange transactions you made in the last 12 months"))
     }
 
-    "contain the expected content elements for ASP renewal" in new ViewFixture{
+    "contain the expected content elements for ASP renewal" in new ViewFixture {
       def view = what_you_need(Some(BusinessActivities(Set(AccountancyServices))), None)
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
-      html must include(messages("your total net profit for the last 12 months, if your business was involved in other activities"))
+      html must include(
+        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+      )
       html must include(messages("your total net profit for the last 12 months from the services you have registered"))
-      html must include(messages("which countries your customers lived or worked in, if you had customers who lived or worked outside of the UK"))
+      html must include(
+        messages(
+          "which countries your customers lived or worked in, if you had customers who lived or worked outside of the UK"
+        )
+      )
     }
 
-    "contain the expected content elements for HVD renewal" in new ViewFixture{
+    "contain the expected content elements for HVD renewal" in new ViewFixture {
       def view = what_you_need(Some(BusinessActivities(Set(HighValueDealing))), None)
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
-      html must include(messages("your total net profit for the last 12 months, if your business was involved in other activities"))
+      html must include(
+        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+      )
       html must include(messages("your total net profit for the last 12 months from the services you have registered"))
-      html must include(messages("which countries your customers lived or worked in, if you had customers who lived or worked outside of the UK"))
+      html must include(
+        messages(
+          "which countries your customers lived or worked in, if you had customers who lived or worked outside of the UK"
+        )
+      )
       html must include(messages("the percentage of your turnover that came from cash payments of €10,000 or more"))
-      html must include(messages("how you received cash payments of €10,000 or more from customers you had not met in person, if you received any"))
+      html must include(
+        messages(
+          "how you received cash payments of €10,000 or more from customers you had not met in person, if you received any"
+        )
+      )
     }
 
     behave like pageWithBackLink(what_you_need(None, None))

@@ -40,14 +40,14 @@ import scala.concurrent.Future
 class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
-  val mockStatusService = mock[StatusService]
-  val recordId = 1
+  val mockStatusService      = mock[StatusService]
+  val recordId               = 1
 
   trait Fixture extends AuthorisedFixture {
     self =>
-    val request = addToken(authRequest)
-    lazy val view = inject[TimeAtAddressView]
-    val timeAtCurrentAddressController = new TimeAtCurrentAddressController (
+    val request                        = addToken(authRequest)
+    lazy val view                      = inject[TimeAtAddressView]
+    val timeAtCurrentAddressController = new TimeAtCurrentAddressController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
       statusService = mockStatusService,
@@ -63,8 +63,8 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with
   }
 
   val mockCacheMap = mock[Cache]
-  val emptyCache = Cache.empty
-  val outOfBounds = 99
+  val emptyCache   = Cache.empty
+  val outOfBounds  = 99
 
   "TimeAtCurrentAddressController" when {
 
@@ -93,9 +93,9 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with
 
           val personName = Some(PersonName("firstname", None, "lastname"))
 
-          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
-          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+          val UKAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+          val currentAddress    = ResponsiblePersonCurrentAddress(UKAddress, Some(ZeroToFiveMonths))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
           when(timeAtCurrentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -136,23 +136,31 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with
         "edit is true and answer is has lived at address over a year" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.TimeAtCurrentAddressController.post(1, true).url)
-          .withFormUrlEncodedBody(
-            "timeAtAddress" -> OneToThreeYears.toString
-          )
+            .withFormUrlEncodedBody(
+              "timeAtAddress" -> OneToThreeYears.toString
+            )
 
-          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
-          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(SixToElevenMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+          val UKAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+          val currentAddress    = ResponsiblePersonCurrentAddress(UKAddress, Some(SixToElevenMonths))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
           when(timeAtCurrentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(timeAtCurrentAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+          when(
+            timeAtCurrentAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
+          )
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = timeAtCurrentAddressController.post(recordId, true, Some(flowFromDeclaration))(requestWithParams)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(recordId, Some(flowFromDeclaration)).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(
+              controllers.responsiblepeople.routes.DetailedAnswersController
+                .get(recordId, Some(flowFromDeclaration))
+                .url
+            )
+          )
         }
       }
 
@@ -160,23 +168,27 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with
         "edit is false and more than 3 years" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.TimeAtCurrentAddressController.post(1).url)
-          .withFormUrlEncodedBody(
-            "timeAtAddress" -> ThreeYearsPlus.toString
-          )
+            .withFormUrlEncodedBody(
+              "timeAtAddress" -> ThreeYearsPlus.toString
+            )
 
-          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
-          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+          val UKAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+          val currentAddress    = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
           when(timeAtCurrentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(timeAtCurrentAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+          when(
+            timeAtCurrentAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
+          )
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = timeAtCurrentAddressController.post(recordId)(requestWithParams)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(recordId).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(recordId).url)
+          )
         }
       }
 
@@ -184,22 +196,24 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with
         "edit is false and less than 1 year" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.TimeAtCurrentAddressController.post(1).url)
-          .withFormUrlEncodedBody(
-            "timeAtAddress" -> SixToElevenMonths.toString
-          )
+            .withFormUrlEncodedBody(
+              "timeAtAddress" -> SixToElevenMonths.toString
+            )
 
-          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
-          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(SixToElevenMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+          val UKAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+          val currentAddress    = ResponsiblePersonCurrentAddress(UKAddress, Some(SixToElevenMonths))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
           when(timeAtCurrentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(timeAtCurrentAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+          when(
+            timeAtCurrentAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
+          )
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = timeAtCurrentAddressController.post(recordId)(requestWithParams)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(recordId).url))
         }
 
@@ -210,18 +224,20 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with
               "timeAtAddress" -> SixToElevenMonths.toString
             )
 
-          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
-          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(SixToElevenMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+          val UKAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+          val currentAddress    = ResponsiblePersonCurrentAddress(UKAddress, Some(SixToElevenMonths))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
           when(timeAtCurrentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(timeAtCurrentAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+          when(
+            timeAtCurrentAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
+          )
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = timeAtCurrentAddressController.post(recordId, true)(requestWithParams)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(recordId, true).url))
         }
       }
@@ -231,15 +247,17 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with
         "given an invalid form" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.TimeAtCurrentAddressController.post(1).url)
-          .withFormUrlEncodedBody(
-            "timeAtAddress" -> ""
-          )
+            .withFormUrlEncodedBody(
+              "timeAtAddress" -> ""
+            )
 
           val responsiblePeople = ResponsiblePerson()
 
           when(timeAtCurrentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(timeAtCurrentAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+          when(
+            timeAtCurrentAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
+          )
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = timeAtCurrentAddressController.post(recordId, true)(requestWithParams)
@@ -253,13 +271,15 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with
       "respond with NOT_FOUND" when {
         "a current address is not stored for that index" in new Fixture {
           val requestWithParams = FakeRequest(POST, routes.TimeAtCurrentAddressController.post(1).url)
-          .withFormUrlEncodedBody(
-            "timeAtAddress" -> OneToThreeYears.toString
-          )
+            .withFormUrlEncodedBody(
+              "timeAtAddress" -> OneToThreeYears.toString
+            )
 
           when(timeAtCurrentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
-          when(timeAtCurrentAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
+          when(
+            timeAtCurrentAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
+          )
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = timeAtCurrentAddressController.post(recordId)(requestWithParams)

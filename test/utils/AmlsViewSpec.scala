@@ -34,7 +34,13 @@ import play.api.test.{FakeRequest, Injecting}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.HeaderCarrier
 
-trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with Matchers with AuthorisedFixture with Injecting {
+trait AmlsViewSpec
+    extends PlaySpec
+    with GuiceOneAppPerSuite
+    with MockitoSugar
+    with Matchers
+    with AuthorisedFixture
+    with Injecting {
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(
@@ -45,13 +51,13 @@ trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar w
   val commonDependencies = app.injector.instanceOf(classOf[CommonPlayDependencies])
 
   implicit lazy val messagesApi: MessagesApi = app.injector.instanceOf(classOf[MessagesApi])
-  implicit lazy val messages: Messages = messagesApi.preferred(FakeRequest())
+  implicit lazy val messages: Messages       = messagesApi.preferred(FakeRequest())
 
   implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
-  implicit val lang: Lang = mock[Lang]
+  implicit val lang: Lang                   = mock[Lang]
   implicit val appConfig: ApplicationConfig = mock[ApplicationConfig]
-  implicit val mat: Materializer = mock[Materializer]
+  implicit val mat: Materializer            = mock[Materializer]
 
   val mockMcc = mock[MessagesControllerComponents]
 
@@ -63,18 +69,17 @@ trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar w
 
   when(appConfig.logoutUrl).thenReturn("some url")
 
-
   // Assertion helper methods
-  def pageWithBackLink(html: Html): Unit = {
-
+  def pageWithBackLink(html: Html): Unit =
     "have a back link" in {
       def doc: Document = Jsoup.parse(html.body)
-      assert(doc.getElementsByClass("govuk-back-link") != null, "\n\nElement " + "govuk-back-link" + " was not rendered on the page.\n")
+      assert(
+        doc.getElementsByClass("govuk-back-link") != null,
+        "\n\nElement " + "govuk-back-link" + " was not rendered on the page.\n"
+      )
     }
-  }
 
-  def pageWithErrors(view: Html, idSelectorPrefix: String, errorMessage: String): Unit = {
-
+  def pageWithErrors(view: Html, idSelectorPrefix: String, errorMessage: String): Unit =
     s"show errors correctly for $idSelectorPrefix field" in {
 
       def doc: Document = Jsoup.parse(view.body)
@@ -84,6 +89,5 @@ trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar w
       doc.getElementById(s"$idSelectorPrefix-error").text() must include(messages(errorMessage))
 
     }
-  }
 
 }

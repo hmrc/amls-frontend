@@ -22,9 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class AccountantIsUKAddressFormProvider @Inject()() extends Mappings {
+class AccountantIsUKAddressFormProvider @Inject() () extends Mappings {
 
-  private val errorMessage = "error.required.ba.advisor.isuk"
+  private val errorMessage                   = "error.required.ba.advisor.isuk"
   def apply(): Form[WhoIsYourAccountantIsUk] = Form[WhoIsYourAccountantIsUk](
     "isUK" -> boolean(errorMessage, errorMessage)
       .transform[WhoIsYourAccountantIsUk](WhoIsYourAccountantIsUk.apply, _.isUk)

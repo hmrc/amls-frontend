@@ -28,7 +28,7 @@ import views.html.tcsp.ServiceProviderTypesView
 class ServiceProviderTypesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val service_provider_types = inject[ServiceProviderTypesView]
-  lazy val fp = inject[ServiceProviderTypesFormProvider]
+  lazy val fp                     = inject[ServiceProviderTypesFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   trait ViewFixture extends Fixture {
@@ -42,16 +42,17 @@ class ServiceProviderTypesViewSpec extends AmlsViewSpec with Matchers {
       def view = service_provider_types(fp().fill(TcspTypes(TcspTypes.all.toSet)), true)
 
       val title = messages("tcsp.kind.of.service.provider.title") + " - " + messages("summary.tcsp") + " - " +
-                  messages("title.amls") + " - " + messages("title.gov")
+        messages("title.amls") + " - " + messages("title.gov")
       doc.title must be(title)
 
-      heading.html must be(messages("tcsp.kind.of.service.provider.title"))
+      heading.html    must be(messages("tcsp.kind.of.service.provider.title"))
       subHeading.html must include(messages("summary.tcsp"))
     }
 
     behave like pageWithErrors(
       service_provider_types(fp().withError("serviceProviders", "error.required.tcsp.service.providers"), true),
-      "serviceProviders", "error.required.tcsp.service.providers"
+      "serviceProviders",
+      "error.required.tcsp.service.providers"
     )
 
     behave like pageWithBackLink(service_provider_types(fp(), false))

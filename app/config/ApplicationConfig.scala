@@ -24,42 +24,46 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import java.net.URLEncoder
 
 @Singleton
-class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: ServicesConfig) {
+class ApplicationConfig @Inject() (configuration: Configuration, servicesConfig: ServicesConfig) {
 
   private def baseUrl(serviceName: String) = {
     val protocol = configuration.getOptional[String](s"microservice.services.$serviceName.protocol").getOrElse("http")
-    val host = configuration.get[String](s"microservice.services.$serviceName.host")
-    val port = configuration.get[String](s"microservice.services.$serviceName.port")
+    val host     = configuration.get[String](s"microservice.services.$serviceName.host")
+    val port     = configuration.get[String](s"microservice.services.$serviceName.port")
     s"$protocol://$host:$port"
   }
 
-  private def getConfigString(key: String) = servicesConfig.getConfString(key, throw new Exception(s"Could not find config '$key'"))
+  private def getConfigString(key: String) =
+    servicesConfig.getConfString(key, throw new Exception(s"Could not find config '$key'"))
 
   lazy val feedbackFrontendUrl = getConfigString("feedback-frontend.url")
 
-  def contactFrontendReportUrl(implicit request: Request[_]): String = {
+  def contactFrontendReportUrl(implicit request: Request[_]): String =
     getConfigString("contact-frontend.report-problem-url.non-js") +
       "&referrerUrl=" + URLEncoder.encode(frontendBaseUrl + request.uri, "utf-8")
-  }
 
-  def logoutUrl = getConfigString("logout.url")
+  def logoutUrl             = getConfigString("logout.url")
   def logoutUrlWithFeedback = s"$logoutUrl?continue=${URLEncoder.encode(feedbackFrontendUrl, "utf-8")}"
-  lazy val loginContinue = getConfigString("login.continue")
+  lazy val loginContinue    = getConfigString("login.continue")
 
-  lazy val paymentsUrl:String = getConfigString("paymentsUrl")
+  lazy val paymentsUrl: String = getConfigString("paymentsUrl")
 
-  lazy val timeout = servicesConfig.getInt("timeout.seconds")
+  lazy val timeout          = servicesConfig.getInt("timeout.seconds")
   lazy val timeoutCountdown = servicesConfig.getInt("timeout.countdown")
 
-  lazy val ampWhatYouNeedUrl = s"${servicesConfig.getConfString("amls-art-market-participant-frontend.url", "")}/what-you-need"
-  lazy val ampSummaryUrl     = s"${servicesConfig.getConfString("amls-art-market-participant-frontend.url", "")}/check-your-answers"
+  lazy val ampWhatYouNeedUrl =
+    s"${servicesConfig.getConfString("amls-art-market-participant-frontend.url", "")}/what-you-need"
+  lazy val ampSummaryUrl     =
+    s"${servicesConfig.getConfString("amls-art-market-participant-frontend.url", "")}/check-your-answers"
 
-  lazy val eabWhatYouNeedUrl = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/what-you-need"
-  lazy val eabSummaryUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/check-your-answers"
-  lazy val eabRedressUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.redress-url", "")}/change-redress-scheme"
+  lazy val eabWhatYouNeedUrl =
+    s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/what-you-need"
+  lazy val eabSummaryUrl     =
+    s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/check-your-answers"
+  lazy val eabRedressUrl     =
+    s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.redress-url", "")}/change-redress-scheme"
 
   def businessCustomerUrl = getConfigString("business-customer.url")
-
 
   def amlsUrl = baseUrl("amls")
 
@@ -82,12 +86,12 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
   def allNotificationsUrl = s"$notificationsUrl/amls-notification"
 
   val mongoEncryptionEnabled = configuration.getOptional[Boolean]("appCache.mongo.encryptionEnabled").getOrElse(true)
-  val cacheExpiryInSeconds = configuration.getOptional[Int]("appCache.expiryInSeconds").getOrElse(60)
+  val cacheExpiryInSeconds   = configuration.getOptional[Int]("appCache.expiryInSeconds").getOrElse(60)
 
   def frontendBaseUrl = {
     val secure = servicesConfig.getConfBool("amls-frontend.public.secure", false)
     val scheme = if (secure) "https" else "http"
-    val host = servicesConfig.getConfString("amls-frontend.public.host", "")
+    val host   = servicesConfig.getConfString("amls-frontend.public.host", "")
 
     s"$scheme://$host"
   }
@@ -100,13 +104,16 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   lazy val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
 
-  val tradingPremisesVirtualOfficeLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register"
+  val tradingPremisesVirtualOfficeLink =
+    "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register"
 
-  val tcspWhoNeedsToRegisterLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register"
+  val tcspWhoNeedsToRegisterLink =
+    "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register"
 
   val contactHmrcLink = "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/money-laundering"
 
-  val applicationWhoNeedsToRegisterLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#businesses-already-supervised-for-money-laundering-purposes"
+  val applicationWhoNeedsToRegisterLink =
+    "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#businesses-already-supervised-for-money-laundering-purposes"
 
   val tradeInformationLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register"
 
@@ -118,9 +125,11 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   val cardPaymentLink = "https://www.gov.uk/pay-tax-debit-credit-card"
 
-  val waysToPayLink = "https://www.gov.uk/guidance/pay-money-laundering-regulations-fees-and-penalty-charges#ways-to-pay"
+  val waysToPayLink =
+    "https://www.gov.uk/guidance/pay-money-laundering-regulations-fees-and-penalty-charges#ways-to-pay"
 
-  val registerNewOrgLink = "/coafe/government-gateway/register?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend"
+  val registerNewOrgLink =
+    "/coafe/government-gateway/register?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend"
 
   val nationalCrimeAgencyUrl = "https://sarsreporting.nationalcrimeagency.gov.uk/"
 

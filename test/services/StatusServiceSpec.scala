@@ -39,17 +39,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with GuiceOneAppPerSuite {
 
-  override def fakeApplication(): Application = {
+  override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .configure(
         "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
       )
       .build()
-  }
 
   val mockClock: Clock = mock[Clock]
 
-   val service = new StatusService(
+  val service = new StatusService(
     amlsConnector = mock[AmlsConnector],
     dataCacheConnector = mock[DataCacheConnector],
     enrolmentsService = mock[AuthEnrolmentsService],
@@ -58,15 +57,16 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     clock = mockClock
   )
 
-  val amlsRegNo = Some("X0123456789")
+  val amlsRegNo     = Some("X0123456789")
   val accountTypeId = ("accountType", "accountId")
-  val credId = "123412345"
-  
-  implicit val hc: HeaderCarrier = mock[HeaderCarrier]
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-  implicit val messages: Messages = Helpers.stubMessages()
+  val credId        = "123412345"
 
-  val readStatusResponse: ReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
+  implicit val hc: HeaderCarrier    = mock[HeaderCarrier]
+  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+  implicit val messages: Messages   = Helpers.stubMessages()
+
+  val readStatusResponse: ReadStatusResponse =
+    ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None, None, false)
 
   "Status Service" must {
     "return NotCompleted" in {
@@ -95,7 +95,8 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         when(service.sectionsProvider.taskRows(any[String])(any(), any()))
           .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
-        when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse))
+        when(service.amlsConnector.status(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(readStatusResponse))
         whenReady(service.getStatus(None, accountTypeId, credId)) {
           _ mustEqual SubmissionReady
         }
@@ -109,7 +110,8 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         when(service.sectionsProvider.taskRows(any[String])(any(), any()))
           .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", true, Updated, TaskRow.updatedTag))))
 
-        when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse))
+        when(service.amlsConnector.status(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(readStatusResponse))
         whenReady(service.getStatus(None, accountTypeId, credId)) {
           _ mustEqual SubmissionReady
         }
@@ -121,12 +123,17 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
           .thenReturn(Future.successful(None))
 
         when(service.sectionsProvider.taskRows(any[String])(any(), any()))
-          .thenReturn(Future.successful(Seq(
-            TaskRow("test", "/foo", false, Completed, TaskRow.completedTag),
-            TaskRow("test2", "/bar", true, Updated, TaskRow.updatedTag),
-          )))
+          .thenReturn(
+            Future.successful(
+              Seq(
+                TaskRow("test", "/foo", false, Completed, TaskRow.completedTag),
+                TaskRow("test2", "/bar", true, Updated, TaskRow.updatedTag)
+              )
+            )
+          )
 
-        when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse))
+        when(service.amlsConnector.status(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(readStatusResponse))
         whenReady(service.getStatus(None, accountTypeId, credId)) {
           _ mustEqual SubmissionReady
         }
@@ -206,7 +213,6 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
-
         .thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Expired")))
       whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual SubmissionDecisionExpired
@@ -224,15 +230,20 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
+        .thenReturn(
+          Future.successful(
+            readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))
+          )
+        )
       whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual ReadyForRenewal(Some(renewalDate))
       }
     }
 
     "return ReadyForRenewal when on first day of window" in {
-      val renewalDate = LocalDate.of(2017,3,31)
-      when(mockClock.withZone(UTC)).thenReturn(Clock.fixed(Instant.from(ZonedDateTime.of(2017, 3, 2, 0, 0, 0, 0, UTC)), UTC))
+      val renewalDate = LocalDate.of(2017, 3, 31)
+      when(mockClock.withZone(UTC))
+        .thenReturn(Clock.fixed(Instant.from(ZonedDateTime.of(2017, 3, 2, 0, 0, 0, 0, UTC)), UTC))
 
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
@@ -241,7 +252,11 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
+        .thenReturn(
+          Future.successful(
+            readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))
+          )
+        )
 
       whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual ReadyForRenewal(Some(renewalDate))
@@ -249,9 +264,9 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     }
 
     "return Approved when one day before window" in {
-      val renewalDate = LocalDate.of(2017,3,31)
-      when(mockClock.withZone(UTC)).thenReturn(Clock.fixed(Instant.from(ZonedDateTime.of(2017, 3, 1, 0, 0, 0, 0, UTC)), UTC))
-
+      val renewalDate = LocalDate.of(2017, 3, 31)
+      when(mockClock.withZone(UTC))
+        .thenReturn(Clock.fixed(Instant.from(ZonedDateTime.of(2017, 3, 1, 0, 0, 0, 0, UTC)), UTC))
 
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
         .thenReturn(Future.successful(Some("amlsref")))
@@ -260,7 +275,11 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))))
+        .thenReturn(
+          Future.successful(
+            readStatusResponse.copy(formBundleStatus = "Approved", currentRegYearEndDate = Some(renewalDate))
+          )
+        )
 
       whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual SubmissionDecisionApproved
@@ -277,10 +296,14 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "adasdasd", currentRegYearEndDate = Some(renewalDate))))
+        .thenReturn(
+          Future.successful(
+            readStatusResponse.copy(formBundleStatus = "adasdasd", currentRegYearEndDate = Some(renewalDate))
+          )
+        )
 
       whenReady(service.getStatus(amlsRegNo, accountTypeId, credId).failed) {
-        _.getMessage mustBe("ETMP returned status is inconsistent [status:adasdasd]")
+        _.getMessage mustBe "ETMP returned status is inconsistent [status:adasdasd]"
       }
 
     }
@@ -293,7 +316,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
 
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved",renewalConFlag = true)))
+        .thenReturn(Future.successful(readStatusResponse.copy(formBundleStatus = "Approved", renewalConFlag = true)))
 
       whenReady(service.getStatus(amlsRegNo, accountTypeId, credId)) {
         _ mustEqual RenewalSubmitted(None)
@@ -398,10 +421,14 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
           .thenReturn(Future.successful(None))
 
         when(service.sectionsProvider.taskRows(any[String])(any(), any()))
-          .thenReturn(Future.successful(Seq(
-            TaskRow("test", "/foo", false, Completed, TaskRow.completedTag),
-            TaskRow("test2", "/bar", true, Updated, TaskRow.updatedTag)
-          )))
+          .thenReturn(
+            Future.successful(
+              Seq(
+                TaskRow("test", "/foo", false, Completed, TaskRow.completedTag),
+                TaskRow("test2", "/bar", true, Updated, TaskRow.updatedTag)
+              )
+            )
+          )
 
         val result = service.getDetailedStatus(None, ("", ""), "credId")
 

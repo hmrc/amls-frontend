@@ -35,15 +35,17 @@ import scala.concurrent.Future
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends DependencyMocks {
-    self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[WhatYouNeedView]
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[WhatYouNeedView]
     val controller = new WhatYouNeedController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       authConnector = mock[AuthConnector],
       cc = mockMcc,
-      view = view)
+      view = view
+    )
   }
 
   "WhatYouNeedController" must {
@@ -52,7 +54,11 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       "redirect to InvolvedInOtherController" when {
         "creating a new submission" in new Fixture {
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
-            .thenReturn(Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))))
+            .thenReturn(
+              Future.successful(
+                Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))
+              )
+            )
 
           mockApplicationStatus(SubmissionReadyForReview)
 
@@ -66,7 +72,11 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
         "performing a variation" in new Fixture {
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
-            .thenReturn(Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))))
+            .thenReturn(
+              Future.successful(
+                Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))
+              )
+            )
 
           mockApplicationStatus(SubmissionDecisionApproved)
 
@@ -80,7 +90,11 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
         "in a renewal pending status" in new Fixture {
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
-            .thenReturn(Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))))
+            .thenReturn(
+              Future.successful(
+                Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))
+              )
+            )
 
           mockApplicationStatus(ReadyForRenewal(None))
 
@@ -94,7 +108,11 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
         "in a renewal submitted status" in new Fixture {
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
-            .thenReturn(Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))))
+            .thenReturn(
+              Future.successful(
+                Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))
+              )
+            )
 
           mockApplicationStatus(RenewalSubmitted(None))
 
@@ -108,13 +126,13 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       }
 
       "throw an error when data cannot be fetched" in new Fixture {
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
-            .thenReturn(Future.successful(None))
-          mockApplicationStatus(SubmissionReadyForReview)
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
+          .thenReturn(Future.successful(None))
+        mockApplicationStatus(SubmissionReadyForReview)
 
-          a[Exception] must be thrownBy {
-            ScalaFutures.whenReady(controller.get(request)) { x => x }
-          }
+        a[Exception] must be thrownBy {
+          ScalaFutures.whenReady(controller.get(request))(x => x)
+        }
       }
 
     }

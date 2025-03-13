@@ -23,7 +23,7 @@ import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessdetails.BusinessDetails
 import models.businessmatching.BusinessActivity._
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, BusinessActivities => BMBusinessActivities}
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessMatching, BusinessMatchingMsbServices}
 import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
@@ -42,7 +42,7 @@ import scala.concurrent.Future
 
 class SectionsProviderSpec extends AmlsSpec with IntegrationPatience {
 
-  val mockCacheConnector = mock[DataCacheConnector]
+  val mockCacheConnector        = mock[DataCacheConnector]
   implicit val mockCache: Cache = mock[Cache]
 
   lazy val sectionsProvider = new SectionsProvider(mockCacheConnector, appConfig)
@@ -126,10 +126,14 @@ class SectionsProviderSpec extends AmlsSpec with IntegrationPatience {
         s"include ${activity._1.toString} row when it is set in the cache" in {
 
           when(mockCache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching(
-              activities = Some(BMBusinessActivities(Set(activity._1))),
-              msbServices = Some(BusinessMatchingMsbServices(Set.empty))
-            )))
+            .thenReturn(
+              Some(
+                BusinessMatching(
+                  activities = Some(BMBusinessActivities(Set(activity._1))),
+                  msbServices = Some(BusinessMatchingMsbServices(Set.empty))
+                )
+              )
+            )
 
           sectionsProvider.taskRows(credId).futureValue must contain(activity._2)
         }
@@ -138,10 +142,14 @@ class SectionsProviderSpec extends AmlsSpec with IntegrationPatience {
       "include supervision row when ASP and TCSP are in cache" in {
 
         when(mockCache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(
-            activities = Some(BMBusinessActivities(Set(AccountancyServices, TrustAndCompanyServices))),
-            msbServices = Some(BusinessMatchingMsbServices(Set.empty))
-          )))
+          .thenReturn(
+            Some(
+              BusinessMatching(
+                activities = Some(BMBusinessActivities(Set(AccountancyServices, TrustAndCompanyServices))),
+                msbServices = Some(BusinessMatchingMsbServices(Set.empty))
+              )
+            )
+          )
 
         when(mockCache.getEntry[Supervision](eqTo(Supervision.key))(any()))
           .thenReturn(Some(Supervision()))

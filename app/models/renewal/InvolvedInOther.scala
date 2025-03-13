@@ -34,31 +34,31 @@ object InvolvedInOther {
 
   val key = "renewal-involved-in-other"
 
-  def fromBool(bool: Boolean): InvolvedInOther = {
+  def fromBool(bool: Boolean): InvolvedInOther =
     if (bool) {
       InvolvedInOtherYes("")
     } else {
       InvolvedInOtherNo
     }
-  }
 
   implicit val jsonReads: Reads[InvolvedInOther] =
     (__ \ "involvedInOther").read[Boolean] flatMap {
-      case true => (__ \ "details").read[String] map InvolvedInOtherYes.apply
+      case true  => (__ \ "details").read[String] map InvolvedInOtherYes.apply
       case false => Reads(_ => JsSuccess(InvolvedInOtherNo))
     }
 
   implicit val jsonWrites: Writes[InvolvedInOther] = Writes[InvolvedInOther] {
-    case InvolvedInOtherYes(details) => Json.obj(
-      "involvedInOther" -> true,
-      "details" -> details
-    )
-    case involvedInOtherNo => Json.obj("involvedInOther" -> false)
+    case InvolvedInOtherYes(details) =>
+      Json.obj(
+        "involvedInOther" -> true,
+        "details"         -> details
+      )
+    case involvedInOtherNo           => Json.obj("involvedInOther" -> false)
   }
 
   implicit def convert(model: InvolvedInOther): models.businessactivities.InvolvedInOther = model match {
     case InvolvedInOtherYes(details) => models.businessactivities.InvolvedInOtherYes(details)
-    case InvolvedInOtherNo => models.businessactivities.InvolvedInOtherNo
+    case InvolvedInOtherNo           => models.businessactivities.InvolvedInOtherNo
   }
-  
+
 }

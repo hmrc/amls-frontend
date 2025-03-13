@@ -28,7 +28,7 @@ import views.html.msb.SendMoneyToOtherCountryView
 class SendMoneyToOtherCountryViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val countryView = inject[SendMoneyToOtherCountryView]
-  lazy val fp = inject[SendMoneyToOtherCountryFormProvider]
+  lazy val fp          = inject[SendMoneyToOtherCountryFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,24 +42,27 @@ class SendMoneyToOtherCountryViewSpec extends AmlsViewSpec with Matchers {
 
       def view = countryView(fp().fill(SendMoneyToOtherCountry(true)), true)
 
-      doc.title must be(messages("msb.send.money.title") +
-        " - " + messages("summary.msb") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("msb.send.money.title") +
+          " - " + messages("summary.msb") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = countryView(fp().fill(SendMoneyToOtherCountry(false)), true)
 
-      heading.html must be(messages("msb.send.money.title"))
+      heading.html    must be(messages("msb.send.money.title"))
       subHeading.html must include(messages("summary.msb"))
 
     }
 
     behave like pageWithErrors(
       countryView(fp().withError("money", "error.required.msb.send.money"), false),
-      "money", "error.required.msb.send.money"
+      "money",
+      "error.required.msb.send.money"
     )
 
     behave like pageWithBackLink(countryView(fp(), false))

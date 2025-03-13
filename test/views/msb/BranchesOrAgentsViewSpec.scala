@@ -28,7 +28,7 @@ import views.html.msb.BranchesOrAgentsView
 class BranchesOrAgentsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val branches_or_agents = inject[BranchesOrAgentsView]
-  lazy val fp = inject[BranchesOrAgentsFormProvider]
+  lazy val fp                 = inject[BranchesOrAgentsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,25 +42,29 @@ class BranchesOrAgentsViewSpec extends AmlsViewSpec with Matchers {
 
       def view = branches_or_agents(fp().fill(BranchesOrAgentsHasCountries(true)), edit = true)
 
-      doc.title must be(messages("msb.branchesoragents.title") +
-        " - " + messages("summary.msb") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("msb.branchesoragents.title") +
+          " - " + messages("summary.msb") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = branches_or_agents(fp().fill(BranchesOrAgentsHasCountries(false)), edit = true)
 
-      heading.html must be(messages("msb.branchesoragents.title"))
+      heading.html    must be(messages("msb.branchesoragents.title"))
       subHeading.html must include(messages("summary.msb"))
     }
 
     behave like pageWithErrors(
       branches_or_agents(
-        fp().withError("hasCountries", "error.required.hasCountries.msb.branchesOrAgents"), false
+        fp().withError("hasCountries", "error.required.hasCountries.msb.branchesOrAgents"),
+        false
       ),
-      "hasCountries", "error.required.hasCountries.msb.branchesOrAgents"
+      "hasCountries",
+      "error.required.hasCountries.msb.branchesOrAgents"
     )
 
     behave like pageWithBackLink(branches_or_agents(fp(), false))

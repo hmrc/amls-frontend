@@ -40,14 +40,18 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
   val recordId = 1
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[SelfAssessmentRegisteredView]
-    val controller = new RegisteredForSelfAssessmentController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[SelfAssessmentRegisteredView]
+    val controller = new RegisteredForSelfAssessmentController(
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
       formProvider = inject[SelfAssessmentRegisteredFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
   }
 
   val emptyCache = Cache.empty
@@ -64,7 +68,7 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
         status(result) must be(OK)
 
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.getElementById("saRegistered-true").hasAttr("checked") must be(false)
+        document.getElementById("saRegistered-true").hasAttr("checked")  must be(false)
         document.getElementById("saRegistered-false").hasAttr("checked") must be(false)
       }
 
@@ -73,15 +77,19 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
         val utr = "0123456789"
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, saRegistered = Some(SaRegisteredYes(utr)))))))
+          .thenReturn(
+            Future.successful(
+              Some(Seq(ResponsiblePerson(personName = personName, saRegistered = Some(SaRegisteredYes(utr)))))
+            )
+          )
 
         val result = controller.get(recordId)(request)
         status(result) must be(OK)
 
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.getElementById("saRegistered-true").hasAttr("checked") must be(true)
+        document.getElementById("saRegistered-true").hasAttr("checked")  must be(true)
         document.getElementById("saRegistered-false").hasAttr("checked") must be(false)
-        document.getElementById("utrNumber").`val` must be(utr)
+        document.getElementById("utrNumber").`val`                       must be(utr)
       }
 
       "respond with NOT_FOUND when there is no responsiblePeople data" in new Fixture {
@@ -97,11 +105,11 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
         val newRequest = FakeRequest(POST, routes.RegisteredForSelfAssessmentController.post(1).url)
-        .withFormUrlEncodedBody(
-          "saRegistered" -> "test"
-        )
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
+          .withFormUrlEncodedBody(
+            "saRegistered" -> "test"
+          )
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
 
         val result = controller.post(recordId)(newRequest)
         status(result) must be(BAD_REQUEST)
@@ -110,13 +118,13 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
 
       "respond with NOT_FOUND when the index is out of bounds" in new Fixture {
         val newRequest = FakeRequest(POST, routes.RegisteredForSelfAssessmentController.post(1).url)
-        .withFormUrlEncodedBody(
-          "saRegistered" -> "true",
-          "utrNumber" -> "0123456789"
-        )
+          .withFormUrlEncodedBody(
+            "saRegistered" -> "true",
+            "utrNumber"    -> "0123456789"
+          )
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
         val result = controller.post(99)(newRequest)
         status(result) must be(NOT_FOUND)
@@ -125,37 +133,39 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
       "when edit is false" must {
         "redirect to the ExperienceTrainingController" in new Fixture {
           val newRequest = FakeRequest(POST, routes.RegisteredForSelfAssessmentController.post(1).url)
-          .withFormUrlEncodedBody(
-            "saRegistered" -> "true",
-            "utrNumber" -> "0123456789"
-          )
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-            (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
+            .withFormUrlEncodedBody(
+              "saRegistered" -> "true",
+              "utrNumber"    -> "0123456789"
+            )
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())
-            (any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())(any()))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(recordId, edit = false)(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.ExperienceTrainingController.get(recordId).url))
         }
       }
-      "when edit is true" must {
+      "when edit is true"  must {
         "on post with valid data in edit mode" in new Fixture {
           val newRequest = FakeRequest(POST, routes.RegisteredForSelfAssessmentController.post(1).url)
-          .withFormUrlEncodedBody(
-            "saRegistered" -> "true",
-            "utrNumber" -> "0123456789"
-          )
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-            (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
+            .withFormUrlEncodedBody(
+              "saRegistered" -> "true",
+              "utrNumber"    -> "0123456789"
+            )
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())
-            (any())).thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())(any()))
+            .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(recordId, true, Some(flowFromDeclaration))(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId, Some(flowFromDeclaration)).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(routes.DetailedAnswersController.get(recordId, Some(flowFromDeclaration)).url)
+          )
         }
       }
     }

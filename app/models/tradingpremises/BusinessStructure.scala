@@ -23,7 +23,6 @@ import play.api.libs.json._
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
-
 sealed trait BusinessStructure {
 
   import models.tradingpremises.BusinessStructure._
@@ -31,15 +30,15 @@ sealed trait BusinessStructure {
   val value: String
   def message(implicit messages: Messages): String =
     this match {
-      case SoleProprietor =>
+      case SoleProprietor              =>
         messages("businessType.lbl.01")
       case LimitedLiabilityPartnership =>
         messages("businessType.lbl.02")
-      case Partnership =>
+      case Partnership                 =>
         messages("businessType.lbl.03")
-      case IncorporatedBody =>
+      case IncorporatedBody            =>
         messages("businessType.lbl.04")
-      case UnincorporatedBody =>
+      case UnincorporatedBody          =>
         messages("businessType.lbl.05")
     }
 }
@@ -68,24 +67,23 @@ object BusinessStructure extends Enumerable.Implicits {
 
   import utils.MappingUtils.Implicits._
 
-  implicit val jsonReadsBusinessStructure: Reads[BusinessStructure] = {
+  implicit val jsonReadsBusinessStructure: Reads[BusinessStructure] =
     (__ \ "agentsBusinessStructure").read[String].flatMap[BusinessStructure] {
       case "01" => SoleProprietor
       case "02" => LimitedLiabilityPartnership
       case "03" => Partnership
       case "04" => IncorporatedBody
       case "05" => UnincorporatedBody
-      case _ =>
+      case _    =>
         play.api.libs.json.JsonValidationError("error.invalid")
     }
-  }
 
   implicit val jsonWritesBusinessStructure: Writes[BusinessStructure] = Writes[BusinessStructure] {
-    case SoleProprietor => Json.obj("agentsBusinessStructure" -> "01")
+    case SoleProprietor              => Json.obj("agentsBusinessStructure" -> "01")
     case LimitedLiabilityPartnership => Json.obj("agentsBusinessStructure" -> "02")
-    case Partnership => Json.obj("agentsBusinessStructure" -> "03")
-    case IncorporatedBody => Json.obj("agentsBusinessStructure" -> "04")
-    case UnincorporatedBody => Json.obj("agentsBusinessStructure" -> "05")
+    case Partnership                 => Json.obj("agentsBusinessStructure" -> "03")
+    case IncorporatedBody            => Json.obj("agentsBusinessStructure" -> "04")
+    case UnincorporatedBody          => Json.obj("agentsBusinessStructure" -> "05")
   }
 
   def formValues()(implicit messages: Messages): Seq[RadioItem] = all.sortBy(_.toString).map { structure =>

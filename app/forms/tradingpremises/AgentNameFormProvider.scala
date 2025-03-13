@@ -24,12 +24,12 @@ import play.api.data.Forms.mapping
 
 import javax.inject.Inject
 
-class AgentNameFormProvider @Inject()() extends Mappings {
+class AgentNameFormProvider @Inject() () extends Mappings {
 
-  val length = 140
+  val length                   = 140
   def apply(): Form[AgentName] = Form[AgentName](
     mapping(
-      "agentName" -> text("error.required.tp.agent.name").verifying(
+      "agentName"        -> text("error.required.tp.agent.name").verifying(
         firstError(
           maxLength(length, "error.length.tp.agent.name"),
           regexp(basicPunctuationRegex, "error.char.tp.agent.name")
@@ -46,7 +46,9 @@ class AgentNameFormProvider @Inject()() extends Mappings {
         minDate(LocalDate.of(1900, 1, 1), "error.invalid.agent.date.1900"),
         maxDate(LocalDate.now(), "error.invalid.agent.date.future")
       )
-    )((name, date) => AgentName(name, agentDateOfBirth = Some(date)))(x => x.agentDateOfBirth.map(y => (x.agentName, y)))
+    )((name, date) => AgentName(name, agentDateOfBirth = Some(date)))(x =>
+      x.agentDateOfBirth.map(y => (x.agentName, y))
+    )
   )
 
 }

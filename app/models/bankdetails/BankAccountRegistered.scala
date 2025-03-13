@@ -23,4 +23,3 @@ case class BankAccountRegistered(registerAnotherBank: Boolean)
 object BankAccountRegistered {
   implicit val formats: OFormat[BankAccountRegistered] = Json.format[BankAccountRegistered]
 }
-

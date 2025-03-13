@@ -23,7 +23,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ConfirmationService @Inject()(val cacheConnector: DataCacheConnector) extends DataCacheService {
+class ConfirmationService @Inject() (val cacheConnector: DataCacheConnector) extends DataCacheService {
 
   def isRenewalDefined(credId: String)(implicit ec: ExecutionContext): Future[Boolean] =
     cacheConnector.fetch[Renewal](credId, Renewal.key).map(_.isDefined)

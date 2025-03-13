@@ -27,8 +27,8 @@ import views.html.renewal.SendLargestAmountsOfMoneyView
 
 class SendLargestAmountsOfMoneyViewSpec extends AmlsViewSpec with Matchers with AutoCompleteServiceMocks {
 
-  lazy val send_largest_amounts_of_money = inject[SendLargestAmountsOfMoneyView]
-  lazy val fp = inject[SendLargestAmountsOfMoneyFormProvider]
+  lazy val send_largest_amounts_of_money                         = inject[SendLargestAmountsOfMoneyView]
+  lazy val fp                                                    = inject[SendLargestAmountsOfMoneyFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -37,7 +37,9 @@ class SendLargestAmountsOfMoneyViewSpec extends AmlsViewSpec with Matchers with 
     "have correct title" in new ViewFixture {
 
       def view = send_largest_amounts_of_money(
-        fp().fill(SendTheLargestAmountsOfMoney(Seq(Country("Country", "US")))), true, mockAutoComplete.formOptions
+        fp().fill(SendTheLargestAmountsOfMoney(Seq(Country("Country", "US")))),
+        true,
+        mockAutoComplete.formOptions
       )
 
       doc.title must startWith(messages("renewal.msb.largest.amounts.title") + " - " + messages("summary.renewal"))
@@ -46,10 +48,12 @@ class SendLargestAmountsOfMoneyViewSpec extends AmlsViewSpec with Matchers with 
     "have correct headings" in new ViewFixture {
 
       def view = send_largest_amounts_of_money(
-        fp().fill(SendTheLargestAmountsOfMoney(Seq(Country("Country", "US")))), true, mockAutoComplete.formOptions
+        fp().fill(SendTheLargestAmountsOfMoney(Seq(Country("Country", "US")))),
+        true,
+        mockAutoComplete.formOptions
       )
 
-      heading.html must be(messages("renewal.msb.largest.amounts.title"))
+      heading.html    must be(messages("renewal.msb.largest.amounts.title"))
       subHeading.html must include(messages("summary.renewal"))
     }
 

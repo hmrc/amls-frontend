@@ -20,11 +20,12 @@ import models.responsiblepeople.{PersonAddress, ResponsiblePersonCurrentAddress}
 
 import javax.inject.Inject
 
-class CurrentAddressFormProvider @Inject()() extends IsAddressUKFormProvider[ResponsiblePersonCurrentAddress] {
+class CurrentAddressFormProvider @Inject() () extends IsAddressUKFormProvider[ResponsiblePersonCurrentAddress] {
 
   override val error = "error.required.uk.or.overseas.address.current"
 
-  override def apply(personAddress: PersonAddress): ResponsiblePersonCurrentAddress = ResponsiblePersonCurrentAddress(personAddress, None)
+  override def apply(personAddress: PersonAddress): ResponsiblePersonCurrentAddress =
+    ResponsiblePersonCurrentAddress(personAddress, None)
 
   override def unapply(a: ResponsiblePersonCurrentAddress): Option[PersonAddress] = Some(a.personAddress)
 }

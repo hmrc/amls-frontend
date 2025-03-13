@@ -58,10 +58,12 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
         be(Json.obj("registeredForVAT" -> false))
 
       Json.toJson(VATRegisteredYes("12345678").asInstanceOf[VATRegistered]) must
-        be(Json.obj(
-          "registeredForVAT" -> true,
-          "vrnNumber" -> "12345678"
-        ))
+        be(
+          Json.obj(
+            "registeredForVAT" -> true,
+            "vrnNumber"        -> "12345678"
+          )
+        )
     }
 
     "return the correct radio button items" in {

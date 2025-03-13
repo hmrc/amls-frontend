@@ -27,13 +27,16 @@ import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmlsNotificationConnector @Inject()(http: HttpClientV2,
-                                          appConfig: ApplicationConfig)(implicit ec: ExecutionContext) extends Logging {
+class AmlsNotificationConnector @Inject() (http: HttpClientV2, appConfig: ApplicationConfig)(implicit
+  ec: ExecutionContext
+) extends Logging {
 
-  private[connectors] def baseUrl : String = appConfig.allNotificationsUrl
+  private[connectors] def baseUrl: String = appConfig.allNotificationsUrl
 
-  def fetchAllByAmlsRegNo(amlsRegistrationNumber: String, accountTypeId: (String, String))
-                         (implicit headerCarrier: HeaderCarrier,ec: ExecutionContext): Future[Seq[NotificationRow]] = {
+  def fetchAllByAmlsRegNo(amlsRegistrationNumber: String, accountTypeId: (String, String))(implicit
+    headerCarrier: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Seq[NotificationRow]] = {
 
     val (accountType, accountId) = accountTypeId
 
@@ -42,17 +45,18 @@ class AmlsNotificationConnector @Inject()(http: HttpClientV2,
     // $COVERAGE-OFF$
     logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
     // $COVERAGE-ON$
-    http.get(getUrl).execute[Seq[NotificationRow]] map {
-      response =>
-        // $COVERAGE-OFF$
-        logger.debug(s"$prefix - Response Body: $response")
-        // $COVERAGE-ON$
-        response
+    http.get(getUrl).execute[Seq[NotificationRow]] map { response =>
+      // $COVERAGE-OFF$
+      logger.debug(s"$prefix - Response Body: $response")
+      // $COVERAGE-ON$
+      response
     }
   }
 
-  def fetchAllBySafeId(safeId: String, accountTypeId: (String, String))
-                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Seq[NotificationRow]] = {
+  def fetchAllBySafeId(safeId: String, accountTypeId: (String, String))(implicit
+    headerCarrier: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Seq[NotificationRow]] = {
 
     val (accountType, accountId) = accountTypeId
 
@@ -61,20 +65,22 @@ class AmlsNotificationConnector @Inject()(http: HttpClientV2,
     // $COVERAGE-OFF$
     logger.debug(s"$prefix - Request : $safeId")
     // $COVERAGE-ON$
-    http.get(getUrl).execute[Seq[NotificationRow]] map {
-      response =>
-        // $COVERAGE-OFF$
-        logger.debug(s"$prefix - Response Body: $response")
-        // $COVERAGE-ON$
-        response
+    http.get(getUrl).execute[Seq[NotificationRow]] map { response =>
+      // $COVERAGE-OFF$
+      logger.debug(s"$prefix - Response Body: $response")
+      // $COVERAGE-ON$
+      response
     }
   }
 
-  def getMessageDetailsByAmlsRegNo(amlsRegistrationNumber: String, contactNumber: String, accountTypeId: (String, String))
-                                  (implicit hc : HeaderCarrier, ec: ExecutionContext): Future[Option[NotificationDetails]]= {
+  def getMessageDetailsByAmlsRegNo(
+    amlsRegistrationNumber: String,
+    contactNumber: String,
+    accountTypeId: (String, String)
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[NotificationDetails]] = {
 
     val (accountType, accountId) = accountTypeId
-    val url = url"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/$contactNumber"
+    val url                      = url"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/$contactNumber"
     http.get(url).execute[Option[NotificationDetails]]
   }
 }

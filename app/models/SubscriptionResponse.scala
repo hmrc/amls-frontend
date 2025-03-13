@@ -16,13 +16,12 @@
 
 package models
 
-
 case class SubscriptionResponse(
-                                 etmpFormBundleNumber: String,
-                                 amlsRefNo: String,
-                                 subscriptionFees: Option[SubscriptionFees],
-                                 previouslySubmitted: Option[Boolean] = None
-                               ) extends SubmissionResponse {
+  etmpFormBundleNumber: String,
+  amlsRefNo: String,
+  subscriptionFees: Option[SubscriptionFees],
+  previouslySubmitted: Option[Boolean] = None
+) extends SubmissionResponse {
 
   override def getRegistrationFee: BigDecimal = subscriptionFees.fold(BigDecimal(0)) {
     _.registrationFee
@@ -59,21 +58,33 @@ object SubscriptionResponse {
 
   val key = "Subscription"
 
-  implicit val format: OFormat[SubscriptionResponse] = Json.format[SubscriptionResponse]
+  implicit val format: OFormat[SubscriptionResponse]             = Json.format[SubscriptionResponse]
   implicit val formatOption: Reads[Option[SubscriptionResponse]] = Reads.optionNoError[SubscriptionResponse]
 
   val oldFeesStructureTransformer: Reads[JsObject] =
     (
-      (__ \ Symbol("subscriptionFees") \ Symbol("paymentReference")).json.copyFrom((__ \ Symbol("paymentReference")).json.pick) and
-        (__ \ Symbol("subscriptionFees") \ Symbol("registrationFee")).json.copyFrom((__ \ Symbol("registrationFee")).json.pick) and
+      (__ \ Symbol("subscriptionFees") \ Symbol("paymentReference")).json.copyFrom(
+        (__ \ Symbol("paymentReference")).json.pick
+      ) and
+        (__ \ Symbol("subscriptionFees") \ Symbol("registrationFee")).json.copyFrom(
+          (__ \ Symbol("registrationFee")).json.pick
+        ) and
         (__ \ Symbol("subscriptionFees") \ Symbol("fpFee")).json.copyFrom((__ \ Symbol("fpFee")).json.pick) and
         (__ \ Symbol("subscriptionFees") \ Symbol("fpFeeRate")).json.copyFrom((__ \ Symbol("fpFeeRate")).json.pick) and
-        (__ \ Symbol("subscriptionFees") \ Symbol("approvalCheckFee")).json.copyFrom((__ \ Symbol("approvalCheckFee")).json.pick) and
-        (__ \ Symbol("subscriptionFees") \ Symbol("approvalCheckFeeRate")).json.copyFrom((__ \ Symbol("approvalCheckFeeRate")).json.pick) and
-        (__ \ Symbol("subscriptionFees") \ Symbol("premiseFee")).json.copyFrom((__ \ Symbol("premiseFee")).json.pick) and
-        (__ \ Symbol("subscriptionFees") \ Symbol("premiseFeeRate")).json.copyFrom((__ \ Symbol("premiseFeeRate")).json.pick) and
+        (__ \ Symbol("subscriptionFees") \ Symbol("approvalCheckFee")).json.copyFrom(
+          (__ \ Symbol("approvalCheckFee")).json.pick
+        ) and
+        (__ \ Symbol("subscriptionFees") \ Symbol("approvalCheckFeeRate")).json.copyFrom(
+          (__ \ Symbol("approvalCheckFeeRate")).json.pick
+        ) and
+        (__ \ Symbol("subscriptionFees") \ Symbol("premiseFee")).json.copyFrom(
+          (__ \ Symbol("premiseFee")).json.pick
+        ) and
+        (__ \ Symbol("subscriptionFees") \ Symbol("premiseFeeRate")).json.copyFrom(
+          (__ \ Symbol("premiseFeeRate")).json.pick
+        ) and
         (__ \ Symbol("subscriptionFees") \ Symbol("totalFees")).json.copyFrom((__ \ Symbol("totalFees")).json.pick)
-      ).reduce.orElse((__ \ Symbol("subscriptionFees")).json.pickBranch).orElse(Reads.pure(Json.obj()))
+    ).reduce.orElse((__ \ Symbol("subscriptionFees")).json.pickBranch).orElse(Reads.pure(Json.obj()))
 
   implicit val reads: Reads[SubscriptionResponse] = {
     import play.api.libs.functional.syntax._
@@ -81,10 +92,9 @@ object SubscriptionResponse {
     (
       (__ \ "etmpFormBundleNumber").read[String] and
         (__ \ "amlsRefNo").read[String] and
-        oldFeesStructureTransformer.andThen(((__ \ "subscriptionFees").readNullable[SubscriptionFees])) and
+        oldFeesStructureTransformer.andThen((__ \ "subscriptionFees").readNullable[SubscriptionFees]) and
         (__ \ "previouslySubmitted").readNullable[Boolean]
-
-      ) apply SubscriptionResponse.apply _
+    ) apply SubscriptionResponse.apply _
   }
 
 }

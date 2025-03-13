@@ -18,8 +18,8 @@ package models.declaration
 
 import play.api.libs.json.{Json, OFormat}
 
-case class BusinessPartners(value: String){
-  val indexValue = """([0-9]+)$""".r.findFirstIn(value) map {_.toInt}
+case class BusinessPartners(value: String) {
+  val indexValue = """([0-9]+)$""".r.findFirstIn(value) map { _.toInt }
 }
 
 object BusinessPartners {

@@ -26,33 +26,35 @@ import views.html.{UnauthorisedRoleView, UnauthorisedView}
 
 class AmlsControllerSpec extends AmlsSpec {
 
-    trait UnauthenticatedFixture extends MockitoSugar {
-      self =>
+  trait UnauthenticatedFixture extends MockitoSugar {
+    self =>
 
-      implicit val unauthenticatedRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-      val request = addToken(unauthenticatedRequest)
-      lazy val view1 = app.injector.instanceOf[UnauthorisedView]
-      lazy val view2 = app.injector.instanceOf[UnauthorisedRoleView]
-      val controller = new AmlsController(SuccessfulAuthAction,
-        commonDependencies,
-        mockMcc,
-        messagesApi,
-        mock[BodyParsers.Default],
-        unauthorisedView = view1,
-        unauthorisedRole = view2)
+    implicit val unauthenticatedRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+    val request                                                              = addToken(unauthenticatedRequest)
+    lazy val view1                                                           = app.injector.instanceOf[UnauthorisedView]
+    lazy val view2                                                           = app.injector.instanceOf[UnauthorisedRoleView]
+    val controller                                                           = new AmlsController(
+      SuccessfulAuthAction,
+      commonDependencies,
+      mockMcc,
+      messagesApi,
+      mock[BodyParsers.Default],
+      unauthorisedView = view1,
+      unauthorisedRole = view2
+    )
+  }
+
+  "AmlsController" must {
+    "load the unauthorised page with an unauthenticated request" in new UnauthenticatedFixture {
+      val result = controller.unauthorised(request)
+      status(result)          must be(OK)
+      contentAsString(result) must include(messages("unauthorised.title"))
     }
 
-    "AmlsController" must {
-      "load the unauthorised page with an unauthenticated request" in new UnauthenticatedFixture {
-          val result = controller.unauthorised(request)
-          status(result) must be(OK)
-          contentAsString(result) must include(messages("unauthorised.title"))
-        }
-
-      "load the unauthorised role with an unauthenticated request" in new UnauthenticatedFixture {
-        val result = controller.unauthorised_role(request)
-        status(result) mustBe UNAUTHORIZED
-        contentAsString(result) must include(messages("unauthorised.title"))
-      }
+    "load the unauthorised role with an unauthenticated request" in new UnauthenticatedFixture {
+      val result = controller.unauthorised_role(request)
+      status(result) mustBe UNAUTHORIZED
+      contentAsString(result) must include(messages("unauthorised.title"))
     }
+  }
 }

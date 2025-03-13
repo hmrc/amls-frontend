@@ -20,10 +20,7 @@ import play.api.data.{Form, FormError}
 
 trait RadioFieldBehaviours extends FormSpec {
 
-  def radioField[T](form: Form[_],
-                    fieldName: String,
-                    validValues: Seq[T],
-                    invalidError: FormError): Unit = {
+  def radioField[T](form: Form[_], fieldName: String, validValues: Seq[T], invalidError: FormError): Unit = {
     validValues.foreach { value =>
       s"binds `$value` successfully" in {
         val data = Map(fieldName -> value.toString)
@@ -39,9 +36,7 @@ trait RadioFieldBehaviours extends FormSpec {
     }
   }
 
-  def mandatoryRadioField(form: Form[_],
-                             fieldName: String,
-                             requiredKey: String): Unit = {
+  def mandatoryRadioField(form: Form[_], fieldName: String, requiredKey: String): Unit = {
 
     "fail to bind when no answers are selected" in {
       val data = Map.empty[String, String]

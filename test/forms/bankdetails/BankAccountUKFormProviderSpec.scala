@@ -23,16 +23,16 @@ import play.api.data.{Form, FormError}
 
 class BankAccountUKFormProviderSpec extends StringFieldBehaviours {
 
-  val fp = new BankAccountUKFormProvider()
+  val fp                    = new BankAccountUKFormProvider()
   val form: Form[UKAccount] = fp()
 
-  val sortCodeField = "sortCode"
+  val sortCodeField       = "sortCode"
   val sortCodeLengthError = "error.invalid.bankdetails.sortcode.length"
 
-  val accountNumberField = "accountNumber"
+  val accountNumberField       = "accountNumber"
   val accountNumberLengthError = "error.max.length.bankdetails.accountnumber"
 
-  def sortCodeGen: Gen[String] = Gen.chooseNum(100000, 999999).map(_.toString).suchThat(_.nonEmpty)
+  def sortCodeGen: Gen[String]      = Gen.chooseNum(100000, 999999).map(_.toString).suchThat(_.nonEmpty)
   def accountNumberGen: Gen[String] = Gen.chooseNum(10000000, 99999999).map(_.toString).suchThat(_.nonEmpty)
 
   "BankAccountUKFormProvider" when {
@@ -44,13 +44,15 @@ class BankAccountUKFormProviderSpec extends StringFieldBehaviours {
       behave like mandatoryField(form, sortCodeField, FormError(sortCodeField, "error.invalid.bankdetails.sortcode"))
 
       behave like numberFieldWithMinLength(
-        form, sortCodeField,
+        form,
+        sortCodeField,
         fp.sortcodeLength,
         FormError(sortCodeField, sortCodeLengthError, Seq(fp.sortcodeLength))
       )
 
       behave like numberFieldWithMaxLength(
-        form, sortCodeField,
+        form,
+        sortCodeField,
         fp.sortcodeLength,
         FormError(sortCodeField, sortCodeLengthError, Seq(fp.sortcodeLength))
       )
@@ -58,13 +60,14 @@ class BankAccountUKFormProviderSpec extends StringFieldBehaviours {
       "not bind if violates regex" in {
 
         forAll(accountNumberGen) { accountNumber =>
-          val result = form.bind(Map(
-            sortCodeField -> "12345Q",
-            accountNumberField -> accountNumber
-          ))
+          val result = form.bind(
+            Map(
+              sortCodeField      -> "12345Q",
+              accountNumberField -> accountNumber
+            )
+          )
 
-
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(
             FormError(sortCodeField, "error.invalid.bankdetails.sortcode.characters", Seq(fp.sortcodeRegex))
           )
@@ -77,17 +80,21 @@ class BankAccountUKFormProviderSpec extends StringFieldBehaviours {
       behave like fieldThatBindsValidData(form, accountNumberField, accountNumberGen)
 
       behave like mandatoryField(
-        form, accountNumberField, FormError(accountNumberField, "error.bankdetails.accountnumber")
+        form,
+        accountNumberField,
+        FormError(accountNumberField, "error.bankdetails.accountnumber")
       )
 
       behave like numberFieldWithMinLength(
-        form, accountNumberField,
+        form,
+        accountNumberField,
         fp.accountNumberLength,
         FormError(accountNumberField, accountNumberLengthError, Seq(fp.accountNumberLength))
       )
 
       behave like numberFieldWithMaxLength(
-        form, accountNumberField,
+        form,
+        accountNumberField,
         fp.accountNumberLength,
         FormError(accountNumberField, accountNumberLengthError, Seq(fp.accountNumberLength))
       )
@@ -95,12 +102,14 @@ class BankAccountUKFormProviderSpec extends StringFieldBehaviours {
       "not bind if violates regex" in {
 
         forAll(sortCodeGen) { sortCode =>
-          val result = form.bind(Map(
-            sortCodeField -> sortCode,
-            accountNumberField -> "1234567Q"
-          ))
+          val result = form.bind(
+            Map(
+              sortCodeField      -> sortCode,
+              accountNumberField -> "1234567Q"
+            )
+          )
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(
             FormError(accountNumberField, "error.invalid.bankdetails.accountnumber", Seq(fp.accountNumberRegex))
           )

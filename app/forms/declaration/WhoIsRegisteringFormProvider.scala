@@ -22,7 +22,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class WhoIsRegisteringFormProvider @Inject()() extends Mappings {
+class WhoIsRegisteringFormProvider @Inject() () extends Mappings {
 
   def apply(errorSuffix: String): Form[WhoIsRegistering] = {
 

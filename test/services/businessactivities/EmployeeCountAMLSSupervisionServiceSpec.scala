@@ -30,7 +30,7 @@ import scala.concurrent.Future
 class EmployeeCountAMLSSupervisionServiceSpec extends AmlsSpec with BeforeAndAfterEach with IntegrationPatience {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[Cache]
+  val mockCacheMap       = mock[Cache]
 
   val service = new EmployeeCountAMLSSupervisionService(mockCacheConnector)
 
@@ -48,9 +48,13 @@ class EmployeeCountAMLSSupervisionServiceSpec extends AmlsSpec with BeforeAndAft
           val count = "38"
 
           when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
-            .thenReturn(Future.successful(Some(
-              BusinessActivities(howManyEmployees = Some(HowManyEmployees(Some("648"), Some(count))))
-            )))
+            .thenReturn(
+              Future.successful(
+                Some(
+                  BusinessActivities(howManyEmployees = Some(HowManyEmployees(Some("648"), Some(count))))
+                )
+              )
+            )
 
           service.getEmployeeCountAMLSSupervision(credId).futureValue mustBe Some(count)
         }
@@ -61,9 +65,13 @@ class EmployeeCountAMLSSupervisionServiceSpec extends AmlsSpec with BeforeAndAft
         "employeeCountAMLSSupervision is not set in the cache" in {
 
           when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
-            .thenReturn(Future.successful(Some(
-              BusinessActivities(howManyEmployees = Some(HowManyEmployees(Some("648"), None)))
-            )))
+            .thenReturn(
+              Future.successful(
+                Some(
+                  BusinessActivities(howManyEmployees = Some(HowManyEmployees(Some("648"), None)))
+                )
+              )
+            )
 
           service.getEmployeeCountAMLSSupervision(credId).futureValue mustBe None
         }
@@ -99,15 +107,18 @@ class EmployeeCountAMLSSupervisionServiceSpec extends AmlsSpec with BeforeAndAft
             Future.successful(Some(bm))
           )
 
-        when(mockCacheConnector.save[BusinessActivities](
-          eqTo(credId),
-          eqTo(BusinessActivities.key),
-          any()
-        )(any()))
+        when(
+          mockCacheConnector.save[BusinessActivities](
+            eqTo(credId),
+            eqTo(BusinessActivities.key),
+            any()
+          )(any())
+        )
           .thenReturn(Future.successful(mockCacheMap))
 
-
-        service.updateHowManyEmployees(credId, EmployeeCountAMLSSupervision(count)).futureValue mustBe Some(mockCacheMap)
+        service.updateHowManyEmployees(credId, EmployeeCountAMLSSupervision(count)).futureValue mustBe Some(
+          mockCacheMap
+        )
 
         verify(mockCacheConnector).save[BusinessActivities](
           eqTo(credId),

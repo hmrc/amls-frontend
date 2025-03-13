@@ -53,7 +53,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
             hasChanged = true
           )
 
-          outputRp mustEqual (expectedRp)
+          outputRp mustEqual expectedRp
         }
       }
 
@@ -71,7 +71,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
             hasChanged = true
           )
 
-          outputRp mustEqual (expectedRp)
+          outputRp mustEqual expectedRp
         }
 
         "choice is false, and msbOrTcsp is true so the answer to the approval question is not needed" in {
@@ -86,40 +86,39 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
             hasChanged = true
           )
 
-          outputRp mustEqual (expectedRp)
+          outputRp mustEqual expectedRp
         }
       }
     }
 
     "reset when resetBasedOnApprovalFlags is called" when {
-        "fitAndProper is true and approval is true" in {
-          val inputRp = ResponsiblePerson(
-            approvalFlags = ApprovalFlags(
-              hasAlreadyPassedFitAndProper = Some(true),
-              hasAlreadyPaidApprovalCheck = Some(true)),
-            hasAccepted = true,
-            hasChanged = true)
+      "fitAndProper is true and approval is true" in {
+        val inputRp = ResponsiblePerson(
+          approvalFlags =
+            ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true)),
+          hasAccepted = true,
+          hasChanged = true
+        )
 
-          inputRp.resetBasedOnApprovalFlags() mustBe(inputRp)
-        }
+        inputRp.resetBasedOnApprovalFlags() mustBe inputRp
+      }
 
-        "fitAndProper is false and approval is true" in {
-          val inputRp = ResponsiblePerson(
-            approvalFlags = ApprovalFlags(
-              hasAlreadyPassedFitAndProper = Some(false),
-              hasAlreadyPaidApprovalCheck = Some(true)),
-            hasAccepted = true,
-            hasChanged = true)
+      "fitAndProper is false and approval is true" in {
+        val inputRp = ResponsiblePerson(
+          approvalFlags =
+            ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = Some(true)),
+          hasAccepted = true,
+          hasChanged = true
+        )
 
-          val expectedRp = ResponsiblePerson(
-            approvalFlags = ApprovalFlags(
-              hasAlreadyPassedFitAndProper = Some(false),
-              hasAlreadyPaidApprovalCheck = None),
-            hasAccepted = false,
-            hasChanged = true)
+        val expectedRp = ResponsiblePerson(
+          approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = None),
+          hasAccepted = false,
+          hasChanged = true
+        )
 
-          inputRp.resetBasedOnApprovalFlags() mustBe(expectedRp)
-        }
+        inputRp.resetBasedOnApprovalFlags() mustBe expectedRp
+      }
     }
 
     "set hasPreviousName correctly" when {
@@ -167,7 +166,9 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
       }
 
       "the model partially complete with soleProprietorOfAnotherBusiness is empty" in {
-        completeModelUkResident.copy(soleProprietorOfAnotherBusiness = None, hasAccepted = true).isComplete must be(true)
+        completeModelUkResident.copy(soleProprietorOfAnotherBusiness = None, hasAccepted = true).isComplete must be(
+          true
+        )
       }
 
       "the model partially complete with vat registration model is empty" in {
@@ -175,8 +176,12 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
       }
 
       "the model partially complete soleProprietorOfAnotherBusiness is selected as No vat registration is not empty" in {
-        completeModelUkResident.copy(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false)),
-          vatRegistered = Some(VATRegisteredNo)).isComplete must be(false)
+        completeModelUkResident
+          .copy(
+            soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false)),
+            vatRegistered = Some(VATRegisteredNo)
+          )
+          .isComplete must be(false)
       }
 
       "the model is incomplete" in {

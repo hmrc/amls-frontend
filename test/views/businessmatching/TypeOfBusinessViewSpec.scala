@@ -25,10 +25,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.TypeOfBusinessView
 
-class TypeOfBusinessViewSpec extends AmlsViewSpec with Matchers  {
+class TypeOfBusinessViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val type_of_business = app.injector.instanceOf[TypeOfBusinessView]
-  lazy val formProvider = app.injector.instanceOf[TypeOfBusinessFormProvider]
+  lazy val type_of_business                                      = app.injector.instanceOf[TypeOfBusinessView]
+  lazy val formProvider                                          = app.injector.instanceOf[TypeOfBusinessFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -40,7 +40,9 @@ class TypeOfBusinessViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = type_of_business(filledForm, edit = true)
 
-      doc.title must startWith(messages("businessmatching.typeofbusiness.title") + " - " + messages("summary.businessmatching"))
+      doc.title must startWith(
+        messages("businessmatching.typeofbusiness.title") + " - " + messages("summary.businessmatching")
+      )
     }
 
     "have correct headings" in new ViewFixture {
@@ -49,7 +51,7 @@ class TypeOfBusinessViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = type_of_business(filledForm, edit = true)
 
-      heading.html must include(messages("businessmatching.typeofbusiness.title"))
+      heading.html    must include(messages("businessmatching.typeofbusiness.title"))
       subHeading.html must include(messages("summary.businessmatching"))
 
     }

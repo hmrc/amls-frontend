@@ -22,7 +22,7 @@ import controllers.actions.SuccessfulAuthAction
 import forms.businessactivities.InvolvedInOtherFormProvider
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
 import models.businessmatching.BusinessActivity._
-import models.businessmatching.{BusinessMatching, BusinessActivities => BMActivities}
+import models.businessmatching.{BusinessActivities => BMActivities, BusinessMatching}
 import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -43,13 +43,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
 
   trait Fixture {
-    self => val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
-    implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-    lazy val view: InvolvedInOtherNameView = inject[InvolvedInOtherNameView]
-    val controller = new InvolvedInOtherController (
+    self =>
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    implicit val ec: ExecutionContext            = app.injector.instanceOf[ExecutionContext]
+    lazy val view: InvolvedInOtherNameView       = inject[InvolvedInOtherNameView]
+    val controller                               = new InvolvedInOtherController(
       dataCacheConnector = mock[DataCacheConnector],
       recoverActivitiesService = mock[RecoverActivitiesService],
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = mock[StatusService],
       cc = mockMcc,
       formProvider = inject[InvolvedInOtherFormProvider],
@@ -68,8 +70,19 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
       "display the is your involved in other page with an empty form" in new Fixture {
 
         val businessMatching: BusinessMatching = BusinessMatching(
-          activities = Some(BMActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService,
-            HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
+          activities = Some(
+            BMActivities(
+              Set(
+                AccountancyServices,
+                BillPaymentServices,
+                EstateAgentBusinessService,
+                HighValueDealing,
+                MoneyServiceBusiness,
+                TrustAndCompanyServices,
+                TelephonePaymentService
+              )
+            )
+          )
         )
 
         when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
@@ -99,9 +112,9 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
 
         val page: Document = Jsoup.parse(html)
 
-        page.select("input[type=radio][name=involvedInOther][value=true]").hasAttr("checked") must be(false)
+        page.select("input[type=radio][name=involvedInOther][value=true]").hasAttr("checked")  must be(false)
         page.select("input[type=radio][name=involvedInOther][value=false]").hasAttr("checked") must be(false)
-        page.select("textarea[name=details]").`val` must be("")
+        page.select("textarea[name=details]").`val`                                            must be("")
       }
 
       "display the is your involved in other page when there is no cache data" in new Fixture {
@@ -136,9 +149,9 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
 
         val page: Document = Jsoup.parse(contentAsString(result))
 
-        page.select("input[type=radio][name=involvedInOther][value=true]").hasAttr("checked") must be(true)
+        page.select("input[type=radio][name=involvedInOther][value=true]").hasAttr("checked")  must be(true)
         page.select("input[type=radio][name=involvedInOther][value=false]").hasAttr("checked") must be(false)
-        page.select("textarea[name=details]").`val` must be("test")
+        page.select("textarea[name=details]").`val`                                            must be("test")
       }
 
       "redirect to itself after performing a successful recovery of missing business types" in new Fixture {
@@ -186,10 +199,11 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
         "edit is false" when {
           "involvedInOther is true and there is no existing BusinessActivities data" in new Fixture {
 
-            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
-              "involvedInOther" -> "true",
-              "details" -> "test"
-            )
+            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+              FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
+                "involvedInOther" -> "true",
+                "details"         -> "test"
+              )
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
@@ -198,15 +212,16 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
               .thenReturn(Future.successful(emptyCache))
 
             val result: Future[Result] = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.ExpectedBusinessTurnoverController.get().url))
           }
           "involvedInOther is true and there is existing BusinessActivities data" in new Fixture {
 
-            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
-              "involvedInOther" -> "true",
-              "details" -> "test"
-            )
+            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+              FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
+                "involvedInOther" -> "true",
+                "details"         -> "test"
+              )
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(Some(BusinessActivities())))
@@ -215,15 +230,16 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
               .thenReturn(Future.successful(emptyCache))
 
             val result: Future[Result] = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.ExpectedBusinessTurnoverController.get().url))
           }
 
           "involvedInOther is false and there is no existing BusinessActivities data" in new Fixture {
 
-            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
-              "involvedInOther" -> "false"
-            )
+            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+              FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
+                "involvedInOther" -> "false"
+              )
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
@@ -232,15 +248,16 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
               .thenReturn(Future.successful(emptyCache))
 
             val result: Future[Result] = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.ExpectedAMLSTurnoverController.get().url))
           }
 
           "involvedInOther is false and there is existing BusinessActivities data" in new Fixture {
 
-            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
-              "involvedInOther" -> "false"
-            )
+            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+              FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
+                "involvedInOther" -> "false"
+              )
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(Some(BusinessActivities())))
@@ -249,17 +266,18 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
               .thenReturn(Future.successful(emptyCache))
 
             val result: Future[Result] = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.ExpectedAMLSTurnoverController.get().url))
           }
         }
         "edit is true" when {
           "involvedInOther is true" in new Fixture {
 
-            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post(true).url).withFormUrlEncodedBody(
-              "involvedInOther" -> "true",
-              "details" -> "test"
-            )
+            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+              FakeRequest(POST, routes.InvolvedInOtherController.post(true).url).withFormUrlEncodedBody(
+                "involvedInOther" -> "true",
+                "details"         -> "test"
+              )
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
@@ -268,15 +286,16 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
               .thenReturn(Future.successful(emptyCache))
 
             val result: Future[Result] = controller.post(true)(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.ExpectedBusinessTurnoverController.get(true).url))
           }
 
           "involvedInOther is false" in new Fixture {
 
-            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post(true).url).withFormUrlEncodedBody(
-              "involvedInOther" -> "false"
-            )
+            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+              FakeRequest(POST, routes.InvolvedInOtherController.post(true).url).withFormUrlEncodedBody(
+                "involvedInOther" -> "false"
+              )
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
@@ -285,7 +304,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
               .thenReturn(Future.successful(emptyCache))
 
             val result: Future[Result] = controller.post(true)(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.SummaryController.get.url))
           }
         }
@@ -297,9 +316,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
-            "involvedInOther" -> "test"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
+              "involvedInOther" -> "test"
+            )
 
           val result: Future[Result] = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -314,10 +334,11 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
-            "involvedInOther" -> "true",
-            "details" -> ""
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
+              "involvedInOther" -> "true",
+              "details"         -> ""
+            )
 
           val result: Future[Result] = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)

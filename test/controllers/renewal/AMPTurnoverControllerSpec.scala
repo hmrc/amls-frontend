@@ -45,12 +45,14 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     val emptyCache = Cache.empty
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
-    lazy val mockRenewalService = mock[RenewalService]
-    lazy val view = app.injector.instanceOf[AMPTurnoverView]
-    val controller = new AMPTurnoverController(
+    lazy val mockRenewalService     = mock[RenewalService]
+    lazy val view                   = app.injector.instanceOf[AMPTurnoverView]
+    val controller                  = new AMPTurnoverController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      renewalService = mockRenewalService,
+      cc = mockMcc,
       formProvider = inject[AMPTurnoverFormProvider],
       view = view
     )
@@ -80,8 +82,10 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       "display the AMP Turnover page" in new Fixture {
 
         val result = controller.get()(request)
-        status(result) must be(OK)
-        contentAsString(result) must include("How much of your turnover for the last 12 months came from sales of art for €10,000 or more?")
+        status(result)          must be(OK)
+        contentAsString(result) must include(
+          "How much of your turnover for the last 12 months came from sales of art for €10,000 or more?"
+        )
       }
 
       "display the AMP Turnover page with pre populated data" in new Fixture {
@@ -105,11 +109,11 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         )
 
         val result = controller.post()(newRequest)
-        status(result) must be(BAD_REQUEST)
+        status(result)          must be(BAD_REQUEST)
         contentAsString(result) must include(messages("error.required.renewal.amp.percentage"))
       }
 
-      "when edit is true" must {
+      "when edit is true"  must {
         "Redirect to the summary page" in new Fixture {
           val newRequest = FakeRequest(POST, routes.AMPTurnoverController.post().url).withFormUrlEncodedBody(
             "percentageExpectedTurnover" -> AMPTurnover.First.toString
@@ -119,8 +123,8 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
             activities = Some(Activities(Set(ArtMarketParticipant)))
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any())).thenReturn(Future.successful(None))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
+            .thenReturn(Future.successful(None))
 
           when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
@@ -129,7 +133,7 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           mockCacheFetch[BusinessMatching](Some(bMatching), Some(BusinessMatching.key))
 
           val result = controller.post(true)(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
         }
       }
@@ -143,14 +147,14 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
             activities = Some(Activities(Set(ArtMarketParticipant)))
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any())).thenReturn(Future.successful(Some(bMatching)))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
+            .thenReturn(Future.successful(Some(bMatching)))
 
           when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
           when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
         }
         "go to CustomerOutsideIsUKController when HVD (and not ASP or MSB) is selected" in new Fixture {
@@ -162,14 +166,14 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
             activities = Some(Activities(Set(ArtMarketParticipant, HighValueDealing)))
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any())).thenReturn(Future.successful(Some(bMatching)))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
+            .thenReturn(Future.successful(Some(bMatching)))
 
           when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
           when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url))
         }
         "go to the TotalThroughput page when MSB (and not ASP) is selected" in new Fixture {
@@ -181,14 +185,14 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
             activities = Some(Activities(Set(ArtMarketParticipant, MoneyServiceBusiness, HighValueDealing)))
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any())).thenReturn(Future.successful(Some(bMatching)))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
+            .thenReturn(Future.successful(Some(bMatching)))
 
           when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
           when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.renewal.routes.TotalThroughputController.get().url))
         }
       }

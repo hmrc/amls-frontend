@@ -29,22 +29,22 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
   "RegisteredOffice" must {
 
     "validate toLines for UK address" in {
-      RegisteredOfficeUK("38B", Some("some street"), None, None, "AA1 1AA").toLines must be(Seq("38B",
-        "some street",
-        "AA1 1AA"))
+      RegisteredOfficeUK("38B", Some("some street"), None, None, "AA1 1AA").toLines must be(
+        Seq("38B", "some street", "AA1 1AA")
+      )
 
     }
 
     "validate toLines for Non UK address" in {
-      RegisteredOfficeNonUK("38B", Some("some street"), None, None, Country("United Kingdom", "GB")).toLines must be(Seq("38B",
-        "some street",
-        "United Kingdom"))
+      RegisteredOfficeNonUK("38B", Some("some street"), None, None, Country("United Kingdom", "GB")).toLines must be(
+        Seq("38B", "some street", "United Kingdom")
+      )
 
     }
 
     "json read the given non UK address" in {
 
-      val data = RegisteredOfficeUK("38B", Some("area"), Some("line 1"), None, "AA1 1AA")
+      val data    = RegisteredOfficeUK("38B", Some("area"), Some("line 1"), None, "AA1 1AA")
       val jsonObj = Json.obj("postCode" -> "AA1 1AA")
 
       Json.fromJson[RegisteredOffice](jsonObj) must be
@@ -52,16 +52,25 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
     }
 
     "write correct value to json with date of change" in {
-      val data = RegisteredOfficeUK("38B", Some("area"), Some("line 1"), None, "AA1 1AA", Some(DateOfChange(LocalDate.of(2017,1,1))))
+      val data = RegisteredOfficeUK(
+        "38B",
+        Some("area"),
+        Some("line 1"),
+        None,
+        "AA1 1AA",
+        Some(DateOfChange(LocalDate.of(2017, 1, 1)))
+      )
 
       Json.toJson(data.asInstanceOf[RegisteredOffice]) must
-        be(Json.obj(
-          "addressLine1" -> "38B",
-          "addressLine2" -> "area",
-          "addressLine3" -> "line 1",
-          "addressLine4" -> JsNull,
-          "postCode" -> "AA1 1AA",
-          "dateOfChange" -> "2017-01-01")
+        be(
+          Json.obj(
+            "addressLine1" -> "38B",
+            "addressLine2" -> "area",
+            "addressLine3" -> "line 1",
+            "addressLine4" -> JsNull,
+            "postCode"     -> "AA1 1AA",
+            "dateOfChange" -> "2017-01-01"
+          )
         )
     }
 
@@ -69,13 +78,15 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
       val data = RegisteredOfficeUK("38B", Some("area"), Some("line 1"), None, "AA1 1AA", None)
 
       Json.toJson(data.asInstanceOf[RegisteredOffice]) must
-        be(Json.obj(
-          "addressLine1" -> "38B",
-          "addressLine2" -> "area",
-          "addressLine3" -> "line 1",
-          "addressLine4" -> JsNull,
-          "postCode" -> "AA1 1AA",
-          "dateOfChange" -> JsNull)
+        be(
+          Json.obj(
+            "addressLine1" -> "38B",
+            "addressLine2" -> "area",
+            "addressLine3" -> "line 1",
+            "addressLine4" -> JsNull,
+            "postCode"     -> "AA1 1AA",
+            "dateOfChange" -> JsNull
+          )
         )
     }
 
@@ -108,16 +119,20 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
     }
 
     "convert Business Customer Address to RegisteredOfficeUK" in {
-      val address = Address("addr1", Some("addr2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB"))
+      val address =
+        Address("addr1", Some("addr2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB"))
 
-      RegisteredOffice.convert(address) must be(RegisteredOfficeUK("addr1", Some("addr2"), Some("line3"), Some("line4"), "AA1 1AA"))
+      RegisteredOffice.convert(address) must be(
+        RegisteredOfficeUK("addr1", Some("addr2"), Some("line3"), Some("line4"), "AA1 1AA")
+      )
     }
 
     "convert Business Customer Address to RegisteredOfficeNonUK" in {
       val address = Address("addr1", Some("addr2"), Some("line3"), Some("line4"), None, Country("Albania", "AL"))
 
-      RegisteredOffice.convert(address) must be(RegisteredOfficeNonUK("addr1", Some("addr2"), Some("line3"), Some("line4"), Country("Albania", "AL")))
+      RegisteredOffice.convert(address) must be(
+        RegisteredOfficeNonUK("addr1", Some("addr2"), Some("line3"), Some("line4"), Country("Albania", "AL"))
+      )
     }
   }
 }
-

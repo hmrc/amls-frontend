@@ -19,25 +19,25 @@ package models
 import play.api.libs.json.{Json, OFormat, Reads}
 
 case class AmendVariationRenewalResponse(
-                                    processingDate: String,
-                                    etmpFormBundleNumber: String,
-                                    registrationFee: BigDecimal,
-                                    fpFee: Option[BigDecimal],
-                                    fpFeeRate: Option[BigDecimal],
-                                    approvalCheckFee: Option[BigDecimal],
-                                    approvalCheckFeeRate: Option[BigDecimal],
-                                    premiseFee: BigDecimal,
-                                    premiseFeeRate: Option[BigDecimal],
-                                    totalFees: BigDecimal,
-                                    paymentReference: Option[String],
-                                    difference: Option[BigDecimal],
-                                    addedResponsiblePeople: Int = 0,  // fps + aps
-                                    addedResponsiblePeopleFitAndProper: Int = 0, // fps who has f&p flag = false
-                                    addedResponsiblePeopleApprovalCheck: Int = 0, // fps who has Ap flag = false
-                                    addedFullYearTradingPremises: Int = 0,
-                                    halfYearlyTradingPremises: Int = 0,
-                                    zeroRatedTradingPremises: Int = 0
-                                  ) extends SubmissionResponse {
+  processingDate: String,
+  etmpFormBundleNumber: String,
+  registrationFee: BigDecimal,
+  fpFee: Option[BigDecimal],
+  fpFeeRate: Option[BigDecimal],
+  approvalCheckFee: Option[BigDecimal],
+  approvalCheckFeeRate: Option[BigDecimal],
+  premiseFee: BigDecimal,
+  premiseFeeRate: Option[BigDecimal],
+  totalFees: BigDecimal,
+  paymentReference: Option[String],
+  difference: Option[BigDecimal],
+  addedResponsiblePeople: Int = 0, // fps + aps
+  addedResponsiblePeopleFitAndProper: Int = 0, // fps who has f&p flag = false
+  addedResponsiblePeopleApprovalCheck: Int = 0, // fps who has Ap flag = false
+  addedFullYearTradingPremises: Int = 0,
+  halfYearlyTradingPremises: Int = 0,
+  zeroRatedTradingPremises: Int = 0
+) extends SubmissionResponse {
 
   override def getRegistrationFee: BigDecimal = registrationFee
 
@@ -62,8 +62,8 @@ object AmendVariationRenewalResponse {
 
   val key = "AmendVariationResponse"
 
-  implicit val format: OFormat[AmendVariationRenewalResponse] = Json.format[AmendVariationRenewalResponse]
-  implicit val formatOption: Reads[Option[AmendVariationRenewalResponse]] = Reads.optionWithNull[AmendVariationRenewalResponse]
-
+  implicit val format: OFormat[AmendVariationRenewalResponse]             = Json.format[AmendVariationRenewalResponse]
+  implicit val formatOption: Reads[Option[AmendVariationRenewalResponse]] =
+    Reads.optionWithNull[AmendVariationRenewalResponse]
 
 }

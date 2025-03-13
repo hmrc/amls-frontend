@@ -19,43 +19,40 @@ package models.hvd
 import models.hvd.SalesChannel._
 import play.api.libs.json._
 
-case class HowWillYouSellGoods(channels : Set[SalesChannel])
+case class HowWillYouSellGoods(channels: Set[SalesChannel])
 
 trait HowWillYouSellGoods0 {
 
   implicit val jsonReads: Reads[HowWillYouSellGoods] =
     (__ \ "salesChannels").read[Set[String]].flatMap { x: Set[String] =>
       x.map {
-        case "Retail" => Reads(_ => JsSuccess(Retail)) map identity[SalesChannel]
+        case "Retail"    => Reads(_ => JsSuccess(Retail)) map identity[SalesChannel]
         case "Wholesale" => Reads(_ => JsSuccess(Wholesale)) map identity[SalesChannel]
-        case "Auction" => Reads(_ => JsSuccess(Auction)) map identity[SalesChannel]
+        case "Auction"   => Reads(_ => JsSuccess(Auction)) map identity[SalesChannel]
       }.foldLeft[Reads[Set[SalesChannel]]](
         Reads[Set[SalesChannel]](_ => JsSuccess(Set.empty))
-      ) {
-        (result, data) =>
-          data flatMap { m =>
-            result.map { n =>
-              n + m
-            }
+      ) { (result, data) =>
+        data flatMap { m =>
+          result.map { n =>
+            n + m
           }
+        }
       }
     } map HowWillYouSellGoods.apply
 
-
-  val jsonW: Writes[HowWillYouSellGoods] = {
+  val jsonW: Writes[HowWillYouSellGoods] =
     (__ \ "salesChannels").write[Seq[String]].contramap { hwysg: HowWillYouSellGoods =>
       hwysg.channels.toSeq.map {
-        case Retail => "Retail"
+        case Retail    => "Retail"
         case Wholesale => "Wholesale"
-        case Auction => "Auction"
+        case Auction   => "Auction"
       }
     }
-  }
 }
 
 object HowWillYouSellGoods {
   private object Cache extends HowWillYouSellGoods0
 
-  implicit val jsonR: Reads[HowWillYouSellGoods] = Cache.jsonReads
+  implicit val jsonR: Reads[HowWillYouSellGoods]  = Cache.jsonReads
   implicit val jsonW: Writes[HowWillYouSellGoods] = Cache.jsonW
 }

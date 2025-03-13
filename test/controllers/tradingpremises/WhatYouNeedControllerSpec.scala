@@ -36,21 +36,34 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
   val mockDataCacheConnector = mock[DataCacheConnector]
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[WhatYouNeedView]
-    val controller = new WhatYouNeedController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[WhatYouNeedView]
+    val controller = new WhatYouNeedController(
       mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      view = view)
+      view = view
+    )
   }
 
   "WhatYouNeedController" must {
 
     "load the what you need page" in new Fixture {
-      when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any())) thenReturn(
-        Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), None, None, None)))
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any())) thenReturn (
+        Future.successful(
+          Some(
+            BusinessMatching(
+              None,
+              Some(BusinessActivities(Set(MoneyServiceBusiness))),
+              Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+              None,
+              None,
+              None
+            )
+          )
+        )
       )
 
       val result = controller.get(1)(request)
@@ -59,11 +72,13 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
 
     "load the what you need page when msb selected as an option in business matching" in new Fixture {
       val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness))
-      val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+      val bm                      = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
 
-      when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any())) thenReturn(Future.successful(bm))
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any())) thenReturn (Future.successful(
+        bm
+      ))
       val result = controller.get(1)(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("tradingpremises.whatyouneed.agents.sub.heading"))
 
     }
@@ -95,7 +110,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
         .thenReturn(Future.successful(None))
 
       a[Exception] must be thrownBy {
-        ScalaFutures.whenReady(controller.get(1)(request)) { x => x }
+        ScalaFutures.whenReady(controller.get(1)(request))(x => x)
       }
     }
   }

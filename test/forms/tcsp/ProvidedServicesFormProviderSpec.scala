@@ -26,21 +26,25 @@ import play.api.data.{Form, FormError}
 class ProvidedServicesFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val formProvider: ProvidedServicesFormProvider = new ProvidedServicesFormProvider()
-  val form: Form[ProvidedServices] = formProvider()
+  val form: Form[ProvidedServices]               = formProvider()
 
   val checkboxField = "services"
-  val textField = "details"
+  val textField     = "details"
 
   "ProvidedServicesFormProvider" when {
 
     "services is submitted" must {
 
       behave like fieldThatBindsValidData(
-        form, checkboxField, Gen.oneOf(ProvidedServices.all.filterNot(_ == Other("")).map(_.toString))
+        form,
+        checkboxField,
+        Gen.oneOf(ProvidedServices.all.filterNot(_ == Other("")).map(_.toString))
       )
 
       behave like mandatoryField(
-        form, checkboxField, FormError(checkboxField, "error.required.tcsp.provided_services.services")
+        form,
+        checkboxField,
+        FormError(checkboxField, "error.required.tcsp.provided_services.services")
       )
     }
 
@@ -49,35 +53,42 @@ class ProvidedServicesFormProviderSpec extends StringFieldBehaviours with Constr
       "bind valid strings" in {
 
         forAll(stringOfLengthGen(formProvider.length)) { detail =>
-          val result = form.bind(Map(
-            checkboxField -> Other("").toString,
-            textField -> detail
-          )).apply(textField)
+          val result = form
+            .bind(
+              Map(
+                checkboxField -> Other("").toString,
+                textField     -> detail
+              )
+            )
+            .apply(textField)
           result.value.value shouldBe detail
         }
       }
 
       "be mandatory if Other is selected" in {
 
-        val result = form.bind(Map(
-          checkboxField -> Other("").toString,
-          textField -> ""
-        ))
+        val result = form.bind(
+          Map(
+            checkboxField -> Other("").toString,
+            textField     -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value            shouldBe None
         result.error(textField) shouldBe Some(FormError(textField, "error.required.tcsp.provided_services.details"))
       }
 
       s"not bind strings that are longer that ${formProvider.length}" in {
 
         forAll(stringsLongerThan(formProvider.length).suchThat(_.nonEmpty)) { longString =>
+          val result = form.bind(
+            Map(
+              checkboxField -> Other("").toString,
+              textField     -> longString
+            )
+          )
 
-          val result = form.bind(Map(
-            checkboxField -> Other("").toString,
-            textField -> longString
-          ))
-
-          result.value shouldBe None
+          result.value            shouldBe None
           result.error(textField) shouldBe Some(
             FormError(textField, "error.required.tcsp.provided_services.details.length", Seq(formProvider.length))
           )
@@ -86,17 +97,23 @@ class ProvidedServicesFormProviderSpec extends StringFieldBehaviours with Constr
 
       "not bind invalid strings" in {
 
-        forAll(stringsShorterThan(formProvider.length - 1).suchThat(_.nonEmpty), invalidCharForNames) { (detail, invalid) =>
+        forAll(stringsShorterThan(formProvider.length - 1).suchThat(_.nonEmpty), invalidCharForNames) {
+          (detail, invalid) =>
+            val result = form.bind(
+              Map(
+                checkboxField -> Other("").toString,
+                textField     -> (detail + invalid)
+              )
+            )
 
-          val result = form.bind(Map(
-            checkboxField -> Other("").toString,
-            textField -> (detail + invalid)
-          ))
-
-          result.value shouldBe None
-          result.error(textField) shouldBe Some(
-            FormError(textField, "error.required.tcsp.provided_services.details.punctuation", Seq(basicPunctuationRegex))
-          )
+            result.value            shouldBe None
+            result.error(textField) shouldBe Some(
+              FormError(
+                textField,
+                "error.required.tcsp.provided_services.details.punctuation",
+                Seq(basicPunctuationRegex)
+              )
+            )
         }
       }
     }

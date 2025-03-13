@@ -24,16 +24,17 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class AnotherBodyFormProvider @Inject()() extends Mappings {
+class AnotherBodyFormProvider @Inject() () extends Mappings {
 
   val length = 140
 
-  private val booleanFieldName = "anotherBody"
-  private val booleanErrorKey = "error.required.supervision.anotherbody"
+  private val booleanFieldName   = "anotherBody"
+  private val booleanErrorKey    = "error.required.supervision.anotherbody"
   def apply(): Form[AnotherBody] = Form[AnotherBody](
     mapping(
       booleanFieldName -> boolean(booleanErrorKey, booleanErrorKey),
-      "supervisorName" -> mandatoryIfTrue(booleanFieldName,
+      "supervisorName" -> mandatoryIfTrue(
+        booleanFieldName,
         text("error.required.supervision.supervisor").verifying(
           firstError(
             maxLength(length, "error.invalid.supervision.supervisor.length.140"),
@@ -45,14 +46,14 @@ class AnotherBodyFormProvider @Inject()() extends Mappings {
   )
 
   private def apply(b: Boolean, optS: Option[String]): AnotherBody = (b, optS) match {
-    case (false, None) => AnotherBodyNo
+    case (false, None)      => AnotherBodyNo
     case (true, Some(name)) => AnotherBodyYes(name)
-    case (true, None) => throw new IllegalArgumentException("Cannot have Another Body without name")
-    case (false, Some(_)) => throw new IllegalArgumentException("Cannot have name with no other body")
+    case (true, None)       => throw new IllegalArgumentException("Cannot have Another Body without name")
+    case (false, Some(_))   => throw new IllegalArgumentException("Cannot have name with no other body")
   }
 
   private def unapply(aB: AnotherBody): Option[(Boolean, Option[String])] = aB match {
     case AnotherBodyYes(name, _, _, _) => Some((true, Some(name)))
-    case AnotherBodyNo => Some((false, None))
+    case AnotherBodyNo                 => Some((false, None))
   }
 }

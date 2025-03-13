@@ -24,8 +24,6 @@ import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import ResponsiblePeopleService._
 
-
-
 class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenerator with ScalaFutures {
 
   trait Fixture extends DependencyMocks {
@@ -48,9 +46,7 @@ class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenera
   }
 
   "getActive" must {
-    "return only the people who are not deleted or not complete" in new Fixture {
-
-    }
+    "return only the people who are not deleted or not complete" in new Fixture {}
   }
 
   "updateResponsiblePeople" must {
@@ -59,27 +55,67 @@ class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenera
 
         "a single selection is made" in new Fixture {
           val indices = Set(1)
-          val result = service.updateFitAndProperFlag(responsiblePeople, indices, false)
+          val result  = service.updateFitAndProperFlag(responsiblePeople, indices, false)
 
           result mustBe Seq(
-            responsiblePeople.head.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasAccepted = true, hasChanged = true),
-            responsiblePeople(1).copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)), hasAccepted = true, hasChanged = true),
-            responsiblePeople(2).copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasAccepted = true, hasChanged = true),
-            responsiblePeople(3).copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasAccepted = true, hasChanged = true),
-            responsiblePeople.last.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasAccepted = true, hasChanged = true)
+            responsiblePeople.head.copy(
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)),
+              hasAccepted = true,
+              hasChanged = true
+            ),
+            responsiblePeople(1).copy(
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+              hasAccepted = true,
+              hasChanged = true
+            ),
+            responsiblePeople(2).copy(
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)),
+              hasAccepted = true,
+              hasChanged = true
+            ),
+            responsiblePeople(3).copy(
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)),
+              hasAccepted = true,
+              hasChanged = true
+            ),
+            responsiblePeople.last.copy(
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)),
+              hasAccepted = true,
+              hasChanged = true
+            )
           )
         }
 
         "multiple selections are made" in new Fixture {
           val indices = Set(0, 3, 4)
-          val result = service.updateFitAndProperFlag(responsiblePeople, indices, false)
+          val result  = service.updateFitAndProperFlag(responsiblePeople, indices, false)
 
           result mustBe Seq(
-              responsiblePeople.head.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)), hasAccepted = true, hasChanged = true),
-              responsiblePeople(1).copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasAccepted = true, hasChanged = true),
-              responsiblePeople(2).copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasAccepted = true, hasChanged = true),
-              responsiblePeople(3).copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)), hasAccepted = true, hasChanged = true),
-              responsiblePeople.last.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)), hasAccepted = true, hasChanged = true)
+            responsiblePeople.head.copy(
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+              hasAccepted = true,
+              hasChanged = true
+            ),
+            responsiblePeople(1).copy(
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)),
+              hasAccepted = true,
+              hasChanged = true
+            ),
+            responsiblePeople(2).copy(
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)),
+              hasAccepted = true,
+              hasChanged = true
+            ),
+            responsiblePeople(3).copy(
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+              hasAccepted = true,
+              hasChanged = true
+            ),
+            responsiblePeople.last.copy(
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+              hasAccepted = true,
+              hasChanged = true
+            )
           )
         }
       }
@@ -89,10 +125,16 @@ class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenera
   "A list of responsible people" can {
     "be filtered to only include people not deleted or are incomplete" in new Fixture {
 
-      val people = responsiblePeople.patch(0, Seq(
-        responsiblePersonGen.sample.get.copy(status = Some(StatusConstants.Deleted)),
-        responsiblePersonGen.sample.get.copy(personName = None)),
-        2).zipWithIndex
+      val people = responsiblePeople
+        .patch(
+          0,
+          Seq(
+            responsiblePersonGen.sample.get.copy(status = Some(StatusConstants.Deleted)),
+            responsiblePersonGen.sample.get.copy(personName = None)
+          ),
+          2
+        )
+        .zipWithIndex
 
       val filtered = people.exceptInactive
 
@@ -102,10 +144,16 @@ class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenera
 
     "be filtered to only include people not deleted" in new Fixture {
 
-      val people = responsiblePeople.patch(0, Seq(
-        responsiblePersonGen.sample.get.copy(status = Some(StatusConstants.Deleted)),
-        responsiblePersonGen.sample.get.copy(personName = None)),
-        2).zipWithIndex
+      val people = responsiblePeople
+        .patch(
+          0,
+          Seq(
+            responsiblePersonGen.sample.get.copy(status = Some(StatusConstants.Deleted)),
+            responsiblePersonGen.sample.get.copy(personName = None)
+          ),
+          2
+        )
+        .zipWithIndex
 
       val filtered = people.exceptDeleted
 

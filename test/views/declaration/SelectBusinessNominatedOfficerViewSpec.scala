@@ -30,7 +30,7 @@ import views.html.declaration.SelectBusinessNominatedOfficerView
 class SelectBusinessNominatedOfficerViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val officerView = inject[SelectBusinessNominatedOfficerView]
-  lazy val fp = inject[BusinessNominatedOfficerFormProvider]
+  lazy val fp          = inject[BusinessNominatedOfficerFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -49,9 +49,9 @@ class SelectBusinessNominatedOfficerViewSpec extends AmlsViewSpec with Matchers 
       def view = officerView("subheading", fp(), Seq.empty[ResponsiblePerson])
 
       doc.title mustBe s"${messages("declaration.who.is.business.nominated.officer")} - ${messages("title.amls")} - ${messages("title.gov")}"
-      heading.html must be(messages("declaration.who.is.business.nominated.officer"))
+      heading.html    must be(messages("declaration.who.is.business.nominated.officer"))
       subHeading.html must include("subheading")
-      doc.text() must include(messages("declaration.who.is.business.nominated.officer.text"))
+      doc.text()      must include(messages("declaration.who.is.business.nominated.officer.text"))
     }
 
     "have a list of responsible people" in new ViewFixture {
@@ -61,7 +61,7 @@ class SelectBusinessNominatedOfficerViewSpec extends AmlsViewSpec with Matchers 
       people.zipWithIndex.map { n =>
         n._1.personName.map { obj =>
           val id = s"value-${n._2}"
-          val e = doc.getElementById(id)
+          val e  = doc.getElementById(id)
 
           Option(e) must be(defined)
           e.`val` mustBe s"${obj.firstName}${obj.lastName}"
@@ -84,7 +84,7 @@ class SelectBusinessNominatedOfficerViewSpec extends AmlsViewSpec with Matchers 
       def view = officerView("subheading", fp(), Seq.empty[ResponsiblePerson])
 
       Option(doc.select("input[type=radio][id=other]")) must be(defined)
-      doc.select("label[for=other]").text() must include(messages("lbl.register.some.one.else"))
+      doc.select("label[for=other]").text()             must include(messages("lbl.register.some.one.else"))
     }
 
     behave like pageWithErrors(
@@ -93,7 +93,8 @@ class SelectBusinessNominatedOfficerViewSpec extends AmlsViewSpec with Matchers 
         fp().withError("value", "error.required.declaration.nominated.officer"),
         Seq.empty[ResponsiblePerson]
       ),
-      "value", "error.required.declaration.nominated.officer"
+      "value",
+      "error.required.declaration.nominated.officer"
     )
 
     behave like pageWithBackLink(officerView("subheading", fp(), Seq.empty[ResponsiblePerson]))

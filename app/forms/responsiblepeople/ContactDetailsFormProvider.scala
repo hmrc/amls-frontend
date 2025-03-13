@@ -23,16 +23,16 @@ import play.api.data.Forms.mapping
 
 import javax.inject.Inject
 
-class ContactDetailsFormProvider @Inject()() extends Mappings {
+class ContactDetailsFormProvider @Inject() () extends Mappings {
 
   val phoneLength = 24
   val emailLength = 100
 
-  private val phoneInvalidError = "error.invalid.rp.contact.phone.number"
-  private val phoneRegex = "^[0-9 ()+\u2010\u002d]{1,24}$"
+  private val phoneInvalidError     = "error.invalid.rp.contact.phone.number"
+  private val phoneRegex            = "^[0-9 ()+\u2010\u002d]{1,24}$"
   def apply(): Form[ContactDetails] = Form[ContactDetails](
     mapping(
-      "phoneNumber" -> text("error.required.rp.contact.phone.number")
+      "phoneNumber"  -> text("error.required.rp.contact.phone.number")
         .verifying(
           firstError(
             maxLength(phoneLength, phoneInvalidError),

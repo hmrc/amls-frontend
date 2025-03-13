@@ -28,19 +28,19 @@ class PercentageOfCashPaymentOver15000Spec extends PlaySpec {
       "successfully validate given an enum value" in {
 
         Json.fromJson[PercentageOfCashPaymentOver15000](Json.obj("percentage" -> "01")) must
-          be(JsSuccess(PercentageOfCashPaymentOver15000.First, JsPath ))
+          be(JsSuccess(PercentageOfCashPaymentOver15000.First, JsPath))
 
         Json.fromJson[PercentageOfCashPaymentOver15000](Json.obj("percentage" -> "02")) must
-          be(JsSuccess(PercentageOfCashPaymentOver15000.Second, JsPath ))
+          be(JsSuccess(PercentageOfCashPaymentOver15000.Second, JsPath))
 
         Json.fromJson[PercentageOfCashPaymentOver15000](Json.obj("percentage" -> "03")) must
-          be(JsSuccess(PercentageOfCashPaymentOver15000.Third, JsPath ))
+          be(JsSuccess(PercentageOfCashPaymentOver15000.Third, JsPath))
 
         Json.fromJson[PercentageOfCashPaymentOver15000](Json.obj("percentage" -> "04")) must
-          be(JsSuccess(PercentageOfCashPaymentOver15000.Fourth, JsPath ))
+          be(JsSuccess(PercentageOfCashPaymentOver15000.Fourth, JsPath))
 
         Json.fromJson[PercentageOfCashPaymentOver15000](Json.obj("percentage" -> "05")) must
-          be(JsSuccess(PercentageOfCashPaymentOver15000.Fifth, JsPath ))
+          be(JsSuccess(PercentageOfCashPaymentOver15000.Fifth, JsPath))
 
       }
 
@@ -65,9 +65,9 @@ class PercentageOfCashPaymentOver15000Spec extends PlaySpec {
 
       "throw error for invalid data" in {
         Json.fromJson[PercentageOfCashPaymentOver15000](Json.obj("percentage" -> "20")) must
-          be(JsError(JsPath , play.api.libs.json.JsonValidationError("error.invalid")))
+          be(JsError(JsPath, play.api.libs.json.JsonValidationError("error.invalid")))
       }
     }
-   
+
   }
 }

@@ -20,24 +20,23 @@ import play.api.libs.json._
 
 sealed trait ProfessionalBody
 
-case class ProfessionalBodyYes(value : String) extends ProfessionalBody
+case class ProfessionalBodyYes(value: String) extends ProfessionalBody
 case object ProfessionalBodyNo extends ProfessionalBody
-
 
 object ProfessionalBody {
 
   implicit val jsonReads: Reads[ProfessionalBody] =
     (__ \ "penalised").read[Boolean] flatMap {
-    case true => (__ \ "professionalBody").read[String] map ProfessionalBodyYes.apply _
-    case false => Reads(_ => JsSuccess(ProfessionalBodyNo))
-  }
+      case true  => (__ \ "professionalBody").read[String] map ProfessionalBodyYes.apply _
+      case false => Reads(_ => JsSuccess(ProfessionalBodyNo))
+    }
 
   implicit val jsonWrites: Writes[ProfessionalBody] = Writes[ProfessionalBody] {
-    case ProfessionalBodyYes(value) => Json.obj(
-      "penalised" -> true,
-      "professionalBody" -> value
-    )
-    case ProfessionalBodyNo => Json.obj("penalised" -> false)
+    case ProfessionalBodyYes(value) =>
+      Json.obj(
+        "penalised"        -> true,
+        "professionalBody" -> value
+      )
+    case ProfessionalBodyNo         => Json.obj("penalised" -> false)
   }
 }
-

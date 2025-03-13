@@ -24,48 +24,61 @@ import play.api.data.{Form, FormError}
 class CETransactionsInLast12MonthsFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val fp: CETransactionsInLast12MonthsFormProvider = new CETransactionsInLast12MonthsFormProvider()
-  val form: Form[CETransactionsInLast12Months] = fp()
-  val fieldName = "ceTransaction"
-  val lengthAndRegexError = "error.invalid.renewal.ce.transactions.in.12months"
+  val form: Form[CETransactionsInLast12Months]     = fp()
+  val fieldName                                    = "ceTransaction"
+  val lengthAndRegexError                          = "error.invalid.renewal.ce.transactions.in.12months"
 
   "CETransactionsInLast12MonthsFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, fieldName, numStringOfLength(fp.length).suchThat(_.nonEmpty)
+      form,
+      fieldName,
+      numStringOfLength(fp.length).suchThat(_.nonEmpty)
     )
 
-    behave like mandatoryField(form, fieldName, FormError(fieldName, "error.required.renewal.ce.transactions.in.12months"))
+    behave like mandatoryField(
+      form,
+      fieldName,
+      FormError(fieldName, "error.required.renewal.ce.transactions.in.12months")
+    )
 
-    behave like fieldWithMaxLength(form, fieldName, fp.length, FormError(fieldName, lengthAndRegexError, Seq(fp.length)))
+    behave like fieldWithMaxLength(
+      form,
+      fieldName,
+      fp.length,
+      FormError(fieldName, lengthAndRegexError, Seq(fp.length))
+    )
 
     "bind a single digit value" in {
       val result = form.bind(Map(fieldName -> "1"))
       result.hasErrors shouldBe false
-      result.value shouldBe Some(CETransactionsInLast12Months("1"))
+      result.value     shouldBe Some(CETransactionsInLast12Months("1"))
     }
 
     "strip spaces from input" in {
       val result = form.bind(Map(fieldName -> "  5 "))
       result.hasErrors shouldBe false
-      result.value shouldBe Some(CETransactionsInLast12Months("5"))
+      result.value     shouldBe Some(CETransactionsInLast12Months("5"))
     }
 
     "strip commas from input" in {
       val result = form.bind(Map(fieldName -> "1,000"))
       result.hasErrors shouldBe false
-      result.value shouldBe Some(CETransactionsInLast12Months("1000"))
+      result.value     shouldBe Some(CETransactionsInLast12Months("1000"))
     }
 
     "strip spaces and commas from input" in {
       val result = form.bind(Map(fieldName -> " 12,345,678,901 "))
       result.hasErrors shouldBe false
-      result.value shouldBe Some(CETransactionsInLast12Months("12345678901"))
+      result.value     shouldBe Some(CETransactionsInLast12Months("12345678901"))
     }
 
     "fail to bind non-numbers" in {
 
       forAll(alphaStringsShorterThan(fp.length).suchThat(_.nonEmpty)) { str =>
-        form.bind(Map(fieldName -> str)).errors shouldBe Seq(FormError(fieldName, lengthAndRegexError, Seq(transactionsRegex)))
+        form.bind(Map(fieldName -> str)).errors shouldBe Seq(
+          FormError(fieldName, lengthAndRegexError, Seq(transactionsRegex))
+        )
       }
     }
   }

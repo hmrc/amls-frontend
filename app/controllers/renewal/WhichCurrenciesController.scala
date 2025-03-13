@@ -30,62 +30,56 @@ import views.html.renewal.WhichCurrenciesView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class WhichCurrenciesController @Inject()(val authAction: AuthAction,
-                                          val ds: CommonPlayDependencies,
-                                          renewalService: RenewalService,
-                                          dataCacheConnector: DataCacheConnector,
-                                          val cc: MessagesControllerComponents,
-                                          autocompleteService: CurrencyAutocompleteService,
-                                          formProvider: WhichCurrenciesFormProvider,
-                                          view: WhichCurrenciesView) extends AmlsBaseController(ds, cc) {
+class WhichCurrenciesController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  renewalService: RenewalService,
+  dataCacheConnector: DataCacheConnector,
+  val cc: MessagesControllerComponents,
+  autocompleteService: CurrencyAutocompleteService,
+  formProvider: WhichCurrenciesFormProvider,
+  view: WhichCurrenciesView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      val block = for {
-        renewal <- OptionT(renewalService.getRenewal(request.credId))
-        whichCurrencies <- OptionT.fromOption[Future](renewal.whichCurrencies)
-      } yield {
-        Ok(view(formProvider().fill(whichCurrencies), edit, autocompleteService.formOptions))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    val block = for {
+      renewal         <- OptionT(renewalService.getRenewal(request.credId))
+      whichCurrencies <- OptionT.fromOption[Future](renewal.whichCurrencies)
+    } yield Ok(view(formProvider().fill(whichCurrencies), edit, autocompleteService.formOptions))
 
-      block getOrElse Ok(view(formProvider(), edit, autocompleteService.formOptions))
+    block getOrElse Ok(view(formProvider(), edit, autocompleteService.formOptions))
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false) = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, autocompleteService.formOptions))),
         data =>
-          dataCacheConnector.fetchAll(request.credId).flatMap {
-            optMap =>
-              val result = for {
-                cacheMap <- optMap
-                renewal <- cacheMap.getEntry[Renewal](Renewal.key)
-              } yield {
-                renewalService.updateRenewal(request.credId, updateWhichCurrencies(renewal, data)) map { _ =>
-                  if (edit) {
-                    Redirect(routes.SummaryController.get)
-                  } else {
-                    Redirect(routes.UsesForeignCurrenciesController.get())
-                  }
-                }
-
+          dataCacheConnector.fetchAll(request.credId).flatMap { optMap =>
+            val result = for {
+              cacheMap <- optMap
+              renewal  <- cacheMap.getEntry[Renewal](Renewal.key)
+            } yield renewalService.updateRenewal(request.credId, updateWhichCurrencies(renewal, data)) map { _ =>
+              if (edit) {
+                Redirect(routes.SummaryController.get)
+              } else {
+                Redirect(routes.UsesForeignCurrenciesController.get())
               }
-              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+            }
+
+            result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
           }
       )
   }
 
-  def updateWhichCurrencies(oldRenewal: Renewal, whichCurrencies: WhichCurrencies) = {
+  def updateWhichCurrencies(oldRenewal: Renewal, whichCurrencies: WhichCurrencies) =
     oldRenewal.whichCurrencies match {
-      case Some(wc) => {
+      case Some(wc) =>
         val newWc = wc.currencies(whichCurrencies.currencies)
         oldRenewal.whichCurrencies(newWc)
-      }
-      case None => {
+      case None     =>
         val newWc = WhichCurrencies(whichCurrencies.currencies)
         oldRenewal.whichCurrencies(newWc)
-      }
     }
-  }
 }

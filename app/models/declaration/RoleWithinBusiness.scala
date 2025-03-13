@@ -51,24 +51,26 @@ object RoleWithinBusiness {
       case "05" => NominatedOfficer
       case "06" => Partner
       case "07" => SoleProprietor
-      case "08" => (JsPath \ "roleWithinBusinessOther").read[String] map {
-        Other(_)
-      }
-      case _ => play.api.libs.json.JsonValidationError("error.invalid")
+      case "08" =>
+        (JsPath \ "roleWithinBusinessOther").read[String] map {
+          Other(_)
+        }
+      case _    => play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 
   implicit val jsonWrites: Writes[RoleWithinBusiness] = Writes[RoleWithinBusiness] {
     case BeneficialShareholder => Json.obj("roleWithinBusiness" -> "01")
-    case Director => Json.obj("roleWithinBusiness" -> "02")
-    case ExternalAccountant => Json.obj("roleWithinBusiness" -> "03")
-    case InternalAccountant => Json.obj("roleWithinBusiness" -> "04")
-    case NominatedOfficer => Json.obj("roleWithinBusiness" -> "05")
-    case Partner => Json.obj("roleWithinBusiness" -> "06")
-    case SoleProprietor => Json.obj("roleWithinBusiness" -> "07")
-    case Other(value) => Json.obj(
-      "roleWithinBusiness" -> "08",
-      "roleWithinBusinessOther" -> value
-    )
+    case Director              => Json.obj("roleWithinBusiness" -> "02")
+    case ExternalAccountant    => Json.obj("roleWithinBusiness" -> "03")
+    case InternalAccountant    => Json.obj("roleWithinBusiness" -> "04")
+    case NominatedOfficer      => Json.obj("roleWithinBusiness" -> "05")
+    case Partner               => Json.obj("roleWithinBusiness" -> "06")
+    case SoleProprietor        => Json.obj("roleWithinBusiness" -> "07")
+    case Other(value)          =>
+      Json.obj(
+        "roleWithinBusiness"      -> "08",
+        "roleWithinBusinessOther" -> value
+      )
   }
 }

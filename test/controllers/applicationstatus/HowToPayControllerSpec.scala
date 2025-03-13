@@ -38,8 +38,8 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
     self =>
 
     val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
-    lazy val howToPay: HowToPayView = app.injector.instanceOf[HowToPayView]
-    val controller = new HowToPayController(
+    lazy val howToPay: HowToPayView              = app.injector.instanceOf[HowToPayView]
+    val controller                               = new HowToPayController(
       authAction = SuccessfulAuthAction,
       feeHelper = mock[FeeHelper],
       cc = mockMcc,
@@ -95,7 +95,9 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
 
           when {
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
-          } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType).copy(paymentReference = Some("    "))))
+          } thenReturn Future.successful(
+            Some(feeResponse(SubscriptionResponseType).copy(paymentReference = Some("    ")))
+          )
 
           val result: Future[Result] = controller.get()(request)
           status(result) must be(OK)

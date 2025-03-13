@@ -26,9 +26,9 @@ import play.api.data.{Form, FormError}
 class DeregistrationReasonFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val formProvider: DeregistrationReasonFormProvider = new DeregistrationReasonFormProvider()
-  val form: Form[DeregistrationReason] = formProvider()
+  val form: Form[DeregistrationReason]               = formProvider()
 
-  val radio = "deregistrationReason"
+  val radio     = "deregistrationReason"
   val textField = "specifyOtherReason"
 
   "DeregistrationReasonFormProvider" when {
@@ -45,35 +45,42 @@ class DeregistrationReasonFormProviderSpec extends StringFieldBehaviours with Co
       "bind valid strings" in {
 
         forAll(stringOfLengthGen(formProvider.length)) { reason =>
-          val result = form.bind(Map(
-            radio -> Other("").toString,
-            textField -> reason
-          )).apply(textField)
+          val result = form
+            .bind(
+              Map(
+                radio     -> Other("").toString,
+                textField -> reason
+              )
+            )
+            .apply(textField)
           result.value.value shouldBe reason
         }
       }
 
       "be mandatory if Other is selected" in {
 
-        val result = form.bind(Map(
-          radio -> Other("").toString,
-          textField -> ""
-        ))
+        val result = form.bind(
+          Map(
+            radio     -> Other("").toString,
+            textField -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value            shouldBe None
         result.error(textField) shouldBe Some(FormError(textField, "error.required.deregistration.reason.input"))
       }
 
       s"not bind strings that are longer that ${formProvider.length}" in {
 
         forAll(stringsLongerThan(formProvider.length).suchThat(_.nonEmpty)) { longString =>
+          val result = form.bind(
+            Map(
+              radio     -> Other("").toString,
+              textField -> longString
+            )
+          )
 
-          val result = form.bind(Map(
-            radio -> Other("").toString,
-            textField -> longString
-          ))
-
-          result.value shouldBe None
+          result.value            shouldBe None
           result.error(textField) shouldBe Some(
             FormError(textField, "error.required.deregistration.reason.length", Seq(formProvider.length))
           )
@@ -82,17 +89,19 @@ class DeregistrationReasonFormProviderSpec extends StringFieldBehaviours with Co
 
       "not bind invalid strings" in {
 
-        forAll(stringsShorterThan(formProvider.length).suchThat(_.nonEmpty), invalidCharForNames) { (software, invalidChar) =>
+        forAll(stringsShorterThan(formProvider.length).suchThat(_.nonEmpty), invalidCharForNames) {
+          (software, invalidChar) =>
+            val result = form.bind(
+              Map(
+                radio     -> Other("").toString,
+                textField -> (software + invalidChar)
+              )
+            )
 
-          val result = form.bind(Map(
-            radio -> Other("").toString,
-            textField -> (software + invalidChar)
-          ))
-
-          result.value shouldBe None
-          result.error(textField) shouldBe Some(
-            FormError(textField, "error.required.deregistration.reason.format", Seq(basicPunctuationRegex))
-          )
+            result.value            shouldBe None
+            result.error(textField) shouldBe Some(
+              FormError(textField, "error.required.deregistration.reason.format", Seq(basicPunctuationRegex))
+            )
         }
       }
     }

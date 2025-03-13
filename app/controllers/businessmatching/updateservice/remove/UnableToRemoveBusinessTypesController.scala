@@ -30,21 +30,22 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class UnableToRemoveBusinessTypesController @Inject()(authAction: AuthAction,
-                                                      val ds: CommonPlayDependencies,
-                                                      val dataCacheConnector: DataCacheConnector,
-                                                      val cc: MessagesControllerComponents,
-                                                      view: UnableToRemoveActivityView) extends AmlsBaseController(ds, cc) {
+class UnableToRemoveBusinessTypesController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val dataCacheConnector: DataCacheConnector,
+  val cc: MessagesControllerComponents,
+  view: UnableToRemoveActivityView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
-    implicit request =>
-      getBusinessActivity(request.credId) map { activity =>
-        Ok(view(activity))
-      } getOrElse (InternalServerError("Get: Unable to show Unable to Remove Activities page"))
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    getBusinessActivity(request.credId) map { activity =>
+      Ok(view(activity))
+    } getOrElse (InternalServerError("Get: Unable to show Unable to Remove Activities page"))
   }
 
   private def getBusinessActivity(credId: String)(implicit messages: Messages): OptionT[Future, String] = for {
-    model <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
+    model      <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
     activities <- OptionT.fromOption[Future](model.alphabeticalBusinessActivitiesLowerCase(false))
   } yield activities.head
 

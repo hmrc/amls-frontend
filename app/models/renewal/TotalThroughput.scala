@@ -35,15 +35,18 @@ object TotalThroughput {
     Mapping("07", "renewal.msb.throughput.selection.7", ExpectedThroughput.Seventh)
   )
 
-  def labelFor(model: TotalThroughput)(implicit messages: Messages) = throughputValues.collectFirst {
-    case Mapping(model.throughput, label, _) => messages(label)
-  }.getOrElse("")
+  def labelFor(model: TotalThroughput)(implicit messages: Messages) = throughputValues
+    .collectFirst { case Mapping(model.throughput, label, _) =>
+      messages(label)
+    }
+    .getOrElse("")
 
   implicit val format: OFormat[TotalThroughput] = Json.format[TotalThroughput]
 
-  implicit def convert(model: TotalThroughput): ExpectedThroughput = {
-    throughputValues.collectFirst {
-      case x if x.value == model.throughput => x.submissionModel
-    }.getOrElse(throw new Exception("Invalid MSB throughput value"))
-  }
+  implicit def convert(model: TotalThroughput): ExpectedThroughput =
+    throughputValues
+      .collectFirst {
+        case x if x.value == model.throughput => x.submissionModel
+      }
+      .getOrElse(throw new Exception("Invalid MSB throughput value"))
 }

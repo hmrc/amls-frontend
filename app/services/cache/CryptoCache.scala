@@ -19,15 +19,14 @@ package services.cache
 import play.api.libs.json.Reads
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
-/**
-  * Implements getEncryptedEntry[T], which will decrypt the entry on retrieval
-  * This type itself is a type of Cache.
+/** Implements getEncryptedEntry[T], which will decrypt the entry on retrieval This type itself is a type of Cache.
   *
-  * @param cache  The cache to wrap.
-  * @param crypto The cryptography instance to use to decrypt values
+  * @param cache
+  *   The cache to wrap.
+  * @param crypto
+  *   The cryptography instance to use to decrypt values
   */
 class CryptoCache(cache: Cache, crypto: Encrypter with Decrypter) extends Cache(cache.id, cache.data) with CacheOps {
-  override def getEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] = {
+  override def getEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] =
     catchDoubleEncryption(cache, key)(fmt, crypto)
-  }
 }

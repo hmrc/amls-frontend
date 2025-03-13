@@ -30,18 +30,19 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BusinessAppliedForPsrNumberPageRouter @Inject()(val statusService: StatusService,
-                                                      val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
+class BusinessAppliedForPsrNumberPageRouter @Inject() (
+  val statusService: StatusService,
+  val businessMatchingService: BusinessMatchingService
+) extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+  override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Result] =
     (edit, model.businessAppliedForPSRNumber) match {
-      case (_, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
-      case (_, Some(BusinessAppliedForPSRNumberNo)) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
-      case (_, None) => Future.successful(error(PsrNumberPageId))
+      case (_, Some(BusinessAppliedForPSRNumberYes(_))) =>
+        Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
+      case (_, Some(BusinessAppliedForPSRNumberNo))     => Future.successful(Redirect(addRoutes.NoPsrController.get()))
+      case (_, None)                                    => Future.successful(error(PsrNumberPageId))
     }
-  }
 }
-
-
-

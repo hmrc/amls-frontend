@@ -28,7 +28,7 @@ import views.html.msb.TransactionsInNext12MonthsView
 class TransactionsInNext12MonthsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val txnView = inject[TransactionsInNext12MonthsView]
-  lazy val fp = inject[TransactionsInNext12MonthsFormProvider]
+  lazy val fp      = inject[TransactionsInNext12MonthsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,23 +42,26 @@ class TransactionsInNext12MonthsViewSpec extends AmlsViewSpec with Matchers {
 
       def view = txnView(fp().fill(TransactionsInNext12Months("10")), true)
 
-      doc.title must be(messages("msb.transactions.expected.title") +
-        " - " + messages("summary.msb") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("msb.transactions.expected.title") +
+          " - " + messages("summary.msb") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = txnView(fp().fill(TransactionsInNext12Months("10")), true)
 
-      heading.html must include(messages("msb.transactions.expected.title"))
+      heading.html    must include(messages("msb.transactions.expected.title"))
       subHeading.html must include(messages("summary.msb"))
     }
 
     behave like pageWithErrors(
       txnView(fp().withError("txnAmount", "error.required.msb.transactions.in.12months"), false),
-      "txnAmount", "error.required.msb.transactions.in.12months"
+      "txnAmount",
+      "error.required.msb.transactions.in.12months"
     )
 
     behave like pageWithBackLink(txnView(fp(), false))

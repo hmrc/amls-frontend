@@ -44,11 +44,12 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
 
     val request = addToken(authRequest)
 
-    implicit val hc: HeaderCarrier = new HeaderCarrier()
+    implicit val hc: HeaderCarrier    = new HeaderCarrier()
     implicit val ec: ExecutionContext = mock[ExecutionContext]
-    lazy val view = inject[TypeOfBankView]
-    val controller = new TypeOfBankController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+    lazy val view                     = inject[TypeOfBankView]
+    val controller                    = new TypeOfBankController(
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       auditConnector = mock[AuditConnector],
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
@@ -63,23 +64,27 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
     val paymentRef = paymentRefGen.sample.get
 
     when {
-      controller.authEnrolmentsService.amlsRegistrationNumber(any(), any())(any(),any())
+      controller.authEnrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())
     } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
     when {
-      controller.feeResponseService.getFeeResponse(any(), any())(any(),any())
-    } thenReturn Future.successful(Some(FeeResponse(
-      SubscriptionResponseType,
-      amlsRegistrationNumber,
-      100,
-      None,
-      None,
-      0,
-      100,
-      Some(paymentReferenceNumber),
-      None,
-      LocalDateTime.now()
-    )))
+      controller.feeResponseService.getFeeResponse(any(), any())(any(), any())
+    } thenReturn Future.successful(
+      Some(
+        FeeResponse(
+          SubscriptionResponseType,
+          amlsRegistrationNumber,
+          100,
+          None,
+          None,
+          0,
+          100,
+          Some(paymentReferenceNumber),
+          None,
+          LocalDateTime.now()
+        )
+      )
+    )
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())
@@ -101,7 +106,12 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
       Some(CustomersOutsideIsUK(true)),
       Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
       Some(PercentageOfCashPaymentOver15000.First),
-      Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other")))))),
+      Some(
+        CashPayments(
+          CashPaymentsCustomerNotMet(true),
+          Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+        )
+      ),
       Some(TotalThroughput("01")),
       Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
       Some(TransactionsInLast12Months("1500")),
@@ -124,7 +134,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
 
         val result = controller.get()(request)
 
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("payments.typeofbank.title"))
 
       }
@@ -141,8 +151,8 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
 
           val result = controller.post()(postRequest)
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be (Some(controllers.payments.routes.BankDetailsController.get(true).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.payments.routes.BankDetailsController.get(true).url))
           verify(controller.auditConnector).sendEvent(any())(any(), any())
         }
       }
@@ -157,7 +167,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
           val result = controller.post()(postRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) must be (Some(controllers.payments.routes.BankDetailsController.get(false).url))
+          redirectLocation(result) must be(Some(controllers.payments.routes.BankDetailsController.get(false).url))
           verify(controller.auditConnector).sendEvent(any())(any(), any())
         }
       }

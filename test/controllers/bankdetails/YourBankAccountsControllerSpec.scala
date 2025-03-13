@@ -35,7 +35,6 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
-
     val ukAccount: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12341234", "000000")))
 
     val completeModel1: BankDetails = BankDetails(
@@ -45,7 +44,8 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
       hasChanged = false,
       refreshedFromServer = false,
       None,
-      hasAccepted = true)
+      hasAccepted = true
+    )
 
     val completeModel2: BankDetails = BankDetails(
       Some(BelongsToBusiness),
@@ -54,7 +54,8 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
       hasChanged = false,
       refreshedFromServer = false,
       None,
-      hasAccepted = true)
+      hasAccepted = true
+    )
 
     val completeModel3: BankDetails = BankDetails(
       Some(BelongsToOtherBusiness),
@@ -77,13 +78,9 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
       None,
       Some(ukAccount)
     )
-    val inCompleteModel2: BankDetails = BankDetails(
-      Some(BelongsToBusiness),
-      Some("Incomplete Second Account Name"))
+    val inCompleteModel2: BankDetails = BankDetails(Some(BelongsToBusiness), Some("Incomplete Second Account Name"))
 
-    val inCompleteModel3: BankDetails = BankDetails(
-      None,
-      Some("Incomplete Third Account Name"))
+    val inCompleteModel3: BankDetails = BankDetails(None, Some("Incomplete Third Account Name"))
 
     val deletedInCompleteModel4: BankDetails = inCompleteModel3.copy(
       status = Some(StatusConstants.Deleted),
@@ -97,13 +94,26 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       mcc = mockMcc,
-      view = bankAccountView)
+      view = bankAccountView
+    )
   }
 
   "Get" must {
     "load the 'your bank accounts' screen with a list of complete and incomplete items" in new Fixture {
-      mockCacheFetch[Seq[BankDetails]](Some(Seq(completeModel1, completeModel2, completeModel3, deletedCompleteModel4,
-        inCompleteModel1, inCompleteModel2, inCompleteModel3, deletedInCompleteModel4)))
+      mockCacheFetch[Seq[BankDetails]](
+        Some(
+          Seq(
+            completeModel1,
+            completeModel2,
+            completeModel3,
+            deletedCompleteModel4,
+            inCompleteModel1,
+            inCompleteModel2,
+            inCompleteModel3,
+            deletedInCompleteModel4
+          )
+        )
+      )
 
       mockApplicationStatus(SubmissionReady)
 
@@ -124,9 +134,10 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
       contentAsString(result) mustNot include("Incomplete Deleted fourth Account Name")
     }
 
-
     "load the 'your bank accounts' screen with a list of incomplete items only" in new Fixture {
-      mockCacheFetch[Seq[BankDetails]](Some(Seq(inCompleteModel1, inCompleteModel2, inCompleteModel3, deletedInCompleteModel4)))
+      mockCacheFetch[Seq[BankDetails]](
+        Some(Seq(inCompleteModel1, inCompleteModel2, inCompleteModel3, deletedInCompleteModel4))
+      )
 
       mockApplicationStatus(SubmissionReady)
 
@@ -184,9 +195,13 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "filter out empty bank accounts" in new Fixture {
-      mockCacheFetch[Seq[BankDetails]](Some(Seq(
-        BankDetails()
-      )))
+      mockCacheFetch[Seq[BankDetails]](
+        Some(
+          Seq(
+            BankDetails()
+          )
+        )
+      )
 
       mockApplicationStatus(SubmissionReady)
 
@@ -198,9 +213,13 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "filters out empty but accepted bank accounts" in new Fixture {
-      mockCacheFetch[Seq[BankDetails]](Some(Seq(
-        BankDetails(hasAccepted = true)
-      )))
+      mockCacheFetch[Seq[BankDetails]](
+        Some(
+          Seq(
+            BankDetails(hasAccepted = true)
+          )
+        )
+      )
 
       mockApplicationStatus(SubmissionReady)
 
@@ -212,9 +231,13 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "filters out empty and not accepted bank accounts" in new Fixture {
-      mockCacheFetch[Seq[BankDetails]](Some(Seq(
-        BankDetails()
-      )))
+      mockCacheFetch[Seq[BankDetails]](
+        Some(
+          Seq(
+            BankDetails()
+          )
+        )
+      )
 
       mockApplicationStatus(SubmissionReady)
 
@@ -226,5 +249,3 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
     }
   }
 }
-
-

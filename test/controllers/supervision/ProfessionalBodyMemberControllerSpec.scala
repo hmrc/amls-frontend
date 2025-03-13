@@ -37,16 +37,17 @@ import scala.concurrent.duration._
 
 class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
-  trait Fixture extends DependencyMocks {self =>
-    val request = addToken(authRequest)
-    lazy val view = inject[MemberOfProfessionalBodyView]
-    val controller = new ProfessionalBodyMemberController (
+  trait Fixture extends DependencyMocks { self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[MemberOfProfessionalBodyView]
+    val controller = new ProfessionalBodyMemberController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[MemberOfProfessionalBodyFormProvider],
-      view = view)
+      view = view
+    )
 
     mockCacheSave[Supervision]
 
@@ -57,7 +58,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
     "update the the answer field in supervision when the answer is yes" in new Fixture {
 
       val supervision = Some(
-        Supervision (
+        Supervision(
           anotherBody = Some(AnotherBodyNo),
           professionalBodyMember = Some(ProfessionalBodyMemberNo),
           professionalBodies = None,
@@ -69,13 +70,13 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
 
       val newSupervision = controller.updateSupervisionFromIncomingData(ProfessionalBodyMemberYes, supervision)
 
-      Await.result(newSupervision, 1 seconds).professionalBodyMember.get mustEqual(ProfessionalBodyMemberYes)
+      Await.result(newSupervision, 1 seconds).professionalBodyMember.get mustEqual ProfessionalBodyMemberYes
     }
 
     "reset professionalBodies to null if the answer to the question is No" in new Fixture {
 
       val supervision = Some(
-        Supervision (
+        Supervision(
           anotherBody = Some(AnotherBodyNo),
           professionalBodyMember = Some(ProfessionalBodyMemberYes),
           professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians))),
@@ -87,24 +88,28 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
 
       val newSupervision = controller.updateSupervisionFromIncomingData(ProfessionalBodyMemberNo, supervision)
 
-      Await.result(newSupervision, 1 seconds).professionalBodies mustEqual(None)
+      Await.result(newSupervision, 1 seconds).professionalBodies mustEqual None
     }
 
-    "load the page Is your business a member of a professional body?" in new Fixture  {
+    "load the page Is your business a member of a professional body?" in new Fixture {
 
       mockCacheFetch[Supervision](None)
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(Messages("supervision.memberofprofessionalbody.title"))
 
     }
 
-    "load the page Is your business a member of a professional body? with pre-populate data" in new Fixture  {
+    "load the page Is your business a member of a professional body? with pre-populate data" in new Fixture {
 
-      mockCacheFetch[Supervision](Some(Supervision(
-        professionalBodyMember = Some(ProfessionalBodyMemberYes)
-      )))
+      mockCacheFetch[Supervision](
+        Some(
+          Supervision(
+            professionalBodyMember = Some(ProfessionalBodyMemberYes)
+          )
+        )
+      )
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -119,8 +124,8 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
       "redirect to WhichProfessionalBodyController" when {
 
         "the answer to the question is yes and no previous professional bodies exist in the cache" in new Fixture {
-          val supervision = Some (
-            Supervision (
+          val supervision = Some(
+            Supervision(
               professionalBodyMember = Some(ProfessionalBodyMemberYes),
               professionalBodies = None
             )
@@ -128,7 +133,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
 
           val result: Future[Result] = Future(controller.redirectTo(supervision, false))
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.WhichProfessionalBodyController.get().url))
         }
 
@@ -136,28 +141,28 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
           "edit is false" in new Fixture {
 
             val newRequest = FakeRequest(POST, routes.ProfessionalBodyMemberController.post().url)
-            .withFormUrlEncodedBody(
-              "isAMember" -> "true"
-            )
+              .withFormUrlEncodedBody(
+                "isAMember" -> "true"
+              )
 
             mockCacheFetch[Supervision](None)
 
             val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.WhichProfessionalBodyController.get().url))
           }
           "edit is true" when {
             "professionalBodies is not defined" in new Fixture {
 
               val newRequest = FakeRequest(POST, routes.ProfessionalBodyMemberController.post().url)
-              .withFormUrlEncodedBody(
-                "isAMember" -> "true"
-              )
+                .withFormUrlEncodedBody(
+                  "isAMember" -> "true"
+                )
 
               mockCacheFetch[Supervision](None)
 
               val result = controller.post(true)(newRequest)
-              status(result) must be(SEE_OTHER)
+              status(result)           must be(SEE_OTHER)
               redirectLocation(result) must be(Some(routes.WhichProfessionalBodyController.get(true).url))
             }
           }
@@ -167,29 +172,29 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
       "redirect to PenalisedByProfessionalController" when {
 
         "the answer to the question is no and no previous professional bodies exist in the cache" in new Fixture {
-          val supervision = Some (
-            Supervision (
+          val supervision = Some(
+            Supervision(
               professionalBodyMember = Some(ProfessionalBodyMemberNo)
             )
           )
 
           val result: Future[Result] = Future(controller.redirectTo(supervision, edit = false))
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.PenalisedByProfessionalController.get().url))
         }
 
         "isMember is false" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.ProfessionalBodyMemberController.post().url)
-          .withFormUrlEncodedBody(
-            "isAMember" -> "false"
-          )
+            .withFormUrlEncodedBody(
+              "isAMember" -> "false"
+            )
 
           mockCacheFetch[Supervision](None)
 
           val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.PenalisedByProfessionalController.get().url))
         }
       }
@@ -197,8 +202,8 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
       "redirect to SummaryController" when {
 
         "the answer is yes and professional bodies is already known" in new Fixture {
-          val supervision = Some (
-            Supervision (
+          val supervision = Some(
+            Supervision(
               anotherBody = Some(AnotherBodyNo),
               professionalBodyMember = Some(ProfessionalBodyMemberYes),
               professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians))),
@@ -210,7 +215,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
 
           val result: Future[Result] = Future(controller.redirectTo(supervision, false))
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get().url))
 
         }
@@ -220,18 +225,22 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
             "ProfessionalBodyMemberYes is already defined and professional bodies provided" in new Fixture {
 
               val newRequest = FakeRequest(POST, routes.ProfessionalBodyMemberController.post().url)
-              .withFormUrlEncodedBody(
-                "isAMember" -> "true"
-              )
+                .withFormUrlEncodedBody(
+                  "isAMember" -> "true"
+                )
 
-              mockCacheFetch[Supervision](Some(Supervision(
-                anotherBody = Some(AnotherBodyNo),
-                professionalBodyMember = Some(ProfessionalBodyMemberYes),
-                professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians))),
-                professionalBody = Some(ProfessionalBodyNo),
-                hasChanged = true,
-                hasAccepted = true
-              )))
+              mockCacheFetch[Supervision](
+                Some(
+                  Supervision(
+                    anotherBody = Some(AnotherBodyNo),
+                    professionalBodyMember = Some(ProfessionalBodyMemberYes),
+                    professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians))),
+                    professionalBody = Some(ProfessionalBodyNo),
+                    hasChanged = true,
+                    hasAccepted = true
+                  )
+                )
+              )
 
               val complete = mock[Supervision]
 
@@ -239,7 +248,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
               when(mockCacheMap.getEntry[Supervision]("supervision")) thenReturn Some(complete)
 
               val result = controller.post(true)(newRequest)
-              status(result) must be(SEE_OTHER)
+              status(result)           must be(SEE_OTHER)
               redirectLocation(result) must be(Some(routes.SummaryController.get().url))
             }
           }
@@ -250,7 +259,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
     "on post with invalid data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.ProfessionalBodyMemberController.post().url)
-      .withFormUrlEncodedBody("" -> "")
+        .withFormUrlEncodedBody("" -> "")
 
       mockCacheFetch[Supervision](None)
 
@@ -258,7 +267,9 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
       status(result) must be(BAD_REQUEST)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#isAMember]").html() must include(Messages("error.required.supervision.business.a.member"))
+      document.select("a[href=#isAMember]").html() must include(
+        Messages("error.required.supervision.business.a.member")
+      )
     }
 
   }
@@ -269,46 +280,70 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
       "updated from ProfessionalBodyMemberYes to No" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.ProfessionalBodyMemberController.post().url)
-        .withFormUrlEncodedBody(
-          "isAMember" -> "false"
-        )
+          .withFormUrlEncodedBody(
+            "isAMember" -> "false"
+          )
 
-        mockCacheFetch[Supervision](Some(Supervision(
-          professionalBodyMember = Some(ProfessionalBodyMemberYes),
-          professionalBodies = Some(ProfessionalBodies(
-            Set(AccountantsEnglandandWales, Other("Another professional body"))
-          ))
-        )))
+        mockCacheFetch[Supervision](
+          Some(
+            Supervision(
+              professionalBodyMember = Some(ProfessionalBodyMemberYes),
+              professionalBodies = Some(
+                ProfessionalBodies(
+                  Set(AccountantsEnglandandWales, Other("Another professional body"))
+                )
+              )
+            )
+          )
+        )
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
 
-        verify(controller.dataCacheConnector).save[Supervision](any(), any(), eqTo(Supervision(
-          professionalBodyMember = Some(ProfessionalBodyMemberNo),
-          hasChanged = true
-        )))(any())
+        verify(controller.dataCacheConnector).save[Supervision](
+          any(),
+          any(),
+          eqTo(
+            Supervision(
+              professionalBodyMember = Some(ProfessionalBodyMemberNo),
+              hasChanged = true
+            )
+          )
+        )(any())
 
       }
       "ProfessionalBodyMemberNo and professionalBodies is defined" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.ProfessionalBodyMemberController.post().url)
-        .withFormUrlEncodedBody(
-          "isAMember" -> "false"
-        )
+          .withFormUrlEncodedBody(
+            "isAMember" -> "false"
+          )
 
-        mockCacheFetch[Supervision](Some(Supervision(
-          professionalBodies = Some(ProfessionalBodies(
-            Set(AccountantsEnglandandWales, Other("Another professional body"))
-          ))
-        )))
+        mockCacheFetch[Supervision](
+          Some(
+            Supervision(
+              professionalBodies = Some(
+                ProfessionalBodies(
+                  Set(AccountantsEnglandandWales, Other("Another professional body"))
+                )
+              )
+            )
+          )
+        )
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
 
-        verify(controller.dataCacheConnector).save[Supervision](any(), any(), eqTo(Supervision(
-          professionalBodyMember = Some(ProfessionalBodyMemberNo),
-          hasChanged = true
-        )))(any())
+        verify(controller.dataCacheConnector).save[Supervision](
+          any(),
+          any(),
+          eqTo(
+            Supervision(
+              professionalBodyMember = Some(ProfessionalBodyMemberNo),
+              hasChanged = true
+            )
+          )
+        )(any())
 
       }
     }

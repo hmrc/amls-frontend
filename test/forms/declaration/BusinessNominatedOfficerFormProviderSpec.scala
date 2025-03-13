@@ -23,16 +23,16 @@ import play.api.data.FormError
 class BusinessNominatedOfficerFormProviderSpec extends StringFieldBehaviours {
 
   val formProvider = new BusinessNominatedOfficerFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   val fieldName = "value"
-  val error = "error.required.declaration.nominated.officer"
+  val error     = "error.required.declaration.nominated.officer"
 
   "BusinessNominatedOfficerFormProvider" must {
 
     "bind with valid data" in {
 
-      val str = "officer1"
+      val str    = "officer1"
       val result = form.bind(Map(fieldName -> str))
 
       result.value shouldBe Some(BusinessNominatedOfficer(str))

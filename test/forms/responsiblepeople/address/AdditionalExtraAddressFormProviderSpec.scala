@@ -24,8 +24,8 @@ import play.api.data.Form
 class AdditionalExtraAddressFormProviderSpec extends BooleanFieldBehaviours[ResponsiblePersonAddress] {
 
   override val form: Form[ResponsiblePersonAddress] = new AdditionalExtraAddressFormProvider()()
-  override val fieldName: String = "isUK"
-  override val errorMessage: String = "error.required.uk.or.overseas.address.previous.other"
+  override val fieldName: String                    = "isUK"
+  override val errorMessage: String                 = "error.required.uk.or.overseas.address.previous.other"
 
   "AdditionalExtraAddressFormProvider" must {
 

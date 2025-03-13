@@ -24,7 +24,7 @@ import play.api.data.{Form, FormError}
 class SupervisionEndReasonsFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val formProvider: SupervisionEndReasonsFormProvider = new SupervisionEndReasonsFormProvider()
-  val form: Form[SupervisionEndReasons] = formProvider()
+  val form: Form[SupervisionEndReasons]               = formProvider()
 
   val fieldName: String = "endingReason"
 
@@ -44,10 +44,9 @@ class SupervisionEndReasonsFormProviderSpec extends StringFieldBehaviours with C
     "not bind text that violates regex" in {
 
       forAll(stringsShorterThan(formProvider.length - 1), invalidCharForNames) { (input, invalid) =>
-
         val result = form.bind(Map(fieldName -> (input + "§")))
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(
           FormError(fieldName, "error.supervision.end.reason.invalid", Seq(basicPunctuationRegex))
         )

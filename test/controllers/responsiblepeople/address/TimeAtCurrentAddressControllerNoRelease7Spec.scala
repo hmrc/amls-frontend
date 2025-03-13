@@ -36,14 +36,16 @@ import scala.concurrent.Future
 class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Injecting {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
-  val recordId = 1
+  val recordId               = 1
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[TimeAtAddressView]
-    val timeAtAddressController = new TimeAtCurrentAddressController (
+    self =>
+    val request                 = addToken(authRequest)
+    lazy val view               = inject[TimeAtAddressView]
+    val timeAtAddressController = new TimeAtCurrentAddressController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = mock[StatusService],
       cc = mockMcc,
       formProvider = inject[TimeAtAddressFormProvider],
@@ -60,12 +62,12 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Injecti
         "redirect to the AdditionalAddressController" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.TimeAtCurrentAddressController.post(1).url)
-          .withFormUrlEncodedBody(
-            "timeAtAddress" -> ZeroToFiveMonths.toString
-          )
-          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA11AA")
+            .withFormUrlEncodedBody(
+              "timeAtAddress" -> ZeroToFiveMonths.toString
+            )
+          val ukAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA11AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
 
           when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -78,7 +80,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Injecti
 
           val result = timeAtAddressController.post(recordId, true)(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.AdditionalAddressController.get(recordId, true).url))
         }
       }
@@ -86,14 +88,13 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Injecti
         "redirect to the correct location" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.TimeAtCurrentAddressController.post(1).url)
-          .withFormUrlEncodedBody(
-            "timeAtAddress" -> OneToThreeYears.toString
-          )
-          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA11AA")
+            .withFormUrlEncodedBody(
+              "timeAtAddress" -> OneToThreeYears.toString
+            )
+          val ukAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA11AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(OneToThreeYears))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val history           = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
-
 
           when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -105,8 +106,10 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Injecti
 
           val result = timeAtAddressController.post(recordId, true)(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(recordId).url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(recordId).url)
+          )
         }
       }
     }

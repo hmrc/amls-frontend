@@ -23,7 +23,7 @@ import views.html.businessmatching.updateservice.add.CannotAddServicesView
 
 class CannotAddServicesViewSpec extends AmlsViewSpec {
 
-  lazy val cannot_add_services = app.injector.instanceOf[CannotAddServicesView]
+  lazy val cannot_add_services                                   = app.injector.instanceOf[CannotAddServicesView]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
@@ -33,7 +33,11 @@ class CannotAddServicesViewSpec extends AmlsViewSpec {
   "CannotAddServicesView" must {
 
     "have the correct title" in new ViewFixture {
-      doc.title must startWith(messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title") + " - " + messages("summary.updateservice"))
+      doc.title must startWith(
+        messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title") + " - " + messages(
+          "summary.updateservice"
+        )
+      )
     }
 
     "have correct heading" in new ViewFixture {
@@ -47,7 +51,9 @@ class CannotAddServicesViewSpec extends AmlsViewSpec {
     behave like pageWithBackLink(cannot_add_services())
 
     "show the correct content" in new ViewFixture {
-      doc.body().text() must include(messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2"))
+      doc.body().text() must include(
+        messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2")
+      )
     }
   }
 }

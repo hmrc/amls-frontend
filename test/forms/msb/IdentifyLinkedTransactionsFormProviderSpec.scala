@@ -22,13 +22,14 @@ import play.api.data.Form
 
 class IdentifyLinkedTransactionsFormProviderSpec extends BooleanFieldBehaviours[IdentifyLinkedTransactions] {
   override val form: Form[IdentifyLinkedTransactions] = new IdentifyLinkedTransactionsFormProvider()()
-  override val fieldName: String = "linkedTxn"
-  override val errorMessage: String = "error.required.msb.linked.txn"
+  override val fieldName: String                      = "linkedTxn"
+  override val errorMessage: String                   = "error.required.msb.linked.txn"
 
   "IdentifyLinkedTransactionsFormProvider" must {
 
     behave like booleanFieldWithModel(
-      IdentifyLinkedTransactions(true), IdentifyLinkedTransactions(false)
+      IdentifyLinkedTransactions(true),
+      IdentifyLinkedTransactions(false)
     )
   }
 }

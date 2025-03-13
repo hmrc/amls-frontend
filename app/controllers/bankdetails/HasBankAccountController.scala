@@ -27,30 +27,32 @@ import views.html.bankdetails.HasBankAccountView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class HasBankAccountController @Inject()(val authAction: AuthAction,
-                                         val ds: CommonPlayDependencies,
-                                         cacheConnector: DataCacheConnector,
-                                         val cc: MessagesControllerComponents,
-                                         formProvider: HasBankAccountFormProvider,
-                                         view: HasBankAccountView) extends AmlsBaseController(ds, cc) {
+class HasBankAccountController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  cacheConnector: DataCacheConnector,
+  val cc: MessagesControllerComponents,
+  formProvider: HasBankAccountFormProvider,
+  view: HasBankAccountView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
-      implicit request =>
-        Future.successful(Ok(view.apply(formProvider())))
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    Future.successful(Ok(view.apply(formProvider())))
   }
 
-  def post: Action[AnyContent] = authAction.async {
-      implicit request =>
-        formProvider().bindFromRequest().fold(
-          formWithErrors => Future.successful(BadRequest(view.apply(formWithErrors))),
-          data =>
-            if(data) {
-              Future.successful(Redirect(routes.BankAccountNameController.getNoIndex))
-            } else {
-              cacheConnector.save(request.credId, BankDetails.key, Seq.empty[BankDetails]) map { _ =>
-                Redirect(routes.YourBankAccountsController.get())
-              }
+  def post: Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view.apply(formWithErrors))),
+        data =>
+          if (data) {
+            Future.successful(Redirect(routes.BankAccountNameController.getNoIndex))
+          } else {
+            cacheConnector.save(request.credId, BankDetails.key, Seq.empty[BankDetails]) map { _ =>
+              Redirect(routes.YourBankAccountsController.get())
             }
-        )
+          }
+      )
   }
 }

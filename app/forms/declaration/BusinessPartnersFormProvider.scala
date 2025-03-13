@@ -22,12 +22,11 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class BusinessPartnersFormProvider @Inject()() extends Mappings {
+class BusinessPartnersFormProvider @Inject() () extends Mappings {
 
-  def apply(): Form[BusinessPartners] = {
+  def apply(): Form[BusinessPartners] =
     Form(
       "value" -> text("error.required.declaration.partners")
         .transform[BusinessPartners](BusinessPartners.apply, _.value)
     )
-  }
 }

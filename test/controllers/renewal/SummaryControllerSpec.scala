@@ -48,13 +48,15 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
     val emptyCache = Cache.empty
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
-    lazy val mockRenewalService = mock[RenewalService]
-    lazy val mockProgressService = mock[ProgressService]
-    lazy val view = inject[CheckYourAnswersView]
-    val controller = new SummaryController(
+    lazy val mockRenewalService     = mock[RenewalService]
+    lazy val mockProgressService    = mock[ProgressService]
+    lazy val view                   = inject[CheckYourAnswersView]
+    val controller                  = new SummaryController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      renewalService = mockRenewalService,
+      cc = mockMcc,
       progressService = mockProgressService,
       cyaHelper = inject[CheckYourAnswersHelper],
       view = view
@@ -72,22 +74,30 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       Some(CustomersOutsideIsUK(true)),
       Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
       Some(PercentageOfCashPaymentOver15000.First),
-      Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
+      Some(
+        CashPayments(
+          CashPaymentsCustomerNotMet(true),
+          Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+        )
+      ),
       Some(TotalThroughput("01")),
-      Some(WhichCurrencies(Seq("EUR"),None,Some(MoneySources(None,None,None)))),
+      Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
       Some(TransactionsInLast12Months("1500")),
       Some(SendTheLargestAmountsOfMoney(Seq(Country("us", "US")))),
       Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
       Some(CETransactionsInLast12Months("123")),
       Some(FXTransactionsInLast12Months("12")),
       false,
-      hasAccepted = true)
+      hasAccepted = true
+    )
 
   }
 
-    val mockCacheMap = mock[Cache]
+  val mockCacheMap = mock[Cache]
 
-    val bmBusinessActivities = Some(BMBusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
+  val bmBusinessActivities = Some(
+    BMBusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+  )
 
   "Get" must {
 

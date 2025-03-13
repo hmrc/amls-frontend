@@ -34,15 +34,16 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
 
   trait Fixture extends DependencyMocks with AuthorisedFixture { self =>
 
-    val request = addToken(authRequest)
-    lazy val view = inject[WhichProfessionalBodyView]
+    val request    = addToken(authRequest)
+    lazy val view  = inject[WhichProfessionalBodyView]
     val controller = new WhichProfessionalBodyController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[WhichProfessionalBodyFormProvider],
-      view = view)
+      view = view
+    )
     mockCacheFetch[Supervision](Some(Supervision()))
     mockCacheSave[Supervision]
   }
@@ -54,9 +55,13 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
 
         "form data exists" in new Fixture {
 
-          mockCacheFetch[Supervision](Some(Supervision(
-            professionalBodies = Some(ProfessionalBodies(Set(AssociationOfBookkeepers, Other("SomethingElse"))))
-          )))
+          mockCacheFetch[Supervision](
+            Some(
+              Supervision(
+                professionalBodies = Some(ProfessionalBodies(Set(AssociationOfBookkeepers, Other("SomethingElse"))))
+              )
+            )
+          )
 
           val result = controller.get()(request)
 
@@ -64,10 +69,10 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
 
           val document = Jsoup.parse(contentAsString(result))
 
-          document.title() must include(messages("supervision.whichprofessionalbody.title"))
+          document.title()                                                                         must include(messages("supervision.whichprofessionalbody.title"))
           document.select(s"input[value=${AssociationOfBookkeepers.toString}]").hasAttr("checked") must be(true)
-          document.select(s"input[value=${Other("").toString}]").hasAttr("checked") must be(true)
-          document.select("input[name=specifyOtherBusiness]").`val`() must be("SomethingElse")
+          document.select(s"input[value=${Other("").toString}]").hasAttr("checked")                must be(true)
+          document.select("input[name=specifyOtherBusiness]").`val`()                              must be("SomethingElse")
 
         }
 
@@ -83,7 +88,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
 
           document.title() must include(messages("supervision.whichprofessionalbody.title"))
 
-          document.select("input[type=checkbox]").hasAttr("checked") must be(false)
+          document.select("input[type=checkbox]").hasAttr("checked")  must be(false)
           document.select("input[name=specifyOtherBusiness]").`val`() must be(empty)
         }
       }
@@ -97,13 +102,13 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
           "not in edit mode" in new Fixture {
 
             val newRequest = FakeRequest(POST, routes.WhichProfessionalBodyController.post().url)
-            .withFormUrlEncodedBody(
-              "businessType[0]" -> AccountingTechnicians.toString,
-              "businessType[1]" -> CharteredCertifiedAccountants.toString
-            )
+              .withFormUrlEncodedBody(
+                "businessType[0]" -> AccountingTechnicians.toString,
+                "businessType[1]" -> CharteredCertifiedAccountants.toString
+              )
 
             val result = controller.post()(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.PenalisedByProfessionalController.get().url))
           }
         }
@@ -112,13 +117,13 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
           "in edit mode" in new Fixture {
 
             val newRequest = FakeRequest(POST, routes.WhichProfessionalBodyController.post().url)
-            .withFormUrlEncodedBody(
-              "businessType[0]" -> AccountingTechnicians.toString,
-              "businessType[1]" -> CharteredCertifiedAccountants.toString
-            )
+              .withFormUrlEncodedBody(
+                "businessType[0]" -> AccountingTechnicians.toString,
+                "businessType[1]" -> CharteredCertifiedAccountants.toString
+              )
 
             val result = controller.post(true)(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.SummaryController.get().url))
           }
         }
@@ -128,7 +133,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
         "respond with BAD_REQUEST" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.WhichProfessionalBodyController.post().url)
-          .withFormUrlEncodedBody("" -> "")
+            .withFormUrlEncodedBody("" -> "")
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -141,18 +146,24 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
     "save the valid data to the supervision model" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.WhichProfessionalBodyController.post().url)
-      .withFormUrlEncodedBody(
-        "businessType[0]" -> AccountingTechnicians.toString,
-        "businessType[1]" -> CharteredCertifiedAccountants.toString
-      )
+        .withFormUrlEncodedBody(
+          "businessType[0]" -> AccountingTechnicians.toString,
+          "businessType[1]" -> CharteredCertifiedAccountants.toString
+        )
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
 
-      verify(controller.dataCacheConnector).save[Supervision](any(), any(), eqTo(Supervision(
-        professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants))),
-        hasChanged = true
-      )))(any())
+      verify(controller.dataCacheConnector).save[Supervision](
+        any(),
+        any(),
+        eqTo(
+          Supervision(
+            professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants))),
+            hasChanged = true
+          )
+        )
+      )(any())
     }
   }
 }

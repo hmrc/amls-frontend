@@ -23,8 +23,8 @@ import play.api.data.Form
 class SoleProprietorFormProviderSpec extends BooleanFieldBehaviours[SoleProprietorOfAnotherBusiness] {
 
   override val form: Form[SoleProprietorOfAnotherBusiness] = new SoleProprietorFormProvider()()
-  override val fieldName: String = "soleProprietorOfAnotherBusiness"
-  override val errorMessage: String = "error.required.rp.sole_proprietor"
+  override val fieldName: String                           = "soleProprietorOfAnotherBusiness"
+  override val errorMessage: String                        = "error.required.rp.sole_proprietor"
 
   "SoleProprietorFormProvider" must {
 

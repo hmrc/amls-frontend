@@ -31,7 +31,6 @@ case object ServicesOfAnotherTCSPNo extends ServicesOfAnotherTCSP
 object ServicesOfAnotherTCSP {
 
   def formValues(html: Html)(implicit messages: Messages): Seq[RadioItem] = HmrcYesNoRadioItems().map { radioItem =>
-
     if (radioItem.value.contains("true")) {
       radioItem.copy(
         id = Some("servicesOfAnotherTCSP-true"),
@@ -46,15 +45,16 @@ object ServicesOfAnotherTCSP {
 
   implicit val jsonReads: Reads[ServicesOfAnotherTCSP] =
     (__ \ "servicesOfAnotherTCSP").read[Boolean] flatMap {
-      case true => (__ \ "mlrRefNumber").readNullable[String] map ServicesOfAnotherTCSPYes.apply
+      case true  => (__ \ "mlrRefNumber").readNullable[String] map ServicesOfAnotherTCSPYes.apply
       case false => Reads(__ => JsSuccess(ServicesOfAnotherTCSPNo))
     }
 
   implicit val jsonWrites: Writes[ServicesOfAnotherTCSP] = Writes[ServicesOfAnotherTCSP] {
-    case ServicesOfAnotherTCSPYes(value) => Json.obj(
-          "servicesOfAnotherTCSP" -> true,
-          "mlrRefNumber" -> value
-    )
-    case ServicesOfAnotherTCSPNo => Json.obj("servicesOfAnotherTCSP" -> false)
+    case ServicesOfAnotherTCSPYes(value) =>
+      Json.obj(
+        "servicesOfAnotherTCSP" -> true,
+        "mlrRefNumber"          -> value
+      )
+    case ServicesOfAnotherTCSPNo         => Json.obj("servicesOfAnotherTCSP" -> false)
   }
 }

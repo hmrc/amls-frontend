@@ -39,19 +39,21 @@ import scala.concurrent.Future
 
 class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
-  val mockService = mock[PreviouslyRegisteredService]
+  val mockService  = mock[PreviouslyRegisteredService]
   val mockCacheMap = mock[Cache]
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[PreviouslyRegisteredView]
-    val controller = new PreviouslyRegisteredController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[PreviouslyRegisteredView]
+    val controller = new PreviouslyRegisteredController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       service = mockService,
       formProvider = app.injector.instanceOf[PreviouslyRegisteredFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   val emptyCache = Cache.empty
@@ -65,7 +67,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
         .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
-      status(result) must be(OK)
+      status(result)          must be(OK)
       contentAsString(result) must include(messages("businessdetails.registeredformlr.title"))
     }
 
@@ -84,11 +86,22 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
     "on post with valid data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.PreviouslyRegisteredController.post().url).withFormUrlEncodedBody(
-        "value" -> "true",
+        "value"        -> "true",
         "prevMLRRegNo" -> "12345678"
       )
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+      val reviewDtls = ReviewDetails(
+        "BusinessName",
+        Some(BusinessType.LimitedCompany),
+        Address(
+          "line1",
+          Some("line2"),
+          Some("line3"),
+          Some("line4"),
+          Some("NE77 0QQ"),
+          Country("United Kingdom", "GB")
+        ),
+        "ghghg"
+      )
 
       val update = PreviouslyRegisteredYes(None)
 
@@ -98,10 +111,11 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
       when(mockService.updatePreviouslyRegistered(any(), meq(update)))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-
       val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessdetails.routes.ActivityStartDateController.get(false).url))
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(
+        Some(controllers.businessdetails.routes.ActivityStartDateController.get(false).url)
+      )
 
       verify(mockService).updatePreviouslyRegistered(any(), meq(update))
     }
@@ -111,8 +125,19 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
       val newRequest = FakeRequest(POST, routes.PreviouslyRegisteredController.post().url).withFormUrlEncodedBody(
         "value" -> "false"
       )
-      val reviewDtls = ReviewDetails("BusinessName", None,
-        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+      val reviewDtls = ReviewDetails(
+        "BusinessName",
+        None,
+        Address(
+          "line1",
+          Some("line2"),
+          Some("line3"),
+          Some("line4"),
+          Some("AA11 1AA"),
+          Country("United Kingdom", "GB")
+        ),
+        "ghghg"
+      )
 
       val update = PreviouslyRegisteredNo
 
@@ -123,7 +148,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
         .thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.ConfirmRegisteredOfficeController.get().url))
 
       verify(mockService).updatePreviouslyRegistered(any(), meq(update))
@@ -132,11 +157,22 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
     "on post with valid data in edit mode and load summary page" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.PreviouslyRegisteredController.post().url).withFormUrlEncodedBody(
-        "value" -> "true",
+        "value"        -> "true",
         "prevMLRRegNo" -> "12345678"
       )
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+      val reviewDtls = ReviewDetails(
+        "BusinessName",
+        Some(BusinessType.LimitedCompany),
+        Address(
+          "line1",
+          Some("line2"),
+          Some("line3"),
+          Some("line4"),
+          Some("AA11 1AA"),
+          Country("United Kingdom", "GB")
+        ),
+        "ghghg"
+      )
 
       val update = PreviouslyRegisteredYes(None)
 
@@ -147,7 +183,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.businessdetails.routes.SummaryController.get.url))
 
       verify(mockService).updatePreviouslyRegistered(any(), meq(update))

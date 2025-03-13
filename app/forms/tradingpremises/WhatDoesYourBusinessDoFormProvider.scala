@@ -24,12 +24,13 @@ import play.api.data.Forms.seq
 
 import javax.inject.Inject
 
-class WhatDoesYourBusinessDoFormProvider @Inject()() extends Mappings {
+class WhatDoesYourBusinessDoFormProvider @Inject() () extends Mappings {
 
   private val errorMessage = "error.required.tp.activity.your.business.do"
 
   def apply(): Form[WhatDoesYourBusinessDo] = Form[WhatDoesYourBusinessDo](
-    "value" -> seq(enumerable[BusinessActivity](errorMessage)).verifying(nonEmptySeq(errorMessage))
+    "value" -> seq(enumerable[BusinessActivity](errorMessage))
+      .verifying(nonEmptySeq(errorMessage))
       .transform[WhatDoesYourBusinessDo](x => WhatDoesYourBusinessDo(x.toSet), _.activities.toSeq)
   )
 }

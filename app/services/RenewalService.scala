@@ -34,28 +34,23 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RenewalService @Inject()(
+class RenewalService @Inject() (
   dataCache: DataCacheConnector,
   statusService: StatusService
 )(implicit ec: ExecutionContext) {
 
-  def isRenewalFlow(
-    amlsRegistrationNo: Option[String],
-    accountTypeId: (String, String),
-    cacheId: String)(implicit
+  def isRenewalFlow(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)(implicit
     hc: HeaderCarrier,
     messages: Messages
-  ): Future[Boolean] = {
-
+  ): Future[Boolean] =
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) flatMap {
       case ReadyForRenewal(_) =>
         dataCache.fetch[Renewal](cacheId, Renewal.key) map {
           case Some(_) => true
-          case None => false
+          case None    => false
         }
-      case _ => Future.successful(false)
+      case _                  => Future.successful(false)
     }
-  }
 
   def getTaskRow(credId: String)(implicit messages: Messages): Future[TaskRow] = {
 
@@ -82,20 +77,22 @@ class RenewalService @Inject()(
             )
           } else {
             model match {
-              case Renewal(None, None, None, None, None, _, _, _, _, _, _, _, _, _, _, _, _, _) => Future.successful(notStarted)
-              case _ => Future.successful(
-                TaskRow(
-                  Renewal.sectionKey,
-                  controllers.renewal.routes.WhatYouNeedController.get.url,
-                  model.hasChanged,
-                  Started,
-                  TaskRow.incompleteTag
+              case Renewal(None, None, None, None, None, _, _, _, _, _, _, _, _, _, _, _, _, _) =>
+                Future.successful(notStarted)
+              case _                                                                            =>
+                Future.successful(
+                  TaskRow(
+                    Renewal.sectionKey,
+                    controllers.renewal.routes.WhatYouNeedController.get.url,
+                    model.hasChanged,
+                    Started,
+                    TaskRow.incompleteTag
+                  )
                 )
-              )
             }
           }
         }
-      case _ => Future.successful(notStarted)
+      case _           => Future.successful(notStarted)
     }
   }
 
@@ -109,20 +106,17 @@ class RenewalService @Inject()(
   def isRenewalComplete(renewal: Renewal, credId: String)(implicit ec: ExecutionContext): Future[Boolean] = {
 
     val isComplete = for {
-      cache <- OptionT(dataCache.fetchAll(credId))
+      cache            <- OptionT(dataCache.fetchAll(credId))
       businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
-      activities <- OptionT.fromOption[Future](businessMatching.activities)
-    } yield {
-
-      activities.businessActivities collect {
-        case MoneyServiceBusiness => checkCompletionOfMsb(renewal, businessMatching.msbServices)
-        case HighValueDealing => checkCompletionOfHvd(renewal)
-        case AccountancyServices => checkCompletionOfAsp(renewal)
-        case ArtMarketParticipant => checkCompletionOfAMP(renewal)
-      } match {
-        case s if s.nonEmpty => s.forall(identity)
-        case _ => renewal.standardRule
-      }
+      activities       <- OptionT.fromOption[Future](businessMatching.activities)
+    } yield activities.businessActivities collect {
+      case MoneyServiceBusiness => checkCompletionOfMsb(renewal, businessMatching.msbServices)
+      case HighValueDealing     => checkCompletionOfHvd(renewal)
+      case AccountancyServices  => checkCompletionOfAsp(renewal)
+      case ArtMarketParticipant => checkCompletionOfAMP(renewal)
+    } match {
+      case s if s.nonEmpty => s.forall(identity)
+      case _               => renewal.standardRule
     }
 
     isComplete.getOrElse(false)
@@ -134,55 +128,55 @@ class RenewalService @Inject()(
       cache <- dataCache.fetchAll(credId)
     } yield cache match {
       case Some(c) => true
-      case _ => false
+      case _       => false
     }
 
     isCache
   }
 
-  private def checkCompletionOfMsb(renewal: Renewal, msbServices: Option[BusinessMatchingMsbServices]): Boolean = {
+  private def checkCompletionOfMsb(renewal: Renewal, msbServices: Option[BusinessMatchingMsbServices]): Boolean =
     Seq(
       Some(renewal.totalThroughput.isDefined),
       if (msbServices.exists(_.msbServices.contains(TransmittingMoney))) Some(renewal.moneyTransmitterRule) else None,
       if (msbServices.exists(_.msbServices.contains(CurrencyExchange))) Some(renewal.currencyExchangeRule) else None,
-      if (msbServices.exists(_.msbServices.contains(ForeignExchange))) Some(renewal.fxTransactionsInLast12Months.isDefined) else None,
+      if (msbServices.exists(_.msbServices.contains(ForeignExchange)))
+        Some(renewal.fxTransactionsInLast12Months.isDefined)
+      else None,
       Some(renewal.standardRule)
     ).flatten.forall(identity)
-  }
 
-  private def checkCompletionOfAMP(renewal: Renewal): Boolean = {
+  private def checkCompletionOfAMP(renewal: Renewal): Boolean =
     Seq(
       renewal.ampTurnover.isDefined,
       renewal.standardRule
     ).forall(identity)
-  }
 
-  private def checkCompletionOfAsp(renewal: Renewal): Boolean = {
+  private def checkCompletionOfAsp(renewal: Renewal): Boolean =
     Seq(
       renewal.aspRule,
       renewal.standardRule
     ).forall(identity)
-  }
 
-  private def checkCompletionOfHvd(renewal: Renewal): Boolean = {
+  private def checkCompletionOfHvd(renewal: Renewal): Boolean =
     Seq(
       renewal.hvdRule,
       renewal.standardRule
     ).forall(identity)
-  }
 
-  def canSubmit(renewalSection: TaskRow, variationSections: Seq[TaskRow]): Boolean = {
+  def canSubmit(renewalSection: TaskRow, variationSections: Seq[TaskRow]): Boolean =
     variationSections.forall(row => row.status == Completed || row.status == Updated) &&
       !renewalSection.status.equals(Started) &&
       (variationSections :+ renewalSection).exists(_.hasChanged)
-  }
 
-  def getFirstBusinessActivityInLowercase(cacheId: String)
-                                         (implicit ec: ExecutionContext, messages: Messages): Future[Option[String]] = {
+  def getFirstBusinessActivityInLowercase(
+    cacheId: String
+  )(implicit ec: ExecutionContext, messages: Messages): Future[Option[String]] =
     getBusinessMatching(cacheId)
-      .map(optBm => optBm.flatMap(bm => bm.alphabeticalBusinessActivitiesLowerCase())
-        .flatMap(activities => if (activities.length == 1) activities.headOption else None))
-  }
+      .map(optBm =>
+        optBm
+          .flatMap(bm => bm.alphabeticalBusinessActivitiesLowerCase())
+          .flatMap(activities => if (activities.length == 1) activities.headOption else None)
+      )
 
   def getBusinessMatching(cacheId: String): Future[Option[BusinessMatching]] =
     dataCache.fetch[BusinessMatching](cacheId, BusinessMatching.key)
@@ -194,14 +188,12 @@ class RenewalService @Inject()(
    */
   def fetchAndUpdateRenewal(credId: String, updateAction: Renewal => Renewal): Future[Option[Cache]] = {
     for {
-      renewal <- OptionT(getRenewal(credId))
+      renewal      <- OptionT(getRenewal(credId))
       updatedCache <- OptionT.liftF(updateRenewal(credId, updateAction(renewal)))
-    } yield {
-      updatedCache
-    }
+    } yield updatedCache
   }.value
 
-  def createOrUpdateRenewal(credId: String, updateAction: Renewal => Renewal, newRenewal: Renewal): Future[Cache] = {
+  def createOrUpdateRenewal(credId: String, updateAction: Renewal => Renewal, newRenewal: Renewal): Future[Cache] =
     getRenewal(credId).flatMap { optRenewal =>
       if (optRenewal.isEmpty) {
         dataCache.save(credId, Renewal.key, newRenewal)
@@ -209,12 +201,16 @@ class RenewalService @Inject()(
         updateRenewal(credId, updateAction(optRenewal.head))
       }
     }
-  }
 
-  def updateOtherBusinessActivities(credId: String, involvedInOtherYes: InvolvedInOtherYes): Future[Option[BusinessAndOtherActivities]] = {
+  def updateOtherBusinessActivities(
+    credId: String,
+    involvedInOtherYes: InvolvedInOtherYes
+  ): Future[Option[BusinessAndOtherActivities]] =
     getRenewal(credId)
       .map { optRenewal =>
-        optRenewal.map(renewal => updateRenewal(credId, renewal.copy(involvedInOtherActivities = Some(involvedInOtherYes))))
+        optRenewal.map(renewal =>
+          updateRenewal(credId, renewal.copy(involvedInOtherActivities = Some(involvedInOtherYes)))
+        )
       }
       .flatMap { _ =>
         getBusinessMatching(credId).map { optBusinessMatching =>
@@ -225,9 +221,11 @@ class RenewalService @Inject()(
           }
         }
       }
-  }
 }
 
 object RenewalService {
-  case class BusinessAndOtherActivities(businessActivities: Set[BusinessActivity], involvedInOtherYes: InvolvedInOtherYes)
+  case class BusinessAndOtherActivities(
+    businessActivities: Set[BusinessActivity],
+    involvedInOtherYes: InvolvedInOtherYes
+  )
 }

@@ -28,7 +28,7 @@ import views.html.msb.BusinessUseAnIPSPView
 class BusinessUseAnIPSPViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val businessView = inject[BusinessUseAnIPSPView]
-  lazy val fp = inject[BusinessUseAnIPSPFormProvider]
+  lazy val fp           = inject[BusinessUseAnIPSPFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,17 +42,19 @@ class BusinessUseAnIPSPViewSpec extends AmlsViewSpec with Matchers {
 
       def view = businessView(fp().fill(BusinessUseAnIPSPNo), true)
 
-      doc.title must be(messages("msb.ipsp.title") +
-        " - " + messages("summary.msb") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("msb.ipsp.title") +
+          " - " + messages("summary.msb") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = businessView(fp().fill(BusinessUseAnIPSPNo), true)
 
-      heading.html must include(messages("msb.ipsp.title"))
+      heading.html    must include(messages("msb.ipsp.title"))
       subHeading.html must include(messages("summary.msb"))
     }
 

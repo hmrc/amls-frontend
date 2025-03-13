@@ -37,16 +37,18 @@ import scala.concurrent.Future
 class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[TaxMattersView]
-    val controller = new TaxMattersController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[TaxMattersView]
+    val controller = new TaxMattersController(
       dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[TaxMattersFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
   }
 
   "TaxMattersController" when {
@@ -55,36 +57,57 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
       "display the 'Manage Your Tax Affairs?' page with an empty form" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
-          .thenReturn(Future.successful(Some(BusinessActivities(
-            whoIsYourAccountant = Some(WhoIsYourAccountant(
-              Some(WhoIsYourAccountantName("Accountant name", accountantsTradingName = None)),
-              Some(WhoIsYourAccountantIsUk(true)),
-              Some(UkAccountantsAddress("", None, None, None, ""))))))))
+          .thenReturn(
+            Future.successful(
+              Some(
+                BusinessActivities(
+                  whoIsYourAccountant = Some(
+                    WhoIsYourAccountant(
+                      Some(WhoIsYourAccountantName("Accountant name", accountantsTradingName = None)),
+                      Some(WhoIsYourAccountantIsUk(true)),
+                      Some(UkAccountantsAddress("", None, None, None, ""))
+                    )
+                  )
+                )
+              )
+            )
+          )
 
         val result = controller.get()(request)
         status(result) must be(OK)
 
         val page = Jsoup.parse(contentAsString(result))
 
-        page.getElementById("manageYourTaxAffairs").hasAttr("checked") must be(false)
+        page.getElementById("manageYourTaxAffairs").hasAttr("checked")   must be(false)
         page.getElementById("manageYourTaxAffairs-2").hasAttr("checked") must be(false)
       }
 
       "display the 'Manage Your Tax Affairs?' page with pre populated data if found in cache" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
-          .thenReturn(Future.successful(Some(BusinessActivities(taxMatters = Some(TaxMatters(true)),
-            whoIsYourAccountant = Some(WhoIsYourAccountant(
-              Some(WhoIsYourAccountantName("Accountant name", accountantsTradingName = None)),
-              Some(WhoIsYourAccountantIsUk(true)),
-              Some(UkAccountantsAddress("", None, None, None, ""))))))))
+          .thenReturn(
+            Future.successful(
+              Some(
+                BusinessActivities(
+                  taxMatters = Some(TaxMatters(true)),
+                  whoIsYourAccountant = Some(
+                    WhoIsYourAccountant(
+                      Some(WhoIsYourAccountantName("Accountant name", accountantsTradingName = None)),
+                      Some(WhoIsYourAccountantIsUk(true)),
+                      Some(UkAccountantsAddress("", None, None, None, ""))
+                    )
+                  )
+                )
+              )
+            )
+          )
 
         val result = controller.get()(request)
         status(result) must be(OK)
 
         val page = Jsoup.parse(contentAsString(result))
 
-        page.getElementById("manageYourTaxAffairs").hasAttr("checked") must be(true)
+        page.getElementById("manageYourTaxAffairs").hasAttr("checked")   must be(true)
         page.getElementById("manageYourTaxAffairs-2").hasAttr("checked") must be(false)
       }
     }
@@ -103,19 +126,23 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
           .thenReturn(Future.successful(Cache(BusinessActivities.key, Map("" -> Json.obj()))))
 
         val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       }
 
       "respond with Bad Request on post with invalid data" in new Fixture {
         val accountantsName = "Accountant name"
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
-          .thenReturn(Future.successful(Some(BusinessActivities(
-            whoIsYourAccountant = Some(
-              WhoIsYourAccountant(
-                Some(WhoIsYourAccountantName(accountantsName, None)),
-                None,
-                None))))))
+          .thenReturn(
+            Future.successful(
+              Some(
+                BusinessActivities(
+                  whoIsYourAccountant =
+                    Some(WhoIsYourAccountant(Some(WhoIsYourAccountantName(accountantsName, None)), None, None))
+                )
+              )
+            )
+          )
 
         val newRequest = FakeRequest(POST, routes.TaxMattersController.post(false).url).withFormUrlEncodedBody(
           "manageYourTaxAffairs" -> "grrrrr"
@@ -138,7 +165,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
           .thenReturn(Future.successful(Cache(BusinessActivities.key, Map("" -> Json.obj()))))
 
         val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       }
     }

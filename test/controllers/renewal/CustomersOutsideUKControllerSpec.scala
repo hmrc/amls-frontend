@@ -44,10 +44,10 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
     val request = addToken(authRequest)
 
     val dataCacheConnector = mock[DataCacheConnector]
-    val renewalService = mock[RenewalService]
-    val authAction = SuccessfulAuthAction
+    val renewalService     = mock[RenewalService]
+    val authAction         = SuccessfulAuthAction
 
-    val emptyCache = Cache.empty
+    val emptyCache   = Cache.empty
     val mockCacheMap = mock[Cache]
 
     lazy val app = new GuiceApplicationBuilder()
@@ -67,21 +67,22 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
     def formData(data: Option[Request[AnyContentAsFormUrlEncoded]]) = data match {
       case Some(d) => d
-      case None => FakeRequest(POST, routes.CustomersOutsideUKController.post().url)
-        .withFormUrlEncodedBody("countries[0]" -> "GB")
+      case None    =>
+        FakeRequest(POST, routes.CustomersOutsideUKController.post().url)
+          .withFormUrlEncodedBody("countries[0]" -> "GB")
     }
 
     def formRequest(data: Option[Request[AnyContentAsFormUrlEncoded]]) = formData(data)
 
     val cache = mock[Cache]
 
-    val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Seq(Country("GB","GB")))
-    val mostTransactions = MostTransactions(Seq(Country("GB","GB")))
-    val customersOutsideUK = CustomersOutsideUK(Some(Seq(Country("GB", "GB"))))
-    val customersOutsideIsUK = CustomersOutsideIsUK(true)
+    val sendTheLargestAmountsOfMoney = SendTheLargestAmountsOfMoney(Seq(Country("GB", "GB")))
+    val mostTransactions             = MostTransactions(Seq(Country("GB", "GB")))
+    val customersOutsideUK           = CustomersOutsideUK(Some(Seq(Country("GB", "GB"))))
+    val customersOutsideIsUK         = CustomersOutsideIsUK(true)
 
     when {
-      renewalService.updateRenewal(any(),any())
+      renewalService.updateRenewal(any(), any())
     } thenReturn Future.successful(cache)
 
     when {
@@ -90,40 +91,43 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
     when {
       cache.getEntry[Renewal](Renewal.key)
-    } thenReturn Some(Renewal(
-      customersOutsideIsUK = Some(customersOutsideIsUK),
-      customersOutsideUK = Some(customersOutsideUK),
-      sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
-      mostTransactions = Some(mostTransactions)
-    ))
+    } thenReturn Some(
+      Renewal(
+        customersOutsideIsUK = Some(customersOutsideIsUK),
+        customersOutsideUK = Some(customersOutsideUK),
+        sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
+        mostTransactions = Some(mostTransactions)
+      )
+    )
 
     def post(
-              edit: Boolean = false,
-              data: Option[Request[AnyContentAsFormUrlEncoded]] = None,
-              businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessActivities(Set.empty))),
-              renewal: Option[Renewal] = None
-            )(block: Result => Unit) = block({
+      edit: Boolean = false,
+      data: Option[Request[AnyContentAsFormUrlEncoded]] = None,
+      businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessActivities(Set.empty))),
+      renewal: Option[Renewal] = None
+    )(block: Result => Unit) = block {
 
       when {
         cache.getEntry[Renewal](Renewal.key)
       } thenReturn Some(renewal match {
         case Some(r) => r
-        case None => Renewal(
-          customersOutsideIsUK = Some(customersOutsideIsUK),
-          customersOutsideUK = Some(customersOutsideUK),
-          sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
-          mostTransactions = Some(mostTransactions)
-        )
+        case None    =>
+          Renewal(
+            customersOutsideIsUK = Some(customersOutsideIsUK),
+            customersOutsideUK = Some(customersOutsideUK),
+            sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
+            mostTransactions = Some(mostTransactions)
+          )
       })
 
       when {
         cache.getEntry[BusinessMatching](BusinessMatching.key)
-      } thenReturn{
+      } thenReturn {
         Some(businessMatching)
       }
 
       await(controller.post(edit)(formRequest(data)))
-    })
+    }
   }
 
   "The customer outside uk controller" when {
@@ -148,7 +152,11 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
       "pre-populate the Customer outside UK Page" in new Fixture {
 
         when(renewalService.getRenewal(any()))
-          .thenReturn(Future.successful(Some(Renewal(customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))))))
+          .thenReturn(
+            Future.successful(
+              Some(Renewal(customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))))
+            )
+          )
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -167,21 +175,27 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
         "redirect to the summary page" when {
 
           "in edit mode" in new FormSubmissionFixture {
-            post(edit = true, businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))) { result =>
+            post(
+              edit = true,
+              businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))
+            ) { result =>
               result.header.status mustBe SEE_OTHER
               result.header.headers.get("Location") mustBe Some(routes.SummaryController.get.url)
             }
           }
 
           "business is an asp and not an hvd or an msb" in new FormSubmissionFixture {
-            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices))))) { result =>
-              result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get.url)
+            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices))))) {
+              result =>
+                result.header.status mustBe SEE_OTHER
+                result.header.headers.get("Location") mustBe Some(routes.SummaryController.get.url)
             }
           }
 
           "business is an msb and asp" in new FormSubmissionFixture {
-            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness, AccountancyServices))))) { result =>
+            post(businessMatching =
+              BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness, AccountancyServices))))
+            ) { result =>
               result.header.status mustBe SEE_OTHER
               result.header.headers.get("Location") mustBe Some(routes.SummaryController.get.url)
             }
@@ -190,9 +204,13 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
         "redirect to the PercentageOfCashPaymentOver15000Controller" when {
           "business is an hvd but not an asp" in new FormSubmissionFixture {
-            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))))) { result =>
+            post(businessMatching =
+              BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))))
+            ) { result =>
               result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustBe Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
+              result.header.headers.get("Location") mustBe Some(
+                routes.PercentageOfCashPaymentOver15000Controller.get().url
+              )
             }
           }
         }
@@ -200,10 +218,13 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
       "given invalid data" must {
         "respond with BAD_REQUEST" in new FormSubmissionFixture {
-          post(data = Some(addToken(
-            FakeRequest(POST, routes.CustomersOutsideUKController.post().url)
-              .withFormUrlEncodedBody("countries" -> "abc")
-          ))
+          post(data =
+            Some(
+              addToken(
+                FakeRequest(POST, routes.CustomersOutsideUKController.post().url)
+                  .withFormUrlEncodedBody("countries" -> "abc")
+              )
+            )
           ) { result: Result =>
             result.header.status mustBe BAD_REQUEST
           }

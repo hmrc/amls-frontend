@@ -31,60 +31,61 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction,
-                                            val ds: CommonPlayDependencies,
-                                            override val messagesApi: MessagesApi,
-                                            val cc: MessagesControllerComponents,
-                                            formProvider: BusinessStructureFormProvider,
-                                            view: BusinessStructureView,
-                                            implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class BusinessStructureController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  override val messagesApi: MessagesApi,
+  val cc: MessagesControllerComponents,
+  formProvider: BusinessStructureFormProvider,
+  view: BusinessStructureView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
-  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      getData[TradingPremises](request.credId, index) map {
-        response =>
-          val form = (for {
-            tp <- response
-            services <- tp.businessStructure
-          } yield formProvider().fill(services)).getOrElse(formProvider())
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    getData[TradingPremises](request.credId, index) map { response =>
+      val form = (for {
+        tp       <- response
+        services <- tp.businessStructure
+      } yield formProvider().fill(services)).getOrElse(formProvider())
 
-          Ok(view(form, index, edit))
-      }
-  }
-
-  private def redirectToPage(
-                              data: BusinessStructure,
-                              edit: Boolean,
-                              index: Int,
-                              result: Option[Cache]
-                            )(implicit request: Request[AnyContent]): Result = {
-    data match {
-      case SoleProprietor => Redirect(routes.AgentNameController.get(index, edit))
-      case LimitedLiabilityPartnership | IncorporatedBody => Redirect(routes.AgentCompanyDetailsController.get(index, edit))
-      case Partnership => Redirect(routes.AgentPartnershipController.get(index, edit))
-      case UnincorporatedBody if edit => Redirect(routes.CheckYourAnswersController.get(index))
-      case _ => TPControllerHelper.redirectToNextPage(result, index, edit)
+      Ok(view(form, index, edit))
     }
   }
 
-  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithError =>
-          Future.successful(BadRequest(view(formWithError, index, edit))),
+  private def redirectToPage(
+    data: BusinessStructure,
+    edit: Boolean,
+    index: Int,
+    result: Option[Cache]
+  )(implicit request: Request[AnyContent]): Result =
+    data match {
+      case SoleProprietor                                 => Redirect(routes.AgentNameController.get(index, edit))
+      case LimitedLiabilityPartnership | IncorporatedBody =>
+        Redirect(routes.AgentCompanyDetailsController.get(index, edit))
+      case Partnership                                    => Redirect(routes.AgentPartnershipController.get(index, edit))
+      case UnincorporatedBody if edit                     => Redirect(routes.CheckYourAnswersController.get(index))
+      case _                                              => TPControllerHelper.redirectToNextPage(result, index, edit)
+    }
+
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithError => Future.successful(BadRequest(view(formWithError, index, edit))),
         data =>
           for {
             result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_, tp) =>
-              resetAgentValues(tp.businessStructure(data), data)
-            }
+                        resetAgentValues(tp.businessStructure(data), data)
+                      }
           } yield redirectToPage(data, edit, index, result)
       )
   }
 
   private def resetAgentValues(tp: TradingPremises, data: BusinessStructure): TradingPremises = data match {
-    case UnincorporatedBody => tp.copy(agentName = None, agentCompanyDetails = None, agentPartnership = None, hasChanged = true)
-    case _ => tp.businessStructure(data)
+    case UnincorporatedBody =>
+      tp.copy(agentName = None, agentCompanyDetails = None, agentPartnership = None, hasChanged = true)
+    case _                  => tp.businessStructure(data)
   }
 }
-

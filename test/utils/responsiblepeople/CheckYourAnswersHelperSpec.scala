@@ -39,7 +39,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
   trait RowFixture extends ResponsiblePeopleValues {
 
     val headingsAndSummaryLists: Seq[(String, SummaryList)]
-    def headings: Seq[String] = headingsAndSummaryLists.map(_._1)
+    def headings: Seq[String]                = headingsAndSummaryLists.map(_._1)
     def summaryListRows: Seq[SummaryListRow] = headingsAndSummaryLists.flatMap(_._2.rows)
 
     def assertSubheadingMatches(messageKey: String, sectionIndex: Int): Assertion =
@@ -79,9 +79,9 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
     def addressToLines(addressLines: Seq[String]): String =
       "<ul class=\"govuk-list\">" +
-      addressLines.map { line =>
-        s"""<li>$line<li>"""
-      }.mkString +"</ul>"
+        addressLines.map { line =>
+          s"""<li>$line<li>"""
+        }.mkString + "</ul>"
   }
 
   ".createSummaryList" when {
@@ -90,7 +90,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
       "render the correct title" in new RowFixture {
         override val headingsAndSummaryLists: Seq[(String, Aliases.SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-          responsiblePeopleModel, businessMatching, personName.fullName, 1, None, true, true
+          responsiblePeopleModel,
+          businessMatching,
+          personName.fullName,
+          1,
+          None,
+          true,
+          true
         )
 
         assertSubheadingMatches("responsiblepeople.check_your_answers.subheading.1", 0)
@@ -101,7 +107,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
       "render the correct row" in new RowFixture {
         override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-          responsiblePeopleModel, businessMatching, personName.fullName, 1, None, true, true
+          responsiblePeopleModel,
+          businessMatching,
+          personName.fullName,
+          1,
+          None,
+          true,
+          true
         )
 
         assertRowMatches(
@@ -120,7 +132,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "person has a previous legal name" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -150,8 +168,14 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "person has no previous legal name" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel.copy(legalName = Some(PreviousName(Some(false), None, None, None)), legalNameChangeDate = None),
-            businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel
+              .copy(legalName = Some(PreviousName(Some(false), None, None, None)), legalNameChangeDate = None),
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -171,7 +195,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "person is known by another name" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -194,7 +224,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         "person has no previous legal name" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
             responsiblePeopleModel.copy(knownBy = Some(KnownBy(Some(false), None))),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -212,7 +247,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
       "render the correct row" in new RowFixture {
         override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-          responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          responsiblePeopleModel,
+          businessMatching,
+          personName.titleName,
+          1,
+          None,
+          true,
+          true
         )
 
         assertRowMatches(
@@ -229,7 +270,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
       "render the correct title" in new RowFixture {
         override val headingsAndSummaryLists: Seq[(String, Aliases.SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-          responsiblePeopleModel, businessMatching, personName.fullName, 1, None, true, true
+          responsiblePeopleModel,
+          businessMatching,
+          personName.fullName,
+          1,
+          None,
+          true,
+          true
         )
 
         assertSubheadingMatches("responsiblepeople.check_your_answers.subheading.2", 1)
@@ -242,7 +289,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "person has UK residence" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -265,7 +318,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         "person has non-UK residence" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
             responsiblePeopleModel.copy(personResidenceType = Some(nonUKResidenceType)),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -285,7 +343,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "person has UK passport" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -308,7 +372,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         "person does not have a UK passport" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
             responsiblePeopleModel.copy(ukPassport = Some(UKPassportNo)),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -328,7 +397,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "person has Non-UK passport" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -351,7 +426,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         "person does not have a passport" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
             responsiblePeopleModel.copy(nonUKPassport = Some(NoPassport)),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -371,7 +451,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "person was born in the UK" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -394,7 +480,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         "person was not born in the UK" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
             responsiblePeopleModel.copy(personResidenceType = Some(nonUKResidenceType)),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -422,7 +513,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "person is a UK citizen" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -437,7 +534,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         "person is not a UK citizen" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
             responsiblePeopleModel.copy(personResidenceType = Some(nonUKResidenceType)),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -463,7 +565,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
       "render the correct title" in new RowFixture {
         override val headingsAndSummaryLists: Seq[(String, Aliases.SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-          responsiblePeopleModel, businessMatching, personName.fullName, 1, None, true, true
+          responsiblePeopleModel,
+          businessMatching,
+          personName.fullName,
+          1,
+          None,
+          true,
+          true
         )
 
         assertSubheadingMatches("responsiblepeople.check_your_answers.subheading.3", 2)
@@ -474,7 +582,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
       "render the correct row" in new RowFixture {
         override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-          responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          responsiblePeopleModel,
+          businessMatching,
+          personName.titleName,
+          1,
+          None,
+          true,
+          true
         )
 
         assertRowMatches(
@@ -493,7 +607,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
       "render the correct title" in new RowFixture {
         override val headingsAndSummaryLists: Seq[(String, Aliases.SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-          responsiblePeopleModel, businessMatching, personName.fullName, 1, None, true, true
+          responsiblePeopleModel,
+          businessMatching,
+          personName.fullName,
+          1,
+          None,
+          true,
+          true
         )
 
         assertSubheadingMatches("responsiblepeople.check_your_answers.subheading.4", 3)
@@ -506,7 +626,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "Current address is UK and showHide is true" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -536,7 +662,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "Current address is UK and showHide is false" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, false, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            false,
+            true
           )
 
           assertRowMatches(
@@ -569,7 +701,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             responsiblePeopleModel.copy(
               addressHistory = Some(ResponsiblePersonAddressHistory(currentAddress = Some(currentAddressNonUK)))
             ),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -602,7 +739,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             responsiblePeopleModel.copy(
               addressHistory = Some(ResponsiblePersonAddressHistory(currentAddress = Some(currentAddressNonUK)))
             ),
-            businessMatching, personName.titleName, 1, None, false, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            false,
+            true
           )
 
           assertRowMatches(
@@ -638,7 +780,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "Additional address is UK" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -676,7 +824,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
                 )
               )
             ),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -712,7 +865,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "Extra address is UK" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -751,7 +910,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
                 )
               )
             ),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -785,7 +949,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
       "render the correct title" in new RowFixture {
         override val headingsAndSummaryLists: Seq[(String, Aliases.SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-          responsiblePeopleModel, businessMatching, personName.fullName, 1, None, true, true
+          responsiblePeopleModel,
+          businessMatching,
+          personName.fullName,
+          1,
+          None,
+          true,
+          true
         )
 
         assertSubheadingMatches("responsiblepeople.check_your_answers.subheading.5", 4)
@@ -798,13 +968,21 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "multiple positions are present" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
             26,
             messages("responsiblepeople.position_within_business.heading", personName.titleName),
-            toBulletList(Set(BeneficialOwner, NominatedOfficer).map(p => PositionWithinBusiness.getPrettyName(p)).toList.sorted),
+            toBulletList(
+              Set(BeneficialOwner, NominatedOfficer).map(p => PositionWithinBusiness.getPrettyName(p)).toList.sorted
+            ),
             controllers.responsiblepeople.routes.PositionWithinBusinessController.get(1, true, None).url,
             "rp-positionwithinbusiness-edit"
           )
@@ -823,7 +1001,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             responsiblePeopleModel.copy(
               positions = Some(Positions(Set(BeneficialOwner), Some(PositionStartDate(positionStartDate))))
             ),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -851,7 +1034,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "person is a sole proprietor" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -866,7 +1055,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         "person is not a sole proprietor" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
             responsiblePeopleModel.copy(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false))),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -886,7 +1080,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "person has a VAT number" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -909,7 +1109,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         "person does not have a VAT number" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
             responsiblePeopleModel.copy(vatRegistered = Some(VATRegisteredNo)),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -929,7 +1134,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "person has a UTR number" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -937,7 +1148,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             messages("responsiblepeople.registeredforselfassessment.heading", personName.titleName),
             booleanToLabel(true),
             controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1, true, None).url,
-          "rp-registeredforsa-edit"
+            "rp-registeredforsa-edit"
           )
 
           assertRowMatches(
@@ -952,7 +1163,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         "person does not have a UTR number" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
             responsiblePeopleModel.copy(saRegistered = Some(SaRegisteredNo)),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -960,7 +1176,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             messages("responsiblepeople.registeredforselfassessment.heading", personName.titleName),
             booleanToLabel(false),
             controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1, true, None).url,
-          "rp-registeredforsa-edit"
+            "rp-registeredforsa-edit"
           )
         }
       }
@@ -970,7 +1186,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
       "render the correct title" in new RowFixture {
         override val headingsAndSummaryLists: Seq[(String, Aliases.SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-          responsiblePeopleModel, businessMatching, personName.fullName, 1, None, true, true
+          responsiblePeopleModel,
+          businessMatching,
+          personName.fullName,
+          1,
+          None,
+          true,
+          true
         )
 
         assertSubheadingMatches("responsiblepeople.check_your_answers.subheading.6", 5)
@@ -983,7 +1205,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "person has had experience training with multiple business activities" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -1009,7 +1237,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             businessMatching.copy(
               activities = Some(BusinessActivities(Set(AccountancyServices)))
             ),
-            personName.titleName, 1, None, true, true
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -1036,7 +1268,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         "person has no experience training with multiple business activities" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
             responsiblePeopleModel.copy(experienceTraining = Some(ExperienceTrainingNo)),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -1054,7 +1291,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             businessMatching.copy(
               activities = Some(BusinessActivities(Set(AccountancyServices)))
             ),
-            personName.titleName, 1, None, true, true
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -1078,7 +1319,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         "person has had training" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -1101,7 +1348,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         "person has no experience training with multiple business activities" in new RowFixture {
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
             responsiblePeopleModel.copy(training = Some(TrainingNo)),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -1122,7 +1374,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         "person has passed" in new RowFixture {
 
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -1138,7 +1396,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
             responsiblePeopleModel.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -1159,7 +1422,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         "person has paid" in new RowFixture {
 
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+            responsiblePeopleModel,
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -1167,7 +1436,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             messages("responsiblepeople.approval_check.heading", personName.titleName),
             booleanToLabel(true),
             controllers.responsiblepeople.routes.ApprovalCheckController.get(1, true, None).url,
-          "approval-check"
+            "approval-check"
           )
         }
 
@@ -1175,7 +1444,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           override val headingsAndSummaryLists: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
             responsiblePeopleModel.copy(approvalFlags = ApprovalFlags(Some(true), Some(false))),
-            businessMatching, personName.titleName, 1, None, true, true
+            businessMatching,
+            personName.titleName,
+            1,
+            None,
+            true,
+            true
           )
 
           assertRowMatches(
@@ -1183,7 +1457,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             messages("responsiblepeople.approval_check.heading", personName.titleName),
             booleanToLabel(false),
             controllers.responsiblepeople.routes.ApprovalCheckController.get(1, true, None).url,
-          "approval-check"
+            "approval-check"
           )
         }
       }
@@ -1212,13 +1486,13 @@ trait ResponsiblePeopleValues extends NinoUtil {
 
   val otherName: String = "James Mark Jones"
 
-  val dateOfBirth: LocalDate = LocalDate.of(1990,3,14)
+  val dateOfBirth: LocalDate = LocalDate.of(1990, 3, 14)
 
   val passportNumber: String = "123456789"
 
-  val uk: Country = Country("United Kingdom", "GB")
+  val uk: Country    = Country("United Kingdom", "GB")
   val spain: Country = Country("Spain", "ES")
-  val usa: Country = Country("United States", "US")
+  val usa: Country   = Country("United States", "US")
 
   val residenceType: PersonResidenceType = PersonResidenceType(
     UKResidence(Nino(nino)),
@@ -1233,7 +1507,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   )
 
   val phoneNumber: String = "0142980012013"
-  val email: String = "e@mail.com"
+  val email: String       = "e@mail.com"
 
   val personAddress1: PersonAddressUK = PersonAddressUK(
     "addressLine1",
@@ -1337,7 +1611,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val utrNumber: String = "12345678912"
 
   val experienceDescription: String = "I have great experience in this"
-  val trainingDescription: String = "I have been trained in this"
+  val trainingDescription: String   = "I have been trained in this"
 
   val responsiblePeopleModel: ResponsiblePerson = ResponsiblePerson(
     personName = Some(personName),
@@ -1354,7 +1628,8 @@ trait ResponsiblePeopleValues extends NinoUtil {
     vatRegistered = Some(VATRegisteredYes(vatNumber)),
     saRegistered = Some(SaRegisteredYes(utrNumber)),
     experienceTraining = Some(ExperienceTrainingYes(experienceDescription)),
-    training = Some(TrainingYes(trainingDescription)),    approvalFlags = ApprovalFlags(Some(true), Some(true)),
+    training = Some(TrainingYes(trainingDescription)),
+    approvalFlags = ApprovalFlags(Some(true), Some(true)),
     soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true))
   )
 

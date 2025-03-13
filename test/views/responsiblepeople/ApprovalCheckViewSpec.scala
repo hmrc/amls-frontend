@@ -27,7 +27,7 @@ import views.html.responsiblepeople.ApprovalCheckView
 class ApprovalCheckViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val approval_check = inject[ApprovalCheckView]
-  lazy val fp = inject[ApprovalCheckFormProvider]
+  lazy val fp             = inject[ApprovalCheckFormProvider]
 
   val name = "James Jones"
 
@@ -45,9 +45,9 @@ class ApprovalCheckViewSpec extends AmlsViewSpec with Matchers {
 
       doc.title must be(
         messages("responsiblepeople.approval_check.title", name)
-        + " - " + messages("summary.responsiblepeople")+
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov")
+          + " - " + messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
       )
     }
 
@@ -55,9 +55,9 @@ class ApprovalCheckViewSpec extends AmlsViewSpec with Matchers {
 
       def view = approval_check(fp(), true, 0, None, name)
 
-      heading.html must be(messages("responsiblepeople.approval_check.heading", name))
+      heading.html    must be(messages("responsiblepeople.approval_check.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
-      doc.title must include(messages("responsiblepeople.approval_check.title"))
+      doc.title       must include(messages("responsiblepeople.approval_check.title"))
     }
 
     "have the correct content" when {
@@ -71,9 +71,14 @@ class ApprovalCheckViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       approval_check(
-        fp().withError("hasAlreadyPaidApprovalCheck", "error.required.rp.approval_check"), true, 0, None, name
+        fp().withError("hasAlreadyPaidApprovalCheck", "error.required.rp.approval_check"),
+        true,
+        0,
+        None,
+        name
       ),
-      "hasAlreadyPaidApprovalCheck", "error.required.rp.approval_check"
+      "hasAlreadyPaidApprovalCheck",
+      "error.required.rp.approval_check"
     )
 
     behave like pageWithBackLink(approval_check(fp(), true, 0, None, name))

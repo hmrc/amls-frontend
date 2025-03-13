@@ -38,13 +38,18 @@ import views.html.responsiblepeople.address.CurrentAddressView
 
 import scala.concurrent.Future
 
-class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with OptionValues with BeforeAndAfter with Injecting {
+class CurrentAddressControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with OptionValues
+    with BeforeAndAfter
+    with Injecting {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
-  val mockDataCacheConnector = mock[DataCacheConnector]
-  val RecordId = 1
-  val emptyCache = Cache.empty
-  val outOfBounds = 99
+  val mockDataCacheConnector     = mock[DataCacheConnector]
+  val RecordId                   = 1
+  val emptyCache                 = Cache.empty
+  val outOfBounds                = 99
 
   before {
     reset(mockDataCacheConnector)
@@ -54,7 +59,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
     self =>
     val request = addToken(authRequest)
 
-    lazy val view = inject[CurrentAddressView]
+    lazy val view                = inject[CurrentAddressView]
     val currentAddressController = new CurrentAddressController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
@@ -80,8 +85,8 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
       "respond with NOT_FOUND when called with an index that is out of bounds" in new Fixture {
         val responsiblePeople = ResponsiblePerson()
 
-        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = currentAddressController.get(40)(request)
         status(result) must be(NOT_FOUND)
@@ -91,53 +96,54 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
 
         val responsiblePeople = ResponsiblePerson(personName)
 
-        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = currentAddressController.get(RecordId)(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
-        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(false)
+        document.title                                                      must be(pageTitle)
+        document.select("input[name=isUK][value=true]").hasAttr("checked")  must be(false)
         document.select("input[name=isUK][value=false]").hasAttr("checked") must be(false)
       }
 
       "display the address country page with yes selected when UK address is stored in mongo" in new Fixture {
 
-        val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+        val ukAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
         val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
-        val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+        val history           = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
-        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = currentAddressController.get(RecordId)(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
-        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(true)
+        document.title                                                      must be(pageTitle)
+        document.select("input[name=isUK][value=true]").hasAttr("checked")  must be(true)
         document.select("input[name=isUK][value=false]").hasAttr("checked") must be(false)
       }
 
       "display the address country page with no selected when non-UK address is stored in mongo" in new Fixture {
 
-        val nonUkAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("NZ", "New Zealand"))
+        val nonUkAddress      =
+          PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("NZ", "New Zealand"))
         val additionalAddress = ResponsiblePersonCurrentAddress(nonUkAddress, Some(ZeroToFiveMonths))
-        val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+        val history           = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
-        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+        when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = currentAddressController.get(RecordId)(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title must be(pageTitle)
-        document.select("input[name=isUK][value=true]").hasAttr("checked") must be(false)
+        document.title                                                      must be(pageTitle)
+        document.select("input[name=isUK][value=true]").hasAttr("checked")  must be(false)
         document.select("input[name=isUK][value=false]").hasAttr("checked") must be(true)
       }
     }
@@ -147,8 +153,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
         "true selected" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.CurrentAddressController.post(1).url)
-          .withFormUrlEncodedBody(
-            "isUK" -> "true")
+            .withFormUrlEncodedBody("isUK" -> "true")
 
           val responsiblePeople = ResponsiblePerson()
 
@@ -159,7 +164,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CurrentAddressUKController.get(RecordId).url))
         }
       }
@@ -168,13 +173,15 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
         "changed the answer from yes to no" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.CurrentAddressController.post(1).url)
-          .withFormUrlEncodedBody(
-            "isUK" -> "false")
+            .withFormUrlEncodedBody("isUK" -> "false")
 
-          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
-          val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val ukAddress         = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+          val currentAddress    = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val additionalAddress = ResponsiblePersonAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress), additionalAddress = Some(additionalAddress))
+          val history           = ResponsiblePersonAddressHistory(
+            currentAddress = Some(currentAddress),
+            additionalAddress = Some(additionalAddress)
+          )
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
           when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -184,13 +191,20 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CurrentAddressNonUKController.get(RecordId).url))
 
           val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
-          verify(currentAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any())
+          verify(currentAddressController.dataCacheConnector)
+            .save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any())
           captor.getValue.head.isComplete mustBe false
-          captor.getValue.head.addressHistory.value.currentAddress mustBe Some(ResponsiblePersonCurrentAddress(PersonAddressNonUK("", None, None, None, Country("", "")), Some(ZeroToFiveMonths), None))
+          captor.getValue.head.addressHistory.value.currentAddress mustBe Some(
+            ResponsiblePersonCurrentAddress(
+              PersonAddressNonUK("", None, None, None, Country("", "")),
+              Some(ZeroToFiveMonths),
+              None
+            )
+          )
         }
       }
 
@@ -198,13 +212,15 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
         "changed the answer from no to yes" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.CurrentAddressController.post(1).url)
-          .withFormUrlEncodedBody(
-            "isUK" -> "true")
+            .withFormUrlEncodedBody("isUK" -> "true")
 
-          val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("", ""))
-          val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val ukAddress         = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("", ""))
+          val currentAddress    = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val additionalAddress = ResponsiblePersonAddress(ukAddress, Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress), additionalAddress = Some(additionalAddress))
+          val history           = ResponsiblePersonAddressHistory(
+            currentAddress = Some(currentAddress),
+            additionalAddress = Some(additionalAddress)
+          )
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
           when(currentAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
@@ -214,13 +230,16 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CurrentAddressUKController.get(RecordId).url))
 
           val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
-          verify(currentAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any())
+          verify(currentAddressController.dataCacheConnector)
+            .save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any())
           captor.getValue.head.isComplete mustBe false
-          captor.getValue.head.addressHistory.value.currentAddress mustBe Some(ResponsiblePersonCurrentAddress(PersonAddressUK("", None, None, None, ""), Some(ZeroToFiveMonths), None))
+          captor.getValue.head.addressHistory.value.currentAddress mustBe Some(
+            ResponsiblePersonCurrentAddress(PersonAddressUK("", None, None, None, ""), Some(ZeroToFiveMonths), None)
+          )
         }
       }
 
@@ -228,8 +247,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
         "false selected" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.CurrentAddressController.post(1).url)
-          .withFormUrlEncodedBody(
-            "isUK" -> "false")
+            .withFormUrlEncodedBody("isUK" -> "false")
 
           val responsiblePeople = ResponsiblePerson()
 
@@ -240,7 +258,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CurrentAddressNonUKController.get(RecordId).url))
         }
       }
@@ -250,7 +268,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
         "isUK field is not supplied" in new Fixture {
 
           val line1MissingRequest = FakeRequest(POST, routes.CurrentAddressController.post(1).url)
-          .withFormUrlEncodedBody()
+            .withFormUrlEncodedBody()
 
           val responsiblePeople = ResponsiblePerson(personName)
 
@@ -264,11 +282,11 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#isUK]").html() must include(messages(s"error.required.uk.or.overseas.address.current", personName.get.titleName))
+          document.select("a[href=#isUK]").html() must include(
+            messages(s"error.required.uk.or.overseas.address.current", personName.get.titleName)
+          )
         }
       }
     }
   }
 }
-
-

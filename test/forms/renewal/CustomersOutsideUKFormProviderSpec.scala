@@ -23,13 +23,15 @@ import play.api.data.{Form, FormError}
 
 class CustomersOutsideUKFormProviderSpec extends FieldBehaviours {
   val form: Form[CustomersOutsideUK] = new CustomersOutsideUKFormProvider()()
-  val fieldName: String = "countries"
-  val errorMessage: String = "error.required.renewal.customer.country.name"
+  val fieldName: String              = "countries"
+  val errorMessage: String           = "error.required.renewal.customer.country.name"
 
   "MostTransactionsFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, fieldName, Gen.oneOf(models.countries.map(_.code))
+      form,
+      fieldName,
+      Gen.oneOf(models.countries.map(_.code))
     )
 
     "not bind when key is not present at all" in {

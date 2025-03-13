@@ -26,7 +26,7 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import javax.inject.Inject
 import scala.jdk.CollectionConverters._
 
-class ProvidedServicesFormProvider @Inject()() extends Mappings {
+class ProvidedServicesFormProvider @Inject() () extends Mappings {
 
   private val checkboxError = "error.required.tcsp.provided_services.services"
 
@@ -36,7 +36,7 @@ class ProvidedServicesFormProvider @Inject()() extends Mappings {
     mapping(
       "services" -> seq(enumerable[TcspService](checkboxError, checkboxError)(ProvidedServices.enumerable))
         .verifying(nonEmptySeq(checkboxError)),
-      "details" -> mandatoryIf(
+      "details"  -> mandatoryIf(
         _.values.asJavaCollection.contains(Other("").toString),
         text("error.required.tcsp.provided_services.details").verifying(
           firstError(
@@ -48,14 +48,17 @@ class ProvidedServicesFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  private def apply(services: Seq[TcspService], maybeDetails: Option[String]): ProvidedServices = (services, maybeDetails) match {
-    case (services, Some(detail)) if services.contains(Other("")) =>
-      val modifiedTransactions = services.map(service => if (service == Other("")) Other(detail) else service)
-      ProvidedServices(modifiedTransactions.toSet)
-    case (services, Some(_)) if !services.contains(Other("")) => throw new IllegalArgumentException("Cannot have service details without Other TCSP service")
-    case (services, None) if services.contains(Other("")) => throw new IllegalArgumentException("Cannot have Other TCSP service without service details")
-    case (services, None) if !services.contains(Other("")) => ProvidedServices(services.toSet)
-  }
+  private def apply(services: Seq[TcspService], maybeDetails: Option[String]): ProvidedServices =
+    (services, maybeDetails) match {
+      case (services, Some(detail)) if services.contains(Other("")) =>
+        val modifiedTransactions = services.map(service => if (service == Other("")) Other(detail) else service)
+        ProvidedServices(modifiedTransactions.toSet)
+      case (services, Some(_)) if !services.contains(Other(""))     =>
+        throw new IllegalArgumentException("Cannot have service details without Other TCSP service")
+      case (services, None) if services.contains(Other(""))         =>
+        throw new IllegalArgumentException("Cannot have Other TCSP service without service details")
+      case (services, None) if !services.contains(Other(""))        => ProvidedServices(services.toSet)
+    }
 
   private def unapply(obj: ProvidedServices): Option[(Seq[TcspService], Option[String])] = {
     val objTypes = obj.services.toSeq.map { x =>
@@ -64,10 +67,9 @@ class ProvidedServicesFormProvider @Inject()() extends Mappings {
 
     val maybeName = obj.services.find(_.isInstanceOf[Other]).flatMap {
       case Other(details) => Some(details)
-      case _ => None
+      case _              => None
     }
 
     Some((objTypes, maybeName))
   }
 }
-

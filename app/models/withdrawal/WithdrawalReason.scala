@@ -57,25 +57,25 @@ object WithdrawalReason extends Enumerable.Implicits {
   implicit val jsonReads: Reads[WithdrawalReason] = {
     import play.api.libs.json.Reads.StringReads
     (__ \ "withdrawalReason").read[String].flatMap[WithdrawalReason] {
-      case "Out of scope" => OutOfScope
+      case "Out of scope"             => OutOfScope
       case "Not trading in own right" => NotTradingInOwnRight
       case "Under another supervisor" => UnderAnotherSupervisor
-      case "Other, please specify" =>
+      case "Other, please specify"    =>
         (JsPath \ "specifyOtherReason").read[String] map {
           Other
         }
-      case _ =>
+      case _                          =>
         play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 
   implicit val jsonRedressWrites: Writes[WithdrawalReason] = Writes[WithdrawalReason] {
-    case OutOfScope => Json.obj("withdrawalReason" -> "Out of scope")
-    case NotTradingInOwnRight => Json.obj("withdrawalReason" -> "Not trading in own right")
+    case OutOfScope             => Json.obj("withdrawalReason" -> "Out of scope")
+    case NotTradingInOwnRight   => Json.obj("withdrawalReason" -> "Not trading in own right")
     case UnderAnotherSupervisor => Json.obj("withdrawalReason" -> "Under another supervisor")
-    case Other(reason) =>
+    case Other(reason)          =>
       Json.obj(
-        "withdrawalReason" -> "Other, please specify",
+        "withdrawalReason"   -> "Other, please specify",
         "specifyOtherReason" -> reason
       )
   }

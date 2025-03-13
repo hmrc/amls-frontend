@@ -23,10 +23,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.BusinessTurnoverView
 
-class BusinessTurnoverViewSpec extends AmlsViewSpec with Matchers  {
+class BusinessTurnoverViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val business_turnover = inject[BusinessTurnoverView]
-  lazy val fp = inject[BusinessTurnoverFormProvider]
+  lazy val business_turnover                                     = inject[BusinessTurnoverView]
+  lazy val fp                                                    = inject[BusinessTurnoverFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture
@@ -43,13 +43,14 @@ class BusinessTurnoverViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = business_turnover(fp(), true)
 
-      heading.html must be(messages("renewal.business-turnover.title"))
+      heading.html    must be(messages("renewal.business-turnover.title"))
       subHeading.html must include(messages("summary.renewal"))
     }
 
     behave like pageWithErrors(
       business_turnover(
-        fp().withError("businessTurnover", "error.required.renewal.ba.business.turnover"), false
+        fp().withError("businessTurnover", "error.required.renewal.ba.business.turnover"),
+        false
       ),
       "businessTurnover",
       "error.required.renewal.ba.business.turnover"

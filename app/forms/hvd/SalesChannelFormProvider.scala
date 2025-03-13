@@ -23,9 +23,9 @@ import play.api.data.Forms.seq
 
 import javax.inject.Inject
 
-class SalesChannelFormProvider @Inject()() extends Mappings {
+class SalesChannelFormProvider @Inject() () extends Mappings {
 
-  private val errorMessage = "error.required.hvd.how-will-you-sell-goods"
+  private val errorMessage               = "error.required.hvd.how-will-you-sell-goods"
   def apply(): Form[HowWillYouSellGoods] = Form[HowWillYouSellGoods](
     "salesChannels" -> seq(enumerable[SalesChannel](errorMessage, errorMessage)(SalesChannel.enumerable))
       .verifying(nonEmptySeq(errorMessage))

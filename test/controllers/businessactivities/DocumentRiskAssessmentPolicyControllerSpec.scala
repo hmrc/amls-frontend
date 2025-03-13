@@ -20,7 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import forms.businessactivities.DocumentRiskAssessmentPolicyFormProvider
 import models.businessactivities._
 import models.businessmatching.BusinessActivity.{AccountancyServices, MoneyServiceBusiness}
-import models.businessmatching.{BusinessMatching, BusinessActivities => BMBusinessActivities}
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessMatching}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.ArgumentMatchers._
@@ -37,12 +37,17 @@ import views.html.businessactivities.DocumentRiskAssessmentPolicyView
 
 import scala.concurrent.Future
 
-class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with Injecting with BeforeAndAfterEach {
+class DocumentRiskAssessmentPolicyControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with Injecting
+    with BeforeAndAfterEach {
 
   val mockService: DocumentRiskAssessmentService = mock[DocumentRiskAssessmentService]
 
   trait Fixture {
-    self => val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
+    self =>
+    val request: Request[AnyContentAsEmpty.type]    = addToken(authRequest)
     lazy val view: DocumentRiskAssessmentPolicyView = inject[DocumentRiskAssessmentPolicyView]
 
     val controller = new DocumentRiskAssessmentController(
@@ -52,7 +57,8 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
       service = mockService,
       formProvider = inject[DocumentRiskAssessmentPolicyFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
   }
 
   val emptyCache: Cache = Cache.empty
@@ -77,9 +83,13 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
       "pre-populate the Document Risk assessment Page" in new Fixture {
 
         when(mockService.getRiskAssessmentPolicy(any()))
-          .thenReturn(Future.successful(Some(
-            RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased, Digital)))
-          )))
+          .thenReturn(
+            Future.successful(
+              Some(
+                RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased, Digital)))
+              )
+            )
+          )
 
         val result: Future[Result] = controller.get()(request)
         status(result) must be(OK)
@@ -94,46 +104,55 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
       "when edit is false" must {
         "on post with valid data redirect to check your answers page when businessActivity is ASP" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.DocumentRiskAssessmentController.post(false).url)
-          .withFormUrlEncodedBody(
-            "riskassessments[1]" -> "paperBased",
-            "riskassessments[2]" -> "digital"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.DocumentRiskAssessmentController.post(false).url)
+              .withFormUrlEncodedBody(
+                "riskassessments[1]" -> "paperBased",
+                "riskassessments[2]" -> "digital"
+              )
 
           when(mockService.updateRiskAssessmentType(any(), any()))
-            .thenReturn(Future.successful(
-              Some(BusinessMatching(None, Some(BMBusinessActivities(Set(AccountancyServices, MoneyServiceBusiness)))))
-            ))
+            .thenReturn(
+              Future.successful(
+                Some(BusinessMatching(None, Some(BMBusinessActivities(Set(AccountancyServices, MoneyServiceBusiness)))))
+              )
+            )
 
           val result: Future[Result] = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get.url))
         }
 
         "on post with valid data redirect to advice on MLR due to diligence page when businessActivity is not ASP" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.DocumentRiskAssessmentController.post(false).url)
-          .withFormUrlEncodedBody(
-            "riskassessments[1]" -> "paperBased",
-            "riskassessments[2]" -> "digital"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.DocumentRiskAssessmentController.post(false).url)
+              .withFormUrlEncodedBody(
+                "riskassessments[1]" -> "paperBased",
+                "riskassessments[2]" -> "digital"
+              )
 
           when(mockService.updateRiskAssessmentType(any(), any()))
-            .thenReturn(Future.successful(
-              Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness)))))
-            ))
+            .thenReturn(
+              Future.successful(
+                Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness)))))
+              )
+            )
 
           val result: Future[Result] = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessactivities.routes.AccountantForAMLSRegulationsController.get().url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.businessactivities.routes.AccountantForAMLSRegulationsController.get().url)
+          )
         }
 
         "respond with BAD_REQUEST" when {
           "riskassessments fields are missing" in new Fixture {
 
-            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.DocumentRiskAssessmentController.post(false).url)
-            .withFormUrlEncodedBody(
-            )
+            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+              FakeRequest(POST, routes.DocumentRiskAssessmentController.post(false).url)
+                .withFormUrlEncodedBody(
+                )
 
             val result: Future[Result] = controller.post()(newRequest)
             status(result) must be(BAD_REQUEST)
@@ -143,11 +162,12 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
           "riskassessments fields are missing, represented by an empty string" in new Fixture {
 
-            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.DocumentRiskAssessmentController.post(false).url)
-            .withFormUrlEncodedBody(
-              "riskassessments[1]" -> "",
-              "riskassessments[2]" -> ""
-            )
+            val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+              FakeRequest(POST, routes.DocumentRiskAssessmentController.post(false).url)
+                .withFormUrlEncodedBody(
+                  "riskassessments[1]" -> "",
+                  "riskassessments[2]" -> ""
+                )
 
             val result: Future[Result] = controller.post()(newRequest)
             status(result) must be(BAD_REQUEST)
@@ -160,19 +180,22 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
       "when edit is true" must {
         "redirect to the SummaryController" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.DocumentRiskAssessmentController.post(true).url)
-          .withFormUrlEncodedBody(
-            "riskassessments[1]" -> "paperBased",
-            "riskassessments[2]" -> "digital"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.DocumentRiskAssessmentController.post(true).url)
+              .withFormUrlEncodedBody(
+                "riskassessments[1]" -> "paperBased",
+                "riskassessments[2]" -> "digital"
+              )
 
           when(mockService.updateRiskAssessmentType(any(), any()))
-            .thenReturn(Future.successful(
-              Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness)))))
-            ))
+            .thenReturn(
+              Future.successful(
+                Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness)))))
+              )
+            )
 
           val result: Future[Result] = controller.post(true)(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get.url))
         }
       }

@@ -38,7 +38,8 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec with Injecting {
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
-    val ukBankAccount: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
+    val ukBankAccount: BankAccount               =
+      BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
 
     val accountType: BankAccountType.PersonalAccount.type = PersonalAccount
 
@@ -64,7 +65,10 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec with Injecting {
 
         "there is already bank account detail information" in new Fixture {
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
+          mockCacheFetch[Seq[BankDetails]](
+            Some(Seq(BankDetails(None, None, Some(ukBankAccount)))),
+            Some(BankDetails.key)
+          )
 
           mockApplicationStatus(SubmissionReady)
 
@@ -92,7 +96,8 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec with Injecting {
               Seq(
                 BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true)
               )
-            ), Some(BankDetails.key)
+            ),
+            Some(BankDetails.key)
           )
 
           mockApplicationStatus(SubmissionReadyForReview)
@@ -110,7 +115,8 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec with Injecting {
               Seq(
                 BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true)
               )
-            ), Some(BankDetails.key)
+            ),
+            Some(BankDetails.key)
           )
 
           mockApplicationStatus(SubmissionDecisionApproved)
@@ -127,11 +133,11 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec with Injecting {
       "respond with SEE_OTHER" when {
         "given valid data in edit mode" in new Fixture {
 
-
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountHasIbanController.post(1, edit = true).url)
-            .withFormUrlEncodedBody(
-            "hasIBAN" -> "true"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BankAccountHasIbanController.post(1, edit = true).url)
+              .withFormUrlEncodedBody(
+                "hasIBAN" -> "true"
+              )
 
           when(controller.auditConnector.sendEvent(any())(any(), any()))
             .thenReturn(Future.successful(AuditResult.Success))
@@ -141,15 +147,16 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec with Injecting {
 
           val result: Future[Result] = controller.post(1, edit = true)(newRequest)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.BankAccountIbanController.get(1).url))
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountHasIbanController.post(1, false).url)
-            .withFormUrlEncodedBody(
-            "hasIBAN" -> "false"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BankAccountHasIbanController.post(1, false).url)
+              .withFormUrlEncodedBody(
+                "hasIBAN" -> "false"
+              )
 
           when(controller.auditConnector.sendEvent(any())(any(), any()))
             .thenReturn(Future.successful(Success))
@@ -159,7 +166,7 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec with Injecting {
 
           val result: Future[Result] = controller.post(1)(newRequest)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.BankAccountNonUKController.get(1).url))
         }
 
@@ -168,10 +175,11 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec with Injecting {
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountHasIbanController.post(50, edit = true).url)
-            .withFormUrlEncodedBody(
-            "hasIBAN" -> "true"
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BankAccountHasIbanController.post(50, edit = true).url)
+              .withFormUrlEncodedBody(
+                "hasIBAN" -> "true"
+              )
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
           mockCacheSave[Seq[BankDetails]]
@@ -182,14 +190,14 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec with Injecting {
         }
       }
 
-
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(POST, routes.BankAccountHasIbanController.post(1, edit = true).url)
-            .withFormUrlEncodedBody(
-            "hasIBAN" -> ""
-          )
+          val newRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
+            FakeRequest(POST, routes.BankAccountHasIbanController.post(1, edit = true).url)
+              .withFormUrlEncodedBody(
+                "hasIBAN" -> ""
+              )
 
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))
           mockCacheSave[Seq[BankDetails]]

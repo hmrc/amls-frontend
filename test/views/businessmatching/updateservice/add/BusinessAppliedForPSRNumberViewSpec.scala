@@ -26,8 +26,8 @@ import views.html.businessmatching.updateservice.add.BusinessAppliedForPSRNumber
 class BusinessAppliedForPSRNumberViewSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture
-  lazy val numberView = inject[BusinessAppliedForPSRNumberView]
-  lazy val formProvider = inject[PSRNumberFormProvider]
+  lazy val numberView                                            = inject[BusinessAppliedForPSRNumberView]
+  lazy val formProvider                                          = inject[PSRNumberFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   def view = numberView(formProvider(), edit = false)
@@ -40,8 +40,10 @@ class BusinessAppliedForPSRNumberViewSpec extends AmlsViewSpec {
 
       override def view = numberView(filledForm, edit = false)
 
-      doc.title must startWith(messages("businessmatching.updateservice.psr.number.title") + " - " + messages("summary.updateservice"))
-      heading.html must be(messages("businessmatching.updateservice.psr.number.title"))
+      doc.title       must startWith(
+        messages("businessmatching.updateservice.psr.number.title") + " - " + messages("summary.updateservice")
+      )
+      heading.html    must be(messages("businessmatching.updateservice.psr.number.title"))
       subHeading.html must include(messages("summary.updateservice"))
     }
 
@@ -55,12 +57,14 @@ class BusinessAppliedForPSRNumberViewSpec extends AmlsViewSpec {
 
     behave like pageWithErrors(
       numberView(formProvider().withError("appliedFor", "error.required.msb.psr.options"), edit = false),
-      "appliedFor", "error.required.msb.psr.options"
+      "appliedFor",
+      "error.required.msb.psr.options"
     )
 
     behave like pageWithErrors(
       numberView(formProvider().withError("regNumber", "error.max.msb.psr.number.format"), edit = false),
-      "regNumber", "error.max.msb.psr.number.format"
+      "regNumber",
+      "error.max.msb.psr.number.format"
     )
 
     behave like pageWithBackLink(view)

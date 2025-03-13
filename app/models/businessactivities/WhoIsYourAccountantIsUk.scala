@@ -26,20 +26,17 @@ object WhoIsYourAccountantIsUk {
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Reads._
     import play.api.libs.json._
-      (__ \ "isUK").read[Boolean].map(x => WhoIsYourAccountantIsUk(x)) or
-      (__ \ "accountantsAddressPostCode").read[String]
-          .map(_ => WhoIsYourAccountantIsUk(true)) or
-      (__ \ "accountantsAddressCountry").read[String]
+    (__ \ "isUK").read[Boolean].map(x => WhoIsYourAccountantIsUk(x)) or
+      (__ \ "accountantsAddressPostCode")
+        .read[String]
+        .map(_ => WhoIsYourAccountantIsUk(true)) or
+      (__ \ "accountantsAddressCountry")
+        .read[String]
         .map(_ => WhoIsYourAccountantIsUk(false))
 
   }
 
-  implicit val jsonWrites: Writes[WhoIsYourAccountantIsUk] = Writes {
-    isUk: WhoIsYourAccountantIsUk => Json.obj("isUK" -> isUk.isUk )
+  implicit val jsonWrites: Writes[WhoIsYourAccountantIsUk] = Writes { isUk: WhoIsYourAccountantIsUk =>
+    Json.obj("isUK" -> isUk.isUk)
   }
 }
-
-
-
-
-

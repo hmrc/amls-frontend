@@ -37,9 +37,10 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
     val request = addToken(authRequest)
 
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
-    lazy val view = app.injector.instanceOf[CannotAddServicesView]
-    val controller = new NoPsrController(
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+    lazy val view               = app.injector.instanceOf[CannotAddServicesView]
+    val controller              = new NoPsrController(
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       helper = mockUpdateServiceHelper,
       router = createRouter[AddBusinessTypeFlowModel],
@@ -56,7 +57,9 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
           val result = controller.get()(request)
 
           status(result) mustBe OK
-          contentAsString(result) must include(messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title"))
+          contentAsString(result) must include(
+            messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title")
+          )
         }
       }
     }

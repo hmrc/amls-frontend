@@ -23,19 +23,24 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actio
 
 object CheckYourAnswersHelper {
 
-  def createSummaryList(deregistrationReason: DeregistrationReason)(implicit messages: Messages): SummaryList = {
-    SummaryList(rows = Seq(
-      SummaryListRow(
-        Key(Text(messages("deregistration.cya.question"))),
-        Value(Text(messages(s"deregistration.reason.lbl.${deregistrationReason.value}"))),
-        actions = Some(Actions(
-          items = Seq(ActionItem(
-            href = controllers.deregister.routes.DeregistrationReasonController.get.url,
-            content = Text(messages("button.change")),
-            attributes = Map("id" -> "cya-change-link")
-          ))
-        ))
+  def createSummaryList(deregistrationReason: DeregistrationReason)(implicit messages: Messages): SummaryList =
+    SummaryList(rows =
+      Seq(
+        SummaryListRow(
+          Key(Text(messages("deregistration.cya.question"))),
+          Value(Text(messages(s"deregistration.reason.lbl.${deregistrationReason.value}"))),
+          actions = Some(
+            Actions(
+              items = Seq(
+                ActionItem(
+                  href = controllers.deregister.routes.DeregistrationReasonController.get.url,
+                  content = Text(messages("button.change")),
+                  attributes = Map("id" -> "cya-change-link")
+                )
+              )
+            )
+          )
+        )
       )
-    ))
-  }
+    )
 }

@@ -27,7 +27,7 @@ import views.html.responsiblepeople.DateOfBirthView
 class DateOfBirthViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val date_of_birth = inject[DateOfBirthView]
-  lazy val fp = inject[DateOfBirthFormProvider]
+  lazy val fp            = inject[DateOfBirthFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -41,7 +41,9 @@ class DateOfBirthViewSpec extends AmlsViewSpec with Matchers {
 
       def view = date_of_birth(fp(), false, 1, None, "Gary")
 
-      doc.title() must startWith(messages("responsiblepeople.date.of.birth.title") + " - " + messages("summary.responsiblepeople"))
+      doc.title() must startWith(
+        messages("responsiblepeople.date.of.birth.title") + " - " + messages("summary.responsiblepeople")
+      )
 
     }
 
@@ -54,7 +56,11 @@ class DateOfBirthViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       date_of_birth(
-        fp().withError("dateOfBirth", "error.rp.dob.invalid.date.not.real"), false, 1, None, "first last"
+        fp().withError("dateOfBirth", "error.rp.dob.invalid.date.not.real"),
+        false,
+        1,
+        None,
+        "first last"
       ),
       "dateOfBirth",
       "error.rp.dob.invalid.date.not.real"

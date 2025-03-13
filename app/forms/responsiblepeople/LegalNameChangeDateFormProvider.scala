@@ -23,7 +23,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class LegalNameChangeDateFormProvider @Inject()() extends Mappings {
+class LegalNameChangeDateFormProvider @Inject() () extends Mappings {
 
   def apply(): Form[LegalNameChangeDate] = Form[LegalNameChangeDate](
     "date" -> localDate(
@@ -37,7 +37,8 @@ class LegalNameChangeDateFormProvider @Inject()() extends Mappings {
       minDate(LegalNameChangeDateFormProvider.minDate, "error.rp.name_change.invalid.date.after.1900"),
       maxDate(LegalNameChangeDateFormProvider.maxDate, "error.rp.name_change.invalid.date.future")
     ).transform[LegalNameChangeDate](
-      LegalNameChangeDate(_), _.date
+      LegalNameChangeDate(_),
+      _.date
     )
   )
 

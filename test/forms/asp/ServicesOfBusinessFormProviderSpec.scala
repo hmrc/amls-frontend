@@ -26,13 +26,13 @@ class ServicesOfBusinessFormProviderSpec extends CheckboxFieldBehaviours {
 
   ".value" must {
 
-    val fieldName = "services"
+    val fieldName   = "services"
     val requiredKey = "error.required.asp.business.services"
 
     behave like checkboxFieldWithWrapper[Service, ServicesOfBusiness](
       form,
       fieldName,
-      validValues  = Service.all,
+      validValues = Service.all,
       x => ServicesOfBusiness(Set(x)),
       x => ServicesOfBusiness(x.toSet),
       invalidError = FormError(s"$fieldName[0]", requiredKey)

@@ -22,7 +22,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class PercentageFormProvider @Inject()() extends Mappings {
+class PercentageFormProvider @Inject() () extends Mappings {
 
   private val error = "error.required.renewal.hvd.percentage"
 

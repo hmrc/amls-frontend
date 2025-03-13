@@ -25,10 +25,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.address.TimeAtAddressView
 
-class TimeAtAddressViewSpec extends AmlsViewSpec with Matchers  {
+class TimeAtAddressViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val time_at_address = inject[TimeAtAddressView]
-  lazy val fp = inject[TimeAtAddressFormProvider]
+  lazy val fp              = inject[TimeAtAddressFormProvider]
 
   val name = "FirstName LastName"
 
@@ -44,10 +44,12 @@ class TimeAtAddressViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = time_at_address(fp().fill(ZeroToFiveMonths), false, 0, None, name)
 
-      doc.title must be(messages("responsiblepeople.timeataddress.address_history.current.title") +
-        " - " + messages("summary.responsiblepeople") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("responsiblepeople.timeataddress.address_history.current.title") +
+          " - " + messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct heading" in new ViewFixture {
@@ -58,13 +60,12 @@ class TimeAtAddressViewSpec extends AmlsViewSpec with Matchers  {
     }
 
     behave like pageWithErrors(
-      time_at_address(fp().withError("timeAtAddress", "error.required.timeAtAddress"), false, 1 , None, name),
+      time_at_address(fp().withError("timeAtAddress", "error.required.timeAtAddress"), false, 1, None, name),
       "timeAtAddress",
       "error.required.timeAtAddress"
     )
 
     behave like pageWithBackLink(time_at_address(fp(), false, 1, None, name))
   }
-
 
 }

@@ -40,16 +40,21 @@ import views.html.businessmatching.MsbServicesView
 
 import scala.concurrent.Future
 
-class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
+class MsbSubSectorsControllerSpec
+    extends AmlsSpec
+    with ScalaFutures
+    with MoneyServiceBusinessTestData
+    with BusinessMatchingGenerator {
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
-    val config = mock[ApplicationConfig]
-    lazy val view = app.injector.instanceOf[MsbServicesView]
+    val config     = mock[ApplicationConfig]
+    lazy val view  = app.injector.instanceOf[MsbServicesView]
     val controller = new MsbSubSectorsController(
-      SuccessfulAuthAction, ds = commonDependencies,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
       mockCacheConnector,
       createRouter2[ChangeSubSectorFlowModel],
       mock[BusinessMatchingService],
@@ -75,7 +80,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       controller.businessMatchingService.getModel(any())
     } thenReturn (model match {
       case Some(bm) => OptionT.liftF[Future, BusinessMatching](Future.successful(bm))
-      case _ => OptionT.none[Future, BusinessMatching]
+      case _        => OptionT.none[Future, BusinessMatching]
     })
 
     mockApplicationStatus(NotCompleted)
@@ -87,7 +92,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       setupModel(None)
 
-      val result = controller.get()(request)
+      val result   = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustBe OK
@@ -103,7 +108,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       setupModel(None)
 
-      val result = controller.get()(request)
+      val result   = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustBe OK
@@ -123,7 +128,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       setupModel(Some(model))
 
-      val result = controller.get()(request)
+      val result   = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustBe OK
@@ -139,7 +144,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       val newRequest = FakeRequest(POST, routes.MsbSubSectorsController.post().url)
         .withFormUrlEncodedBody("value[1]" -> "")
 
-      val result = controller.post()(newRequest)
+      val result   = controller.post()(newRequest)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustBe BAD_REQUEST
@@ -155,7 +160,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       val newRequest = FakeRequest(POST, routes.MsbSubSectorsController.post().url)
         .withFormUrlEncodedBody("value[1]" -> "")
 
-      val result = controller.post()(newRequest)
+      val result   = controller.post()(newRequest)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustBe BAD_REQUEST
@@ -171,7 +176,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       val newRequest = FakeRequest(POST, routes.MsbSubSectorsController.post().url)
         .withFormUrlEncodedBody(
           "value[1]" -> TransmittingMoney.toString
-      )
+        )
 
       val result = controller.post()(newRequest)
 
@@ -182,7 +187,10 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
     "redirect to the summary page when adding anything other than TransmittingMoney as a service" in new Fixture {
 
-      mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel(Some(Set(ChequeCashingNotScrapMetal))))
+      mockCacheUpdate[ChangeSubSectorFlowModel](
+        Some(ChangeSubSectorFlowModel.key),
+        ChangeSubSectorFlowModel(Some(Set(ChequeCashingNotScrapMetal)))
+      )
 
       val newRequest = FakeRequest(POST, routes.MsbSubSectorsController.post().url)
         .withFormUrlEncodedBody(
@@ -190,13 +198,19 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
           "value[2]" -> ChequeCashingNotScrapMetal.toString,
           "value[3]" -> ChequeCashingScrapMetal.toString,
           "value[4]" -> ForeignExchange.toString
-      )
+        )
 
       val result = controller.post()(newRequest)
 
       status(result) mustBe SEE_OTHER
 
-      controller.router.verify("internalId", SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal, ForeignExchange))))
+      controller.router.verify(
+        "internalId",
+        SubSectorsPageId,
+        ChangeSubSectorFlowModel(
+          Some(Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal, ForeignExchange))
+        )
+      )
 
     }
   }

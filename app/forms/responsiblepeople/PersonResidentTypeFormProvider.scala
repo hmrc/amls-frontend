@@ -25,15 +25,15 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class PersonResidentTypeFormProvider @Inject()() extends Mappings {
+class PersonResidentTypeFormProvider @Inject() () extends Mappings {
 
   private val booleanFieldName = "isUKResidence"
-  private val booleanError = "error.required.rp.is.uk.resident"
+  private val booleanError     = "error.required.rp.is.uk.resident"
 
   def apply(): Form[PersonResidenceType] = Form[PersonResidenceType](
     mapping(
       booleanFieldName -> boolean(booleanError, booleanError),
-      "nino" -> mandatoryIfTrue(
+      "nino"           -> mandatoryIfTrue(
         booleanFieldName,
         text("error.required.nino")
           .transform[String](_.asNino, _.asNino)
@@ -44,14 +44,13 @@ class PersonResidentTypeFormProvider @Inject()() extends Mappings {
 
   private def apply(isUKResidence: Boolean, nino: Option[String]): PersonResidenceType = (isUKResidence, nino) match {
     case (true, Some(str)) => PersonResidenceType(UKResidence(Nino(str)), None, None)
-    case (false, None) => PersonResidenceType(NonUKResidence, None, None)
-    case _ => throw new IllegalArgumentException(s"Invalid combination of answers")
+    case (false, None)     => PersonResidenceType(NonUKResidence, None, None)
+    case _                 => throw new IllegalArgumentException(s"Invalid combination of answers")
   }
-
 
   private def unapply(obj: PersonResidenceType): Option[(Boolean, Option[String])] = obj.isUKResidence match {
     case UKResidence(nino) => Some((true, Some(nino.value)))
-    case NonUKResidence => Some((false, None))
+    case NonUKResidence    => Some((false, None))
   }
 
   implicit class NinoStringFormatter(str: String) {

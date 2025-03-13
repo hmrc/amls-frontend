@@ -24,7 +24,8 @@ import play.custom.JsPathSupport.RichJsPath
 
 import java.time.LocalDateTime
 
-sealed abstract class PaymentStatus(val isFinal: Boolean, val validNextStates: Seq[PaymentStatus] = Seq()) extends EnumEntry
+sealed abstract class PaymentStatus(val isFinal: Boolean, val validNextStates: Seq[PaymentStatus] = Seq())
+    extends EnumEntry
 
 object PaymentStatuses extends Enum[PaymentStatus] {
   case object Created extends PaymentStatus(false, Seq(Sent))
@@ -37,16 +38,17 @@ object PaymentStatuses extends Enum[PaymentStatus] {
 }
 
 case class Payment(
-                    _id: String,
-                    amlsRefNo: String,
-                    safeId: String,
-                    reference: String,
-                    description: Option[String],
-                    amountInPence: Int,
-                    status: PaymentStatus,
-                    createdAt: LocalDateTime,
-                    isBacs: Option[Boolean] = None,
-                    updatedAt: Option[LocalDateTime] = None)
+  _id: String,
+  amlsRefNo: String,
+  safeId: String,
+  reference: String,
+  description: Option[String],
+  amountInPence: Int,
+  status: PaymentStatus,
+  createdAt: LocalDateTime,
+  isBacs: Option[Boolean] = None,
+  updatedAt: Option[LocalDateTime] = None
+)
 
 object Payment {
   implicit val statusFormat: Format[PaymentStatus] = EnumFormat(PaymentStatuses)
@@ -65,7 +67,7 @@ object Payment {
         (__ \ "createdAt").readLocalDateTime and
         (__ \ "isBacs").readNullable[Boolean] and
         (__ \ "updatedAt").readNullable[LocalDateTime]
-      ) (Payment(_, _, _, _, _, _, _, _, _, _))
+    )(Payment(_, _, _, _, _, _, _, _, _, _))
 
-  implicit val format: OFormat[Payment] = OFormat(reads,writes)
+  implicit val format: OFormat[Payment] = OFormat(reads, writes)
 }

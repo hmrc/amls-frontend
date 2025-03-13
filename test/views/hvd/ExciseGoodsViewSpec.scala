@@ -25,10 +25,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.hvd.ExciseGoodsView
 
-class ExciseGoodsViewSpec extends AmlsViewSpec with Matchers  {
+class ExciseGoodsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val excise_goods = inject[ExciseGoodsView]
-  lazy val fp =inject[ExciseGoodsFormProvider]
+  lazy val fp           = inject[ExciseGoodsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -49,14 +49,15 @@ class ExciseGoodsViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = excise_goods(fp().fill(ExciseGoods(false)), true)
 
-      heading.html must be(messages("hvd.excise.goods.title"))
+      heading.html    must be(messages("hvd.excise.goods.title"))
       subHeading.html must include(messages("summary.hvd"))
 
     }
 
     behave like pageWithErrors(
       excise_goods(fp().withError("exciseGoods", "error.required.hvd.excise.goods"), true),
-      "exciseGoods", "error.required.hvd.excise.goods"
+      "exciseGoods",
+      "error.required.hvd.excise.goods"
     )
 
     behave like pageWithBackLink(excise_goods(fp(), false))

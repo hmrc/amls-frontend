@@ -33,9 +33,10 @@ trait IsAddressUKFormProvider[A] extends Mappings {
     mapping(
       "isUK" -> boolean(error, error)
         .transform[PersonAddress](
-          if (_) PersonAddressUK("", None, None, None, "") else PersonAddressNonUK("", None, None, None, Country("", "")),
+          if (_) PersonAddressUK("", None, None, None, "")
+          else PersonAddressNonUK("", None, None, None, Country("", "")),
           {
-            case PersonAddressUK(_, _, _, _, _) => true
+            case PersonAddressUK(_, _, _, _, _)    => true
             case PersonAddressNonUK(_, _, _, _, _) => false
           }
         )

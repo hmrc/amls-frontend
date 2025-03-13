@@ -17,19 +17,20 @@
 package forms.tcsp
 
 import forms.behaviours.BooleanFieldBehaviours
-import models.tcsp.{OnlyOffTheShelfCompsSold, OnlyOffTheShelfCompsSoldYes, OnlyOffTheShelfCompsSoldNo}
+import models.tcsp.{OnlyOffTheShelfCompsSold, OnlyOffTheShelfCompsSoldNo, OnlyOffTheShelfCompsSoldYes}
 import play.api.data.Form
 
 class OnlyOffTheShelfCompsSoldFormProviderSpec extends BooleanFieldBehaviours[OnlyOffTheShelfCompsSold] {
 
   override val form: Form[OnlyOffTheShelfCompsSold] = new OnlyOffTheShelfCompsSoldFormProvider()()
-  override val fieldName: String = "onlyOffTheShelfCompsSold"
-  override val errorMessage: String = "error.required.tcsp.off.the.shelf.companies"
+  override val fieldName: String                    = "onlyOffTheShelfCompsSold"
+  override val errorMessage: String                 = "error.required.tcsp.off.the.shelf.companies"
 
   "OnlyOffTheShelfCompsSoldFormProvider" must {
 
     behave like booleanFieldWithModel(
-      OnlyOffTheShelfCompsSoldYes, OnlyOffTheShelfCompsSoldNo
+      OnlyOffTheShelfCompsSoldYes,
+      OnlyOffTheShelfCompsSoldNo
     )
   }
 }

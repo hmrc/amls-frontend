@@ -30,7 +30,9 @@ class TotalThroughputFormProviderSpec extends FieldBehaviours {
   "TotalThroughputFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, field, Gen.oneOf(ExpectedThroughput.all.map(_.toString))
+      form,
+      field,
+      Gen.oneOf(ExpectedThroughput.all.map(_.toString))
     )
 
     behave like mandatoryField(form, field, FormError(field, "renewal.msb.throughput.selection.invalid"))
@@ -41,7 +43,7 @@ class TotalThroughputFormProviderSpec extends FieldBehaviours {
 
         val result = form.bind(Map(field -> "foo"))
 
-        result.value shouldBe None
+        result.value        shouldBe None
         result.error(field) shouldBe Some(FormError(field, "error.invalid"))
 
       }

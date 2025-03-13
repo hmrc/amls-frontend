@@ -30,33 +30,45 @@ import utils.HttpResponseHelper
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PayApiConnector @Inject()(
-                                 http: HttpClientV2,
-                                 val auditConnector: DefaultAuditConnector,
-                                 val applicationConfig: ApplicationConfig) extends HttpResponseHelper with Logging {
+class PayApiConnector @Inject() (
+  http: HttpClientV2,
+  val auditConnector: DefaultAuditConnector,
+  val applicationConfig: ApplicationConfig
+) extends HttpResponseHelper
+    with Logging {
 
   // $COVERAGE-OFF$
   private val logDebug = (msg: String) => logger.debug(s"[PayApiConnector] $msg")
-  private val logWarn = (msg: String) => logger.warn(s"[PayApiConnector] $msg")
+  private val logWarn  = (msg: String) => logger.warn(s"[PayApiConnector] $msg")
   // $COVERAGE-ON$
 
-  def createPayment(request: CreatePaymentRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
+  def createPayment(
+    request: CreatePaymentRequest
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
 
     val bodyParser = JsonParsed[CreatePaymentResponse]
     // $COVERAGE-OFF$
     logDebug(s"Creating payment: ${Json.toJson(request)}")
     // $COVERAGE-ON$
-    http.post(url"${applicationConfig.payBaseUrl}/amls/journey/start").withBody(Json.toJson(request)).execute[HttpResponse].map {
-      case response & bodyParser(JsSuccess(body: CreatePaymentResponse, _)) =>
-        auditConnector.sendExtendedEvent(CreatePaymentEvent(request, body))
-        body.some
+    http
+      .post(url"${applicationConfig.payBaseUrl}/amls/journey/start")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .map {
+        case response & bodyParser(JsSuccess(body: CreatePaymentResponse, _)) =>
+          auditConnector.sendExtendedEvent(CreatePaymentEvent(request, body))
+          body.some
 
-      case response: HttpResponse =>
-        auditConnector.sendExtendedEvent(CreatePaymentFailureEvent(request.reference, response.status, response.body, request))
-        // $COVERAGE-OFF$
-        logWarn(s"${request.reference}, status: ${response.status}: Failed to create payment using pay-api, reverting to old payments page")
-        // $COVERAGE-ON$
-        None
-    }
+        case response: HttpResponse =>
+          auditConnector.sendExtendedEvent(
+            CreatePaymentFailureEvent(request.reference, response.status, response.body, request)
+          )
+          // $COVERAGE-OFF$
+          logWarn(
+            s"${request.reference}, status: ${response.status}: Failed to create payment using pay-api, reverting to old payments page"
+          )
+          // $COVERAGE-ON$
+          None
+      }
   }
 }

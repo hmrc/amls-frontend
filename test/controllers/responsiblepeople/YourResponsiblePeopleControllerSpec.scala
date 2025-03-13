@@ -32,68 +32,75 @@ import scala.concurrent.Future
 
 class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
-    trait Fixture {
-      self => val request = addToken(authRequest)
-      val mockService = mock[YourResponsiblePeopleService]
-      lazy val view = app.injector.instanceOf[YourResponsiblePeopleView]
-      val controller = new YourResponsiblePeopleController (
-        authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
-        yourResponsiblePeopleService = mockService,
-        view = view)
+  trait Fixture {
+    self =>
+    val request     = addToken(authRequest)
+    val mockService = mock[YourResponsiblePeopleService]
+    lazy val view   = app.injector.instanceOf[YourResponsiblePeopleView]
+    val controller  = new YourResponsiblePeopleController(
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      yourResponsiblePeopleService = mockService,
+      view = view
+    )
+  }
+
+  "Get" must {
+
+    "load the your answers page when section data is available" in new Fixture {
+      val model  = ResponsiblePerson(None, None)
+      when(mockService.completeAndIncompleteRP(any()))
+        .thenReturn(Future.successful(Some((Seq.empty, Seq(model).zipWithIndex.reverse))))
+      val result = controller.get()(request)
+      status(result)          must be(OK)
+      contentAsString(result) must include(
+        s"${messages("responsiblepeople.whomustregister.title")} - ${messages("summary.responsiblepeople")}"
+      )
     }
 
-    "Get" must {
+    "show the 'Add a responsible person' link" in new Fixture {
 
-      "load the your answers page when section data is available" in new Fixture {
-        val model = ResponsiblePerson(None, None)
-        when(mockService.completeAndIncompleteRP(any())
-        ).thenReturn(Future.successful(Some((Seq.empty, Seq(model).zipWithIndex.reverse))))
-        val result = controller.get()(request)
-        status(result) must be(OK)
-        contentAsString(result) must include (s"${messages("responsiblepeople.whomustregister.title")} - ${messages("summary.responsiblepeople")}")
-      }
+      val rp1 = ResponsiblePerson(Some(PersonName("firstName1", Some("middleName"), "lastName1")))
+      val rp2 = ResponsiblePerson(Some(PersonName("firstName2", None, "lastName2")))
 
-      "show the 'Add a responsible person' link" in new Fixture {
+      when(mockService.completeAndIncompleteRP(any()))
+        .thenReturn(Future.successful(Some((Seq(rp1).zipWithIndex, Seq(rp2).zipWithIndex))))
 
-        val rp1 = ResponsiblePerson(Some(PersonName("firstName1", Some("middleName"), "lastName1")))
-        val rp2 = ResponsiblePerson(Some(PersonName("firstName2", None, "lastName2")))
+      val result = controller.get()(request)
+      status(result) must be(OK)
 
-        when(mockService.completeAndIncompleteRP(any())
-        ).thenReturn(Future.successful(Some((Seq(rp1).zipWithIndex, Seq(rp2).zipWithIndex))))
+      contentAsString(result) must include(messages("responsiblepeople.check_your_answers.add"))
 
-        val result = controller.get()(request)
-        status(result) must be(OK)
+      val document = Jsoup.parse(contentAsString(result))
+      document.getElementById("addResponsiblePerson").attr("href") must be(
+        routes.ResponsiblePeopleAddController.get(false).url
+      )
 
-        contentAsString(result) must include (messages("responsiblepeople.check_your_answers.add"))
+    }
 
-        val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("addResponsiblePerson").attr("href") must be (routes.ResponsiblePeopleAddController.get(false).url)
+    "correctly display responsible people's full names" in new Fixture {
 
-      }
+      val rp1 = ResponsiblePerson(Some(PersonName("firstName1", Some("middleName"), "lastName1")))
+      val rp2 = ResponsiblePerson(Some(PersonName("firstName2", None, "lastName2")))
 
-      "correctly display responsible people's full names" in new Fixture {
+      when(mockService.completeAndIncompleteRP(any()))
+        .thenReturn(Future.successful(Some((Seq(rp1).zipWithIndex, Seq(rp2).zipWithIndex))))
 
-        val rp1 = ResponsiblePerson(Some(PersonName("firstName1", Some("middleName"), "lastName1")))
-        val rp2 = ResponsiblePerson(Some(PersonName("firstName2", None, "lastName2")))
+      val result = controller.get()(request)
+      status(result) must be(OK)
 
-        when(mockService.completeAndIncompleteRP(any())
-        ).thenReturn(Future.successful(Some((Seq(rp1).zipWithIndex, Seq(rp2).zipWithIndex))))
+      val document = contentAsString(result)
+      document must include("firstName1 middleName lastName1")
+      document must include("firstName2 lastName2")
 
-        val result = controller.get()(request)
-        status(result) must be(OK)
+    }
 
-        val document = contentAsString(result)
-        document must include ("firstName1 middleName lastName1")
-        document must include ("firstName2 lastName2")
-
-      }
-
-      "redirect to the main AMLS summary page when section data is unavailable" in new Fixture {
-        when(mockService.completeAndIncompleteRP(any())
-        ).thenReturn(Future.successful(None))
-        val result = controller.get()(request)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
-      }
+    "redirect to the main AMLS summary page when section data is unavailable" in new Fixture {
+      when(mockService.completeAndIncompleteRP(any())).thenReturn(Future.successful(None))
+      val result = controller.get()(request)
+      status(result)           must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
     }
   }
+}

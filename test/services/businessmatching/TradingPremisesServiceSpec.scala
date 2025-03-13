@@ -22,7 +22,7 @@ import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal}
 import models.businessmatching.{BusinessMatchingMsbServices => BMMsbServices}
 import models.tradingpremises.TradingPremisesMsbServices._
-import models.tradingpremises.{WhatDoesYourBusinessDo, TradingPremisesMsbServices => TPMsbServices}
+import models.tradingpremises.{TradingPremisesMsbServices => TPMsbServices, WhatDoesYourBusinessDo}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -31,12 +31,13 @@ import utils.{AmlsSpec, DependencyMocks, FutureAssertions, StatusConstants}
 
 import java.time.LocalDate
 
-class TradingPremisesServiceSpec extends PlaySpec
-  with AmlsSpec
-  with MockitoSugar
-  with ScalaFutures
-  with FutureAssertions
-  with TradingPremisesGenerator {
+class TradingPremisesServiceSpec
+    extends PlaySpec
+    with AmlsSpec
+    with MockitoSugar
+    with ScalaFutures
+    with FutureAssertions
+    with TradingPremisesGenerator {
 
   trait Fixture extends DependencyMocks {
 
@@ -51,9 +52,11 @@ class TradingPremisesServiceSpec extends PlaySpec
 
           val models = Seq(
             tradingPremisesGen.sample.get.copy(
-              whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(BillPaymentServices), Some(DateOfChange(LocalDate.of(2001,10,31)))))
+              whatDoesYourBusinessDoAtThisAddress =
+                Some(WhatDoesYourBusinessDo(Set(BillPaymentServices), Some(DateOfChange(LocalDate.of(2001, 10, 31)))))
             ),
-            tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get.copy(status = Some(StatusConstants.Deleted)),
+            tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get
+              .copy(status = Some(StatusConstants.Deleted)),
             tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get,
             tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get,
             tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get
@@ -65,7 +68,9 @@ class TradingPremisesServiceSpec extends PlaySpec
           result(1) mustBe models(1)
           result(2) mustBe models(2)
           result(3) mustBe models(3)
-          result.lift(4).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices), None))
+          result.lift(4).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(
+            WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices), None)
+          )
 
         }
       }
@@ -78,11 +83,17 @@ class TradingPremisesServiceSpec extends PlaySpec
             tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
           )
 
-          val result = service.updateTradingPremises(Seq(0,2), models, AccountancyServices, None, true)
+          val result = service.updateTradingPremises(Seq(0, 2), models, AccountancyServices, None, true)
 
-          result.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
-          result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(HighValueDealing), None))
-          result.lift(2).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, MoneyServiceBusiness), None))
+          result.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(
+            WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None)
+          )
+          result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(
+            WhatDoesYourBusinessDo(Set(HighValueDealing), None)
+          )
+          result.lift(2).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(
+            WhatDoesYourBusinessDo(Set(AccountancyServices, MoneyServiceBusiness), None)
+          )
 
           result.head.isComplete mustBe true
           result.head.hasChanged mustBe true
@@ -98,7 +109,13 @@ class TradingPremisesServiceSpec extends PlaySpec
               tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
             )
 
-            val result = service.updateTradingPremises(Seq(0), models, MoneyServiceBusiness, Some(BMMsbServices(Set(ChequeCashingScrapMetal))), true)
+            val result = service.updateTradingPremises(
+              Seq(0),
+              models,
+              MoneyServiceBusiness,
+              Some(BMMsbServices(Set(ChequeCashingScrapMetal))),
+              true
+            )
 
             result.headOption.get.msbServices mustBe Some(TPMsbServices(Set(ChequeCashingScrapMetal)))
             result.head.isComplete mustBe true
@@ -110,19 +127,26 @@ class TradingPremisesServiceSpec extends PlaySpec
           "some items exist" in new Fixture {
 
             val models = Seq(
-              tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get.copy(msbServices = Some(TPMsbServices(Set(ChequeCashingNotScrapMetal))))
+              tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
+                .copy(msbServices = Some(TPMsbServices(Set(ChequeCashingNotScrapMetal))))
             )
 
-            val result = service.updateTradingPremises(Seq(0), models, MoneyServiceBusiness, Some(BMMsbServices(Set(ChequeCashingScrapMetal))), true)
+            val result = service.updateTradingPremises(
+              Seq(0),
+              models,
+              MoneyServiceBusiness,
+              Some(BMMsbServices(Set(ChequeCashingScrapMetal))),
+              true
+            )
 
-            result.headOption.get.msbServices mustBe Some(TPMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)))
+            result.headOption.get.msbServices mustBe Some(
+              TPMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))
+            )
             result.head.isComplete mustBe true
             result.head.hasChanged mustBe true
           }
         }
       }
-
-
 
     }
     "mark the trading premises as incomplete if there are no activities left" in new Fixture {
@@ -135,7 +159,9 @@ class TradingPremisesServiceSpec extends PlaySpec
       val result = service.updateTradingPremises(Seq(1), models, AccountancyServices, None, true)
 
       result.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(), None))
-      result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
+      result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(
+        WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None)
+      )
 
       result.head.isComplete mustBe false
       result.head.hasChanged mustBe true
@@ -162,29 +188,31 @@ class TradingPremisesServiceSpec extends PlaySpec
           Set(HighValueDealing, EstateAgentBusinessService, MoneyServiceBusiness)
         )
 
-        result must be(Seq(
-          models.head.copy(
-            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
-            hasAccepted = true,
-            hasChanged = true
-          ),
-          models(1).copy(
-            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
-            hasAccepted = true,
-            hasChanged = true
-          ),
-          models(2).copy(
-            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
-            msbServices = None,
-            hasAccepted = true,
-            hasChanged = true
-          ),
-          models(3).copy(
-            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
-            hasAccepted = true,
-            hasChanged = true
+        result must be(
+          Seq(
+            models.head.copy(
+              whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
+              hasAccepted = true,
+              hasChanged = true
+            ),
+            models(1).copy(
+              whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
+              hasAccepted = true,
+              hasChanged = true
+            ),
+            models(2).copy(
+              whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
+              msbServices = None,
+              hasAccepted = true,
+              hasChanged = true
+            ),
+            models(3).copy(
+              whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
+              hasAccepted = true,
+              hasChanged = true
+            )
           )
-        ))
+        )
 
       }
     }

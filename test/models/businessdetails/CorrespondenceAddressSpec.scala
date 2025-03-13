@@ -24,8 +24,24 @@ class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
 
   "CorrespondenceAddress" must {
 
-    val ukAddress = CorrespondenceAddressUk("YourName", "BusinessName", "Line1", Some("Line2"), Some("Line3"), Some("Line4"), "NE1 1NE")
-    val nonUkAddress = CorrespondenceAddressNonUk("YourName", "BusinessName", "Line1", Some("Line2"), Some("Line3"), Some("Line4"), Country("Albania", "AL"))
+    val ukAddress    = CorrespondenceAddressUk(
+      "YourName",
+      "BusinessName",
+      "Line1",
+      Some("Line2"),
+      Some("Line3"),
+      Some("Line4"),
+      "NE1 1NE"
+    )
+    val nonUkAddress = CorrespondenceAddressNonUk(
+      "YourName",
+      "BusinessName",
+      "Line1",
+      Some("Line2"),
+      Some("Line3"),
+      Some("Line4"),
+      Country("Albania", "AL")
+    )
 
     "return true for isUk" when {
       "it contains a UK address" in {

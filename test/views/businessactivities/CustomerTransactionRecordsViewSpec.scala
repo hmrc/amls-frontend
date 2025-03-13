@@ -26,7 +26,7 @@ import views.html.businessactivities.CustomerTransactionRecordsView
 
 class CustomerTransactionRecordsViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val customer: CustomerTransactionRecordsView = inject[CustomerTransactionRecordsView]
+  lazy val customer: CustomerTransactionRecordsView    = inject[CustomerTransactionRecordsView]
   lazy val formProvider: TransactionRecordFormProvider = inject[TransactionRecordFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
@@ -47,7 +47,7 @@ class CustomerTransactionRecordsViewSpec extends AmlsViewSpec with Matchers {
 
       def view = customer(formProvider().fill(false), true)
 
-      heading.html must be(messages("businessactivities.keep.customer.records.title"))
+      heading.html    must be(messages("businessactivities.keep.customer.records.title"))
       subHeading.html must include(messages("summary.businessactivities"))
 
     }

@@ -29,43 +29,43 @@ import views.html.msb.SendLargestAmountsOfMoneyView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction,
-                                                       val ds: CommonPlayDependencies,
-                                                       implicit val cacheConnector: DataCacheConnector,
-                                                       implicit val statusService: StatusService,
-                                                       implicit val serviceFlow: ServiceFlow,
-                                                       val autoCompleteService: AutoCompleteService,
-                                                       val cc: MessagesControllerComponents,
-                                                       formProvider: SendLargestAmountsFormProvider,
-                                                       view: SendLargestAmountsOfMoneyView) extends AmlsBaseController(ds, cc) {
+class SendTheLargestAmountsOfMoneyController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val cacheConnector: DataCacheConnector,
+  implicit val statusService: StatusService,
+  implicit val serviceFlow: ServiceFlow,
+  val autoCompleteService: AutoCompleteService,
+  val cc: MessagesControllerComponents,
+  formProvider: SendLargestAmountsFormProvider,
+  view: SendLargestAmountsOfMoneyView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      cacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
-        response =>
-          val form = (for {
-            msb <- response
-            amount <- msb.sendTheLargestAmountsOfMoney
-          } yield amount).fold(formProvider())(formProvider().fill)
-          Ok(view(form, edit, autoCompleteService.formOptions))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    cacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map { response =>
+      val form = (for {
+        msb    <- response
+        amount <- msb.sendTheLargestAmountsOfMoney
+      } yield amount).fold(formProvider())(formProvider().fill)
+      Ok(view(form, edit, autoCompleteService.formOptions))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
         data =>
           for {
             msb <-
-            cacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
-            _ <- cacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
-              msb.sendTheLargestAmountsOfMoney(Some(data))
-            )
-          } yield {
-           Redirect(routes.MostTransactionsController.get(edit))
-          }
+              cacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+            _   <- cacheConnector.save[MoneyServiceBusiness](
+                     request.credId,
+                     MoneyServiceBusiness.key,
+                     msb.sendTheLargestAmountsOfMoney(Some(data))
+                   )
+          } yield Redirect(routes.MostTransactionsController.get(edit))
       )
   }
 }

@@ -17,7 +17,7 @@
 package controllers
 
 import com.google.inject.Inject
-import config.{ApplicationConfig}
+import config.ApplicationConfig
 import play.api.i18n.{Lang, MessagesApi, MessagesImpl, MessagesProvider}
 import play.api.mvc.{AnyContent, BodyParsers, MessagesActionBuilderImpl, MessagesControllerComponents, Request}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -25,7 +25,10 @@ import utils.ControllerHelper
 
 import scala.concurrent.ExecutionContext
 
-abstract class AmlsBaseController(val cpd: CommonPlayDependencies, override val controllerComponents: MessagesControllerComponents) extends FrontendController(controllerComponents) {
+abstract class AmlsBaseController(
+  val cpd: CommonPlayDependencies,
+  override val controllerComponents: MessagesControllerComponents
+) extends FrontendController(controllerComponents) {
 
   override implicit val messagesApi: MessagesApi = cpd.messagesApi
 
@@ -37,17 +40,18 @@ abstract class AmlsBaseController(val cpd: CommonPlayDependencies, override val 
 
   val messages: MessagesApi = messagesApi
 
-  implicit val messagesProvider: MessagesProvider = {
+  implicit val messagesProvider: MessagesProvider =
     MessagesImpl(lang, messagesApi)
-  }
 
-  def notFoundView(implicit request: Request[_], messages: play.api.i18n.Messages, error: views.html.ErrorView) = ControllerHelper.notFoundView
+  def notFoundView(implicit request: Request[_], messages: play.api.i18n.Messages, error: views.html.ErrorView) =
+    ControllerHelper.notFoundView
 }
 
-class CommonPlayDependencies @Inject()(val amlsConfig: ApplicationConfig,
-                                       val messagesApi: MessagesApi)
+class CommonPlayDependencies @Inject() (val amlsConfig: ApplicationConfig, val messagesApi: MessagesApi)
 
 trait MessagesRequestHelper {
-  def messagesAction(parsers: BodyParsers.Default)(implicit executionContext: ExecutionContext, messagesApi: MessagesApi) =
+  def messagesAction(
+    parsers: BodyParsers.Default
+  )(implicit executionContext: ExecutionContext, messagesApi: MessagesApi) =
     new MessagesActionBuilderImpl[AnyContent](parsers, messagesApi)
 }

@@ -24,10 +24,10 @@ import play.api.data.validation.{Constraint, Invalid, Valid}
 
 import javax.inject.Inject
 
-class WhichCurrenciesFormProvider @Inject()() extends Mappings {
+class WhichCurrenciesFormProvider @Inject() () extends Mappings {
 
   private def error(key: String) = s"error.$key.renewal.wc.currencies"
-  private val emptyError = error("required")
+  private val emptyError         = error("required")
 
   def apply(): Form[WhichCurrencies] = Form[WhichCurrencies](
     "currencies" -> seq(
@@ -41,7 +41,7 @@ class WhichCurrenciesFormProvider @Inject()() extends Mappings {
   private val isCurrencyConstraint: Constraint[String] = Constraint {
     case str if models.currencies.contains(str) =>
       Valid
-    case _ =>
+    case _                                      =>
       Invalid(error("invalid"))
   }
 }

@@ -28,16 +28,17 @@ object Training {
 
   implicit val jsonReads: Reads[Training] =
     (__ \ "training").read[Boolean] flatMap {
-      case true => (__ \ "information").read[String] map (TrainingYes.apply _)
+      case true  => (__ \ "information").read[String] map (TrainingYes.apply _)
       case false => Reads(_ => JsSuccess(TrainingNo))
     }
 
   implicit val jsonWrites: Writes[Training] = Writes[Training] {
-    case TrainingYes(information) => Json.obj(
-      "training" -> true,
-      "information" -> information
-    )
-    case TrainingNo => Json.obj("training" -> false)
+    case TrainingYes(information) =>
+      Json.obj(
+        "training"    -> true,
+        "information" -> information
+      )
+    case TrainingNo               => Json.obj("training" -> false)
   }
 
 }

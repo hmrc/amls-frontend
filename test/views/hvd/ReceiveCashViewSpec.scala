@@ -40,10 +40,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.hvd.ReceiveCashView
 
-class ReceiveCashViewSpec extends AmlsViewSpec with Matchers  {
+class ReceiveCashViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val cashView = inject[ReceiveCashView]
-  lazy val fp = inject[ReceiveCashPaymentsFormProvider]
+  lazy val fp       = inject[ReceiveCashPaymentsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -57,21 +57,22 @@ class ReceiveCashViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = cashView(fp().fill(true), true)
 
-      doc.title must startWith (messages("hvd.receiving.title") + " - " + messages("summary.hvd"))
+      doc.title must startWith(messages("hvd.receiving.title") + " - " + messages("summary.hvd"))
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = cashView(fp().fill(true), true)
 
-      heading.html must be (messages("hvd.receiving.title"))
-      subHeading.html must include (messages("summary.hvd"))
+      heading.html    must be(messages("hvd.receiving.title"))
+      subHeading.html must include(messages("summary.hvd"))
 
     }
 
     behave like pageWithErrors(
       cashView(fp().withError("receivePayments", "error.required.hvd.receive.cash.payments"), false),
-      "receivePayments", "error.required.hvd.receive.cash.payments"
+      "receivePayments",
+      "error.required.hvd.receive.cash.payments"
     )
 
     behave like pageWithBackLink(cashView(fp(), false))

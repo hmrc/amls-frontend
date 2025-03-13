@@ -23,17 +23,18 @@ import services.responsiblepeople.YourResponsiblePeopleService
 import utils.AuthAction
 import views.html.responsiblepeople.YourResponsiblePeopleView
 
-class YourResponsiblePeopleController @Inject()(authAction: AuthAction,
-                                                val ds: CommonPlayDependencies,
-                                                val cc: MessagesControllerComponents,
-                                                yourResponsiblePeopleService: YourResponsiblePeopleService,
-                                                view: YourResponsiblePeopleView) extends AmlsBaseController(ds, cc) {
+class YourResponsiblePeopleController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  yourResponsiblePeopleService: YourResponsiblePeopleService,
+  view: YourResponsiblePeopleView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      yourResponsiblePeopleService.completeAndIncompleteRP(request.credId) map {
-        case Some((completeRP, incompleteRP)) => Ok(view(completeRP, incompleteRP))
-        case None => Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+  def get(): Action[AnyContent] = authAction.async { implicit request =>
+    yourResponsiblePeopleService.completeAndIncompleteRP(request.credId) map {
+      case Some((completeRP, incompleteRP)) => Ok(view(completeRP, incompleteRP))
+      case None                             => Redirect(controllers.routes.RegistrationProgressController.get())
+    }
   }
 }

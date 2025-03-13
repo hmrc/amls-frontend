@@ -23,7 +23,7 @@ import play.api.data.{Form, FormError}
 
 class BankAccountNonUKFormProviderSpec extends StringFieldBehaviours with Constraints {
 
-  val fp = new BankAccountNonUKFormProvider()
+  val fp                             = new BankAccountNonUKFormProvider()
   val form: Form[NonUKAccountNumber] = fp()
 
   val fieldName = "nonUKAccountNumber"
@@ -39,10 +39,9 @@ class BankAccountNonUKFormProviderSpec extends StringFieldBehaviours with Constr
       "max length is exceeded" in {
 
         forAll(stringsLongerThan(fp.length)) { invalidNumber =>
-
           val result = form.bind(Map(fieldName -> invalidNumber))
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(fieldName, "error.invalid.bankdetails.account.length", Seq(fp.length)))
         }
       }
@@ -50,20 +49,19 @@ class BankAccountNonUKFormProviderSpec extends StringFieldBehaviours with Constr
       "string is non-alphanumeric" in {
 
         forAll(stringsShorterThan(fp.length - 1), invalidCharForNames) { (number, invalidChar) =>
-
           val result = form.bind(Map(fieldName -> (number + invalidChar)))
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(fieldName, "error.invalid.bankdetails.account", Seq(alphanumericRegex)))
         }
       }
       "accept valid alphanumeric input with spaces" in {
         val validInputWithSpaces = "123 456 78"
-        val trimmedInput = "12345678"
+        val trimmedInput         = "12345678"
 
         val result = form.bind(Map(fieldName -> validInputWithSpaces))
 
-        result.value shouldBe Some(NonUKAccountNumber(trimmedInput))
+        result.value  shouldBe Some(NonUKAccountNumber(trimmedInput))
         result.errors shouldBe Seq.empty
       }
     }

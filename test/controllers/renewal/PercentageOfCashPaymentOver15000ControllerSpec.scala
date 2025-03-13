@@ -34,7 +34,11 @@ import views.html.renewal.PercentageView
 
 import scala.concurrent.Future
 
-class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
+class PercentageOfCashPaymentOver15000ControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with ScalaFutures
+    with Injecting {
 
   trait Fixture {
     self =>
@@ -45,12 +49,14 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
     val emptyCache = Cache.empty
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
-    lazy val mockRenewalService = mock[RenewalService]
-    lazy val view = inject[PercentageView]
-    val controller = new PercentageOfCashPaymentOver15000Controller(
+    lazy val mockRenewalService     = mock[RenewalService]
+    lazy val view                   = inject[PercentageView]
+    val controller                  = new PercentageOfCashPaymentOver15000Controller(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      renewalService = mockRenewalService,
+      cc = mockMcc,
       formProvider = inject[PercentageFormProvider],
       view = view
     )
@@ -68,14 +74,19 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
-        status(result) must be(OK)
-        contentAsString(result) must include("What percentage of your turnover came from cash payments of €10,000 or more?")
+        status(result)          must be(OK)
+        contentAsString(result) must include(
+          "What percentage of your turnover came from cash payments of €10,000 or more?"
+        )
       }
 
       "display the Percentage Of CashPayment Over 15000 page with pre populated data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Renewal](any(), any())
-        (any())).thenReturn(Future.successful(Some(Renewal(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First)))))
+        when(controller.dataCacheConnector.fetch[Renewal](any(), any())(any())).thenReturn(
+          Future.successful(
+            Some(Renewal(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First)))
+          )
+        )
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -90,11 +101,11 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.PercentageOfCashPaymentOver15000Controller.post().url)
-        .withFormUrlEncodedBody(
-        )
+          .withFormUrlEncodedBody(
+          )
 
         val result = controller.post()(newRequest)
-        status(result) must be(BAD_REQUEST)
+        status(result)          must be(BAD_REQUEST)
         contentAsString(result) must include(messages("error.required.renewal.hvd.percentage"))
       }
 
@@ -102,17 +113,19 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
         "redirect to the CashPaymentController" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.PercentageOfCashPaymentOver15000Controller.post().url)
-          .withFormUrlEncodedBody(
-            "percentage" -> PercentageOfCashPaymentOver15000.First.toString
-          )
+            .withFormUrlEncodedBody(
+              "percentage" -> PercentageOfCashPaymentOver15000.First.toString
+            )
 
           when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
           when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(emptyCache))
 
           val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.renewal.routes.CashPaymentsCustomersNotMetController.get().url))
+          status(result)           must be(SEE_OTHER)
+          redirectLocation(result) must be(
+            Some(controllers.renewal.routes.CashPaymentsCustomersNotMetController.get().url)
+          )
         }
       }
 
@@ -120,16 +133,16 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
         "redirect to the SummaryController" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.PercentageOfCashPaymentOver15000Controller.post().url)
-          .withFormUrlEncodedBody(
-            "percentage" -> PercentageOfCashPaymentOver15000.First.toString
-          )
+            .withFormUrlEncodedBody(
+              "percentage" -> PercentageOfCashPaymentOver15000.First.toString
+            )
 
           when(mockRenewalService.getRenewal(any())).thenReturn(Future.successful(None))
 
           when(mockRenewalService.updateRenewal(any(), any())).thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(true)(newRequest)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
         }
       }

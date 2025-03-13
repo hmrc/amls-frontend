@@ -21,8 +21,8 @@ import play.api.data.{Form, FormError}
 
 class LegalNameFormProviderSpec extends BooleanFieldBehaviours[Boolean] {
 
-  override val form: Form[Boolean] = new LegalNameFormProvider()()
-  override val fieldName: String = "hasPreviousName"
+  override val form: Form[Boolean]  = new LegalNameFormProvider()()
+  override val fieldName: String    = "hasPreviousName"
   override val errorMessage: String = "error.required.rp.hasPreviousName"
 
   "LegalNameFormProvider" must {

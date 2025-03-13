@@ -26,7 +26,7 @@ import views.html.responsiblepeople.address.NewHomeAddressView
 class NewHomeAddressViewSpec extends AmlsViewSpec {
 
   lazy val new_home_address = inject[NewHomeAddressView]
-  lazy val fp = inject[NewHomeAddressFormProvider]
+  lazy val fp               = inject[NewHomeAddressFormProvider]
 
   val name = "firstName lastName"
 
@@ -41,11 +41,13 @@ class NewHomeAddressViewSpec extends AmlsViewSpec {
 
       def view = new_home_address(fp(), 1, name)
 
-      doc.title must be(messages("responsiblepeople.new.home.is.uk.title") +
-        " - " + messages("summary.responsiblepeople") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
-      heading.html must be(messages("responsiblepeople.new.home.is.uk.heading", name))
+      doc.title       must be(
+        messages("responsiblepeople.new.home.is.uk.title") +
+          " - " + messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
+      heading.html    must be(messages("responsiblepeople.new.home.is.uk.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "isUK") must not be empty
@@ -53,7 +55,8 @@ class NewHomeAddressViewSpec extends AmlsViewSpec {
 
     behave like pageWithErrors(
       new_home_address(fp().withError("isUK", "error.required.uk.or.overseas.address.new.home"), 1, name),
-      "isUK", "error.required.uk.or.overseas.address.new.home"
+      "isUK",
+      "error.required.uk.or.overseas.address.new.home"
     )
 
     behave like pageWithBackLink(new_home_address(fp(), 1, name))

@@ -31,60 +31,51 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 case class NotificationRow(
-                            status: Option[Status],
-                            contactType: Option[ContactType],
-                            contactNumber: Option[String],
-                            variation: Boolean,
-                            receivedAt: LocalDateTime,
-                            isRead: Boolean,
-                            amlsRegistrationNumber: String,
-                            templatePackageVersion: String,
-                            _id: IDType
-                          ) {
+  status: Option[Status],
+  contactType: Option[ContactType],
+  contactNumber: Option[String],
+  variation: Boolean,
+  receivedAt: LocalDateTime,
+  isRead: Boolean,
+  amlsRegistrationNumber: String,
+  templatePackageVersion: String,
+  _id: IDType
+) {
 
-  def dateReceived: String = {
+  def dateReceived: String =
     receivedAt.format(DateTimeFormatter.ofPattern("d MMMM Y"))
-  }
 
   def subject: String = contactType match {
     case Some(RejectionReasons) =>
       (for {
         st <- status
         sr <- st.statusReason match {
-          case Some(NonCompliant) | Some(FitAndProperFailure) | Some(OtherRefused) => Some("notifications.rejr.title")
-          case _ => None
-        }
+                case Some(NonCompliant) | Some(FitAndProperFailure) | Some(OtherRefused) =>
+                  Some("notifications.rejr.title")
+                case _                                                                   => None
+              }
       } yield sr) getOrElse "notifications.fail.title"
 
     case _ =>
       val cType = ContactTypeHelper.getContactType(status, contactType, variation)
       templatePackageVersion match {
         case _ if cType == ApplicationAutorejectionForFailureToPay => "notifications.fail.title"
-        case "v1m0" | "v2m0" | "v3m0" | "v4m0" => s"notifications.subject.$cType"
-        case "v5m0" => s"notifications.subject.v5.$cType"
-        case "v6m0" => s"notifications.subject.v6.$cType"
-        case _ => throw new Exception(s"Unknown template version $templatePackageVersion")
+        case "v1m0" | "v2m0" | "v3m0" | "v4m0"                     => s"notifications.subject.$cType"
+        case "v5m0"                                                => s"notifications.subject.v5.$cType"
+        case "v6m0"                                                => s"notifications.subject.v6.$cType"
+        case _                                                     => throw new Exception(s"Unknown template version $templatePackageVersion")
       }
 
   }
 
   def notificationType: String = ContactTypeHelper.getContactType(status, contactType, variation) match {
-    case ApplicationApproval |
-         RegistrationVariationApproval |
-         RenewalApproval |
-         RejectionReasons |
-         ApplicationAutorejectionForFailureToPay |
-         RevocationReasons |
-         AutoExpiryOfRegistration |
-         RegistrationVariationApproval |
-         ApplicationAutorejectionForFailureToPay |
-         DeRegistrationEffectiveDateChange => "notifications.type.statusChange"
-    case ReminderToPayForApplication |
-         ReminderToPayForVariation |
-         ReminderToPayForRenewal |
-         ReminderToPayForManualCharges |
-         RenewalReminder |
-         NewRenewalReminder => "notifications.type.reminder"
+    case ApplicationApproval | RegistrationVariationApproval | RenewalApproval | RejectionReasons |
+        ApplicationAutorejectionForFailureToPay | RevocationReasons | AutoExpiryOfRegistration |
+        RegistrationVariationApproval | ApplicationAutorejectionForFailureToPay | DeRegistrationEffectiveDateChange =>
+      "notifications.type.statusChange"
+    case ReminderToPayForApplication | ReminderToPayForVariation | ReminderToPayForRenewal |
+        ReminderToPayForManualCharges | RenewalReminder | NewRenewalReminder =>
+      "notifications.type.reminder"
     case _ => "notifications.type.communication"
   }
 
@@ -93,8 +84,7 @@ case class NotificationRow(
     val link =
       s"""
          |<a id="hyper-link-$id-$index" class="govuk-link"
-         |href="${
-        controllers.routes.NotificationController.messageDetails(
+         |href="${controllers.routes.NotificationController.messageDetails(
           _id.id,
           utils.ContactTypeHelper.getContactType(
             status,
@@ -103,8 +93,7 @@ case class NotificationRow(
           ),
           amlsRegistrationNumber,
           templatePackageVersion
-        )
-      }
+        )}
          |">
          |${messages(this.subject)}
          |</a>
@@ -142,7 +131,7 @@ object NotificationRow {
         (JsPath \ "amlsRegistrationNumber").read[String] and
         (JsPath \ "templatePackageVersion").read[String] and
         (JsPath \ "_id").read[IDType]
-      ) (NotificationRow.apply _)
+    )(NotificationRow.apply _)
 
   val writes: OWrites[NotificationRow] =
     (
@@ -155,7 +144,7 @@ object NotificationRow {
         (JsPath \ "amlsRegistrationNumber").write[String] and
         (JsPath \ "templatePackageVersion").write[String] and
         (JsPath \ "_id").write[IDType]
-      ) (unlift(NotificationRow.unapply))
+    )(unlift(NotificationRow.unapply))
 
   implicit val format: OFormat[NotificationRow] = OFormat(reads, writes)
 }

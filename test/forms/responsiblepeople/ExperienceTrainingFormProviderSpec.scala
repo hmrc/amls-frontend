@@ -25,12 +25,12 @@ import play.api.test.{FakeRequest, Helpers}
 
 class ExperienceTrainingFormProviderSpec extends StringFieldBehaviours with Constraints with MessagesImplicits {
 
-  implicit val messages: Messages = Helpers.stubMessagesApi().preferred(FakeRequest())
-  val formProvider = new ExperienceTrainingFormProvider()
-  val name = "John Smith"
+  implicit val messages: Messages    = Helpers.stubMessagesApi().preferred(FakeRequest())
+  val formProvider                   = new ExperienceTrainingFormProvider()
+  val name                           = "John Smith"
   val form: Form[ExperienceTraining] = formProvider(name, None)
-  val booleanFieldName: String = "experienceTraining"
-  val stringFieldName: String = "experienceInformation"
+  val booleanFieldName: String       = "experienceTraining"
+  val stringFieldName: String        = "experienceInformation"
 
   "ExperienceTrainingFormProvider" must {
 
@@ -39,11 +39,12 @@ class ExperienceTrainingFormProviderSpec extends StringFieldBehaviours with Cons
       "true is submitted with other names" in {
 
         forAll(stringsShorterThan(formProvider.length).suchThat(_.nonEmpty)) { info =>
-
-          val result = form.bind(Map(
-            booleanFieldName -> "true",
-            stringFieldName -> info
-          ))
+          val result = form.bind(
+            Map(
+              booleanFieldName -> "true",
+              stringFieldName  -> info
+            )
+          )
 
           result.value shouldBe Some(ExperienceTrainingYes(info))
           assert(result.errors.isEmpty)
@@ -52,9 +53,11 @@ class ExperienceTrainingFormProviderSpec extends StringFieldBehaviours with Cons
 
       "false is submitted" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> "false"
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> "false"
+          )
+        )
 
         result.value shouldBe Some(ExperienceTrainingNo)
         assert(result.errors.isEmpty)
@@ -66,12 +69,13 @@ class ExperienceTrainingFormProviderSpec extends StringFieldBehaviours with Cons
       s"$booleanFieldName is an invalid value" in {
 
         forAll(alphaStringsShorterThan(formProvider.length).suchThat(_.nonEmpty)) { invalid =>
+          val result = form.bind(
+            Map(
+              booleanFieldName -> invalid
+            )
+          )
 
-          val result = form.bind(Map(
-            booleanFieldName -> invalid
-          ))
-
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(FormError(booleanFieldName, "error.required.rp.experiencetraining"))
         }
       }
@@ -79,11 +83,13 @@ class ExperienceTrainingFormProviderSpec extends StringFieldBehaviours with Cons
       s"$booleanFieldName is empty with single service" in {
 
         val service = "high value dealer"
-        val result = formProvider(name, Some(service)).bind(Map(
-          booleanFieldName -> ""
-        ))
+        val result  = formProvider(name, Some(service)).bind(
+          Map(
+            booleanFieldName -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(
           FormError(
             booleanFieldName,
@@ -94,34 +100,40 @@ class ExperienceTrainingFormProviderSpec extends StringFieldBehaviours with Cons
 
       s"$booleanFieldName is empty with multiple services" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(booleanFieldName, messages("error.required.rp.experiencetraining", name)))
       }
 
       s"$stringFieldName is empty when $booleanFieldName is true" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> "true",
-          stringFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> "true",
+            stringFieldName  -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(stringFieldName, "error.required.rp.experiencetraining.information"))
       }
 
       s"$stringFieldName is longer than ${formProvider.length} when $booleanFieldName is true" in {
 
         forAll(stringsLongerThan(formProvider.length).suchThat(_.nonEmpty)) { info =>
-          val result = form.bind(Map(
-            booleanFieldName -> "true",
-            stringFieldName -> info
-          ))
+          val result = form.bind(
+            Map(
+              booleanFieldName -> "true",
+              stringFieldName  -> info
+            )
+          )
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(
             FormError(
               stringFieldName,
@@ -134,12 +146,14 @@ class ExperienceTrainingFormProviderSpec extends StringFieldBehaviours with Cons
 
       s"$stringFieldName violates regex when $booleanFieldName is true" in {
 
-        val result = form.bind(Map(
-          booleanFieldName -> "true",
-          stringFieldName -> "§±@*(&%!£"
-        ))
+        val result = form.bind(
+          Map(
+            booleanFieldName -> "true",
+            stringFieldName  -> "§±@*(&%!£"
+          )
+        )
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(
           FormError(
             stringFieldName,

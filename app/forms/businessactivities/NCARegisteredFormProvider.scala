@@ -22,9 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class NCARegisteredFormProvider @Inject()() extends Mappings {
+class NCARegisteredFormProvider @Inject() () extends Mappings {
 
-  private val errorMessage = "error.required.ba.select.nca"
+  private val errorMessage         = "error.required.ba.select.nca"
   def apply(): Form[NCARegistered] = Form[NCARegistered](
     "ncaRegistered" -> boolean(errorMessage, errorMessage)
       .transform[NCARegistered](NCARegistered.apply, _.ncaRegistered)

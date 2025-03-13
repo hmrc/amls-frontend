@@ -33,7 +33,8 @@ import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TaxEnrolmentsConnector @Inject()(http: HttpClientV2, val appConfig: ApplicationConfig, audit: AuditConnector) extends Logging {
+class TaxEnrolmentsConnector @Inject() (http: HttpClientV2, val appConfig: ApplicationConfig, audit: AuditConnector)
+    extends Logging {
 
   lazy val baseUrl = if (appConfig.enrolmentStubsEnabled) {
     s"${appConfig.enrolmentStubsUrl}/tax-enrolments"
@@ -46,76 +47,81 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClientV2, val appConfig: Applic
   // $COVERAGE-ON$
 
   object ResponseCodes {
-    val duplicateEnrolment = "ERROR_INVALID_IDENTIFIERS"
+    val duplicateEnrolment    = "ERROR_INVALID_IDENTIFIERS"
     val invalidCredentialRole = "INVALID_CREDENTIAL_ID"
   }
 
-  def enrol(enrolKey: EnrolmentKey, enrolment: TaxEnrolment, groupId: Option[String])
-           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  def enrol(enrolKey: EnrolmentKey, enrolment: TaxEnrolment, groupId: Option[String])(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[HttpResponse] = {
 
     // $COVERAGE-OFF$
-      logger.debug("TaxEnrolmentsConnector:enrol:enrolKey:" + enrolKey)
+    logger.debug("TaxEnrolmentsConnector:enrol:enrolKey:" + enrolKey)
     // $COVERAGE-ON$
-      groupId match {
-        case Some(groupId) =>
-          val url = url"$baseUrl/groups/$groupId/enrolments/${enrolKey.key}"
+    groupId match {
+      case Some(groupId) =>
+        val url = url"$baseUrl/groups/$groupId/enrolments/${enrolKey.key}"
 
-          http.post(url).withBody(Json.toJson(enrolment)).execute[HttpResponse] map { response =>
-            audit.sendEvent(ESEnrolEvent(enrolment, response, enrolKey))
-            response
-          } recoverWith {
-            case e: UpstreamErrorResponse if Json.parse(e.message).asOpt[ErrorResponse].isDefined =>
-              val error = Json.parse(e.message).as[ErrorResponse]
-              audit.sendEvent(ESEnrolFailureEvent(enrolment, e, enrolKey))
-              // $COVERAGE-OFF$
-              warn(error.toString)
-              // $COVERAGE-ON$
+        http.post(url).withBody(Json.toJson(enrolment)).execute[HttpResponse] map { response =>
+          audit.sendEvent(ESEnrolEvent(enrolment, response, enrolKey))
+          response
+        } recoverWith {
+          case e: UpstreamErrorResponse if Json.parse(e.message).asOpt[ErrorResponse].isDefined =>
+            val error = Json.parse(e.message).as[ErrorResponse]
+            audit.sendEvent(ESEnrolFailureEvent(enrolment, e, enrolKey))
+            // $COVERAGE-OFF$
+            warn(error.toString)
+            // $COVERAGE-ON$
 
-              (e.statusCode, error.code) match {
-                case (BAD_REQUEST, ResponseCodes.duplicateEnrolment) =>
-                  throw DuplicateEnrolmentException(error.toString, e)
-                case (FORBIDDEN, ResponseCodes.invalidCredentialRole) =>
-                  throw InvalidEnrolmentCredentialsException(error.toString, e)
-                case _ => throw new Exception("An Unknown exception has occurred :")
-              }
+            (e.statusCode, error.code) match {
+              case (BAD_REQUEST, ResponseCodes.duplicateEnrolment)  =>
+                throw DuplicateEnrolmentException(error.toString, e)
+              case (FORBIDDEN, ResponseCodes.invalidCredentialRole) =>
+                throw InvalidEnrolmentCredentialsException(error.toString, e)
+              case _                                                => throw new Exception("An Unknown exception has occurred :")
+            }
 
-            case e: Throwable =>
-              audit.sendEvent(ESEnrolFailureEvent(enrolment, e, enrolKey))
-              // $COVERAGE-OFF$
-              warn(e.getMessage)
-              // $COVERAGE-ON$
-              throw e
-          }
+          case e: Throwable =>
+            audit.sendEvent(ESEnrolFailureEvent(enrolment, e, enrolKey))
+            // $COVERAGE-OFF$
+            warn(e.getMessage)
+            // $COVERAGE-ON$
+            throw e
+        }
 
-        case _ => throw new Exception("Group identifier is unavailable")
-      }
+      case _ => throw new Exception("Group identifier is unavailable")
+    }
   }
 
-  def deEnrol(registrationNumber: String, groupId: Option[String])
-             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  def deEnrol(registrationNumber: String, groupId: Option[String])(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[HttpResponse] = {
 
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
     // $COVERAGE-OFF$
-      logger.debug("TaxEnrolmentsConnector:deEnrol:enrolKey:" + enrolKey)
+    logger.debug("TaxEnrolmentsConnector:deEnrol:enrolKey:" + enrolKey)
     // $COVERAGE-ON$
-      groupId match {
-        case Some(groupId) =>
-          val url = url"$baseUrl/groups/$groupId/enrolments/$enrolKey"
+    groupId match {
+      case Some(groupId) =>
+        val url = url"$baseUrl/groups/$groupId/enrolments/$enrolKey"
 
-          http.delete(url).execute[HttpResponse].map { response =>
-            audit.sendEvent(ESDeEnrolEvent(response, enrolKey))
-            response
-          }
+        http.delete(url).execute[HttpResponse].map { response =>
+          audit.sendEvent(ESDeEnrolEvent(response, enrolKey))
+          response
+        }
 
-        case _ => throw new Exception("Group identifier is unavailable")
-      }
+      case _ => throw new Exception("Group identifier is unavailable")
+    }
   }
 
-  def removeKnownFacts(registrationNumber: String)
-                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  def removeKnownFacts(
+    registrationNumber: String
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
-    val url = url"$baseUrl/enrolments/$enrolKey"
+    val url      = url"$baseUrl/enrolments/$enrolKey"
 
     http.delete(url).execute[HttpResponse].map { response =>
       audit.sendEvent(ESRemoveKnownFactsEvent(response, enrolKey))

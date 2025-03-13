@@ -19,7 +19,7 @@ package models.moneyservicebusiness
 import models.Country
 import play.api.libs.json.{Json, Reads, Writes}
 
-case class SendTheLargestAmountsOfMoney (countries: Seq[Country])
+case class SendTheLargestAmountsOfMoney(countries: Seq[Country])
 
 private sealed trait SendTheLargestAmountsOfMoney0 {
 
@@ -27,18 +27,18 @@ private sealed trait SendTheLargestAmountsOfMoney0 {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
     ((__ \ "country_1").read[Country] and
-    (__ \ "country_2").readNullable[Country] and
-    (__ \ "country_3").readNullable[Country]).tupled map { countries =>
+      (__ \ "country_2").readNullable[Country] and
+      (__ \ "country_3").readNullable[Country]).tupled map { countries =>
       SendTheLargestAmountsOfMoney(countries._1 +: Seq(countries._2, countries._3).flatten)
-      }
     }
+  }
 
   val jsonW = Writes[SendTheLargestAmountsOfMoney] { lom =>
     lom.countries match {
       case Seq(a, b, c) => Json.obj("country_1" -> a, "country_2" -> b, "country_3" -> c)
-      case Seq(a, b) => Json.obj("country_1" -> a, "country_2" -> b)
-      case Seq(a) => Json.obj("country_1" -> a)
-      case _ => Json.obj()
+      case Seq(a, b)    => Json.obj("country_1" -> a, "country_2" -> b)
+      case Seq(a)       => Json.obj("country_1" -> a)
+      case _            => Json.obj()
     }
   }
 }
@@ -47,6 +47,6 @@ object SendTheLargestAmountsOfMoney {
 
   private object Cache extends SendTheLargestAmountsOfMoney0
 
-  implicit val jsonR: Reads[SendTheLargestAmountsOfMoney] = Cache.jsonR
+  implicit val jsonR: Reads[SendTheLargestAmountsOfMoney]  = Cache.jsonR
   implicit val jsonW: Writes[SendTheLargestAmountsOfMoney] = Cache.jsonW
 }

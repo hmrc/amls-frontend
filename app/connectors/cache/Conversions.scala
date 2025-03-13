@@ -20,14 +20,15 @@ import play.api.libs.json.{JsObject, JsValue}
 // $COVERAGE-OFF$
 trait Conversions {
 
-  /**
-    * Maps a JSValue to a Map of String -> JsValue
-    * @param json The json to convert
-    * @return A map, where the keys of the input json form the keys of the output Map
+  /** Maps a JSValue to a Map of String -> JsValue
+    * @param json
+    *   The json to convert
+    * @return
+    *   A map, where the keys of the input json form the keys of the output Map
     */
   def toMap(json: JsValue): Map[String, JsValue] = json match {
     case JsObject(fields) => fields.toMap
-    case _ => Map.empty[String, JsValue]
+    case _                => Map.empty[String, JsValue]
   }
 }
 // $COVERAGE-ON$

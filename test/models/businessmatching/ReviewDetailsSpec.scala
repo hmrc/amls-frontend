@@ -31,26 +31,31 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
     businessName = "Name",
     businessType = Some(BusinessType.SoleProprietor),
     businessAddress = Address(
-      "1 Test Street", Some("Test Town"), None, None, None, Country("United Kingdom", "GB")
+      "1 Test Street",
+      Some("Test Town"),
+      None,
+      None,
+      None,
+      Country("United Kingdom", "GB")
     ),
     safeId = "safeId"
   )
 
   val json = Json.obj(
-    "businessName" -> "Name",
-    "businessType" -> "Sole Trader",
+    "businessName"    -> "Name",
+    "businessType"    -> "Sole Trader",
     "businessAddress" -> Json.obj(
-      "line_1" -> "1 Test Street",
-      "line_2" -> "Test Town",
+      "line_1"  -> "1 Test Street",
+      "line_2"  -> "Test Town",
       "country" -> "GB"
     ),
-    "safeId" -> "safeId"
+    "safeId"          -> "safeId"
   )
 
   "Review Details Model" must {
     "validate correctly with a `Some` business type" in {
       Json.fromJson[ReviewDetails](json) mustEqual JsSuccess(model)
-      Json.toJson(model) mustEqual (json)
+      Json.toJson(model) mustEqual json
     }
 
     "validate successfully with an invalid business type" in {
@@ -59,14 +64,14 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
       )
 
       val json = Json.obj(
-        "businessName" -> "Name",
-        "businessType" -> "invalid body",
+        "businessName"    -> "Name",
+        "businessType"    -> "invalid body",
         "businessAddress" -> Json.obj(
-          "line_1" -> "1 Test Street",
-          "line_2" -> "Test Town",
+          "line_1"  -> "1 Test Street",
+          "line_2"  -> "Test Town",
           "country" -> "GB"
         ),
-        "safeId" -> "safeId"
+        "safeId"          -> "safeId"
       )
 
       Json.fromJson[ReviewDetails](json) mustEqual JsSuccess(model)
@@ -76,13 +81,13 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
       val model = suite.model.copy(businessType = None)
 
       val json = Json.obj(
-        "businessName" -> "Name",
+        "businessName"    -> "Name",
         "businessAddress" -> Json.obj(
-          "line_1" -> "1 Test Street",
-          "line_2" -> "Test Town",
+          "line_1"  -> "1 Test Street",
+          "line_2"  -> "Test Town",
           "country" -> "GB"
         ),
-        "safeId" -> "safeId"
+        "safeId"          -> "safeId"
       )
 
       Json.fromJson[ReviewDetails](json) mustEqual JsSuccess(model)
@@ -96,7 +101,9 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
         Some("Address line 2"),
         Some("Address line 3"),
         Some("Address line4"),
-        Some("AA11AA"), "GB")
+        Some("AA11AA"),
+        "GB"
+      )
 
       val expectedAddressModel = Address(
         "Address line1",
@@ -104,9 +111,10 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
         Some("Address line 3"),
         Some("Address line4"),
         Some("AA11AA"),
-        Country("United Kingdom", "GB"))
+        Country("United Kingdom", "GB")
+      )
 
-      ReviewDetails.convert(bmAddressModel) mustBe(expectedAddressModel)
+      ReviewDetails.convert(bmAddressModel) mustBe expectedAddressModel
     }
 
     "properly convert valid non-UK business matching address model to business customer address model" in {
@@ -115,7 +123,9 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
         Some("Address line 2"),
         Some("Address line 3"),
         Some("Address line4"),
-        None, "FR")
+        None,
+        "FR"
+      )
 
       val expectedAddressModel = Address(
         "Address line1",
@@ -123,9 +133,10 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
         Some("Address line 3"),
         Some("Address line4"),
         None,
-        Country("France", "FR"))
+        Country("France", "FR")
+      )
 
-      ReviewDetails.convert(bmAddressModel) mustBe(expectedAddressModel)
+      ReviewDetails.convert(bmAddressModel) mustBe expectedAddressModel
     }
 
     "properly convert business matching address model with not existing country code to business customer address model" in {
@@ -134,7 +145,9 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
         Some("Address line 2"),
         Some("Address line 3"),
         Some("Address line4"),
-        None, "XYZ")
+        None,
+        "XYZ"
+      )
 
       val expectedAddressModel = Address(
         "Address line1",
@@ -142,9 +155,10 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
         Some("Address line 3"),
         Some("Address line4"),
         None,
-        Country("", "XYZ"))
+        Country("", "XYZ")
+      )
 
-      ReviewDetails.convert(bmAddressModel) mustBe(expectedAddressModel)
+      ReviewDetails.convert(bmAddressModel) mustBe expectedAddressModel
     }
 
     "properly convert business matching address model with missing country code to business customer address model" in {
@@ -153,7 +167,9 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
         Some("Address line 2"),
         Some("Address line 3"),
         Some("Address line4"),
-        None, "")
+        None,
+        ""
+      )
 
       val expectedAddressModel = Address(
         "Address line1",
@@ -161,9 +177,10 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
         Some("Address line 3"),
         Some("Address line4"),
         None,
-        Country("", ""))
+        Country("", "")
+      )
 
-      ReviewDetails.convert(bmAddressModel) mustBe(expectedAddressModel)
+      ReviewDetails.convert(bmAddressModel) mustBe expectedAddressModel
     }
   }
 }

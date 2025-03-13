@@ -40,8 +40,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[MostTransactionsView]
+    self =>
+    val request                       = addToken(authRequest)
+    lazy val view                     = inject[MostTransactionsView]
     implicit val ec: ExecutionContext = inject[ExecutionContext]
 
     val controller = new MostTransactionsController(
@@ -53,7 +54,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
       mockAutoComplete,
       cc = mockMcc,
       formProvider = inject[MostTransactionsFormProvider],
-      view = view)
+      view = view
+    )
 
     mockCacheFetch[ServiceChangeRegister](None, None)
     mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister()), ServiceChangeRegister.key)
@@ -72,7 +74,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
       mockApplicationStatus(NotCompleted)
       mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
 
-      val result = controller.get()(request)
+      val result   = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustEqual OK
@@ -100,7 +102,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
       mockApplicationStatus(NotCompleted)
       mockCacheFetch[MoneyServiceBusiness](Some(model), Some(MoneyServiceBusiness.key))
 
-      val result = controller.get()(request)
+      val result   = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustEqual OK
@@ -117,7 +119,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
         mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("msb.most.transactions.title"))
       }
 
@@ -127,7 +129,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
         mockIsNewActivityNewAuth(false)
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("msb.most.transactions.title"))
       }
     }
@@ -135,11 +137,10 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
     "return a Bad request with errors on invalid submission" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url)
-      .withFormUrlEncodedBody("mostTransactionsCountries[0]" -> "adsadsdsdsaads")
+        .withFormUrlEncodedBody("mostTransactionsCountries[0]" -> "adsadsdsdsaads")
 
-      val result = controller.post()(newRequest)
+      val result   = controller.post()(newRequest)
       val document = Jsoup.parse(contentAsString(result))
-
 
       status(result) mustEqual BAD_REQUEST
 
@@ -165,13 +166,14 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
             MostTransactions(
               Seq(Country("United Kingdom", "GB"))
             )
-          ), hasChanged = true
+          ),
+          hasChanged = true
         )
 
         val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url)
-        .withFormUrlEncodedBody(
-          "mostTransactionsCountries[]" -> "GB"
-        )
+          .withFormUrlEncodedBody(
+            "mostTransactionsCountries[]" -> "GB"
+          )
 
         mockCacheFetchAll
         mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
@@ -185,7 +187,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
       }
 
       "edit is false and we're adding MSB to an approved application (CE)" in new Fixture {
-        val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+        val msbServices   = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
         val incomingModel = MoneyServiceBusiness()
 
         val outgoingModel = incomingModel.copy(
@@ -193,13 +195,14 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
             MostTransactions(
               Seq(Country("United Kingdom", "GB"))
             )
-          ), hasChanged = true
+          ),
+          hasChanged = true
         )
 
         val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url)
-        .withFormUrlEncodedBody(
-          "mostTransactionsCountries[]" -> "GB"
-        )
+          .withFormUrlEncodedBody(
+            "mostTransactionsCountries[]" -> "GB"
+          )
 
         when {
           mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
@@ -208,7 +211,10 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
         mockCacheFetchAll
         mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
         mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
-        mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister(Some(Set(MoneyServiceBusinessActivity)))), ServiceChangeRegister.key)
+        mockCacheGetEntry[ServiceChangeRegister](
+          Some(ServiceChangeRegister(Some(Set(MoneyServiceBusinessActivity)))),
+          ServiceChangeRegister.key
+        )
         mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
 
         val result = controller.post()(newRequest)
@@ -218,7 +224,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
       }
 
       "edit is false and we're adding MSB to an approved application (CE, FX)" in new Fixture {
-        val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ForeignExchange)))
+        val msbServices   = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ForeignExchange)))
         val incomingModel = MoneyServiceBusiness()
 
         val outgoingModel = incomingModel.copy(
@@ -226,13 +232,14 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
             MostTransactions(
               Seq(Country("United Kingdom", "GB"))
             )
-          ), hasChanged = true
+          ),
+          hasChanged = true
         )
 
         val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url)
-        .withFormUrlEncodedBody(
-          "mostTransactionsCountries[]" -> "GB"
-        )
+          .withFormUrlEncodedBody(
+            "mostTransactionsCountries[]" -> "GB"
+          )
 
         when {
           mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
@@ -241,7 +248,10 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
         mockCacheFetchAll
         mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
         mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
-        mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister(Some(Set(MoneyServiceBusinessActivity)))), ServiceChangeRegister.key)
+        mockCacheGetEntry[ServiceChangeRegister](
+          Some(ServiceChangeRegister(Some(Set(MoneyServiceBusinessActivity)))),
+          ServiceChangeRegister.key
+        )
         mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
 
         val result = controller.post()(newRequest)
@@ -262,13 +272,14 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
             MostTransactions(
               Seq(Country("United Kingdom", "GB"))
             )
-          ), hasChanged = true
+          ),
+          hasChanged = true
         )
 
         val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url)
-        .withFormUrlEncodedBody(
-          "mostTransactionsCountries[]" -> "GB"
-        )
+          .withFormUrlEncodedBody(
+            "mostTransactionsCountries[]" -> "GB"
+          )
 
         mockCacheFetchAll
         mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
@@ -281,7 +292,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
       }
 
       "edit is false and we're adding MSB to an approved application (CE)" in new Fixture {
-        val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
+        val msbServices   = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
         val incomingModel = MoneyServiceBusiness()
 
         val outgoingModel = incomingModel.copy(
@@ -289,13 +300,14 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
             MostTransactions(
               Seq(Country("United Kingdom", "GB"))
             )
-          ), hasChanged = true
+          ),
+          hasChanged = true
         )
 
         val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url)
-        .withFormUrlEncodedBody(
-          "mostTransactionsCountries[]" -> "GB"
-        )
+          .withFormUrlEncodedBody(
+            "mostTransactionsCountries[]" -> "GB"
+          )
 
         when {
           mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
@@ -304,7 +316,10 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
         mockCacheFetchAll
         mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
         mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
-        mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister(Some(Set(MoneyServiceBusinessActivity)))), ServiceChangeRegister.key)
+        mockCacheGetEntry[ServiceChangeRegister](
+          Some(ServiceChangeRegister(Some(Set(MoneyServiceBusinessActivity)))),
+          ServiceChangeRegister.key
+        )
         mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
 
         val result = controller.post()(newRequest)
@@ -316,7 +331,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
 
     "redirect to CETransactionsInNext12Months on valid submission when CE is available but has not just been added to the application " in new Fixture {
 
-      val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+      val msbServices   = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
       val incomingModel = MoneyServiceBusiness()
 
       val outgoingModel = incomingModel.copy(
@@ -324,20 +339,24 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
           MostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
-        ), hasChanged = true
+        ),
+        hasChanged = true
       )
 
       val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url)
-      .withFormUrlEncodedBody(
-        "mostTransactionsCountries[]" -> "GB"
-      )
+        .withFormUrlEncodedBody(
+          "mostTransactionsCountries[]" -> "GB"
+        )
 
       mockCacheFetchAll
       mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
       mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
-      mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister(addedSubSectors = Some(Set(TransmittingMoney)))), ServiceChangeRegister.key)
+      mockCacheGetEntry[ServiceChangeRegister](
+        Some(ServiceChangeRegister(addedSubSectors = Some(Set(TransmittingMoney)))),
+        ServiceChangeRegister.key
+      )
       mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
-      
+
       when {
         mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(false)
@@ -357,24 +376,25 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
           MostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
-        ), hasChanged = true
+        ),
+        hasChanged = true
       )
-      val msbServices = Some(
+      val msbServices   = Some(
         BusinessMatchingMsbServices(
           Set(
             ChequeCashingScrapMetal
           )
         )
       )
-      val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url)
-      .withFormUrlEncodedBody(
-        "mostTransactionsCountries[]" -> "GB"
-      )
+      val newRequest    = FakeRequest(POST, routes.MostTransactionsController.post().url)
+        .withFormUrlEncodedBody(
+          "mostTransactionsCountries[]" -> "GB"
+        )
 
       mockCacheFetchAll
       mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
       mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
-      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
+      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
 
       val result = controller.post()(newRequest)
 
@@ -393,31 +413,36 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
       )
 
       val incomingModel = MoneyServiceBusiness(
-        ceTransactionsInNext12Months = Some(CETransactionsInNext12Months(
-          "1223131"
-        ))
+        ceTransactionsInNext12Months = Some(
+          CETransactionsInNext12Months(
+            "1223131"
+          )
+        )
       )
 
       val outgoingModel = MoneyServiceBusiness(
-        ceTransactionsInNext12Months = Some(CETransactionsInNext12Months(
-          "1223131"
-        )),
+        ceTransactionsInNext12Months = Some(
+          CETransactionsInNext12Months(
+            "1223131"
+          )
+        ),
         mostTransactions = Some(
           MostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
-        ), hasChanged = true
+        ),
+        hasChanged = true
       )
 
       val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url)
-      .withFormUrlEncodedBody(
-        "mostTransactionsCountries[]" -> "GB"
-      )
+        .withFormUrlEncodedBody(
+          "mostTransactionsCountries[]" -> "GB"
+        )
 
       mockCacheFetchAll
       mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
       mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
-      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
+      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
 
       val result = controller.post(edit = true)(newRequest)
 
@@ -433,17 +458,18 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
           MostTransactions(
             Seq(Country("United Kingdom", "GB"))
           )
-        ), hasChanged = true
+        ),
+        hasChanged = true
       )
 
       val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url)
-      .withFormUrlEncodedBody(
-        "mostTransactionsCountries[0]" -> "GB"
-      )
+        .withFormUrlEncodedBody(
+          "mostTransactionsCountries[0]" -> "GB"
+        )
 
       mockCacheFetchAll
       mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
-      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
+      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
     }
 
     "return a redirect on valid submission where the next page data doesn't exist (edit) (CE)" in new NextPageDataDoesNotExistFixture {
@@ -455,23 +481,23 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
       redirectLocation(result) mustBe Some(routes.CurrencyExchangesInNext12MonthsController.get(true).url)
     }
 
-  "return a redirect on valid submission where the next page data doesn't exist (edit) (CE, FX)" in new NextPageDataDoesNotExistFixture {
+    "return a redirect on valid submission where the next page data doesn't exist (edit) (CE, FX)" in new NextPageDataDoesNotExistFixture {
       val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ForeignExchange)))
       mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
 
       val result = controller.post(edit = true)(newRequest)
       status(result) mustEqual SEE_OTHER
       redirectLocation(result) mustBe Some(routes.CurrencyExchangesInNext12MonthsController.get(true).url)
-  }
+    }
 
-  "return a redirect on valid submission where the next page data doesn't exist (edit) (FX)" in new NextPageDataDoesNotExistFixture {
+    "return a redirect on valid submission where the next page data doesn't exist (edit) (FX)" in new NextPageDataDoesNotExistFixture {
       val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
       mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
 
       val result = controller.post(edit = true)(newRequest)
       status(result) mustEqual SEE_OTHER
       redirectLocation(result) mustBe Some(routes.FXTransactionsInNext12MonthsController.get(true).url)
-  }
+    }
 
     "return a redirect to the summary page on valid submission (edit) (non-CE, non-FX)" in new NextPageDataDoesNotExistFixture {
       val msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal)))
@@ -486,9 +512,9 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
   "throw exception when Msb services in Business Matching returns none" in new Fixture {
 
     val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url)
-    .withFormUrlEncodedBody(
-      "mostTransactionsCountries[]" -> "GB"
-    )
+      .withFormUrlEncodedBody(
+        "mostTransactionsCountries[]" -> "GB"
+      )
 
     val incomingModel = MoneyServiceBusiness()
 
@@ -500,11 +526,10 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
     mockCacheFetchAll
     mockCacheGetEntry[MoneyServiceBusiness](None, MoneyServiceBusiness.key)
     mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
-    mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
-
+    mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
 
     a[Exception] must be thrownBy {
-      ScalaFutures.whenReady(controller.post(true)(newRequest)) { x => x }
+      ScalaFutures.whenReady(controller.post(true)(newRequest))(x => x)
     }
   }
 }

@@ -25,11 +25,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.address.AdditionalExtraAddressView
 
-
 class AdditionalExtraAddressViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val extraAddressView = inject[AdditionalExtraAddressView]
-  lazy val fp = inject[AdditionalExtraAddressFormProvider]
+  lazy val fp               = inject[AdditionalExtraAddressFormProvider]
 
   val name = "firstName lastName"
 
@@ -43,22 +42,38 @@ class AdditionalExtraAddressViewSpec extends AmlsViewSpec with Matchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = extraAddressView(fp().fill(ResponsiblePersonAddress(PersonAddressUK("",None,None,None,""), None)), true, 1, None, name)
+      def view = extraAddressView(
+        fp().fill(ResponsiblePersonAddress(PersonAddressUK("", None, None, None, ""), None)),
+        true,
+        1,
+        None,
+        name
+      )
 
-      doc.title must startWith (messages("responsiblepeople.additional_extra_address.title", name))
+      doc.title must startWith(messages("responsiblepeople.additional_extra_address.title", name))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = extraAddressView(fp().fill(ResponsiblePersonAddress(PersonAddressUK("",None,None,None,""), None)), true, 1, None, name)
+      def view = extraAddressView(
+        fp().fill(ResponsiblePersonAddress(PersonAddressUK("", None, None, None, ""), None)),
+        true,
+        1,
+        None,
+        name
+      )
 
-      heading.html must be(messages("responsiblepeople.additional_extra_address.heading", name))
+      heading.html    must be(messages("responsiblepeople.additional_extra_address.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
     }
 
     behave like pageWithErrors(
       extraAddressView(
-        fp().withError("isUK", "error.required.uk.or.overseas.address.previous.other"), false, 1, None, name
+        fp().withError("isUK", "error.required.uk.or.overseas.address.previous.other"),
+        false,
+        1,
+        None,
+        name
       ),
       "isUK",
       "error.required.uk.or.overseas.address.previous.other"

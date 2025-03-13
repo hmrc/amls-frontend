@@ -40,15 +40,22 @@ import scala.jdk.CollectionConverters._
 class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks with ResponsiblePeopleValues {
 
   lazy val answersView = inject[CheckYourAnswersView]
-  lazy val cyaHelper = inject[CheckYourAnswersHelper]
+  lazy val cyaHelper   = inject[CheckYourAnswersHelper]
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken: Request[_] = addTokenForView(FakeRequest())
 
-    val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))
+    val businessMatching: BusinessMatching =
+      BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))
 
     val cyaList: Seq[(String, SummaryList)] = cyaHelper.getHeadingsAndSummaryLists(
-      responsiblePeopleModel, businessMatching, personName.fullName, 1, None, true, true
+      responsiblePeopleModel,
+      businessMatching,
+      personName.fullName,
+      1,
+      None,
+      true,
+      true
     )
   }
 
@@ -63,7 +70,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
     "have correct headings" in new ViewFixture {
       def view = answersView(cyaList, 1, true, personName.fullName)
 
-      heading.html must be(messages("title.cya"))
+      heading.html    must be(messages("title.cya"))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
       doc.getElementsByClass("govuk-heading-m").asScala.zipWithIndex.foreach { case (subheading, index) =>
@@ -78,15 +85,14 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
         (
           cyaList.flatMap(_._2.rows) lazyZip
-          doc.getElementsByClass("govuk-summary-list__key").asScala lazyZip
-          doc.getElementsByClass("govuk-summary-list__value").asScala
+            doc.getElementsByClass("govuk-summary-list__key").asScala lazyZip
+            doc.getElementsByClass("govuk-summary-list__value").asScala
         ).foreach { case (row, key, value) =>
-
           row.key.content.asHtml.body must include(key.text())
 
           val valueText = row.value.content.asHtml.body match {
             case str if str.startsWith("<") => Jsoup.parse(str).text()
-            case str => str
+            case str                        => str
           }
 
           valueText must include(value.text())
@@ -97,7 +103,12 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
         val cyaListNonUK = cyaHelper.getHeadingsAndSummaryLists(
           responsiblePeopleModel.copy(addressHistory = Some(addressHistoryNonUK)),
-          businessMatching, personName.fullName, 1, None, true, true
+          businessMatching,
+          personName.fullName,
+          1,
+          None,
+          true,
+          true
         )
 
         override def view: HtmlFormat.Appendable = answersView(
@@ -109,15 +120,14 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
         (
           cyaListNonUK.flatMap(_._2.rows) lazyZip
-          doc.getElementsByClass("govuk-summary-list__key").asScala lazyZip
-          doc.getElementsByClass("govuk-summary-list__value").asScala
+            doc.getElementsByClass("govuk-summary-list__key").asScala lazyZip
+            doc.getElementsByClass("govuk-summary-list__value").asScala
         ).foreach { case (row, key, value) =>
-
           row.key.content.asHtml.body must include(key.text())
 
           val valueText = row.value.content.asHtml.body match {
             case str if str.startsWith("<") => Jsoup.parse(str).text()
-            case str => str
+            case str                        => str
           }
 
           valueText must include(value.text())
@@ -126,18 +136,30 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
       "ensure approval check question is not shown if flag is false" in new ViewFixture {
         val responsiblePeopleModelWithApprovalCheck = responsiblePeopleModel.copy(
-          approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true))
+          approvalFlags =
+            ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true))
         )
 
-        def view = {
+        def view =
           answersView(
             cyaHelper.getHeadingsAndSummaryLists(
-              responsiblePeopleModelWithApprovalCheck, businessMatching, personName.fullName, 1, None, true, false
+              responsiblePeopleModelWithApprovalCheck,
+              businessMatching,
+              personName.fullName,
+              1,
+              None,
+              true,
+              false
             ),
-            1, true, personName.fullName, None)
-        }
+            1,
+            true,
+            personName.fullName,
+            None
+          )
 
-        val elem = doc.getElementsContainingText(messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName.fullName))
+        val elem = doc.getElementsContainingText(
+          messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName.fullName)
+        )
 
         elem.isEmpty mustBe true
       }
@@ -145,16 +167,26 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
       "ensure tell us you moved links are different go to MovedAddressController if flag is true" in new ViewFixture {
 
         val responsiblePeopleModelWithApprovalCheck = responsiblePeopleModel.copy(
-          approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true))
+          approvalFlags =
+            ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true))
         )
 
-        def view = {
+        def view =
           answersView(
             cyaHelper.getHeadingsAndSummaryLists(
-              responsiblePeopleModelWithApprovalCheck, businessMatching, personName.fullName, 1, None, true, true
+              responsiblePeopleModelWithApprovalCheck,
+              businessMatching,
+              personName.fullName,
+              1,
+              None,
+              true,
+              true
             ),
-            1, true, personName.fullName, None)
-        }
+            1,
+            true,
+            personName.fullName,
+            None
+          )
 
         val resultUrl = controllers.responsiblepeople.address.routes.MovedAddressController.get(1).url
 
@@ -165,21 +197,37 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
       "ensure tell us you moved links are different if flag is false" in new ViewFixture {
 
         val responsiblePeopleModelWithApprovalCheck = responsiblePeopleModel.copy(
-          approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true))
+          approvalFlags =
+            ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true))
         )
 
-        def view = {
+        def view =
           answersView(
             cyaHelper.getHeadingsAndSummaryLists(
-              responsiblePeopleModelWithApprovalCheck, businessMatching, personName.fullName, 1, None, false, true
+              responsiblePeopleModelWithApprovalCheck,
+              businessMatching,
+              personName.fullName,
+              1,
+              None,
+              false,
+              true
             ),
-            1, true, personName.fullName, None)
-        }
+            1,
+            true,
+            personName.fullName,
+            None
+          )
 
-        doc.getElementById("rpaddress-isUK-edit")
-          .attr("href") mustBe controllers.responsiblepeople.address.routes.CurrentAddressController.get(1, true, None).url
-        doc.getElementById("rpaddress-edit")
-          .attr("href") mustBe controllers.responsiblepeople.address.routes.CurrentAddressUKController.get(1, true, None).url
+        doc
+          .getElementById("rpaddress-isUK-edit")
+          .attr("href") mustBe controllers.responsiblepeople.address.routes.CurrentAddressController
+          .get(1, true, None)
+          .url
+        doc
+          .getElementById("rpaddress-edit")
+          .attr("href") mustBe controllers.responsiblepeople.address.routes.CurrentAddressUKController
+          .get(1, true, None)
+          .url
       }
     }
   }

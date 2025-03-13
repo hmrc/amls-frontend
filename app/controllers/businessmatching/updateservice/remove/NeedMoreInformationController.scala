@@ -30,27 +30,26 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class NeedMoreInformationController @Inject()(authAction: AuthAction,
-                                              val ds: CommonPlayDependencies,
-                                              implicit val dataCacheConnector: DataCacheConnector,
-                                              val router: Router[RemoveBusinessTypeFlowModel],
-                                              val cc: MessagesControllerComponents,
-                                              view: NeedMoreInformationView) extends AmlsBaseController(ds, cc) {
+class NeedMoreInformationController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val dataCacheConnector: DataCacheConnector,
+  val router: Router[RemoveBusinessTypeFlowModel],
+  val cc: MessagesControllerComponents,
+  view: NeedMoreInformationView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key))
-        activities <- OptionT.fromOption[Future](model.activitiesToRemove) orElse OptionT.some(Set.empty)
-      } yield {
-        Ok(view(activities))
-       }) getOrElse(InternalServerError("Cannot retrieve information from cache"))
+  def get(): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      model      <-
+        OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key))
+      activities <- OptionT.fromOption[Future](model.activitiesToRemove) orElse OptionT.some(Set.empty)
+    } yield Ok(view(activities))) getOrElse (InternalServerError("Cannot retrieve information from cache"))
   }
 
-  def post(): Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        route <- OptionT.liftF(router.getRoute(request.credId, NeedToUpdatePageId, new RemoveBusinessTypeFlowModel()))
-      } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: Remove : NewServiceInformationController")
+  def post(): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      route <- OptionT.liftF(router.getRoute(request.credId, NeedToUpdatePageId, new RemoveBusinessTypeFlowModel()))
+    } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: Remove : NewServiceInformationController")
   }
 }

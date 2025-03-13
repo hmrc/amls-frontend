@@ -37,17 +37,20 @@ import scala.concurrent.Future
 
 class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
-  trait Fixture  {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[RegisteringAgentPremisesView]
-    val controller = new RegisteringAgentPremisesController (
+  trait Fixture {
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[RegisteringAgentPremisesView]
+    val controller = new RegisteringAgentPremisesController(
       mock[DataCacheConnector],
-      SuccessfulAuthAction, ds = commonDependencies,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
       messagesApi,
       cc = mockMcc,
       formProvider = inject[RegisteringAgentPremisesFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
   }
 
   val emptyCache = Cache.empty
@@ -60,13 +63,13 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
       "edit is false" when {
         "it is not an MSB" must {
           "redirect to Trading Premises Details form" in new Fixture {
-            val model = TradingPremises(
+            val model                         = TradingPremises(
               registeringAgentPremises = Some(
                 RegisteringAgentPremises(true)
               )
             )
-            val businessMatchingActivitiesAll = BusinessMatchingActivities(
-              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+            val businessMatchingActivitiesAll =
+              BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
             when(controller.dataCacheConnector.fetchAll(any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -86,8 +89,9 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           "load the Register Agent Premises page" in new Fixture {
 
             val businessMatchingActivitiesAll = BusinessMatchingActivities(
-              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
-            val model = TradingPremises()
+              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness)
+            )
+            val model                         = TradingPremises()
             when(controller.dataCacheConnector.fetchAll(any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -102,13 +106,14 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
 
           "load Yes when mongoCache returns true" in new Fixture {
 
-            val model = TradingPremises(
+            val model                         = TradingPremises(
               registeringAgentPremises = Some(
                 RegisteringAgentPremises(true)
               )
             )
             val businessMatchingActivitiesAll = BusinessMatchingActivities(
-              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness)
+            )
             when(controller.dataCacheConnector.fetchAll(any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -125,13 +130,14 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           }
           "load No when mongoCache returns false" in new Fixture {
 
-            val model = TradingPremises(
+            val model                         = TradingPremises(
               registeringAgentPremises = Some(
                 RegisteringAgentPremises(false)
               )
             )
             val businessMatchingActivitiesAll = BusinessMatchingActivities(
-              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness)
+            )
             when(controller.dataCacheConnector.fetchAll(any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -149,7 +155,8 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
 
           "respond with NOT_FOUND when there is no data" in new Fixture {
             val businessMatchingActivitiesAll = BusinessMatchingActivities(
-              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness)
+            )
             when(controller.dataCacheConnector.fetchAll(any()))
               .thenReturn(Future.successful(None))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -162,13 +169,14 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           }
 
           "respond with NOT_FOUND when there is no data at all at the given index" in new Fixture {
-            val model = TradingPremises(
+            val model                         = TradingPremises(
               registeringAgentPremises = Some(
                 RegisteringAgentPremises(true)
               )
             )
             val businessMatchingActivitiesAll = BusinessMatchingActivities(
-              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+              Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness)
+            )
             when(controller.dataCacheConnector.fetchAll(any()))
               .thenReturn(Future.successful(None))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -187,8 +195,8 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
 
       "on post invalid data show error" in new Fixture {
         val newRequest = FakeRequest(POST, routes.RegisteringAgentPremisesController.post(1).url)
-        .withFormUrlEncodedBody("" -> "")
-        val result = controller.post(1)(newRequest)
+          .withFormUrlEncodedBody("" -> "")
+        val result     = controller.post(1)(newRequest)
         status(result) must be(BAD_REQUEST)
 
       }
@@ -202,9 +210,9 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         )
 
         val newRequest = FakeRequest(POST, routes.RegisteringAgentPremisesController.post(1, true).url)
-        .withFormUrlEncodedBody(
-          "agentPremises" -> "false"
-        )
+          .withFormUrlEncodedBody(
+            "agentPremises" -> "false"
+          )
 
         when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -214,7 +222,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         when(controller.dataCacheConnector.save(any(), any(), any())(any()))
           .thenReturn(Future.successful(mockCacheMap))
 
-        val result = controller.post(1,edit = true)(newRequest)
+        val result = controller.post(1, edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.CheckYourAnswersController.get(1).url)
@@ -229,9 +237,9 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         )
 
         val newRequest = FakeRequest(POST, routes.RegisteringAgentPremisesController.post(1).url)
-        .withFormUrlEncodedBody(
-          "agentPremises" -> "false"
-        )
+          .withFormUrlEncodedBody(
+            "agentPremises" -> "false"
+          )
 
         when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -241,7 +249,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         when(controller.dataCacheConnector.save(any(), any(), any())(any()))
           .thenReturn(Future.successful(mockCacheMap))
 
-        val result = controller.post(1,edit = false)(newRequest)
+        val result = controller.post(1, edit = false)(newRequest)
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.WhereAreTradingPremisesController.get(1).url)
@@ -255,9 +263,9 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         )
 
         val newRequest = FakeRequest(POST, routes.RegisteringAgentPremisesController.post(1).url)
-        .withFormUrlEncodedBody(
-          "agentPremises" -> "true"
-        )
+          .withFormUrlEncodedBody(
+            "agentPremises" -> "true"
+          )
 
         when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -267,19 +275,19 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         when(controller.dataCacheConnector.save(any(), any(), any())(any()))
           .thenReturn(Future.successful(mockCacheMap))
 
-        val result = controller.post(1,edit = false)(newRequest)
+        val result = controller.post(1, edit = false)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.BusinessStructureController.get(1,false).url)
+        redirectLocation(result) mustBe Some(routes.BusinessStructureController.get(1, false).url)
       }
 
       "respond with NOT_FOUND" when {
         "the given index is out of bounds" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.RegisteringAgentPremisesController.post(1).url)
-          .withFormUrlEncodedBody(
-            "agentPremises" -> "true"
-          )
+            .withFormUrlEncodedBody(
+              "agentPremises" -> "true"
+            )
           when(controller.dataCacheConnector.fetchAll(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -295,9 +303,9 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
       "set the hasChanged flag to true" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.RegisteringAgentPremisesController.post(1).url)
-        .withFormUrlEncodedBody(
-          "agentPremises" -> "false"
-        )
+          .withFormUrlEncodedBody(
+            "agentPremises" -> "false"
+          )
         when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
@@ -309,19 +317,26 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
 
         val result = controller.post(1)(newRequest)
 
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1, false).url))
 
         verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
-          any(), any(),
-          meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
-            hasChanged = true,
-            registeringAgentPremises = Some(RegisteringAgentPremises(false)),
-            agentName=None,
-            businessStructure=None,
-            agentCompanyDetails=None,
-            agentPartnership=None
-          ), TradingPremises())))(any())
+          any(),
+          any(),
+          meq(
+            Seq(
+              TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
+                hasChanged = true,
+                registeringAgentPremises = Some(RegisteringAgentPremises(false)),
+                agentName = None,
+                businessStructure = None,
+                agentCompanyDetails = None,
+                agentPartnership = None
+              ),
+              TradingPremises()
+            )
+          )
+        )(any())
       }
 
     }

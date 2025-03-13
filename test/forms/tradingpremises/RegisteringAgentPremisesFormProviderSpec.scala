@@ -23,13 +23,14 @@ import play.api.data.Form
 class RegisteringAgentPremisesFormProviderSpec extends BooleanFieldBehaviours[RegisteringAgentPremises] {
 
   override val form: Form[RegisteringAgentPremises] = new RegisteringAgentPremisesFormProvider()()
-  override val fieldName: String = "agentPremises"
-  override val errorMessage: String = "error.required.tp.agent.premises"
+  override val fieldName: String                    = "agentPremises"
+  override val errorMessage: String                 = "error.required.tp.agent.premises"
 
   "RegisteringAgentPremisesFormProvider" must {
 
     behave like booleanFieldWithModel(
-      RegisteringAgentPremises(true), RegisteringAgentPremises(false)
+      RegisteringAgentPremises(true),
+      RegisteringAgentPremises(false)
     )
   }
 }

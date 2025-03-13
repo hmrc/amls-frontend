@@ -22,10 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class CurrencyExchangesInNext12MonthsFormProvider @Inject()() extends Mappings {
+class CurrencyExchangesInNext12MonthsFormProvider @Inject() () extends Mappings {
 
-  val length = 11
-  private val regex = "^[0-9]{1,11}"
+  val length                                      = 11
+  private val regex                               = "^[0-9]{1,11}"
   def apply(): Form[CETransactionsInNext12Months] = Form[CETransactionsInNext12Months](
     "ceTransaction" -> text("error.required.msb.ce.transactions.in.12months")
       .verifying(

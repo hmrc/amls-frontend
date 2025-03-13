@@ -41,7 +41,7 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
     }
 
     "Have the correct Headings" in new ViewFixture {
-      heading.html must be(messages("title.wyn"))
+      heading.html    must be(messages("title.wyn"))
       subHeading.html must include(messages("summary.bankdetails"))
     }
 

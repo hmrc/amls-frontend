@@ -23,8 +23,8 @@ import java.time.LocalDate
 
 class DateOfBirthSpec extends PlaySpec {
 
-  val validYear = 1990
-  val validDay = 24
+  val validYear  = 1990
+  val validDay   = 24
   val validMonth = 2
 
   "DateOfBirth Json" must {

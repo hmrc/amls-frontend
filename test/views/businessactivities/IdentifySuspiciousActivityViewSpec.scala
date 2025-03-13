@@ -24,10 +24,9 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessactivities.IdentifySuspiciousActivityView
 
-
 class IdentifySuspiciousActivityViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val activity: IdentifySuspiciousActivityView = inject[IdentifySuspiciousActivityView]
+  lazy val activity: IdentifySuspiciousActivityView             = inject[IdentifySuspiciousActivityView]
   lazy val formProvider: IdentifySuspiciousActivityFormProvider = inject[IdentifySuspiciousActivityFormProvider]
 
   implicit val request: Request[_] = FakeRequest()
@@ -41,17 +40,19 @@ class IdentifySuspiciousActivityViewSpec extends AmlsViewSpec with Matchers {
 
       def view = activity(formProvider(), true)
 
-      doc.title must be(messages("businessactivities.identify-suspicious-activity.title") + " - " +
-        messages("summary.businessactivities") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("businessactivities.identify-suspicious-activity.title") + " - " +
+          messages("summary.businessactivities") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = activity(formProvider(), true)
 
-      heading.html must be(messages("businessactivities.identify-suspicious-activity.title"))
+      heading.html    must be(messages("businessactivities.identify-suspicious-activity.title"))
       subHeading.html must include(messages("summary.businessactivities"))
 
     }

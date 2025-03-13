@@ -25,8 +25,7 @@ object CharacterCountParser {
     incomingData.map { case (key, values) =>
       if (key == fieldName) {
         (key, values.map(_.replace("\r\n", "\n")))
-      }
-      else {
+      } else {
         (key, values)
       }
     }

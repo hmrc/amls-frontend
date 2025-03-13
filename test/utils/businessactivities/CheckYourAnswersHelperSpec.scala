@@ -30,26 +30,26 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
   lazy val cyaHelper: CheckYourAnswersHelper = inject[CheckYourAnswersHelper]
 
-  val involvedInOthersIndex = 0
-  val involvedInOthersDetailIndex = 1
-  val expectedBusinessTurnoverIndex = 2
-  val expectedAMLSTurnoverIndex = 3
-  val businessFranchiseIndex = 4
-  val businessFranchiseNameIndex = 5
-  val amlsEmployeeCountIndex = 6
-  val employeeCountIndex = 7
-  val transactionRecordIndex = 8
-  val transactionTypesIndex = 9
-  val softwareNameIndex = 10
-  val suspiciousActivityIndex = 11
-  val ncaRegisteredIndex = 12
-  val riskAssessmentPolicyIndex = 13
-  val riskAssessmentTypesIndex = 14
+  val involvedInOthersIndex             = 0
+  val involvedInOthersDetailIndex       = 1
+  val expectedBusinessTurnoverIndex     = 2
+  val expectedAMLSTurnoverIndex         = 3
+  val businessFranchiseIndex            = 4
+  val businessFranchiseNameIndex        = 5
+  val amlsEmployeeCountIndex            = 6
+  val employeeCountIndex                = 7
+  val transactionRecordIndex            = 8
+  val transactionTypesIndex             = 9
+  val softwareNameIndex                 = 10
+  val suspiciousActivityIndex           = 11
+  val ncaRegisteredIndex                = 12
+  val riskAssessmentPolicyIndex         = 13
+  val riskAssessmentTypesIndex          = 14
   val accountantForAMLSRegulationsIndex = 15
-  val accountantNameIndex = 16
-  val accountantIsUKIndex = 17
-  val accountantAddressIndex = 18
-  val taxMattersIndex = 19
+  val accountantNameIndex               = 16
+  val accountantIsUKIndex               = 17
+  val accountantAddressIndex            = 18
+  val taxMattersIndex                   = 19
 
   val completeModel: BusinessActivities = BusinessActivities(
     involvedInOther = Some(BusinessActivitiesValues.defaultInvolvedInOther),
@@ -88,10 +88,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
   ".createSummaryList" must {
 
-    val summaryListRows = cyaHelper.createSummaryList(
-      completeModel,
-      needsAccountancyQuestions = true
-    ).rows
+    val summaryListRows = cyaHelper
+      .createSummaryList(
+        completeModel,
+        needsAccountancyQuestions = true
+      )
+      .rows
 
     def assertRowMatches(index: Int, title: String, value: String, changeUrl: String, changeId: String) = {
 
@@ -150,13 +152,20 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
       "contains Expected AMLS Turnover" in {
 
-        val result = cyaHelper.createSummaryList(
-          completeModel,
-          needsAccountancyQuestions = true
-        ).rows.lift(expectedAMLSTurnoverIndex).getOrElse(fail(s"Row for index $expectedAMLSTurnoverIndex does not exist"))
+        val result = cyaHelper
+          .createSummaryList(
+            completeModel,
+            needsAccountancyQuestions = true
+          )
+          .rows
+          .lift(expectedAMLSTurnoverIndex)
+          .getOrElse(fail(s"Row for index $expectedAMLSTurnoverIndex does not exist"))
 
         result.key.toString must include(
-          messages("businessactivities.turnover.heading", messages("businessactivities.registerservices.servicename.lbl.06"))
+          messages(
+            "businessactivities.turnover.heading",
+            messages("businessactivities.registerservices.servicename.lbl.06")
+          )
         )
 
         result.value.toString must include(
@@ -314,17 +323,21 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
           val types = Set[RiskAssessmentType](PaperBased, Digital)
 
-          val result = cyaHelper.createSummaryList(
-            completeModel.copy(
-              riskAssessmentPolicy = Some(
-                RiskAssessmentPolicy(
-                  RiskAssessmentHasPolicy(true),
-                  RiskAssessmentTypes(types)
+          val result = cyaHelper
+            .createSummaryList(
+              completeModel.copy(
+                riskAssessmentPolicy = Some(
+                  RiskAssessmentPolicy(
+                    RiskAssessmentHasPolicy(true),
+                    RiskAssessmentTypes(types)
+                  )
                 )
-              )
-            ),
-            needsAccountancyQuestions = true
-          ).rows.lift(riskAssessmentTypesIndex).getOrElse(fail(s"Row for index $riskAssessmentTypesIndex does not exist"))
+              ),
+              needsAccountancyQuestions = true
+            )
+            .rows
+            .lift(riskAssessmentTypesIndex)
+            .getOrElse(fail(s"Row for index $riskAssessmentTypesIndex does not exist"))
 
           result.key.toString must include(messages("businessactivities.document.riskassessment.policy.title"))
 
@@ -345,7 +358,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
         "there is one type" in {
 
-            assertRowMatches(
+          assertRowMatches(
             riskAssessmentTypesIndex,
             messages("businessactivities.document.riskassessment.policy.title"),
             messages(s"businessactivities.RiskAssessmentType.lbl.${PaperBased.value}"),
@@ -374,16 +387,20 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
           val name = "John Doe"
 
-          val result = cyaHelper.createSummaryList(
-            completeModel.copy(
-              whoIsYourAccountant = Some(
-                BusinessActivitiesValues.defaultWhoIsYourAccountant.copy(
-                  names = Some(WhoIsYourAccountantName(name, None))
+          val result = cyaHelper
+            .createSummaryList(
+              completeModel.copy(
+                whoIsYourAccountant = Some(
+                  BusinessActivitiesValues.defaultWhoIsYourAccountant.copy(
+                    names = Some(WhoIsYourAccountantName(name, None))
+                  )
                 )
-              )
-            ),
-            needsAccountancyQuestions = true
-          ).rows.lift(accountantNameIndex).getOrElse(fail(s"Row for index $accountantNameIndex does not exist"))
+              ),
+              needsAccountancyQuestions = true
+            )
+            .rows
+            .lift(accountantNameIndex)
+            .getOrElse(fail(s"Row for index $accountantNameIndex does not exist"))
 
           result.key.toString must include(messages("businessactivities.whoisyouraccountant.title"))
 
@@ -438,20 +455,32 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
         "accountant non-UK address is present" in {
 
-          val address = NonUkAccountantsAddress("address1", Some("address2"), Some("address3"), Some("address4"), Country("United States", "US"))
+          val address = NonUkAccountantsAddress(
+            "address1",
+            Some("address2"),
+            Some("address3"),
+            Some("address4"),
+            Country("United States", "US")
+          )
 
-          val result = cyaHelper.createSummaryList(
-            completeModel.copy(
-              whoIsYourAccountant = Some(
-                BusinessActivitiesValues.defaultWhoIsYourAccountant.copy(
-                  address = Some(address)
+          val result = cyaHelper
+            .createSummaryList(
+              completeModel.copy(
+                whoIsYourAccountant = Some(
+                  BusinessActivitiesValues.defaultWhoIsYourAccountant.copy(
+                    address = Some(address)
+                  )
                 )
-              )
-            ),
-            needsAccountancyQuestions = true
-          ).rows.lift(accountantAddressIndex).getOrElse(fail(s"Row for index $accountantAddressIndex does not exist"))
+              ),
+              needsAccountancyQuestions = true
+            )
+            .rows
+            .lift(accountantAddressIndex)
+            .getOrElse(fail(s"Row for index $accountantAddressIndex does not exist"))
 
-          result.key.toString must include(messages("businessactivities.whoisyouraccountant.address.header", names.accountantsName))
+          result.key.toString must include(
+            messages("businessactivities.whoisyouraccountant.address.header", names.accountantsName)
+          )
 
           result.value.toString must include(
             "<ul class=\"govuk-list\">" +
@@ -493,7 +522,6 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
             accountantAddressIndex,
             taxMattersIndex
           ) foreach { i =>
-
             result.rows.lift(i) mustBe None
           }
         }
@@ -504,25 +532,25 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 }
 
 object BusinessActivitiesValues {
-  val defaultFranchiseName = "DEFAULT FRANCHISE NAME"
-  val defaultSoftwareName = "DEFAULT SOFTWARE"
-  val defaultBusinessTurnover = ExpectedBusinessTurnover.First
-  val defaultAMLSTurnover = ExpectedAMLSTurnover.First
-  val defaultInvolvedInOtherDetails = "DEFAULT INVOLVED"
-  val defaultInvolvedInOther = InvolvedInOtherYes(defaultInvolvedInOtherDetails)
-  val defaultBusinessFranchise = BusinessFranchiseYes(defaultFranchiseName)
-  val defaultTransactionRecord = true
-  val defaultTransactionRecordTypes = TransactionTypes(Set(Paper, DigitalSoftware(defaultSoftwareName)))
-  val defaultCustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
-  val defaultNCARegistered = NCARegistered(true)
+  val defaultFranchiseName                = "DEFAULT FRANCHISE NAME"
+  val defaultSoftwareName                 = "DEFAULT SOFTWARE"
+  val defaultBusinessTurnover             = ExpectedBusinessTurnover.First
+  val defaultAMLSTurnover                 = ExpectedAMLSTurnover.First
+  val defaultInvolvedInOtherDetails       = "DEFAULT INVOLVED"
+  val defaultInvolvedInOther              = InvolvedInOtherYes(defaultInvolvedInOtherDetails)
+  val defaultBusinessFranchise            = BusinessFranchiseYes(defaultFranchiseName)
+  val defaultTransactionRecord            = true
+  val defaultTransactionRecordTypes       = TransactionTypes(Set(Paper, DigitalSoftware(defaultSoftwareName)))
+  val defaultCustomersOutsideUK           = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
+  val defaultNCARegistered                = NCARegistered(true)
   val defaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
-  val defaultRiskAssessments = RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))
-  val defaultHowManyEmployees = HowManyEmployees(Some("5"),Some("4"))
-  val defaultWhoIsYourAccountant = WhoIsYourAccountant(
+  val defaultRiskAssessments              = RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased)))
+  val defaultHowManyEmployees             = HowManyEmployees(Some("5"), Some("4"))
+  val defaultWhoIsYourAccountant          = WhoIsYourAccountant(
     Some(WhoIsYourAccountantName("Accountant's name", Some("Accountant's trading name"))),
     Some(WhoIsYourAccountantIsUk(true)),
     Some(UkAccountantsAddress("address1", Some("address2"), Some("address3"), Some("address4"), "POSTCODE"))
   )
-  val defaultIdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
-  val defaultTaxMatters = TaxMatters(false)
+  val defaultIdentifySuspiciousActivity   = IdentifySuspiciousActivity(true)
+  val defaultTaxMatters                   = TaxMatters(false)
 }

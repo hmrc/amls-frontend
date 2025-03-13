@@ -30,29 +30,37 @@ import views.html.payments.BankDetailsView
 
 import scala.concurrent.Future
 
-class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                      val authAction: AuthAction,
-                                      val ds: CommonPlayDependencies,
-                                      val authEnrolmentsService: AuthEnrolmentsService,
-                                      val feeResponseService: FeeResponseService,
-                                      val statusService: StatusService,
-                                      val cc: MessagesControllerComponents,
-                                      val renewalService: RenewalService,
-                                      view: BankDetailsView) extends AmlsBaseController(ds, cc) {
+class BankDetailsController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val authEnrolmentsService: AuthEnrolmentsService,
+  val feeResponseService: FeeResponseService,
+  val statusService: StatusService,
+  val cc: MessagesControllerComponents,
+  val renewalService: RenewalService,
+  view: BankDetailsView
+) extends AmlsBaseController(ds, cc) {
 
-
-  def get(isUK: Boolean = true): Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        submissionRequestStatus <- OptionT.liftF(dataCacheConnector.fetch[SubmissionRequestStatus](request.credId, SubmissionRequestStatus.key))
-        status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
-        amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-        fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber, request.accountTypeId))
-        subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
-        paymentReference <- OptionT.fromOption[Future](fees.paymentReference)
-      } yield {
-        val amount = fees.toPay(status, submissionRequestStatus)
-          Ok(view(isUK, amount, paymentReference, subHeading))
-      }) getOrElse InternalServerError("Failed to retrieve submission data")
+  def get(isUK: Boolean = true): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      submissionRequestStatus <-
+        OptionT.liftF(dataCacheConnector.fetch[SubmissionRequestStatus](request.credId, SubmissionRequestStatus.key))
+      status                  <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
+      amlsRegistrationNumber  <-
+        OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+      fees                    <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber, request.accountTypeId))
+      subHeading              <- DeclarationHelper.getSubheadingBasedOnStatus(
+                                   request.credId,
+                                   request.amlsRefNumber,
+                                   request.accountTypeId,
+                                   statusService,
+                                   renewalService
+                                 )
+      paymentReference        <- OptionT.fromOption[Future](fees.paymentReference)
+    } yield {
+      val amount = fees.toPay(status, submissionRequestStatus)
+      Ok(view(isUK, amount, paymentReference, subHeading))
+    }) getOrElse InternalServerError("Failed to retrieve submission data")
   }
 }

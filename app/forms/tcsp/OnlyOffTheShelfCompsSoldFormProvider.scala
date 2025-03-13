@@ -22,16 +22,17 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class OnlyOffTheShelfCompsSoldFormProvider @Inject()() extends BooleanFormProvider {
+class OnlyOffTheShelfCompsSoldFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[OnlyOffTheShelfCompsSold] = createForm[OnlyOffTheShelfCompsSold](
-    "onlyOffTheShelfCompsSold", "error.required.tcsp.off.the.shelf.companies"
+    "onlyOffTheShelfCompsSold",
+    "error.required.tcsp.off.the.shelf.companies"
   )(apply, unapply)
 
   private def apply(boolean: Boolean): OnlyOffTheShelfCompsSold =
-    if(boolean) OnlyOffTheShelfCompsSoldYes else OnlyOffTheShelfCompsSoldNo
-  private def unapply(obj: OnlyOffTheShelfCompsSold) = obj match {
+    if (boolean) OnlyOffTheShelfCompsSoldYes else OnlyOffTheShelfCompsSoldNo
+  private def unapply(obj: OnlyOffTheShelfCompsSold)            = obj match {
     case OnlyOffTheShelfCompsSoldYes => true
-    case OnlyOffTheShelfCompsSoldNo => false
+    case OnlyOffTheShelfCompsSoldNo  => false
   }
 }

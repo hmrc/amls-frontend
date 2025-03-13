@@ -18,7 +18,7 @@ package utils
 
 import java.time.LocalDate
 
-class DateHelperSpec extends AmlsSpec  {
+class DateHelperSpec extends AmlsSpec {
   "DateHelper" should {
     "isNotFutureDate" when {
       "return false if the date is later than current date" in {

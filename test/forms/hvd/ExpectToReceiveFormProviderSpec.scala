@@ -24,10 +24,10 @@ import play.api.data.{Form, FormError}
 
 class ExpectToReceiveFormProviderSpec extends CheckboxFieldBehaviours with StringFieldBehaviours with Constraints {
 
-  val formProvider = new ExpectToReceiveFormProvider()
+  val formProvider               = new ExpectToReceiveFormProvider()
   val form: Form[PaymentMethods] = formProvider()
 
-  val checkboxFieldName = "paymentMethods"
+  val checkboxFieldName    = "paymentMethods"
   val checkboxErrorMessage = "error.required.hvd.choose.option"
 
   val textFieldName = "details"
@@ -50,35 +50,42 @@ class ExpectToReceiveFormProviderSpec extends CheckboxFieldBehaviours with Strin
       "bind when Other is selected" in {
 
         forAll(stringOfLengthGen(formProvider.length)) { otherDetails =>
-          val result = form.bind(Map(
-            checkboxFieldName -> Other("").toString,
-            textFieldName -> otherDetails
-          )).apply(textFieldName)
+          val result = form
+            .bind(
+              Map(
+                checkboxFieldName -> Other("").toString,
+                textFieldName     -> otherDetails
+              )
+            )
+            .apply(textFieldName)
           result.value.value shouldBe otherDetails
         }
       }
 
       "be mandatory if Other is selected" in {
 
-        val result = form.bind(Map(
-          checkboxFieldName -> Other("").toString,
-          textFieldName -> ""
-        ))
+        val result = form.bind(
+          Map(
+            checkboxFieldName -> Other("").toString,
+            textFieldName     -> ""
+          )
+        )
 
-        result.value shouldBe None
+        result.value                shouldBe None
         result.error(textFieldName) shouldBe Some(FormError(textFieldName, "error.required.hvd.describe"))
       }
 
       s"not bind strings that are longer that ${formProvider.length}" in {
 
         forAll(stringsLongerThan(formProvider.length).suchThat(_.nonEmpty)) { longString =>
+          val result = form.bind(
+            Map(
+              checkboxFieldName -> Other("").toString,
+              textFieldName     -> longString
+            )
+          )
 
-          val result = form.bind(Map(
-            checkboxFieldName -> Other("").toString,
-            textFieldName -> longString
-          ))
-
-          result.value shouldBe None
+          result.value                shouldBe None
           result.error(textFieldName) shouldBe Some(
             FormError(textFieldName, "error.maxlength.hvd.describe", Seq(formProvider.length))
           )
@@ -87,17 +94,19 @@ class ExpectToReceiveFormProviderSpec extends CheckboxFieldBehaviours with Strin
 
       "not bind invalid strings" in {
 
-        forAll(stringsShorterThan(formProvider.length - 1).suchThat(_.nonEmpty), invalidCharForNames) { (detail, invalid) =>
+        forAll(stringsShorterThan(formProvider.length - 1).suchThat(_.nonEmpty), invalidCharForNames) {
+          (detail, invalid) =>
+            val result = form.bind(
+              Map(
+                checkboxFieldName -> Other("").toString,
+                textFieldName     -> (detail + invalid)
+              )
+            )
 
-          val result = form.bind(Map(
-            checkboxFieldName -> Other("").toString,
-            textFieldName -> (detail + invalid)
-          ))
-
-          result.value shouldBe None
-          result.error(textFieldName) shouldBe Some(
-            FormError(textFieldName, "error.required.hvd.format", Seq(basicPunctuationRegex))
-          )
+            result.value                shouldBe None
+            result.error(textFieldName) shouldBe Some(
+              FormError(textFieldName, "error.required.hvd.format", Seq(basicPunctuationRegex))
+            )
         }
       }
     }

@@ -28,31 +28,32 @@ import views.html.deregister.DeregistrationConfirmationView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class DeregistrationConfirmationController @Inject()(
-                                                      authAction: AuthAction,
-                                                      ds: CommonPlayDependencies,
-                                                      statusService: StatusService,
-                                                      enrolmentService: AuthEnrolmentsService,
-                                                      cc: MessagesControllerComponents,
-                                                      view: DeregistrationConfirmationView)(implicit
-                                                                                            dataCacheConnector: DataCacheConnector,
-                                                                                            amlsConnector: AmlsConnector
-                                                    ) extends AmlsBaseController(ds, cc) {
+class DeregistrationConfirmationController @Inject() (
+  authAction: AuthAction,
+  ds: CommonPlayDependencies,
+  statusService: StatusService,
+  enrolmentService: AuthEnrolmentsService,
+  cc: MessagesControllerComponents,
+  view: DeregistrationConfirmationView
+)(implicit
+  dataCacheConnector: DataCacheConnector,
+  amlsConnector: AmlsConnector
+) extends AmlsBaseController(ds, cc) {
 
   def get: Action[AnyContent] = authAction.async { implicit request =>
-
     val okResult = for {
       amlsRefNumber <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-      status <- OptionT.liftF(statusService.getReadStatus(amlsRefNumber, request.accountTypeId))
-      key  <- fetchDeregistrationReason
-      businessName <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
-    } yield {
-      Ok(view(
+
+      status        <- OptionT.liftF(statusService.getReadStatus(amlsRefNumber, request.accountTypeId))
+      key           <- fetchDeregistrationReason
+      businessName  <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
+    } yield Ok(
+      view(
         dynamicKey = key.value,
         businessName = businessName,
         amlsRefNumber = amlsRefNumber
-      ))
-    }
+      )
+    )
     okResult getOrElse InternalServerError("Unable to get Deregistration confirmation")
   }
 

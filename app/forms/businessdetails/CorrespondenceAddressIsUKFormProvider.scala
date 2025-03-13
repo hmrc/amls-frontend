@@ -22,7 +22,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class CorrespondenceAddressIsUKFormProvider @Inject()() extends BooleanFormProvider {
+class CorrespondenceAddressIsUKFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[CorrespondenceAddressIsUk] = createForm[CorrespondenceAddressIsUk](
     "isUk",

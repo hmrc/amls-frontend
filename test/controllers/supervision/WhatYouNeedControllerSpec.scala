@@ -24,14 +24,12 @@ import views.html.supervision.WhatYouNeedView
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends DependencyMocks{
-    self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[WhatYouNeedView]
-    val controller = new WhatYouNeedController(
-      authAction = SuccessfulAuthAction,
-      ds = commonDependencies,
-      cc = mockMcc,
-      view = view)
+  trait Fixture extends DependencyMocks {
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[WhatYouNeedView]
+    val controller =
+      new WhatYouNeedController(authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc, view = view)
   }
 
   "WhatYouNeedController" must {

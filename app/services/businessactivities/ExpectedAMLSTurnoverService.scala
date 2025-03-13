@@ -25,31 +25,34 @@ import services.cache.Cache
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ExpectedAMLSTurnoverService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) {
+class ExpectedAMLSTurnoverService @Inject() (val dataCacheConnector: DataCacheConnector)(implicit
+  ec: ExecutionContext
+) {
 
-  def getBusinessMatchingExpectedTurnover(credId: String): Future[Option[(BusinessMatching, Option[ExpectedAMLSTurnover])]] = {
-
+  def getBusinessMatchingExpectedTurnover(
+    credId: String
+  ): Future[Option[(BusinessMatching, Option[ExpectedAMLSTurnover])]] =
     dataCacheConnector.fetchAll(credId) map { optCache =>
       optCache flatMap { cache =>
-        (cache.getEntry[BusinessMatching](BusinessMatching.key), cache.getEntry[BusinessActivities](BusinessActivities.key)) match {
+        (
+          cache.getEntry[BusinessMatching](BusinessMatching.key),
+          cache.getEntry[BusinessActivities](BusinessActivities.key)
+        ) match {
           case (Some(bm), Some(ba)) => Some((bm, ba.expectedAMLSTurnover))
-          case (Some(bm), None) => Some((bm, None))
-          case _ => None
+          case (Some(bm), None)     => Some((bm, None))
+          case _                    => None
         }
       }
     }
-  }
 
-  def getBusinessMatching(credId: String): Future[Option[BusinessMatching]] = {
+  def getBusinessMatching(credId: String): Future[Option[BusinessMatching]] =
     dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key)
-  }
 
-  def updateBusinessActivities(credId: String, expectedAMLSTurnover: ExpectedAMLSTurnover): Future[Option[Cache]] = {
-
+  def updateBusinessActivities(credId: String, expectedAMLSTurnover: ExpectedAMLSTurnover): Future[Option[Cache]] =
     dataCacheConnector.fetch[BusinessActivities](credId, BusinessActivities.key) map { baOpt =>
       baOpt map { ba =>
-        dataCacheConnector.save[BusinessActivities](credId, BusinessActivities.key, ba.expectedAMLSTurnover(expectedAMLSTurnover))
+        dataCacheConnector
+          .save[BusinessActivities](credId, BusinessActivities.key, ba.expectedAMLSTurnover(expectedAMLSTurnover))
       }
     } flatMap (_.sequence)
-  }
 }

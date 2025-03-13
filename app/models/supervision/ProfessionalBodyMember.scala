@@ -26,16 +26,14 @@ case object ProfessionalBodyMemberNo extends ProfessionalBodyMember
 
 object ProfessionalBodyMember {
 
-  implicit val jsonReads: Reads[ProfessionalBodyMember] = {
+  implicit val jsonReads: Reads[ProfessionalBodyMember] =
     (__ \ "isAMember").read[Boolean] flatMap {
-      case true => Reads(_ => JsSuccess(ProfessionalBodyMemberYes))
+      case true  => Reads(_ => JsSuccess(ProfessionalBodyMemberYes))
       case false => Reads(_ => JsSuccess(ProfessionalBodyMemberNo))
     }
-  }
 
   implicit val jsonWrites: Writes[ProfessionalBodyMember] = Writes[ProfessionalBodyMember] {
     case ProfessionalBodyMemberYes => Json.obj("isAMember" -> true)
-    case ProfessionalBodyMemberNo => Json.obj("isAMember" -> false)
+    case ProfessionalBodyMemberNo  => Json.obj("isAMember" -> false)
   }
 }
-

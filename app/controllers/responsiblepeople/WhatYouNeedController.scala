@@ -25,26 +25,26 @@ import utils.AuthAction
 import play.api.Logging
 import views.html.responsiblepeople.WhatYouNeedView
 
-class WhatYouNeedController @Inject () (
-                                         val dataCacheConnector: DataCacheConnector,
-                                         authAction: AuthAction,
-                                         val ds: CommonPlayDependencies,
-                                         val cc: MessagesControllerComponents,
-                                         view: WhatYouNeedView) extends AmlsBaseController(ds, cc) with Logging {
+class WhatYouNeedController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  view: WhatYouNeedView
+) extends AmlsBaseController(ds, cc)
+    with Logging {
 
   def get(index: Int, flow: Option[String] = None): Action[AnyContent] =
-    authAction.async {
-      implicit request =>
-        dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
-          (for {
-            bm <- businessMatching
-            ba <- bm.activities
-          } yield {
-            Ok(view(controllers.responsiblepeople.routes.PersonNameController.get(index, false, flow), Some(ba)))
-          }).getOrElse {
-              logger.warn("Unable to retrieve business activities in [responsiblepeople][WhatYouNeedController]")
-              throw new Exception("Unable to retrieve business activities in [responsiblepeople][WhatYouNeedController]")
-            }
-        }
+    authAction.async { implicit request =>
+      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
+        (for {
+          bm <- businessMatching
+          ba <- bm.activities
+        } yield Ok(view(controllers.responsiblepeople.routes.PersonNameController.get(index, false, flow), Some(ba))))
+          .getOrElse {
+            logger.warn("Unable to retrieve business activities in [responsiblepeople][WhatYouNeedController]")
+            throw new Exception("Unable to retrieve business activities in [responsiblepeople][WhatYouNeedController]")
+          }
+      }
     }
 }

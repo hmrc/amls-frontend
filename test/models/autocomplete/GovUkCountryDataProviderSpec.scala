@@ -34,38 +34,52 @@ class GovUkCountryDataProviderSpec extends PlaySpec with MockitoSugar {
 
     def setupEnvironment(countries: Option[Seq[NameValuePair]]) = when {
       env.resourceAsStream(any())
-    } thenReturn Some(new ByteArrayInputStream(
-      Json.toJson(countries).toString.getBytes
-    ))
+    } thenReturn Some(
+      new ByteArrayInputStream(
+        Json.toJson(countries).toString.getBytes
+      )
+    )
   }
 
   "fetch" must {
     "retain only the country code data" in new Fixture {
 
-      setupEnvironment(Some(Seq(
-        NameValuePair("Great Britain", "country:GB"),
-        NameValuePair("Bermuda", "country:BM"),
-        NameValuePair("Ghana", "country:GH"),
-        NameValuePair("Kenya", "KE")
-      )))
+      setupEnvironment(
+        Some(
+          Seq(
+            NameValuePair("Great Britain", "country:GB"),
+            NameValuePair("Bermuda", "country:BM"),
+            NameValuePair("Ghana", "country:GH"),
+            NameValuePair("Kenya", "KE")
+          )
+        )
+      )
 
-      model.fetch mustBe Some(Seq(
-        NameValuePair("Great Britain", "GB"),
-        NameValuePair("Bermuda", "BM"),
-        NameValuePair("Ghana", "GH"),
-        NameValuePair("Kenya", "KE")
-      ))
+      model.fetch mustBe Some(
+        Seq(
+          NameValuePair("Great Britain", "GB"),
+          NameValuePair("Bermuda", "BM"),
+          NameValuePair("Ghana", "GH"),
+          NameValuePair("Kenya", "KE")
+        )
+      )
     }
 
     "strip out countries that don't appear in the allowList" in new Fixture {
-      setupEnvironment(Some(Seq(
-        NameValuePair("Haiti", "HT"),
-        NameValuePair("Made up country", "MUC")
-      )))
+      setupEnvironment(
+        Some(
+          Seq(
+            NameValuePair("Haiti", "HT"),
+            NameValuePair("Made up country", "MUC")
+          )
+        )
+      )
 
-      model.fetch mustBe Some(Seq(
-        NameValuePair("Haiti", "HT")
-      ))
+      model.fetch mustBe Some(
+        Seq(
+          NameValuePair("Haiti", "HT")
+        )
+      )
     }
   }
 }

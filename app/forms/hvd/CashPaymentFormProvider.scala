@@ -23,6 +23,7 @@ import play.api.data.Form
 class CashPaymentFormProvider extends BooleanFormProvider {
 
   def apply(): Form[CashPaymentOverTenThousandEuros] = createForm[CashPaymentOverTenThousandEuros](
-    "acceptedAnyPayment", "error.required.hvd.accepted.cash.payment"
+    "acceptedAnyPayment",
+    "error.required.hvd.accepted.cash.payment"
   )(CashPaymentOverTenThousandEuros.apply, _.acceptedAnyPayment)
 }

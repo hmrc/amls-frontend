@@ -26,14 +26,17 @@ import uk.gov.voa.play.form.ConditionalMappings._
 
 import javax.inject.Inject
 
-class RemoveAgentPremisesReasonsFormProvider @Inject()() extends Mappings {
+class RemoveAgentPremisesReasonsFormProvider @Inject() () extends Mappings {
 
-  val radioErrorMessage = "tradingpremises.remove_reasons.missing"
-  val length = 255
+  val radioErrorMessage                 = "tradingpremises.remove_reasons.missing"
+  val length                            = 255
   def apply(): Form[AgentRemovalReason] = Form[AgentRemovalReason](
     mapping(
-      "removalReason" -> enumerable[AgentRemovalReasonAnswer](radioErrorMessage, radioErrorMessage)(AgentRemovalReason.enumerable),
-      "removalReasonOther" -> mandatoryIf(_.get("removalReason").contains(Other.toString),
+      "removalReason"      -> enumerable[AgentRemovalReasonAnswer](radioErrorMessage, radioErrorMessage)(
+        AgentRemovalReason.enumerable
+      ),
+      "removalReasonOther" -> mandatoryIf(
+        _.get("removalReason").contains(Other.toString),
         text("tradingpremises.remove_reasons.agent.other.missing").verifying(
           firstError(
             maxLength(length, "error.invalid.maxlength.255"),
@@ -41,7 +44,8 @@ class RemoveAgentPremisesReasonsFormProvider @Inject()() extends Mappings {
           )
         )
       )
-    )(
-      (reason, reasonOther) => AgentRemovalReason(Rules.toSchemaReason(reason.value), reasonOther))(x => Some((x.reasonToObj, x.removalReasonOther)))
+    )((reason, reasonOther) => AgentRemovalReason(Rules.toSchemaReason(reason.value), reasonOther))(x =>
+      Some((x.reasonToObj, x.removalReasonOther))
+    )
   )
 }

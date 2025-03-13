@@ -41,12 +41,13 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
 
     val request = addToken(authRequest)
 
-    implicit val hc: HeaderCarrier = new HeaderCarrier()
+    implicit val hc: HeaderCarrier    = new HeaderCarrier()
     implicit val ec: ExecutionContext = mock[ExecutionContext]
-    lazy val view = app.injector.instanceOf[BankDetailsView]
-    val controller = new BankDetailsController(
+    lazy val view                     = app.injector.instanceOf[BankDetailsView]
+    val controller                    = new BankDetailsController(
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
       statusService = mockStatusService,
@@ -65,7 +66,12 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
       Some(CustomersOutsideIsUK(true)),
       Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
       Some(PercentageOfCashPaymentOver15000.First),
-      Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other")))))),
+      Some(
+        CashPayments(
+          CashPaymentsCustomerNotMet(true),
+          Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other"))))
+        )
+      ),
       Some(TotalThroughput("01")),
       Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
       Some(TransactionsInLast12Months("1500")),
@@ -90,23 +96,35 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
         mockApplicationStatus(SubmissionDecisionApproved)
 
         when {
-          controller.authEnrolmentsService.amlsRegistrationNumber(any(),any())(any(), any())
+          controller.authEnrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())
         } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
         when {
-          controller.feeResponseService.getFeeResponse(any(),any())(any(),any())
-        } thenReturn Future.successful(Some(FeeResponse(
-          SubscriptionResponseType,
-          amlsRegistrationNumber, 100, None, None, 0, 200, Some(paymentReferenceNumber), None, LocalDateTime.now()))
+          controller.feeResponseService.getFeeResponse(any(), any())(any(), any())
+        } thenReturn Future.successful(
+          Some(
+            FeeResponse(
+              SubscriptionResponseType,
+              amlsRegistrationNumber,
+              100,
+              None,
+              None,
+              0,
+              200,
+              Some(paymentReferenceNumber),
+              None,
+              LocalDateTime.now()
+            )
+          )
         )
 
         when {
-            controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(),eqTo(SubmissionRequestStatus.key))(any())
+          controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(), eqTo(SubmissionRequestStatus.key))(any())
         } thenReturn Future.successful(Some(SubmissionRequestStatus(true)))
 
         val result = controller.get()(request)
 
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(Messages("payments.bankdetails.title"))
 
       }

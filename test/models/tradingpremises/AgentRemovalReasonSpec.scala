@@ -32,10 +32,12 @@ class AgentRemovalReasonSpec extends PlaySpec with ScalaCheckDrivenPropertyCheck
       "return the correct json" in {
         val model = AgentRemovalReason("Other", Some("Some other reason"))
 
-        Json.toJson(model) must be(Json.obj(
-          "removalReason" -> Schema.OTHER,
-          "removalReasonOther" -> "Some other reason"
-        ))
+        Json.toJson(model) must be(
+          Json.obj(
+            "removalReason"      -> Schema.OTHER,
+            "removalReasonOther" -> "Some other reason"
+          )
+        )
       }
 
     }
@@ -59,15 +61,17 @@ class AgentRemovalReasonSpec extends PlaySpec with ScalaCheckDrivenPropertyCheck
     }
 
     "correctly parse form reason to schema reason and vice versa" in {
-      val formReason = Gen.oneOf(Form.MAJOR_COMPLIANCE_ISSUES,
+      val formReason = Gen.oneOf(
+        Form.MAJOR_COMPLIANCE_ISSUES,
         Form.MINOR_COMPLIANCE_ISSUES,
         Form.LACK_OF_PROFIT,
         Form.CEASED_TRADING,
         Form.REQUESTED_BY_AGENT,
-        Form.OTHER)
+        Form.OTHER
+      )
 
       forAll(formReason) { reason =>
-        Rules.fromSchemaReason(Rules.toSchemaReason(reason)) mustBe(reason)
+        Rules.fromSchemaReason(Rules.toSchemaReason(reason)) mustBe reason
       }
     }
 

@@ -28,45 +28,50 @@ import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ChangeSubSectorHelper @Inject()(implicit val dataCacheConnector: DataCacheConnector) {
+class ChangeSubSectorHelper @Inject() (implicit val dataCacheConnector: DataCacheConnector) {
 
-  def requiresPSRNumber(model: ChangeSubSectorFlowModel): Boolean = {
+  def requiresPSRNumber(model: ChangeSubSectorFlowModel): Boolean =
     model.psrNumber match {
       case None => model.subSectors.getOrElse(Set.empty).contains(TransmittingMoney)
-      case _ => false
+      case _    => false
     }
-  }
 
   def createFlowModel(credId: String)(implicit ec: ExecutionContext): Future[ChangeSubSectorFlowModel] =
     dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key).map {
-      case Some(x) => ChangeSubSectorFlowModel(subSectors = x.msbServices.map(_.msbServices), psrNumber = x.businessAppliedForPSRNumber)
-      case None => ChangeSubSectorFlowModel()
+      case Some(x) =>
+        ChangeSubSectorFlowModel(
+          subSectors = x.msbServices.map(_.msbServices),
+          psrNumber = x.businessAppliedForPSRNumber
+        )
+      case None    => ChangeSubSectorFlowModel()
     }
 
   def getOrCreateFlowModel(credId: String)(implicit ec: ExecutionContext): Future[ChangeSubSectorFlowModel] =
     (dataCacheConnector.fetch[ChangeSubSectorFlowModel](credId: String, ChangeSubSectorFlowModel.key) map {
       case Some(x) => Future.successful(x)
-      case None => createFlowModel(credId)
+      case None    => createFlowModel(credId)
     }).flatMap(identity)
 
-  def updateSubSectors(credId: String, model: ChangeSubSectorFlowModel)
-                      (implicit ec: ExecutionContext): Future[(MoneyServiceBusiness, BusinessMatching, Seq[TradingPremises])] = for {
-    _ <- updateServiceRegister(credId, model)
+  def updateSubSectors(credId: String, model: ChangeSubSectorFlowModel)(implicit
+    ec: ExecutionContext
+  ): Future[(MoneyServiceBusiness, BusinessMatching, Seq[TradingPremises])] = for {
+    _   <- updateServiceRegister(credId, model)
     msb <- updateMsb(credId, model)
-    bm <- updateBusinessMatching(credId, model)
-    tp <- updateTradingPremises(credId, model)
+    bm  <- updateBusinessMatching(credId, model)
+    tp  <- updateTradingPremises(credId, model)
   } yield (msb, bm, tp)
 
-  def updateServiceRegister(credId: String, model: ChangeSubSectorFlowModel)
-                           (implicit ec: ExecutionContext): Future[ServiceChangeRegister] =
+  def updateServiceRegister(credId: String, model: ChangeSubSectorFlowModel)(implicit
+    ec: ExecutionContext
+  ): Future[ServiceChangeRegister] =
     dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key) flatMap { maybeBm =>
       dataCacheConnector.update[ServiceChangeRegister](credId, ServiceChangeRegister.key) { maybeRegister =>
         val bmSectors = maybeBm.fold[Set[BusinessMatchingMsbService]](Set.empty) {
           _.msbServices.fold[Set[BusinessMatchingMsbService]](Set.empty)(_.msbServices)
         }
 
-        val newSectors = model.subSectors.getOrElse(Set.empty) diff bmSectors
-        val register = maybeRegister.getOrElse(ServiceChangeRegister())
+        val newSectors       = model.subSectors.getOrElse(Set.empty) diff bmSectors
+        val register         = maybeRegister.getOrElse(ServiceChangeRegister())
         val mergedSubSectors = register.addedSubSectors.getOrElse(Set.empty) ++ newSectors
 
         register.copy(addedSubSectors = Some(mergedSubSectors))
@@ -75,18 +80,18 @@ class ChangeSubSectorHelper @Inject()(implicit val dataCacheConnector: DataCache
       }
     }
 
-  def updateMsb(credId: String, model: ChangeSubSectorFlowModel)
-               (implicit ec: ExecutionContext): Future[MoneyServiceBusiness] = {
+  def updateMsb(credId: String, model: ChangeSubSectorFlowModel)(implicit
+    ec: ExecutionContext
+  ): Future[MoneyServiceBusiness] = {
 
-    val updateCE = (msb: MoneyServiceBusiness, newSectors: Set[BusinessMatchingMsbService]) => {
+    val updateCE = (msb: MoneyServiceBusiness, newSectors: Set[BusinessMatchingMsbService]) =>
       if (!newSectors.contains(CurrencyExchange)) {
         msb.copy(ceTransactionsInNext12Months = None, whichCurrencies = None)
       } else {
         msb
       }
-    }
 
-    val updateMT = (msb: MoneyServiceBusiness, newSectors: Set[BusinessMatchingMsbService]) => {
+    val updateMT = (msb: MoneyServiceBusiness, newSectors: Set[BusinessMatchingMsbService]) =>
       if (!newSectors.contains(TransmittingMoney)) {
         msb.copy(
           businessUseAnIPSP = None,
@@ -99,13 +104,12 @@ class ChangeSubSectorHelper @Inject()(implicit val dataCacheConnector: DataCache
       } else {
         msb
       }
-    }
 
     dataCacheConnector.fetch[MoneyServiceBusiness](credId, MoneyServiceBusiness.key) flatMap { maybeMsb =>
-      val sectorDiff = model.subSectors.getOrElse(Set.empty)
-      val msb = maybeMsb.getOrElse(MoneyServiceBusiness())
+      val sectorDiff  = model.subSectors.getOrElse(Set.empty)
+      val msb         = maybeMsb.getOrElse(MoneyServiceBusiness())
       val hasAccepted = msb.hasAccepted
-      val updatedMsb = updateMT(updateCE(msb, sectorDiff), sectorDiff)
+      val updatedMsb  = updateMT(updateCE(msb, sectorDiff), sectorDiff)
 
       if (sectorDiff.isEmpty) {
         Future.successful(msb)
@@ -115,7 +119,11 @@ class ChangeSubSectorHelper @Inject()(implicit val dataCacheConnector: DataCache
           Future.successful(None)
         } else {
           updateChangeFlag(credId, model) flatMap { isSectionChanged =>
-            dataCacheConnector.save[MoneyServiceBusiness](credId, MoneyServiceBusiness.key, updatedMsb.copy(hasChanged = isSectionChanged)) map { _ =>
+            dataCacheConnector.save[MoneyServiceBusiness](
+              credId,
+              MoneyServiceBusiness.key,
+              updatedMsb.copy(hasChanged = isSectionChanged)
+            ) map { _ =>
               updatedMsb.copy(hasAccepted = hasAccepted)
             }
           }
@@ -124,8 +132,9 @@ class ChangeSubSectorHelper @Inject()(implicit val dataCacheConnector: DataCache
     }
   }
 
-  def updateBusinessMatching(credId: String, model: ChangeSubSectorFlowModel)
-                            (implicit ec: ExecutionContext): Future[BusinessMatching] = {
+  def updateBusinessMatching(credId: String, model: ChangeSubSectorFlowModel)(implicit
+    ec: ExecutionContext
+  ): Future[BusinessMatching] = {
 
     val updatePsr = (bm: BusinessMatching, newSectors: Set[BusinessMatchingMsbService]) => {
       val updatedBm = bm.copy(msbServices = Some(BusinessMatchingMsbServices(model.subSectors.getOrElse(Set.empty))))
@@ -140,10 +149,10 @@ class ChangeSubSectorHelper @Inject()(implicit val dataCacheConnector: DataCache
     }
 
     dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key) flatMap { maybeBm =>
-      val sectorDiff = model.subSectors.getOrElse(Set.empty)
-      val bm = maybeBm.getOrElse(BusinessMatching())
+      val sectorDiff  = model.subSectors.getOrElse(Set.empty)
+      val bm          = maybeBm.getOrElse(BusinessMatching())
       val hasAccepted = bm.hasAccepted
-      val updatedBm = updatePsr(maybeBm.getOrElse(bm), sectorDiff)
+      val updatedBm   = updatePsr(maybeBm.getOrElse(bm), sectorDiff)
 
       if (sectorDiff.isEmpty) {
         Future.successful(bm)
@@ -155,14 +164,16 @@ class ChangeSubSectorHelper @Inject()(implicit val dataCacheConnector: DataCache
     }
   }
 
-  def updateChangeFlag(credId: String, model: ChangeSubSectorFlowModel)
-                      (implicit ec: ExecutionContext): Future[Boolean] =
+  def updateChangeFlag(credId: String, model: ChangeSubSectorFlowModel)(implicit
+    ec: ExecutionContext
+  ): Future[Boolean] =
     dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key) flatMap { maybeBm =>
-      val bm = maybeBm.getOrElse(BusinessMatching())
-      val msbActivitiesFromBm = bm.msbServices.getOrElse(BusinessMatchingMsbServices(Set.empty)).msbServices
+      val bm                                = maybeBm.getOrElse(BusinessMatching())
+      val msbActivitiesFromBm               = bm.msbServices.getOrElse(BusinessMatchingMsbServices(Set.empty)).msbServices
       val msbActivitiesFromChangeSubsectors = model.subSectors.getOrElse(Set.empty)
 
-      val diffMsbServices = (msbActivitiesFromBm diff msbActivitiesFromChangeSubsectors) union (msbActivitiesFromChangeSubsectors diff msbActivitiesFromBm)
+      val diffMsbServices =
+        (msbActivitiesFromBm diff msbActivitiesFromChangeSubsectors) union (msbActivitiesFromChangeSubsectors diff msbActivitiesFromBm)
 
       if (diffMsbServices.nonEmpty) {
         Future.successful(true)
@@ -171,17 +182,19 @@ class ChangeSubSectorHelper @Inject()(implicit val dataCacheConnector: DataCache
       }
     }
 
-  def updateTradingPremises(credId: String, model: ChangeSubSectorFlowModel)
-                           (implicit ec: ExecutionContext): Future[Seq[TradingPremises]] =
+  def updateTradingPremises(credId: String, model: ChangeSubSectorFlowModel)(implicit
+    ec: ExecutionContext
+  ): Future[Seq[TradingPremises]] =
     if (model.subSectors.getOrElse(Set.empty).isEmpty) {
       Future.successful(Seq.empty)
     } else {
       dataCacheConnector.update[Seq[TradingPremises]](credId, TradingPremises.key) {
-        case Some(tp) => tp map {
-          case t if hasMsb(t) => applySubSectorsTo(t, model.subSectors.get)
-          case t => t
-        }
-        case None => Seq.empty
+        case Some(tp) =>
+          tp map {
+            case t if hasMsb(t) => applySubSectorsTo(t, model.subSectors.get)
+            case t              => t
+          }
+        case None     => Seq.empty
       } map {
         _.getOrElse(Seq.empty)
       }
@@ -189,17 +202,21 @@ class ChangeSubSectorHelper @Inject()(implicit val dataCacheConnector: DataCache
 
   private def applySubSectorsTo(t: TradingPremises, subSectors: Set[BusinessMatchingMsbService]): TradingPremises = {
     val hasAccepted = t.hasAccepted
-    val s = subSectors.map(convertSingleService) intersect t.msbServices.getOrElse(TradingPremisesMsbServices(Set.empty)).services
+    val s           = subSectors
+      .map(convertSingleService) intersect t.msbServices.getOrElse(TradingPremisesMsbServices(Set.empty)).services
 
     t.msbServices(Some(TradingPremisesMsbServices(s match {
       case l if l.isEmpty && subSectors.size == 1 => convertServices(subSectors)
-      case _ => s
-    }))).copy(hasAccepted = hasAccepted)
+      case _                                      => s
+    })))
+      .copy(hasAccepted = hasAccepted)
   }
 
   private def hasMsb(tp: TradingPremises): Boolean = tp match {
-    case t if t.whatDoesYourBusinessDoAtThisAddress.isDefined
-      && t.whatDoesYourBusinessDoAtThisAddress.get.activities.contains(BusinessActivity.MoneyServiceBusiness) => true
+    case t
+        if t.whatDoesYourBusinessDoAtThisAddress.isDefined
+          && t.whatDoesYourBusinessDoAtThisAddress.get.activities.contains(BusinessActivity.MoneyServiceBusiness) =>
+      true
     case _ => false
   }
 }

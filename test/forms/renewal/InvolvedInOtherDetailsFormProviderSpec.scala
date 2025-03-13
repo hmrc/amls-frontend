@@ -25,26 +25,39 @@ import play.api.data.{Form, FormError}
 class InvolvedInOtherDetailsFormProviderSpec extends StringFieldBehaviours with Constraints with OptionValues {
 
   val involvedInOtherDetailsFormProvider: InvolvedInOtherDetailsFormProvider = new InvolvedInOtherDetailsFormProvider()
-  val formProvider: Form[InvolvedInOtherYes] = involvedInOtherDetailsFormProvider()
-  val detailsField = "details"
-  val requiredTextErrorMsg = "error.required.renewal.ba.involved.in.other.text"
-  val textMaxLengthErrorMsg = "error.invalid.maxlength.255.renewal.ba.involved.in.other"
-  val basicPunctuationErrorMsg = "error.text.validation.renewal.ba.involved.in.other"
+  val formProvider: Form[InvolvedInOtherYes]                                 = involvedInOtherDetailsFormProvider()
+  val detailsField                                                           = "details"
+  val requiredTextErrorMsg                                                   = "error.required.renewal.ba.involved.in.other.text"
+  val textMaxLengthErrorMsg                                                  = "error.invalid.maxlength.255.renewal.ba.involved.in.other"
+  val basicPunctuationErrorMsg                                               = "error.text.validation.renewal.ba.involved.in.other"
 
   "Involved In Other Details Form" should {
 
-    behave like fieldThatBindsValidData(formProvider, detailsField, alphaStringsShorterThan(involvedInOtherDetailsFormProvider.detailsMaxLength))
+    behave like fieldThatBindsValidData(
+      formProvider,
+      detailsField,
+      alphaStringsShorterThan(involvedInOtherDetailsFormProvider.detailsMaxLength)
+    )
 
     behave like mandatoryField(formProvider, detailsField, FormError(detailsField, requiredTextErrorMsg))
 
-    behave like fieldWithMaxLength(formProvider, detailsField, involvedInOtherDetailsFormProvider.detailsMaxLength,
-      FormError(detailsField, textMaxLengthErrorMsg, Seq(involvedInOtherDetailsFormProvider.detailsMaxLength)))
+    behave like fieldWithMaxLength(
+      formProvider,
+      detailsField,
+      involvedInOtherDetailsFormProvider.detailsMaxLength,
+      FormError(detailsField, textMaxLengthErrorMsg, Seq(involvedInOtherDetailsFormProvider.detailsMaxLength))
+    )
 
     "should not bind" when {
       "invalid details are submitted" in {
-        forAll(stringsShorterThan(involvedInOtherDetailsFormProvider.detailsMaxLength - 1), invalidCharForNames) { (details, char) =>
-          val boundForm = formProvider.bind(Map(detailsField -> s"${details.dropRight(1)}$char"))
-          boundForm.errors.head shouldBe FormError(detailsField, "error.text.validation.renewal.ba.involved.in.other", Seq(basicPunctuationRegex))
+        forAll(stringsShorterThan(involvedInOtherDetailsFormProvider.detailsMaxLength - 1), invalidCharForNames) {
+          (details, char) =>
+            val boundForm = formProvider.bind(Map(detailsField -> s"${details.dropRight(1)}$char"))
+            boundForm.errors.head shouldBe FormError(
+              detailsField,
+              "error.text.validation.renewal.ba.involved.in.other",
+              Seq(basicPunctuationRegex)
+            )
         }
       }
     }

@@ -25,41 +25,62 @@ import utils.AmlsSpec
 
 import java.time.LocalDate
 
-
 class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
 
   "The BusinessActivities model" must {
 
     "get the value for each activity type" in {
       BusinessActivities.getValue(EstateAgentBusinessService) must be("04")
-      BusinessActivities.getValue(AccountancyServices) must be("01")
-      BusinessActivities.getValue(HighValueDealing) must be("05")
-      BusinessActivities.getValue(MoneyServiceBusiness) must be("06")
-      BusinessActivities.getValue(TrustAndCompanyServices) must be("07")
-      BusinessActivities.getValue(TelephonePaymentService) must be("08")
+      BusinessActivities.getValue(AccountancyServices)        must be("01")
+      BusinessActivities.getValue(HighValueDealing)           must be("05")
+      BusinessActivities.getValue(MoneyServiceBusiness)       must be("06")
+      BusinessActivities.getValue(TrustAndCompanyServices)    must be("07")
+      BusinessActivities.getValue(TelephonePaymentService)    must be("08")
 
     }
 
     "get the message for each activity type" in {
-      AccountancyServices.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.01"))
-      ArtMarketParticipant.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.02"))
-      BillPaymentServices.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.03"))
-      EstateAgentBusinessService.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.04"))
-      HighValueDealing.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.05"))
-      MoneyServiceBusiness.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.06"))
-      TrustAndCompanyServices.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.07"))
-      TelephonePaymentService.getMessage(false) must be(Messages("businessmatching.registerservices.servicename.lbl.08"))
+      AccountancyServices.getMessage(false)        must be(Messages("businessmatching.registerservices.servicename.lbl.01"))
+      ArtMarketParticipant.getMessage(false)       must be(Messages("businessmatching.registerservices.servicename.lbl.02"))
+      BillPaymentServices.getMessage(false)        must be(Messages("businessmatching.registerservices.servicename.lbl.03"))
+      EstateAgentBusinessService.getMessage(false) must be(
+        Messages("businessmatching.registerservices.servicename.lbl.04")
+      )
+      HighValueDealing.getMessage(false)           must be(Messages("businessmatching.registerservices.servicename.lbl.05"))
+      MoneyServiceBusiness.getMessage(false)       must be(Messages("businessmatching.registerservices.servicename.lbl.06"))
+      TrustAndCompanyServices.getMessage(false)    must be(
+        Messages("businessmatching.registerservices.servicename.lbl.07")
+      )
+      TelephonePaymentService.getMessage(false)    must be(
+        Messages("businessmatching.registerservices.servicename.lbl.08")
+      )
     }
 
     "get the phrased message for each activity type" in {
-      AccountancyServices.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.01.phrased"))
-      ArtMarketParticipant.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.02.phrased"))
-      BillPaymentServices.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.03.phrased"))
-      EstateAgentBusinessService.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.04.phrased"))
-      HighValueDealing.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.05.phrased"))
-      MoneyServiceBusiness.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.06.phrased"))
-      TrustAndCompanyServices.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.07.phrased"))
-      TelephonePaymentService.getMessage(true) must be(Messages("businessmatching.registerservices.servicename.lbl.08.phrased"))
+      AccountancyServices.getMessage(true)        must be(
+        Messages("businessmatching.registerservices.servicename.lbl.01.phrased")
+      )
+      ArtMarketParticipant.getMessage(true)       must be(
+        Messages("businessmatching.registerservices.servicename.lbl.02.phrased")
+      )
+      BillPaymentServices.getMessage(true)        must be(
+        Messages("businessmatching.registerservices.servicename.lbl.03.phrased")
+      )
+      EstateAgentBusinessService.getMessage(true) must be(
+        Messages("businessmatching.registerservices.servicename.lbl.04.phrased")
+      )
+      HighValueDealing.getMessage(true)           must be(
+        Messages("businessmatching.registerservices.servicename.lbl.05.phrased")
+      )
+      MoneyServiceBusiness.getMessage(true)       must be(
+        Messages("businessmatching.registerservices.servicename.lbl.06.phrased")
+      )
+      TrustAndCompanyServices.getMessage(true)    must be(
+        Messages("businessmatching.registerservices.servicename.lbl.07.phrased")
+      )
+      TelephonePaymentService.getMessage(true)    must be(
+        Messages("businessmatching.registerservices.servicename.lbl.08.phrased")
+      )
     }
 
     "JSON validation" when {
@@ -69,16 +90,18 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
         "successfully validate given an enum value" in {
           val json = Json.obj("businessActivities" -> Seq("05", "06", "07"))
 
-          Json.fromJson[BusinessActivities](json) must
-            be(JsSuccess(BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))))
+          Json.fromJson[BusinessActivities](json)                                                    must
+            be(
+              JsSuccess(BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
+            )
 
           Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01", "02", "03"))) must
             be(JsSuccess(BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))))
 
-          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("04"))) must
+          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("04")))             must
             be(JsSuccess(BusinessActivities(Set(HighValueDealing))))
 
-          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("08"))) must
+          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("08")))             must
             be(JsSuccess(BusinessActivities(Set(ArtMarketParticipant))))
 
         }
@@ -93,29 +116,41 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
 
         "successfully validate given an enum value" in {
 
-          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("05", "06", "07"), "additionalActivities" -> Seq("01", "02"))) must
-            be(JsSuccess(
-              BusinessActivities(
-                Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService),
-                Some(Set(AccountancyServices, BillPaymentServices))
+          Json.fromJson[BusinessActivities](
+            Json.obj("businessActivities" -> Seq("05", "06", "07"), "additionalActivities" -> Seq("01", "02"))
+          ) must
+            be(
+              JsSuccess(
+                BusinessActivities(
+                  Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService),
+                  Some(Set(AccountancyServices, BillPaymentServices))
+                )
               )
-            ))
+            )
 
-          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01", "02", "03"), "additionalActivities" -> Seq("04", "05", "06"))) must
-            be(JsSuccess(
-              BusinessActivities(
-                Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService),
-                Some(Set(HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices))
+          Json.fromJson[BusinessActivities](
+            Json.obj("businessActivities" -> Seq("01", "02", "03"), "additionalActivities" -> Seq("04", "05", "06"))
+          ) must
+            be(
+              JsSuccess(
+                BusinessActivities(
+                  Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService),
+                  Some(Set(HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices))
+                )
               )
-            ))
+            )
 
-          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("04"), "additionalActivities" -> Seq("07"))) must
+          Json.fromJson[BusinessActivities](
+            Json.obj("businessActivities" -> Seq("04"), "additionalActivities" -> Seq("07"))
+          ) must
             be(JsSuccess(BusinessActivities(Set(HighValueDealing), Some(Set(TelephonePaymentService)))))
 
         }
 
         "fail given invalid data" in {
-          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01"),  "additionalActivities" -> Seq("11"))) must
+          Json.fromJson[BusinessActivities](
+            Json.obj("businessActivities" -> Seq("01"), "additionalActivities" -> Seq("11"))
+          ) must
             be(JsError((JsPath \ "additionalActivities") -> play.api.libs.json.JsonValidationError("error.invalid")))
         }
       }
@@ -124,31 +159,43 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
 
         "successfully validate given an enum value" in {
 
-          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("05", "06", "07"), "removeActivities" -> Seq("01", "02"))) must
-            be(JsSuccess(
-              BusinessActivities(
-                Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService),
-                None,
-                Some(Set(AccountancyServices, BillPaymentServices))
+          Json.fromJson[BusinessActivities](
+            Json.obj("businessActivities" -> Seq("05", "06", "07"), "removeActivities" -> Seq("01", "02"))
+          ) must
+            be(
+              JsSuccess(
+                BusinessActivities(
+                  Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService),
+                  None,
+                  Some(Set(AccountancyServices, BillPaymentServices))
+                )
               )
-            ))
+            )
 
-          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01", "02", "03"), "removeActivities" -> Seq("04", "05", "06"))) must
-            be(JsSuccess(
-              BusinessActivities(
-                Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService),
-                None,
-                Some(Set(HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices))
+          Json.fromJson[BusinessActivities](
+            Json.obj("businessActivities" -> Seq("01", "02", "03"), "removeActivities" -> Seq("04", "05", "06"))
+          ) must
+            be(
+              JsSuccess(
+                BusinessActivities(
+                  Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService),
+                  None,
+                  Some(Set(HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices))
+                )
               )
-            ))
+            )
 
-          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("04"), "removeActivities" -> Seq("07"))) must
+          Json.fromJson[BusinessActivities](
+            Json.obj("businessActivities" -> Seq("04"), "removeActivities" -> Seq("07"))
+          ) must
             be(JsSuccess(BusinessActivities(Set(HighValueDealing), None, Some(Set(TelephonePaymentService)))))
 
         }
 
         "fail given invalid data" in {
-          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01"),  "removeActivities" -> Seq("11"))) must
+          Json.fromJson[BusinessActivities](
+            Json.obj("businessActivities" -> Seq("01"), "removeActivities" -> Seq("11"))
+          ) must
             be(JsError((JsPath \ "removeActivities") -> play.api.libs.json.JsonValidationError("error.invalid")))
         }
       }
@@ -159,16 +206,20 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
 
           val json = Json.obj(
             "businessActivities" -> Seq("05", "06", "07"),
-            "dateOfChange" -> "1990-02-24"
+            "dateOfChange"       -> "1990-02-24"
           )
 
           Json.fromJson[BusinessActivities](json) must
-            be(JsSuccess(BusinessActivities(
-              Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService),
-              None,
-              None,
-              Some(DateOfChange(LocalDate.of(1990, 2,24)))
-            )))
+            be(
+              JsSuccess(
+                BusinessActivities(
+                  Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService),
+                  None,
+                  None,
+                  Some(DateOfChange(LocalDate.of(1990, 2, 24)))
+                )
+              )
+            )
 
         }
 
@@ -183,25 +234,40 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
       }
 
       "additionalActivities are present" in {
-        Json.toJson(BusinessActivities(Set(HighValueDealing, EstateAgentBusinessService), Some(Set(AccountancyServices, BillPaymentServices)))) must
+        Json.toJson(
+          BusinessActivities(
+            Set(HighValueDealing, EstateAgentBusinessService),
+            Some(Set(AccountancyServices, BillPaymentServices))
+          )
+        ) must
           be(Json.obj("businessActivities" -> Seq("04", "03"), "additionalActivities" -> Seq("01", "02")))
       }
 
       "removeActivities are present" in {
-        Json.toJson(BusinessActivities(Set(HighValueDealing, EstateAgentBusinessService), None, Some(Set(AccountancyServices, BillPaymentServices)))) must
+        Json.toJson(
+          BusinessActivities(
+            Set(HighValueDealing, EstateAgentBusinessService),
+            None,
+            Some(Set(AccountancyServices, BillPaymentServices))
+          )
+        ) must
           be(Json.obj("businessActivities" -> Seq("04", "03"), "removeActivities" -> Seq("01", "02")))
       }
 
       "dateOfChange is present" in {
-        Json.toJson(BusinessActivities(
-          Set(HighValueDealing, EstateAgentBusinessService),
-          None,
-          None,
-          Some(DateOfChange(LocalDate.of(1990, 2,24)))
-        )) must be(Json.obj(
-          "businessActivities" -> Seq("04", "03"),
-          "dateOfChange" -> "1990-02-24"
-        ))
+        Json.toJson(
+          BusinessActivities(
+            Set(HighValueDealing, EstateAgentBusinessService),
+            None,
+            None,
+            Some(DateOfChange(LocalDate.of(1990, 2, 24)))
+          )
+        ) must be(
+          Json.obj(
+            "businessActivities" -> Seq("04", "03"),
+            "dateOfChange"       -> "1990-02-24"
+          )
+        )
       }
 
     }

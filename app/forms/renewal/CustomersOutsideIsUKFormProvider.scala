@@ -22,9 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class CustomersOutsideIsUKFormProvider @Inject()() extends BooleanFormProvider {
+class CustomersOutsideIsUKFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[CustomersOutsideIsUK] = createForm[CustomersOutsideIsUK](
-    "isOutside", "error.required.ba.renewal.select.yes"
+    "isOutside",
+    "error.required.ba.renewal.select.yes"
   )(CustomersOutsideIsUK.apply, _.isOutside)
 }

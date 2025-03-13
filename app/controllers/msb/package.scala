@@ -23,14 +23,18 @@ import models.businessmatching.BusinessActivity.MoneyServiceBusiness
 
 package object msb {
 
-  def currencyExchangeAddedPostSubmission(msbActivities: Set[BusinessMatchingMsbService], register: ServiceChangeRegister) = {
+  def currencyExchangeAddedPostSubmission(
+    msbActivities: Set[BusinessMatchingMsbService],
+    register: ServiceChangeRegister
+  ) =
     (register.addedActivities.fold(false)(_.contains(MoneyServiceBusiness)) ||
       register.addedSubSectors.fold(false)(_.contains(CurrencyExchange))) && msbActivities.contains(CurrencyExchange)
-  }
 
-  def foreignExchangeAddedPostSubmission(msbActivities: Set[BusinessMatchingMsbService], register: ServiceChangeRegister) = {
+  def foreignExchangeAddedPostSubmission(
+    msbActivities: Set[BusinessMatchingMsbService],
+    register: ServiceChangeRegister
+  ) =
     (register.addedActivities.fold(false)(_.contains(MoneyServiceBusiness)) ||
-            register.addedSubSectors.fold(false)(_.contains(ForeignExchange))) && msbActivities.contains(ForeignExchange)
-  }
+      register.addedSubSectors.fold(false)(_.contains(ForeignExchange))) && msbActivities.contains(ForeignExchange)
 
 }

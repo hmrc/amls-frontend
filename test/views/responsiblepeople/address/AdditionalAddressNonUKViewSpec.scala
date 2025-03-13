@@ -28,7 +28,7 @@ import views.html.responsiblepeople.address.AdditionalAddressNonUKView
 class AdditionalAddressNonUKViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val nonUKView = inject[AdditionalAddressNonUKView]
-  lazy val fp = inject[AdditionalAddressNonUKFormProvider]
+  lazy val fp        = inject[AdditionalAddressNonUKFormProvider]
 
   val name = "firstName lastName"
 
@@ -48,25 +48,32 @@ class AdditionalAddressNonUKViewSpec extends AmlsViewSpec with Matchers {
 
       def view = nonUKView(fp(), true, 1, None, name, countries)
 
-      doc.title must be(messages("responsiblepeople.additional_address_country.title") +
-        " - " + messages("summary.responsiblepeople") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
-      heading.html must be(messages("responsiblepeople.additional_address_country.heading", name))
+      doc.title       must be(
+        messages("responsiblepeople.additional_address_country.title") +
+          " - " + messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
+      heading.html    must be(messages("responsiblepeople.additional_address_country.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "addressLine1") must not be empty
       doc.getElementsByAttributeValue("name", "addressLine2") must not be empty
       doc.getElementsByAttributeValue("name", "addressLine3") must not be empty
       doc.getElementsByAttributeValue("name", "addressLine4") must not be empty
-      doc.getElementsByAttributeValue("name", "country") must not be empty
+      doc.getElementsByAttributeValue("name", "country")      must not be empty
 
     }
 
     Seq(1, 2, 3, 4) foreach { line =>
       behave like pageWithErrors(
         nonUKView(
-          fp().withError(s"addressLine$line", s"error.text.validation.address.line$line"), false, 1, None, name, countries
+          fp().withError(s"addressLine$line", s"error.text.validation.address.line$line"),
+          false,
+          1,
+          None,
+          name,
+          countries
         ),
         s"addressLine$line",
         s"error.text.validation.address.line$line"
@@ -75,7 +82,12 @@ class AdditionalAddressNonUKViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       nonUKView(
-        fp().withError("country", "error.invalid.country"), false, 1, None, name, countries
+        fp().withError("country", "error.invalid.country"),
+        false,
+        1,
+        None,
+        name,
+        countries
       ),
       "location-autocomplete",
       "error.invalid.country"

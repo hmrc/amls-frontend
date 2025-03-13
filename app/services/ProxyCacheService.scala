@@ -25,22 +25,20 @@ import services.cache.Cache
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ProxyCacheService @Inject()(cacheConnector: DataCacheConnector)
-                                 (implicit ec: ExecutionContext){
+class ProxyCacheService @Inject() (cacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) {
 
-  //AMP
-  def getAmp(credId: String): Future[Option[JsValue]] = {
+  // AMP
+  def getAmp(credId: String): Future[Option[JsValue]] =
     for {
       amp <- cacheConnector.fetch[Amp](credId, Amp.key)
     } yield amp match {
       case Some(amp) => Some(Json.toJson(amp))
-      case _ => None
+      case _         => None
     }
-  }
 
   def setAmp(credId: String, body: JsValue): Future[Cache] = {
     val jsonObject: JsObject = body.as[JsObject]
-    val ampData = jsonObject.value("data").as[JsObject]
+    val ampData              = jsonObject.value("data").as[JsObject]
 
     for {
       existing <- cacheConnector.fetch[Amp](credId, Amp.key)
@@ -48,19 +46,18 @@ class ProxyCacheService @Inject()(cacheConnector: DataCacheConnector)
     } yield result
   }
 
-  //EAB
-  def getEab(credId: String): Future[Option[JsValue]] = {
+  // EAB
+  def getEab(credId: String): Future[Option[JsValue]] =
     for {
       eab <- cacheConnector.fetch[Eab](credId, Eab.key)
     } yield eab match {
       case Some(eab) => Some(Json.toJson(eab))
-      case _ => None
+      case _         => None
     }
-  }
 
   def setEab(credId: String, body: JsValue): Future[Cache] = {
     val jsonObject: JsObject = body.as[JsObject]
-    val eabData = jsonObject.value("data").as[JsObject]
+    val eabData              = jsonObject.value("data").as[JsObject]
 
     for {
       existing <- cacheConnector.fetch[Eab](credId, Eab.key)

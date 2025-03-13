@@ -25,16 +25,14 @@ object ComplexCorpStructureCreation {
   import play.api.libs.json._
   import play.api.libs.json.Reads._
 
-  implicit val jsonReads: Reads[ComplexCorpStructureCreation] =  {
+  implicit val jsonReads: Reads[ComplexCorpStructureCreation] =
     (__ \ "complexCorpStructureCreation").read[Boolean] map {
-      case true => ComplexCorpStructureCreationYes
-      case false  => ComplexCorpStructureCreationNo
+      case true  => ComplexCorpStructureCreationYes
+      case false => ComplexCorpStructureCreationNo
     }
-  }
 
   implicit val jsonWrite: Writes[ComplexCorpStructureCreation] = Writes[ComplexCorpStructureCreation] {
     case ComplexCorpStructureCreationYes => Json.obj("complexCorpStructureCreation" -> true)
-    case ComplexCorpStructureCreationNo => Json.obj("complexCorpStructureCreation" -> false)
+    case ComplexCorpStructureCreationNo  => Json.obj("complexCorpStructureCreation" -> false)
   }
 }
-

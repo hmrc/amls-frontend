@@ -31,48 +31,46 @@ import views.html.businessmatching.CompanyRegistrationNumberView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class CompanyRegistrationNumberController @Inject()(authAction: AuthAction,
-                                                   val ds: CommonPlayDependencies,
-                                                   val dataCacheConnector: DataCacheConnector,
-                                                   val statusService: StatusService,
-                                                   val businessMatchingService:BusinessMatchingService,
-                                                   val cc: MessagesControllerComponents,
-                                                   formProvider: CompanyRegistrationNumberFormProvider,
-                                                   view: CompanyRegistrationNumberView) extends AmlsBaseController(ds, cc) {
+class CompanyRegistrationNumberController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val dataCacheConnector: DataCacheConnector,
+  val statusService: StatusService,
+  val businessMatchingService: BusinessMatchingService,
+  val cc: MessagesControllerComponents,
+  formProvider: CompanyRegistrationNumberFormProvider,
+  view: CompanyRegistrationNumberView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-      implicit request =>
-        (for {
-          bm <- businessMatchingService.getModel(request.credId)
-          status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId,request.credId))
-        } yield {
-          val form = bm.companyRegistrationNumber.map(formProvider().fill)
-          Ok(view(form.getOrElse(formProvider()), edit, bm.hasAccepted , statusService.isPreSubmission(status)))
-        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
-    }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      bm     <- businessMatchingService.getModel(request.credId)
+      status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
+    } yield {
+      val form = bm.companyRegistrationNumber.map(formProvider().fill)
+      Ok(view(form.getOrElse(formProvider()), edit, bm.hasAccepted, statusService.isPreSubmission(status)))
+    }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+  }
 
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    val form = formProvider().bindFromRequest()
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-
-      val form = formProvider().bindFromRequest()
-
-      form.fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
-        value =>
-          for {
-            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-            _ <- dataCacheConnector.save[BusinessMatching](request.credId, BusinessMatching.key,
-              businessMatching.companyRegistrationNumber(value)
-            )
-          } yield if (edit) {
+    form.fold(
+      formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+      value =>
+        for {
+          businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
+          _                <- dataCacheConnector.save[BusinessMatching](
+                                request.credId,
+                                BusinessMatching.key,
+                                businessMatching.companyRegistrationNumber(value)
+                              )
+        } yield
+          if (edit) {
             Redirect(routes.SummaryController.get())
           } else {
             Redirect(routes.RegisterServicesController.get())
           }
-      )
-    }
+    )
   }
 }
-

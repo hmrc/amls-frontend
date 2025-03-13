@@ -21,8 +21,8 @@ import play.api.data.{Form, FormError}
 
 class FitAndProperFormProviderSpec extends BooleanFieldBehaviours[Boolean] {
 
-  override val form: Form[Boolean] = new FitAndProperFormProvider()()
-  override val fieldName: String = "hasAlreadyPassedFitAndProper"
+  override val form: Form[Boolean]  = new FitAndProperFormProvider()()
+  override val fieldName: String    = "hasAlreadyPassedFitAndProper"
   override val errorMessage: String = "error.required.rp.fit_and_proper"
 
   val formError: FormError = FormError(fieldName, errorMessage)
@@ -33,12 +33,14 @@ class FitAndProperFormProviderSpec extends BooleanFieldBehaviours[Boolean] {
 
     s"fail to bind when $fieldName is empty" in {
 
-      val result = form.bind(Map(
-        fieldName -> ""
-      ))
+      val result = form.bind(
+        Map(
+          fieldName -> ""
+        )
+      )
 
-      result.value shouldBe None
-      result.errors shouldBe(Seq(formError))
+      result.value  shouldBe None
+      result.errors shouldBe (Seq(formError))
     }
   }
 }

@@ -26,14 +26,12 @@ import views.html.businessmatching.updateservice.remove.RemoveActivitiesView
 
 class RemoveActivitiesViewSpec extends AmlsViewSpec {
 
-  lazy val formProvider: RemoveBusinessActivitiesFormProvider = inject[RemoveBusinessActivitiesFormProvider]
-  lazy val remove_activities: RemoveActivitiesView = inject[RemoveActivitiesView]
+  lazy val formProvider: RemoveBusinessActivitiesFormProvider    = inject[RemoveBusinessActivitiesFormProvider]
+  lazy val remove_activities: RemoveActivitiesView               = inject[RemoveActivitiesView]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
-  def createView: HtmlFormat.Appendable = remove_activities(formProvider(2),
-    edit = true,
-    Seq(AccountancyServices, MoneyServiceBusiness)
-  )
+  def createView: HtmlFormat.Appendable =
+    remove_activities(formProvider(2), edit = true, Seq(AccountancyServices, MoneyServiceBusiness))
 
   trait ViewFixture extends Fixture {
     override def view: HtmlFormat.Appendable = createView
@@ -63,8 +61,10 @@ class RemoveActivitiesViewSpec extends AmlsViewSpec {
         Seq(AccountancyServices, MoneyServiceBusiness)
       )
 
-      doc.body().text() must include (messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
-      doc.getElementById("button").text() must include (messages("businessmatching.updateservice.removeactivities.button"))
+      doc.body().text()                   must include(messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
+      doc.getElementById("button").text() must include(
+        messages("businessmatching.updateservice.removeactivities.button")
+      )
     }
 
     "show the correct checkbox values" in new ViewFixture {
@@ -75,15 +75,26 @@ class RemoveActivitiesViewSpec extends AmlsViewSpec {
         Seq(AccountancyServices, MoneyServiceBusiness)
       )
 
-      doc.select("#main-content > div > div > div > form > div.govuk-form-group > fieldset > div.govuk-checkboxes > div:nth-child(1) > label").text() mustBe "Accountancy service provider"
-      doc.select("#main-content > div > div > div > form > div.govuk-form-group > fieldset > div.govuk-checkboxes > div:nth-child(2) > label").text() mustBe "Money service business"
-      }
+      doc
+        .select(
+          "#main-content > div > div > div > form > div.govuk-form-group > fieldset > div.govuk-checkboxes > div:nth-child(1) > label"
+        )
+        .text() mustBe "Accountancy service provider"
+      doc
+        .select(
+          "#main-content > div > div > div > form > div.govuk-form-group > fieldset > div.govuk-checkboxes > div:nth-child(2) > label"
+        )
+        .text() mustBe "Money service business"
+    }
 
     behave like pageWithErrors(
       remove_activities(
-        formProvider(2).withError("value", "error.required.bm.remove.service.multiple"), false, Seq(AccountancyServices, MoneyServiceBusiness)
+        formProvider(2).withError("value", "error.required.bm.remove.service.multiple"),
+        false,
+        Seq(AccountancyServices, MoneyServiceBusiness)
       ),
-      "value", "error.required.bm.remove.service.multiple"
+      "value",
+      "error.required.bm.remove.service.multiple"
     )
   }
 }

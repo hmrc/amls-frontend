@@ -41,25 +41,26 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
   trait Fixture {
     self =>
     implicit val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
-    lazy val view = inject[RemoveAgentPremisesReasonsView]
-    val controller = new RemoveAgentPremisesReasonsController (
+    lazy val view                                         = inject[RemoveAgentPremisesReasonsView]
+    val controller                                        = new RemoveAgentPremisesReasonsController(
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[RemoveAgentPremisesReasonsFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
 
     val tradingPremises = TradingPremises()
-    val cache = Cache.empty
+    val cache           = Cache.empty
 
     def mockFetch(model: Option[Seq[TradingPremises]]) =
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
-        (any())).thenReturn(Future.successful(model))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
+        .thenReturn(Future.successful(model))
 
-    when(controller.dataCacheConnector.save( any(), eqTo(TradingPremises.key), any())(any())).
-      thenReturn(Future.successful(cache))
+    when(controller.dataCacheConnector.save(any(), eqTo(TradingPremises.key), any())(any()))
+      .thenReturn(Future.successful(cache))
 
     mockFetch(Some(Seq(tradingPremises)))
   }
@@ -90,9 +91,9 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
       "return a bad request if there is a validation problem" in new Fixture {
 
         val formRequest = FakeRequest(POST, routes.RemoveAgentPremisesReasonsController.post(1).url)
-        .withFormUrlEncodedBody(
-          "removalReason" -> Other.toString
-        )
+          .withFormUrlEncodedBody(
+            "removalReason" -> Other.toString
+          )
 
         val result = controller.post(1)(formRequest)
 
@@ -103,19 +104,19 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
       "save the reason data to mongoCache" in new Fixture {
 
         val formRequest = FakeRequest(POST, routes.RemoveAgentPremisesReasonsController.post(1).url)
-        .withFormUrlEncodedBody(
-          "removalReason" -> Other.toString,
-          "removalReasonOther" -> "Some reason"
-        )
+          .withFormUrlEncodedBody(
+            "removalReason"      -> Other.toString,
+            "removalReasonOther" -> "Some reason"
+          )
 
         await(controller.post(1)(formRequest))
 
         val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
-        verify(controller.dataCacheConnector).save( any(), eqTo(TradingPremises.key), captor.capture())(any())
+        verify(controller.dataCacheConnector).save(any(), eqTo(TradingPremises.key), captor.capture())(any())
 
         captor.getValue match {
           case tp :: tail =>
-            tp.removalReason must be(Some(Schema.OTHER))
+            tp.removalReason      must be(Some(Schema.OTHER))
             tp.removalReasonOther must be(Some("Some reason"))
         }
 
@@ -124,15 +125,17 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
       "redirect to the 'Remove trading premises' page" in new Fixture {
 
         val formRequest = FakeRequest(POST, routes.RemoveAgentPremisesReasonsController.post(1).url)
-        .withFormUrlEncodedBody(
-          "removalReason" -> Other.toString,
-          "removalReasonOther" -> "Some reason"
-        )
+          .withFormUrlEncodedBody(
+            "removalReason"      -> Other.toString,
+            "removalReasonOther" -> "Some reason"
+          )
 
         val result = controller.post(1)(formRequest)
 
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1).url))
+        status(result)           must be(SEE_OTHER)
+        redirectLocation(result) must be(
+          Some(controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1).url)
+        )
 
       }
     }

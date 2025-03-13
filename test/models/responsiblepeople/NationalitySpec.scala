@@ -21,7 +21,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-
 class NationalitySpec extends PlaySpec with MockitoSugar {
 
   "JSON" must {
@@ -34,12 +33,15 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
     "Read read and write the option `other country` successfully" in {
       val json = Nationality.jsonWrites.writes(OtherCountry(Country("United Kingdom", "GB")))
       Nationality.jsonReads.reads(json) must be(
-        JsSuccess(OtherCountry(Country("United Kingdom", "GB")), JsPath \ "otherCountry"))
+        JsSuccess(OtherCountry(Country("United Kingdom", "GB")), JsPath \ "otherCountry")
+      )
     }
 
     "fail to validate given an invalid value supplied that is not matching to any nationality" in {
 
-      Nationality.jsonReads.reads(Json.obj("nationality" -> "10")) must be(JsError(List((JsPath, List(play.api.libs.json.JsonValidationError("error.invalid"))))))
+      Nationality.jsonReads.reads(Json.obj("nationality" -> "10")) must be(
+        JsError(List((JsPath, List(play.api.libs.json.JsonValidationError("error.invalid")))))
+      )
 
     }
   }

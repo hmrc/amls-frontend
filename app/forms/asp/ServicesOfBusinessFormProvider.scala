@@ -23,9 +23,9 @@ import play.api.data.Forms.seq
 
 import javax.inject.Inject
 
-class ServicesOfBusinessFormProvider @Inject()() extends Mappings {
+class ServicesOfBusinessFormProvider @Inject() () extends Mappings {
 
-  val errorMessage = "error.required.asp.business.services"
+  val errorMessage                      = "error.required.asp.business.services"
   def apply(): Form[ServicesOfBusiness] = Form(
     "services" -> seq(enumerable[Service](errorMessage, errorMessage))
       .verifying(nonEmptySeq(errorMessage))

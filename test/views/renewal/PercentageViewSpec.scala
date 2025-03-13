@@ -24,12 +24,12 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.PercentageView
 
-class PercentageViewSpec extends AmlsViewSpec with Matchers  {
+class PercentageViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture
 
-  lazy val percentage = inject[PercentageView]
-  lazy val fp = inject[PercentageFormProvider]
+  lazy val percentage                                            = inject[PercentageView]
+  lazy val fp                                                    = inject[PercentageFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   "PercentageView" must {
@@ -44,7 +44,7 @@ class PercentageViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = percentage(fp().fill(Third), true)
 
-      heading.html must be(messages("renewal.hvd.percentage.title"))
+      heading.html    must be(messages("renewal.hvd.percentage.title"))
       subHeading.html must include(messages("summary.renewal"))
     }
 

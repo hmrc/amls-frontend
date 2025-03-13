@@ -57,7 +57,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
   }
 
-  val emptyCache = Cache.empty
+  val emptyCache   = Cache.empty
   val mockCacheMap = mock[Cache]
 
   "TrainingController" when {
@@ -68,25 +68,31 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
       "display the page with pre populated data (training is set to Yes)" in new Fixture {
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, training = Some(TrainingYes("test")))))))
+          .thenReturn(
+            Future.successful(
+              Some(Seq(ResponsiblePerson(personName = personName, training = Some(TrainingYes("test")))))
+            )
+          )
 
         val result = controller.get(recordId)(request)
         status(result) must be(OK)
 
         val page: Document = Jsoup.parse(contentAsString(result))
         page.getElementById("training-true").hasAttr("checked") must be(true)
-        page.getElementById("information").`val` must be("test")
+        page.getElementById("information").`val`                must be("test")
       }
 
       "display the page with pre populated data (training is set to No)" in new Fixture {
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, training = Some(TrainingNo))))))
+          .thenReturn(
+            Future.successful(Some(Seq(ResponsiblePerson(personName = personName, training = Some(TrainingNo)))))
+          )
 
         val result = controller.get(recordId)(request)
         status(result) must be(OK)
 
         val page: Document = Jsoup.parse(contentAsString(result))
-        page.getElementById("training-true").hasAttr("checked") must be(false)
+        page.getElementById("training-true").hasAttr("checked")  must be(false)
         page.getElementById("training-false").hasAttr("checked") must be(true)
       }
 
@@ -98,9 +104,9 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
         status(result) must be(OK)
 
         val page: Document = Jsoup.parse(contentAsString(result))
-        page.getElementById("training-true").hasAttr("checked") must be(false)
+        page.getElementById("training-true").hasAttr("checked")  must be(false)
         page.getElementById("training-false").hasAttr("checked") must be(false)
-        page.getElementById("information").`val` must be("")
+        page.getElementById("information").`val`                 must be("")
       }
 
       "respond with NOT_FOUND when there is no personName" in new Fixture {
@@ -116,10 +122,10 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       "index is out of bounds, must respond with NOT_FOUND" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.TrainingController.post(1).url)
-        .withFormUrlEncodedBody(
-          "training" -> "true",
-          "information" -> "test"
-        )
+          .withFormUrlEncodedBody(
+            "training"    -> "true",
+            "information" -> "test"
+          )
 
         when(controller.dataCacheConnector.fetchAll(any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -135,10 +141,10 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
         "edit is false" must {
           "redirect to FitAndProperNoticeController" in new Fixture {
             val newRequest = FakeRequest(POST, routes.TrainingController.post(1).url)
-            .withFormUrlEncodedBody(
-              "training" -> "true",
-              "information" -> "I do not remember when I did the training"
-            )
+              .withFormUrlEncodedBody(
+                "training"    -> "true",
+                "information" -> "I do not remember when I did the training"
+              )
 
             when(controller.dataCacheConnector.fetchAll(any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -150,36 +156,38 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(recordId, false)(newRequest)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.FitAndProperNoticeController.get(recordId).url))
           }
         }
-        "edit is true" must {
+        "edit is true"  must {
           "redirect to DetailedAnswersController" in new Fixture {
 
             val newRequest = FakeRequest(POST, routes.TrainingController.post(1).url)
-            .withFormUrlEncodedBody(
-              "training" -> "true",
-              "information" -> "I do not remember when I did the training"
-            )
+              .withFormUrlEncodedBody(
+                "training"    -> "true",
+                "information" -> "I do not remember when I did the training"
+              )
 
             when(controller.dataCacheConnector.fetchAll(any()))
               .thenReturn(Future.successful(Some(emptyCache)))
 
             val result = controller.post(recordId, true, Some(flowFromDeclaration))(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId, Some(flowFromDeclaration)).url))
+            status(result)           must be(SEE_OTHER)
+            redirectLocation(result) must be(
+              Some(routes.DetailedAnswersController.get(recordId, Some(flowFromDeclaration)).url)
+            )
           }
         }
       }
 
       "given invalid data, must respond with BAD_REQUEST" in new Fixture {
         val newRequest = FakeRequest(POST, routes.TrainingController.post(1).url)
-        .withFormUrlEncodedBody(
-          "training" -> "not a boolean value"
-        )
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))
+          .withFormUrlEncodedBody(
+            "training" -> "not a boolean value"
+          )
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))
 
         val result = controller.post(recordId)(newRequest)
         status(result) must be(BAD_REQUEST)

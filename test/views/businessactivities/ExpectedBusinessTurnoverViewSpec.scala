@@ -28,7 +28,7 @@ import views.html.businessactivities.ExpectedBusinessTurnoverView
 
 class ExpectedBusinessTurnoverViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val turnover = inject[ExpectedBusinessTurnoverView]
+  lazy val turnover     = inject[ExpectedBusinessTurnoverView]
   lazy val formProvider = inject[ExpectedBusinessTurnoverFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
@@ -42,14 +42,16 @@ class ExpectedBusinessTurnoverViewSpec extends AmlsViewSpec with Matchers {
 
       def view = turnover(formProvider().fill(ExpectedBusinessTurnover.Third), true)
 
-      doc.title must startWith(messages("businessactivities.business-turnover.title") + " - " + messages("summary.businessactivities"))
+      doc.title must startWith(
+        messages("businessactivities.business-turnover.title") + " - " + messages("summary.businessactivities")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = turnover(formProvider().fill(ExpectedBusinessTurnover.Second), true)
 
-      heading.html must be(messages("businessactivities.business-turnover.title"))
+      heading.html    must be(messages("businessactivities.business-turnover.title"))
       subHeading.html must include(messages("summary.businessactivities"))
 
     }

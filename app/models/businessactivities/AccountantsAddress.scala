@@ -22,18 +22,18 @@ import play.api.libs.json.{Reads, Writes}
 sealed trait AccountantsAddress {
 
   def isUk: Boolean = this match {
-    case _: UkAccountantsAddress => true
+    case _: UkAccountantsAddress    => true
     case _: NonUkAccountantsAddress => false
   }
 
   def isComplete: Boolean = this match {
-    case UkAccountantsAddress(al1, _, _, _, ap) if al1.nonEmpty & ap.nonEmpty => true
+    case UkAccountantsAddress(al1, _, _, _, ap) if al1.nonEmpty & ap.nonEmpty                         => true
     case NonUkAccountantsAddress(al1, _, _, _, c) if al1.nonEmpty & c.name.nonEmpty & c.code.nonEmpty => true
-    case _ => false
+    case _                                                                                            => false
   }
 
   def toLines: Seq[String] = this match {
-    case a: UkAccountantsAddress =>
+    case a: UkAccountantsAddress    =>
       Seq(
         Some(a.addressLine1),
         a.addressLine2,
@@ -53,20 +53,20 @@ sealed trait AccountantsAddress {
 }
 
 case class UkAccountantsAddress(
-                                 addressLine1: String,
-                                 addressLine2: Option[String],
-                                 addressLine3: Option[String],
-                                 addressLine4: Option[String],
-                                 postCode: String
-                               ) extends AccountantsAddress
+  addressLine1: String,
+  addressLine2: Option[String],
+  addressLine3: Option[String],
+  addressLine4: Option[String],
+  postCode: String
+) extends AccountantsAddress
 
 case class NonUkAccountantsAddress(
-                                    addressLine1: String,
-                                    addressLine2: Option[String],
-                                    addressLine3: Option[String],
-                                    addressLine4: Option[String],
-                                    country: Country
-                                  ) extends AccountantsAddress
+  addressLine1: String,
+  addressLine2: Option[String],
+  addressLine3: Option[String],
+  addressLine4: Option[String],
+  country: Country
+) extends AccountantsAddress
 
 object AccountantsAddress {
 
@@ -75,17 +75,17 @@ object AccountantsAddress {
     import play.api.libs.json.Reads._
     import play.api.libs.json._
     (__ \ "accountantsAddressPostCode").read[String] andKeep (
-        ((__ \ "accountantsAddressLine1").read[String] and
+      ((__ \ "accountantsAddressLine1").read[String] and
         (__ \ "accountantsAddressLine2").readNullable[String] and
         (__ \ "accountantsAddressLine3").readNullable[String] and
         (__ \ "accountantsAddressLine4").readNullable[String] and
-        (__ \ "accountantsAddressPostCode").read[String])  (UkAccountantsAddress.apply _) map identity[AccountantsAddress]
-      ) orElse
-        ( (__ \ "accountantsAddressLine1").read[String] and
-          (__ \ "accountantsAddressLine2").readNullable[String] and
-          (__ \ "accountantsAddressLine3").readNullable[String] and
-          (__ \ "accountantsAddressLine4").readNullable[String] and
-          (__ \ "accountantsAddressCountry").read[Country]) (NonUkAccountantsAddress.apply _)
+        (__ \ "accountantsAddressPostCode").read[String])(UkAccountantsAddress.apply _) map identity[AccountantsAddress]
+    ) orElse
+      ((__ \ "accountantsAddressLine1").read[String] and
+        (__ \ "accountantsAddressLine2").readNullable[String] and
+        (__ \ "accountantsAddressLine3").readNullable[String] and
+        (__ \ "accountantsAddressLine4").readNullable[String] and
+        (__ \ "accountantsAddressCountry").read[Country])(NonUkAccountantsAddress.apply _)
 
   }
 
@@ -94,22 +94,22 @@ object AccountantsAddress {
     import play.api.libs.json.Writes._
     import play.api.libs.json._
     Writes[AccountantsAddress] {
-      case a: UkAccountantsAddress =>
+      case a: UkAccountantsAddress    =>
         (
-            (__ \ "accountantsAddressLine1").write[String] and
+          (__ \ "accountantsAddressLine1").write[String] and
             (__ \ "accountantsAddressLine2").writeNullable[String] and
             (__ \ "accountantsAddressLine3").writeNullable[String] and
             (__ \ "accountantsAddressLine4").writeNullable[String] and
             (__ \ "accountantsAddressPostCode").write[String]
-          ) (unlift(UkAccountantsAddress.unapply)).writes(a)
+        )(unlift(UkAccountantsAddress.unapply)).writes(a)
       case a: NonUkAccountantsAddress =>
         (
-            (__ \ "accountantsAddressLine1").write[String] and
+          (__ \ "accountantsAddressLine1").write[String] and
             (__ \ "accountantsAddressLine2").writeNullable[String] and
             (__ \ "accountantsAddressLine3").writeNullable[String] and
             (__ \ "accountantsAddressLine4").writeNullable[String] and
             (__ \ "accountantsAddressCountry").write[Country]
-          ) (unlift(NonUkAccountantsAddress.unapply)).writes(a)
+        )(unlift(NonUkAccountantsAddress.unapply)).writes(a)
     }
   }
 }

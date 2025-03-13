@@ -22,15 +22,17 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class BankAccountNonUKFormProvider @Inject()() extends Mappings {
+class BankAccountNonUKFormProvider @Inject() () extends Mappings {
 
-  val length = 40
+  val length                            = 40
   def apply(): Form[NonUKAccountNumber] = Form[NonUKAccountNumber](
-    "nonUKAccountNumber" -> textAllowWhitespace("error.bankdetails.accountnumber").verifying(
-      firstError(
-        maxLength(length, "error.invalid.bankdetails.account.length"),
-        regexp(alphanumericRegex, "error.invalid.bankdetails.account")
+    "nonUKAccountNumber" -> textAllowWhitespace("error.bankdetails.accountnumber")
+      .verifying(
+        firstError(
+          maxLength(length, "error.invalid.bankdetails.account.length"),
+          regexp(alphanumericRegex, "error.invalid.bankdetails.account")
+        )
       )
-    ).transform[NonUKAccountNumber](NonUKAccountNumber.apply, _.accountNumber)
+      .transform[NonUKAccountNumber](NonUKAccountNumber.apply, _.accountNumber)
   )
 }

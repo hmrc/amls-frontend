@@ -29,10 +29,10 @@ import views.html.payments.TypeOfBankView
 class TypeOfBankViewSpec extends PlaySpec with AmlsViewSpec {
 
   lazy val typeOfBankView = inject[TypeOfBankView]
-  lazy val fp = inject[TypeOfBankFormProvider]
+  lazy val fp             = inject[TypeOfBankFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-  val secondaryHeading = "Submit application"
+  val secondaryHeading                                      = "Submit application"
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
@@ -44,8 +44,8 @@ class TypeOfBankViewSpec extends PlaySpec with AmlsViewSpec {
 
       def view = typeOfBankView(fp(), secondaryHeading)
 
-      doc.title must startWith(messages("payments.typeofbank.title"))
-      heading.html must be(messages("payments.typeofbank.header"))
+      doc.title       must startWith(messages("payments.typeofbank.title"))
+      heading.html    must be(messages("payments.typeofbank.header"))
       subHeading.html must include(messages("submit.registration"))
     }
 
@@ -56,7 +56,7 @@ class TypeOfBankViewSpec extends PlaySpec with AmlsViewSpec {
       val radios: Elements = doc.getElementsByClass("govuk-radios__input")
       radios.size() mustBe 2
 
-      val trueRadio: Element = radios.get(0)
+      val trueRadio: Element  = radios.get(0)
       val falseRadio: Element = radios.get(1)
 
       trueRadio.id() mustBe "typeOfBank"

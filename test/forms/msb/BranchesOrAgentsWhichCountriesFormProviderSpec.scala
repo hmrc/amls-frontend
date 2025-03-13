@@ -23,13 +23,15 @@ import play.api.data.{Form, FormError}
 
 class BranchesOrAgentsWhichCountriesFormProviderSpec extends FieldBehaviours {
   val form: Form[BranchesOrAgentsWhichCountries] = new BranchesOrAgentsWhichCountriesFormProvider()()
-  val fieldName: String = "countries"
-  val errorMessage: String = "error.invalid.countries.msb.branchesOrAgents.country"
+  val fieldName: String                          = "countries"
+  val errorMessage: String                       = "error.invalid.countries.msb.branchesOrAgents.country"
 
   "BranchesOrAgentsWhichCountriesFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, fieldName, Gen.oneOf(models.countries.map(_.code))
+      form,
+      fieldName,
+      Gen.oneOf(models.countries.map(_.code))
     )
 
     "not bind when key is not present at all" in {

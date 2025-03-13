@@ -18,17 +18,18 @@ package config
 
 import com.google.inject.Inject
 import play.api.i18n.MessagesApi
-import play.api.mvc.{RequestHeader}
+import play.api.mvc.RequestHeader
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import views.html.ErrorView
 
-class AmlsErrorHandler @Inject()(val messagesApi: MessagesApi,
-                                 val errorView: ErrorView)
-                                (implicit val appConfig: ApplicationConfig,
-                                 implicit protected val ec: ExecutionContext) extends FrontendErrorHandler {
+class AmlsErrorHandler @Inject() (val messagesApi: MessagesApi, val errorView: ErrorView)(
+  implicit val appConfig: ApplicationConfig,
+  implicit protected val ec: ExecutionContext
+) extends FrontendErrorHandler {
 
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: RequestHeader): Future[play.twirl.api.Html] = {
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
+    request: RequestHeader
+  ): Future[play.twirl.api.Html] =
     Future.successful(errorView(pageTitle, heading, message))
-  }
 }

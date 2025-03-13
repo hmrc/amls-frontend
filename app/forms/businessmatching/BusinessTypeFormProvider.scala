@@ -22,7 +22,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class BusinessTypeFormProvider @Inject()() extends Mappings {
+class BusinessTypeFormProvider @Inject() () extends Mappings {
 
   val error = "businessmatching.businessType.error"
 

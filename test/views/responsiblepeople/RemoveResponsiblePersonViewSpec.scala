@@ -43,9 +43,14 @@ class RemoveResponsiblePersonViewSpec extends AmlsViewSpec with Matchers {
 
     "have correct title" in new ViewFixture {
 
-      def view: HtmlFormat.Appendable = personView(fp().fill(Right(ResponsiblePersonEndDate(LocalDate.now()))), 1, "Gary", showDateField = false)
+      def view: HtmlFormat.Appendable =
+        personView(fp().fill(Right(ResponsiblePersonEndDate(LocalDate.now()))), 1, "Gary", showDateField = false)
 
-      doc.title() must startWith(messages("responsiblepeople.remove.named.responsible.person.heading", "Gary") + " - " + messages("summary.responsiblepeople"))
+      doc.title() must startWith(
+        messages("responsiblepeople.remove.named.responsible.person.heading", "Gary") + " - " + messages(
+          "summary.responsiblepeople"
+        )
+      )
     }
 
     "show none named person heading" in new ViewFixture {
@@ -59,13 +64,14 @@ class RemoveResponsiblePersonViewSpec extends AmlsViewSpec with Matchers {
 
       def view: HtmlFormat.Appendable = personView(fp(), 1, "Gary", showDateField = true)
 
-      heading.html() must be(messages("responsiblepeople.remove.named.responsible.person.heading", "Gary"))
+      heading.html()                                   must be(messages("responsiblepeople.remove.named.responsible.person.heading", "Gary"))
       doc.getElementsByAttributeValue("id", "endDate") must not be empty
     }
 
     behave like pageWithErrors(
       personView(fp().withError("endDate", "error.future.date"), 1, "Gary", showDateField = true),
-      "endDate", "error.future.date"
+      "endDate",
+      "error.future.date"
     )
 
     behave like pageWithBackLink(personView(fp(), 1, "Gary", showDateField = true))

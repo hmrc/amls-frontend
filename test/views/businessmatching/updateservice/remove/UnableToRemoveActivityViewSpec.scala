@@ -26,20 +26,30 @@ class UnableToRemoveActivityViewSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
-    def view = unableView("test")
+    def view                                                       = unableView("test")
   }
 
-  lazy val unableView = app.injector.instanceOf[UnableToRemoveActivityView]
+  lazy val unableView                                       = app.injector.instanceOf[UnableToRemoveActivityView]
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   "UnableToRemoveActivityView" must {
 
     "have the correct title" in new ViewFixture {
-      doc.title must startWith(messages("businessmatching.updateservice.removeactivitiesinformation.title") + " - " + messages("summary.updateservice"))
+      doc.title must startWith(
+        messages("businessmatching.updateservice.removeactivitiesinformation.title") + " - " + messages(
+          "summary.updateservice"
+        )
+      )
     }
 
     "have correct heading" in new ViewFixture {
-      heading.html must be(messages("businessmatching.updateservice.removeactivitiesinformation.heading", "test", messages("summary.updateinformation")))
+      heading.html must be(
+        messages(
+          "businessmatching.updateservice.removeactivitiesinformation.heading",
+          "test",
+          messages("summary.updateinformation")
+        )
+      )
     }
 
     behave like pageWithBackLink(unableView("test"))

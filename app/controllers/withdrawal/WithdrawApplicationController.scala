@@ -28,28 +28,30 @@ import views.html.withdrawal.WithdrawApplicationView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class WithdrawApplicationController @Inject()(authAction: AuthAction,
-                                              val ds: CommonPlayDependencies,
-                                              implicit val amls: AmlsConnector,
-                                              implicit val dc: DataCacheConnector,
-                                              enrolments: AuthEnrolmentsService,
-                                              implicit val statusService: StatusService,
-                                              val cc: MessagesControllerComponents,
-                                              view: WithdrawApplicationView) extends AmlsBaseController(ds, cc) {
+class WithdrawApplicationController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  implicit val amls: AmlsConnector,
+  implicit val dc: DataCacheConnector,
+  enrolments: AuthEnrolmentsService,
+  implicit val statusService: StatusService,
+  val cc: MessagesControllerComponents,
+  view: WithdrawApplicationView
+) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async {
-      implicit request =>
-        val maybeProcessingDate = for {
-          status <- OptionT.liftF(statusService.getDetailedStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
-          response <- OptionT.fromOption[Future](status._2)
-        } yield response.processingDate
+  def get: Action[AnyContent] = authAction.async { implicit request =>
+    val maybeProcessingDate = for {
+      status   <-
+        OptionT.liftF(statusService.getDetailedStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
+      response <- OptionT.fromOption[Future](status._2)
+    } yield response.processingDate
 
-        (for {
-          processingDate <- maybeProcessingDate
-          amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-          id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId, request.credId))
-          name <- BusinessName.getName(request.credId, Some(id), request.accountTypeId)
-        } yield Ok(view(name, processingDate))) getOrElse InternalServerError("Unable to show the withdrawal page")
+    (for {
+      processingDate <- maybeProcessingDate
+      amlsRegNumber  <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+      id             <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId, request.credId))
+      name           <- BusinessName.getName(request.credId, Some(id), request.accountTypeId)
+    } yield Ok(view(name, processingDate))) getOrElse InternalServerError("Unable to show the withdrawal page")
   }
 
   def post: Action[AnyContent] = authAction {

@@ -26,10 +26,15 @@ import views.html.notifications.v1m0.RevocationReasonsView
 class RevocationReasonsViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
-    lazy val revocation_reasons = app.injector.instanceOf[RevocationReasonsView]
+    lazy val revocation_reasons                                    = app.injector.instanceOf[RevocationReasonsView]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
-    val notificationParams = NotificationParams(businessName = Some("Fake Name Ltd."), msgContent = "msgContent", amlsRefNo = Some("amlsRegNo"), endDate = Some("endDate"))
+    val notificationParams = NotificationParams(
+      businessName = Some("Fake Name Ltd."),
+      msgContent = "msgContent",
+      amlsRefNo = Some("amlsRegNo"),
+      endDate = Some("endDate")
+    )
   }
 
   "RevocationReasonsView" must {
@@ -38,17 +43,19 @@ class RevocationReasonsViewSpec extends AmlsViewSpec with Matchers {
 
       def view = revocation_reasons(notificationParams)
 
-      doc.title must be("Your supervision has been revoked" +
-        " - " + "Your registration" +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        "Your supervision has been revoked" +
+          " - " + "Your registration" +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = revocation_reasons(notificationParams)
 
-      heading.html must be("Your supervision has been revoked")
+      heading.html    must be("Your supervision has been revoked")
       subHeading.html must include("Your registration")
     }
 
@@ -56,14 +63,18 @@ class RevocationReasonsViewSpec extends AmlsViewSpec with Matchers {
 
       def view = revocation_reasons(notificationParams)
 
-      doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("amlsRegNo") and include("endDate"))
+      doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("amlsRegNo") and include(
+        "endDate"
+      ))
     }
 
     "have a back link" in new ViewFixture {
 
       def view = revocation_reasons(notificationParams)
 
-      doc.getElementById("return-to-messages").attr("href") mustBe controllers.routes.NotificationController.getMessages().url
+      doc.getElementById("return-to-messages").attr("href") mustBe controllers.routes.NotificationController
+        .getMessages()
+        .url
     }
   }
 }

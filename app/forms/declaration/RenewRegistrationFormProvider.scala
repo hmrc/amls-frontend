@@ -22,17 +22,18 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class RenewRegistrationFormProvider @Inject()() extends BooleanFormProvider {
+class RenewRegistrationFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[RenewRegistration] = createForm[RenewRegistration](
-    "renewRegistration", "error.required.declaration.renew.registration"
+    "renewRegistration",
+    "error.required.declaration.renew.registration"
   )(apply, unapply)
 
   def apply(boolean: Boolean): RenewRegistration =
-    if(boolean) RenewRegistrationYes else RenewRegistrationNo
+    if (boolean) RenewRegistrationYes else RenewRegistrationNo
 
   def unapply(obj: RenewRegistration): Boolean = obj match {
     case RenewRegistrationYes => true
-    case RenewRegistrationNo => false
+    case RenewRegistrationNo  => false
   }
 }

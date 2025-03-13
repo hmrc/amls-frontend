@@ -32,14 +32,20 @@ import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.msb.SendLargestAmountsOfMoneyView
 
-class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
-  with MockitoSugar with PatienceConfiguration with IntegrationPatience with Injecting {
+class SendTheLargestAmountsOfMoneyControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with PatienceConfiguration
+    with IntegrationPatience
+    with Injecting {
 
   trait Fixture extends DependencyMocks {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[SendLargestAmountsOfMoneyView]
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[SendLargestAmountsOfMoneyView]
     val controller = new SendTheLargestAmountsOfMoneyController(
-      SuccessfulAuthAction, ds = commonDependencies,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
       mockCacheConnector,
       mockStatusService,
       mockServiceFlow,
@@ -55,7 +61,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
   val emptyCache = Cache.empty
 
   "SendTheLargestAmountsOfMoneyController" must {
-    "load the 'Where to Send The Largest Amounts Of Money' page" in new Fixture  {
+    "load the 'Where to Send The Largest Amounts Of Money' page" in new Fixture {
       mockIsNewActivityNewAuth(false)
       mockApplicationStatus(NotCompleted)
       mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
@@ -63,15 +69,20 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      document.title() must be (messages("msb.send.the.largest.amounts.of.money.title") +
-        " - " + messages("summary.msb") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      document.title() must be(
+        messages("msb.send.the.largest.amounts.of.money.title") +
+          " - " + messages("summary.msb") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
-    "pre-populate the 'Where to Send The Largest Amounts Of Money' Page" in new Fixture  {
-      val msb = Some(MoneyServiceBusiness(
-        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"))))))
+    "pre-populate the 'Where to Send The Largest Amounts Of Money' Page" in new Fixture {
+      val msb = Some(
+        MoneyServiceBusiness(
+          sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"))))
+        )
+      )
 
       mockIsNewActivityNewAuth(false)
       mockApplicationStatus(NotCompleted)
@@ -92,7 +103,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
         mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("msb.send.the.largest.amounts.of.money.title"))
       }
 
@@ -102,7 +113,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
         mockIsNewActivityNewAuth(false)
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result)          must be(OK)
         contentAsString(result) must include(messages("msb.send.the.largest.amounts.of.money.title"))
       }
     }
@@ -110,47 +121,49 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
     "on post with valid data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.SendTheLargestAmountsOfMoneyController.post().url)
-      .withFormUrlEncodedBody(
-        "largestAmountsOfMoney[0]" -> "GS"
-      )
+        .withFormUrlEncodedBody(
+          "largestAmountsOfMoney[0]" -> "GS"
+        )
 
       mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
       mockCacheSave[MoneyServiceBusiness]
 
       val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.MostTransactionsController.get().url))
     }
 
     "on post with valid data in edit mode when the next page's data is in the store" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.SendTheLargestAmountsOfMoneyController.post().url)
-      .withFormUrlEncodedBody(
-        "largestAmountsOfMoney[0]" -> "GB"
-      )
+        .withFormUrlEncodedBody(
+          "largestAmountsOfMoney[0]" -> "GB"
+        )
 
       val incomingModel = MoneyServiceBusiness(
-        mostTransactions = Some(MostTransactions(
-          Seq(
-            Country("United Kingdom", "UK")
+        mostTransactions = Some(
+          MostTransactions(
+            Seq(
+              Country("United Kingdom", "UK")
+            )
           )
-        ))
+        )
       )
 
       mockCacheFetch[MoneyServiceBusiness](Some(incomingModel), Some(MoneyServiceBusiness.key))
       mockCacheSave[MoneyServiceBusiness]
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.MostTransactionsController.get(true).url))
     }
 
     "on post with valid data in edit mode when the next page's data isn't in the store" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.SendTheLargestAmountsOfMoneyController.post().url)
-      .withFormUrlEncodedBody(
-        "largestAmountsOfMoney[0]" -> "GB"
-      )
+        .withFormUrlEncodedBody(
+          "largestAmountsOfMoney[0]" -> "GB"
+        )
 
       val incomingModel = MoneyServiceBusiness()
 
@@ -158,16 +171,16 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
       mockCacheSave[MoneyServiceBusiness]
 
       val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.MostTransactionsController.get(true).url))
     }
 
     "on post with invalid data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.SendTheLargestAmountsOfMoneyController.post().url)
-      .withFormUrlEncodedBody(
-        "largestAmountsOfMoney[0]" -> ""
-      )
+        .withFormUrlEncodedBody(
+          "largestAmountsOfMoney[0]" -> ""
+        )
 
       mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
       mockCacheSave[MoneyServiceBusiness]

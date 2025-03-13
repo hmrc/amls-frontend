@@ -40,13 +40,13 @@ class WithdrawalCheckYourAnswersControllerSpec extends AmlsSpec with Injecting {
     self =>
 
     val credentialId: String = SuccessfulAuthAction.credentialId
-    val request = addToken(authRequest)
+    val request              = addToken(authRequest)
 
-    val amlsConnector: AmlsConnector = mock[AmlsConnector]
+    val amlsConnector: AmlsConnector                 = mock[AmlsConnector]
     val authEnrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
-    val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
+    val dataCacheConnector: DataCacheConnector       = mock[DataCacheConnector]
 
-    lazy val view = inject[WithdrawalCheckYourAnswersView]
+    lazy val view       = inject[WithdrawalCheckYourAnswersView]
     lazy val controller = new WithdrawalCheckYourAnswersController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
@@ -97,12 +97,14 @@ class WithdrawalCheckYourAnswersControllerSpec extends AmlsSpec with Injecting {
         status(result) must be(SEE_OTHER)
         redirectLocation(result).value mustBe controllers.withdrawal.routes.WithdrawalConfirmationController.get.url
 
-        val captor: ArgumentCaptor[WithdrawSubscriptionRequest] = ArgumentCaptor.forClass(classOf[WithdrawSubscriptionRequest])
+        val captor: ArgumentCaptor[WithdrawSubscriptionRequest] =
+          ArgumentCaptor.forClass(classOf[WithdrawSubscriptionRequest])
 
         verify(amlsConnector).withdraw(
           amlsRegistrationNumber = eqTo(amlsRegistrationNumber),
           request = captor.capture(),
-          accountTypeId = any())(any(), any())
+          accountTypeId = any()
+        )(any(), any())
 
         captor.getValue.withdrawalReason mustBe WithdrawalReason.OutOfScope
       }

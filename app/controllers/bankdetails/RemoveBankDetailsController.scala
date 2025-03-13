@@ -25,29 +25,28 @@ import utils.{AuthAction, StatusConstants}
 import views.html.bankdetails.RemoveBankDetailsView
 
 @Singleton
-class RemoveBankDetailsController @Inject()(val authAction: AuthAction,
-                                            val ds: CommonPlayDependencies,
-                                            val dataCacheConnector: DataCacheConnector,
-                                            val mcc: MessagesControllerComponents,
-                                            view: RemoveBankDetailsView,
-                                            implicit val error: views.html.ErrorView) extends BankDetailsController(ds, mcc) {
+class RemoveBankDetailsController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val dataCacheConnector: DataCacheConnector,
+  val mcc: MessagesControllerComponents,
+  view: RemoveBankDetailsView,
+  implicit val error: views.html.ErrorView
+) extends BankDetailsController(ds, mcc) {
 
-  def get(index: Int): Action[AnyContent] = authAction.async {
-      implicit request =>
-        getData[BankDetails](request.credId, index) map {
-          case Some(BankDetails(_, Some(name), _, _, _, _, _)) =>
-            Ok(view(index, name))
-          case _ => NotFound(notFoundView)
-        }
+  def get(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    getData[BankDetails](request.credId, index) map {
+      case Some(BankDetails(_, Some(name), _, _, _, _, _)) =>
+        Ok(view(index, name))
+      case _                                               => NotFound(notFoundView)
+    }
   }
 
-  def remove(index: Int): Action[AnyContent] = authAction.async {
-      implicit request => {
-        for {
-          _ <- updateDataStrict[BankDetails](request.credId, index) { ba =>
-            ba.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
-          }
-        } yield Redirect(routes.YourBankAccountsController.get())
-      }
+  def remove(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    for {
+      _ <- updateDataStrict[BankDetails](request.credId, index) { ba =>
+             ba.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
+           }
+    } yield Redirect(routes.YourBankAccountsController.get())
   }
 }

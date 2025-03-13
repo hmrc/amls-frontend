@@ -25,7 +25,7 @@ class PaymentMethodSpec extends PlaySpec {
 
     "roundtrip through json" in {
       val data = PaymentMethods(courier = true, direct = true, other = Some("foo"))
-      val js = Json.toJson(data)
+      val js   = Json.toJson(data)
       js.as[PaymentMethods] mustEqual data
     }
   }

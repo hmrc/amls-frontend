@@ -31,49 +31,48 @@ import views.html.hvd.ProductsView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class ProductsController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                    val statusService: StatusService,
-                                    val authAction: AuthAction,
-                                    val ds: CommonPlayDependencies,
-                                    val serviceFlow: ServiceFlow,
-                                    val cc: MessagesControllerComponents,
-                                    formProvider: ProductsFormProvider,
-                                    view: ProductsView) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+class ProductsController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val statusService: StatusService,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val serviceFlow: ServiceFlow,
+  val cc: MessagesControllerComponents,
+  formProvider: ProductsFormProvider,
+  view: ProductsView
+) extends AmlsBaseController(ds, cc)
+    with DateOfChangeHelper {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
-        response =>
-          val form = (for {
-            hvd <- response
-            products <- hvd.products
-          } yield formProvider().fill(products)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map { response =>
+      val form = (for {
+        hvd      <- response
+        products <- hvd.products
+      } yield formProvider().fill(products)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
-        data => {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
-            hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
-            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-            _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, hvd.products(data))
+            hvd           <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
+            status        <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+            _             <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, hvd.products(data))
             isNewActivity <- serviceFlow.isNewActivity(request.credId, HighValueDealing)
           } yield {
-            val redirect = !isNewActivity && redirectToDateOfChange[Products](status, hvd.products, data)
+            val redirect    = !isNewActivity && redirectToDateOfChange[Products](status, hvd.products, data)
             val exciseGoods = data.items.contains(Alcohol) | data.items.contains(Tobacco)
             Redirect(getNextPage(redirect, exciseGoods, edit))
           }
-        }
       )
-    }
+  }
 
-  private def getNextPage(redirect: Boolean, exciseGoods: Boolean, edit:Boolean): Call = {
+  private def getNextPage(redirect: Boolean, exciseGoods: Boolean, edit: Boolean): Call =
     (redirect, exciseGoods, edit) match {
       case (true, true, true)    => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoodsEdit)
       case (true, true, false)   => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.exciseGoods)
@@ -83,5 +82,4 @@ class ProductsController @Inject() (val dataCacheConnector: DataCacheConnector,
       case (false, false, true)  => routes.SummaryController.get
       case (false, false, false) => routes.HowWillYouSellGoodsController.get()
     }
-  }
 }

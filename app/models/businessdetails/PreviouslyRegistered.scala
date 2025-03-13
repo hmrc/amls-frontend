@@ -27,7 +27,7 @@ object PreviouslyRegistered {
 
   implicit val jsonReads: Reads[PreviouslyRegistered] =
     (__ \ "previouslyRegistered").read[Boolean] flatMap {
-      case true => (__ \ "prevMLRRegNo").readNullable[String].map(PreviouslyRegisteredYes)
+      case true  => (__ \ "prevMLRRegNo").readNullable[String].map(PreviouslyRegisteredYes)
       case false => Reads(_ => JsSuccess(PreviouslyRegisteredNo))
     }
 
@@ -35,12 +35,12 @@ object PreviouslyRegistered {
     case PreviouslyRegisteredYes(Some(value)) =>
       Json.obj(
         "previouslyRegistered" -> true,
-        "prevMLRRegNo" -> value
+        "prevMLRRegNo"         -> value
       )
-    case PreviouslyRegisteredYes(None) =>
+    case PreviouslyRegisteredYes(None)        =>
       Json.obj(
         "previouslyRegistered" -> true
       )
-    case PreviouslyRegisteredNo => Json.obj("previouslyRegistered" -> false)
+    case PreviouslyRegisteredNo               => Json.obj("previouslyRegistered" -> false)
   }
 }

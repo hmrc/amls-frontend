@@ -45,13 +45,14 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
   trait Fixture {
     self =>
     implicit val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
-    val renewalService = mock[RenewalService]
-    val dataCacheConnector = mock[DataCacheConnector]
-    val renewal = Renewal()
-    val cacheMap = mock[Cache]
-    lazy val view = inject[TotalThroughputView]
-    lazy val controller = new TotalThroughputController(
-      SuccessfulAuthAction, ds = commonDependencies,
+    val renewalService                                    = mock[RenewalService]
+    val dataCacheConnector                                = mock[DataCacheConnector]
+    val renewal                                           = Renewal()
+    val cacheMap                                          = mock[Cache]
+    lazy val view                                         = inject[TotalThroughputView]
+    lazy val controller                                   = new TotalThroughputController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
       renewalService,
       dataCacheConnector,
       cc = mockMcc,
@@ -63,12 +64,12 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
   trait FormSubmissionFixture extends Fixture {
     self =>
 
-    val formData = "throughput" -> ExpectedThroughput.First.toString
+    val formData    = "throughput" -> ExpectedThroughput.First.toString
     val formRequest = FakeRequest(POST, routes.TotalThroughputController.post().url).withFormUrlEncodedBody(formData)
-    val cache = mock[Cache]
+    val cache       = mock[Cache]
 
     when {
-      renewalService.updateRenewal(any(),any())
+      renewalService.updateRenewal(any(), any())
     } thenReturn Future.successful(cache)
 
     when {
@@ -80,9 +81,15 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
     def post(edit: Boolean = false)(block: Future[Result] => Unit) =
       block(controller.post(edit)(formRequest))
 
-    def setupBusinessMatching(activities: Set[BusinessActivity], msbServices: Set[BusinessMatchingMsbService] = Set()) = when {
+    def setupBusinessMatching(activities: Set[BusinessActivity], msbServices: Set[BusinessMatchingMsbService] = Set()) =
+      when {
         cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-    } thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(msbServices)), activities = Some(BusinessActivities(activities))))
+      } thenReturn Some(
+        BusinessMatching(
+          msbServices = Some(BusinessMatchingMsbServices(msbServices)),
+          activities = Some(BusinessActivities(activities))
+        )
+      )
   }
 
   "The MSB throughput controller" must {
@@ -115,7 +122,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
       val page = Jsoup.parse(contentAsString(result))
 
       ExpectedThroughput.all.map(_.toString) foreach { id =>
-        val result = if(id == "first") true else false
+        val result = if (id == "first") true else false
         page.getElementById(id).hasAttr("checked") must be(result)
       }
     }
@@ -127,26 +134,27 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
   }
 
   trait RenewalModelFormSubmissionFixture extends FormSubmissionFixture {
-      val incomingModel = Renewal()
-      val outgoingModel = incomingModel.copy(
-          totalThroughput = Some(
-              TotalThroughput(
-                  "01"
-              )
-          ), hasChanged = true
-      )
-      val newRequest = FakeRequest(POST, routes.TotalThroughputController.post().url).withFormUrlEncodedBody(
-          "throughput" -> ExpectedThroughput.First.toString
-      )
+    val incomingModel = Renewal()
+    val outgoingModel = incomingModel.copy(
+      totalThroughput = Some(
+        TotalThroughput(
+          "01"
+        )
+      ),
+      hasChanged = true
+    )
+    val newRequest    = FakeRequest(POST, routes.TotalThroughputController.post().url).withFormUrlEncodedBody(
+      "throughput" -> ExpectedThroughput.First.toString
+    )
 
-      when(dataCacheConnector.fetchAll(any()))
-              .thenReturn(Future.successful(Some(cacheMap)))
+    when(dataCacheConnector.fetchAll(any()))
+      .thenReturn(Future.successful(Some(cacheMap)))
 
-      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-              .thenReturn(Some(incomingModel))
+    when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+      .thenReturn(Some(incomingModel))
 
-      when(dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), eqTo(outgoingModel))(any()))
-              .thenReturn(Future.successful(Cache.empty))
+    when(dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), eqTo(outgoingModel))(any()))
+      .thenReturn(Future.successful(Cache.empty))
   }
 
   "A valid form post to the MSB throughput controller" when {
@@ -157,7 +165,9 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
 
         post() { result =>
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.renewal.routes.TransactionsInLast12MonthsController.get().url)
+          redirectLocation(result) mustBe Some(
+            controllers.renewal.routes.TransactionsInLast12MonthsController.get().url
+          )
         }
       }
 
@@ -166,7 +176,9 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
 
         post() { result =>
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.renewal.routes.CETransactionsInLast12MonthsController.get().url)
+          redirectLocation(result) mustBe Some(
+            controllers.renewal.routes.CETransactionsInLast12MonthsController.get().url
+          )
         }
       }
 
@@ -175,7 +187,9 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
 
         post() { result =>
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.renewal.routes.FXTransactionsInLast12MonthsController.get().url)
+          redirectLocation(result) mustBe Some(
+            controllers.renewal.routes.FXTransactionsInLast12MonthsController.get().url
+          )
         }
       }
 

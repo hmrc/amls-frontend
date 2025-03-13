@@ -26,35 +26,39 @@ import views.html.businessactivities.DocumentRiskAssessmentPolicyView
 
 import scala.concurrent.Future
 
+class DocumentRiskAssessmentController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  service: DocumentRiskAssessmentService,
+  formProvider: DocumentRiskAssessmentPolicyFormProvider,
+  view: DocumentRiskAssessmentPolicyView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc) {
 
-class
-DocumentRiskAssessmentController @Inject()(val authAction: AuthAction,
-                                           val ds: CommonPlayDependencies,
-                                           val cc: MessagesControllerComponents,
-                                           service: DocumentRiskAssessmentService,
-                                           formProvider: DocumentRiskAssessmentPolicyFormProvider,
-                                           view: DocumentRiskAssessmentPolicyView,
-                                           implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
-
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      service.getRiskAssessmentPolicy(request.credId) map { responseOpt =>
-        val form = responseOpt.fold(formProvider())(x => formProvider().fill(x.riskassessments))
-        Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    service.getRiskAssessmentPolicy(request.credId) map { responseOpt =>
+      val form = responseOpt.fold(formProvider())(x => formProvider().fill(x.riskassessments))
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
-        data => {
-          service.updateRiskAssessmentType(request.credId, data).map(_.map { bm =>
-            redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(bm))
-          }).map(_.head)
-        } recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
+        data =>
+          {
+            service
+              .updateRiskAssessmentType(request.credId, data)
+              .map(_.map { bm =>
+                redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(bm))
+              })
+              .map(_.head)
+          } recoverWith { case _: IndexOutOfBoundsException =>
+            Future.successful(NotFound(notFoundView))
+          }
       )
   }
 

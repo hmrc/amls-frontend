@@ -98,7 +98,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
       "returns a Completed task row when model is complete" in {
 
-        val complete = mock[Supervision]
+        val complete         = mock[Supervision]
         val completedTaskRow = TaskRow(
           "supervision",
           controllers.supervision.routes.SummaryController.get().url,
@@ -115,7 +115,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
       "returns an Updated task row when model is complete and has changed" in {
 
-        val complete = mock[Supervision]
+        val complete       = mock[Supervision]
         val updatedTaskRow = TaskRow(
           "supervision",
           controllers.supervision.routes.SummaryController.get().url,
@@ -133,7 +133,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
       "returns a Started task row when model is incomplete" in {
 
-        val incomplete = mock[Supervision]
+        val incomplete        = mock[Supervision]
         val incompleteTaskRow = TaskRow(
           "supervision",
           controllers.supervision.routes.WhatYouNeedController.get().url,
@@ -190,15 +190,29 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
       "return Supervision with anotherBody set and indicating changes have been made" in {
         val result = initial.anotherBody(DefaultValues.DefaultAnotherBody)
-        result must be(Supervision(Some(DefaultValues.DefaultAnotherBody), None, hasChanged = true, hasAccepted = false))
+        result must be(
+          Supervision(Some(DefaultValues.DefaultAnotherBody), None, hasChanged = true, hasAccepted = false)
+        )
       }
       "return Supervision with professionalBody set and indicating changes have been made" in {
         val result = initial.professionalBody(DefaultValues.DefaultProfessionalBody)
-        result must be(Supervision(professionalBody = Some(DefaultValues.DefaultProfessionalBody), hasChanged = true, hasAccepted = false))
+        result must be(
+          Supervision(
+            professionalBody = Some(DefaultValues.DefaultProfessionalBody),
+            hasChanged = true,
+            hasAccepted = false
+          )
+        )
       }
       "return Supervision with professionalBodyMember set and indicating changes have been made" in {
         val result = initial.professionalBodyMember(DefaultValues.DefaultProfessionalBodyMember)
-        result must be(Supervision(professionalBodyMember = Some(DefaultValues.DefaultProfessionalBodyMember), hasChanged = true, hasAccepted = false))
+        result must be(
+          Supervision(
+            professionalBodyMember = Some(DefaultValues.DefaultProfessionalBodyMember),
+            hasChanged = true,
+            hasAccepted = false
+          )
+        )
       }
 
     }
@@ -212,11 +226,20 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
       }
       "return Supervision with professionalBody set and indicating changes have been made" in {
         val result = initial.professionalBody(NewValues.NewProfessionalBody)
-        result must be(completeModel.copy(professionalBody = Some(NewValues.NewProfessionalBody), hasChanged = true, hasAccepted = false))
+        result must be(
+          completeModel
+            .copy(professionalBody = Some(NewValues.NewProfessionalBody), hasChanged = true, hasAccepted = false)
+        )
       }
       "return Supervision with professionalBodyMember set and indicating changes have been made" in {
         val result = initial.professionalBodyMember(NewValues.ProfessionalBodyMemberYes)
-        result must be(completeModel.copy(professionalBodyMember = Some(NewValues.ProfessionalBodyMemberYes), hasChanged = true, hasAccepted = false))
+        result must be(
+          completeModel.copy(
+            professionalBodyMember = Some(NewValues.ProfessionalBodyMemberYes),
+            hasChanged = true,
+            hasAccepted = false
+          )
+        )
       }
     }
 
@@ -225,7 +248,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
         "is the same as before" must {
           "leave the object unchanged" in {
             val res: Supervision = completeModel.anotherBody(DefaultValues.DefaultAnotherBody)
-            res must be(completeModel)
+            res            must be(completeModel)
             res.hasChanged must be(false)
           }
         }
@@ -233,7 +256,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
         "is different" must {
           "set the hasChanged & previouslyRegisterd Properties" in {
             val res = completeModel.anotherBody(NewValues.NewAnotherBody)
-            res.hasChanged must be(true)
+            res.hasChanged  must be(true)
             res.anotherBody must be(Some(NewValues.NewAnotherBody))
           }
         }
@@ -243,14 +266,14 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
         "is the same as before" must {
           "leave the object unchanged" in {
             val res: Supervision = completeModel.professionalBodyMember(DefaultValues.DefaultProfessionalBodyMember)
-            res must be(completeModel)
+            res            must be(completeModel)
             res.hasChanged must be(false)
           }
         }
-        "is different" must {
+        "is different"          must {
           "set the hasChanged & previouslyRegisterd Properties" in {
             val res = completeModel.professionalBodyMember(NewValues.ProfessionalBodyMemberYes)
-            res.hasChanged must be(true)
+            res.hasChanged             must be(true)
             res.professionalBodyMember must be(Some(NewValues.ProfessionalBodyMemberYes))
           }
         }
@@ -260,14 +283,14 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
         "is the same as before" must {
           "leave the object unchanged" in {
             val res: Supervision = completeModel.professionalBodies(Some(DefaultValues.DefaultBusinessTypes))
-            res must be(completeModel)
+            res            must be(completeModel)
             res.hasChanged must be(false)
           }
         }
-        "is different" must {
+        "is different"          must {
           "set the hasChanged update the value" in {
             val res = completeModel.professionalBodies(Some(NewValues.NewBusinessTypes))
-            res.hasChanged must be(true)
+            res.hasChanged         must be(true)
             res.professionalBodies must be(Some(NewValues.NewBusinessTypes))
           }
         }
@@ -277,14 +300,14 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
         "is the same as before" must {
           "leave the object unchanged" in {
             val res: Supervision = completeModel.professionalBody(DefaultValues.DefaultProfessionalBody)
-            res must be(completeModel)
+            res            must be(completeModel)
             res.hasChanged must be(false)
           }
         }
-        "is different" must {
+        "is different"          must {
           "set the hasChanged & previouslyRegisterd Properties" in {
             val res = completeModel.professionalBody(NewValues.NewProfessionalBody)
-            res.hasChanged must be(true)
+            res.hasChanged       must be(true)
             res.professionalBody must be(Some(NewValues.NewProfessionalBody))
           }
         }
@@ -298,23 +321,25 @@ trait SupervisionValues {
   object DefaultValues {
 
     private val supervisor = "Company A"
-    private val start = Some(SupervisionStart(LocalDate.of(1993, 8, 25)))
-    //scalastyle:off magic.number
-    private val end = Some(SupervisionEnd(LocalDate.of(1999, 8, 25)))
-    //scalastyle:off magic.number
-    private val reason = Some(SupervisionEndReasons("Ending reason"))
+    private val start      = Some(SupervisionStart(LocalDate.of(1993, 8, 25)))
+    // scalastyle:off magic.number
+    private val end        = Some(SupervisionEnd(LocalDate.of(1999, 8, 25)))
+    // scalastyle:off magic.number
+    private val reason     = Some(SupervisionEndReasons("Ending reason"))
 
-    val DefaultAnotherBody = AnotherBodyYes(supervisor, start, end, reason)
-    val DefaultProfessionalBody = ProfessionalBodyYes("details")
+    val DefaultAnotherBody            = AnotherBodyYes(supervisor, start, end, reason)
+    val DefaultProfessionalBody       = ProfessionalBodyYes("details")
     val DefaultProfessionalBodyMember = ProfessionalBodyMemberYes
-    val DefaultBusinessTypes = ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))
+    val DefaultBusinessTypes          = ProfessionalBodies(
+      Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test"))
+    )
   }
 
   object NewValues {
-    val NewAnotherBody = AnotherBodyNo
-    val NewProfessionalBody = ProfessionalBodyNo
+    val NewAnotherBody            = AnotherBodyNo
+    val NewProfessionalBody       = ProfessionalBodyNo
     val ProfessionalBodyMemberYes = ProfessionalBodyMemberNo
-    val NewBusinessTypes = ProfessionalBodies(Set(AccountantsIreland))
+    val NewBusinessTypes          = ProfessionalBodies(Set(AccountantsIreland))
   }
 
   val completeModel = Supervision(
@@ -330,52 +355,53 @@ trait SupervisionValues {
     Some(DefaultValues.DefaultProfessionalBodyMember),
     None,
     Some(DefaultValues.DefaultProfessionalBody),
-    hasAccepted = true)
+    hasAccepted = true
+  )
 
   val partialModel = Supervision(Some(DefaultValues.DefaultAnotherBody))
 
   val completeJson = Json.obj(
-    "anotherBody" -> Json.obj(
-      "anotherBody" -> true,
+    "anotherBody"            -> Json.obj(
+      "anotherBody"    -> true,
       "supervisorName" -> "Company A",
-      "startDate" -> Json.obj("supervisionStartDate" -> "1993-08-25"),
-      "endDate" -> Json.obj("supervisionEndDate" -> "1999-08-25"),
-      "endingReason" -> Json.obj("supervisionEndingReason" -> "Ending reason")
+      "startDate"      -> Json.obj("supervisionStartDate" -> "1993-08-25"),
+      "endDate"        -> Json.obj("supervisionEndDate" -> "1999-08-25"),
+      "endingReason"   -> Json.obj("supervisionEndingReason" -> "Ending reason")
     ),
     "professionalBodyMember" -> Json.obj(
       "isAMember" -> true
     ),
-    "professionalBodies" -> Json.obj(
-      "businessType" -> Json.arr("01", "02", "14"),
+    "professionalBodies"     -> Json.obj(
+      "businessType"         -> Json.arr("01", "02", "14"),
       "specifyOtherBusiness" -> "test"
     ),
-    "professionalBody" -> Json.obj(
-      "penalised" -> true,
+    "professionalBody"       -> Json.obj(
+      "penalised"        -> true,
       "professionalBody" -> "details"
     ),
-    "hasChanged" -> false,
-    "hasAccepted" -> true
+    "hasChanged"             -> false,
+    "hasAccepted"            -> true
   )
 
   val completeJsonOldFormat = Json.obj(
-    "anotherBody" -> Json.obj(
-      "anotherBody" -> true,
+    "anotherBody"            -> Json.obj(
+      "anotherBody"    -> true,
       "supervisorName" -> "Company A",
-      "startDate" -> Json.obj("supervisionStartDate" -> "1993-08-25"),
-      "endDate" -> Json.obj("supervisionEndDate" -> "1999-08-25"),
-      "endingReason" -> Json.obj("supervisionEndingReason" -> "Ending reason")
+      "startDate"      -> Json.obj("supervisionStartDate" -> "1993-08-25"),
+      "endDate"        -> Json.obj("supervisionEndDate" -> "1999-08-25"),
+      "endingReason"   -> Json.obj("supervisionEndingReason" -> "Ending reason")
     ),
     "professionalBodyMember" -> Json.obj(
-      "isAMember" -> true,
-      "businessType" -> Json.arr("01", "02", "14"),
+      "isAMember"            -> true,
+      "businessType"         -> Json.arr("01", "02", "14"),
       "specifyOtherBusiness" -> "test"
     ),
-    "professionalBody" -> Json.obj(
-      "penalised" -> true,
+    "professionalBody"       -> Json.obj(
+      "penalised"        -> true,
       "professionalBody" -> "details"
     ),
-    "hasChanged" -> false,
-    "hasAccepted" -> true
+    "hasChanged"             -> false,
+    "hasAccepted"            -> true
   )
 
 }

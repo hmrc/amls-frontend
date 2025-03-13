@@ -23,14 +23,16 @@ import play.api.data.FormError
 
 class ExpectedThroughputFormProviderSpec extends FieldBehaviours {
 
-  val form = new ExpectedThroughputFormProvider()()
+  val form      = new ExpectedThroughputFormProvider()()
   val fieldName = "throughput"
-  val errorKey = "error.required.msb.throughput"
+  val errorKey  = "error.required.msb.throughput"
 
   "ExpectedThroughputFormProvider" must {
 
     behave like fieldThatBindsValidData(
-      form, fieldName, Gen.oneOf[String](ExpectedThroughput.all.map(_.toString))
+      form,
+      fieldName,
+      Gen.oneOf[String](ExpectedThroughput.all.map(_.toString))
     )
 
     behave like mandatoryField(form, fieldName, FormError(fieldName, errorKey))
@@ -40,7 +42,7 @@ class ExpectedThroughputFormProviderSpec extends FieldBehaviours {
       forAll(Gen.alphaNumStr) { invalidAnswer =>
         val result = form.bind(Map(fieldName -> invalidAnswer))
 
-        result.value shouldBe None
+        result.value  shouldBe None
         result.errors shouldBe Seq(FormError(fieldName, errorKey))
       }
     }

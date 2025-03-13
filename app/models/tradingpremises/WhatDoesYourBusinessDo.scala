@@ -20,7 +20,7 @@ import models.DateOfChange
 import models.businessmatching.BusinessActivity
 import play.api.libs.json.{Json, OFormat}
 
-case class WhatDoesYourBusinessDo(activities : Set[BusinessActivity], dateOfChange: Option[DateOfChange] = None)
+case class WhatDoesYourBusinessDo(activities: Set[BusinessActivity], dateOfChange: Option[DateOfChange] = None)
 
 object WhatDoesYourBusinessDo {
   implicit val format: OFormat[WhatDoesYourBusinessDo] = Json.format[WhatDoesYourBusinessDo]

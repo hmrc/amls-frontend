@@ -28,55 +28,54 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class NewHomeAddressDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                     authAction: AuthAction,
-                                                     val ds: CommonPlayDependencies,
-                                                     val cc: MessagesControllerComponents,
-                                                     formProvider: NewHomeAddressDateOfChangeFormProvider,
-                                                     view: NewHomeDateOfChangeView,
-                                                     implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class NewHomeAddressDateOfChangeController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: NewHomeAddressDateOfChangeFormProvider,
+  view: NewHomeDateOfChangeView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
-  def get(index: Int): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetchAll(request.credId) flatMap {
-        cacheMap =>
-          (for {
-            cache <- cacheMap
-            rp <- getData[ResponsiblePerson](cache, index)
-          } yield cache.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key) match {
-            case Some(dateOfChange) =>
-              Future.successful(
-                Ok(view(formProvider().fill(dateOfChange), index, rp.personName.fold[String]("")(_.fullName)))
-              )
-            case None =>
-              Future.successful(
-                Ok(view(formProvider(), index, rp.personName.fold[String]("")(_.fullName)))
-              )
-          }).getOrElse(Future.successful(NotFound(notFoundView)))
-      }
+  def get(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetchAll(request.credId) flatMap { cacheMap =>
+      (for {
+        cache <- cacheMap
+        rp    <- getData[ResponsiblePerson](cache, index)
+      } yield cache.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key) match {
+        case Some(dateOfChange) =>
+          Future.successful(
+            Ok(view(formProvider().fill(dateOfChange), index, rp.personName.fold[String]("")(_.fullName)))
+          )
+        case None               =>
+          Future.successful(
+            Ok(view(formProvider(), index, rp.personName.fold[String]("")(_.fullName)))
+          )
+      }).getOrElse(Future.successful(NotFound(notFoundView)))
+    }
   }
 
-  def post(index: Int): Action[AnyContent] = authAction.async {
-    implicit request =>
-      getPersonName(request.credId, index) flatMap {
-        case personName =>
-          formProvider().bindFromRequest().fold(
-            formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, index, personName))),
+  def post(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    getPersonName(request.credId, index) flatMap {
+      case personName =>
+        formProvider()
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors, index, personName))),
             data =>
               for {
                 _ <- dataCacheConnector.save[NewHomeDateOfChange](request.credId, NewHomeDateOfChange.key, data)
               } yield Redirect(controllers.responsiblepeople.address.routes.NewHomeAddressController.get(index))
           )
-        case _ => Future.successful(NotFound(notFoundView))
-      }
+      case _          => Future.successful(NotFound(notFoundView))
+    }
   }
 
-  private def getPersonName(credId: String, index: Int): Future[String] = {
+  private def getPersonName(credId: String, index: Int): Future[String] =
     getData[ResponsiblePerson](credId, index) map { x =>
       val personName = ControllerHelper.rpTitleName(x)
       personName
     }
-  }
 }
-

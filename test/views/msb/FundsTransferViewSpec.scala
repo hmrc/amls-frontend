@@ -28,7 +28,7 @@ import views.html.msb.FundsTransferView
 class FundsTransferViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val funds_transfer = inject[FundsTransferView]
-  lazy val fp = inject[FundsTransferFormProvider]
+  lazy val fp             = inject[FundsTransferFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,25 +42,29 @@ class FundsTransferViewSpec extends AmlsViewSpec with Matchers {
 
       def view = funds_transfer(fp().fill(FundsTransfer(true)), true)
 
-      doc.title must be(messages("msb.fundstransfer.title") +
-        " - " + messages("summary.msb") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("msb.fundstransfer.title") +
+          " - " + messages("summary.msb") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = funds_transfer(fp().fill(FundsTransfer(true)), true)
 
-      heading.html must be(messages("msb.fundstransfer.title"))
+      heading.html    must be(messages("msb.fundstransfer.title"))
       subHeading.html must include(messages("summary.msb"))
     }
 
     behave like pageWithErrors(
       funds_transfer(
-        fp().withError("transferWithoutFormalSystems", "error.required.msb.fundsTransfer"), false
+        fp().withError("transferWithoutFormalSystems", "error.required.msb.fundsTransfer"),
+        false
       ),
-      "transferWithoutFormalSystems", "error.required.msb.fundsTransfer"
+      "transferWithoutFormalSystems",
+      "error.required.msb.fundsTransfer"
     )
 
     behave like pageWithBackLink(funds_transfer(fp(), false))

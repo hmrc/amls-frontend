@@ -27,10 +27,9 @@ class BusinessEmailAddressFormProviderSpec extends StringFieldBehaviours {
 
   val emailField = "email"
 
-
   val requiredError = "error.required.email"
-  val lengthError = "error.invalid.email.max.length"
-  val invalidError = "error.invalid.email"
+  val lengthError   = "error.invalid.email.max.length"
+  val invalidError  = "error.invalid.email"
 
   "BusinessEmailAddressFormProvider" must {
 
@@ -39,15 +38,13 @@ class BusinessEmailAddressFormProviderSpec extends StringFieldBehaviours {
       "values match" in {
 
         forAll(emailGen.suchThat(_.length <= form.length)) { email =>
-
           val result = form().bind(
             Map(
-              emailField -> email,
-
+              emailField -> email
             )
           )
 
-          result.value shouldBe Some(ContactingYouEmail(email))
+          result.value  shouldBe Some(ContactingYouEmail(email))
           result.errors shouldBe Nil
         }
       }
@@ -64,9 +61,9 @@ class BusinessEmailAddressFormProviderSpec extends StringFieldBehaviours {
             )
           )
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(
-            FormError(emailField, requiredError),
+            FormError(emailField, requiredError)
           )
         }
       }
@@ -76,13 +73,13 @@ class BusinessEmailAddressFormProviderSpec extends StringFieldBehaviours {
         forAll(Gen.alphaNumStr.suchThat(_.length > form.length)) { invalidEmail =>
           val result = form().bind(
             Map(
-              emailField -> invalidEmail,
+              emailField -> invalidEmail
             )
           )
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(
-            FormError(emailField, lengthError, Seq(form.length)),
+            FormError(emailField, lengthError, Seq(form.length))
           )
         }
       }
@@ -92,13 +89,13 @@ class BusinessEmailAddressFormProviderSpec extends StringFieldBehaviours {
         forAll(emailGen.suchThat(_.length < form.length), invalidChar.suchThat(_ != "@")) { (email, invalidChar) =>
           val result = form().bind(
             Map(
-              emailField -> (email + invalidChar),
+              emailField -> (email + invalidChar)
             )
           )
 
-          result.value shouldBe None
+          result.value  shouldBe None
           result.errors shouldBe Seq(
-            FormError(emailField, invalidError, Seq(form.regex)),
+            FormError(emailField, invalidError, Seq(form.regex))
           )
         }
       }

@@ -29,15 +29,20 @@ import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.auth.core.AuthConnector
 import views.HtmlAssertions
 
-trait AmlsSummaryViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with Matchers with HtmlAssertions with Injecting {
+trait AmlsSummaryViewSpec
+    extends PlaySpec
+    with GuiceOneAppPerSuite
+    with MockitoSugar
+    with Matchers
+    with HtmlAssertions
+    with Injecting {
 
-  override def fakeApplication(): Application = {
+  override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .configure(
         "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
       )
       .build()
-  }
 
   val authConnector = mock[AuthConnector]
 
@@ -48,8 +53,8 @@ trait AmlsSummaryViewSpec extends PlaySpec with GuiceOneAppPerSuite with Mockito
   }
 
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView(FakeRequest())
-  val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
-  implicit val messages: Messages = messagesApi.preferred(requestWithToken)
-  implicit val lang: Lang = Lang.defaultLang
-  implicit val appConfig: ApplicationConfig = mock[ApplicationConfig]
+  val messagesApi: MessagesApi                                   = app.injector.instanceOf[MessagesApi]
+  implicit val messages: Messages                                = messagesApi.preferred(requestWithToken)
+  implicit val lang: Lang                                        = Lang.defaultLang
+  implicit val appConfig: ApplicationConfig                      = mock[ApplicationConfig]
 }

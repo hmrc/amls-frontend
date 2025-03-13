@@ -42,13 +42,14 @@ import views.html.msb.MoneySourcesView
 
 import scala.concurrent.Future
 
-class MoneySourcesControllerSpec extends AmlsSpec
-  with MockitoSugar
-  with Matchers
-  with PatienceConfiguration
-  with IntegrationPatience
-  with ScalaFutures
-  with Injecting {
+class MoneySourcesControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with Matchers
+    with PatienceConfiguration
+    with IntegrationPatience
+    with ScalaFutures
+    with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
@@ -59,16 +60,19 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
     when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
       .thenReturn(Future.successful(Cache("TESTID", Map())))
-    lazy val view = inject[MoneySourcesView]
-    val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+    lazy val view  = inject[MoneySourcesView]
+    val controller = new MoneySourcesController(
+      dataCacheConnector = mockCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow,
       cc = mockMcc,
       service = inject[MoneySourcesService],
       formProvider = inject[MoneySourcesFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
@@ -91,35 +95,46 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
     val newRequest = FakeRequest(POST, routes.MoneySourcesController.post().url).withFormUrlEncodedBody(
       "moneySources[1]" -> "banks",
-      "bankNames" -> "Bank names",
+      "bankNames"       -> "Bank names",
       "moneySources[2]" -> "wholesalers",
       "wholesalerNames" -> "wholesaler names",
-      "moneySources[3]" -> "customers")
+      "moneySources[3]" -> "customers"
+    )
 
-    val cacheMap = mock[Cache]
+    val cacheMap  = mock[Cache]
     lazy val view = inject[MoneySourcesView]
     when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
-      .thenReturn(Future.successful(Some(completeMsb.copy(whichCurrencies = Some(WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, None))))))))
+      .thenReturn(
+        Future.successful(
+          Some(
+            completeMsb.copy(whichCurrencies =
+              Some(WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, None))))
+            )
+          )
+        )
+      )
 
     when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any()))
       .thenReturn(Future.successful(cacheMap))
 
-    val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies,
+    val controller = new MoneySourcesController(
+      dataCacheConnector = mockCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService = mock[StatusService],
       serviceFlow = mock[ServiceFlow],
       cc = mockMcc,
       service = inject[MoneySourcesService],
       formProvider = inject[MoneySourcesFormProvider],
       view = view,
-      error = errorView)
+      error = errorView
+    )
 
     val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
 
     when(mockCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
       .thenReturn(Future.successful(Some(BusinessMatching(msbServices = msbServices))))
   }
-
 
   "MoneySourcesController" when {
     "get is called" should {
@@ -142,17 +157,18 @@ class MoneySourcesControllerSpec extends AmlsSpec
       }
 
       "show a pre-populated form when model contains data" in new Fixture {
-        val currentModel = MoneySources(
-          None,
-          None,
-          Some(true))
+        val currentModel = MoneySources(None, None, Some(true))
 
         mockApplicationStatus(NotCompleted)
 
         when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
-          .thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(WhichCurrencies(Seq(), None, Some(currentModel)))))))
+          .thenReturn(
+            Future.successful(
+              Some(MoneyServiceBusiness(whichCurrencies = Some(WhichCurrencies(Seq(), None, Some(currentModel)))))
+            )
+          )
 
-        val result = controller.get()(request)
+        val result   = controller.get()(request)
         val document = Jsoup.parse(contentAsString(result))
 
         status(result) mustEqual OK
@@ -180,7 +196,10 @@ class MoneySourcesControllerSpec extends AmlsSpec
           mockCacheFetchAll
 
           mockCacheGetEntry[MoneyServiceBusiness](Some(MoneyServiceBusiness()), MoneyServiceBusiness.key)
-          mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))), BusinessMatching.key)
+          mockCacheGetEntry[BusinessMatching](
+            Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))),
+            BusinessMatching.key
+          )
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.msb.routes.SummaryController.get.url)

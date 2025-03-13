@@ -26,10 +26,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.supervision.AnotherBodyView
 
-class AnotherBodyViewSpec extends AmlsViewSpec with Matchers  {
+class AnotherBodyViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val another_body = inject[AnotherBodyView]
-  lazy val fp = inject[AnotherBodyFormProvider]
+  lazy val fp           = inject[AnotherBodyFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -43,8 +43,8 @@ class AnotherBodyViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = another_body(fp().fill(AnotherBodyYes("A Name")), edit = false)
 
-      doc.title must startWith(Messages("supervision.another_body.title"))
-      heading.html must be(Messages("supervision.another_body.title"))
+      doc.title       must startWith(Messages("supervision.another_body.title"))
+      heading.html    must be(Messages("supervision.another_body.title"))
       subHeading.html must include(Messages("summary.supervision"))
 
       doc.getElementsByAttributeValue("name", "anotherBody") must not be empty

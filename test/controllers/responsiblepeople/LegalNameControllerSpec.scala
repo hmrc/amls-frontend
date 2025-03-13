@@ -29,9 +29,9 @@ import views.html.responsiblepeople.LegalNameView
 class LegalNameControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
 
   trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
-    val request = addToken(self.authRequest)
-    val RecordId = 1
-    lazy val view = inject[LegalNameView]
+    val request         = addToken(self.authRequest)
+    val RecordId        = 1
+    lazy val view       = inject[LegalNameView]
     lazy val controller = new LegalNameController(
       mockCacheConnector,
       SuccessfulAuthAction,
@@ -95,15 +95,15 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures with Injecting 
           "edit is false" in new TestFixture {
 
             val requestWithParams = FakeRequest(POST, routes.LegalNameController.post(1).url)
-            .withFormUrlEncodedBody(
-              "hasPreviousName" -> "true"
-            )
+              .withFormUrlEncodedBody(
+                "hasPreviousName" -> "true"
+              )
 
             mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[PreviousName]
 
             val result = controller.post(RecordId)(requestWithParams)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.LegalNameInputController.get(RecordId).url))
           }
         }
@@ -112,9 +112,9 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures with Injecting 
           "edit is true" in new TestFixture {
 
             val requestWithParams = FakeRequest(POST, routes.LegalNameController.post(1).url)
-            .withFormUrlEncodedBody(
-              "hasPreviousName" -> "true"
-            )
+              .withFormUrlEncodedBody(
+                "hasPreviousName" -> "true"
+              )
 
             mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[PreviousName]
@@ -126,9 +126,9 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures with Injecting 
           "edit is true and does not have previous names" in new TestFixture {
 
             val requestWithParams = FakeRequest(POST, routes.LegalNameController.post(1).url)
-            .withFormUrlEncodedBody(
-              "hasPreviousName" -> "false"
-            )
+              .withFormUrlEncodedBody(
+                "hasPreviousName" -> "false"
+              )
 
             mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[PreviousName]
@@ -143,9 +143,9 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures with Injecting 
         "return BAD_REQUEST" in new TestFixture {
 
           val notValidData = FakeRequest(POST, routes.LegalNameController.post(1).url)
-          .withFormUrlEncodedBody(
-            "hasPreviousName" -> "fail"
-          )
+            .withFormUrlEncodedBody(
+              "hasPreviousName" -> "fail"
+            )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[PreviousName]
@@ -161,15 +161,15 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures with Injecting 
           "redirect to LegalNameInputController" in new TestFixture {
 
             val requestWithHasPreviousNameTrue = FakeRequest(POST, routes.LegalNameController.post(1).url)
-            .withFormUrlEncodedBody(
-              "hasPreviousName" -> "true"
-            )
+              .withFormUrlEncodedBody(
+                "hasPreviousName" -> "true"
+              )
 
             mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[PreviousName]
 
             val result = controller.post(RecordId)(requestWithHasPreviousNameTrue)
-            status(result) must be(SEE_OTHER)
+            status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.LegalNameInputController.get(RecordId).url))
           }
         }
@@ -179,9 +179,9 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures with Injecting 
         "return NOT_FOUND" in new TestFixture {
 
           val requestWithParams = FakeRequest(POST, routes.LegalNameController.post(1).url)
-          .withFormUrlEncodedBody(
-            "hasPreviousName" -> "true"
-          )
+            .withFormUrlEncodedBody(
+              "hasPreviousName" -> "true"
+            )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[PreviousName]

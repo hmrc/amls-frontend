@@ -22,9 +22,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class SelectActivitiesFormProvider @Inject()() extends Mappings {
+class SelectActivitiesFormProvider @Inject() () extends Mappings {
 
-  private val error = "error.required.bm.register.service"
+  private val error                   = "error.required.bm.register.service"
   def apply(): Form[BusinessActivity] = Form[BusinessActivity](
     "businessActivities" -> enumerable[BusinessActivity](error, error)
   )

@@ -26,158 +26,153 @@ import play.api.mvc.{AnyContentAsEmpty, Request}
 import views.Fixture
 import views.html.businessmatching.updateservice.add.UpdateServicesSummaryView
 
-/**
-  * Trait to hold the fixtures used for data setup to mixin with the UpdateServicesSummarySpec class.
+/** Trait to hold the fixtures used for data setup to mixin with the UpdateServicesSummarySpec class.
   *
   * Holds traits required to test the check your answers page given FX.
   */
-trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
+trait UpdateServicesSummaryFixtures extends AmlsViewSpec {
 
-  /**
-    * ViewFixture.
+  /** ViewFixture.
     *
-    * Extends Fixture and handles oAuth.
-    * All other traits will extend to inherit oAuth
+    * Extends Fixture and handles oAuth. All other traits will extend to inherit oAuth
     */
   trait ViewFixture extends Fixture {
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
   }
 
-  /**
-    * SimpleFlowModelViewFixture.
+  /** SimpleFlowModelViewFixture.
     *
     * View in simple form with high value dealing.
     */
   trait SimpleFlowModelViewFixture extends ViewFixture {
     lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
-    override def view = update_services_summary(AddBusinessTypeFlowModel(
-      activity = Some(HighValueDealing)))
+    override def view                = update_services_summary(AddBusinessTypeFlowModel(activity = Some(HighValueDealing)))
   }
 
-  /**
-    * SimpleTCSPViewFixture.
+  /** SimpleTCSPViewFixture.
     *
     * View to include TrustAndCompanyServices.
     */
   trait SimpleTCSPViewFixture extends ViewFixture {
     lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
-    val completePersonName = Some(PersonName("Katie", None, "Test"))
-    val completePersonName2 = Some(PersonName("David", None, "Test"))
-    val completeRp1 = ResponsiblePerson(completePersonName)
-    val completeRp2 = ResponsiblePerson(completePersonName2)
-    override def view = update_services_summary(AddBusinessTypeFlowModel(
-      activity = Some(TrustAndCompanyServices)))
+    val completePersonName           = Some(PersonName("Katie", None, "Test"))
+    val completePersonName2          = Some(PersonName("David", None, "Test"))
+    val completeRp1                  = ResponsiblePerson(completePersonName)
+    val completeRp2                  = ResponsiblePerson(completePersonName2)
+    override def view                = update_services_summary(AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices)))
   }
 
-  /**
-    * SimpleTCSPNoFitAndProperViewFixture.
+  /** SimpleTCSPNoFitAndProperViewFixture.
     *
     * View to include TrustAndCompanyServices.
     */
   trait SimpleTCSPNoFitAndProperViewFixture extends ViewFixture {
     lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
-    override def view = update_services_summary(AddBusinessTypeFlowModel(
-      activity = Some(TrustAndCompanyServices)
-    ))
+    override def view                = update_services_summary(
+      AddBusinessTypeFlowModel(
+        activity = Some(TrustAndCompanyServices)
+      )
+    )
   }
 
-  /**
-    * MSBViewFixture.
+  /** MSBViewFixture.
     *
-    * View to include MoneyServiceBusiness.
-    * Has single CurrencyExchange sub service.
+    * View to include MoneyServiceBusiness. Has single CurrencyExchange sub service.
     */
   trait MSBViewFixture extends ViewFixture {
     lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
-    override def view = update_services_summary(AddBusinessTypeFlowModel(
-      activity = Some(MoneyServiceBusiness),
-      subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
-    ))
+    override def view                = update_services_summary(
+      AddBusinessTypeFlowModel(
+        activity = Some(MoneyServiceBusiness),
+        subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+      )
+    )
   }
 
-  /**
-    * MSBViewFixture.
+  /** MSBViewFixture.
     *
-    * View to include MoneyServiceBusiness.
-    * Has single CurrencyExchange sub service.
+    * View to include MoneyServiceBusiness. Has single CurrencyExchange sub service.
     */
   trait MSBViewNoPremisesFixture extends ViewFixture {
     lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
-    override def view = update_services_summary(AddBusinessTypeFlowModel(
-      activity = Some(MoneyServiceBusiness),
-      subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
-    ))
+    override def view                = update_services_summary(
+      AddBusinessTypeFlowModel(
+        activity = Some(MoneyServiceBusiness),
+        subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+      )
+    )
   }
 
-  /**
-    * MSBAllViewFixture.
+  /** MSBAllViewFixture.
     *
-    * View to include MoneyServiceBusiness.
-    * Has all sub services.
-    * Has PSR No.
+    * View to include MoneyServiceBusiness. Has all sub services. Has PSR No.
     */
   trait MSBAllViewFixture extends ViewFixture {
     lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
-    val completePersonName = Some(PersonName("Katie", None, "Test"))
-    val completeRp1 = ResponsiblePerson(completePersonName)
-    val address = Address("1", None, None, None, "AA1 1BB", None)
-    override def view = update_services_summary(AddBusinessTypeFlowModel(
-      activity = Some(MoneyServiceBusiness),
-      subSectors = Some(BusinessMatchingMsbServices(Set(
-        TransmittingMoney,
-        CurrencyExchange,
-        ForeignExchange,
-        ChequeCashingNotScrapMetal,
-        ChequeCashingScrapMetal)
-      )),
-      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))))
+    val completePersonName           = Some(PersonName("Katie", None, "Test"))
+    val completeRp1                  = ResponsiblePerson(completePersonName)
+    val address                      = Address("1", None, None, None, "AA1 1BB", None)
+    override def view                = update_services_summary(
+      AddBusinessTypeFlowModel(
+        activity = Some(MoneyServiceBusiness),
+        subSectors = Some(
+          BusinessMatchingMsbServices(
+            Set(
+              TransmittingMoney,
+              CurrencyExchange,
+              ForeignExchange,
+              ChequeCashingNotScrapMetal,
+              ChequeCashingScrapMetal
+            )
+          )
+        ),
+        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))
+      )
+    )
   }
 
-  /**
-    * MSBSingleViewFixture.
+  /** MSBSingleViewFixture.
     *
-    * View to include MoneyServiceBusiness.
-    * Has a single sub services.
-    * Has PSR No.
+    * View to include MoneyServiceBusiness. Has a single sub services. Has PSR No.
     */
   trait MSBSingleViewFixture extends ViewFixture {
     lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
-    override def view = update_services_summary(AddBusinessTypeFlowModel(
-      activity = Some(MoneyServiceBusiness),
-      subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))))
+    override def view                = update_services_summary(
+      AddBusinessTypeFlowModel(
+        activity = Some(MoneyServiceBusiness),
+        subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))
+      )
+    )
   }
 
-  /**
-    * MSBNoPSRViewFixture.
+  /** MSBNoPSRViewFixture.
     *
-    * View to include MoneyServiceBusiness.
-    * Has single CurrencyExchange sub service.
-    * Has no PSR No.
+    * View to include MoneyServiceBusiness. Has single CurrencyExchange sub service. Has no PSR No.
     */
   trait MSBNoPSRViewFixture extends ViewFixture {
     lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
-    override def view = update_services_summary(AddBusinessTypeFlowModel(
-      activity = Some(MoneyServiceBusiness),
-      subSectors = Some(BusinessMatchingMsbServices(Set(
-        TransmittingMoney)
-      )),
-      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)))
+    override def view                = update_services_summary(
+      AddBusinessTypeFlowModel(
+        activity = Some(MoneyServiceBusiness),
+        subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)
+      )
+    )
   }
 
-  /**
-    * MSBViewFixture.
+  /** MSBViewFixture.
     *
-    * View to include MoneyServiceBusiness.
-    * Has single CurrencyExchange sub service.
-    * Has a PSR No.
+    * View to include MoneyServiceBusiness. Has single CurrencyExchange sub service. Has a PSR No.
     */
   trait SingleSubSectorPSRMSBViewFixture extends ViewFixture {
     lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
-    override def view = update_services_summary(AddBusinessTypeFlowModel(
-      activity = Some(MoneyServiceBusiness),
-      subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))
-    ))
+    override def view                = update_services_summary(
+      AddBusinessTypeFlowModel(
+        activity = Some(MoneyServiceBusiness),
+        subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))
+      )
+    )
   }
 }

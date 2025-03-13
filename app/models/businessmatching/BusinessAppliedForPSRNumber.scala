@@ -29,8 +29,7 @@ case object BusinessAppliedForPSRNumberNo extends BusinessAppliedForPSRNumber
 object BusinessAppliedForPSRNumber {
 
   def formValues(html: Html)(implicit messages: Messages): Seq[RadioItem] = HmrcYesNoRadioItems().map { radioItem =>
-
-    if(radioItem.value.contains("true")) {
+    if (radioItem.value.contains("true")) {
       radioItem.copy(
         id = Some("appliedFor-true"),
         conditionalHtml = Some(html)
@@ -44,17 +43,17 @@ object BusinessAppliedForPSRNumber {
 
   implicit val jsonReads: Reads[BusinessAppliedForPSRNumber] =
     (__ \ "appliedFor").read[Boolean] flatMap {
-      case true => (__ \ "regNumber").read[String] map BusinessAppliedForPSRNumberYes.apply
+      case true  => (__ \ "regNumber").read[String] map BusinessAppliedForPSRNumberYes.apply
       case false => Reads(_ => JsSuccess(BusinessAppliedForPSRNumberNo))
-  }
+    }
 
   implicit val jsonWrites: Writes[BusinessAppliedForPSRNumber] = Writes[BusinessAppliedForPSRNumber] {
-    case BusinessAppliedForPSRNumberYes(value) => Json.obj(
-      "appliedFor" -> true,
-      "regNumber" -> value
-    )
-    case BusinessAppliedForPSRNumberNo => Json.obj("appliedFor" -> false)
+    case BusinessAppliedForPSRNumberYes(value) =>
+      Json.obj(
+        "appliedFor" -> true,
+        "regNumber"  -> value
+      )
+    case BusinessAppliedForPSRNumberNo         => Json.obj("appliedFor" -> false)
   }
 
 }
-

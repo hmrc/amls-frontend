@@ -23,7 +23,7 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.bankdetails.RemoveBankDetailsView
 
-class RemoveBankDetailsViewSpec extends AmlsViewSpec with Matchers  {
+class RemoveBankDetailsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val removeBankDetails = inject[RemoveBankDetailsView]
 
@@ -38,14 +38,16 @@ class RemoveBankDetailsViewSpec extends AmlsViewSpec with Matchers  {
 
       def view = removeBankDetails(0, "AccountName")
 
-      doc.title must startWith(messages("bankdetails.remove.bank.account.title") + " - " + messages("summary.bankdetails"))
+      doc.title must startWith(
+        messages("bankdetails.remove.bank.account.title") + " - " + messages("summary.bankdetails")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = removeBankDetails(0, "AccountName")
 
-      heading.html must be(messages("bankdetails.remove.bank.account.title"))
+      heading.html    must be(messages("bankdetails.remove.bank.account.title"))
       subHeading.html must include(messages("summary.bankdetails"))
 
     }
@@ -53,7 +55,7 @@ class RemoveBankDetailsViewSpec extends AmlsViewSpec with Matchers  {
     "have the correct message" in new ViewFixture {
 
       val accountName = "Main Account"
-      def view = removeBankDetails(0, accountName)
+      def view        = removeBankDetails(0, accountName)
 
       doc.getElementsByTag("p").text() must include(messages("bankdetails.remove.bank.account.text", accountName))
     }

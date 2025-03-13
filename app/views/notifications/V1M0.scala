@@ -20,26 +20,25 @@ import views.html.notifications.v1m0._
 
 import javax.inject.Inject
 
-class V1M0 @Inject()(
-                      val messageDetailsView: MessageDetailsView,
-                      val mindedToRejectView: MindedToRejectView,
-                      val mindedToRevokeView: MindedToRevokeView,
-                      val noLongerMindedToRejectView: NoLongerMindedToRejectView,
-                      val noLongerMindedToRevokeView: NoLongerMindedToRevokeView,
-                      val rejectionReasonsView: RejectionReasonsView,
-                      val revocationReasonsView: RevocationReasonsView
-                    ) extends VersionedView {
+class V1M0 @Inject() (
+  val messageDetailsView: MessageDetailsView,
+  val mindedToRejectView: MindedToRejectView,
+  val mindedToRevokeView: MindedToRevokeView,
+  val noLongerMindedToRejectView: NoLongerMindedToRejectView,
+  val noLongerMindedToRevokeView: NoLongerMindedToRevokeView,
+  val rejectionReasonsView: RejectionReasonsView,
+  val revocationReasonsView: RevocationReasonsView
+) extends VersionedView {
 
-  override def viewFromTemplateFilename(templateName: String): NotificationViewScalaTemplate5 = {
+  override def viewFromTemplateFilename(templateName: String): NotificationViewScalaTemplate5 =
     templateName match {
-      case "message_details" => messageDetailsView
-      case "minded_to_reject" => mindedToRejectView
-      case "minded_to_revoke" => mindedToRevokeView
+      case "message_details"            => messageDetailsView
+      case "minded_to_reject"           => mindedToRejectView
+      case "minded_to_revoke"           => mindedToRevokeView
       case "no_longer_minded_to_reject" => noLongerMindedToRejectView
       case "no_longer_minded_to_revoke" => noLongerMindedToRevokeView
-      case "rejection_reasons" => rejectionReasonsView
-      case "revocation_reasons" => revocationReasonsView
-      case _ => throw new RuntimeException(s"Message template $templateName not found")
+      case "rejection_reasons"          => rejectionReasonsView
+      case "revocation_reasons"         => revocationReasonsView
+      case _                            => throw new RuntimeException(s"Message template $templateName not found")
     }
-  }
 }

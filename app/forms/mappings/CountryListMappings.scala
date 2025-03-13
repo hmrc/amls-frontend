@@ -22,7 +22,9 @@ import play.api.data.Mapping
 
 trait CountryListMappings extends AddressMappings {
 
-  def countryListMapping[A](errorKey: String)(apply: Seq[Option[Country]] => A, unapply: A => Seq[Option[Country]]): Mapping[A] =
+  def countryListMapping[A](
+    errorKey: String
+  )(apply: Seq[Option[Country]] => A, unapply: A => Seq[Option[Country]]): Mapping[A] =
     seq(
       optional(
         text(errorKey)
@@ -30,5 +32,5 @@ trait CountryListMappings extends AddressMappings {
           .transform[Country](parseCountry, _.code)
       )
     ).verifying(nonEmptyOptionalSeq(errorKey))
-    .transform[A](apply, unapply)
+      .transform[A](apply, unapply)
 }

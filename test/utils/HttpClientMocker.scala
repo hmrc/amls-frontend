@@ -27,10 +27,9 @@ import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import java.net.URL
 import scala.concurrent.{ExecutionContext, Future}
 
-
 class HttpClientMocker extends MockFactory {
 
-  val httpClient: HttpClientV2 = mock[HttpClientV2]("mockHttp")
+  val httpClient: HttpClientV2               = mock[HttpClientV2]("mockHttp")
   private val requestBuilder: RequestBuilder = mock[RequestBuilder]("mockRequestBuilder")
 
   def mockGet[Res: HttpReads](url: URL, response: Res): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
@@ -38,50 +37,72 @@ class HttpClientMocker extends MockFactory {
     mockExecute(Future.successful(response))
   }
 
-  def mockGet[Res: HttpReads](url: URL, response: Exception): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
+  def mockGet[Res: HttpReads](
+    url: URL,
+    response: Exception
+  ): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
     (httpClient.get(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
     mockExecute(Future.failed(response))
   }
 
-  def mockDelete[Res: HttpReads](url: URL, response: Res): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
+  def mockDelete[Res: HttpReads](
+    url: URL,
+    response: Res
+  ): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
     (httpClient.delete(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
     mockExecute(Future.successful(response))
   }
 
-  def mockPostJson[B : Writes, Res: HttpReads](url: URL, requestBody: B, response: Res): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
+  def mockPostJson[B: Writes, Res: HttpReads](
+    url: URL,
+    requestBody: B,
+    response: Res
+  ): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
     (httpClient.post(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
     mockWithBody(Json.toJson(requestBody))
     mockExecute(Future.successful(response))
   }
 
-  def mockPostJson[B : Writes, Res: HttpReads](url: URL, requestBody: B, response: Exception): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
+  def mockPostJson[B: Writes, Res: HttpReads](
+    url: URL,
+    requestBody: B,
+    response: Exception
+  ): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
     (httpClient.post(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
     mockWithBody(Json.toJson(requestBody))
     mockExecute(Future.failed(response))
   }
 
-  def mockPostString[Res: HttpReads](url: URL, requestBody: String, response: Res): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
+  def mockPostString[Res: HttpReads](
+    url: URL,
+    requestBody: String,
+    response: Res
+  ): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
     (httpClient.post(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
     mockWithBody(requestBody)
     mockExecute(Future.successful(response))
   }
 
-  def mockPut[B : Writes, Res: HttpReads](url: URL, requestBody: B, response: Res): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
+  def mockPut[B: Writes, Res: HttpReads](
+    url: URL,
+    requestBody: B,
+    response: Res
+  ): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
     (httpClient.put(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
     mockWithBody(Json.toJson(requestBody))
     mockExecute(Future.successful(response))
   }
 
   private def mockExecute[T: HttpReads](response: Future[T]) =
-    (requestBuilder.execute[T](_: HttpReads[T], _: ExecutionContext))
+    (requestBuilder
+      .execute[T](_: HttpReads[T], _: ExecutionContext))
       .expects(*, *)
       .returning(response)
 
-  private def mockWithBody[B: BodyWritable: Tag](requestBody: B) = {
+  private def mockWithBody[B: BodyWritable: Tag](requestBody: B) =
     (requestBuilder
       .withBody(_: B)(_: BodyWritable[B], _: izumi.reflect.Tag[B], _: ExecutionContext))
       .expects(requestBody, *, *, *)
       .returning(requestBuilder)
-  }
 
 }

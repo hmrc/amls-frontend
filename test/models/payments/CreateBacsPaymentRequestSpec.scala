@@ -28,10 +28,10 @@ class CreateBacsPaymentRequestSpec extends PlaySpec with Matchers with PaymentGe
     val model = createBacsPaymentGen.sample.get
 
     val json = Json.obj(
-      "amlsReference" -> model.amlsReference,
+      "amlsReference"    -> model.amlsReference,
       "paymentReference" -> model.paymentReference,
-      "safeId" -> model.safeId,
-      "amountInPence" -> model.amountInPence
+      "safeId"           -> model.safeId,
+      "amountInPence"    -> model.amountInPence
     )
 
     "serialize to the correct JSON format" in {

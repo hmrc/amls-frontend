@@ -30,13 +30,13 @@ sealed trait Service {
 
   val value: String
 
-  val message = "asp.service.lbl."
+  val message                                         = "asp.service.lbl."
   def getMessage(implicit messages: Messages): String =
     this match {
-      case Accountancy => messages(s"${message}01")
-      case PayrollServices => messages(s"${message}02")
-      case BookKeeping => messages(s"${message}03")
-      case Auditing => messages(s"${message}04")
+      case Accountancy          => messages(s"${message}01")
+      case PayrollServices      => messages(s"${message}02")
+      case BookKeeping          => messages(s"${message}03")
+      case Auditing             => messages(s"${message}04")
       case FinancialOrTaxAdvice => messages(s"${message}05")
     }
 }
@@ -63,14 +63,16 @@ object Service extends Enumerable.Implicits {
     override val value = "05"
   }
 
-  def formValues(implicit messages: Messages): Seq[CheckboxItem] = all.zipWithIndex.map { case (service, index) =>
-    CheckboxItem(
-      content = Text(messages(s"asp.service.lbl.${service.value}")),
-      value = service.toString,
-      id = Some(s"services_$index"),
-      name = Some(s"services[$index]")
-    )
-  }.sortBy(_.content.asHtml.body)
+  def formValues(implicit messages: Messages): Seq[CheckboxItem] = all.zipWithIndex
+    .map { case (service, index) =>
+      CheckboxItem(
+        content = Text(messages(s"asp.service.lbl.${service.value}")),
+        value = service.toString,
+        id = Some(s"services_$index"),
+        name = Some(s"services[$index]")
+      )
+    }
+    .sortBy(_.content.asHtml.body)
 
   val all: Seq[Service] = Seq(
     Accountancy,
@@ -90,15 +92,15 @@ object Service extends Enumerable.Implicits {
       case JsString("03") => JsSuccess(BookKeeping)
       case JsString("04") => JsSuccess(Auditing)
       case JsString("05") => JsSuccess(FinancialOrTaxAdvice)
-      case _ => JsError((JsPath \ "services") -> JsonValidationError("error.invalid"))
+      case _              => JsError((JsPath \ "services") -> JsonValidationError("error.invalid"))
     }
 
   implicit val jsonServiceWrites: Writes[Service] = Writes[Service] {
-      case Accountancy => JsString("01")
-      case PayrollServices => JsString("02")
-      case BookKeeping => JsString("03")
-      case Auditing => JsString("04")
-      case FinancialOrTaxAdvice => JsString("05")
+    case Accountancy          => JsString("01")
+    case PayrollServices      => JsString("02")
+    case BookKeeping          => JsString("03")
+    case Auditing             => JsString("04")
+    case FinancialOrTaxAdvice => JsString("05")
   }
 
 }
@@ -106,4 +108,3 @@ object Service extends Enumerable.Implicits {
 object ServicesOfBusiness {
   implicit val formats: OFormat[ServicesOfBusiness] = Json.format[ServicesOfBusiness]
 }
-

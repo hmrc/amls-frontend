@@ -25,10 +25,10 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.supervision.PenalisedByProfessionalView
 
-class PenalisedByProfessionalViewSpec extends AmlsViewSpec with Matchers  {
+class PenalisedByProfessionalViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val viewUnderTest = inject[PenalisedByProfessionalView]
-  lazy val fp = inject[PenalisedByProfessionalFormProvider]
+  lazy val fp            = inject[PenalisedByProfessionalFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -43,7 +43,7 @@ class PenalisedByProfessionalViewSpec extends AmlsViewSpec with Matchers  {
 
       doc.title() mustBe
         s"${messages("supervision.penalisedbyprofessional.title")} - ${messages("summary.supervision")}" +
-          s" - ${messages("title.amls")} - ${messages("title.gov")}"
+        s" - ${messages("title.amls")} - ${messages("title.gov")}"
     }
 
     "have the correct heading" in new ViewFixture {
@@ -71,13 +71,16 @@ class PenalisedByProfessionalViewSpec extends AmlsViewSpec with Matchers  {
     "have the correct legend" in new ViewFixture {
       override def view: HtmlFormat.Appendable = viewUnderTest(fp(), false)
 
-      doc.getElementsByTag("legend")
-        .first().text() mustBe messages("supervision.penalisedbyprofessional.heading1")
+      doc
+        .getElementsByTag("legend")
+        .first()
+        .text() mustBe messages("supervision.penalisedbyprofessional.heading1")
     }
 
     behave like pageWithErrors(
       viewUnderTest(
-        fp().withError("penalised", "error.required.professionalbody.penalised.by.professional.body"), true
+        fp().withError("penalised", "error.required.professionalbody.penalised.by.professional.body"),
+        true
       ),
       "penalised",
       "error.required.professionalbody.penalised.by.professional.body"

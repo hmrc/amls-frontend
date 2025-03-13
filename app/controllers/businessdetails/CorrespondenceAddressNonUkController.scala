@@ -35,55 +35,62 @@ import views.html.businessdetails.CorrespondenceAddressNonUKView
 
 import scala.concurrent.Future
 
-class CorrespondenceAddressNonUkController @Inject ()(val dataConnector: DataCacheConnector,
-                                                      val auditConnector: AuditConnector,
-                                                      val autoCompleteService: AutoCompleteService,
-                                                      val authAction: AuthAction,
-                                                      val ds: CommonPlayDependencies,
-                                                      val cc: MessagesControllerComponents,
-                                                      formProvider: CorrespondenceAddressNonUKFormProvider,
-                                                      view: CorrespondenceAddressNonUKView) extends AmlsBaseController(ds, cc) {
+class CorrespondenceAddressNonUkController @Inject() (
+  val dataConnector: DataCacheConnector,
+  val auditConnector: AuditConnector,
+  val autoCompleteService: AutoCompleteService,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: CorrespondenceAddressNonUKFormProvider,
+  view: CorrespondenceAddressNonUKView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
-        response =>
-          val form = for {
-            businessDetails <- response
-            correspondenceAddress <- businessDetails.correspondenceAddress
-            address <- correspondenceAddress.nonUkAddress
-          } yield {
-            formProvider().fill(address)
-          }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map { response =>
+      val form = for {
+        businessDetails       <- response
+        correspondenceAddress <- businessDetails.correspondenceAddress
+        address               <- correspondenceAddress.nonUkAddress
+      } yield formProvider().fill(address)
 
-          Ok(view(form.getOrElse(formProvider()), edit, autoCompleteService.formOptions))
-      }
+      Ok(view(form.getOrElse(formProvider()), edit, autoCompleteService.formOptions))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
         data => {
           val doUpdate = for {
-            businessDetails: BusinessDetails <- OptionT(dataConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key))
-            _ <- OptionT.liftF(dataConnector.save[BusinessDetails]
-              (request.credId, BusinessDetails.key, businessDetails.correspondenceAddress(CorrespondenceAddress(None, Some(data)))))
-            _ <- OptionT.liftF(auditAddressChange(data, businessDetails.correspondenceAddress.flatMap(a => a.nonUkAddress), edit)) orElse OptionT.some(Success)
+            businessDetails: BusinessDetails <-
+              OptionT(dataConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key))
+            _                                <- OptionT.liftF(
+                                                  dataConnector.save[BusinessDetails](
+                                                    request.credId,
+                                                    BusinessDetails.key,
+                                                    businessDetails.correspondenceAddress(CorrespondenceAddress(None, Some(data)))
+                                                  )
+                                                )
+            _                                <- OptionT.liftF(
+                                                  auditAddressChange(data, businessDetails.correspondenceAddress.flatMap(a => a.nonUkAddress), edit)
+                                                ) orElse OptionT.some(Success)
           } yield Redirect(routes.SummaryController.get)
           doUpdate getOrElse InternalServerError("Could not update correspondence address")
         }
       )
-    }
   }
 
-  def auditAddressChange(currentAddress: CorrespondenceAddressNonUk, oldAddress: Option[CorrespondenceAddressNonUk], edit: Boolean)
-                        (implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
+  def auditAddressChange(
+    currentAddress: CorrespondenceAddressNonUk,
+    oldAddress: Option[CorrespondenceAddressNonUk],
+    edit: Boolean
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] =
     if (edit) {
       auditConnector.sendEvent(AddressModifiedEvent(currentAddress, oldAddress))
     } else {
       auditConnector.sendEvent(AddressCreatedEvent(currentAddress))
     }
-  }
 }

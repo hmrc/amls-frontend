@@ -21,8 +21,8 @@ import play.api.data.{Form, FormError}
 
 class ServicesOfAnotherTCSPFormProviderSpec extends BooleanFieldBehaviours[Boolean] {
 
-  override val form: Form[Boolean] = new ServicesOfAnotherTCSPFormProvider()()
-  override val fieldName: String = "servicesOfAnotherTCSP"
+  override val form: Form[Boolean]  = new ServicesOfAnotherTCSPFormProvider()()
+  override val fieldName: String    = "servicesOfAnotherTCSP"
   override val errorMessage: String = "error.required.tcsp.services.another.tcsp"
 
   "ServicesOfAnotherTCSPFormProvider" must {

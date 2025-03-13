@@ -28,7 +28,7 @@ import views.html.msb.IdentifyLinkedTransactionsView
 class IdentifyLinkedTransactionsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val transactionsView = inject[IdentifyLinkedTransactionsView]
-  lazy val fp = inject[IdentifyLinkedTransactionsFormProvider]
+  lazy val fp               = inject[IdentifyLinkedTransactionsFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -42,24 +42,27 @@ class IdentifyLinkedTransactionsViewSpec extends AmlsViewSpec with Matchers {
 
       def view = transactionsView(fp().fill(IdentifyLinkedTransactions(true)), true)
 
-      doc.title must be(messages("msb.linked.txn.title") +
-        " - " + messages("summary.msb") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
+      doc.title must be(
+        messages("msb.linked.txn.title") +
+          " - " + messages("summary.msb") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = transactionsView(fp().fill(IdentifyLinkedTransactions(true)), true)
 
-      heading.html must be(messages("msb.linked.txn.title"))
+      heading.html    must be(messages("msb.linked.txn.title"))
       subHeading.html must include(messages("summary.msb"))
 
     }
 
     behave like pageWithErrors(
       transactionsView(fp().withError("linkedTxn", "error.required.msb.linked.txn"), false),
-      "linkedTxn", "error.required.msb.linked.txn"
+      "linkedTxn",
+      "error.required.msb.linked.txn"
     )
 
     behave like pageWithBackLink(transactionsView(fp(), false))

@@ -25,30 +25,28 @@ import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
 case class PaymentMethods(
-                         courier: Boolean,
-                         direct: Boolean,
-                         other: Option[String]
-                         ) {
-  def getSummaryMessages(implicit messages: Messages): Seq[String] = {
+  courier: Boolean,
+  direct: Boolean,
+  other: Option[String]
+) {
+  def getSummaryMessages(implicit messages: Messages): Seq[String] =
     Seq(
-      if(courier) Some(messages("hvd.receiving.option.01")) else None,
-      if(direct) Some(messages("hvd.receiving.option.02")) else None,
+      if (courier) Some(messages("hvd.receiving.option.01")) else None,
+      if (direct) Some(messages("hvd.receiving.option.02")) else None,
       other
     ).flatten
-  }
 }
 
 sealed trait PaymentMethod
 
 object PaymentMethods extends Enumerable.Implicits {
 
-  def apply(methods: Seq[PaymentMethod], detail: Option[String]): PaymentMethods = {
+  def apply(methods: Seq[PaymentMethod], detail: Option[String]): PaymentMethods =
     PaymentMethods(
       methods.contains(Courier),
       methods.contains(Direct),
       if (methods.exists(_.isInstanceOf[Other])) detail else None
     )
-  }
 
   case object Courier extends WithName("courier") with PaymentMethod
 
@@ -60,8 +58,7 @@ object PaymentMethods extends Enumerable.Implicits {
 
   def formValues(html: Html)(implicit messages: Messages): Seq[CheckboxItem] = all.zipWithIndex map {
     case (method, index) =>
-
-      val conditional = if(method.toString == Other("").toString) Some(html) else None
+      val conditional = if (method.toString == Other("").toString) Some(html) else None
 
       CheckboxItem(
         content = Text(messages(s"hvd.receiving.option.0${index + 1}")),
@@ -74,25 +71,25 @@ object PaymentMethods extends Enumerable.Implicits {
 
   implicit val enumerable: Enumerable[PaymentMethod] = Enumerable(all.map(v => v.toString -> v): _*)
 
-  implicit val reads: Reads[PaymentMethods] = {
+  implicit val reads: Reads[PaymentMethods] =
     (
       (JsPath \ "courier").read[Boolean] and
         (JsPath \ "direct").read[Boolean] and
         (JsPath \ "other").read[Boolean] and
         (JsPath \ "details").readNullable[String]
-      )((courier, direct, _, details) =>
-        PaymentMethods(
-          courier, direct, details
-        )
+    )((courier, direct, _, details) =>
+      PaymentMethods(
+        courier,
+        direct,
+        details
       )
-  }
+    )
 
-  implicit val writes: OWrites[PaymentMethods] = (obj: PaymentMethods) => {
+  implicit val writes: OWrites[PaymentMethods] = (obj: PaymentMethods) =>
     Json.obj(
       "courier" -> obj.courier,
-      "direct" -> obj.direct,
-      "other" -> obj.other.isDefined,
+      "direct"  -> obj.direct,
+      "other"   -> obj.other.isDefined,
       "details" -> obj.other
     )
-  }
 }

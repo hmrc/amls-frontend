@@ -26,31 +26,33 @@ import views.html.businessdetails.PreviouslyRegisteredView
 
 import scala.concurrent.Future
 
-class PreviouslyRegisteredController @Inject ()(val authAction: AuthAction,
-                                                val ds: CommonPlayDependencies,
-                                                val cc: MessagesControllerComponents,
-                                                service: PreviouslyRegisteredService,
-                                                formProvider: PreviouslyRegisteredFormProvider,
-                                                view: PreviouslyRegisteredView) extends AmlsBaseController(ds, cc) {
+class PreviouslyRegisteredController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  service: PreviouslyRegisteredService,
+  formProvider: PreviouslyRegisteredFormProvider,
+  view: PreviouslyRegisteredView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      service.getPreviouslyRegistered(request.credId).map { optPreviouslyRegistered =>
-        Ok(view(optPreviouslyRegistered.fold(formProvider())(formProvider().fill), edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    service.getPreviouslyRegistered(request.credId).map { optPreviouslyRegistered =>
+      Ok(view(optPreviouslyRegistered.fold(formProvider())(formProvider().fill), edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
-        data => service.updatePreviouslyRegistered(request.credId, data).map {
-          _.fold(Redirect(routes.ConfirmRegisteredOfficeController.get(edit))) { _ =>
-            getRouting(edit)
+        data =>
+          service.updatePreviouslyRegistered(request.credId, data).map {
+            _.fold(Redirect(routes.ConfirmRegisteredOfficeController.get(edit))) { _ =>
+              getRouting(edit)
+            }
           }
-        }
       )
-    }
   }
 
   private def getRouting(edit: Boolean): Result =

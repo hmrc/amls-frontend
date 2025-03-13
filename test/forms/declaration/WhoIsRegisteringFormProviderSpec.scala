@@ -22,17 +22,17 @@ import play.api.data.{Form, FormError}
 
 class WhoIsRegisteringFormProviderSpec extends StringFieldBehaviours {
 
-  val formProvider = new WhoIsRegisteringFormProvider()
+  val formProvider                              = new WhoIsRegisteringFormProvider()
   def form(str: String): Form[WhoIsRegistering] = formProvider(str)
 
-  val fieldName = "person"
+  val fieldName   = "person"
   val errorPrefix = "error.required.declaration.who.is.declaring.this"
 
   "WhoIsRegisteringFormProvider" must {
 
     "bind with valid data" in {
 
-      val str = "partner1"
+      val str    = "partner1"
       val result = form("renewal").bind(Map(fieldName -> str))
 
       result.value shouldBe Some(WhoIsRegistering(str))
@@ -41,7 +41,9 @@ class WhoIsRegisteringFormProviderSpec extends StringFieldBehaviours {
 
     "append given string to error message" in {
       val suffix = "foo"
-      formProvider(suffix).bind(Map(fieldName -> "")).error(fieldName).map(_.message) shouldBe Some(s"$errorPrefix.$suffix")
+      formProvider(suffix).bind(Map(fieldName -> "")).error(fieldName).map(_.message) shouldBe Some(
+        s"$errorPrefix.$suffix"
+      )
     }
 
     behave like mandatoryField(form("renewal"), fieldName, FormError(fieldName, s"$errorPrefix.renewal"))

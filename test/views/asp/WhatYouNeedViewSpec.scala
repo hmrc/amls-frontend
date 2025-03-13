@@ -25,8 +25,8 @@ import views.html.asp.WhatYouNeedView
 
 class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val whatYouNeed = app.injector.instanceOf[WhatYouNeedView]
-  val call = controllers.asp.routes.ServicesOfBusinessController.get()
+  lazy val whatYouNeed                                      = app.injector.instanceOf[WhatYouNeedView]
+  val call                                                  = controllers.asp.routes.ServicesOfBusinessController.get()
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   trait ViewFixture extends Fixture {
@@ -41,14 +41,14 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       doc.title must startWith(messages("title.wyn"))
     }
 
-    "Have the correct Headings" in new ViewFixture{
+    "Have the correct Headings" in new ViewFixture {
       def view = whatYouNeed(call)
 
-      heading.html must be (messages("title.wyn"))
-      subHeading.html must include (messages("summary.asp"))
+      heading.html    must be(messages("title.wyn"))
+      subHeading.html must include(messages("summary.asp"))
     }
 
-    "contain the expected content elements" in new ViewFixture{
+    "contain the expected content elements" in new ViewFixture {
       def view = whatYouNeed(call)
 
       html must include(messages("You’ll need to tell us:"))

@@ -27,7 +27,7 @@ import views.html.responsiblepeople.address.CurrentAddressView
 class CurrentAddressViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val current_address = inject[CurrentAddressView]
-  lazy val fp = inject[CurrentAddressFormProvider]
+  lazy val fp              = inject[CurrentAddressFormProvider]
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -43,11 +43,13 @@ class CurrentAddressViewSpec extends AmlsViewSpec with Matchers {
 
       def view = current_address(fp(), true, 1, None, name)
 
-      doc.title must be(messages("responsiblepeople.wherepersonlives.title") +
-        " - " + messages("summary.responsiblepeople") +
-        " - " + messages("title.amls") +
-        " - " + messages("title.gov"))
-      heading.html must be(messages("responsiblepeople.wherepersonlives.heading", name))
+      doc.title       must be(
+        messages("responsiblepeople.wherepersonlives.title") +
+          " - " + messages("summary.responsiblepeople") +
+          " - " + messages("title.amls") +
+          " - " + messages("title.gov")
+      )
+      heading.html    must be(messages("responsiblepeople.wherepersonlives.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "isUK") must not be empty
@@ -55,7 +57,11 @@ class CurrentAddressViewSpec extends AmlsViewSpec with Matchers {
 
     behave like pageWithErrors(
       current_address(
-        fp().withError("isUK", "error.required.uk.or.overseas.address.current"), false, 1, None, name
+        fp().withError("isUK", "error.required.uk.or.overseas.address.current"),
+        false,
+        1,
+        None,
+        name
       ),
       "isUK",
       "error.required.uk.or.overseas.address.current"

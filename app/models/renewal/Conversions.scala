@@ -28,40 +28,60 @@ object Conversions {
     def withRenewalData(renewal: Renewal): SubscriptionRequest = {
 
       val baSection = request.businessActivitiesSection match {
-        case Some(ba) => Some(ba.copy(
-          expectedAMLSTurnover = renewal.turnover contramap AMLSTurnover.convert,
-          expectedBusinessTurnover = renewal.businessTurnover contramap BusinessTurnover.convert,
-          involvedInOther = renewal.involvedInOtherActivities contramap InvolvedInOther.convert,
-          customersOutsideUK = renewal.customersOutsideUK contramap CustomersOutsideUK.convert
-        ))
-        case _ => throw new Exception("[Conversions] Trying to process data for renewal, but no business activities data was found")
+        case Some(ba) =>
+          Some(
+            ba.copy(
+              expectedAMLSTurnover = renewal.turnover contramap AMLSTurnover.convert,
+              expectedBusinessTurnover = renewal.businessTurnover contramap BusinessTurnover.convert,
+              involvedInOther = renewal.involvedInOtherActivities contramap InvolvedInOther.convert,
+              customersOutsideUK = renewal.customersOutsideUK contramap CustomersOutsideUK.convert
+            )
+          )
+        case _        =>
+          throw new Exception(
+            "[Conversions] Trying to process data for renewal, but no business activities data was found"
+          )
       }
 
       val msbSection: Option[MoneyServiceBusiness] = request.msbSection flatMap { msb =>
-        Some(msb.copy(
-          throughput = renewal.totalThroughput contramap TotalThroughput.convert,
-          transactionsInNext12Months = renewal.transactionsInLast12Months contramap TransactionsInLast12Months.convert,
-          sendTheLargestAmountsOfMoney = renewal.sendTheLargestAmountsOfMoney contramap SendTheLargestAmountsOfMoney.convert,
-          sendMoneyToOtherCountry = renewal.sendMoneyToOtherCountry contramap SendMoneyToOtherCountry.convert,
-          mostTransactions = renewal.mostTransactions contramap MostTransactions.convert,
-          ceTransactionsInNext12Months = renewal.ceTransactionsInLast12Months contramap CETransactionsInLast12Months.convert,
-          whichCurrencies = renewal.whichCurrencies contramap WhichCurrencies.convert,
-          fxTransactionsInNext12Months = renewal.fxTransactionsInLast12Months contramap FXTransactionsInLast12Months.convert
-        ))
+        Some(
+          msb.copy(
+            throughput = renewal.totalThroughput contramap TotalThroughput.convert,
+            transactionsInNext12Months =
+              renewal.transactionsInLast12Months contramap TransactionsInLast12Months.convert,
+            sendTheLargestAmountsOfMoney =
+              renewal.sendTheLargestAmountsOfMoney contramap SendTheLargestAmountsOfMoney.convert,
+            sendMoneyToOtherCountry = renewal.sendMoneyToOtherCountry contramap SendMoneyToOtherCountry.convert,
+            mostTransactions = renewal.mostTransactions contramap MostTransactions.convert,
+            ceTransactionsInNext12Months =
+              renewal.ceTransactionsInLast12Months contramap CETransactionsInLast12Months.convert,
+            whichCurrencies = renewal.whichCurrencies contramap WhichCurrencies.convert,
+            fxTransactionsInNext12Months =
+              renewal.fxTransactionsInLast12Months contramap FXTransactionsInLast12Months.convert
+          )
+        )
       }
 
       val hvdSection = request.hvdSection flatMap { hvd =>
-        Some(hvd.copy(
-          percentageOfCashPaymentOver15000 = renewal.percentageOfCashPaymentOver15000 contramap PercentageOfCashPaymentOver15000.convert,
-          receiveCashPayments = Some((renewal.receiveCashPayments contramap CashPayments.convert).isDefined),
-          cashPaymentMethods = renewal.receiveCashPayments flatMap CashPayments.convert
-        ))
+        Some(
+          hvd.copy(
+            percentageOfCashPaymentOver15000 =
+              renewal.percentageOfCashPaymentOver15000 contramap PercentageOfCashPaymentOver15000.convert,
+            receiveCashPayments = Some((renewal.receiveCashPayments contramap CashPayments.convert).isDefined),
+            cashPaymentMethods = renewal.receiveCashPayments flatMap CashPayments.convert
+          )
+        )
       }
 
       val ampSection: Option[Amp] = request.ampSection map { amp =>
         AMPTurnover.convert(renewal.ampTurnover, amp)
       }
-      request.copy(businessActivitiesSection = baSection, msbSection = msbSection, hvdSection = hvdSection, ampSection = ampSection)
+      request.copy(
+        businessActivitiesSection = baSection,
+        msbSection = msbSection,
+        hvdSection = hvdSection,
+        ampSection = ampSection
+      )
     }
   }
 

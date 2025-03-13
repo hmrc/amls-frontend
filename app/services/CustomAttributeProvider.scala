@@ -33,19 +33,20 @@ object CustomAttributeProvider {
   object CustomExtension extends HtmlRendererExtension {
     override def rendererOptions(mutableDataHolder: MutableDataHolder): Unit = {}
 
-    override def extend(builder: HtmlRenderer.Builder, s: String): Unit = builder.attributeProviderFactory(new AttributeProviderFactory{
-      override def getAfterDependents = null
+    override def extend(builder: HtmlRenderer.Builder, s: String): Unit =
+      builder.attributeProviderFactory(new AttributeProviderFactory {
+        override def getAfterDependents = null
 
-      override def getBeforeDependents = null
+        override def getBeforeDependents = null
 
-      override def affectsGlobalScope(): Boolean = true
+        override def affectsGlobalScope(): Boolean = true
 
-      override def apply(context: LinkResolverContext): AttributeProvider = CustomAttributeProvider
-    })
+        override def apply(context: LinkResolverContext): AttributeProvider = CustomAttributeProvider
+      })
   }
 
   object CustomAttributeProvider extends AttributeProvider {
-    override def setAttributes(node: Node, part: AttributablePart, attributes: MutableAttributes): Unit = {
+    override def setAttributes(node: Node, part: AttributablePart, attributes: MutableAttributes): Unit =
       if (node.isInstanceOf[BulletList]) {
         attributes.toMutable.replaceValue("class", "govuk-list govuk-list--bullet")
       } else if (node.isInstanceOf[Paragraph]) {
@@ -53,19 +54,18 @@ object CustomAttributeProvider {
       } else if (node.isInstanceOf[Heading]) {
         attributes.toMutable.replaceValue("class", "govuk-heading-l")
       }
-    }
 
   }
 
   def commonMark(rawEtmp: String): String = {
-    val markdown = rawEtmp.replace("<P>","\n").replace("</P>","\n\n").replace("<tab> "," ")
-    val options = new MutableDataSet
-    options.set[util.Collection[Extension]](Parser.EXTENSIONS, util.Arrays.asList({CustomExtension}))
+    val markdown = rawEtmp.replace("<P>", "\n").replace("</P>", "\n\n").replace("<tab> ", " ")
+    val options  = new MutableDataSet
+    options.set[util.Collection[Extension]](Parser.EXTENSIONS, util.Arrays.asList { CustomExtension })
     options.set(HtmlRenderer.SOFT_BREAK, "<br/>")
-    val parser = Parser.builder(options).build
+    val parser   = Parser.builder(options).build
     val document = parser.parse(markdown)
     val renderer = HtmlRenderer.builder(options).build
-    val html = renderer.render(document)
+    val html     = renderer.render(document)
     html
   }
 }

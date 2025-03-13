@@ -27,39 +27,36 @@ import views.html.asp.OtherBusinessTaxMattersView
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class OtherBusinessTaxMattersController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                  authAction: AuthAction,
-                                                  val ds: CommonPlayDependencies,
-                                                  val cc: MessagesControllerComponents,
-                                                  formProvider: OtherBusinessTaxMattersFormProvider,
-                                                  view: OtherBusinessTaxMattersView) extends AmlsBaseController(ds, cc) {
+class OtherBusinessTaxMattersController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: OtherBusinessTaxMattersFormProvider,
+  view: OtherBusinessTaxMattersView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      dataCacheConnector.fetch[Asp](request.credId, Asp.key) map {
-        response =>
-          val form = (for {
-            asp <- response
-            otherTax <- asp.otherBusinessTaxMatters
-          } yield formProvider().fill(otherTax)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    dataCacheConnector.fetch[Asp](request.credId, Asp.key) map { response =>
+      val form = (for {
+        asp      <- response
+        otherTax <- asp.otherBusinessTaxMatters
+      } yield formProvider().fill(otherTax)).getOrElse(formProvider())
+      Ok(view(form, edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           for {
             asp <- dataCacheConnector.fetch[Asp](request.credId, Asp.key)
-            _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
-              asp.otherBusinessTaxMatters(data)
-            )
+            _   <- dataCacheConnector.save[Asp](request.credId, Asp.key, asp.otherBusinessTaxMatters(data))
           } yield Redirect(routes.SummaryController.get)
       )
-    }
   }
 
 }

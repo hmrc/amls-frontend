@@ -35,35 +35,39 @@ import play.api.libs.json.{JsArray, Json, OFormat, Writes}
 import scala.collection.Seq
 
 case class SubscriptionRequest(
-                                businessMatchingSection: Option[BusinessMatching],
-                                eabSection: Option[Eab],
-                                tradingPremisesSection: Option[Seq[TradingPremises]],
-                                businessDetailsSection: Option[BusinessDetails],
-                                bankDetailsSection: Option[Seq[BankDetails]],
-                                aboutYouSection: Option[AddPerson],
-                                businessActivitiesSection: Option[BusinessActivities],
-                                responsiblePeopleSection: Option[Seq[ResponsiblePerson]],
-                                tcspSection: Option[Tcsp],
-                                aspSection: Option[Asp],
-                                msbSection: Option[MoneyServiceBusiness],
-                                hvdSection: Option[Hvd],
-                                ampSection: Option[Amp],
-                                supervisionSection: Option[Supervision]
-                              )
+  businessMatchingSection: Option[BusinessMatching],
+  eabSection: Option[Eab],
+  tradingPremisesSection: Option[Seq[TradingPremises]],
+  businessDetailsSection: Option[BusinessDetails],
+  bankDetailsSection: Option[Seq[BankDetails]],
+  aboutYouSection: Option[AddPerson],
+  businessActivitiesSection: Option[BusinessActivities],
+  responsiblePeopleSection: Option[Seq[ResponsiblePerson]],
+  tcspSection: Option[Tcsp],
+  aspSection: Option[Asp],
+  msbSection: Option[MoneyServiceBusiness],
+  hvdSection: Option[Hvd],
+  ampSection: Option[Amp],
+  supervisionSection: Option[Supervision]
+)
 
 object SubscriptionRequest {
 
-  implicit def tpSequenceWrites(implicit tradingPremisesWrites: Writes[TradingPremises]): Writes[Seq[TradingPremises]] = {
-    Writes(x => JsArray(x.filterNot(_ == TradingPremises()).map {
-      tp => tradingPremisesWrites.writes(tp)
-    }))
-  }
+  implicit def tpSequenceWrites(implicit tradingPremisesWrites: Writes[TradingPremises]): Writes[Seq[TradingPremises]] =
+    Writes(x =>
+      JsArray(x.filterNot(_ == TradingPremises()).map { tp =>
+        tradingPremisesWrites.writes(tp)
+      })
+    )
 
-  implicit def rpSequenceWrites(implicit responsiblePeopleWrites: Writes[ResponsiblePerson]): Writes[Seq[ResponsiblePerson]] = {
-    Writes(x => JsArray(x.filterNot(_ == ResponsiblePerson()).map {
-      rp => responsiblePeopleWrites.writes(rp)
-    }))
-  }
+  implicit def rpSequenceWrites(implicit
+    responsiblePeopleWrites: Writes[ResponsiblePerson]
+  ): Writes[Seq[ResponsiblePerson]] =
+    Writes(x =>
+      JsArray(x.filterNot(_ == ResponsiblePerson()).map { rp =>
+        responsiblePeopleWrites.writes(rp)
+      })
+    )
 
   implicit val format: OFormat[SubscriptionRequest] = Json.format[SubscriptionRequest]
 }

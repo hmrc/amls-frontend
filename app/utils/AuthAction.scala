@@ -31,22 +31,28 @@ import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
-final case class AuthorisedRequest[A](request: Request[A],
-                                      amlsRefNumber: Option[String],
-                                      credId: String,
-                                      affinityGroup: AffinityGroup,
-                                      enrolments: Enrolments,
-                                      accountTypeId: (String, String),
-                                      groupIdentifier: Option[String],
-                                      credentialRole: Option[CredentialRole]) extends WrappedRequest[A](request)
+final case class AuthorisedRequest[A](
+  request: Request[A],
+  amlsRefNumber: Option[String],
+  credId: String,
+  affinityGroup: AffinityGroup,
+  enrolments: Enrolments,
+  accountTypeId: (String, String),
+  groupIdentifier: Option[String],
+  credentialRole: Option[CredentialRole]
+) extends WrappedRequest[A](request)
 
 final case class enrolmentNotFound(msg: String = "enrolmentNotFound") extends AuthorisationException(msg)
 
-class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
-                                   applicationConfig: ApplicationConfig,
-                                   val parser: BodyParsers.Default,
-                                   headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter)
-                                  (implicit val executionContext: ExecutionContext) extends AuthAction with AuthorisedFunctions with Logging {
+class DefaultAuthAction @Inject() (
+  val authConnector: AuthConnector,
+  applicationConfig: ApplicationConfig,
+  val parser: BodyParsers.Default,
+  headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter
+)(implicit val executionContext: ExecutionContext)
+    extends AuthAction
+    with AuthorisedFunctions
+    with Logging {
 
   private val amlsKey       = "HMRC-MLR-ORG"
   private val amlsNumberKey = "MLRRefNumber"
@@ -54,7 +60,8 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
   private val ctKey         = "IR-CT"
 
   private lazy val unauthorisedUrl = URLEncoder.encode(
-    ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(applicationConfig).absoluteUrl, "utf-8"
+    ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(applicationConfig).absoluteUrl,
+    "utf-8"
   )
 
   def unauthorised = s"${applicationConfig.logoutUrl}?continue=$unauthorisedUrl"
@@ -67,66 +74,66 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
     authorised(authPredicate)
       .retrieve(
         Retrievals.allEnrolments and
-        Retrievals.credentials and
-        Retrievals.affinityGroup and
-        Retrievals.groupIdentifier and
-        Retrievals.credentialRole
+          Retrievals.credentials and
+          Retrievals.affinityGroup and
+          Retrievals.groupIdentifier and
+          Retrievals.credentialRole
       ) {
-      case enrolments ~ Some(credentials) ~ Some(affinityGroup) ~ groupIdentifier ~ credentialRole =>
-        // $COVERAGE-OFF$
-        logger.debug("DefaultAuthAction:Refine - Enrolments:" + enrolments)
-        // $COVERAGE-ON$
+        case enrolments ~ Some(credentials) ~ Some(affinityGroup) ~ groupIdentifier ~ credentialRole =>
+          // $COVERAGE-OFF$
+          logger.debug("DefaultAuthAction:Refine - Enrolments:" + enrolments)
+          // $COVERAGE-ON$
 
-        Future.successful(
-          Right(
-            AuthorisedRequest(
-              request = request,
-              amlsRefNumber = amlsRefNo(enrolments),
-              credId = credentials.providerId,
-              affinityGroup = affinityGroup,
-              enrolments = enrolments,
-              accountTypeId = accountTypeAndId(affinityGroup, enrolments, credentials.providerId),
-              groupIdentifier = groupIdentifier,
-              credentialRole = credentialRole
+          Future.successful(
+            Right(
+              AuthorisedRequest(
+                request = request,
+                amlsRefNumber = amlsRefNo(enrolments),
+                credId = credentials.providerId,
+                affinityGroup = affinityGroup,
+                enrolments = enrolments,
+                accountTypeId = accountTypeAndId(affinityGroup, enrolments, credentials.providerId),
+                groupIdentifier = groupIdentifier,
+                credentialRole = credentialRole
+              )
             )
           )
-        )
-      case _ =>
-        // $COVERAGE-OFF$
-        logger.debug("DefaultAuthAction:Refine - Non match (enrolments ~ Some(credentials) ~ Some(affinityGroup))")
-        // $COVERAGE-ON$
-        Future.successful(Left(Redirect(Call("GET", unauthorised))))
-    }.recover[Either[Result, AuthorisedRequest[A]]] {
-      case nas: NoActiveSession =>
-        logger.debug("DefaultAuthAction:Refine - NoActiveSession:" + nas)
-        Left(Redirect(Call("GET", signout)))
-      case ie: InsufficientEnrolments =>
-        logger.debug("DefaultAuthAction:Refine - InsufficientEnrolments:" + ie)
-        Left(Redirect(Call("GET", unauthorised)))
-      case icl: InsufficientConfidenceLevel =>
-        logger.debug("DefaultAuthAction:Refine - InsufficientConfidenceLevel:" + icl)
-        Left(Redirect(Call("GET", unauthorised)))
-      case uap: UnsupportedAuthProvider =>
-        logger.debug("DefaultAuthAction:Refine - UnsupportedAuthProvider:" + uap)
-        Left(Redirect(Call("GET", unauthorised)))
-      case uag: UnsupportedAffinityGroup =>
-        logger.debug("DefaultAuthAction:Refine - UnsupportedAffinityGroup:" + uag)
-        Left(Redirect(Call("GET", unauthorised)))
-      case ucr: UnsupportedCredentialRole =>
-        logger.debug("DefaultAuthAction:Refine - UnsupportedCredentialRole:" + ucr)
-        Left(Redirect(Call("GET", unauthorised)))
-      case enf: enrolmentNotFound =>
-        logger.debug("DefaultAuthAction:Refine - enrolmentNotFound:" + enf)
-        Left(Redirect(Call("GET", unauthorised)))
-      case e : AuthorisationException =>
-        logger.debug("DefaultAuthAction:Refine - AuthorisationException:" + e)
-        Left(Redirect(Call("GET", unauthorised)))
-    }
+        case _                                                                                       =>
+          // $COVERAGE-OFF$
+          logger.debug("DefaultAuthAction:Refine - Non match (enrolments ~ Some(credentials) ~ Some(affinityGroup))")
+          // $COVERAGE-ON$
+          Future.successful(Left(Redirect(Call("GET", unauthorised))))
+      }
+      .recover[Either[Result, AuthorisedRequest[A]]] {
+        case nas: NoActiveSession             =>
+          logger.debug("DefaultAuthAction:Refine - NoActiveSession:" + nas)
+          Left(Redirect(Call("GET", signout)))
+        case ie: InsufficientEnrolments       =>
+          logger.debug("DefaultAuthAction:Refine - InsufficientEnrolments:" + ie)
+          Left(Redirect(Call("GET", unauthorised)))
+        case icl: InsufficientConfidenceLevel =>
+          logger.debug("DefaultAuthAction:Refine - InsufficientConfidenceLevel:" + icl)
+          Left(Redirect(Call("GET", unauthorised)))
+        case uap: UnsupportedAuthProvider     =>
+          logger.debug("DefaultAuthAction:Refine - UnsupportedAuthProvider:" + uap)
+          Left(Redirect(Call("GET", unauthorised)))
+        case uag: UnsupportedAffinityGroup    =>
+          logger.debug("DefaultAuthAction:Refine - UnsupportedAffinityGroup:" + uag)
+          Left(Redirect(Call("GET", unauthorised)))
+        case ucr: UnsupportedCredentialRole   =>
+          logger.debug("DefaultAuthAction:Refine - UnsupportedCredentialRole:" + ucr)
+          Left(Redirect(Call("GET", unauthorised)))
+        case enf: enrolmentNotFound           =>
+          logger.debug("DefaultAuthAction:Refine - enrolmentNotFound:" + enf)
+          Left(Redirect(Call("GET", unauthorised)))
+        case e: AuthorisationException        =>
+          logger.debug("DefaultAuthAction:Refine - AuthorisationException:" + e)
+          Left(Redirect(Call("GET", unauthorised)))
+      }
   }
 
-  private def authPredicate = {
+  private def authPredicate =
     User and (AffinityGroup.Organisation or (Enrolment(saKey) or Enrolment(ctKey)))
-  }
 
   private def amlsRefNo(enrolments: Enrolments): Option[String] = {
     val amlsRefNumber = for {
@@ -136,21 +143,18 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
     amlsRefNumber
   }
 
-  private def getActiveEnrolment(enrolments: Enrolments, key: String) = {
+  private def getActiveEnrolment(enrolments: Enrolments, key: String) =
     /*
-    *  Look for activated enrolments only for SA and CT.
-    *  Enrolments can be 'Activated' or 'NotYetActivated'.
-    */
+     *  Look for activated enrolments only for SA and CT.
+     *  Enrolments can be 'Activated' or 'NotYetActivated'.
+     */
     enrolments.getEnrolment(key).filter(e => e.isActivated)
-  }
 
-  private def accountTypeAndId(affinityGroup: AffinityGroup,
-                               enrolments: Enrolments,
-                               credId: String): (String, String) = {
+  private def accountTypeAndId(affinityGroup: AffinityGroup, enrolments: Enrolments, credId: String): (String, String) =
     /*
-    * Set the `accountType` to `"org"` if `affinityGroup = "Organisation"` (which you get through retrievals)
-    * Set the `accountId` as a hash of the CredId. Its possible to get the `credId` through retrievals
-    */
+     * Set the `accountType` to `"org"` if `affinityGroup = "Organisation"` (which you get through retrievals)
+     * Set the `accountId` as a hash of the CredId. Its possible to get the `credId` through retrievals
+     */
 
     /*
      * For an affinity group other than Org;
@@ -162,8 +166,7 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
 
     affinityGroup match {
       case AffinityGroup.Organisation => ("org", UrlHelper.hash(credId))
-      case _ =>
-
+      case _                          =>
         val sa: Option[(String, String)] = for {
           enrolment <- getActiveEnrolment(enrolments, saKey)
           utr       <- enrolment.getIdentifier("UTR")
@@ -176,7 +179,6 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
 
         (sa orElse ct).getOrElse(throw new enrolmentNotFound)
     }
-  }
 }
 
 @com.google.inject.ImplementedBy(classOf[DefaultAuthAction])

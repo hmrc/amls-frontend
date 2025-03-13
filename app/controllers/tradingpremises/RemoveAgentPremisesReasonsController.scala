@@ -27,38 +27,39 @@ import views.html.tradingpremises.RemoveAgentPremisesReasonsView
 
 import scala.concurrent.Future
 
+class RemoveAgentPremisesReasonsController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: RemoveAgentPremisesReasonsFormProvider,
+  view: RemoveAgentPremisesReasonsView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
-class RemoveAgentPremisesReasonsController @Inject () (
-                                                        val dataCacheConnector: DataCacheConnector,
-                                                        val authAction: AuthAction,
-                                                        val ds: CommonPlayDependencies,
-                                                        val cc: MessagesControllerComponents,
-                                                        formProvider: RemoveAgentPremisesReasonsFormProvider,
-                                                        view: RemoveAgentPremisesReasonsView,
-                                                        implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+  def get(index: Int, complete: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    for {
+      tp <- getData[TradingPremises](request.credId, index)
+    } yield tp match {
+      case (Some(tradingPremises)) =>
+        val form = tradingPremises.removalReason.fold(formProvider())(reason =>
+          formProvider().fill(AgentRemovalReason(reason, tradingPremises.removalReasonOther))
+        )
+        Ok(view(form, index, complete))
 
-  def get(index: Int, complete: Boolean = false): Action[AnyContent] = authAction.async {
-      implicit request =>
-        for {
-          tp <- getData[TradingPremises](request.credId, index)
-        } yield tp match {
-          case (Some(tradingPremises)) =>
-            val form = tradingPremises.removalReason.fold(formProvider())(
-              reason => formProvider().fill(AgentRemovalReason(reason, tradingPremises.removalReasonOther))
-            )
-            Ok(view(form, index, complete))
-
-          case _ => NotFound(notFoundView)
-        }
+      case _ => NotFound(notFoundView)
+    }
   }
 
   def post(index: Int, complete: Boolean = false): Action[AnyContent] =
-    authAction.async {
-        implicit request =>
-          formProvider().bindFromRequest().fold(
-            formWithErrors => Future.successful(
-              BadRequest(view(formWithErrors, index, complete))),
-            data => updateDataStrict[TradingPremises](request.credId, index) {
+    authAction.async { implicit request =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, index, complete))),
+          data =>
+            updateDataStrict[TradingPremises](request.credId, index) {
               _.copy(
                 removalReason = Some(data.removalReason),
                 removalReasonOther = data.removalReasonOther
@@ -66,7 +67,7 @@ class RemoveAgentPremisesReasonsController @Inject () (
             } map { _ =>
               Redirect(controllers.tradingpremises.routes.RemoveTradingPremisesController.get(index, complete))
             }
-          )
+        )
     }
 
 }

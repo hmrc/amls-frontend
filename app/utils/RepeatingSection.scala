@@ -29,71 +29,75 @@ trait RepeatingSection {
 
   def dataCacheConnector: DataCacheConnector
 
-  def getData[T](cache: Cache, index: Int)
-                (implicit formats: Format[T], key: MongoKey[T]): Option[T] =
+  def getData[T](cache: Cache, index: Int)(implicit formats: Format[T], key: MongoKey[T]): Option[T] =
     getData[T](cache) match {
       case data if index > 0 && index <= data.length + 1 => data lift (index - 1)
-      case _ => None
+      case _                                             => None
     }
 
-  def getData[T](credId: String, index: Int)
-                (implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Option[T]] =
+  def getData[T](credId: String, index: Int)(implicit
+    formats: Format[T],
+    key: MongoKey[T],
+    ec: ExecutionContext
+  ): Future[Option[T]] =
     getData[T](credId) map {
       case data if index > 0 && index <= data.length + 1 => data lift (index - 1)
-      case _ => None
+      case _                                             => None
     }
 
-  def getData[T](cache: Cache)
-                (implicit formats: Format[T], key: MongoKey[T]): Seq[T] =
+  def getData[T](cache: Cache)(implicit formats: Format[T], key: MongoKey[T]): Seq[T] =
     cache.getEntry[Seq[T]](key()).fold(Seq.empty[T])(identity)
 
   def getData[T](credId: String)(implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Seq[T]] =
     dataCacheConnector.fetch[Seq[T]](credId, key()) map { _.fold(Seq.empty[T])(identity) }
 
-  def addData[T](credId:String, data: T)
-                (implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Int] =
+  def addData[T](credId: String, data: T)(implicit
+    formats: Format[T],
+    key: MongoKey[T],
+    ec: ExecutionContext
+  ): Future[Int] =
     getData[T](credId).flatMap { d =>
       if (!d.lastOption.contains(data)) {
-        putData(credId, d :+ data) map {
-          _ => d.size + 1
+        putData(credId, d :+ data) map { _ =>
+          d.size + 1
         }
       } else {
         Future.successful(d.size)
       }
     }
 
-  def fetchAllAndUpdateStrict[T](credId: String, index: Int)(fn: (Cache, T) => T)
-                                (implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Option[Cache]] =
+  def fetchAllAndUpdateStrict[T](credId: String, index: Int)(
+    fn: (Cache, T) => T
+  )(implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Option[Cache]] =
     dataCacheConnector.fetchAll(credId).flatMap {
-      _.map {
-        cacheMap =>
-          cacheMap.getEntry[Seq[T]](key()).map {
-            data =>
-              putData(credId, data.patch(index - 1, Seq(fn(cacheMap, data(index - 1))), 1))
-                .map(_ => Some(cacheMap))
-          }.getOrElse(Future.successful(Some(cacheMap)))
+      _.map { cacheMap =>
+        cacheMap
+          .getEntry[Seq[T]](key())
+          .map { data =>
+            putData(credId, data.patch(index - 1, Seq(fn(cacheMap, data(index - 1))), 1))
+              .map(_ => Some(cacheMap))
+          }
+          .getOrElse(Future.successful(Some(cacheMap)))
       }.getOrElse(Future.successful(None))
     }
 
-  protected def updateDataStrict[T](credId: String, index: Int)(fn: T => T)
-                                   (implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Cache] =
-    getData[T](credId) flatMap {
-      data => {
-        putData(credId, data.patch(index - 1, Seq(fn(data(index - 1))), 1))
-      }
+  protected def updateDataStrict[T](credId: String, index: Int)(
+    fn: T => T
+  )(implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Cache] =
+    getData[T](credId) flatMap { data =>
+      putData(credId, data.patch(index - 1, Seq(fn(data(index - 1))), 1))
     }
 
-  protected def removeDataStrict[T](credId: String, index: Int)
-                                   (implicit formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Cache] =
-    getData(credId) flatMap {
-      data => {
-        putData(credId, data.patch(index - 1, Nil, 1))
-      }
+  protected def removeDataStrict[T](credId: String, index: Int)(implicit
+    formats: Format[T],
+    key: MongoKey[T],
+    ec: ExecutionContext
+  ): Future[Cache] =
+    getData(credId) flatMap { data =>
+      putData(credId, data.patch(index - 1, Nil, 1))
     }
 
-  protected def putData[T](credId: String, data: Seq[T])
-                          (implicit formats: Format[T], key: MongoKey[T]): Future[Cache] =
+  protected def putData[T](credId: String, data: Seq[T])(implicit formats: Format[T], key: MongoKey[T]): Future[Cache] =
     dataCacheConnector.save[Seq[T]](credId, key(), data)
 
 }
-

@@ -24,20 +24,19 @@ import play.api.data.validation.{Constraint, Invalid, Valid}
 
 import javax.inject.Inject
 
-class RemoveBusinessActivitiesFormProvider @Inject()() extends Mappings {
+class RemoveBusinessActivitiesFormProvider @Inject() () extends Mappings {
 
   def apply(noOfActivities: Int): Form[Seq[BusinessActivity]] = {
 
-    def notAllActivitiesRemoved: Constraint[Seq[_]] = {
+    def notAllActivitiesRemoved: Constraint[Seq[_]] =
       Constraint {
         case seq if seq.size == 2 && seq.size == noOfActivities =>
           Invalid("error.required.bm.remove.leave.twobusinesses")
-        case seq if seq.size == noOfActivities =>
+        case seq if seq.size == noOfActivities                  =>
           Invalid("error.required.bm.remove.leave.one")
-        case _ =>
+        case _                                                  =>
           Valid
       }
-    }
 
     val error = if (noOfActivities > 2) {
       "error.required.bm.remove.service.multiple"

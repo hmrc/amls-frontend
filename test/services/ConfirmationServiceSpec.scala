@@ -43,7 +43,7 @@ import scala.concurrent.Future
 class ConfirmationServiceSpec extends AmlsSpec {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val cache = mock[Cache]
+  val cache              = mock[Cache]
 
   val service = new ConfirmationService(mockCacheConnector)
 

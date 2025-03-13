@@ -23,13 +23,14 @@ import play.api.data.Form
 class ComplexCorpStructureCreationFormProviderSpec extends BooleanFieldBehaviours[ComplexCorpStructureCreation] {
 
   override val form: Form[ComplexCorpStructureCreation] = new ComplexCorpStructureCreationFormProvider()()
-  override val fieldName: String = "complexCorpStructureCreation"
-  override val errorMessage: String = "error.required.tcsp.complex.corporate.structures"
+  override val fieldName: String                        = "complexCorpStructureCreation"
+  override val errorMessage: String                     = "error.required.tcsp.complex.corporate.structures"
 
   "ComplexCorpStructureCreationFormProvider" must {
 
     behave like booleanFieldWithModel(
-      ComplexCorpStructureCreationYes, ComplexCorpStructureCreationNo
+      ComplexCorpStructureCreationYes,
+      ComplexCorpStructureCreationNo
     )
   }
 }

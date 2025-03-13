@@ -24,16 +24,16 @@ import views.html.businessmatching.CheckCompanyIsNotRegisteredView
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class CheckCompanyController @Inject()(authAction: AuthAction,
-                                       val ds: CommonPlayDependencies,
-                                       val cc: MessagesControllerComponents,
-                                       view: CheckCompanyIsNotRegisteredView) extends AmlsBaseController(ds, cc) {
+class CheckCompanyController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  view: CheckCompanyIsNotRegisteredView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(): Action[AnyContent] = authAction {
-    implicit request =>
-      Ok(view())
+  def get(): Action[AnyContent] = authAction { implicit request =>
+    Ok(view())
   }
-
 
   def post(): Action[AnyContent] = authAction { _ =>
     Redirect(routes.SummaryController.get())

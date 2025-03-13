@@ -22,9 +22,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class RegisteredOfficeIsUKFormProvider @Inject()() extends BooleanFormProvider {
+class RegisteredOfficeIsUKFormProvider @Inject() () extends BooleanFormProvider {
 
   def apply(): Form[RegisteredOfficeIsUK] = createForm[RegisteredOfficeIsUK](
-    "isUK", "error.required.atb.registered.office.uk.or.overseas"
+    "isUK",
+    "error.required.atb.registered.office.uk.or.overseas"
   )(RegisteredOfficeIsUK(_), _.isUK)
 }

@@ -22,7 +22,7 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class ExpectedBusinessTurnoverFormProvider @Inject()() extends Mappings {
+class ExpectedBusinessTurnoverFormProvider @Inject() () extends Mappings {
 
   def apply(): Form[ExpectedBusinessTurnover] = Form(
     "expectedBusinessTurnover" -> enumerable[ExpectedBusinessTurnover]("error.required.ba.business.turnover")

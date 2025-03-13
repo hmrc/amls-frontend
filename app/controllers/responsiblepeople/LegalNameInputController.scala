@@ -28,41 +28,48 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class LegalNameInputController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                         authAction: AuthAction,
-                                         val ds: CommonPlayDependencies,
-                                         val cc: MessagesControllerComponents,
-                                         formProvider: LegalNameInputFormProvider,
-                                         view: LegalNameInputView,
-                                         implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class LegalNameInputController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  formProvider: LegalNameInputFormProvider,
+  view: LegalNameInputView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           (person.personName, person.legalName) match {
-            case (Some(name), Some(previousName)) => Ok(view(formProvider().fill(previousName), edit, index, flow, name.titleName))
-            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
-            case _ => NotFound(notFoundView)
+            case (Some(name), Some(previousName)) =>
+              Ok(view(formProvider().fill(previousName), edit, index, flow, name.titleName))
+            case (Some(name), _)                  => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _                                => NotFound(notFoundView)
           }
         }
       }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
-    implicit request => {
-      formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          },
-        data =>
-          updateDataStrict[ResponsiblePerson](request.credId, index)(_.legalName(data)).map { _ =>
-            Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
-          }.recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-          }
-      )
-    }
+    implicit request =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
+              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            },
+          data =>
+            updateDataStrict[ResponsiblePerson](request.credId, index)(_.legalName(data))
+              .map { _ =>
+                Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
+              }
+              .recoverWith { case _: IndexOutOfBoundsException =>
+                Future.successful(NotFound(notFoundView))
+              }
+        )
   }
 }

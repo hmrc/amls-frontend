@@ -31,20 +31,20 @@ import utils.AmlsSpec
 class AddressCreatedEventSpec extends AmlsSpec {
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/test-path")
-  implicit override val headerCarrier: HeaderCarrier = HeaderCarrier()
+  implicit override val headerCarrier: HeaderCarrier        = HeaderCarrier()
 
   "The AddressCreatedAuditEvent" must {
     "create the proper detail" when {
       "given an address of a responsible person in the UK" in {
 
-        val address = PersonAddressUK("Line 1", Some("Line 2"), "Line 3".some, None, "postcode")
-        val event = AddressCreatedEvent(address)
+        val address  = PersonAddressUK("Line 1", Some("Line 2"), "Line 3".some, None, "postcode")
+        val event    = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "Line 1",
           "addressLine2" -> "Line 2",
           "addressLine3" -> "Line 3",
-          "country" -> "GB",
-          "postCode" -> "postcode"
+          "country"      -> "GB",
+          "postCode"     -> "postcode"
         )
 
         event.detail mustBe expected
@@ -52,81 +52,98 @@ class AddressCreatedEventSpec extends AmlsSpec {
       }
 
       "given an address of a responsible person outside the UK" in {
-        val address = PersonAddressNonUK("Line 1", Some("Line 2"), "Line 3".some, None, Country("Norway", "NW"))
-        val event = AddressCreatedEvent(address)
+        val address  = PersonAddressNonUK("Line 1", Some("Line 2"), "Line 3".some, None, Country("Norway", "NW"))
+        val event    = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "Line 1",
           "addressLine2" -> "Line 2",
           "addressLine3" -> "Line 3",
-          "country" -> "Norway"
+          "country"      -> "Norway"
         )
 
         event.detail mustBe expected
       }
 
       "given the address of a trading premises" in {
-        val address = TradingPremisesAddress("TP Line 1", Some("TP Line 2"), "TP Line 3".some, None, "a post code")
-        val event = AddressCreatedEvent(address)
+        val address  = TradingPremisesAddress("TP Line 1", Some("TP Line 2"), "TP Line 3".some, None, "a post code")
+        val event    = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "TP Line 1",
           "addressLine2" -> "TP Line 2",
           "addressLine3" -> "TP Line 3",
-          "country" -> "GB",
-          "postCode" -> "a post code"
+          "country"      -> "GB",
+          "postCode"     -> "a post code"
         )
 
         event.detail mustBe expected
       }
 
       "given the address of a registered office in the UK" in {
-        val address = RegisteredOfficeUK("RO Line 1", Some("RO Line 2"), "RO Line 3".some, None, "a post code")
-        val event = AddressCreatedEvent(address)
+        val address  = RegisteredOfficeUK("RO Line 1", Some("RO Line 2"), "RO Line 3".some, None, "a post code")
+        val event    = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "RO Line 1",
           "addressLine2" -> "RO Line 2",
           "addressLine3" -> "RO Line 3",
-          "country" -> "GB",
-          "postCode" -> "a post code"
+          "country"      -> "GB",
+          "postCode"     -> "a post code"
         )
 
         event.detail mustBe expected
       }
 
       "given the address of a registered office outside the UK" in {
-        val address = RegisteredOfficeNonUK("RO Line 1", Some("RO Line 2"), "RO Line 3".some, None, Country("Albania", "AL"))
-        val event = AddressCreatedEvent(address)
+        val address  =
+          RegisteredOfficeNonUK("RO Line 1", Some("RO Line 2"), "RO Line 3".some, None, Country("Albania", "AL"))
+        val event    = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "RO Line 1",
           "addressLine2" -> "RO Line 2",
           "addressLine3" -> "RO Line 3",
-          "country" -> "Albania"
+          "country"      -> "Albania"
         )
 
         event.detail mustBe expected
       }
 
       "given a correspondence address in the UK" in {
-        val address = CorrespondenceAddressUk("not used", "not used", "CA Line 1", Some("CA Line 2"), "CA Line 3".some, None, "NE1 1ET")
-        val event = AddressCreatedEvent(address)
+        val address  = CorrespondenceAddressUk(
+          "not used",
+          "not used",
+          "CA Line 1",
+          Some("CA Line 2"),
+          "CA Line 3".some,
+          None,
+          "NE1 1ET"
+        )
+        val event    = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "CA Line 1",
           "addressLine2" -> "CA Line 2",
           "addressLine3" -> "CA Line 3",
-          "country" -> "GB",
-          "postCode" -> "NE1 1ET"
+          "country"      -> "GB",
+          "postCode"     -> "NE1 1ET"
         )
 
         event.detail mustBe expected
       }
 
       "given a correspondence address outside the UK" in {
-        val address = CorrespondenceAddressNonUk("not used", "not used", "CA Line 1", Some("CA Line 2"), "CA Line 3".some, None, Country("Finland", "FIN"))
-        val event = AddressCreatedEvent(address)
+        val address  = CorrespondenceAddressNonUk(
+          "not used",
+          "not used",
+          "CA Line 1",
+          Some("CA Line 2"),
+          "CA Line 3".some,
+          None,
+          Country("Finland", "FIN")
+        )
+        val event    = AddressCreatedEvent(address)
         val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "CA Line 1",
           "addressLine2" -> "CA Line 2",
           "addressLine3" -> "CA Line 3",
-          "country" -> "Finland"
+          "country"      -> "Finland"
         )
 
         event.detail mustBe expected

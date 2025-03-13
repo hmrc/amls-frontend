@@ -38,16 +38,18 @@ import scala.concurrent.Future
 class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
-    self => val request = addToken(authRequest)
-    lazy val view = inject[DateOfChangeView]
-    val controller = new RegisteredOfficeDateOfChangeController (
+    self =>
+    val request    = addToken(authRequest)
+    lazy val view  = inject[DateOfChangeView]
+    val controller = new RegisteredOfficeDateOfChangeController(
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = inject[DateOfChangeFormProvider],
-      view = view)
+      view = view
+    )
   }
 
   val emptyCache = Cache.empty
@@ -62,30 +64,35 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
 
       val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post().url)
         .withFormUrlEncodedBody(
-        "dateOfChange.year" -> "2010",
-        "dateOfChange.month" -> "10",
-        "dateOfChange.day" -> "01"
-      )
+          "dateOfChange.year"  -> "2010",
+          "dateOfChange.month" -> "10",
+          "dateOfChange.day"   -> "01"
+        )
 
-      val date = LocalDate.of(2010, 10, 1)
-      val office = RegisteredOfficeUK("305", Some("address line"), Some("address line2"), Some("address line3"), "AA1 1AA")
+      val date          = LocalDate.of(2010, 10, 1)
+      val office        =
+        RegisteredOfficeUK("305", Some("address line"), Some("address line2"), Some("address line3"), "AA1 1AA")
       val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(date)))
 
       val business = BusinessDetails(registeredOffice = Some(office), activityStartDate = Some(ActivityStartDate(date)))
 
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any())).
-        thenReturn(Future.successful(Some(business)))
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any()))
+        .thenReturn(Future.successful(Some(business)))
 
-      when(controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(any())).
-        thenReturn(Future.successful(mock[Cache]))
+      when(
+        controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(
+          any()
+        )
+      ).thenReturn(Future.successful(mock[Cache]))
 
       val result = controller.post()(postRequest)
 
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
       val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
-      verify(controller.dataCacheConnector).save[BusinessDetails](any(), eqTo(BusinessDetails.key), captor.capture())(any())
+      verify(controller.dataCacheConnector)
+        .save[BusinessDetails](any(), eqTo(BusinessDetails.key), captor.capture())(any())
 
       captor.getValue.registeredOffice match {
         case Some(savedOffice: RegisteredOfficeUK) => savedOffice must be(updatedOffice)
@@ -97,32 +104,42 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
 
       val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post().url)
         .withFormUrlEncodedBody(
-        "dateOfChange.year" -> "2005",
-        "dateOfChange.month" -> "04",
-        "dateOfChange.day" -> "26"
-      )
+          "dateOfChange.year"  -> "2005",
+          "dateOfChange.month" -> "04",
+          "dateOfChange.day"   -> "26"
+        )
 
       val date = LocalDate.of(2005, 4, 26)
 
-      val office = RegisteredOfficeNonUK("305", Some("address line"), Some("address line2"), Some("address line3"), Country("Finland", "FIN"))
+      val office = RegisteredOfficeNonUK(
+        "305",
+        Some("address line"),
+        Some("address line2"),
+        Some("address line3"),
+        Country("Finland", "FIN")
+      )
 
       val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(date)))
 
       val business = BusinessDetails(registeredOffice = Some(office), activityStartDate = Some(ActivityStartDate(date)))
 
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any())).
-        thenReturn(Future.successful(Some(business)))
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any()))
+        .thenReturn(Future.successful(Some(business)))
 
-      when(controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(any())).
-        thenReturn(Future.successful(mock[Cache]))
+      when(
+        controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(
+          any()
+        )
+      ).thenReturn(Future.successful(mock[Cache]))
 
       val result = controller.post()(postRequest)
 
-      status(result) must be(SEE_OTHER)
+      status(result)           must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
       val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
-      verify(controller.dataCacheConnector).save[BusinessDetails](any(), eqTo(BusinessDetails.key), captor.capture())(any())
+      verify(controller.dataCacheConnector)
+        .save[BusinessDetails](any(), eqTo(BusinessDetails.key), captor.capture())(any())
 
       captor.getValue.registeredOffice match {
         case Some(savedOffice: RegisteredOfficeNonUK) => savedOffice must be(updatedOffice)
@@ -133,8 +150,8 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
   "show the data of change form once again" when {
     "posted with invalid data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any())).
-        thenReturn(Future.successful(Some(BusinessDetails())))
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any()))
+        .thenReturn(Future.successful(Some(BusinessDetails())))
 
       val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post().url)
         .withFormUrlEncodedBody("invalid" -> "data")
@@ -148,23 +165,27 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
     "dateOfChange is earlier than Business Activities Start Date" in new Fixture {
       val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post().url)
         .withFormUrlEncodedBody(
-        "dateOfChange.year" -> "2010",
-        "dateOfChange.month" -> "10",
-        "dateOfChange.day" -> "01"
-      )
+          "dateOfChange.year"  -> "2010",
+          "dateOfChange.month" -> "10",
+          "dateOfChange.day"   -> "01"
+        )
 
-      val office = RegisteredOfficeUK("305", Some("address line"), Some("address line2"), Some("address line3"), "AA1 1AA")
+      val office =
+        RegisteredOfficeUK("305", Some("address line"), Some("address line2"), Some("address line3"), "AA1 1AA")
 
       val business = BusinessDetails(
         activityStartDate = Some(ActivityStartDate(LocalDate.of(2015, 10, 1))),
         registeredOffice = Some(office)
       )
 
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any())).
-        thenReturn(Future.successful(Some(business)))
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any()))
+        .thenReturn(Future.successful(Some(business)))
 
-      when(controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(any())).
-        thenReturn(Future.successful(mock[Cache]))
+      when(
+        controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(
+          any()
+        )
+      ).thenReturn(Future.successful(mock[Cache]))
 
       val result = controller.post()(postRequest)
       status(result) must be(BAD_REQUEST)

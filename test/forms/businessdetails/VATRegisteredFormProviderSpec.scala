@@ -29,7 +29,7 @@ class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours[VATRegistered
 
   override val form: Form[VATRegistered] = formProvider()
 
-  override val fieldName: String = "registeredForVAT"
+  override val fieldName: String    = "registeredForVAT"
   override val errorMessage: String = "error.required.atb.registered.for.vat"
 
   val inputFieldName: String = "vrnNumber"
@@ -42,37 +42,32 @@ class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours[VATRegistered
 
         val boundForm = form.bind(Map(fieldName -> "false"))
 
-        boundForm.value shouldBe Some(VATRegisteredNo)
+        boundForm.value  shouldBe Some(VATRegisteredNo)
         boundForm.errors shouldBe Nil
       }
 
       "'Yes' is submitted and a VAT number is given" in {
 
         forAll(numSequence(formProvider.length)) { vatNum =>
-
           val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> vatNum))
 
-          boundForm.value shouldBe Some(VATRegisteredYes(vatNum))
+          boundForm.value  shouldBe Some(VATRegisteredYes(vatNum))
           boundForm.errors shouldBe Nil
         }
       }
 
       "'Yes' is submitted with a VAT number which contains spaces" in {
 
-        val vatNum = " 1 2 34 5 6 78 9"
+        val vatNum               = " 1 2 34 5 6 78 9"
         val vatStringTransformed = "123456789"
 
+        val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> vatNum))
 
-          val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> vatNum))
-
-          boundForm.value shouldBe Some(VATRegisteredYes(vatStringTransformed))
-          boundForm.errors shouldBe Nil
-
+        boundForm.value  shouldBe Some(VATRegisteredYes(vatStringTransformed))
+        boundForm.errors shouldBe Nil
 
       }
     }
-
-
 
     "fail to bind and give the correct error" when {
 
@@ -98,8 +93,6 @@ class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours[VATRegistered
 
         boundForm.errors.headOption shouldBe Some(FormError(inputFieldName, "error.required.vat.number"))
       }
-
-
 
       "'Yes' is submitted with a VAT number" which {
         "is too long" in {

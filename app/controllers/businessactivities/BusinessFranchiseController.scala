@@ -26,23 +26,25 @@ import views.html.businessactivities.BusinessFranchiseNameView
 
 import scala.concurrent.Future
 
-class BusinessFranchiseController @Inject() (val authAction: AuthAction,
-                                             val ds: CommonPlayDependencies,
-                                             val cc: MessagesControllerComponents,
-                                             service: BusinessFranchiseService,
-                                             formProvider: BusinessFranchiseFormProvider,
-                                             view: BusinessFranchiseNameView) extends AmlsBaseController(ds, cc) {
+class BusinessFranchiseController @Inject() (
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  service: BusinessFranchiseService,
+  formProvider: BusinessFranchiseFormProvider,
+  view: BusinessFranchiseNameView
+) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-   implicit request =>
-     service.getBusinessFranchise(request.credId) map { franchiseOpt =>
-       Ok(view(franchiseOpt.fold(formProvider())(formProvider().fill), edit))
-     }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    service.getBusinessFranchise(request.credId) map { franchiseOpt =>
+      Ok(view(franchiseOpt.fold(formProvider())(formProvider().fill), edit))
+    }
   }
 
-  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request =>
-      formProvider().bindFromRequest().fold(
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
+    formProvider()
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data => service.updateBusinessFranchise(request.credId, data).map(_ => redirectTo(edit))
       )

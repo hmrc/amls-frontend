@@ -27,8 +27,8 @@ import views.html.renewal.TotalThroughputView
 
 class TotalThroughputViewSpec extends AmlsViewSpec with Matchers {
 
-  lazy val total_throughput = inject[TotalThroughputView]
-  lazy val fp = inject[TotalThroughputFormProvider]
+  lazy val total_throughput                                      = inject[TotalThroughputView]
+  lazy val fp                                                    = inject[TotalThroughputFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture {
@@ -55,8 +55,8 @@ class TotalThroughputViewSpec extends AmlsViewSpec with Matchers {
     }
 
     ExpectedThroughput.all.zipWithIndex foreach { case (selection, index) =>
-
-      val getElement = (doc: Document) => doc.select(s"""input[type="radio"][name="throughput"][value="${selection.toString}"]""")
+      val getElement =
+        (doc: Document) => doc.select(s"""input[type="radio"][name="throughput"][value="${selection.toString}"]""")
 
       s"display the radio button for selection ${selection.toString}" in new ViewFixture {
         Option(getElement(doc).first) mustBe defined
@@ -80,7 +80,6 @@ class TotalThroughputViewSpec extends AmlsViewSpec with Matchers {
       "renewal.msb.throughput.selection.required"
     )
 
-    behave like pageWithBackLink(total_throughput(fp(), false),
-    )
+    behave like pageWithBackLink(total_throughput(fp(), false))
   }
 }

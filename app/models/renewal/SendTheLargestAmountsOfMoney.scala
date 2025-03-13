@@ -19,7 +19,7 @@ package models.renewal
 import models.Country
 import play.api.libs.json.{Json, Reads, Writes}
 
-case class SendTheLargestAmountsOfMoney (countries: Seq[Country])
+case class SendTheLargestAmountsOfMoney(countries: Seq[Country])
 
 private sealed trait SendTheLargestAmountsOfMoney0 {
 
@@ -36,9 +36,9 @@ private sealed trait SendTheLargestAmountsOfMoney0 {
   val jsonW = Writes[SendTheLargestAmountsOfMoney] { lom =>
     lom.countries match {
       case Seq(a, b, c) => Json.obj("country_1" -> a, "country_2" -> b, "country_3" -> c)
-      case Seq(a, b) => Json.obj("country_1" -> a, "country_2" -> b)
-      case Seq(a) => Json.obj("country_1" -> a)
-      case _ => Json.obj()
+      case Seq(a, b)    => Json.obj("country_1" -> a, "country_2" -> b)
+      case Seq(a)       => Json.obj("country_1" -> a)
+      case _            => Json.obj()
     }
   }
 }
@@ -47,10 +47,9 @@ object SendTheLargestAmountsOfMoney {
 
   private object Cache extends SendTheLargestAmountsOfMoney0
 
-  implicit val jsonR: Reads[SendTheLargestAmountsOfMoney] = Cache.jsonR
+  implicit val jsonR: Reads[SendTheLargestAmountsOfMoney]  = Cache.jsonR
   implicit val jsonW: Writes[SendTheLargestAmountsOfMoney] = Cache.jsonW
 
-  implicit def convert(model: SendTheLargestAmountsOfMoney): models.moneyservicebusiness.SendTheLargestAmountsOfMoney = {
+  implicit def convert(model: SendTheLargestAmountsOfMoney): models.moneyservicebusiness.SendTheLargestAmountsOfMoney =
     models.moneyservicebusiness.SendTheLargestAmountsOfMoney(model.countries)
-  }
 }

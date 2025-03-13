@@ -32,13 +32,13 @@ import scala.concurrent.Future
 class ServicesOfBusinessDateOfChangeServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
   val mockCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[Cache]
+  val mockCacheMap       = mock[Cache]
 
   val service = new ServicesOfBusinessDateOfChangeService(mockCacheConnector)
 
   val cacheId = "123456"
 
-  val date = LocalDate.now()
+  val date              = LocalDate.now()
   val activityStartDate = ActivityStartDate(date)
 
   val asp = Asp().services(ServicesOfBusiness(Service.all.toSet))
@@ -62,7 +62,7 @@ class ServicesOfBusinessDateOfChangeServiceSpec extends AmlsSpec with BeforeAndA
           when(mockCacheMap.getEntry[Asp](eqTo(Asp.key))(any()))
             .thenReturn(Some(asp))
 
-          service.getModelWithDate(cacheId).futureValue mustBe((asp, Some(activityStartDate)))
+          service.getModelWithDate(cacheId).futureValue mustBe ((asp, Some(activityStartDate)))
         }
       }
 
@@ -79,7 +79,7 @@ class ServicesOfBusinessDateOfChangeServiceSpec extends AmlsSpec with BeforeAndA
           when(mockCacheMap.getEntry[Asp](eqTo(Asp.key))(any()))
             .thenReturn(Some(asp))
 
-          service.getModelWithDate(cacheId).futureValue mustBe((asp, None))
+          service.getModelWithDate(cacheId).futureValue mustBe ((asp, None))
         }
       }
 
@@ -96,7 +96,7 @@ class ServicesOfBusinessDateOfChangeServiceSpec extends AmlsSpec with BeforeAndA
           when(mockCacheMap.getEntry[Asp](eqTo(Asp.key))(any()))
             .thenReturn(None)
 
-          service.getModelWithDate(cacheId).futureValue mustBe((Asp(), None))
+          service.getModelWithDate(cacheId).futureValue mustBe ((Asp(), None))
         }
       }
     }

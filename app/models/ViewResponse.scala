@@ -34,22 +34,22 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
 case class ViewResponse(
-                         etmpFormBundleNumber:String,
-                         businessMatchingSection: BusinessMatching,
-                         eabSection: Option[Eab],
-                         tradingPremisesSection: Option[Seq[TradingPremises]],
-                         businessDetailsSection: BusinessDetails,
-                         bankDetailsSection: Seq[BankDetails],
-                         aboutYouSection: AddPerson,
-                         businessActivitiesSection: BusinessActivities,
-                         responsiblePeopleSection: Option[Seq[ResponsiblePerson]],
-                         tcspSection: Option[Tcsp],
-                         aspSection: Option[Asp],
-                         msbSection: Option[MoneyServiceBusiness],
-                         hvdSection: Option[Hvd],
-                         ampSection: Option[Amp],
-                         supervisionSection: Option[Supervision]
-                       )
+  etmpFormBundleNumber: String,
+  businessMatchingSection: BusinessMatching,
+  eabSection: Option[Eab],
+  tradingPremisesSection: Option[Seq[TradingPremises]],
+  businessDetailsSection: BusinessDetails,
+  bankDetailsSection: Seq[BankDetails],
+  aboutYouSection: AddPerson,
+  businessActivitiesSection: BusinessActivities,
+  responsiblePeopleSection: Option[Seq[ResponsiblePerson]],
+  tcspSection: Option[Tcsp],
+  aspSection: Option[Asp],
+  msbSection: Option[MoneyServiceBusiness],
+  hvdSection: Option[Hvd],
+  ampSection: Option[Amp],
+  supervisionSection: Option[Supervision]
+)
 
 object ViewResponse {
 
@@ -58,31 +58,30 @@ object ViewResponse {
   implicit val jsonWrites: OWrites[ViewResponse] = Json.writes[ViewResponse]
 
   def constructReads(
-                      etmpFormBundleNumber:String,
-                      businessMatchingSection: BusinessMatching,
-                      eabSection: Option[Eab],
-                      tradingPremisesSection: Option[Seq[TradingPremises]],
-                      businessDetailsSection: Option[BusinessDetails],
-                      oldBusinessDetailsSection: Option[BusinessDetails],
-                      bankDetailsSection: Seq[BankDetails],
-                      aboutYouSection: AddPerson,
-                      businessActivitiesSection: BusinessActivities,
-                      responsiblePeopleSection: Option[Seq[ResponsiblePerson]],
-                      tcspSection: Option[Tcsp],
-                      aspSection: Option[Asp],
-                      msbSection: Option[MoneyServiceBusiness],
-                      hvdSection: Option[Hvd],
-                      ampSection: Option[Amp],
-                      supervisionSection: Option[Supervision]
-                    ) =  {
+    etmpFormBundleNumber: String,
+    businessMatchingSection: BusinessMatching,
+    eabSection: Option[Eab],
+    tradingPremisesSection: Option[Seq[TradingPremises]],
+    businessDetailsSection: Option[BusinessDetails],
+    oldBusinessDetailsSection: Option[BusinessDetails],
+    bankDetailsSection: Seq[BankDetails],
+    aboutYouSection: AddPerson,
+    businessActivitiesSection: BusinessActivities,
+    responsiblePeopleSection: Option[Seq[ResponsiblePerson]],
+    tcspSection: Option[Tcsp],
+    aspSection: Option[Asp],
+    msbSection: Option[MoneyServiceBusiness],
+    hvdSection: Option[Hvd],
+    ampSection: Option[Amp],
+    supervisionSection: Option[Supervision]
+  ) = {
 
-    def readBusinessDetails = {
+    def readBusinessDetails =
       businessDetailsSection.getOrElse(
         oldBusinessDetailsSection.getOrElse(
           throw new Exception("[ViewResponse][constructReads] - Invalid Index (businessDetailsSection)")
         )
       )
-    }
 
     apply(
       etmpFormBundleNumber,
@@ -120,7 +119,7 @@ object ViewResponse {
       (__ \ "hvdSection").readNullable[Hvd] and
       (__ \ "ampSection").readNullable[Amp] and
       (__ \ "supervisionSection").readNullable[Supervision]
-    }.apply(ViewResponse.constructReads _)
+  }.apply(ViewResponse.constructReads _)
 
   implicit val formatOption: Reads[Option[ViewResponse]] = Reads.optionWithNull[ViewResponse]
 

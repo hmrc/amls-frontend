@@ -38,30 +38,33 @@ import views.html.tradingpremises.ConfirmAddressView
 
 import scala.concurrent.Future
 
-class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with TradingPremisesGenerator with BusinessMatchingGenerator {
+class ConfirmAddressControllerSpec
+    extends AmlsSpec
+    with MockitoSugar
+    with TradingPremisesGenerator
+    with BusinessMatchingGenerator {
 
   trait Fixture extends DependencyMocks {
     self =>
     val applicationReference = "SUIYD3274890384"
 
-    val request = addToken(authRequest)
+    val request                       = addToken(authRequest)
     val dataCache: DataCacheConnector = mockCacheConnector
-    val reviewDetails = mock[ReviewDetails]
-    val statusService = mock[StatusService]
-    val amls = mock[AmlsConnector]
-    lazy val view = app.injector.instanceOf[ConfirmAddressView]
-    val controller = new ConfirmAddressController(
+    val reviewDetails                 = mock[ReviewDetails]
+    val statusService                 = mock[StatusService]
+    val amls                          = mock[AmlsConnector]
+    lazy val view                     = app.injector.instanceOf[ConfirmAddressView]
+    val controller                    = new ConfirmAddressController(
       messagesApi,
       self.dataCache,
-      SuccessfulAuthAction, ds = commonDependencies,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
       statusService,
       amls,
       cc = mockMcc,
       app.injector.instanceOf[ConfirmAddressFormProvider],
       view = view
     )
-
-
 
     mockCacheFetchAll
   }
@@ -81,7 +84,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
 
           val result = controller.get(1)(request)
 
-          status(result) must be(OK)
+          status(result)          must be(OK)
           contentAsString(result) must include(Messages(bm.reviewDetails.get.businessAddress.line_1))
         }
       }
@@ -91,7 +94,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
           mockCacheGetEntry(None, BusinessMatching.key)
 
           val result = controller.get(1)(request)
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
         }
 
@@ -100,7 +103,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
 
           val result = controller.get(1)(request)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
         }
 
@@ -110,7 +113,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
 
           val result = controller.get(1)(request)
 
-          status(result) must be(SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
         }
       }
@@ -120,8 +123,10 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
 
       val safeId = "X87FUDIKJJKJH87364"
 
-      val businessAddress = Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB"))
-      val reviewDetailsModel = ReviewDetails("Business name from review details", Some(BusinessType.SoleProprietor), businessAddress, safeId)
+      val businessAddress        =
+        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB"))
+      val reviewDetailsModel     =
+        ReviewDetails("Business name from review details", Some(BusinessType.SoleProprietor), businessAddress, safeId)
       val bmWithNewReviewDetails = bm.copy(reviewDetails = Some(reviewDetailsModel))
 
       val ytp = (bmWithNewReviewDetails.reviewDetails map { rd =>
@@ -158,9 +163,9 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
           } thenReturn Future.successful(Some(safeId))
 
           val newRequest = FakeRequest(POST, routes.ConfirmAddressController.post(1).url)
-          .withFormUrlEncodedBody(
-            "confirmAddress" -> "true"
-          )
+            .withFormUrlEncodedBody(
+              "confirmAddress" -> "true"
+            )
 
           mockCacheGetEntry(Some(Seq(TradingPremises())), TradingPremises.key)
           mockCacheGetEntry(Some(model), BusinessMatching.key)
@@ -170,30 +175,31 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
 
           val result = controller.post(1)(newRequest)
 
-          status(result) must be (SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.ActivityStartDateController.get(1).url))
 
-          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
-            any(),
-            any(),
-            meq(Seq(TradingPremises(yourTradingPremises = Some(ytp)))))(any())
+          verify(controller.dataCacheConnector)
+            .save[Seq[TradingPremises]](any(), any(), meq(Seq(TradingPremises(yourTradingPremises = Some(ytp)))))(any())
 
         }
 
         "option is 'No' is selected confirming the mentioned address is the trading premises address" in new Fixture {
           val newRequest = FakeRequest(POST, routes.ConfirmAddressController.post(1).url)
-          .withFormUrlEncodedBody(
-            "confirmAddress" -> "false"
-          )
+            .withFormUrlEncodedBody(
+              "confirmAddress" -> "false"
+            )
 
-          mockCacheGetEntry(Some(Seq(TradingPremises(yourTradingPremises = Some(mock[YourTradingPremises])))), TradingPremises.key)
+          mockCacheGetEntry(
+            Some(Seq(TradingPremises(yourTradingPremises = Some(mock[YourTradingPremises])))),
+            TradingPremises.key
+          )
           mockCacheGetEntry(Some(bm), BusinessMatching.key)
 
           when(controller.dataCacheConnector.save(any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
-          status(result) must be (SEE_OTHER)
+          status(result)           must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
         }
 
@@ -201,7 +207,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
 
       "throw error message on not selecting the option" in new Fixture {
         val newRequest = FakeRequest(POST, routes.ConfirmAddressController.post(1).url)
-        .withFormUrlEncodedBody("" -> "")
+          .withFormUrlEncodedBody("" -> "")
 
         mockCacheFetch[BusinessMatching](Some(bm))
 

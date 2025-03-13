@@ -21,20 +21,20 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
-class BranchesOrAgentsSpec extends PlaySpec with Matchers{
+class BranchesOrAgentsSpec extends PlaySpec with Matchers {
 
   "MsbServices" must {
 
     "round trip through Json correctly" in {
       val model: BranchesOrAgents = BranchesOrAgents(
         BranchesOrAgentsHasCountries(true),
-        Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))))
+        Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB"))))
+      )
       Json.fromJson[BranchesOrAgents](Json.toJson(model)) mustBe JsSuccess(model)
     }
 
     "parse json correctly where no countries" in {
-      val model: BranchesOrAgents = BranchesOrAgents(
-        BranchesOrAgentsHasCountries(false), None)
+      val model: BranchesOrAgents = BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)
 
       val json = Json.obj(
         "hasCountries" -> false
@@ -51,7 +51,8 @@ class BranchesOrAgentsSpec extends PlaySpec with Matchers{
 
         BranchesOrAgents.update(
           BranchesOrAgents(BranchesOrAgentsHasCountries(true), None),
-          BranchesOrAgentsWhichCountries(Seq.empty)) mustBe BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)
+          BranchesOrAgentsWhichCountries(Seq.empty)
+        ) mustBe BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)
       }
     }
 
@@ -60,11 +61,12 @@ class BranchesOrAgentsSpec extends PlaySpec with Matchers{
 
         BranchesOrAgents.update(
           BranchesOrAgents(BranchesOrAgentsHasCountries(false), None),
-          BranchesOrAgentsWhichCountries(Seq(Country(name = "sadasd", code = "asdasd")))) mustBe BranchesOrAgents(
+          BranchesOrAgentsWhichCountries(Seq(Country(name = "sadasd", code = "asdasd")))
+        ) mustBe BranchesOrAgents(
           BranchesOrAgentsHasCountries(true),
-          Some(BranchesOrAgentsWhichCountries(Seq(Country(name = "sadasd", code = "asdasd")))))
+          Some(BranchesOrAgentsWhichCountries(Seq(Country(name = "sadasd", code = "asdasd"))))
+        )
       }
     }
   }
 }
-

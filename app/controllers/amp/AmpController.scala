@@ -28,33 +28,32 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ProxyCacheService
 import utils.AuthAction
 
-class AmpController @Inject()(proxyCacheService: ProxyCacheService,
-                              authAction: AuthAction,
-                              val cacheConnector : DataCacheConnector,
-                              val ds: CommonPlayDependencies,
-                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+class AmpController @Inject() (
+  proxyCacheService: ProxyCacheService,
+  authAction: AuthAction,
+  val cacheConnector: DataCacheConnector,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents
+) extends AmlsBaseController(ds, cc) {
 
   def get(credId: String): Action[AnyContent] = Action.async {
-      proxyCacheService.getAmp(credId).map {
-        _.map(Ok(_: JsValue)).getOrElse(NotFound)
-      }
-  }
-
-  def set(credId: String): Action[JsValue] = Action.async(parse.json) {
-    implicit request => {
-      proxyCacheService.setAmp(credId, request.body).map {
-        _ => {
-          Ok(Json.obj("_id" -> credId))
-        }
-      }
+    proxyCacheService.getAmp(credId).map {
+      _.map(Ok(_: JsValue)).getOrElse(NotFound)
     }
   }
 
-  def accept: Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        amp <- OptionT(cacheConnector.fetch[Amp](request.credId, Amp.key))
-        _ <- OptionT.liftF(cacheConnector.save[Amp](request.credId, Amp.key, amp.copy(hasAccepted = true)))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update AMP")
+  def set(credId: String): Action[JsValue] = Action.async(parse.json) { implicit request =>
+    proxyCacheService.setAmp(credId, request.body).map { _ =>
+      Ok(Json.obj("_id" -> credId))
+    }
+  }
+
+  def accept: Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      amp <- OptionT(cacheConnector.fetch[Amp](request.credId, Amp.key))
+      _   <- OptionT.liftF(cacheConnector.save[Amp](request.credId, Amp.key, amp.copy(hasAccepted = true)))
+    } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError(
+      "Could not update AMP"
+    )
   }
 }

@@ -28,13 +28,13 @@ class IsKnownByOtherNamesSpec extends PlaySpec with MockitoSugar {
 
       val json = Json.obj(
         "isKnownByOtherNames" -> true,
-        "otherfirstnames" -> "first",
-        "othermiddlenames" -> "middle",
-        "otherlastnames" -> "last"
+        "otherfirstnames"     -> "first",
+        "othermiddlenames"    -> "middle",
+        "otherlastnames"      -> "last"
       )
 
       IsKnownByOtherNames.jsonReads.reads(json) must
-        be(JsSuccess(IsKnownByOtherNamesYes("first", Some("middle"), "last"), JsPath ))
+        be(JsSuccess(IsKnownByOtherNamesYes("first", Some("middle"), "last"), JsPath))
     }
 
     "Write the json successfully from the InKnownByOtherNamesYes domain object created" in {
@@ -43,9 +43,9 @@ class IsKnownByOtherNamesSpec extends PlaySpec with MockitoSugar {
 
       val json = Json.obj(
         "isKnownByOtherNames" -> true,
-        "otherfirstnames" -> "first",
-        "othermiddlenames" -> "middle",
-        "otherlastnames" -> "last"
+        "otherfirstnames"     -> "first",
+        "othermiddlenames"    -> "middle",
+        "otherlastnames"      -> "last"
       )
 
       IsKnownByOtherNames.jsonWrites.writes(isKnownByOtherNamesYes) must be(json)

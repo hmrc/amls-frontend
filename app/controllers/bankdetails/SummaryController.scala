@@ -29,32 +29,32 @@ import views.html.bankdetails.CheckYourAnswersView
 import scala.concurrent.Future
 
 @Singleton
-class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                  val authAction: AuthAction,
-                                  val ds: CommonPlayDependencies,
-                                  val mcc: MessagesControllerComponents,
-                                  cyaHelper: CheckYourAnswersHelper,
-                                  view: CheckYourAnswersView) extends BankDetailsController(ds, mcc) {
+class SummaryController @Inject() (
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val mcc: MessagesControllerComponents,
+  cyaHelper: CheckYourAnswersHelper,
+  view: CheckYourAnswersView
+) extends BankDetailsController(ds, mcc) {
 
-  def get(index: Int): Action[AnyContent] = authAction.async {
-    implicit request =>
-      for {
-        bankDetails <- getData[BankDetails](request.credId, index)
-      } yield bankDetails match {
-        case Some(data) =>
-          val summaryList = cyaHelper.createSummaryList(bankDetails, index)
-          Ok(view(summaryList, index))
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+  def get(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    for {
+      bankDetails <- getData[BankDetails](request.credId, index)
+    } yield bankDetails match {
+      case Some(data) =>
+        val summaryList = cyaHelper.createSummaryList(bankDetails, index)
+        Ok(view(summaryList, index))
+      case _          => Redirect(controllers.routes.RegistrationProgressController.get())
+    }
   }
 
-  def post(index: Int): Action[AnyContent] = authAction.async {
-    implicit request =>
-      (for {
-        _ <- updateDataStrict[BankDetails](request.credId, index) { bd => bd.copy(hasAccepted = true) }
-      } yield Redirect(controllers.bankdetails.routes.YourBankAccountsController.get()))
-        .map(_.removingFromSession("itemIndex")) recoverWith {
-          case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
-        }
+  def post(index: Int): Action[AnyContent] = authAction.async { implicit request =>
+    (for {
+      _ <- updateDataStrict[BankDetails](request.credId, index)(bd => bd.copy(hasAccepted = true))
+    } yield Redirect(controllers.bankdetails.routes.YourBankAccountsController.get()))
+      .map(_.removingFromSession("itemIndex")) recoverWith { case _: Throwable =>
+      Future.successful(InternalServerError("Unable to save data and get redirect link"))
+    }
   }
 }

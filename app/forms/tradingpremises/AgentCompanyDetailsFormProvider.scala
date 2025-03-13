@@ -23,15 +23,15 @@ import play.api.data.Forms.mapping
 
 import javax.inject.Inject
 
-class AgentCompanyDetailsFormProvider @Inject()() extends Mappings {
+class AgentCompanyDetailsFormProvider @Inject() () extends Mappings {
 
-  val companyNameLength = 140
+  val companyNameLength   = 140
   val companyNumberLength = 8
 
-  val crnNumberRegex = "^[A-Z0-9]{8}$"
+  val crnNumberRegex                     = "^[A-Z0-9]{8}$"
   def apply(): Form[AgentCompanyDetails] = Form[AgentCompanyDetails](
     mapping(
-      "agentCompanyName" -> text("error.required.tp.agent.company.details").verifying(
+      "agentCompanyName"          -> text("error.required.tp.agent.company.details").verifying(
         firstError(
           maxLength(companyNameLength, "error.invalid.tp.agent.company.details"),
           regexp(basicPunctuationRegex, "error.invalid.char.tp.agent.company.details")

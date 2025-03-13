@@ -23,7 +23,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Actions, SummaryL
 
 import javax.inject.Inject
 
-class CheckYourAnswersHelper @Inject()() {
+class CheckYourAnswersHelper @Inject() () {
 
   def createSummaryList(bankDetails: BankDetails, index: Int)(implicit messages: Messages): SummaryList = {
     val rows = Seq(
@@ -34,8 +34,9 @@ class CheckYourAnswersHelper @Inject()() {
     SummaryList(rows)
   }
 
-  private def accountNameRow(bankDetails: BankDetails, index: Int)(implicit messages: Messages): Option[SummaryListRow] = {
-
+  private def accountNameRow(bankDetails: BankDetails, index: Int)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     bankDetails.accountName.map { accName =>
       row(
         "bankdetails.bankaccount.accountname.title",
@@ -47,9 +48,10 @@ class CheckYourAnswersHelper @Inject()() {
         )
       )
     }
-  }
 
-  private def accountTypeRow(bankDetails: BankDetails, index: Int)(implicit messages: Messages): Option[SummaryListRow] = {
+  private def accountTypeRow(bankDetails: BankDetails, index: Int)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     bankDetails.bankAccountType.map { bankAccountType =>
       row(
         "bankdetails.accounttype.title",
@@ -61,11 +63,12 @@ class CheckYourAnswersHelper @Inject()() {
         )
       )
     }
-  }
 
-  private def bankAccountRows(bankDetails: BankDetails, index: Int)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def bankAccountRows(bankDetails: BankDetails, index: Int)(implicit
+    messages: Messages
+  ): Option[Seq[SummaryListRow]] = {
 
-    def isUKRow(accountIsUk: Option[BankAccountIsUk]): Option[SummaryListRow] = {
+    def isUKRow(accountIsUk: Option[BankAccountIsUk]): Option[SummaryListRow] =
       accountIsUk map { isUK =>
         row(
           "bankdetails.bankaccount.accounttype.title",
@@ -77,9 +80,8 @@ class CheckYourAnswersHelper @Inject()() {
           )
         )
       }
-    }
 
-    def hasIBANRow(accountHasIBAN: Option[BankAccountHasIban]): Option[SummaryListRow] = {
+    def hasIBANRow(accountHasIBAN: Option[BankAccountHasIban]): Option[SummaryListRow] =
       accountHasIBAN map { hasIBAN =>
         row(
           "bankdetails.bankaccount.hasiban",
@@ -91,7 +93,6 @@ class CheckYourAnswersHelper @Inject()() {
           )
         )
       }
-    }
 
     def accountRows(account: Option[Account]): Option[Seq[SummaryListRow]] = account map {
       case account @ UKAccount(accountNumber, _) =>
@@ -115,63 +116,64 @@ class CheckYourAnswersHelper @Inject()() {
             )
           )
         )
-      case NonUKAccountNumber(accountNumber) => Seq(
-        row(
-          "bankdetails.bankaccount.accountnumber.nonuk.title",
-          accountNumber,
-          editAction(
-            controllers.bankdetails.routes.BankAccountNonUKController.get(index, true).url,
-            "bankdetails.checkYourAnswers.change.bankAccNo",
-            "nonukaccountnumber-edit"
+      case NonUKAccountNumber(accountNumber)     =>
+        Seq(
+          row(
+            "bankdetails.bankaccount.accountnumber.nonuk.title",
+            accountNumber,
+            editAction(
+              controllers.bankdetails.routes.BankAccountNonUKController.get(index, true).url,
+              "bankdetails.checkYourAnswers.change.bankAccNo",
+              "nonukaccountnumber-edit"
+            )
           )
         )
-      )
-      case NonUKIBANNumber(ibanNumber) => Seq(
-        row(
-          "bankdetails.bankaccount.iban.title",
-          ibanNumber,
-          editAction(
-            controllers.bankdetails.routes.BankAccountIbanController.get(index, true).url,
-            "bankdetails.checkYourAnswers.change.IBAN",
-            "ibannumber-edit"
+      case NonUKIBANNumber(ibanNumber)           =>
+        Seq(
+          row(
+            "bankdetails.bankaccount.iban.title",
+            ibanNumber,
+            editAction(
+              controllers.bankdetails.routes.BankAccountIbanController.get(index, true).url,
+              "bankdetails.checkYourAnswers.change.IBAN",
+              "ibannumber-edit"
+            )
           )
         )
-      )
     }
 
     for {
       bankAccount <- bankDetails.bankAccount
-    } yield {
-      Seq(
-        isUKRow(bankAccount.isUk),
-        hasIBANRow(bankAccount.hasIban)
-      ).flatten ++ accountRows(bankAccount.account).getOrElse(Nil)
-    }
+    } yield Seq(
+      isUKRow(bankAccount.isUk),
+      hasIBANRow(bankAccount.hasIban)
+    ).flatten ++ accountRows(bankAccount.account).getOrElse(Nil)
   }
 
-
-    private def booleanToLabel(bool: Boolean)(implicit messages: Messages): String = if (bool) {
+  private def booleanToLabel(bool: Boolean)(implicit messages: Messages): String = if (bool) {
     messages("lbl.yes")
   } else {
     messages("lbl.no")
   }
 
-  private def row(title: String, label: String, actions: Option[Actions])(implicit messages: Messages): SummaryListRow = {
+  private def row(title: String, label: String, actions: Option[Actions])(implicit messages: Messages): SummaryListRow =
     SummaryListRow(
       Key(Text(messages(title))),
       Value(Text(label)),
       actions = actions
     )
-  }
 
-  private def editAction(route: String, hiddenText: String, id: String)(implicit messages: Messages): Option[Actions] = {
-    Some(Actions(
-      items = Seq(ActionItem(
-        route,
-        Text(messages("button.edit")),
-        visuallyHiddenText = Some(messages(hiddenText)),
-        attributes = Map("id" -> id)
-      ))
-    ))
-  }
+  private def editAction(route: String, hiddenText: String, id: String)(implicit messages: Messages): Option[Actions] =
+    Some(
+      Actions(
+        items = Seq(
+          ActionItem(
+            route,
+            Text(messages("button.edit")),
+            visuallyHiddenText = Some(messages(hiddenText)),
+            attributes = Map("id" -> id)
+          )
+        )
+      )
+    )
 }
