@@ -20,12 +20,13 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import models.deregister.DeregistrationReason
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AuthAction, BusinessName}
+import utils.{AuthAction, AuthorisedRequest, BusinessName}
 import views.html.deregister.DeregistrationConfirmationView
-
 import javax.inject.Inject
+import scala.concurrent.Future
 
 class DeregistrationConfirmationController @Inject() (
   authAction: AuthAction,
@@ -42,16 +43,22 @@ class DeregistrationConfirmationController @Inject() (
   def get: Action[AnyContent] = authAction.async { implicit request =>
     val okResult = for {
       amlsRefNumber <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+
       status        <- OptionT.liftF(statusService.getReadStatus(amlsRefNumber, request.accountTypeId))
+      key           <- fetchDeregistrationReason
       businessName  <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
     } yield Ok(
       view(
+        dynamicKey = key.value,
         businessName = businessName,
         amlsRefNumber = amlsRefNumber
       )
     )
-
     okResult getOrElse InternalServerError("Unable to get Deregistration confirmation")
   }
+
+  private def fetchDeregistrationReason()(implicit request: AuthorisedRequest[AnyContent]) = OptionT[Future, DeregistrationReason](
+    dataCacheConnector.fetch[DeregistrationReason](request.credId, DeregistrationReason.key)
+  )
 
 }

@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.SessionKeys
 
 trait AuthorisedFixture extends MockitoSugar {
 
-  var authConnector = mock[AuthConnector]
+  val authConnector = mock[AuthConnector]
 
   val authRequest              = FakeRequest().withSession(
     SessionKeys.sessionId -> "SessionId",

@@ -29,7 +29,8 @@ class DeregistrationConfirmationViewSpec extends AmlsViewSpec {
 
     val deregistrationConfirmationView                    = inject[DeregistrationConfirmationView]
     implicit val request: Request[AnyContentAsEmpty.type] = addTokenForView()
-    def view: Html                                        = deregistrationConfirmationView("Acme Production LTD", "XBML00000567890")
+
+    def view: Html                                        = deregistrationConfirmationView("01", "Acme Production LTD", "XBML00000567890")
 
     val content: String = doc.text()
     content must include("You have deregistered")
@@ -40,7 +41,7 @@ class DeregistrationConfirmationViewSpec extends AmlsViewSpec {
       "You have deregistered from your supervision with HMRC under the Anti-Money Laundering Supervision."
     )
     content must include(
-      "Your given reason for doing so is: Business is not trading in its own right because it is now an agent of a money service business."
+      "Your given reason for doing so is: Business is out of scope as no longer carrying out activities covered by the Money Laundering Regulations"
     )
     content must include("You can re-register for supervision from your registration page.")
     content must include("Print this page")
