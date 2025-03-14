@@ -1621,6 +1621,7 @@ businessmatching.businessType.lbl.04 = Limited partnership or limited liability 
 businessmatching.businessType.lbl.05 = Unincorporated association or trust
 businessmatching.businessType.error = Select your business structure
 businessmatching.registerservices.title = Which services do you need to register?
+businessmatching.registerservices.cya.lbl = Services you are registering
 businessmatching.registerservices.other.title = What other service do you need to register?
 businessmatching.registerservices.details = What these services mean
 
@@ -1673,6 +1674,7 @@ businessmatching.registrationnumber.lbl = Company registration number
 businessmatching.registrationnumber.line_1 = You can
 businessmatching.registrationnumber.line_2 = search Companies House for your company registration number (opens in new tab)
 businessmatching.typeofbusiness.title = What type of unincorporated association or trust are you registering?
+businessmatching.typeofbusiness.cya.lbl = Type of unincorporated association or trust you are registering
 businessmatching.typeofbusiness.lbl = Type of business
 businessmatching.typeofbusiness.lbl.hint = For example, association, charity, trust.
 businessmatching.psr.number.title = Does your business have a Payment Services Regulations (PSR) registration number?
@@ -1696,6 +1698,7 @@ businessmatching.checkYourAnswers.change.PSRReg = your business’s PSR registra
 
 businessmatching.summary.noedit.anchortext = Return to about your business
 businessmatching.services.title = Which money service business activities does your business carry out?
+businessmatching.services.cya.lbl = Money service business activities your business carries out
 businessmatching.services.list.heading = Select all that apply
 businessmatching.services.list.lbl.01 = Transmitting money
 businessmatching.services.list.lbl.02 = Currency exchange

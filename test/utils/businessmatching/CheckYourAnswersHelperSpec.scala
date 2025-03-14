@@ -117,7 +117,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             .lift(registrationTypeIndex)
             .getOrElse(failIfEmpty)
 
-          result.key.toString must include(messages("businessmatching.registrationnumber.title"))
+          result.key.toString must include(messages("businessmatching.registrationnumber.lbl"))
 
           result.value.toString must include(companyRegistrationNumberModel.companyRegistrationNumber)
         }
@@ -137,7 +137,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             .lift(registrationTypeIndex)
             .getOrElse(failIfEmpty)
 
-          result.key.toString must include(messages("businessmatching.registrationnumber.title"))
+          result.key.toString must include(messages("businessmatching.registrationnumber.lbl"))
 
           result.value.toString must include(companyRegistrationNumberModel.companyRegistrationNumber)
         }
@@ -162,7 +162,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             .lift(registrationTypeIndex)
             .getOrElse(failIfEmpty)
 
-          result.key.toString must include(messages("businessmatching.typeofbusiness.title"))
+          result.key.toString must include(messages("businessmatching.typeofbusiness.cya.lbl"))
 
           result.value.toString must include(typeOfBusinessModel.typeOfBusiness)
         }
@@ -192,7 +192,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
               .lift(registeredServicesIndex)
               .getOrElse(failIfEmpty)
 
-            result.key.toString must include(messages("businessmatching.registerservices.title"))
+            result.key.toString must include(messages("businessmatching.registerservices.cya.lbl"))
 
             result.value.toString must include(
               messages(s"businessmatching.registerservices.servicename.lbl.${HighValueDealing.value}")
@@ -213,7 +213,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
               .lift(registeredServicesIndex)
               .getOrElse(failIfEmpty)
 
-            result.key.toString must include(messages("businessmatching.registerservices.title"))
+            result.key.toString must include(messages("businessmatching.registerservices.cya.lbl"))
 
             result.value.toString must include(
               messages(s"businessmatching.registerservices.servicename.lbl.${HighValueDealing.value}")
@@ -242,7 +242,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
               .lift(registeredServicesIndex)
               .getOrElse(failIfEmpty)
 
-            result.key.toString must include(messages("businessmatching.registerservices.title"))
+            result.key.toString must include(messages("businessmatching.registerservices.cya.lbl"))
 
             result.value.toString must include(
               messages(s"businessmatching.registerservices.servicename.lbl.${HighValueDealing.value}")
@@ -272,7 +272,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
               .lift(registeredServicesIndex)
               .getOrElse(failIfEmpty)
 
-            result.key.toString must include(messages("businessmatching.registerservices.title"))
+            result.key.toString must include(messages("businessmatching.registerservices.cya.lbl"))
 
             businessActivitiesModel.businessActivities foreach { activity =>
               result.value.toString must include(
@@ -295,7 +295,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
               .lift(registeredServicesIndex)
               .getOrElse(failIfEmpty)
 
-            result.key.toString must include(messages("businessmatching.registerservices.title"))
+            result.key.toString must include(messages("businessmatching.registerservices.cya.lbl"))
 
             businessActivitiesModel.businessActivities foreach { activity =>
               result.value.toString must include(
@@ -322,7 +322,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
               .lift(registeredServicesIndex)
               .getOrElse(failIfEmpty)
 
-            result.key.toString must include(messages("businessmatching.registerservices.title"))
+            result.key.toString must include(messages("businessmatching.registerservices.cya.lbl"))
 
             businessActivitiesModel.businessActivities foreach { activity =>
               result.value.toString must include(
@@ -360,7 +360,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
               .lift(msbActivitiesIndex)
               .getOrElse(failIfEmpty)
 
-            result.key.toString must include(messages("businessmatching.services.title"))
+            result.key.toString must include(messages("businessmatching.services.cya.lbl"))
 
             result.value.toString must include(
               messages(s"businessmatching.services.list.lbl.${TransmittingMoney.value}")
@@ -381,7 +381,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
               .lift(msbActivitiesIndex)
               .getOrElse(failIfEmpty)
 
-            result.key.toString must include(messages("businessmatching.services.title"))
+            result.key.toString must include(messages("businessmatching.services.cya.lbl"))
 
             result.value.toString must include(
               messages(s"businessmatching.services.list.lbl.${TransmittingMoney.value}")
@@ -412,7 +412,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
               .lift(msbActivitiesIndex)
               .getOrElse(failIfEmpty)
 
-            result.key.toString must include(messages("businessmatching.services.title"))
+            result.key.toString must include(messages("businessmatching.services.cya.lbl"))
 
             msbServices.msbServices foreach { msbService =>
               result.value.toString must include(messages(s"businessmatching.services.list.lbl.${msbService.value}"))
@@ -433,7 +433,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
               .lift(msbActivitiesIndex)
               .getOrElse(failIfEmpty)
 
-            result.key.toString must include(messages("businessmatching.services.title"))
+            result.key.toString must include(messages("businessmatching.services.cya.lbl"))
 
             msbServices.msbServices foreach { msbService =>
               result.value.toString must include(messages(s"businessmatching.services.list.lbl.${msbService.value}"))
