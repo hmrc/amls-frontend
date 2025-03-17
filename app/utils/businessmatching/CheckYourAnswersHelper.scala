@@ -99,7 +99,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
       case BusinessType.LPrLLP | BusinessType.LimitedCompany =>
         businessMatching.companyRegistrationNumber map { regNumber =>
           SummaryListRow(
-            Key(Text(messages("businessmatching.registrationnumber.title"))),
+            Key(Text(messages("businessmatching.registrationnumber.lbl"))),
             Value(Text(regNumber.companyRegistrationNumber), "registration-number"),
             actions = Some(
               Actions(
@@ -118,7 +118,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
       case BusinessType.UnincorporatedBody                   =>
         businessMatching.typeOfBusiness map { businessType =>
           SummaryListRow(
-            Key(Text(messages("businessmatching.typeofbusiness.title"))),
+            Key(Text(messages("businessmatching.typeofbusiness.cya.lbl"))),
             Value(Text(businessType.typeOfBusiness), "type-of-business"),
             actions = if (isPreSubmission) {
               Some(
@@ -156,7 +156,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
       case Some(values) =>
         Some(
           SummaryListRow(
-            key = Key(Text(messages("businessmatching.registerservices.title"))),
+            key = Key(Text(messages("businessmatching.registerservices.cya.lbl"))),
             value = Value(values),
             actions = if (!isPending) {
               Some(
@@ -199,7 +199,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
       case Some(values) =>
         Some(
           SummaryListRow(
-            key = Key(Text(messages("businessmatching.services.title"))),
+            key = Key(Text(messages("businessmatching.services.cya.lbl"))),
             value = Value(values),
             actions = if (!isPending) {
               Some(
