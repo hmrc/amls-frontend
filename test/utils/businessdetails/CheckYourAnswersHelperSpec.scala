@@ -169,7 +169,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
 
         assertRowMatches(
           1,
-          "businessdetails.activity.start.date.title",
+          "businessdetails.activity.start.date.cya.lbl",
           DateHelper.formatDate(startDate),
           controllers.businessdetails.routes.ActivityStartDateController.get(true).url,
           "businessdetailsactivitystartdate-edit"
@@ -230,7 +230,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
 
           assertRowMatches(
             5,
-            "businessdetails.registeredoffice.where.title",
+            "businessdetails.registeredoffice.where.cya.lbl",
             addressToLines(model.registeredOffice.value.toLines).content.toString,
             controllers.businessdetails.routes.RegisteredOfficeUKController.get(true).url,
             "businessdetailsregoffice-edit"
@@ -270,7 +270,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
 
           assertRowMatches(
             5,
-            "businessdetails.registeredoffice.where.title",
+            "businessdetails.registeredoffice.where.cya.lbl",
             addressToLines(address).content.toString,
             controllers.businessdetails.routes.RegisteredOfficeNonUKController.get(true).url,
             "businessdetailsregoffice-edit"
@@ -288,7 +288,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
 
         assertRowMatches(
           6,
-          "businessdetails.contactingyou.email.title",
+          "businessdetails.contactingyou.email.cya.lbl",
           email,
           controllers.businessdetails.routes.BusinessEmailAddressController.get(true).url,
           "businessdetailscontactyou-edit"
@@ -296,7 +296,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
 
         assertRowMatches(
           7,
-          "businessdetails.contactingyou.phone.title",
+          "businessdetails.contactingyou.phone.cya.lbl",
           phoneNo,
           controllers.businessdetails.routes.ContactingYouPhoneController.get(true).url,
           "businessdetailscontactphone-edit"
@@ -345,7 +345,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
 
           assertRowMatches(
             10,
-            "businessdetails.correspondenceaddress.title",
+            "businessdetails.correspondenceaddress.cya.lbl",
             addressToLines(model.correspondenceAddress.flatMap(_.ukAddress).value.toLines).content.toString,
             controllers.businessdetails.routes.CorrespondenceAddressUkController.get(true).url,
             "businessdetailscorraddress-edit"
@@ -390,7 +390,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
 
           assertRowMatches(
             10,
-            "businessdetails.correspondenceaddress.title",
+            "businessdetails.correspondenceaddress.cya.lbl",
             addressToLines(nonUkAddress.toLines).content.toString,
             controllers.businessdetails.routes.CorrespondenceAddressNonUkController.get(true).url,
             "businessdetailscorraddress-edit"
