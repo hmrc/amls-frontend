@@ -81,7 +81,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
   )(implicit messages: Messages): Option[SummaryListRow] =
     businessDetails.activityStartDate map { activityStartDate =>
       row(
-        "businessdetails.activity.start.date.title",
+        "businessdetails.activity.start.date.cya.lbl",
         DateHelper.formatDate(activityStartDate.startDate),
         Some(
           Actions(
@@ -138,7 +138,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
           ),
           SummaryListRow(
             Key(
-              Text(messages("businessdetails.registeredoffice.where.title"))
+              Text(messages("businessdetails.registeredoffice.where.cya.lbl"))
             ),
             addressToLines(ukAddress.toLines),
             actions = editAction(
@@ -158,7 +158,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
           ),
           SummaryListRow(
             Key(
-              Text(messages("businessdetails.registeredoffice.where.title"))
+              Text(messages("businessdetails.registeredoffice.where.cya.lbl"))
             ),
             addressToLines(nonUkAddress.toLines),
             actions = editAction(
@@ -180,7 +180,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
       phoneNumber   <- contactingYou.phoneNumber
     } yield Seq(
       row(
-        "businessdetails.contactingyou.email.title",
+        "businessdetails.contactingyou.email.cya.lbl",
         email,
         editAction(
           controllers.businessdetails.routes.BusinessEmailAddressController.get(true).url,
@@ -189,7 +189,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
         )
       ),
       row(
-        "businessdetails.contactingyou.phone.title",
+        "businessdetails.contactingyou.phone.cya.lbl",
         phoneNumber,
         editAction(
           controllers.businessdetails.routes.ContactingYouPhoneController.get(true).url,
@@ -232,7 +232,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
             addressIsUKRow("businessdetails.correspondenceaddress.ukAddress"),
             SummaryListRow(
               Key(
-                Text(messages("businessdetails.correspondenceaddress.title"))
+                Text(messages("businessdetails.correspondenceaddress.cya.lbl"))
               ),
               addressToLines(address.toLines),
               actions = editAction(
@@ -250,7 +250,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
             addressIsUKRow("businessdetails.correspondenceaddress.nonUkAddress"),
             SummaryListRow(
               Key(
-                Text(messages("businessdetails.correspondenceaddress.title"))
+                Text(messages("businessdetails.correspondenceaddress.cya.lbl"))
               ),
               addressToLines(address.toLines),
               actions = editAction(
