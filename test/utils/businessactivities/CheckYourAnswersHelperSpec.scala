@@ -128,7 +128,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
           assertRowMatches(
             involvedInOthersDetailIndex,
-            messages("businessactivities.confirm-activities.lbl.details"),
+            messages("businessactivities.confirm-activities.cya.lbl"),
             BusinessActivitiesValues.defaultInvolvedInOtherDetails,
             controllers.businessactivities.routes.InvolvedInOtherController.get(true).url,
             "involvedinotherdetails-edit"
@@ -142,7 +142,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
           assertRowMatches(
             expectedBusinessTurnoverIndex,
-            messages("businessactivities.business-turnover.title"),
+            messages("businessactivities.business-turnover.cya"),
             messages(s"businessactivities.turnover.lbl.${BusinessActivitiesValues.defaultBusinessTurnover.value}"),
             controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true).url,
             "expectedbusinessturnover-edit"
@@ -252,7 +252,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
           assertRowMatches(
             transactionTypesIndex,
-            messages("businessactivities.do.keep.records"),
+            messages("businessactivities.do.keep.records.cya"),
             "<ul class=\"govuk-list govuk-list--bullet\">" +
               BusinessActivitiesValues.defaultTransactionRecordTypes.types.map { x =>
                 "<li>" + messages(s"businessactivities.transactiontype.lbl.${x.value}") + "</li>"
@@ -339,7 +339,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
             .lift(riskAssessmentTypesIndex)
             .getOrElse(fail(s"Row for index $riskAssessmentTypesIndex does not exist"))
 
-          result.key.toString must include(messages("businessactivities.document.riskassessment.policy.title"))
+          result.key.toString must include(messages("businessactivities.document.riskassessment.policy.cya"))
 
           result.value.toString must include(
             "<ul class=\"govuk-list govuk-list--bullet\">" +
@@ -360,7 +360,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
           assertRowMatches(
             riskAssessmentTypesIndex,
-            messages("businessactivities.document.riskassessment.policy.title"),
+            messages("businessactivities.document.riskassessment.policy.cya"),
             messages(s"businessactivities.RiskAssessmentType.lbl.${PaperBased.value}"),
             controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).url,
             "documentriskassessment-edit"
@@ -402,7 +402,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
             .lift(accountantNameIndex)
             .getOrElse(fail(s"Row for index $accountantNameIndex does not exist"))
 
-          result.key.toString must include(messages("businessactivities.whoisyouraccountant.title"))
+          result.key.toString must include(messages("businessactivities.whoisyouraccountant.cya"))
 
           result.value.toString must include(name)
 
@@ -417,7 +417,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
           assertRowMatches(
             accountantNameIndex,
-            messages("businessactivities.whoisyouraccountant.title"),
+            messages("businessactivities.whoisyouraccountant.cya"),
             s"""<ul class="govuk-list"><li>Name: ${names.accountantsName}</li>""" +
               s"""<li>Trading name: ${names.accountantsTradingName.get}</li></ul>""",
             controllers.businessactivities.routes.WhoIsYourAccountantNameController.get(true).url,
@@ -442,7 +442,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
           assertRowMatches(
             accountantAddressIndex,
-            messages("businessactivities.whoisyouraccountant.address.header", names.accountantsName),
+            messages("businessactivities.whoisyouraccountant.address.cya", names.accountantsName),
             "<ul class=\"govuk-list\">" +
               address.toLines.map { line =>
                 s"""<li>$line<li>"""
@@ -479,7 +479,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
             .getOrElse(fail(s"Row for index $accountantAddressIndex does not exist"))
 
           result.key.toString must include(
-            messages("businessactivities.whoisyouraccountant.address.header", names.accountantsName)
+            messages("businessactivities.whoisyouraccountant.address.cya", names.accountantsName)
           )
 
           result.value.toString must include(

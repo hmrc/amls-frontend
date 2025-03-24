@@ -80,7 +80,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
             yesNoEditAction
           ),
           row(
-            "businessactivities.confirm-activities.lbl.details",
+            "businessactivities.confirm-activities.cya.lbl",
             details,
             editAction(
               controllers.businessactivities.routes.InvolvedInOtherController.get(true).url,
@@ -96,7 +96,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
   )(implicit messages: Messages): Option[SummaryListRow] =
     businessActivities.expectedBusinessTurnover.map { ebt =>
       row(
-        "businessactivities.business-turnover.title",
+        "businessactivities.business-turnover.cya",
         messages(s"businessactivities.turnover.lbl.${ebt.value}"),
         editAction(
           controllers.businessactivities.routes.ExpectedBusinessTurnoverController.get(true).url,
@@ -223,7 +223,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
           x => messages(s"businessactivities.transactiontype.lbl.${x.value}")
         ).map { value =>
           SummaryListRow(
-            Key(Text(messages("businessactivities.do.keep.records"))),
+            Key(Text(messages("businessactivities.do.keep.records.cya"))),
             value,
             actions = editAction(
               controllers.businessactivities.routes.TransactionTypesController.get(true).url,
@@ -301,7 +301,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
             x => messages(s"businessactivities.RiskAssessmentType.lbl.${x.value}")
           ).map { value =>
             SummaryListRow(
-              Key(Text(messages("businessactivities.document.riskassessment.policy.title"))),
+              Key(Text(messages("businessactivities.document.riskassessment.policy.cya"))),
               value,
               actions = editAction(
                 controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).url,
@@ -330,7 +330,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
 
     def makeNameRow(name: WhoIsYourAccountantName) =
       SummaryListRow(
-        Key(Text(messages("businessactivities.whoisyouraccountant.title"))),
+        Key(Text(messages("businessactivities.whoisyouraccountant.cya"))),
         nameValues(name),
         actions = editAction(
           controllers.businessactivities.routes.WhoIsYourAccountantNameController.get(true).url,
@@ -352,7 +352,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
 
     def makeAddressRow(address: AccountantsAddress, name: WhoIsYourAccountantName) =
       SummaryListRow(
-        Key(Text(messages("businessactivities.whoisyouraccountant.address.header", name.accountantsName))),
+        Key(Text(messages("businessactivities.whoisyouraccountant.address.cya", name.accountantsName))),
         addressToLines(address.toLines),
         actions = editAction(
           if (address.isUk) {
