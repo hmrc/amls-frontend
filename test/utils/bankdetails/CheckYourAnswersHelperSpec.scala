@@ -103,7 +103,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
         assertRowMatches(
           accountNameIndex,
-          "bankdetails.bankaccount.accountname.title",
+          "bankdetails.bankaccount.accountname.cya",
           ukBankDetails.accountName.get,
           controllers.bankdetails.routes.BankAccountNameController.getIndex(1, edit = true).url,
           "accountname-edit"
@@ -115,7 +115,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
         assertRowMatches(
           accountTypeIndex,
-          "bankdetails.accounttype.title",
+          "bankdetails.accounttype.cya",
           messages(s"bankdetails.summary.accounttype.lbl.${PersonalAccount.value}"),
           controllers.bankdetails.routes.BankAccountTypeController.get(1, edit = true).url,
           "accounttype-edit"

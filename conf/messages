@@ -1872,6 +1872,7 @@ bankdetails.whatyouneed.line_4 = International Bank Account Number (IBAN) or acc
 bankdetails.whatyouneed.p.01 = Enter the details for all your accounts one at a time.
 bankdetails.whatyouneed.p.02 = Give each bank account an informal name to help you identify it within your anti-money laundering supervision account.
 bankdetails.accounttype.title = What type of bank account is this?
+bankdetails.accounttype.cya = Type of bank account
 bankdetails.accounttype.lbl.01 = Personal bank account
 bankdetails.accounttype.lbl.02 = Business bank account belonging to this business
 bankdetails.accounttype.lbl.03 = Business bank account belonging to another business
@@ -1887,6 +1888,7 @@ bankdetails.accounttype.nonuk.lbl.04 = The business doesn’t use a bank account
 bankdetails.bankaccount.title = What kind of bank account is this?
 bankdetails.bankaccount.accountname.title = Give this bank account an informal name to help you identify it
 bankdetails.bankaccount.accountname = Give this bank account an informal name to help you identify it
+bankdetails.bankaccount.accountname.cya = Name you chose for this bank account
 bankdetails.bankaccount.hint = For example, ‘business account’ or ‘client account’
 
 bankdetails.bankaccount.accounttype.title = Is this a UK bank account?
