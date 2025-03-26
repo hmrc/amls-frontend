@@ -39,7 +39,7 @@ class CheckYourAnswersHelper @Inject() () {
   ): Option[SummaryListRow] =
     bankDetails.accountName.map { accName =>
       row(
-        "bankdetails.bankaccount.accountname.title",
+        "bankdetails.bankaccount.accountname.cya",
         accName,
         editAction(
           controllers.bankdetails.routes.BankAccountNameController.getIndex(index, edit = true).url,
@@ -54,7 +54,7 @@ class CheckYourAnswersHelper @Inject() () {
   ): Option[SummaryListRow] =
     bankDetails.bankAccountType.map { bankAccountType =>
       row(
-        "bankdetails.accounttype.title",
+        "bankdetails.accounttype.cya",
         messages(s"bankdetails.summary.accounttype.lbl.${bankAccountType.value}"),
         editAction(
           controllers.bankdetails.routes.BankAccountTypeController.get(index, edit = true).url,
