@@ -80,7 +80,7 @@ class CheckYourAnswersHelper @Inject() () {
   ): Option[SummaryListRow] =
     tradingPremises.businessStructure.map { structure =>
       row(
-        "tradingpremises.businessStructure.title",
+        "tradingpremises.businessStructure.cya",
         messages(structure.message),
         editAction(
           controllers.tradingpremises.routes.BusinessStructureController.get(index, true).url,
@@ -139,7 +139,7 @@ class CheckYourAnswersHelper @Inject() () {
   ): Option[SummaryListRow] =
     tradingPremises.agentPartnership.map { partnership =>
       row(
-        "tradingpremises.agentpartnership.title",
+        "tradingpremises.agentpartnership.cya",
         partnership.agentPartnership,
         editAction(
           controllers.tradingpremises.routes.AgentPartnershipController.get(index, true).url,
@@ -182,7 +182,7 @@ class CheckYourAnswersHelper @Inject() () {
         )
       ),
       row(
-        "tradingpremises.startDate.title",
+        "tradingpremises.startDate.cya",
         DateHelper.formatDate(startDate),
         editAction(
           controllers.tradingpremises.routes.ActivityStartDateController.get(index, true).url,
@@ -223,7 +223,7 @@ class CheckYourAnswersHelper @Inject() () {
       }
 
       SummaryListRow(
-        Key(Text(messages("tradingpremises.whatdoesyourbusinessdo.title"))),
+        Key(Text(messages("tradingpremises.whatdoesyourbusinessdo.cya"))),
         message,
         actions = changeLinkOpt
       )
@@ -249,7 +249,7 @@ class CheckYourAnswersHelper @Inject() () {
       }
 
       SummaryListRow(
-        Key(Text(messages("tradingpremises.msb.services.title"))),
+        Key(Text(messages("tradingpremises.msb.services.cya"))),
         message,
         actions = changeLinkOpt
       )
