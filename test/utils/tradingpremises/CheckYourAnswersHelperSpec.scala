@@ -200,7 +200,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
           assertRowMatches(
             1,
-            "tradingpremises.businessStructure.title",
+            "tradingpremises.businessStructure.cya",
             messages(structure.message),
             controllers.tradingpremises.routes.BusinessStructureController.get(index, true).url,
             "tradingpremisesbusinessstructure-edit"
@@ -246,7 +246,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
         assertRowMatches(
           2,
-          "tradingpremises.agentpartnership.title",
+          "tradingpremises.agentpartnership.cya",
           agentPartnershipName,
           controllers.tradingpremises.routes.AgentPartnershipController.get(index, true).url,
           "tradingpremisesagentpartnershiptitle-edit"
@@ -335,7 +335,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
           assertRowMatches(
             dateIndex,
-            "tradingpremises.startDate.title",
+            "tradingpremises.startDate.cya",
             DateHelper.formatDate(tpDate),
             controllers.tradingpremises.routes.ActivityStartDateController.get(index, true).url,
             "tradingprmisedsummarystartdate-edit"
@@ -391,7 +391,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
           assertRowMatches(
             servicesIndex,
-            "tradingpremises.whatdoesyourbusinessdo.title",
+            "tradingpremises.whatdoesyourbusinessdo.cya",
             toBulletList(
               tpServices.sortBy(_.toString).map(_.value),
               "businessmatching.registerservices.servicename.lbl"
@@ -424,7 +424,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
           assertRowMatchesNoChangeLink(
             servicesIndex,
-            "tradingpremises.whatdoesyourbusinessdo.title",
+            "tradingpremises.whatdoesyourbusinessdo.cya",
             messages(s"businessmatching.registerservices.servicename.lbl.${ba.value}")
           )
         }
@@ -449,7 +449,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
           assertRowMatches(
             msbIndex,
-            "tradingpremises.msb.services.title",
+            "tradingpremises.msb.services.cya",
             toBulletList(tpServices.sortBy(_.toString).map(_.value), "msb.services.list.lbl"),
             controllers.tradingpremises.routes.MSBServicesController.get(index, true).url,
             "tradingpremisesmsbservices-edit"
@@ -479,7 +479,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
           assertRowMatchesNoChangeLink(
             msbIndex,
-            "tradingpremises.msb.services.title",
+            "tradingpremises.msb.services.cya",
             messages(s"msb.services.list.lbl.${msb.value}")
           )
         }

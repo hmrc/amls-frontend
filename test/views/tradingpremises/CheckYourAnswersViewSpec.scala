@@ -120,7 +120,7 @@ class CheckYourAnswersViewSpec extends TestHelper with TableDrivenPropertyChecks
       val rows  = cyaHelper.createSummaryList(tradingPremises, 1, isMsb, false, false)
       def view  = cyaView(rows, 1)
 
-      doc.text() must include(messages("tradingpremises.whatdoesyourbusinessdo.title"))
+      doc.text() must include(messages("tradingpremises.whatdoesyourbusinessdo.cya"))
       doc.text() must include(messages("button.edit"))
 
     }
@@ -141,7 +141,7 @@ class CheckYourAnswersViewSpec extends TestHelper with TableDrivenPropertyChecks
       val maybeElement    = doc
         .select(".govuk-summary-list__row")
         .asScala
-        .find(e => e.text().contains(messages("tradingpremises.whatdoesyourbusinessdo.title")))
+        .find(e => e.text().contains(messages("tradingpremises.whatdoesyourbusinessdo.cya")))
       val servicesSection = maybeElement.get.toString
 
       servicesSection mustNot include(messages("button.edit"))
