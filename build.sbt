@@ -41,7 +41,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(Global / lintUnusedKeysOnLoad := false)
   .settings(
     libraryDependencies ++= appDependencies,
-    dependencyOverrides ++= Seq("ch.qos.logback" % "logback-classic" % "1.3.0"),
+    dependencyOverrides ++= Seq("ch.qos.logback" % "logback-classic" % "1.3.0","ch.qos.logback" % "logback-core" % "1.3.0"),
     retrieveManaged := true,
     PlayKeys.playDefaultPort := 9222,
     update / evictionWarningOptions := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
