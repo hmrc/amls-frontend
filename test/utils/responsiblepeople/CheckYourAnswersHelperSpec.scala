@@ -118,7 +118,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           0,
-          "responsiblepeople.personName.title",
+          "responsiblepeople.personName.cya",
           personName.fullName,
           controllers.responsiblepeople.routes.PersonNameController.get(1, true, None).url,
           "rp-personname-edit"
@@ -151,7 +151,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             2,
-            messages("responsiblepeople.legalNameInput.heading", personName.titleName),
+            messages("responsiblepeople.legalNameInput.cya", personName.titleName),
             previousName.fullName,
             controllers.responsiblepeople.routes.LegalNameInputController.get(1, true, None).url,
             "rp-legalname-edit"
@@ -159,7 +159,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             3,
-            messages("responsiblepeople.legalnamechangedate.heading", personName.titleName),
+            messages("responsiblepeople.legalnamechangedate.cya", personName.titleName),
             DateHelper.formatDate(legalNameChangeDate),
             controllers.responsiblepeople.routes.LegalNameChangeDateController.get(1, true, None).url,
             "rp-legalnamechangedate-edit"
@@ -258,7 +258,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           6,
-          messages("responsiblepeople.detailed_answers.dob", personName.titleName),
+          messages("responsiblepeople.detailed_answers.dob.cya", personName.titleName),
           DateHelper.formatDate(dateOfBirth),
           controllers.responsiblepeople.routes.DateOfBirthController.get(1, true, None).url,
           "date-of-birth"
@@ -593,7 +593,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           16,
-          messages("responsiblepeople.contact_details.heading", personName.titleName),
+          messages("responsiblepeople.contact_details.cya", personName.titleName),
           s"""<p class="govuk-body">${messages("responsiblepeople.detailed_answers.phone_number")}<br>$phoneNumber</p>
             <p class="govuk-body">${messages("responsiblepeople.detailed_answers.email")}<br>$email</p>
           """,
@@ -645,7 +645,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             18,
-            messages("responsiblepeople.detailed_answers.address", personName.titleName),
+            messages("responsiblepeople.detailed_answers.address.cya", personName.titleName),
             addressToLines(currentAddress.personAddress.toLines),
             controllers.responsiblepeople.address.routes.MovedAddressController.get(1).url,
             "rpaddress-edit"
@@ -653,7 +653,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             19,
-            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages("responsiblepeople.timeataddress.address_history.cya", personName.titleName),
             messages(s"responsiblepeople.timeataddress.${ZeroToFiveMonths.toString}"),
             controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(1, true, None).url,
             "rp-timeatataddress-edit"
@@ -681,7 +681,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             18,
-            messages("responsiblepeople.detailed_answers.address", personName.titleName),
+            messages("responsiblepeople.detailed_answers.address.cya", personName.titleName),
             addressToLines(currentAddress.personAddress.toLines),
             controllers.responsiblepeople.address.routes.CurrentAddressUKController.get(1, true, None).url,
             "rpaddress-edit"
@@ -689,7 +689,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             19,
-            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages("responsiblepeople.timeataddress.address_history.cya", personName.titleName),
             messages(s"responsiblepeople.timeataddress.${ZeroToFiveMonths.toString}"),
             controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(1, true, None).url,
             "rp-timeatataddress-edit"
@@ -719,7 +719,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             18,
-            messages("responsiblepeople.detailed_answers.address", personName.titleName),
+            messages("responsiblepeople.detailed_answers.address.cya", personName.titleName),
             addressToLines(currentAddressNonUK.personAddress.toLines),
             controllers.responsiblepeople.address.routes.MovedAddressController.get(1).url,
             "rpaddress-edit"
@@ -727,7 +727,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             19,
-            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages("responsiblepeople.timeataddress.address_history.cya", personName.titleName),
             messages(s"responsiblepeople.timeataddress.${ZeroToFiveMonths.toString}"),
             controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(1, true, None).url,
             "rp-timeatataddress-edit"
@@ -757,7 +757,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             18,
-            messages("responsiblepeople.detailed_answers.address", personName.titleName),
+            messages("responsiblepeople.detailed_answers.address.cya", personName.titleName),
             addressToLines(currentAddressNonUK.personAddress.toLines),
             controllers.responsiblepeople.address.routes.CurrentAddressNonUKController.get(1, true, None).url,
             "rpaddress-edit"
@@ -765,7 +765,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             19,
-            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages("responsiblepeople.timeataddress.address_history.cya", personName.titleName),
             messages(s"responsiblepeople.timeataddress.${ZeroToFiveMonths.toString}"),
             controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(1, true, None).url,
             "rp-timeatataddress-edit"
@@ -799,7 +799,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             21,
-            messages("responsiblepeople.detailed_answers.address.previous", personName.titleName),
+            messages("responsiblepeople.detailed_answers.address.previous.cya", personName.titleName),
             addressToLines(additionalAddress.personAddress.toLines),
             controllers.responsiblepeople.address.routes.AdditionalAddressUKController.get(1, true, None).url,
             "rp-previousaddress-edit"
@@ -807,7 +807,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             22,
-            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages("responsiblepeople.timeataddress.address_history.cya", personName.titleName),
             messages(s"responsiblepeople.timeataddress.${SixToElevenMonths.toString}"),
             controllers.responsiblepeople.address.routes.TimeAtAdditionalAddressController.get(1, true, None).url,
             "rp-timeatatpreviousaddress-edit"
@@ -842,7 +842,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             21,
-            messages("responsiblepeople.detailed_answers.address.previous", personName.titleName),
+            messages("responsiblepeople.detailed_answers.address.previous.cya", personName.titleName),
             addressToLines(additionalAddressNonUK.personAddress.toLines),
             controllers.responsiblepeople.address.routes.AdditionalAddressNonUKController.get(1, true, None).url,
             "rp-previousaddress-edit"
@@ -850,7 +850,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             22,
-            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages("responsiblepeople.timeataddress.address_history.cya", personName.titleName),
             messages(s"responsiblepeople.timeataddress.${SixToElevenMonths.toString}"),
             controllers.responsiblepeople.address.routes.TimeAtAdditionalAddressController.get(1, true, None).url,
             "rp-timeatatpreviousaddress-edit"
@@ -884,7 +884,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             24,
-            messages("responsiblepeople.detailed_answers.address.other.previous", personName.titleName),
+            messages("responsiblepeople.detailed_answers.address.other.previous.cya", personName.titleName),
             addressToLines(additionalExtraAddress.personAddress.toLines),
             controllers.responsiblepeople.address.routes.AdditionalExtraAddressUKController.get(1, true, None).url,
             "rp-otherpreviousaddress-edit"
@@ -892,7 +892,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             25,
-            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages("responsiblepeople.timeataddress.address_history.cya", personName.titleName),
             messages(s"responsiblepeople.timeataddress.${OneToThreeYears.toString}"),
             controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController.get(1, true, None).url,
             "rp-timeatotherpreviousaddress-edit"
@@ -928,7 +928,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             24,
-            messages("responsiblepeople.detailed_answers.address.other.previous", personName.titleName),
+            messages("responsiblepeople.detailed_answers.address.other.previous.cya", personName.titleName),
             addressToLines(additionalExtraAddressNonUK.personAddress.toLines),
             controllers.responsiblepeople.address.routes.AdditionalExtraAddressNonUKController.get(1, true, None).url,
             "rp-otherpreviousaddress-edit"
@@ -936,7 +936,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             25,
-            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages("responsiblepeople.timeataddress.address_history.cya", personName.titleName),
             messages(s"responsiblepeople.timeataddress.${OneToThreeYears.toString}"),
             controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController.get(1, true, None).url,
             "rp-timeatotherpreviousaddress-edit"
@@ -979,7 +979,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             26,
-            messages("responsiblepeople.position_within_business.heading", personName.titleName),
+            messages("responsiblepeople.position_within_business.cya", personName.titleName),
             toBulletList(
               Set(BeneficialOwner, NominatedOfficer).map(p => PositionWithinBusiness.getPrettyName(p)).toList.sorted
             ),
@@ -989,7 +989,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             27,
-            messages("responsiblepeople.position_within_business.startDate.heading", personName.titleName),
+            messages("responsiblepeople.position_within_business.startDate.cya", personName.titleName),
             DateHelper.formatDate(positionStartDate),
             controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(1, true, None).url,
             "rp-positionstartdate-edit"
@@ -1011,7 +1011,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             26,
-            messages("responsiblepeople.position_within_business.heading", personName.titleName),
+            messages("responsiblepeople.position_within_business.cya", personName.titleName),
             PositionWithinBusiness.getPrettyName(BeneficialOwner),
             controllers.responsiblepeople.routes.PositionWithinBusinessController.get(1, true, None).url,
             "rp-positionwithinbusiness-edit"
@@ -1019,7 +1019,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             27,
-            messages("responsiblepeople.position_within_business.startDate.heading", personName.titleName),
+            messages("responsiblepeople.position_within_business.startDate.cya", personName.titleName),
             DateHelper.formatDate(positionStartDate),
             controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(1, true, None).url,
             "rp-positionstartdate-edit"
@@ -1153,7 +1153,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             32,
-            messages("responsiblepeople.detailed_answers.registered_for_sa"),
+            messages("responsiblepeople.detailed_answers.registered_for_sa.cya"),
             utrNumber,
             controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1, true, None).url,
             "rp-registeredforsa-answer-edit"
@@ -1224,7 +1224,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             34,
-            messages("responsiblepeople.detailed_answers.previous_experience.detail", personName.titleName),
+            messages("responsiblepeople.detailed_answers.previous_experience.detail.cya", personName.titleName),
             experienceDescription,
             controllers.responsiblepeople.routes.ExperienceTrainingController.get(1, true, None).url,
             "rp-training-answer-edit"
@@ -1258,7 +1258,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             34,
-            messages("responsiblepeople.detailed_answers.previous_experience.detail", personName.titleName),
+            messages("responsiblepeople.detailed_answers.previous_experience.detail.cya", personName.titleName),
             experienceDescription,
             controllers.responsiblepeople.routes.ExperienceTrainingController.get(1, true, None).url,
             "rp-training-answer-edit"
