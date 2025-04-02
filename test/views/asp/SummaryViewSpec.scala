@@ -51,7 +51,7 @@ class SummaryViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks
     "include the provided data" in new ViewFixture {
 
       val list = Seq(
-        (messages("asp.services.title"), Service.all.map(_.getMessage).sorted.mkString(" ")),
+        (messages("asp.services.cya"), Service.all.map(_.getMessage).sorted.mkString(" ")),
         (messages("asp.other.business.tax.matters.title"), messages("lbl.yes"))
       )
 
