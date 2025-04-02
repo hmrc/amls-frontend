@@ -105,7 +105,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
   ): Option[SummaryListRow] =
     model.personName.map { name =>
       row(
-        "responsiblepeople.personName.title",
+        "responsiblepeople.personName.cya",
         name.fullName,
         editAction(
           controllers.responsiblepeople.routes.PersonNameController.get(idx, true, flow).url,
@@ -121,7 +121,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
     model.legalName.map { name =>
       val dateRow = model.legalNameChangeDate.map { date =>
         row(
-          messages("responsiblepeople.legalnamechangedate.heading", personName),
+          messages("responsiblepeople.legalnamechangedate.cya", personName),
           DateHelper.formatDate(date),
           editAction(
             controllers.responsiblepeople.routes.LegalNameChangeDateController.get(idx, true, flow).url,
@@ -146,7 +146,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
           Seq(
             legalNameRow(true),
             row(
-              messages("responsiblepeople.legalNameInput.heading", personName),
+              messages("responsiblepeople.legalNameInput.cya", personName),
               name.fullName,
               editAction(
                 controllers.responsiblepeople.routes.LegalNameInputController.get(idx, true, flow).url,
@@ -198,7 +198,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
   ): Option[SummaryListRow] =
     model.dateOfBirth.map { dob =>
       row(
-        messages("responsiblepeople.detailed_answers.dob", personName),
+        messages("responsiblepeople.detailed_answers.dob.cya", personName),
         DateHelper.formatDate(dob.dateOfBirth),
         editAction(
           controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true, flow).url,
@@ -371,7 +371,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
   ): Option[SummaryListRow] =
     model.contactDetails.map { details =>
       SummaryListRow(
-        Key(Text(messages("responsiblepeople.contact_details.heading", personName))),
+        Key(Text(messages("responsiblepeople.contact_details.cya", personName))),
         Value(HtmlContent(s"""<p class="govuk-body">${messages(
             "responsiblepeople.detailed_answers.phone_number"
           )}<br>${details.phoneNumber}</p>
@@ -408,7 +408,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
           )
         ),
         SummaryListRow(
-          Key(Text(messages("responsiblepeople.detailed_answers.address", personName))),
+          Key(Text(messages("responsiblepeople.detailed_answers.address.cya", personName))),
           addressToLines(currentAddress.personAddress.toLines),
           actions = editAction(
             (currentAddress.personAddress, showHide) match {
@@ -424,7 +424,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
           )
         ),
         row(
-          messages("responsiblepeople.timeataddress.address_history.heading", personName),
+          messages("responsiblepeople.timeataddress.address_history.cya", personName),
           currentAddress.timeAtAddress.fold("")(x => messages(s"responsiblepeople.timeataddress.${x.toString}")),
           editAction(
             controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(idx, true, flow).url,
@@ -450,7 +450,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
           )
         ),
         SummaryListRow(
-          Key(Text(messages("responsiblepeople.detailed_answers.address.previous", personName))),
+          Key(Text(messages("responsiblepeople.detailed_answers.address.previous.cya", personName))),
           addressToLines(additionalAddress.personAddress.toLines),
           actions = editAction(
             additionalAddress.personAddress match {
@@ -464,7 +464,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
           )
         ),
         row(
-          messages("responsiblepeople.timeataddress.address_history.heading", personName),
+          messages("responsiblepeople.timeataddress.address_history.cya", personName),
           additionalAddress.timeAtAddress.fold("")(x => messages(s"responsiblepeople.timeataddress.${x.toString}")),
           editAction(
             controllers.responsiblepeople.address.routes.TimeAtAdditionalAddressController.get(idx, true, flow).url,
@@ -490,7 +490,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
           )
         ),
         SummaryListRow(
-          Key(Text(messages("responsiblepeople.detailed_answers.address.other.previous", personName))),
+          Key(Text(messages("responsiblepeople.detailed_answers.address.other.previous.cya", personName))),
           addressToLines(extraAddress.personAddress.toLines),
           actions = editAction(
             extraAddress.personAddress match {
@@ -506,7 +506,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
           )
         ),
         row(
-          messages("responsiblepeople.timeataddress.address_history.heading", personName),
+          messages("responsiblepeople.timeataddress.address_history.cya", personName),
           extraAddress.timeAtAddress.fold("")(x => messages(s"responsiblepeople.timeataddress.${x.toString}")),
           editAction(
             controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController
@@ -525,7 +525,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
     model.positions.map { pos =>
       Seq(
         SummaryListRow(
-          Key(Text(messages("responsiblepeople.position_within_business.heading", personName))),
+          Key(Text(messages("responsiblepeople.position_within_business.cya", personName))),
           if (pos.positions.size == 1) {
             Value(Text(PositionWithinBusiness.getPrettyName(pos.positions.head)))
           } else {
@@ -538,7 +538,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
           )
         ),
         row(
-          messages("responsiblepeople.position_within_business.startDate.heading", personName),
+          messages("responsiblepeople.position_within_business.startDate.cya", personName),
           pos.startDate.map(sd => DateHelper.formatDate(sd.startDate)).getOrElse(""),
           editAction(
             controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(idx, true, flow).url,
@@ -617,7 +617,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
         Seq(
           saYesNoRow(true),
           row(
-            messages("responsiblepeople.detailed_answers.registered_for_sa"),
+            messages("responsiblepeople.detailed_answers.registered_for_sa.cya"),
             regNumber,
             editAction(
               controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(idx, true, flow).url,
@@ -664,7 +664,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
         Seq(
           trainingYesNoRow(true),
           row(
-            messages("responsiblepeople.detailed_answers.previous_experience.detail", personName),
+            messages("responsiblepeople.detailed_answers.previous_experience.detail.cya", personName),
             info,
             editAction(
               controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true, flow).url,
