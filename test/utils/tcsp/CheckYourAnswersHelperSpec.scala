@@ -115,7 +115,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           0,
-          "tcsp.kind.of.service.provider.title",
+          "tcsp.kind.of.service.provider.cya",
           answer,
           controllers.tcsp.routes.TcspTypesController.get(true).url,
           "tcspkindserviceprovider-edit"
@@ -131,7 +131,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           0,
-          "tcsp.kind.of.service.provider.title",
+          "tcsp.kind.of.service.provider.cya",
           messages(s"tcsp.service.provider.lbl.${NomineeShareholdersProvider.value}"),
           controllers.tcsp.routes.TcspTypesController.get(true).url,
           "tcspkindserviceprovider-edit"
@@ -177,7 +177,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           2,
-          "tcsp.create.complex.corporate.structures.lbl",
+          "tcsp.create.complex.corporate.structures.cya",
           booleanToLabel(true),
           controllers.tcsp.routes.ComplexCorpStructureCreationController.get(true).url,
           "complexCorpStructureCreation-edit"
@@ -193,7 +193,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           2,
-          "tcsp.create.complex.corporate.structures.lbl",
+          "tcsp.create.complex.corporate.structures.cya",
           booleanToLabel(false),
           controllers.tcsp.routes.ComplexCorpStructureCreationController.get(true).url,
           "complexCorpStructureCreation-edit"
@@ -208,7 +208,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           3,
-          "tcsp.provided_services.title",
+          "tcsp.provided_services.cya",
           toBulletList(providedServices.services.toSeq.map(_.getMessage)),
           controllers.tcsp.routes.ProvidedServicesController.get(true).url,
           "tcsptypes-edit"
@@ -224,7 +224,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           3,
-          "tcsp.provided_services.title",
+          "tcsp.provided_services.cya",
           EmailServer.getMessage,
           controllers.tcsp.routes.ProvidedServicesController.get(true).url,
           "tcsptypes-edit"
