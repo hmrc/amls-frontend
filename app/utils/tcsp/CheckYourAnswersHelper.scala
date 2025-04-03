@@ -70,7 +70,7 @@ class CheckYourAnswersHelper @Inject() () extends Logging {
       Value(Text(sortedProviders.mkString))
     }
     SummaryListRow(
-      Key(Text(messages("tcsp.kind.of.service.provider.title"))),
+      Key(Text(messages("tcsp.kind.of.service.provider.cya"))),
       answer,
       actions = editAction(
         controllers.tcsp.routes.TcspTypesController.get(true).url,
@@ -109,7 +109,7 @@ class CheckYourAnswersHelper @Inject() () extends Logging {
 
     model.complexCorpStructureCreation.map { s =>
       row(
-        "tcsp.create.complex.corporate.structures.lbl",
+        "tcsp.create.complex.corporate.structures.cya",
         label(s),
         editAction(
           controllers.tcsp.routes.ComplexCorpStructureCreationController.get(true).url,
@@ -137,7 +137,7 @@ class CheckYourAnswersHelper @Inject() () extends Logging {
       if (types.serviceProviders.contains(RegisteredOfficeEtc)) {
         Some(
           SummaryListRow(
-            Key(Text(messages("tcsp.provided_services.title"))),
+            Key(Text(messages("tcsp.provided_services.cya"))),
             label(services),
             actions = editAction(
               controllers.tcsp.routes.ProvidedServicesController.get(true).url,

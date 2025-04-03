@@ -2519,6 +2519,7 @@ tcsp.whatyouneed.requiredinfo.text.5 = if you sell off-the-shelf companies
 tcsp.whatyouneed.requiredinfo.text.6 = which services your business provides
 
 tcsp.kind.of.service.provider.title = What type of trust or company service provider are you?
+tcsp.kind.of.service.provider.cya = Type of trust or company service provider
 tcsp.service.provider.lbl.01 = Nominee shareholders provider
 tcsp.service.provider.lbl.02 = Trustee provider
 tcsp.service.provider.lbl.03 = Registered office, business address, or virtual office services provider
@@ -2527,6 +2528,7 @@ tcsp.service.provider.lbl.05 = Trust or company formation agent
 
 tcsp.off-the-shelf.companies.lbl = Do you sell off-the-shelf companies?
 tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
+tcsp.create.complex.corporate.structures.cya = Do you, or do you plan to, create complex corporate structures for clients?
 tcsp.servicesOfAnotherTcsp.title = Providing services at the address of another business
 tcsp.servicesOfAnotherTcsp.legend = Do you provide services at the address of another business?
 tcsp.servicesOfAnotherTcsp.hint.1 = You must
@@ -2538,6 +2540,7 @@ tcsp.servicesOfAnotherTcsp.mlrregno.lbl = Trust or company service provider’s 
 tcsp.cya.mlrregno = Money Laundering Regulation reference number
 
 tcsp.provided_services.title = Which services does your business provide?
+tcsp.provided_services.cya = Services your business provides
 tcsp.provided_services.service.lbl.01 = Telephone call handling
 tcsp.provided_services.service.lbl.02 = Email handling
 tcsp.provided_services.service.lbl.03 = Email server
