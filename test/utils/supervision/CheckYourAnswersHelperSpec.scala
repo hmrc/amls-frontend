@@ -141,7 +141,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           2,
-          "supervision.supervision_start.title",
+          "supervision.supervision_start.cya",
           DateHelper.formatDate(anotherBody.startDate.value.startDate),
           controllers.supervision.routes.SupervisionStartController.get(true).url,
           "supervisionanotherbody-edit-start-date"
@@ -153,7 +153,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           3,
-          "supervision.supervision_end.title",
+          "supervision.supervision_end.cya",
           DateHelper.formatDate(anotherBody.endDate.value.endDate),
           controllers.supervision.routes.SupervisionEndController.get(true).url,
           "supervisionanotherbody-edit-end-date"
@@ -165,7 +165,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           4,
-          "supervision.supervision_end_reasons.title",
+          "supervision.supervision_end_reasons.cya",
           anotherBody.endingReason.value.endingReason,
           controllers.supervision.routes.SupervisionEndReasonsController.get(true).url,
           "supervisionanotherbody-edit-ending-reason"
@@ -215,7 +215,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           6,
-          "supervision.whichprofessionalbody.title",
+          "supervision.whichprofessionalbody.cya",
           AccountingTechnicians.getMessage(),
           controllers.supervision.routes.WhichProfessionalBodyController.get(true).url,
           "supervisionwhichbody-edit"
@@ -227,7 +227,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           6,
-          "supervision.whichprofessionalbody.title",
+          "supervision.whichprofessionalbody.cya",
           toBulletList(businessTypes.map(_.getMessage()).sorted),
           controllers.supervision.routes.WhichProfessionalBodyController.get(true).url,
           "supervisionwhichbody-edit"
@@ -270,7 +270,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           8,
-          "supervision.penaltydetails.title",
+          "supervision.penaltydetails.cya",
           professionalBody.value,
           controllers.supervision.routes.PenaltyDetailsController.get(true).url,
           "penaltydetails-edit"

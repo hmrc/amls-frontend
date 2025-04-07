@@ -1602,7 +1602,7 @@ estateagentbusiness.penalisedbyprofessional.line_2 = a warning
 estateagentbusiness.penalisedbyprofessional.line_3 = suspension
 estateagentbusiness.penalisedbyprofessional.line_4 = expulsion
 estateagentbusiness.penalisedbyprofessional.line_5 = special terms or conditions imposed on your business
-estateagentbusiness.penalisedbyprofessional.lbl.detailslbl = Describe the penalty received by  a professional body, and when it occurred
+estateagentbusiness.penalisedbyprofessional.lbl.detailslbl = Describe the penalty received by a professional body, and when it occurred
 estateagentbusiness.services.title = Which services does your business provide?
 estateagentbusiness.service.lbl.01 = Residential
 estateagentbusiness.service.lbl.02 = Commercial
@@ -2602,8 +2602,11 @@ supervision.another_body.endDate.hint = For example, 31 03 2010.
 supervision.another_body.endingReason.lbl = Why did the supervision end?
 
 supervision.supervision_start.title = When did your previous supervision start?
+supervision.supervision_start.cya = Previous supervision start date
 supervision.supervision_end.title = When did your previous supervision end?
+supervision.supervision_end.cya = Previous supervision end date
 supervision.supervision_end_reasons.title = Why did your previous anti-money laundering supervision end?
+supervision.supervision_end_reasons.cya = Reason previous supervision ended
 supervision.supervision_end_reasons.lbl = Why did your previous supervision end?
 supervision.supervision_end_reasons.description = Give details of why your previous registration ended
 
@@ -2619,6 +2622,7 @@ supervision.penalisedbyprofessional.details = Only include penalties for busines
 supervision.penalisedbyprofessional.heading1 = Has your business, or anyone in your business, been penalised for business activities covered by Money Laundering Regulations?
 
 supervision.penaltydetails.title = What penalties did you receive for business activities, and when did they occur?
+supervision.penaltydetails.cya = Description of penalty and when it occurred
 supervision.penaltydetails.hint = For example, a £5,000 fine on 31 03 2017.
 
 supervision.memberofprofessionalbody.title = Is your business a member of a professional body?
@@ -2639,6 +2643,7 @@ supervision.memberofprofessionalbody.lbl.14 = Another professional body
 supervision.memberofprofessionalbody.lbl.15 = Name of the professional body you’re a member of
 
 supervision.whichprofessionalbody.title = Which professional bodies are you a member of?
+supervision.whichprofessionalbody.cya = Professional bodies you are a member of
 
 supervision.checkYourAnswers.change.registeredBefore = whether your business has ever been registered with another supervisory body under the Money Laundering Regulations
 supervision.checkYourAnswers.change.prevSupervisor = the name of your previous supervisory body
