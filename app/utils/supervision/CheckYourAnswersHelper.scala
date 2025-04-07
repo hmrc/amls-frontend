@@ -70,7 +70,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
             )
           ),
           row(
-            "supervision.supervision_start.title",
+            "supervision.supervision_start.cya",
             DateHelper.formatDate(startDate.startDate),
             editAction(
               controllers.supervision.routes.SupervisionStartController.get(true).url,
@@ -79,7 +79,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
             )
           ),
           row(
-            "supervision.supervision_end.title",
+            "supervision.supervision_end.cya",
             DateHelper.formatDate(endDate.endDate),
             editAction(
               controllers.supervision.routes.SupervisionEndController.get(true).url,
@@ -88,7 +88,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
             )
           ),
           row(
-            "supervision.supervision_end_reasons.title",
+            "supervision.supervision_end_reasons.cya",
             reasons.endingReason,
             editAction(
               controllers.supervision.routes.SupervisionEndReasonsController.get(true).url,
@@ -128,7 +128,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
 
     answerOpt map { answer =>
       SummaryListRow(
-        Key(Text(messages("supervision.whichprofessionalbody.title"))),
+        Key(Text(messages("supervision.whichprofessionalbody.cya"))),
         answer,
         actions = editAction(
           controllers.supervision.routes.WhichProfessionalBodyController.get(true).url,
@@ -165,7 +165,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
             )
           ),
           row(
-            "supervision.penaltydetails.title",
+            "supervision.penaltydetails.cya",
             details,
             editAction(
               controllers.supervision.routes.PenaltyDetailsController.get(true).url,
