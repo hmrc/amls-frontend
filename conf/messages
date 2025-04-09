@@ -2351,11 +2351,15 @@ responsiblepeople.fit_and_proper.notice.heading2 = HMRC’s approval check
 responsiblepeople.fit_and_proper.notice.text3 = The approval check is for accountancy service providers, art market participants, estate agent businesses, and high value dealers.
 
 responsiblepeople.fit_and_proper.heading = HMRC fit and proper test
-responsiblepeople.fit_and_proper.legend = Has {0} passed HMRC’s fit and proper test?
+responsiblepeople.fit_and_proper.legend = Has {0} passed HMRC’s fit and proper test in their current role?
 responsiblepeople.fit_and_proper.title = HMRC fit and proper test
-responsiblepeople.fit_and_proper.details = HMRC carries out the fit and proper test as part of the registration process for money service businesses and trust or company service providers. It is different to the test carried out by the Financial Conduct Authority.
-responsiblepeople.fit_and_proper.details2 = If a responsible person has already passed the test, either in their current role or in a previous role, they do not need to pass it again.
-
+responsiblepeople.fit_and_proper.details = HMRC carries out the fit and proper test as part of the registration process for money service businesses (MSBs) and trust or company service providers (TCSPs). It is different to the test carried out by the Financial Conduct Authority.
+responsiblepeople.fit_and_proper.details2 = If a responsible person has already passed the test in their current role within your business, HMRC does not usually need to test them again.
+responsiblepeople.fit_and_proper.details3 = However, HMRC will need to test them again if:
+responsiblepeople.fit_and_proper.details4 = You can find detailed information in
+responsiblepeople.fit_and_proper.guidance = HMRC’s full guidance about the fit and proper test
+responsiblepeople.fit_and_proper.bullet1 = they move from one MSB or TCSP to another
+responsiblepeople.fit_and_proper.bullet2 = their role within the business changes significantly, for example becoming a Nominated Officer or changing from a Nominated Officer to a Compliance Officer
 responsiblepeople.approval_check.heading = HMRC approval check
 responsiblepeople.approval_check.legend = Has HMRC charged your business or another business to do an approval check about {0}?
 responsiblepeople.approval_check.title = HMRC approval check

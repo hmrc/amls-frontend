@@ -43,8 +43,18 @@
 
     <p class="govuk-body">@messages("responsiblepeople.fit_and_proper.details")</p>
     <p class="govuk-body">@messages("responsiblepeople.fit_and_proper.details2", personName)</p>
+    <p class="govuk-body">@messages("responsiblepeople.fit_and_proper.details3")</p>
 
-    @formHelper(action = controllers.responsiblepeople.routes.FitAndProperController.post(index, edit, flow)) {
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("responsiblepeople.fit_and_proper.bullet1")</li>
+        <li>@messages("responsiblepeople.fit_and_proper.bullet2")</li>
+    </ul>
+
+    <p class="govuk-body">@messages("responsiblepeople.fit_and_proper.details4") <a class="govuk-link" href="https://www.gov.uk/guidance/money-laundering-regulations-apply-for-the-fit-and-proper-test">@messages("responsiblepeople.fit_and_proper.guidance")</a>.</p>
+
+
+
+@formHelper(action = controllers.responsiblepeople.routes.FitAndProperController.post(index, edit, flow)) {
 
         @inputYesNo(
             Radios(
