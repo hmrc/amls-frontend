@@ -53,7 +53,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
 
     model.products.map { products =>
       SummaryListRow(
-        Key(Text(messages("hvd.products.title"))),
+        Key(Text(messages("hvd.products.cya"))),
         productsValue(products),
         actions = editAction(
           controllers.hvd.routes.ProductsController.get(true).url,
@@ -97,7 +97,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
 
     model.howWillYouSellGoods.map { goods =>
       SummaryListRow(
-        Key(Text(messages("hvd.how-will-you-sell-goods.title"))),
+        Key(Text(messages("hvd.how-will-you-sell-goods.cya"))),
         goodsValue(goods),
         actions = editAction(
           controllers.hvd.routes.HowWillYouSellGoodsController.get(true).url,
@@ -124,7 +124,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
         ),
         payment.firstDate.map { date =>
           row(
-            "hvd.cash.payment.date.title",
+            "hvd.cash.payment.date.cya",
             DateHelper.formatDate(date.paymentDate),
             editAction(
               controllers.hvd.routes.CashPaymentFirstDateController.get(true).url,
@@ -172,7 +172,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
 
     model.cashPaymentMethods.map { cpm =>
       SummaryListRow(
-        Key(Text(messages("hvd.receiving.expect.to.receive"))),
+        Key(Text(messages("hvd.receiving.expect.to.receive.cya"))),
         paymentsValue(cpm),
         actions = editAction(
           controllers.hvd.routes.ExpectToReceiveCashPaymentsController.get(true).url,
@@ -186,7 +186,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
   private def percentagePaymentsRow(model: Hvd)(implicit messages: Messages): Option[SummaryListRow] =
     model.percentageOfCashPaymentOver15000.map { percentage =>
       row(
-        "hvd.percentage.title",
+        "hvd.percentage.cya",
         messages(s"hvd.percentage.lbl.${percentage.value}"),
         editAction(
           controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).url,
