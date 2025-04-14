@@ -103,7 +103,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           0,
-          "hvd.products.title",
+          "hvd.products.cya",
           Alcohol.getMessage,
           controllers.hvd.routes.ProductsController.get(true).url,
           "hvdproducts-edit"
@@ -115,7 +115,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           0,
-          "hvd.products.title",
+          "hvd.products.cya",
           toBulletList(Products(productsList.toSet).sorted.map(_.getMessage)),
           controllers.hvd.routes.ProductsController.get(true).url,
           "hvdproducts-edit"
@@ -165,7 +165,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           2,
-          "hvd.how-will-you-sell-goods.title",
+          "hvd.how-will-you-sell-goods.cya",
           Retail.getMessage,
           controllers.hvd.routes.HowWillYouSellGoodsController.get(true).url,
           "hvdsellgoods-edit"
@@ -177,7 +177,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           2,
-          "hvd.how-will-you-sell-goods.title",
+          "hvd.how-will-you-sell-goods.cya",
           toBulletList(channelsList.map(_.getMessage)),
           controllers.hvd.routes.HowWillYouSellGoodsController.get(true).url,
           "hvdsellgoods-edit"
@@ -216,7 +216,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           4,
-          "hvd.cash.payment.date.title",
+          "hvd.cash.payment.date.cya",
           DateHelper.formatDate(firstDate),
           controllers.hvd.routes.CashPaymentFirstDateController.get(true).url,
           "hvdcashpaymentfirstdate-edit"
@@ -300,7 +300,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           7,
-          "hvd.receiving.expect.to.receive",
+          "hvd.receiving.expect.to.receive.cya",
           singlePaymentMethod.getSummaryMessages.mkString,
           controllers.hvd.routes.ExpectToReceiveCashPaymentsController.get(true).url,
           "hvdcashpaymentmethods-edit"
@@ -312,7 +312,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         assertRowMatches(
           7,
-          "hvd.receiving.expect.to.receive",
+          "hvd.receiving.expect.to.receive.cya",
           toBulletList(paymentMethods.getSummaryMessages),
           controllers.hvd.routes.ExpectToReceiveCashPaymentsController.get(true).url,
           "hvdcashpaymentmethods-edit"
@@ -332,7 +332,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             8,
-            "hvd.percentage.title",
+            "hvd.percentage.cya",
             messages(s"hvd.percentage.lbl.${percentage.value}"),
             controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).url,
             "hvdpercentcashpayment-edit"

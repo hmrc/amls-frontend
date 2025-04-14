@@ -2768,6 +2768,7 @@ hvd.whatyouneed.line_7 = You may need to tell us:
 hvd.whatyouneed.line_8 = if you’ll be buying or selling duty-suspended excise goods
 
 hvd.how-will-you-sell-goods.title = How will you sell these goods?
+hvd.how-will-you-sell-goods.cya = How you will sell these goods
 hvd.how-will-you-sell-goods.channels.auction = Auction
 hvd.how-will-you-sell-goods.channels.retail = Retail
 hvd.how-will-you-sell-goods.channels.wholesale = Wholesale
@@ -2782,9 +2783,11 @@ hvd.cash.payment.data.summary.details.03 = several related cash payments, includ
 hvd.cash.payment.convert.currency.summary = If you do not use euros you’ll need to convert the amount to the currency you use.
 
 hvd.cash.payment.date.title = What was the date of the first payment?
+hvd.cash.payment.date.cya = Date of first payment
 hvd.cash.payment.date.example = For example, 31 03 2015.
 
 hvd.products.title = What will your business buy or sell?
+hvd.products.cya = What your business will buy or sell
 hvd.products.option.01 = Alcohol
 hvd.products.option.02 = Tobacco
 hvd.products.option.03 = Antiques
@@ -2804,6 +2807,7 @@ hvd.identify.linked.cash.payments.subtitle = If you do not use euros you’ll ne
 hvd.receiving.title = Do you expect to receive cash payments of €10,000 or more from customers you have not met in person?
 hvd.receiving.convert.currency.text = If you do not use euros you’ll need to convert the amount to the currency you use.
 hvd.receiving.expect.to.receive = How do you expect to receive cash payments of €10,000 or more from customers you have not met?
+hvd.receiving.expect.to.receive.cya = How you expect to receive cash payments of €10,000 or more from customers you have not met
 hvd.receiving.option.01 = By courier
 hvd.receiving.option.02 = Directly into a bank account
 hvd.receiving.option.03 = Another way to receive cash payments
@@ -2814,6 +2818,7 @@ hvd.expect.to.receive.title = How do you expect to receive cash payments of €1
 hvd.excise.goods.title = Will you be buying or selling duty-suspended excise goods?
 
 hvd.percentage.title = What percentage of your turnover do you expect to come from cash payments of €10,000 or more?
+hvd.percentage.cya = Percentage of turnover you expect to come from cash payments of €10,000 or more
 hvd.percentage.text = If you do not use euros you’ll need to convert the amount to the currency you use.
 hvd.percentage.lbl.01 = 0% to 20%
 hvd.percentage.lbl.02 = 21% to 40%

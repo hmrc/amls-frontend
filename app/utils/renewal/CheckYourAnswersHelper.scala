@@ -371,7 +371,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
   private def getPercentageOfCashRow(model: Renewal)(implicit messages: Messages): Option[SummaryListRow] =
     model.percentageOfCashPaymentOver15000.map { percentage =>
       row(
-        "renewal.hvd.percentage.title",
+        "renewal.hvd.percentage.cya",
         messages(s"hvd.percentage.lbl.${percentage.value}"),
         editAction(
           controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get(true).url,

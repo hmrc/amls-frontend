@@ -751,7 +751,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
             assertRowMatches(
               19,
-              "renewal.hvd.percentage.title",
+              "renewal.hvd.percentage.cya",
               messages(s"hvd.percentage.lbl.${percentage.value}"),
               controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get(true).url,
               "hvdpercentage-edit"
