@@ -164,11 +164,11 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
     "transactions in next 12 months" when {
       "should display when MSB services contains TransmittingMoney" in new TMViewFixture {
-        html must include(messages("msb.transactions.expected.title"))
+        html must include(messages("msb.transactions.expected.cya"))
       }
 
       "should not display when MSB services does not contain TransmittingMoney" in new NoSubsectorsViewFixture {
-        html must not include messages("msb.transactions.expected.title")
+        html must not include messages("msb.transactions.expected.cya")
       }
     }
 
@@ -184,59 +184,59 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
     "send largest amount of money to which countries" when {
       "should display when MSB services contains TransmittingMoney and sends money to other countries" in new TMViewFixture {
-        html must include(messages("msb.send.the.largest.amounts.of.money.title"))
+        html must include(messages("msb.send.the.largest.amounts.of.money.cya"))
       }
 
       "should not display when MSB services contains TransmittingMoney and does not send money to other countries" in new TMNotSendViewFixture {
-        html must not include messages("msb.send.the.largest.amounts.of.money.title")
+        html must not include messages("msb.send.the.largest.amounts.of.money.cya")
       }
 
       "should not display when MSB services does not contain TransmittingMoney" in new NoSubsectorsViewFixture {
-        html must not include messages("msb.send.the.largest.amounts.of.money.title")
+        html must not include messages("msb.send.the.largest.amounts.of.money.cya")
       }
     }
 
     "largest amount of transactions in which countries" when {
       "should display when MSB services contains TransmittingMoney and sends money to other countries" in new TMViewFixture {
-        html must include(messages("msb.most.transactions.title"))
+        html must include(messages("msb.most.transactions.cya"))
       }
 
       "should not display when MSB services contains TransmittingMoney and does not send money to other countries" in new TMNotSendViewFixture {
-        html must not include messages("msb.most.transactions.title")
+        html must not include messages("msb.most.transactions.cya")
       }
 
       "should not display when MSB services does not contain TransmittingMoney" in new NoSubsectorsViewFixture {
-        html must not include messages("msb.most.transactions.title")
+        html must not include messages("msb.most.transactions.cya")
       }
     }
 
     "CE transactions in next 12 months" when {
       "should display when MSB services contains CurrencyExchange" in new CEViewFixture {
-        html must include(messages("msb.ce.transactions.expected.in.12.months.title"))
+        html must include(messages("msb.ce.transactions.expected.in.12.months.cya"))
       }
 
       "should not display when MSB services does not contain CurrencyExchange" in new NoSubsectorsViewFixture {
-        html must not include messages("msb.ce.transactions.expected.in.12.months.title")
+        html must not include messages("msb.ce.transactions.expected.in.12.months.cya")
       }
     }
 
     "which currencies to deal with" when {
       "should display when MSB services contains CurrencyExchange" in new CEViewFixture {
-        html must include(messages("msb.which_currencies.title"))
+        html must include(messages("msb.which_currencies.cya"))
       }
 
       "should not display when MSB services does not contain CurrencyExchange" in new NoSubsectorsViewFixture {
-        html must not include messages("msb.which_currencies.title")
+        html must not include messages("msb.which_currencies.cya")
       }
     }
 
     "FX transactions in next 12 months" when {
       "should display when MSB services contains ForeignExchange" in new FXViewFixture {
-        html must include(messages("msb.fx.transactions.expected.in.12.months.title"))
+        html must include(messages("msb.fx.transactions.expected.in.12.months.cya"))
       }
 
       "should not display when MSB services does not contain ForeignExchange" in new NoSubsectorsViewFixture {
-        html must not include messages("msb.fx.transactions.expected.in.12.months.title")
+        html must not include messages("msb.fx.transactions.expected.in.12.months.cya")
       }
     }
 
