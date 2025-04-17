@@ -72,7 +72,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
   private def expectedThroughputRow(model: MoneyServiceBusiness)(implicit messages: Messages): Option[SummaryListRow] =
     model.throughput.map { expectedThroughput =>
       row(
-        "msb.throughput.title",
+        "msb.throughput.cya",
         messages(s"msb.throughput.lbl.${expectedThroughput.value}"),
         editAction(
           controllers.msb.routes.ExpectedThroughputController.get(true).url,
@@ -98,7 +98,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
             )
           ),
           SummaryListRow(
-            Key(Text(messages("msb.branchesoragents.countries.title"))),
+            Key(Text(messages("msb.branchesoragents.countries.cya"))),
             branches.branches match {
               case branch :: Nil => Value(Text(branch.name))
               case branches      => toBulletList(branches)
@@ -205,7 +205,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
   )(implicit messages: Messages): Option[SummaryListRow] =
     model.transactionsInNext12Months.map { transactions =>
       row(
-        "msb.transactions.expected.title",
+        "msb.transactions.expected.cya",
         transactions.txnAmount,
         editAction(
           controllers.msb.routes.TransactionsInNext12MonthsController.get(true).url,
@@ -246,7 +246,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
           ),
           model.sendTheLargestAmountsOfMoney.map { amount =>
             SummaryListRow(
-              Key(Text(messages("msb.send.the.largest.amounts.of.money.title"))),
+              Key(Text(messages("msb.send.the.largest.amounts.of.money.cya"))),
               amount.countries match {
                 case country :: Nil => Value(Text(country.name))
                 case countries      => toBulletList(countries)
@@ -260,7 +260,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
           },
           model.mostTransactions.map { mt =>
             SummaryListRow(
-              Key(Text(messages("msb.most.transactions.title"))),
+              Key(Text(messages("msb.most.transactions.cya"))),
               mt.countries match {
                 case country :: Nil => Value(Text(country.name))
                 case countries      => toBulletList(countries)
@@ -280,7 +280,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
   )(implicit messages: Messages): Option[SummaryListRow] =
     model.ceTransactionsInNext12Months.map { transactions =>
       row(
-        "msb.ce.transactions.expected.in.12.months.title",
+        "msb.ce.transactions.expected.in.12.months.cya",
         transactions.ceTransaction,
         editAction(
           controllers.msb.routes.CurrencyExchangesInNext12MonthsController.get(true).url,
@@ -297,7 +297,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
       Seq(
         Some(
           SummaryListRow(
-            Key(Text(messages("msb.which_currencies.title"))),
+            Key(Text(messages("msb.which_currencies.cya"))),
             currencies match {
               case currency :: Nil => Value(Text(currency))
               case currencies      => toBulletList(currencies)
@@ -327,7 +327,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
               if (foreignCurrencies.value) {
                 Some(
                   SummaryListRow(
-                    Key(Text(messages("msb.supply_foreign_currencies.title"))),
+                    Key(Text(messages("msb.supply_foreign_currencies.cya"))),
                     sources.toMessages match {
                       case source :: Nil => Value(Text(source))
                       case sources       => toBulletList(sources)
@@ -372,7 +372,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
   )(implicit messages: Messages): Option[SummaryListRow] =
     model.fxTransactionsInNext12Months.map { transactions =>
       row(
-        "msb.fx.transactions.expected.in.12.months.title",
+        "msb.fx.transactions.expected.in.12.months.cya",
         transactions.fxTransaction,
         editAction(
           controllers.msb.routes.FXTransactionsInNext12MonthsController.get(true).url,

@@ -139,7 +139,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
             assertRowMatches(
               0,
-              "msb.throughput.title",
+              "msb.throughput.cya",
               messages(s"msb.throughput.lbl.${throughput.value}"),
               controllers.msb.routes.ExpectedThroughputController.get(true).url,
               "msbthroughput-edit"
@@ -186,7 +186,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
             assertRowMatches(
               2,
-              "msb.branchesoragents.countries.title",
+              "msb.branchesoragents.countries.cya",
               toBulletList(countries.map(_.name)),
               controllers.msb.routes.BranchesOrAgentsWhichCountriesController.get(true).url,
               "msbwhichcountries-edit"
@@ -210,7 +210,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
             assertRowMatches(
               2,
-              "msb.branchesoragents.countries.title",
+              "msb.branchesoragents.countries.cya",
               countries.head.name,
               controllers.msb.routes.BranchesOrAgentsWhichCountriesController.get(true).url,
               "msbwhichcountries-edit"
@@ -352,7 +352,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             8,
-            "msb.transactions.expected.title",
+            "msb.transactions.expected.cya",
             transactions,
             controllers.msb.routes.TransactionsInNext12MonthsController.get(true).url,
             "msbtransactionsexpected-edit"
@@ -399,7 +399,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             10,
-            "msb.send.the.largest.amounts.of.money.title",
+            "msb.send.the.largest.amounts.of.money.cya",
             toBulletList(countries.map(_.name)),
             controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).url,
             "msbsendlargestamounts-edit"
@@ -416,7 +416,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             10,
-            "msb.send.the.largest.amounts.of.money.title",
+            "msb.send.the.largest.amounts.of.money.cya",
             countries.head.name,
             controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).url,
             "msbsendlargestamounts-edit"
@@ -431,7 +431,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             11,
-            "msb.most.transactions.title",
+            "msb.most.transactions.cya",
             toBulletList(countries.map(_.name)),
             controllers.msb.routes.MostTransactionsController.get(true).url,
             "msbmosttransactions-edit"
@@ -448,7 +448,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             11,
-            "msb.most.transactions.title",
+            "msb.most.transactions.cya",
             countries.head.name,
             controllers.msb.routes.MostTransactionsController.get(true).url,
             "msbmosttransactions-edit"
@@ -463,7 +463,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             12,
-            "msb.ce.transactions.expected.in.12.months.title",
+            "msb.ce.transactions.expected.in.12.months.cya",
             ceTransactions,
             controllers.msb.routes.CurrencyExchangesInNext12MonthsController.get(true).url,
             "msbcetransactionsexpected-edit"
@@ -478,7 +478,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             13,
-            "msb.which_currencies.title",
+            "msb.which_currencies.cya",
             toBulletList(currencies),
             controllers.msb.routes.WhichCurrenciesController.get(true).url,
             "whichCurrencies-edit"
@@ -495,7 +495,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             13,
-            "msb.which_currencies.title",
+            "msb.which_currencies.cya",
             currencies.head,
             controllers.msb.routes.WhichCurrenciesController.get(true).url,
             "whichCurrencies-edit"
@@ -542,7 +542,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             15,
-            "msb.supply_foreign_currencies.title",
+            "msb.supply_foreign_currencies.cya",
             toBulletList(fullMoneySourcesModel.toMessages),
             controllers.msb.routes.MoneySourcesController.get(true).url,
             "moneysources-edit"
@@ -564,7 +564,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             15,
-            "msb.supply_foreign_currencies.title",
+            "msb.supply_foreign_currencies.cya",
             moneySourcesModel.toMessages.mkString,
             controllers.msb.routes.MoneySourcesController.get(true).url,
             "moneysources-edit"
@@ -617,10 +617,10 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         assertRowIsNotPresent("msb.summary.ipsp-name")
         assertRowIsNotPresent("msb.summary.ipsp-registration-number")
         assertRowIsNotPresent("msb.fundstransfer.title")
-        assertRowIsNotPresent("msb.transactions.expected.title")
+        assertRowIsNotPresent("msb.transactions.expected.cya")
         assertRowIsNotPresent("msb.send.money.title")
-        assertRowIsNotPresent("msb.send.the.largest.amounts.of.money.title")
-        assertRowIsNotPresent("msb.most.transactions.title")
+        assertRowIsNotPresent("msb.send.the.largest.amounts.of.money.cya")
+        assertRowIsNotPresent("msb.most.transactions.cya")
       }
     }
 
@@ -634,10 +634,10 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
           )
           .rows
 
-        assertRowIsNotPresent("msb.ce.transactions.expected.in.12.months.title")
-        assertRowIsNotPresent("msb.which_currencies.title")
+        assertRowIsNotPresent("msb.ce.transactions.expected.in.12.months.cya")
+        assertRowIsNotPresent("msb.which_currencies.cya")
         assertRowIsNotPresent("msb.deal_foreign_currencies.title")
-        assertRowIsNotPresent("msb.supply_foreign_currencies.title")
+        assertRowIsNotPresent("msb.supply_foreign_currencies.cya")
         assertRowIsNotPresent("msb.bank.names")
         assertRowIsNotPresent("msb.wholesaler.names")
       }
@@ -653,7 +653,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
           )
           .rows
 
-        assertRowIsNotPresent("msb.fx.transactions.expected.in.12.months.title")
+        assertRowIsNotPresent("msb.fx.transactions.expected.in.12.months.cya")
       }
     }
 
@@ -675,7 +675,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
           )
           .rows
 
-        assertRowIsNotPresent("msb.supply_foreign_currencies.title")
+        assertRowIsNotPresent("msb.supply_foreign_currencies.cya")
       }
     }
   }
