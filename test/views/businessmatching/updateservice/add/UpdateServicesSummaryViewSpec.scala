@@ -48,7 +48,7 @@ class UpdateServicesSummaryViewSpec extends UpdateServicesSummaryFixtures {
         AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
       def view                                               = update_services_summary(addBusinessTypeFlowModel)
 
-      doc.body().text must include(messages("businessmatching.updateservice.selectactivities.title"))
+      doc.body().text must include(messages("businessmatching.updateservice.selectactivities.cya"))
     }
 
     "show edit link" in new SimpleFlowModelViewFixture {
