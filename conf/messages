@@ -1327,6 +1327,7 @@ changeservices.choice.add = Register another service
 changeservices.choice.remove = Remove a service
 
 dateofchange.title = When did the change happen?
+dateofchange.cya = Date of change
 dateofchange.hint = For example, 31 03 1980.
 
 deregistration.reason.title = De-Register
@@ -1753,7 +1754,7 @@ businessmatching.updateservice.removeactivitiesinformation.info.3 = You need to 
 businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need to add a new service before you remove the services you are currently registered for.
 businessmatching.updateservice.removeactivitiesinformation.info.2 = If you no longer need to be registered with HMRC under the Money Laundering Regulations, you can de-register your business. You can do this from your registration page.
 
-businessmatching.updateservice.removeactivities.heading = Which service do you need to remove?
+businessmatching.updateservice.removeactivities.cya = Service you need to remove
 businessmatching.updateservice.removeactivities.title.twobusinesses = Which service do you need to remove?
 businessmatching.updateservice.removeactivities.heading.twobusinesses = Which service do you need to remove?
 businessmatching.updateservice.removeactivities.title.multibusinesses = Which services do you need to remove?
