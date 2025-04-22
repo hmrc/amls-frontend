@@ -41,7 +41,7 @@
             Seq(
                 model.activitiesToRemove.map { activities =>
                     SummaryListRow(
-                        Key(Text(messages("businessmatching.updateservice.removeactivities.heading"))),
+                        Key(Text(messages("businessmatching.updateservice.removeactivities.cya"))),
                         if(activities.size == 1) {
                             Value(Text(activities.head.getMessage()))
                         } else {
@@ -68,7 +68,7 @@
                 },
                 model.dateOfChange.map { doc =>
                     SummaryListRow(
-                        Key(Text(messages("dateofchange.title"))),
+                        Key(Text(messages("dateofchange.cya"))),
                         Value(Text(DateHelper.formatDate(doc.dateOfChange))),
                         actions = Some(Actions(
                             items = Seq(ActionItem(
