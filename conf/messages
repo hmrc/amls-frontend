@@ -1798,6 +1798,7 @@ businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredin
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.text = Return to about your business
 
 businessmatching.updateservice.selectactivities.title = Which service do you need to register?
+businessmatching.updateservice.selectactivities.cya = Service you need to register
 businessmatching.updateservice.selectactivities.heading = Which service do you need to register?
 businessmatching.updateservice.selectactivities.hint = You can only add one service at a time.
 businessmatching.updateservice.selectactivities.currentactivities.hint = You have registered as
