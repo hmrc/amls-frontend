@@ -79,7 +79,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
         Seq(
           booleanRow(true),
           row(
-            "renewal.involvedinother.cya.second.title",
+            "renewal.involvedinother.cya.second.cya",
             details,
             editAction(
               controllers.renewal.routes.InvolvedInOtherController.get(true).url,
@@ -96,7 +96,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
   private def businessTurnoverRow(model: Renewal)(implicit messages: Messages): Option[SummaryListRow] =
     model.businessTurnover.map { businessTurnover =>
       row(
-        "renewal.business-turnover.title",
+        "renewal.business-turnover.cya",
         messages(s"businessactivities.turnover.lbl.${businessTurnover.value}"),
         editAction(
           controllers.renewal.routes.BusinessTurnoverController.get(true).url,
@@ -136,7 +136,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
   private def ampTurnoverRow(model: Renewal)(implicit messages: Messages): Option[SummaryListRow] =
     model.ampTurnover.map { ampTurnover =>
       row(
-        "renewal.amp.turnover.title",
+        "renewal.amp.turnover.cya",
         messages(s"hvd.percentage.lbl.${ampTurnover.value}"),
         editAction(
           controllers.renewal.routes.AMPTurnoverController.get(true).url,
@@ -151,7 +151,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
     val seq = Seq(
       model.totalThroughput.map { totalThroughput =>
         row(
-          "renewal.msb.throughput.header",
+          "renewal.msb.throughput.cya",
           TotalThroughput.labelFor(totalThroughput),
           editAction(
             controllers.renewal.routes.TotalThroughputController.get(true).url,
@@ -162,7 +162,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
       },
       model.transactionsInLast12Months.map { transactions =>
         row(
-          "renewal.msb.transfers.header",
+          "renewal.msb.transfers.cya",
           transactions.transfers,
           editAction(
             controllers.renewal.routes.TransactionsInLast12MonthsController.get(true).url,
@@ -191,7 +191,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
       },
       model.sendTheLargestAmountsOfMoney.map { lom =>
         SummaryListRow(
-          Key(Text(messages("renewal.msb.largest.amounts.title"))),
+          Key(Text(messages("renewal.msb.largest.amounts.cya"))),
           if (lom.countries.size == 1) {
             Value(Text(lom.countries.head.name))
           } else {
@@ -206,7 +206,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
       },
       model.mostTransactions.map { mt =>
         SummaryListRow(
-          Key(Text(messages("renewal.msb.most.transactions.title"))),
+          Key(Text(messages("renewal.msb.most.transactions.cya"))),
           if (mt.countries.size == 1) {
             Value(Text(mt.countries.head.name))
           } else {
@@ -228,7 +228,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
 
     def getMoneySourcesRow(value: Value) =
       SummaryListRow(
-        Key(Text(messages("renewal.msb.money_sources.header"))),
+        Key(Text(messages("renewal.msb.money_sources.cya"))),
         value,
         actions = editAction(
           controllers.renewal.routes.MoneySourcesController.get(edit = true).url,
@@ -241,7 +241,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
       Seq(
         model.ceTransactionsInLast12Months map { transactions =>
           row(
-            "renewal.msb.ce.transactions.expected.title",
+            "renewal.msb.ce.transactions.expected.cya",
             transactions.ceTransaction,
             editAction(
               controllers.renewal.routes.CETransactionsInLast12MonthsController.get(edit = true).url,
@@ -252,7 +252,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
         },
         Some(
           SummaryListRow(
-            Key(Text(messages("renewal.msb.whichcurrencies.header"))),
+            Key(Text(messages("renewal.msb.whichcurrencies.cya"))),
             if (wc.currencies.size == 1) {
               Value(Text(wc.currencies.head))
             } else {
@@ -319,7 +319,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
     model.fxTransactionsInLast12Months.map { transactions =>
       Seq(
         row(
-          "renewal.msb.fx.transactions.expected.title",
+          "renewal.msb.fx.transactions.expected.cya",
           transactions.fxTransaction,
           editAction(
             controllers.renewal.routes.FXTransactionsInLast12MonthsController.get(edit = true).url,
@@ -336,7 +336,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
     val seq = Seq(
       model.customersOutsideIsUK.map { boa =>
         row(
-          "renewal.customer.outside.uk.title",
+          "renewal.customer.outside.uk.cya",
           booleanToLabel(boa.isOutside),
           editAction(
             controllers.renewal.routes.CustomersOutsideIsUKController.get(true).url,
@@ -348,7 +348,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
       model.customersOutsideUK.flatMap { boa =>
         def makeRow(value: Value) =
           SummaryListRow(
-            Key(Text(messages("renewal.customer.outside.uk.countries.title"))),
+            Key(Text(messages("renewal.customer.outside.uk.countries.cya"))),
             value,
             actions = editAction(
               controllers.renewal.routes.CustomersOutsideUKController.get(true).url,
@@ -402,7 +402,7 @@ class CheckYourAnswersHelper @Inject() () extends CheckYourAnswersHelperFunction
         ),
         rcp.howCashPaymentsReceived map { hcpr =>
           SummaryListRow(
-            Key(Text(messages("renewal.cash.payments.received.title"))),
+            Key(Text(messages("renewal.cash.payments.received.cya"))),
             hcpr.paymentMethods.getSummaryMessages match {
               case message :: Nil => Value(Text(message))
               case messageList    => toBulletList(messageList)

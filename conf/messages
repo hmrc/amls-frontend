@@ -3057,10 +3057,11 @@ progress.renewal.description = Information about your business over the last 12 
 progress.renewal.time = 7 and 10
 
 renewal.amp.turnover.title = How much of your turnover for the last 12 months came from sales of art for €10,000 or more?
+renewal.amp.turnover.cya = How much of your turnover came from sales of art for €10,000 or more
 
 renewal.involvedinother.title = Other business activities
 renewal.involvedinother.legend = Was your business involved in any other activities in the last 12 months?
-renewal.involvedinother.cya.second.title = Describe the other activities your business was involved in
+renewal.involvedinother.cya.second.cya = Description of activities
 renewal.involvedinother.example = We need to know if your business is involved in other activities such as:
 renewal.involvedinother.listline1 = running a newsagent’s
 renewal.involvedinother.listline2 = recruitment
@@ -3070,7 +3071,9 @@ renewal.involvedinother.details.title = What other activities has your business 
 renewal.involvedinother.details.txtarea.hint = For example, selling software packages.
 
 renewal.customer.outside.uk.title = In the last 12 months did you have customers who lived or worked outside of the UK?
+renewal.customer.outside.uk.cya = In the last 12 months did you have customers who lived or worked outside the UK?
 renewal.customer.outside.uk.countries.title = Which countries did these customers live or work in?
+renewal.customer.outside.uk.countries.cya = Countries customers lived or worked in
 renewal.customer.outside.uk.countries.text = You’ve told us you have customers who lived or worked outside of the UK in the last 12 months.
 
 renewal.turnover.title = Total net profit for the last 12 months
@@ -3085,6 +3088,7 @@ renewal.percentage.list.line3 = several related cash payments, including payment
 renewal.percentage.details = What is a cash payment?
 
 renewal.business-turnover.title = What was your total net profit for the last 12 months?
+renewal.business-turnover.cya = Total net profit for last 12 months
 renewal.receiving.title = Recent cash payments of over €10,000
 renewal.receiving.text.line1 = You must inform HMRC if you have received any cash payments to the amount of €10,000 or more from customers you have not met in person.
 renewal.receiving.text.line2 = If you do not use euros, you’ll need to convert the amount to the currency you use.
@@ -3097,6 +3101,7 @@ renewal.receiving.list.line3 = several related cash payments, including payment 
 renewal.cash.payments.not.met = In the last 12 months, have you received cash payments of €10,000 or more from customers you have not met in person?
 
 renewal.cash.payments.received.title = How did you receive cash payments from customers you have not met in person?
+renewal.cash.payments.received.cya = How these cash payments were received
 renewal.cash.payments.received.text = You have told us you received cash payments of €10,000 or more in the last 12 months.
 renewal.cash.payments.received.lbl1 = By courier
 renewal.cash.payments.received.lbl2 = Directly into a bank account
@@ -3104,6 +3109,7 @@ renewal.cash.payments.received.lbl3 = Another way
 renewal.cash.payments.received.lbl3.hint = Add how you received cash payments from customers you have not met in person
 
 renewal.msb.throughput.header = What was your total value of transactions in the last 12 months?
+renewal.msb.throughput.cya = Total value of transactions in last 12 months
 renewal.msb.throughput.info.prefix = This is also known as your total throughput. It is
 renewal.msb.throughput.info.bold = not
 renewal.msb.throughput.info.suffix = your total net profit or turnover.
@@ -3118,23 +3124,31 @@ renewal.msb.throughput.selection.6 = £101 million to £1 billion
 renewal.msb.throughput.selection.7 = More than £1 billion
 
 renewal.msb.whichcurrencies.header = Which currencies did you supply the most to your customers in the last 12 months?
+renewal.msb.whichcurrencies.cya = Currencies you supplied most in last 12 months
 renewal.msb.foreign_currencies.header =  Did you deal in physical foreign currencies in the last 12 months?
 renewal.msb.money_sources.header =  Who supplied your physical foreign currency in the last 12 months?
+renewal.msb.money_sources.cya =  Who supplied your physical foreign currency in last 12 months
 renewal.msb.money_sources.bank = Names of banks that supplied your foreign currency
 renewal.msb.money_sources.wholesaler = Names of wholesalers that supplied your foreign currency
 renewal.msb.ce.transactions.expected.title = How many currency exchange transactions did you make in the last 12 months?
+renewal.msb.ce.transactions.expected.cya = Number of currency exchange transactions made in last 12 months
 renewal.msb.fx.transactions.expected.title = How many foreign exchange transactions did you make in the last 12 months?
+renewal.msb.fx.transactions.expected.cya = Number of foreign exchange transactions made in last 12 months
 
 renewal.msb.send.money.title = Did you send money to other countries in the last 12 months?
 
 renewal.msb.most.transactions.title = Where did you send the most transactions in the last 12 months?
+renewal.msb.most.transactions.cya = Where you sent most transactions in last 12 months
 
 renewal.msb.transfers.header = How many money transfers did you make in the last 12 months?
+renewal.msb.transfers.cya = Number of money transfers made in last 12 months
 renewal.msb.transfers.value.invalid = Enter how many money transfers your business made in the last 12 months
 
 renewal.hvd.percentage.title = What percentage of your turnover came from cash payments of €10,000 or more?
+renewal.hvd.percentage.cya = Percentage of turnover from cash payments of €10,000 or more
 
 renewal.msb.largest.amounts.title = Which countries did you send the largest amounts of money to in the last 12 months?
+renewal.msb.largest.amounts.cya = Countries you sent largest amounts of money to in last 12 months
 error.required.renewal.largest.amounts.country = Enter the countries you sent the largest amounts of money to in the last 12 months
 
 renewal.customers.outside.uk.hint.lbl = Where did these customers live or work?

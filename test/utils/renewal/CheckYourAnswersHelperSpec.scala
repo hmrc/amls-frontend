@@ -158,7 +158,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             1,
-            "renewal.involvedinother.cya.second.title",
+            "renewal.involvedinother.cya.second.cya",
             activity,
             controllers.renewal.routes.InvolvedInOtherController.get(true).url,
             "involvedinotheractivities-details-edit"
@@ -196,7 +196,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
             assertRowMatches(
               2,
-              "renewal.business-turnover.title",
+              "renewal.business-turnover.cya",
               messages(s"businessactivities.turnover.lbl.${businessTurnover.value}"),
               controllers.renewal.routes.BusinessTurnoverController.get(true).url,
               "businessturnover-edit"
@@ -263,7 +263,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
             assertRowMatches(
               4,
-              "renewal.amp.turnover.title",
+              "renewal.amp.turnover.cya",
               messages(s"hvd.percentage.lbl.${ampTurnover.value}"),
               controllers.renewal.routes.AMPTurnoverController.get(true).url,
               "ampTurnover-edit"
@@ -286,7 +286,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
               assertRowMatches(
                 5,
-                "renewal.msb.throughput.header",
+                "renewal.msb.throughput.cya",
                 TotalThroughput.labelFor(TotalThroughput(value)),
                 controllers.renewal.routes.TotalThroughputController.get(true).url,
                 "msbtotalthroughput-edit"
@@ -307,7 +307,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             6,
-            "renewal.msb.transfers.header",
+            "renewal.msb.transfers.cya",
             transactionsInLast12Months,
             controllers.renewal.routes.TransactionsInLast12MonthsController.get(true).url,
             "msbtransfers-edit"
@@ -365,7 +365,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             8,
-            messages("renewal.msb.largest.amounts.title"),
+            messages("renewal.msb.largest.amounts.cya"),
             countries.head.name,
             controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).url,
             "msblargestamounts-edit"
@@ -383,7 +383,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             8,
-            messages("renewal.msb.largest.amounts.title"),
+            messages("renewal.msb.largest.amounts.cya"),
             toBulletList(countries.map(_.name)),
             controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).url,
             "msblargestamounts-edit"
@@ -404,7 +404,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             9,
-            messages("renewal.msb.most.transactions.title"),
+            messages("renewal.msb.most.transactions.cya"),
             countries.head.name,
             controllers.renewal.routes.MostTransactionsController.get(edit = true).url,
             "msbmostransactions-edit"
@@ -422,7 +422,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             9,
-            messages("renewal.msb.most.transactions.title"),
+            messages("renewal.msb.most.transactions.cya"),
             toBulletList(countries.map(_.name)),
             controllers.renewal.routes.MostTransactionsController.get(edit = true).url,
             "msbmostransactions-edit"
@@ -442,7 +442,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             10,
-            "renewal.msb.ce.transactions.expected.title",
+            "renewal.msb.ce.transactions.expected.cya",
             ceTransactions,
             controllers.renewal.routes.CETransactionsInLast12MonthsController.get(edit = true).url,
             "msbcetransactionsexpected-edit"
@@ -465,7 +465,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             11,
-            messages("renewal.msb.whichcurrencies.header"),
+            messages("renewal.msb.whichcurrencies.cya"),
             currencies.head,
             controllers.renewal.routes.WhichCurrenciesController.get(edit = true).url,
             "msbwhichcurrencies-edit"
@@ -483,7 +483,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             11,
-            messages("renewal.msb.whichcurrencies.header"),
+            messages("renewal.msb.whichcurrencies.cya"),
             toBulletList(currencies),
             controllers.renewal.routes.WhichCurrenciesController.get(edit = true).url,
             "msbwhichcurrencies-edit"
@@ -547,7 +547,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             13,
-            "renewal.msb.money_sources.header",
+            "renewal.msb.money_sources.cya",
             moneySources.toMessages.mkString,
             controllers.renewal.routes.MoneySourcesController.get(edit = true).url,
             "msbmoneysources-edit"
@@ -565,7 +565,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             13,
-            "renewal.msb.money_sources.header",
+            "renewal.msb.money_sources.cya",
             toBulletList(moneySourcesObj.toMessages),
             controllers.renewal.routes.MoneySourcesController.get(edit = true).url,
             "msbmoneysources-edit"
@@ -655,7 +655,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             16,
-            "renewal.msb.fx.transactions.expected.title",
+            "renewal.msb.fx.transactions.expected.cya",
             fxTransactions,
             controllers.renewal.routes.FXTransactionsInLast12MonthsController.get(edit = true).url,
             "msbfxtransactionsexpected-edit"
@@ -675,7 +675,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             17,
-            "renewal.customer.outside.uk.title",
+            "renewal.customer.outside.uk.cya",
             booleanToLabel(true),
             controllers.renewal.routes.CustomersOutsideIsUKController.get(true).url,
             "customersoutsideisuk-edit"
@@ -683,7 +683,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             18,
-            "renewal.customer.outside.uk.countries.title",
+            "renewal.customer.outside.uk.countries.cya",
             countries.head.name,
             controllers.renewal.routes.CustomersOutsideUKController.get(true).url,
             "customersoutsideuk-edit"
@@ -700,7 +700,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             17,
-            "renewal.customer.outside.uk.title",
+            "renewal.customer.outside.uk.cya",
             booleanToLabel(true),
             controllers.renewal.routes.CustomersOutsideIsUKController.get(true).url,
             "customersoutsideisuk-edit"
@@ -708,7 +708,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             18,
-            "renewal.customer.outside.uk.countries.title",
+            "renewal.customer.outside.uk.countries.cya",
             toBulletList(countries.map(_.name)),
             controllers.renewal.routes.CustomersOutsideUKController.get(true).url,
             "customersoutsideuk-edit"
@@ -728,13 +728,13 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             17,
-            "renewal.customer.outside.uk.title",
+            "renewal.customer.outside.uk.cya",
             booleanToLabel(false),
             controllers.renewal.routes.CustomersOutsideIsUKController.get(true).url,
             "customersoutsideisuk-edit"
           )
 
-          assertRowIsNotPresent("renewal.customer.outside.uk.countries.title")
+          assertRowIsNotPresent("renewal.customer.outside.uk.countries.cya")
         }
       }
 
@@ -787,7 +787,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             21,
-            "renewal.cash.payments.received.title",
+            "renewal.cash.payments.received.cya",
             otherPaymentMethod,
             controllers.renewal.routes.HowCashPaymentsReceivedController.get(true).url,
             "receivecashpaymentshowreceived-edit"
@@ -812,7 +812,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           assertRowMatches(
             21,
-            "renewal.cash.payments.received.title",
+            "renewal.cash.payments.received.cya",
             toBulletList(paymentMethods.getSummaryMessages),
             controllers.renewal.routes.HowCashPaymentsReceivedController.get(true).url,
             "receivecashpaymentshowreceived-edit"
@@ -848,8 +848,8 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             .rows
 
           assertRowIsNotPresent("renewal.msb.send.money.title")
-          assertRowIsNotPresent("renewal.msb.largest.amounts.title")
-          assertRowIsNotPresent("renewal.msb.most.transactions.title")
+          assertRowIsNotPresent("renewal.msb.largest.amounts.cya")
+          assertRowIsNotPresent("renewal.msb.most.transactions.cya")
         }
       }
 
@@ -863,10 +863,10 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             )
             .rows
 
-          assertRowIsNotPresent("renewal.msb.ce.transactions.expected.title")
-          assertRowIsNotPresent("renewal.msb.most.transactions.title")
+          assertRowIsNotPresent("renewal.msb.ce.transactions.expected.cya")
+          assertRowIsNotPresent("renewal.msb.most.transactions.cya")
           assertRowIsNotPresent("renewal.msb.foreign_currencies.header")
-          assertRowIsNotPresent("renewal.msb.money_sources.header")
+          assertRowIsNotPresent("renewal.msb.money_sources.cya")
           assertRowIsNotPresent("msb.which_currencies.source.which_banks")
           assertRowIsNotPresent("msb.which_currencies.source.which_wholesalers")
         }
@@ -882,7 +882,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             )
             .rows
 
-          assertRowIsNotPresent("renewal.msb.fx.transactions.expected.title")
+          assertRowIsNotPresent("renewal.msb.fx.transactions.expected.cya")
         }
       }
 
@@ -896,8 +896,8 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             )
             .rows
 
-          assertRowIsNotPresent("renewal.customer.outside.uk.title")
-          assertRowIsNotPresent("renewal.customer.outside.uk.countries.title")
+          assertRowIsNotPresent("renewal.customer.outside.uk.cya")
+          assertRowIsNotPresent("renewal.customer.outside.uk.countries.cya")
         }
       }
     }
