@@ -193,20 +193,22 @@ class LandingController @Inject() (
     landingService.cacheMap(credId) flatMap {
       case Some(cache) => preApplicationComplete(cache, amlsRegistrationNumber, accountTypeId, credId)
       case None        =>
-        landingService.reviewDetails.map { reviewDetails =>
-          (reviewDetails, amlsRegistrationNumber) match {
-            case (Some(rd), None)   =>
-              logger.debug("LandingController:getWithoutAmendments: " + rd)
-              landingService.updateReviewDetails(rd, credId).map { _ =>
-                auditConnector.sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse(""), rd.safeId))
-                businessTypePostcodeRedirectLogic(rd)
-              }
-            case (None, None)       => Future.successful(Redirect(Call("GET", appConfig.businessCustomerUrl)))
-            case (_, Some(amlsRef)) =>
-              logger.debug("LandingController:getWithoutAmendments: " + amlsRef)
-              Future.successful(Redirect(controllers.routes.StatusController.get()))
+        landingService.reviewDetails
+          .map { reviewDetails =>
+            (reviewDetails, amlsRegistrationNumber) match {
+              case (Some(rd), None)   =>
+                logger.debug("LandingController:getWithoutAmendments: " + rd)
+                landingService.updateReviewDetails(rd, credId).map { _ =>
+                  auditConnector
+                    .sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse(""), rd.safeId))
+                  businessTypePostcodeRedirectLogic(rd)
+                }
+              case (None, None)       => Future.successful(Redirect(Call("GET", appConfig.businessCustomerUrl)))
+              case (_, Some(amlsRef)) =>
+                logger.debug("LandingController:getWithoutAmendments: " + amlsRef)
+                Future.successful(Redirect(controllers.routes.StatusController.get()))
+            }
           }
-        }
           .flatMap(identity)
     }
   }
@@ -290,8 +292,8 @@ class LandingController @Inject() (
   )(implicit headerCarrier: HeaderCarrier): Future[Boolean] =
     statusService.getDetailedStatus(amlsRegistrationNumber, accountTypeId, cacheId).flatMap {
       case (
-            SubmissionDecisionRejected |
-            SubmissionDecisionRevoked | DeRegistered | SubmissionDecisionExpired | SubmissionWithdrawn,
+            SubmissionDecisionRejected | SubmissionDecisionRevoked |
+            DeRegistered | SubmissionDecisionExpired | SubmissionWithdrawn,
             _
           ) =>
         Future.successful(false)

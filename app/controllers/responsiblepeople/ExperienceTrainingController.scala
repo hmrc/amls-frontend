@@ -75,13 +75,12 @@ class ExperienceTrainingController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, bm, edit, index, flow, name))),
           data =>
             {
-              updateDataStrict[ResponsiblePerson](request.credId, index)(rp => rp.experienceTraining(data)) map {
-                _ =>
-                  if (edit) {
-                    Redirect(routes.DetailedAnswersController.get(index, flow))
-                  } else {
-                    Redirect(routes.TrainingController.get(index, edit, flow))
-                  }
+              updateDataStrict[ResponsiblePerson](request.credId, index)(rp => rp.experienceTraining(data)) map { _ =>
+                if (edit) {
+                  Redirect(routes.DetailedAnswersController.get(index, flow))
+                } else {
+                  Redirect(routes.TrainingController.get(index, edit, flow))
+                }
               }
             }.recoverWith { case _: IndexOutOfBoundsException =>
               Future.successful(NotFound(notFoundView))

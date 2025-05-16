@@ -202,15 +202,15 @@ class StatusService @Inject() (
       getETMPStatus(response)
     }
 
-  private def etmpReadStatus(amlsRefNumber: String, accountTypeId: (String, String))
-                            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ReadStatusResponse] = {
-    {
-      val status = amlsConnector.status(amlsRefNumber, accountTypeId)
-      // $COVERAGE-OFF$
-      logger.debug("StatusService:etmpReadStatus:status:" + status)
-      // $COVERAGE-ON$
-      status
-    }
+  private def etmpReadStatus(amlsRefNumber: String, accountTypeId: (String, String))(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[ReadStatusResponse] = {
+    val status = amlsConnector.status(amlsRefNumber, accountTypeId)
+    // $COVERAGE-OFF$
+    logger.debug("StatusService:etmpReadStatus:status:" + status)
+    // $COVERAGE-ON$
+    status
   }
 
   def isPending(status: SubmissionStatus): Boolean = status match {
