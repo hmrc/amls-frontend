@@ -60,7 +60,7 @@ object CustomAttributeProvider {
   def commonMark(rawEtmp: String): String = {
     val markdown = rawEtmp.replace("<P>", "\n").replace("</P>", "\n\n").replace("<tab> ", " ")
     val options  = new MutableDataSet
-    options.set[util.Collection[Extension]](Parser.EXTENSIONS, util.Arrays.asList { CustomExtension })
+    options.set[util.Collection[Extension]](Parser.EXTENSIONS, util.Arrays.asList(CustomExtension))
     options.set(HtmlRenderer.SOFT_BREAK, "<br/>")
     val parser   = Parser.builder(options).build
     val document = parser.parse(markdown)

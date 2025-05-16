@@ -44,9 +44,9 @@ class DeregistrationConfirmationController @Inject() (
     val okResult = for {
       amlsRefNumber <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
 
-      status        <- OptionT.liftF(statusService.getReadStatus(amlsRefNumber, request.accountTypeId))
-      key           <- fetchDeregistrationReason
-      businessName  <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
+      status       <- OptionT.liftF(statusService.getReadStatus(amlsRefNumber, request.accountTypeId))
+      key          <- fetchDeregistrationReason
+      businessName <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
     } yield Ok(
       view(
         dynamicKey = key.value,
@@ -57,8 +57,9 @@ class DeregistrationConfirmationController @Inject() (
     okResult getOrElse InternalServerError("Unable to get Deregistration confirmation")
   }
 
-  private def fetchDeregistrationReason()(implicit request: AuthorisedRequest[AnyContent]) = OptionT[Future, DeregistrationReason](
-    dataCacheConnector.fetch[DeregistrationReason](request.credId, DeregistrationReason.key)
-  )
+  private def fetchDeregistrationReason()(implicit request: AuthorisedRequest[AnyContent]) =
+    OptionT[Future, DeregistrationReason](
+      dataCacheConnector.fetch[DeregistrationReason](request.credId, DeregistrationReason.key)
+    )
 
 }
