@@ -305,6 +305,7 @@ package object models {
     Country("Kazakhstan", "KZ"),
     Country("Kenya", "KE"),
     Country("Kiribati", "KI"),
+    Country("Kosovo", "XK"),
     Country("Kuwait", "KW"),
     Country("Kyrgyzstan", "KG"),
     Country("Laos", "LA"),
