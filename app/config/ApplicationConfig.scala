@@ -131,6 +131,9 @@ class ApplicationConfig @Inject() (configuration: Configuration, servicesConfig:
   val registerNewOrgLink =
     "/coafe/government-gateway/register?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend"
 
+  val guidanceLink =
+    "https://www.gov.uk/government/collections/anti-money-laundering-supervision-detailed-information"
+
   val nationalCrimeAgencyUrl = "https://sarsreporting.nationalcrimeagency.gov.uk/"
 
   val companiesHouseUrl = "https://find-and-update.company-information.service.gov.uk/"

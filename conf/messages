@@ -3059,6 +3059,12 @@ progress.renewal.time = 7 and 10
 renewal.amp.turnover.title = How much of your turnover for the last 12 months came from sales of art for €10,000 or more?
 renewal.amp.turnover.cya = How much of your turnover came from sales of art for €10,000 or more
 
+renewal.yourresponsibilities.title = Your responsibilities
+renewal.yourresponsibilities.text1 = When filling in this application to extend your supervision, you must provide accurate and complete information. Non-compliance with the Money Laundering Regulations may result in a civil penalty and/or criminal prosecution.
+renewal.yourresponsibilities.text2 = Before you start, make sure you have read and understood
+renewal.yourresponsibilities.link.text = the Money Laundering Regulations guidance.
+renewal.yourresponsibilities.text3 = At the end of this application, you will need to confirm the information is accurate and you have read and understood the guidance.
+
 renewal.involvedinother.title = Other business activities
 renewal.involvedinother.legend = Was your business involved in any other activities in the last 12 months?
 renewal.involvedinother.cya.second.cya = Description of activities
