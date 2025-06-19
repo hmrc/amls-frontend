@@ -694,6 +694,8 @@ title.cya = Check your answers
 title.cya.pre.application = Check your answers before starting your application
 title.ya = Your answers
 title.yapp = Your application
+title.yr = Your responsibilities
+
 
 button.saveandcontinue = Save and continue
 button.saveandreturn = Save and continue
@@ -1417,6 +1419,11 @@ businessdetails.contactingyou.website.lbl = Website address (optional)
 businessdetails.contactingyou.businessaddress = Business address:
 businessdetails.contactingyou.invalid.phone = Invalid Phone Number
 businessdetails.contactingyou.invalid.mobile = Invalid Mobile Number
+
+businessdetails.yourresponsibilities.warning.text = When filling in this application, you must provide accurate and complete information. Non-compliance with the Money Laundering Regulations may result in a civil penalty and/or criminal prosecution.
+businessdetails.yourresponsibilities.para2.start = Before you start, make sure you have read and understood
+businessdetails.yourresponsibilities.para2.link = the Money Laundering Regulations guidance
+businessdetails.yourresponsibilities.para3 = At the end of this application, you will need to confirm the information is accurate and you have read and understood the guidance.
 
 businessdetails.correspondenceaddress.isuk.title = Is the address to send you letters about your supervision in the UK?
 businessdetails.correspondenceaddress.isuk.error = Select yes if the address to send you letters about your supervision is in the UK

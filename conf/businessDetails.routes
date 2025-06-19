@@ -44,5 +44,7 @@ POST        /letters-address                                       @controllers.
 
 GET         /what-you-need                                         @controllers.businessdetails.WhatYouNeedController.get
 
+GET         /your-responsibilities                                 @controllers.businessdetails.YourResponsibilitiesController.get
+
 GET         /check-your-answers                                    @controllers.businessdetails.SummaryController.get
 POST        /check-your-answers                                    @controllers.businessdetails.SummaryController.post()
