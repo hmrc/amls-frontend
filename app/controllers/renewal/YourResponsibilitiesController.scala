@@ -16,30 +16,19 @@
 
 package controllers.renewal
 
-import controllers.{AmlsBaseController, CommonPlayDependencies, MessagesRequestHelper}
-import play.api.i18n.MessagesApi
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import play.api.mvc._
-import utils.AuthAction
 import views.html.renewal.YourResponsibilitiesView
 
 import javax.inject.Inject
-import scala.concurrent.Future
 
 class YourResponsibilitiesController @Inject()(
-  authAction: AuthAction,
   val ds: CommonPlayDependencies,
   val cc: MessagesControllerComponents,
-  implicit override val messagesApi: MessagesApi,
-  parser: BodyParsers.Default,
   view: YourResponsibilitiesView,
-) extends AmlsBaseController(ds, cc)
-    with MessagesRequestHelper {
+) extends AmlsBaseController(ds, cc) {
 
-  val get: Action[AnyContent] = messagesAction(parser).async { implicit request: MessagesRequest[AnyContent] =>
-    Future.successful(Ok(view()))
-  }
-
-  val get2 = authAction.async {
-    Future.successful(Ok("OK"))
+  def get: Action[AnyContent] = Action { implicit request =>
+    Ok(view())
   }
 }

@@ -34,6 +34,6 @@
         <a id="guidance-link" class="govuk-link" href="@appConfig.guidanceLink">@messages("renewal.yourresponsibilities.link.text")</a>
     <p class="govuk-body">@messages("renewal.yourresponsibilities.text3")</p>
 
-    @button("button.continue")
+    @button(msg = messages("button.continue"), hrefOpt = Some(controllers.renewal.routes.InvolvedInOtherController.get().url))
 
 }

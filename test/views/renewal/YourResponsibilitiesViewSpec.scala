@@ -58,7 +58,7 @@ class YourResponsibilitiesViewSpec extends AmlsViewSpec with Matchers {
       val button: Element = doc.getElementById("button")
 
       button.text() mustBe messages("button.continue")
-      button.attr("href") mustBe s""
+      button.attr("href") mustBe "/anti-money-laundering/renewal/other-activities"
     }
   }
 }
