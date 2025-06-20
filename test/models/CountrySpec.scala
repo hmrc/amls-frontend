@@ -302,6 +302,7 @@ class CountrySpec extends AmlsSpec with ScalaCheckDrivenPropertyChecks {
         "VU",
         "WF",
         "WS",
+        "XK",
         "YE",
         "YT",
         "ZA",
