@@ -3041,6 +3041,12 @@ renewal.whatyouneed.line_12 = the number of foreign exchange transactions you ma
 renewal.whatyouneed.line_13 = which countries your customers lived or worked in, if you had customers who lived or worked outside of the UK
 renewal.whatyouneed.line_14 = the percentage of your turnover that came from cash payments of €10,000 or more
 renewal.whatyouneed.line_15 = how you received cash payments of €10,000 or more from customers you had not met in person, if you received any
+
+renewal.yourresponsibilities.warning.text = When filling in this application to extend your supervision, you must provide accurate and complete information. Non-compliance with the Money Laundering Regulations may result in a civil penalty and/or criminal prosecution.
+renewal.yourresponsibilities.para2.start = Before you start, make sure you have read and understood
+renewal.yourresponsibilities.para2.link = the Money Laundering Regulations guidance
+renewal.yourresponsibilities.para3 = At the end of this application, you will need to confirm the information is accurate and you have read and understood the guidance.
+
 renewal.progress.title = About your business
 renewal.progress.intro.1 = If something has changed in your business that is relevant to Money Laundering Regulations you must update your information.
 renewal.progress.intro.2 = You’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for any additional responsible people.
