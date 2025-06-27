@@ -3,7 +3,7 @@ POST        /progress                                                         @c
 
 GET         /what-you-need                                                    @controllers.renewal.WhatYouNeedController.get
 
-GET         /your-responsibilities                                             @controllers.renewal.YourResponsibilitiesController.get
+GET         /your-responsibilities                                            @controllers.renewal.YourResponsibilitiesController.get
 
 GET         /other-activities                                                 @controllers.renewal.InvolvedInOtherController.get(edit: Boolean ?= false)
 POST        /other-activities                                                 @controllers.renewal.InvolvedInOtherController.post(edit: Boolean ?= false)
