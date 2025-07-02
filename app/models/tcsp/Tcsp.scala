@@ -126,6 +126,7 @@ object Tcsp {
       NotStarted,
       TaskRow.notStartedTag
     )
+    val respUrl    = controllers.tcsp.routes.SummaryController.get().url
     cache.getEntry[Tcsp](key).fold(notStarted) { model =>
       if (model.isComplete && model.hasChanged) {
         TaskRow(
@@ -138,7 +139,7 @@ object Tcsp {
       } else if (model.isComplete) {
         TaskRow(
           key,
-          controllers.tcsp.routes.SummaryController.get().url,
+          controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
           model.hasChanged,
           Completed,
           TaskRow.completedTag

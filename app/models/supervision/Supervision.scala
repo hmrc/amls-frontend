@@ -90,7 +90,7 @@ object Supervision {
       NotStarted,
       TaskRow.notStartedTag
     )
-
+    val respUrl    = controllers.supervision.routes.SummaryController.get().url
     cache.getEntry[Supervision](key).fold(notStarted) {
       case m if m.isComplete && m.hasChanged =>
         TaskRow(
@@ -103,7 +103,7 @@ object Supervision {
       case model @ m if m.isComplete         =>
         TaskRow(
           key,
-          controllers.supervision.routes.SummaryController.get().url,
+          controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
           model.hasChanged,
           Completed,
           TaskRow.completedTag

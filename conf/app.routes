@@ -56,6 +56,7 @@ POST        /your-registration/withdrawal/check-your-answers                    
 
 GET        /your-registration/withdrawal/confirmation                                @controllers.withdrawal.WithdrawalConfirmationController.get
 
+GET         /your-responsibilities-update                                            @controllers.YourResponsibilitiesUpdateController.get(flow: String)
 
 GET         /your-registration/deregister                                             @controllers.deregister.DeRegisterApplicationController.get()
 POST        /your-registration/deregister                                             @controllers.deregister.DeRegisterApplicationController.post()

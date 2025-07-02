@@ -125,14 +125,15 @@ object Eab {
     Call(redirectCallType, destinationUrl)
 
   def taskRow(appConfig: ApplicationConfig)(implicit cache: Cache, messages: Messages): TaskRow = {
-    val messageKey = "eab"
-    val notStarted = TaskRow(
+    val messageKey    = "eab"
+    val notStarted    = TaskRow(
       messageKey,
       generateRedirect(appConfig.eabWhatYouNeedUrl).url,
       hasChanged = false,
       NotStarted,
       TaskRow.notStartedTag
     )
+    val eabSummaryUrl = generateRedirect(appConfig.eabSummaryUrl).url
     cache.getEntry[Eab](key).fold(notStarted) { model =>
       if (model.isComplete && model.hasChanged && model.hasAccepted) {
         TaskRow(
@@ -145,7 +146,7 @@ object Eab {
       } else if (model.isComplete && model.hasAccepted) {
         TaskRow(
           messageKey,
-          generateRedirect(appConfig.eabSummaryUrl).url,
+          controllers.routes.YourResponsibilitiesUpdateController.get(eabSummaryUrl).url,
           model.hasChanged,
           Completed,
           TaskRow.completedTag

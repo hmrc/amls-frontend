@@ -183,7 +183,7 @@ object MoneyServiceBusiness {
       NotStarted,
       TaskRow.notStartedTag
     )
-
+    val respUrl    = controllers.msb.routes.SummaryController.get.url
     cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) { model =>
       val msbService =
         ControllerHelper.getMsbServices(cache.getEntry[BusinessMatching](BusinessMatching.key)).getOrElse(Set.empty)
@@ -204,7 +204,7 @@ object MoneyServiceBusiness {
       } else if (isComplete) {
         TaskRow(
           key,
-          controllers.msb.routes.SummaryController.get.url,
+          controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
           model.hasChanged,
           Completed,
           TaskRow.completedTag

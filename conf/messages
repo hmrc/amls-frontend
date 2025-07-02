@@ -1128,6 +1128,12 @@ amendment.sidebar.heading = Submit amended application
 amendment.sidebar.text = You don’t need to re-submit your application until you’ve made changes to it.
 amendment.sidebar.button.text = Submit amendment
 
+amendment.yourresponsibilities.title = Your responsibilities
+amendment.yourresponsibilities.text1 = When updating your details, you must provide accurate and complete information. Non-compliance with the Money Laundering Regulations may result in a civil penalty and/or criminal prosecution.
+amendment.yourresponsibilities.text2 = Before you start, make sure you have read and understood
+amendment.yourresponsibilities.link.text = the Money Laundering Regulations guidance.
+amendment.yourresponsibilities.text3 = To finish updating your details, you will need to confirm the information is accurate and you have read and understood the guidance.
+
 #### Confirmation page ####
 confirmation.title = Your fee and payment reference
 confirmation.header = Your fee and payment reference

@@ -147,6 +147,7 @@ object Hvd {
       NotStarted,
       TaskRow.notStartedTag
     )
+    val respUrl    = controllers.hvd.routes.SummaryController.get.url
     cache.getEntry[Hvd](key).fold(notStarted) { model =>
       if (model.isComplete && model.hasChanged) {
         TaskRow(
@@ -159,7 +160,7 @@ object Hvd {
       } else if (model.isComplete) {
         TaskRow(
           key,
-          controllers.hvd.routes.SummaryController.get.url,
+          controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
           model.hasChanged,
           Completed,
           TaskRow.completedTag

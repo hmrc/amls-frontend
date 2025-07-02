@@ -290,10 +290,11 @@ class TradingPremisesSpec extends AmlsSpec {
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(completeModel, completeModel)))
         val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
+        val respUrl = controllers.tradingpremises.routes.YourTradingPremisesController.get().url
 
         taskRow.hasChanged must be(false)
         taskRow.status     must be(Completed)
-        taskRow.href       must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
+        taskRow.href       must be(controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url)
         taskRow.tag        must be(TaskRow.completedTag)
       }
     }
