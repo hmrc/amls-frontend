@@ -33,14 +33,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class YourResponsibilitiesController @Inject() (
-                                                 val dataCacheConnector: DataCacheConnector,
-                                                 val authAction: AuthAction,
-                                                 val ds: CommonPlayDependencies,
-                                                 renewalService: RenewalService,
-                                                 val cc: MessagesControllerComponents,
-                                                 view: YourResponsibilitiesView
-                                               )(implicit executionContext: ExecutionContext)
-  extends AmlsBaseController(ds, cc)
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  renewalService: RenewalService,
+  val cc: MessagesControllerComponents,
+  view: YourResponsibilitiesView
+)(implicit executionContext: ExecutionContext)
+    extends AmlsBaseController(ds, cc)
     with Logging {
 
   def get: Action[AnyContent] = authAction.async { implicit request =>
@@ -55,11 +55,11 @@ class YourResponsibilitiesController @Inject() (
   }
 
   def getSection(
-                  renewalService: RenewalService,
-                  credId: String,
-                  ba: Option[BusinessActivities],
-                  msbActivities: Option[BusinessMatchingMsbServices]
-                )(implicit request: Request[_]): Future[Result] =
+    renewalService: RenewalService,
+    credId: String,
+    ba: Option[BusinessActivities],
+    msbActivities: Option[BusinessMatchingMsbServices]
+  )(implicit request: Request[_]): Future[Result] =
     renewalService.getTaskRow(credId) map {
       case TaskRow(_, _, _, NotStarted | Started, _) => Ok(view(ba, msbActivities))
       case _                                         => Redirect(controllers.routes.RegistrationProgressController.get())

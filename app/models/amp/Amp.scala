@@ -78,13 +78,14 @@ object Amp {
     Call(redirectCallType, destinationUrl)
 
   def taskRow(appConfig: ApplicationConfig)(implicit cache: Cache, messages: Messages): TaskRow = {
-    val notStarted = TaskRow(
+    val notStarted    = TaskRow(
       key,
       generateRedirect(appConfig.ampWhatYouNeedUrl).url,
       hasChanged = false,
       NotStarted,
       TaskRow.notStartedTag
     )
+    val ampSummaryUrl = generateRedirect(appConfig.ampSummaryUrl).url
     cache.getEntry[Amp](key).fold(notStarted) { model =>
       if (model.isComplete && model.hasAccepted && model.hasChanged) {
         TaskRow(
@@ -97,7 +98,7 @@ object Amp {
       } else if (model.isComplete && model.hasAccepted) {
         TaskRow(
           key,
-          generateRedirect(appConfig.ampSummaryUrl).url,
+          controllers.routes.YourResponsibilitiesUpdateController.get(ampSummaryUrl).url,
           model.hasChanged,
           Completed,
           TaskRow.completedTag

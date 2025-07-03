@@ -164,12 +164,12 @@ object BusinessDetails {
       NotStarted,
       TaskRow.notStartedTag
     )
-
+    val respUrl    = controllers.businessdetails.routes.SummaryController.get.url
     cache.getEntry[BusinessDetails](key).fold(notStarted) {
       case model if model.isComplete                                                      =>
         TaskRow(
           messageKey,
-          controllers.businessdetails.routes.SummaryController.get.url,
+          controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
           model.hasChanged,
           Completed,
           TaskRow.completedTag

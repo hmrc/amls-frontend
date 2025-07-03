@@ -99,9 +99,10 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
       "returns a Completed task row when model is complete" in {
 
         val complete         = mock[Supervision]
+        val respUrl = controllers.supervision.routes.SummaryController.get().url
         val completedTaskRow = TaskRow(
           "supervision",
-          controllers.supervision.routes.SummaryController.get().url,
+          controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
           false,
           Completed,
           TaskRow.completedTag

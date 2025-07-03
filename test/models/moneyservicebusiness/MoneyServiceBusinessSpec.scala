@@ -114,6 +114,7 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 
       "model is complete" should {
         "return a Completed TaskRow" in {
+          val respUrl = controllers.msb.routes.SummaryController.get.url
           when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(
             BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
           )
@@ -121,7 +122,7 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           MoneyServiceBusiness.taskRow must be(
             TaskRow(
               MoneyServiceBusiness.key,
-              controllers.msb.routes.SummaryController.get.url,
+              controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
               false,
               Completed,
               TaskRow.completedTag

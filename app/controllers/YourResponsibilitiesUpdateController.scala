@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package controllers.businessdetails
+package controllers
 
-import com.google.inject.Inject
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import utils.AuthAction
-import views.html.businessdetails.YourResponsibilitiesView
-
+import views.html.registrationamendment.YourResponsibilitiesUpdateView
 import scala.concurrent.Future
+import javax.inject.Inject
 
-class YourResponsibilitiesController @Inject() (
+class YourResponsibilitiesUpdateController @Inject() (
   val authAction: AuthAction,
   val ds: CommonPlayDependencies,
   val cc: MessagesControllerComponents,
-  yourResponsibilitiesView: YourResponsibilitiesView
+  yourResponsibilitiesUpdateView: YourResponsibilitiesUpdateView
 ) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = authAction.async { implicit request =>
-    Future.successful(Ok(yourResponsibilitiesView()))
+  def get(flow: String): Action[AnyContent] = authAction.async { implicit request =>
+    Future.successful(Ok(yourResponsibilitiesUpdateView(flow)))
   }
 }

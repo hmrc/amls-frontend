@@ -134,4 +134,7 @@ class ApplicationConfig @Inject() (configuration: Configuration, servicesConfig:
   val nationalCrimeAgencyUrl = "https://sarsreporting.nationalcrimeagency.gov.uk/"
 
   val companiesHouseUrl = "https://find-and-update.company-information.service.gov.uk/"
+
+  val responsibilitiesUpdateLink =
+    "https://www.gov.uk/government/collections/anti-money-laundering-supervision-detailed-information"
 }

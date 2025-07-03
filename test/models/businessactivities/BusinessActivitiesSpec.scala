@@ -643,10 +643,10 @@ class BusinessActivitiesSpec extends AmlsSpec {
 
         when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
           .thenReturn(Some(completeModel))
-
+        val respUrl = controllers.businessactivities.routes.SummaryController.get.url
         BusinessActivities.taskRow(mockCacheMap, messages) mustBe TaskRow(
           "businessactivities",
-          controllers.businessactivities.routes.SummaryController.get.url,
+          controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
           hasChanged = false,
           Completed,
           TaskRow.completedTag

@@ -41,8 +41,8 @@ govukSummaryList: GovukSummaryList,
         Value(Text(businessName))
     )
 }
-
 @servicesRowValue = {
+
     @if(serviceNames.length == 1) {
             <p class="govuk-body">@serviceNames.head</p>
     } else {
@@ -54,7 +54,7 @@ govukSummaryList: GovukSummaryList,
     }
             @if(displayLink) {
               <p class="govuk-body govuk-!-margin-top-4">
-                <a id="view-details" href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp govuk-link">
+                <a id="view-details" href="@controllers.routes.YourResponsibilitiesUpdateController.get(controllers.businessmatching.routes.SummaryController.get.url).url" class="edit-preapp govuk-link">
                   @(if(canEditPreApplication) messages("progress.preapplication.canedit") else messages("progress.preapplication.readonly"))
                 </a>
               </p>

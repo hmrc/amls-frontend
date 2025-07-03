@@ -98,7 +98,7 @@ object BankDetails {
       NotStarted,
       TaskRow.notStartedTag
     )
-
+    val respUrl    = controllers.bankdetails.routes.YourBankAccountsController.get().url
     cache.getEntry[Seq[BankDetails]](key).fold(notStarted) {
       case model if model.isEmpty                                         =>
         TaskRow(
@@ -111,7 +111,7 @@ object BankDetails {
       case bds @ model if model.forall(_.isComplete) && anyChanged(model) =>
         TaskRow(
           messageKey,
-          controllers.bankdetails.routes.YourBankAccountsController.get().url,
+          controllers.bankdetails.routes.YourBankAccountsController.get.url,
           true,
           Updated,
           TaskRow.updatedTag
@@ -121,7 +121,7 @@ object BankDetails {
           } =>
         TaskRow(
           messageKey,
-          controllers.bankdetails.routes.YourBankAccountsController.get().url,
+          controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
           anyChanged(bds),
           Completed,
           TaskRow.completedTag

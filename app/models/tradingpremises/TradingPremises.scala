@@ -253,7 +253,7 @@ object TradingPremises {
       NotStarted,
       TaskRow.notStartedTag
     )
-
+    val respUrl    = controllers.tradingpremises.routes.YourTradingPremisesController.get().url
     cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) { tp =>
       if (filter(tp).equals(Nil)) {
         TaskRow(
@@ -280,7 +280,7 @@ object TradingPremises {
               } =>
             TaskRow(
               messageKey,
-              controllers.tradingpremises.routes.YourTradingPremisesController.get().url,
+              controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
               anyChanged(tp),
               Completed,
               TaskRow.completedTag

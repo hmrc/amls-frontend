@@ -350,7 +350,7 @@ object ResponsiblePerson {
       NotStarted,
       TaskRow.notStartedTag
     )
-
+    val respUrl    = controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url
     cache.getEntry[Seq[ResponsiblePerson]](key).fold(notStarted) { rp =>
       if (filter(rp).equals(Nil)) {
         TaskRow(
@@ -378,7 +378,7 @@ object ResponsiblePerson {
               } =>
             TaskRow(
               messageKey,
-              controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url,
+              controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
               anyChanged(rp),
               Completed,
               TaskRow.completedTag

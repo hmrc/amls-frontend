@@ -62,6 +62,7 @@ object Asp {
       NotStarted,
       TaskRow.notStartedTag
     )
+    val respUrl    = controllers.asp.routes.SummaryController.get.url
     cache.getEntry[Asp](key).fold(notStarted) { model =>
       if (model.isComplete && model.hasChanged) {
         TaskRow(
@@ -74,7 +75,7 @@ object Asp {
       } else if (model.isComplete) {
         TaskRow(
           messageKey,
-          controllers.asp.routes.SummaryController.get.url,
+          controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
           model.hasChanged,
           Completed,
           TaskRow.completedTag

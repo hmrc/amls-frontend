@@ -131,6 +131,7 @@ class AmpSpec extends AmlsSpec with AmpValues {
       implicit val cache    = mock[Cache]
       val ampWhatYouNeedUrl = "http://localhost:9223/anti-money-laundering/art-market-participant/what-you-need"
       val ampSummaryUrl     = "http://localhost:9223/anti-money-laundering/art-market-participant/check-your-answers"
+      val ampSummaryUrlCompleted     = "/anti-money-laundering/your-responsibilities-update?flow=http%3A%2F%2Flocalhost%3A9223%2Fanti-money-laundering%2Fart-market-participant%2Fcheck-your-answers"
 
       "returns a Not Started task row when model is empty" in {
         val notStartedTaskRow = TaskRow("amp", ampWhatYouNeedUrl, false, NotStarted, TaskRow.notStartedTag)
@@ -140,7 +141,7 @@ class AmpSpec extends AmlsSpec with AmpValues {
       }
 
       "returns a Completed task row when model is complete" in {
-        val completedTaskRow = TaskRow("amp", ampSummaryUrl, false, Completed, TaskRow.completedTag)
+        val completedTaskRow = TaskRow("amp", ampSummaryUrlCompleted, false, Completed, TaskRow.completedTag)
 
         when(cache.getEntry[Amp]("amp")) thenReturn Some(completeModel)
         Amp.taskRow(appConfig) mustBe completedTaskRow

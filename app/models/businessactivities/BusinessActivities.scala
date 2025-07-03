@@ -274,7 +274,7 @@ case class BusinessActivities(
 
 object BusinessActivities extends Logging {
 
-  def section(implicit cache: Cache): Section = {
+  def section(implicit cache: Cache): Section                     = {
     val messageKey           = "businessactivities"
     val notStarted           =
       Section(messageKey, NotStarted, false, controllers.businessactivities.routes.WhatYouNeedController.get)
@@ -288,7 +288,7 @@ object BusinessActivities extends Logging {
       }
     }
   }
-
+  val respUrl                                                     = controllers.businessactivities.routes.SummaryController.get.url
   def taskRow(implicit cache: Cache, messages: Messages): TaskRow = {
     val messageKey           = "businessactivities"
     val notStarted           = TaskRow(
@@ -312,7 +312,7 @@ object BusinessActivities extends Logging {
       } else if (model.isComplete(bmBusinessActivities)) {
         TaskRow(
           messageKey,
-          controllers.businessactivities.routes.SummaryController.get.url,
+          controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
           hasChanged = false,
           Completed,
           TaskRow.completedTag
