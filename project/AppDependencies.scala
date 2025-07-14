@@ -5,7 +5,7 @@ private object AppDependencies {
 
   private val playV = "play-30"
   private val flexmarkVersion = "0.64.8"
-  private val bootstrapV = "9.13.0"
+  private val bootstrapV = "9.16.0"
   private val hmrcMongoV = "2.6.0"
 
   val compile: Seq[ModuleID] = Seq(
@@ -16,7 +16,7 @@ private object AppDependencies {
     "uk.gov.hmrc"           %% s"crypto-json-$playV"                   % "8.2.0",
     "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-$playV"                    % hmrcMongoV,
     "uk.gov.hmrc"           %% s"bootstrap-frontend-$playV"            % bootstrapV,
-    "uk.gov.hmrc"           %% s"play-frontend-hmrc-$playV"            % "12.6.0",
+    "uk.gov.hmrc"           %% s"play-frontend-hmrc-$playV"            % "12.7.0",
     "uk.gov.hmrc"           %% s"play-conditional-form-mapping-$playV" % "3.3.0",
     // OTHER
     "com.vladsch.flexmark"   % "flexmark"                             % flexmarkVersion exclude("org.apache.pdfbox", "pdfbox"),
