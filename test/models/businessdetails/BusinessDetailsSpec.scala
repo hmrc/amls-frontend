@@ -478,7 +478,7 @@ class BusinessDetailsSpec extends AmlsSpec {
     }
 
     "return a Completed Task Row when model is complete and has not changed" in {
-      val respUrl = controllers.businessdetails.routes.SummaryController.get.url
+      val respUrl          = controllers.businessdetails.routes.SummaryController.get.url
       val completedTaskRow = TaskRow(
         "businessdetails",
         controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,

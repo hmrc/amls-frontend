@@ -170,9 +170,15 @@ class HvdSpec extends PlaySpec with MockitoSugar {
       "return a Completed Task Row when model is complete" in new HvdTestFixture {
 
         val complete         = mock[Hvd]
-        val respUrl = controllers.hvd.routes.SummaryController.get.url
+        val respUrl          = controllers.hvd.routes.SummaryController.get.url
         val completedTaskRow =
-          TaskRow("hvd", controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url, false, Completed, TaskRow.completedTag)
+          TaskRow(
+            "hvd",
+            controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
+            false,
+            Completed,
+            TaskRow.completedTag
+          )
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Hvd]("hvd")) thenReturn Some(complete)

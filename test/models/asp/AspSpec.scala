@@ -131,8 +131,8 @@ class AspSpec extends AmlsSpec with AspValues {
 
       "return a Completed Task Row when model is complete" in {
 
-        val complete = mock[Asp]
-        val respUrl = controllers.asp.routes.SummaryController.get.url
+        val complete         = mock[Asp]
+        val respUrl          = controllers.asp.routes.SummaryController.get.url
         val completedTaskRow = TaskRow(
           "asp",
           controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,

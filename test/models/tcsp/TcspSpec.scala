@@ -126,7 +126,7 @@ class TcspSpec extends AmlsSpec with TcspValues {
       "returns a Completed task row when model is complete" in {
 
         val complete         = mock[Tcsp]
-        val respUrl = controllers.tcsp.routes.SummaryController.get().url
+        val respUrl          = controllers.tcsp.routes.SummaryController.get().url
         val completedTaskRow = TaskRow(
           "tcsp",
           controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,
