@@ -52,7 +52,7 @@ class YourResponsibilitiesUpdateViewSpec extends AmlsViewSpec with Matchers {
     }
     "Have the correct Headings" in new ViewFixture {
       def view = your_responsibilities_update("testFlow")
-      heading.html    must be(messages("amendment.yourresponsibilities.title"))
+      heading.html must be(messages("amendment.yourresponsibilities.title"))
     }
 
     "contain the expected content elements" in new ViewFixture {
@@ -62,7 +62,9 @@ class YourResponsibilitiesUpdateViewSpec extends AmlsViewSpec with Matchers {
         messages("When updating your details, you must provide accurate and complete information.")
       )
       html must include(
-        messages("Non-compliance with the Money Laundering Regulations may result in a civil penalty and/or criminal prosecution.")
+        messages(
+          "Non-compliance with the Money Laundering Regulations may result in a civil penalty and/or criminal prosecution."
+        )
       )
       html must include(
         messages("Before you start, make sure you have read and understood")
@@ -71,7 +73,9 @@ class YourResponsibilitiesUpdateViewSpec extends AmlsViewSpec with Matchers {
         messages("the Money Laundering Regulations guidance")
       )
       html must include(
-        messages("To finish updating your details, you will need to confirm the information is accurate and you have read and understood the guidance.")
+        messages(
+          "To finish updating your details, you will need to confirm the information is accurate and you have read and understood the guidance."
+        )
       )
     }
     behave like pageWithBackLink(your_responsibilities_update("testFlow"))

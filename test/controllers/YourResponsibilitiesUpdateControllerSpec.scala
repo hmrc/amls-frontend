@@ -24,12 +24,12 @@ import play.api.test.Helpers.{contentAsString, status}
 import utils.AmlsSpec
 import views.html.registrationamendment.YourResponsibilitiesUpdateView
 
-class YourResponsibilitiesUpdateControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
+class YourResponsibilitiesUpdateControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture {
     self =>
-    val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[YourResponsibilitiesUpdateView]
+    val request    = addToken(authRequest)
+    lazy val view  = app.injector.instanceOf[YourResponsibilitiesUpdateView]
     val controller = new YourResponsibilitiesUpdateController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
@@ -41,10 +41,10 @@ class YourResponsibilitiesUpdateControllerSpec extends AmlsSpec with MockitoSuga
   "YourResponsibilitiesUpdateController" must {
     "get" must {
       "load the page with the correct flow" in new Fixture {
-        val flow = "testFlow"
+        val flow      = "testFlow"
         val pageTitle = messages("amendment.yourresponsibilities.title") + " - " +
           messages("title.amls") + " - " + messages("title.gov")
-        val result = controller.get(flow)(request)
+        val result    = controller.get(flow)(request)
         status(result)          must be(OK)
         contentAsString(result) must include(pageTitle)
       }

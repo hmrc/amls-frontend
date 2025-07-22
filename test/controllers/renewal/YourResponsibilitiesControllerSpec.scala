@@ -37,9 +37,9 @@ class YourResponsibilitiesControllerSpec extends AmlsSpec {
   trait Fixture extends DependencyMocks {
     self =>
 
-    val renewalService: RenewalService = mock[RenewalService]
+    val renewalService: RenewalService      = mock[RenewalService]
     lazy val view: YourResponsibilitiesView = app.injector.instanceOf[YourResponsibilitiesView]
-    val controller     = new YourResponsibilitiesController(
+    val controller                          = new YourResponsibilitiesController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
@@ -56,7 +56,7 @@ class YourResponsibilitiesControllerSpec extends AmlsSpec {
       "load the page" in new Fixture {
         val BusinessActivitiesModel: BusinessActivities =
           BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-        val bm                      = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+        val bm                                          = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
 
         when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any())) thenReturn (Future.successful(
           bm
@@ -106,7 +106,7 @@ class YourResponsibilitiesControllerSpec extends AmlsSpec {
         )
 
         val result = controller.get(requestWithToken)
-        status(result) must be(SEE_OTHER)
+        status(result)           must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
       }
 

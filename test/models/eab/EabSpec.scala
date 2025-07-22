@@ -377,7 +377,7 @@ class EabSpec extends AmlsSpec {
       }
 
       "return a Completed task row when the model is complete" in {
-        val eabSummaryUrl = appConfig.eabSummaryUrl
+        val eabSummaryUrl    = appConfig.eabSummaryUrl
         val completedTaskRow = TaskRow(
           msgKey,
           controllers.routes.YourResponsibilitiesUpdateController.get(eabSummaryUrl).url,

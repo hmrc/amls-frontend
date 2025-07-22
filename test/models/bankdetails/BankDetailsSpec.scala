@@ -223,7 +223,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
 
     "return a Completed TaskRow" when {
       "model is complete and has not changed" in {
-        val respUrl = controllers.bankdetails.routes.YourBankAccountsController.get().url
+        val respUrl          = controllers.bankdetails.routes.YourBankAccountsController.get().url
         val complete         = Seq(completeModel)
         val completedTaskRow = TaskRow(
           "bankdetails",
@@ -253,7 +253,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
 
       "model is complete with only deleted bankaccounts that have not changed" in {
         val deleted          = Seq(completeModel.copy(status = Some(StatusConstants.Deleted)))
-        val respUrl = controllers.bankdetails.routes.YourBankAccountsController.get().url
+        val respUrl          = controllers.bankdetails.routes.YourBankAccountsController.get().url
         val completedTaskRow = TaskRow(
           "bankdetails",
           controllers.routes.YourResponsibilitiesUpdateController.get(respUrl).url,

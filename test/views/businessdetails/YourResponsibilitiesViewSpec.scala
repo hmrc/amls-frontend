@@ -50,7 +50,9 @@ class YourResponsibilitiesViewSpec extends AmlsViewSpec with Matchers {
         messages("When filling in this application, you must provide accurate and complete information")
       )
       html must include(
-        messages("Non-compliance with the Money Laundering Regulations may result in a civil penalty and/or criminal prosecution")
+        messages(
+          "Non-compliance with the Money Laundering Regulations may result in a civil penalty and/or criminal prosecution"
+        )
       )
       html must include(
         messages("Before you start, make sure you have read and understood")
