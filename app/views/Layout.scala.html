@@ -50,7 +50,7 @@
 @headScripts = {
     @if(timeoutEnabled) {
         @hmrcTimeoutDialogHelper(
-            signOutUrl = appConfig.logoutUrl,
+            signOutUrl = appConfig.logoutUrlContinue,
             keepAliveUrl= Some(controllers.routes.AmlsController.keep_alive.url),
             timeout = Some(appConfig.timeout),
             countdown = Some(appConfig.timeoutCountdown)
