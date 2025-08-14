@@ -15,6 +15,8 @@
 ->          /renewal                                                                  renewal.Routes
 ->          /business-matching                                                        businessMatching.Routes
 
+GET         /we-signed-you-out                                                        @controllers.SignedOutController.get
+
 GET         /amp/accept                                                               @controllers.amp.AmpController.accept()
 GET         /eab/accept                                                               @controllers.eab.EabController.accept()
 
