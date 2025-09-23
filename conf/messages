@@ -3220,3 +3220,10 @@ site.back = Back
 
 ############################### Footer ###############################
 footer.links.accessibility.text = Accessibility statement
+
+
+############################### Sign out page ###############################
+sign_out.title = For your security, we signed you out
+sign_out.heading = For your security, we signed you out
+sign_out.guidance = We saved your answers for 28 days.
+sign_out.button = Sign in

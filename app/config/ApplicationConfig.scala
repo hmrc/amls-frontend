@@ -44,7 +44,17 @@ class ApplicationConfig @Inject() (configuration: Configuration, servicesConfig:
 
   def logoutUrl             = getConfigString("logout.url")
   def logoutUrlWithFeedback = s"$logoutUrl?continue=${URLEncoder.encode(feedbackFrontendUrl, "utf-8")}"
-  lazy val loginContinue    = getConfigString("login.continue")
+
+  def logoutUrlContinue: String = {
+    val basSignOut = getConfigString("logout.url")
+    val continue   = URLEncoder.encode(
+      s"$frontendBaseUrl/anti-money-laundering/we-signed-you-out",
+      "utf-8"
+    )
+    s"$basSignOut?continue=$continue"
+  }
+
+  lazy val loginContinue = getConfigString("login.continue")
 
   lazy val paymentsUrl: String = getConfigString("paymentsUrl")
 
