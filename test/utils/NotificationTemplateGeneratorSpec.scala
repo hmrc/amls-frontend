@@ -36,6 +36,7 @@ class NotificationTemplateGeneratorSpec extends AmlsViewSpec {
   val versionFourMsg: V4M0  = app.injector.instanceOf[V4M0]
   val versionFiveMsg: V5M0  = app.injector.instanceOf[V5M0]
   val versionSixMsg: V6M0   = app.injector.instanceOf[V6M0]
+  val versionSevenMsg: V7M0 = app.injector.instanceOf[V7M0]
 
   val templateGenerator = new NotificationTemplateGenerator(
     versionOneMsg,
@@ -44,6 +45,7 @@ class NotificationTemplateGeneratorSpec extends AmlsViewSpec {
     versionFourMsg,
     versionFiveMsg,
     versionSixMsg,
+    versionSevenMsg,
     commonDependencies
   )
 
