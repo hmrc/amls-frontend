@@ -19,6 +19,7 @@ package models.moneyservicebusiness
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
 import models.registrationprogress._
+import play.api.Logging
 import play.api.i18n.Messages
 import play.api.libs.json._
 import services.cache.Cache
@@ -171,7 +172,7 @@ case class MoneyServiceBusiness(
     allComplete && mtComplete(mtFlag) && ceComplete(ceFlag) && fxComplete(fxFlag) && this.hasAccepted
 }
 
-object MoneyServiceBusiness {
+object MoneyServiceBusiness extends Logging {
 
   val key = "msb"
 
@@ -192,7 +193,20 @@ object MoneyServiceBusiness {
         msbService.contains(CurrencyExchange),
         msbService.contains(ForeignExchange)
       )
-
+      logger.info(
+        s"[MSB DEBUG] " +
+          s"isComplete=$isComplete hasChanged=${Option(model.hasChanged).getOrElse(false)} hasAccepted=${Option(model.hasAccepted).getOrElse(false)} " +
+          s"mt=${msbService != null && msbService.contains(TransmittingMoney)} " +
+          s"ce=${msbService != null && msbService.contains(CurrencyExchange)} " +
+          s"fx=${msbService != null && msbService.contains(ForeignExchange)} " +
+          s"throughput=${Option(model.throughput).exists(_.isDefined)} " +
+          s"branches=${Option(model.branchesOrAgents).exists(_.isDefined)} " +
+          s"identifyLinked=${Option(model.identifyLinkedTransactions).exists(_.isDefined)} " +
+          s"whichCurrencies=${Option(model.whichCurrencies).exists(_.isDefined)} " +
+          s"sendMoney=${Option(model.sendMoneyToOtherCountry).exists(_.isDefined)} " +
+          s"ceTransNext12=${Option(model.ceTransactionsInNext12Months).exists(_.isDefined)} " +
+          s"fxTransNext12=${Option(model.fxTransactionsInNext12Months).exists(_.isDefined)}"
+      )
       if (isComplete && model.hasChanged) {
         TaskRow(
           key,
