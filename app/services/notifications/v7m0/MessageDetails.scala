@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter
 class MessageDetails
 
 object MessageDetails {
-  val f: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+  val f: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
   def formatDate(date: String): String = LocalDate.parse(date).format(f)
 
@@ -85,7 +85,7 @@ object MessageDetails {
        |<p class="govuk-body">You must quote your payment reference when you pay your fee. If you do not, your fee may show as unpaid and your registration may be cancelled.</p>
        |
        |<h2 class="govuk-heading-m">If you have paid your fee, but have not submitted your annual declaration</h2>
-       |<p class="govuk-body">Our system may not recognise that a payment have been made and your registration may be cancelled.</p>
+       |<p class="govuk-body">Our system may not recognise that a payment has been made and your registration may be cancelled.</p>
        |<p class="govuk-body">This is because until you submit your annual declaration, you do not have the correct payment reference.</p>
        |<h2 class="govuk-heading-m">If your registration is cancelled</h2>
        |<p class="govuk-body">You will need to submit a new registration application and pay the correct fees, including the application charge.</p>
