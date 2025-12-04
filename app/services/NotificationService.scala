@@ -110,35 +110,37 @@ class NotificationService @Inject() (
   }
 
   private def handleReminderMessage(
-    amlsRegNo: String,
-    id: String,
-    contactType: ContactType,
-    templateVersion: String,
-    accountTypeId: (String, String)
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[NotificationDetails]] = {
+                                     amlsRegNo: String,
+                                     id: String,
+                                     contactType: ContactType,
+                                     templateVersion: String,
+                                     accountTypeId: (String, String)
+                                   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[NotificationDetails]] = {
 
     val reminderMessage = Class
       .forName(s"services.notifications.$templateVersion.MessageDetails")
       .getDeclaredConstructor()
       .newInstance()
-      .asInstanceOf[{ def reminder(contactType: ContactType, paymentAmount: String, referenceNumber: String): String }
-      ] // TODO this NEEDS to be changed
+      .asInstanceOf[{
+      def reminder(contactType: ContactType, paymentAmount: String, referenceNumber: String, dueDate: String): String
+    }]
 
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId) map {
       case Some(notificationDetails) =>
         for {
           message <- notificationDetails.messageText
-          details <- NotificationDetails.convertReminderMessageText(message)
+          details <- NotificationDetails.convertReminderMessageText(message, notificationDetails.receivedAt) // Pass receivedAt
         } yield notificationDetails.copy(messageText =
           Some(
             reminderMessage.reminder(
               contactType,
               details.paymentAmount.toString,
-              details.referenceNumber
+              details.referenceNumber,
+              details.dueDate
             )
           )
         )
-      case _                         => None
+      case _ => None
     }
   }
 

@@ -46,17 +46,17 @@ object MessageDetails {
         s"""<p class="govuk-body">Your application to register has been approved. You’re now registered until $endDate.</p><p class="govuk-body">Your anti-money laundering registration number is: $referenceNumber.</p><p class="govuk-body">You can find details of your registration on your <a href="$url">status page</a>.</p>"""
       case RenewalApproval          =>
         s"""<p class="govuk-body">Your annual fee has been paid.</p><p class="govuk-body">To continue to be registered with HMRC you will need to repeat this process next year. Your next annual fee will be due before $endDate.</p><p class="govuk-body">HMRC will contact you again to remind you to complete the renewal questions and pay your annual fee.</p><p class="govuk-body">You can find your registration details on your status page.</p>"""
-      case AutoExpiryOfRegistration => registrationAutoExpiry
+      case AutoExpiryOfRegistration => registrationAutoExpiry(endDate)
       case RenewalReminder          => reminderRenewal(endDate)
       case NewRenewalReminder       => newRenewalReminderMsg(endDate)
       case _                        => throw new Exception("An Unknown Exception has occurred, v7m0:endDate():MessageDetails")
     }
 
-  def reminder(contactType: ContactType, paymentAmount: String, referenceNumber: String): String =
+  def reminder(contactType: ContactType, paymentAmount: String, referenceNumber: String,dueDate:String): String =
     contactType match {
       case ReminderToPayForVariation     =>
         s"""<p class="govuk-body">You need to pay $paymentAmount for the recent changes made to your details.</p><p class="govuk-body">Your payment reference is: $referenceNumber.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>"""
-      case ReminderToPayForRenewal       => reminderPayRenewal(referenceNumber)
+      case ReminderToPayForRenewal       => reminderPayRenewal(paymentAmount,referenceNumber,dueDate)
       case ReminderToPayForApplication   =>
         s"""<p class="govuk-body">You need to pay $paymentAmount for your application to register with HM Revenue and Customs.</p><p class="govuk-body">Your payment reference is: $referenceNumber.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>"""
       case ReminderToPayForManualCharges =>
@@ -69,72 +69,53 @@ object MessageDetails {
 
   def newRenewalReminderMsg(endDate: String): String =
     s"""
-       |<p class="govuk-body">This is a reminder that you need to submit your annual declaration and pay your annual supervision fee. Please note that this is
-       |a <strong>two stage process</strong>, and both stages <strong>must</strong> be competed to ensure we can process your fee.</p>
+       |<p class="govuk-body">You or your business are currently registered with HMRC for anti-money laundering supervision.</p>
+       |<p class="govuk-body">It's time to confirm your details and pay your annual fee.</p>
+       |<p class="govuk-body">If you do not do this by <strong>${formatDate(endDate)}</strong>, HMRC will cancel your registration.</p>
+       |<p class="govuk-body">This is a two-stage process. You must complete both stages to stay registered.</p>
        |
-       |<p class="govuk-body"><h3 class="govuk-heading-s">Stage 1 - Submit your declaration all your details and information are correct and up to date.
-       |You must press the submit button to make that declaration which completes this stage.</h3></p>
+       |<h2 class="govuk-heading-m">Stage 1: Confirm your details</h2>
+       |<p class="govuk-body">Go to <a href="${controllers.routes.StatusController.get().url}" class="govuk-link">Your registration</a> and select 'Extend your supervision'.</p>
+       |<p class="govuk-body">Confirm all your registration details are correct and up to date. If anything has changed, you can make an update.</p>
+       |<p class="govuk-body">Even if none of your details have changed, you must still complete this step.</p>
+       |<p class="govuk-body">When you have confirmed your details, you will be asked to make a declaration. You must select 'Accept and submit' to complete stage 1.</p>
        |
-       |<p class="govuk-body">You start this stage from your status page on your anti-money laundering supervision account. You must check that all your details
-       |and information are up to date and make any necessary changes to the details information you have previously provided.</p>
+       |<h2 class="govuk-heading-m">Stage 2: Pay your fee</h2>
+       |<p class="govuk-body">When you have completed stage 1, the system will display your annual fee and payment reference.</p>
+       |<p class="govuk-body">You must quote your payment reference when you pay your fee. If you do not, your fee may show as unpaid and your registration may be cancelled.</p>
        |
-       |<p class="govuk-body"><strong>Please note -</strong> Even if your previous details and information have not changed, you must press the submit button to complete stage 1
-       |in order for us to be able to process your fee payment.</p>
+       |<h2 class="govuk-heading-m">If you have paid your fee, but have not submitted your annual declaration</h2>
+       |<p class="govuk-body">Our system may not recognise that a payment have been made and your registration may be cancelled.</p>
+       |<p class="govuk-body">This is because until you submit your annual declaration, you do not have the correct payment reference.</p>
+       |<h2 class="govuk-heading-m">If your registration is cancelled</h2>
+       |<p class="govuk-body">You will need to submit a new registration application and pay the correct fees, including the application charge.</p>
        |
-       |<p class="govuk-body"><h3 class="govuk-heading-s">Stage 2 - Pay your fee<h3><p>
-       |<p class="govuk-body">Once you have completed stage 1, the system will inform you of your new annual fee and generate a payment reference number which
-       |you must quote when you pay your fee.</p>
-       |
-       |<p class="govuk-body">HMRCs money laundering registration policy, and details of how to pay your fee can be found on
-       |<a href="$amlsRegistrationFeesGuidanceUrl">Fees you’ll pay for money laundering supervision - GOV.UK (www.gov.uk)</a></p>
-       |
-       |<p class="govuk-body">You must pay your annual fee in full by ${formatDate(endDate)}.</p>
-       |
-       |<p class="govuk-body">If you are experiencing difficulties in carrying out these actions, please contact <a href="$emailUrl">MLRCIT@hmrc.gov.uk</a>
-       |immediately.</p>
-       |
-       |<p class="govuk-body"><h3 class="govuk-heading-s">If you do not submit your declaration and pay your correct fee by the above date, your business registration will be
-       |cancelled.</h3></p>
-       |
-       |<p class="govuk-body"><h3 class="govuk-heading-s">If your registration is cancelled and you still wish for your business to continue to be registered with HMRC, you
-       |will need to submit a new registration application and pay the correct fees, including the new application charge
-       |cancelled.</h3></p>
-       |
-       |<p class="govuk-body"><strong>Please note</strong> If you have paid the annual supervision fee before today but failed to submit your
-       |annual declaration, you will not have received a payment reference number and our system may not recognise that payment has been made. This may lead
-       |to your fee being shown as unpaid and your registration being cancelled. If this applies to you, you must submit a new application within 30 days.
-       |Even if you have submitted your annual declaration, if you pay your fee without quoting your payment reference number this may lead to your fee being
-       |shown as unpaid and your registration being cancelled.</p>
-       |
-       |<p class="govuk-body">If your registration is cancelled and you continue to undertake any activity covered by the Regulations, you and/or your business
-       |may be subject to civil sanctions, including a fine, or criminal proceedings.</p>
-       |
-       |<p class="govuk-body">If you have taken the ALL steps outlined above, please ignore this message.</p>
+       |<h2 class="govuk-heading-m">More information</h2>
+       |<p class="govuk-body">For details of HMRC's registration policy and how to pay your fee, visit <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees" class="govuk-link">Fees you'll pay for money laundering supervision</a>.</p>
+       |<p class="govuk-body">If you need help, contact us at <a href="mailto:MLRCIT@hmrc.gov.uk" class="govuk-link">MLRCIT@hmrc.gov.uk</a>.</p>
+       |<p class="govuk-body">If you've already completed both stages, you can ignore this message.</p>
        |""".stripMargin
 
-  def reminderPayRenewal(referenceNumber: String): String =
+  def reminderPayRenewal(paymentAmount: String, referenceNumber: String,dueDate:String): String =
     s"""
-       |<p class="govuk-body">We note you have submitted the annual declaration but have failed to pay your annual supervision fee. You need to pay this fee to
-       |continue your registration with HMRC. The amount you must pay was calculated when you submitted your declaration.
+       |<p class="govuk-body">You have submitted your annual declaration, but have not paid your annual supervision fee.</p>
+       |<p class="govuk-body">You must pay this fee to continue your registration with HMRC.</p>
        |
-       |<p class="govuk-body">HMRCs money laundering registration policy, and details of how to pay your fee can be found on
-       |<a href="$amlsRegistrationFeesGuidanceUrl">Fees you’ll pay for money laundering supervision - GOV.UK (www.gov.uk)</a></p>
+       |<p class="govuk-body"><strong>Your fee:</strong> $paymentAmount</p>
+       |<p class="govuk-body"><strong>Your payment reference:</strong> $referenceNumber</p>
+       |<p class="govuk-body"><strong>Due date:</strong> $dueDate</p>
        |
-       |<p class="govuk-body">When you pay your fee you must quote your payment reference number which is: $referenceNumber. <strong>Please note</strong> that
-       |if you pay your fee without quoting your payment reference number we may not be able to match the payment to your business. This may lead to your fee
-       |being shown as unpaid and your registration being cancelled.</p>
+       |<p class="govuk-body">You must quote your payment reference when you pay your fee. If you do not, your fee may show as unpaid and your registration may be cancelled.</p>
+       |<p class="govuk-body">To pay your fee, go to <a href="https://www.tax.service.gov.uk/pay-online/money-laundering" class="govuk-link">Pay money laundering regulations fees</a>.</p>
        |
-       |<p class="govuk-body">If you are experiencing difficulties in carrying out these actions, please contact <a href="$emailUrl">MLRCIT@hmrc.gov.uk</a>.
-       |</p>
+       |<h2 class="govuk-heading-m">If your registration is cancelled</h2>
+       |<p class="govuk-body">You will need to submit a new registration application and pay the correct fees, including the application charge.</p>
+       |<p class="govuk-body">If your registration is cancelled, you must not undertake any activity covered by the Money Laundering Regulations. Otherwise, you and/or your business may be subject to civil sanctions, such as a fine, or criminal proceedings.</p>
        |
-       |<p class="govuk-body">If you do not pay your fees within 28 days from the date of this message, HMRC will cancel your business’s registration.
-       |If your registration is cancelled and you still wish for your business to continue to be registered with HMRC, you will need to submit a new
-       |registration application and pay the correct fees, including the application charge.</p>
-       |
-       |<p class="govuk-body">If your registration is cancelled and you continue to undertake any activity covered by the Regulations, you and/or your
-       |business may be subject to civil sanctions, such as a fine, or criminal proceedings.</p>
-       |
-       |<p class="govuk-body">If you have already paid the correct fee quoting your payment reference number, please ignore this message.</p>
+       |<h2 class="govuk-heading-m">More information</h2>
+       |<p class="govuk-body">For details of HMRC's registration policy and fees, visit <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees" class="govuk-link">Fees you'll pay for money laundering supervision</a>.</p>
+       |<p class="govuk-body">If you need help, contact us at <a href="mailto:MLRCIT@hmrc.gov.uk" class="govuk-link">MLRCIT@hmrc.gov.uk</a>.</p>
+       |<p class="govuk-body">If you've already paid your fee (quoting your payment reference), you can ignore this message.</p>
        |""".stripMargin
 
   val guidanceRegisterRenewUrl    =
@@ -143,75 +124,49 @@ object MessageDetails {
     "https://www.gov.uk/guidance/money-laundering-regulations-appeals-and-penalties#if-you-disagree-with-an-hmrc-decision"
   val guidanceRegistrationFeesUrl = "https://www.gov.uk/guidance/money-laundering-regulations-registration-fees"
 
-  val registrationAutoExpiry: String =
+  def registrationAutoExpiry(endDate: String): String =
     s"""
-       |<p class="govuk-body"><h3 class="govuk-heading-s">You/your business’s registration with HMRC has been cancelled for failing to pay the annual supervision fee imposed under
-       |Regulation 102 of the Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017. This cancellation
-       |decision is made under regulation 60(3)(a) by virtue of regulation 59(1)(c)(ii).</h3></p>
+       |<p class="govuk-body">Your or your business' registration with HMRC has been cancelled.</p>
+       |<p class="govuk-body">This is because you did not pay the annual supervision fee imposed under Regulation 102 of the Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017.</p>
+       |<p class="govuk-body">This cancellation decision is made under regulation 60(3)(a) by virtue of regulation 59(1)(c)(ii).</p>
        |
-       |<p class="govuk-body">Our system shows that you have failed to complete the required 2 stage process as set out in previous reminders.</p>
+       |<h2 class="govuk-heading-m">What happens next</h2>
+       |<p class="govuk-body">The cancellation will come into effect on <strong>${formatDate(endDate)}</strong>. You may conclude any relevant business during this time.</p>
+       |<p class="govuk-body">After <strong>${formatDate(endDate)}</strong>, you must not undertake any activity covered by the Money Laundering Regulations. Otherwise, you and/or your business may be subject to civil sanctions, such as a fine, or criminal proceedings.</p>
        |
-       |<p class="govuk-body"><strong>Stage 1 – You are</strong> required to submit your declaration confirming all your details and information are correct and
-       |up to date.</p>
+       |<h2 class="govuk-heading-m">If you want to remain registered</h2>
+       |<p class="govuk-body">You must submit a new application and pay all fees, including the application charge.</p>
+       |<p class="govuk-body">Find more information at <a href="https://www.gov.uk/guidance/register-or-renew-your-money-laundering-supervision-with-hmrc" class="govuk-link">Register or update your money laundering supervision with HMRC</a>.</p>
        |
-       |<p class="govuk-body"><strong>Stage 2 – You are</strong> required to pay the correct fee.</p>
-       |
-       |<p class="govuk-body">The cancellation will come into effect 14 days from the date of this notice to allow you to conclude your relevant business</p>
-       |
-       |<p class="govuk-body"><h3 class="govuk-heading-s">If you continue to undertake any activity covered by the Regulations after your registration has been
-       |cancelled, you and/or your business may be subject to civil sanctions, such as a fine, or criminal proceedings</h3></p>
-       |
-       |<p class="govuk-body">You may wish for your business to continue to be registered with HMRC. To enable you to do so you will need to submit a new
-       |registration application and pay the correct fees, including the application charge. This will be the quickest and most efficient way to ensure you are
-       |able to lawfully carry out your supervised business activity. You can find guidance on how to register here
-       |<a href="$guidanceRegisterRenewUrl">Register-or-renew-your-money-laundering-supervision-with-hmrc</a>–GOV.UK (www.gov.uk).</p>
-       |
-       |<p class="govuk-body">If you are experiencing any issues applying for registration, please contact MLRCIT@hmrc.gov.uk.</p>
-       |
-       |<p class="govuk-body"><h3 class="govuk-heading-s">If you/ your business disagree with this decision</hr></p>
-       |
-       |<p class="govuk-body">You also have the right to request a HMRC internal review of this decision or to appeal to an independent tribunal.</p>
-       |
-       |<p class="govuk-body">You can also find information about what you can do if you disagree with an HMRC decision here -
-       |<a href="$disagreeAppealsPenaltiesUrl">Money laundering supervision appeals and penalties - GOV.UK (www.gov.uk)</a>, including how to request a review
-       |of our decision or make appeal to the tribunal.</p>
-       |
-       |<p class="govuk-body">If you would like further clarification on any of the issues raised above, please contact MLRCIT@hmrc.gov.uk.</p>
+       |<h2 class="govuk-heading-m">If you disagree with this decision</h2>
+       |<p class="govuk-body">You have the right to request an HMRC internal review or appeal to an independent tribunal.</p>
+       |<p class="govuk-body">Find more information at <a href="https://www.gov.uk/guidance/money-laundering-regulations-appeals-and-penalties" class="govuk-link">Money laundering supervision appeals and penalties</a>.</p>
+       |<p class="govuk-body">If you need further details or help, contact us at <a href="mailto:MLRCIT@hmrc.gov.uk" class="govuk-link">MLRCIT@hmrc.gov.uk</a>.</p>
        |""".stripMargin
 
   def reminderRenewal(endDate: String): String =
     s"""
-       |<p class="govuk-body">You/your business are currently registered with HMRC for anti-money laundering supervision. It is time to confirm your
-       |registration details and information are up to date and pay your annual supervision fee. Please note that this is a <strong>two stage process</strong>
-       |and both stages <strong>must</strong> be competed to ensure we can process your fee.</p>
+       |<p class="govuk-body">You or your business are currently registered with HMRC for anti-money laundering supervision.</p>
+       |<p class="govuk-body">It's time to confirm your details and pay your annual fee.</p>
+       |<p class="govuk-body">If you do not do this by <strong>${formatDate(endDate)}</strong>, HMRC will cancel your registration.</p>
+       |<p class="govuk-body">This is a two-stage process. You must complete both stages to stay registered.</p>
        |
-       |<p class="govuk-body"><h3 class="govuk-heading-s">Stage 1  - Submit your declaration confirming all your details and information are correct and up to
-       |date. You must press the submit button to make that declaration which completes this stage.</h3></p>
+       |<h2 class="govuk-heading-m">Stage 1: Confirm your details</h2>
+       |<p class="govuk-body">Go to <a href="${controllers.routes.StatusController.get().url}" class="govuk-link">Your registration</a> and select 'Extend your supervision'.</p>
+       |<p class="govuk-body">Confirm all your registration details are correct and up to date. If anything has changed, you can make an update.</p>
+       |<p class="govuk-body">Even if none of your details have changed, you must still complete this step.</p>
+       |<p class="govuk-body">When you have confirmed your details, you will be asked to make a declaration. You must select 'Accept and submit' to complete stage 1.</p>
        |
-       |<p class="govuk-body">You start this stage from your status page on your anti-money laundering supervision account. You must check that all your
-       |details and information are up to date and make any necessary changes to the details and information you have previously provided.</p>
+       |<h2 class="govuk-heading-m">Stage 2: Pay your fee</h2>
+       |<p class="govuk-body">When you have completed stage 1, the system will display your annual fee and payment reference.</p>
+       |<p class="govuk-body">You must quote your payment reference when you pay your fee. If you do not, your fee may show as unpaid and your registration may be cancelled.</p>
        |
-       |<p class="govuk-body"><strong>Please note -</strong> Even if your previous details have not changed, you must press the submit button to complete
-       |stage 1 in order for us to be able to process your fee payment.</p>
+       |<h2 class="govuk-heading-m">If your registration is cancelled</h2>
+       |<p class="govuk-body">You will need to submit a new registration application and pay the correct fees, including the application charge.</p>
        |
-       |<p class="govuk-body"><h3 class="govuk-heading-s">Stage 2 – Pay your fee</h3></p>
-       |
-       |<p class="govuk-body">Once you have completed stage 1, the system will inform you of your new annual fee and generate a payment reference number which
-       |you must quote when you pay your fee.</p>
-       |
-       |<p class="govuk-body">HMRCs money laundering registration policy, and details of how to pay your fee can be found on
-       |<a href="$guidanceRegistrationFeesUrl">Fees you’ll pay for money laundering supervision - GOV.UK (www.gov.uk)</a></p>
-       |
-       |<p class="govuk-body">You must pay your annual fee in full by ${formatDate(endDate)}. Failing to submit your declaration and pay the correct fee in
-       |full by this date may lead to HMRC cancelling your registration.</p>
-       |
-       |<p class="govuk-body"><strong>Please note</strong>, if you pay your fee without quoting your payment reference number we may not be able to match the
-       |payment to your business. This may lead to your fee being shown as unpaid and your registration being cancelled. If your registration is cancelled
-       |and you still wish for your business to continue to be registered with HMRC, you will need to submit a new registration application and pay the
-       |correct fees, including the application charge.</p>
-       |
-       |<p class="govuk-body">If you are experiencing difficulties in carrying out these actions, please contact <a href="$emailUrl">MLRCIT@hmrc.gov.uk</a> immediately.</p>
-       |
-       |<p class="govuk-body">If you have taken ALL the steps outlined above, please ignore this message.</p>
+       |<h2 class="govuk-heading-m">More information</h2>
+       |<p class="govuk-body">For details of HMRC's registration policy and how to pay your fee, visit <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees" class="govuk-link">Fees you'll pay for money laundering supervision</a>.</p>
+       |<p class="govuk-body">If you need help, contact us at <a href="mailto:MLRCIT@hmrc.gov.uk" class="govuk-link">MLRCIT@hmrc.gov.uk</a>.</p>
+       |<p class="govuk-body">If you've already completed both stages, you can ignore this message.</p>
        |""".stripMargin
 }

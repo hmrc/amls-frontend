@@ -74,8 +74,25 @@ object NotificationDetails {
     input => LocalDate.parse(input, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 
   private val extractEndDate: String => Option[LocalDate] = input => {
+    println(s"[DEBUG] Extracting date from: '$input'")
     val pattern = """(?i)[\w\s]+\s*-\s*(\d{1,2}/\d{1,2}/\d{4})""".r.unanchored
-    pattern.findFirstMatchIn(input).fold(none[LocalDate])(m => parseDate(m.group(1)).some)
+    pattern.findFirstMatchIn(input) match {
+      case Some(m) =>
+        val dateStr = m.group(1)
+        println(s"[DEBUG] Regex matched! Date string: '$dateStr'")
+        try {
+          val result = parseDate(dateStr)
+          println(s"[DEBUG] Successfully parsed date: $result")
+          result.some
+        } catch {
+          case e: Exception =>
+            println(s"[DEBUG] Failed to parse date: ${e.getMessage}")
+            none[LocalDate]
+        }
+      case None =>
+        println(s"[DEBUG] Regex did not match!")
+        none[LocalDate]
+    }
   }
 
   private val extractReference: String => Option[String] = input => {
@@ -92,11 +109,16 @@ object NotificationDetails {
   def convertEndDateMessageText(inputString: String): Option[EndDateDetails] =
     extractEndDate(inputString) map { date => EndDateDetails(date, None) }
 
-  def convertReminderMessageText(inputString: String): Option[ReminderDetails] =
+  def convertReminderMessageText(inputString: String, receivedAt: LocalDateTime): Option[ReminderDetails] =
     inputString.split("\\|").toList match {
       case amount :: ref :: tail =>
-        Some(ReminderDetails(Currency(splitByDash(amount).toDouble), splitByDash(ref)))
-      case _                     => None
+        val dueDate = receivedAt.plusDays(28).format(DateTimeFormatter.ofPattern("d MMMM yyyy"))
+        Some(ReminderDetails(
+          Currency(splitByDash(amount).toDouble),
+          splitByDash(ref),
+          dueDate
+        ))
+      case _ => None
     }
 
   def processGenericMessage(msg: String): String = {
