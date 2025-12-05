@@ -31,7 +31,8 @@ class NotificationsCheckSumSpec extends AmlsSpec with Matchers {
       "v3m0",
       "v4m0",
       "v5m0",
-      "v6m0"
+      "v6m0",
+      "v7m0"
     )
     val checkSumRoute: String               = "./conf/notifications/"
     def generateCheckSum(s: String): String =
@@ -81,7 +82,7 @@ class NotificationsCheckSumSpec extends AmlsSpec with Matchers {
         val checkSum: String = generateCheckSum(lines)
         assert(
           checkSum == checkSums(s"$versionNumber/$fileName"),
-          s"Replace checksum for $versionNumber/$fileName with $checkSum"
+          s"Replace checksum for $versionNumber/$fileName with v7m0"
         )
       }
     }
@@ -106,7 +107,7 @@ class NotificationsCheckSumSpec extends AmlsSpec with Matchers {
         val checkSum: String = generateCheckSum(lines)
         assert(
           checkSum == checkSums(s"$versionNumber/$fileName"),
-          s"Replace checksum for $versionNumber/$fileName with $checkSum"
+          s"Replace checksum for $versionNumber/$fileName with v7m0"
         )
       }
     }

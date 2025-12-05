@@ -63,6 +63,7 @@ case class NotificationRow(
         case "v1m0" | "v2m0" | "v3m0" | "v4m0"                     => s"notifications.subject.$cType"
         case "v5m0"                                                => s"notifications.subject.v5.$cType"
         case "v6m0"                                                => s"notifications.subject.v6.$cType"
+        case "v7m0"                                                => s"notifications.subject.v7.$cType"
         case _                                                     => throw new Exception(s"Unknown template version $templatePackageVersion")
       }
 

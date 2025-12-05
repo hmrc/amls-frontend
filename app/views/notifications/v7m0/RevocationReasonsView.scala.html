@@ -1,0 +1,53 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.notifications.NotificationParams
+@import config.ApplicationConfig
+@import views.html.components.{SectionSubtitle, Heading, NotificationsBackLink}
+
+@this(
+    layout: Layout,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    backLink: NotificationsBackLink
+)
+
+@(notificationParams: NotificationParams)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
+
+@businessName = @{notificationParams.businessName.getOrElse("")}
+
+@endDate = @{notificationParams.endDate.getOrElse("")}
+
+@layout(messages("notifications.revr.title") + " - " + messages("your.registration")) {
+
+    @subtitle("your.registration")
+
+    @heading("notifications.revr.title")
+
+    @notificationParams.amlsRefNo.map { amlsRefNo =>
+        <p class="govuk-body">Your reference: @amlsRefNo</p>
+    }
+
+    <p class="govuk-body">Your supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 for @businessName was revoked on @endDate. </p>
+    <p class="govuk-body">This means you are no longer registered for supervision with HMRC. You need to be <u>registered with a supervisory body</u> if the Money Laundering Regulations apply to your business. You may be subject to civil sanctions or criminal proceedings if you continue to trade in activities covered by the Money Laundering, Terrorist Finance and Transfer of Funds (Information on the Payer) Regulations 2017.</p>
+
+    <h2 class="govuk-heading-m">Reason for revocation</h2>
+    <p class="govuk-body">@HtmlFormat.raw(notificationParams.msgContent)</p>
+
+    <p class="govuk-body">You can view the regulations at <a class="govuk-link" href="@appConfig.legislationLink">www.legislation.gov.uk</a>.</p>
+
+    @backLink()
+}

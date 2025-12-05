@@ -1,0 +1,50 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.notifications.NotificationParams
+@import config.ApplicationConfig
+@import views.html.components.{SectionSubtitle, Heading, NotificationsBackLink}
+
+@this(
+    layout: Layout,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    backLink: NotificationsBackLink
+)
+
+@(notificationParams: NotificationParams)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
+
+@businessName = @{notificationParams.businessName.getOrElse("")}
+
+@layout(messages("notifications.mtrv.title") + " - " + messages("your.registration")) {
+
+    @subtitle("your.registration")
+
+    @heading("notifications.mtrv.title")
+
+    @notificationParams.amlsRefNo.map { amlsRefNo =>
+        <p class="govuk-body">Your reference: @amlsRefNo</p>
+    }
+    <p class="govuk-body">We&#8217;re considering revoking your supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 for @businessName. </p>
+    <p class="govuk-body">If we do revoke your application, you&#8217;ll not be supervised and may be subject to penalties and civil proceedings if you trade in activities covered by The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017.</p>
+
+    <h2 class="govuk-heading-m">Reason for considering refusal</h2>
+    <p class="govuk-body">@HtmlFormat.raw(notificationParams.msgContent)</p>
+
+    <p class="govuk-body">You can view the regulations at <a class="govuk-link" href="@appConfig.legislationLink">www.legislation.gov.uk</a>.</p>
+
+    @backLink()
+}
