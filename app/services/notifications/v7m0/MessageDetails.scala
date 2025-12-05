@@ -25,14 +25,23 @@ import java.time.format.DateTimeFormatter
 class MessageDetails
 
 object MessageDetails {
-  val f: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
-  def formatDate(date: String): String = LocalDate.parse(date).format(f)
+  def formatDate(date: String): String = {
+    val outputFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+    val parsedDate = try {
+      val inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+      LocalDate.parse(date, inputFormatter)
+    } catch {
+      case _: Exception => LocalDate.parse(date)
+    }
+
+    parsedDate.format(outputFormatter)
+  }
 
   def static(contactType: ContactType, url: String): String =
     contactType match {
       case ApplicationAutorejectionForFailureToPay =>
-        s"""<p class="govuk-body">Your application to be supervised by HM Revenue and Customs (HMRC) under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 has failed.</p><p class="govuk-body">As you’ve not paid the full fees due, your application has automatically expired.</p><p class="govuk-body">You need to be registered with a <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register">supervisory body</a> if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p><p class="govuk-body">If you still need to be registered with HMRC you should submit a new application immediately. You can apply from your account <a href="$url">status page</a>.</p>"""
+        s"""<p class="govuk-body">Your application to be supervised by HM Revenue and Customs (HMRC) under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 has failed.</p><p class="govuk-body">As you've not paid the full fees due, your application has automatically expired.</p><p class="govuk-body">You need to be registered with a <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register">supervisory body</a> if Money Laundering Regulations apply to your business. If you're not supervised you may be subject to penalties and criminal charges.</p><p class="govuk-body">If you still need to be registered with HMRC you should submit a new application immediately. You can apply from your account <a href="$url">status page</a>.</p>"""
       case RegistrationVariationApproval           =>
         s"""<p class="govuk-body">The recent changes made to your details have been approved.</p><p class="govuk-body">You can find details of your registration on your <a href="$url">status page</a>.</p>"""
       case DeRegistrationEffectiveDateChange       =>
@@ -43,7 +52,7 @@ object MessageDetails {
   def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String =
     contactType match {
       case ApplicationApproval      =>
-        s"""<p class="govuk-body">Your application to register has been approved. You’re now registered until $endDate.</p><p class="govuk-body">Your anti-money laundering registration number is: $referenceNumber.</p><p class="govuk-body">You can find details of your registration on your <a href="$url">status page</a>.</p>"""
+        s"""<p class="govuk-body">Your application to register has been approved. You're now registered until $endDate.</p><p class="govuk-body">Your anti-money laundering registration number is: $referenceNumber.</p><p class="govuk-body">You can find details of your registration on your <a href="$url">status page</a>.</p>"""
       case RenewalApproval          =>
         s"""<p class="govuk-body">Your annual fee has been paid.</p><p class="govuk-body">To continue to be registered with HMRC you will need to repeat this process next year. Your next annual fee will be due before $endDate.</p><p class="govuk-body">HMRC will contact you again to remind you to complete the renewal questions and pay your annual fee.</p><p class="govuk-body">You can find your registration details on your status page.</p>"""
       case AutoExpiryOfRegistration => registrationAutoExpiry(endDate)
@@ -55,12 +64,12 @@ object MessageDetails {
   def reminder(contactType: ContactType, paymentAmount: String, referenceNumber: String,dueDate:String): String =
     contactType match {
       case ReminderToPayForVariation     =>
-        s"""<p class="govuk-body">You need to pay $paymentAmount for the recent changes made to your details.</p><p class="govuk-body">Your payment reference is: $referenceNumber.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>"""
+        s"""<p class="govuk-body">You need to pay $paymentAmount for the recent changes made to your details.</p><p class="govuk-body">Your payment reference is: $referenceNumber.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you've already paid you can ignore this message.</p>"""
       case ReminderToPayForRenewal       => reminderPayRenewal(paymentAmount,referenceNumber,dueDate)
       case ReminderToPayForApplication   =>
-        s"""<p class="govuk-body">You need to pay $paymentAmount for your application to register with HM Revenue and Customs.</p><p class="govuk-body">Your payment reference is: $referenceNumber.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>"""
+        s"""<p class="govuk-body">You need to pay $paymentAmount for your application to register with HM Revenue and Customs.</p><p class="govuk-body">Your payment reference is: $referenceNumber.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you've already paid you can ignore this message.</p>"""
       case ReminderToPayForManualCharges =>
-        s"""<p class="govuk-body">You need to pay $paymentAmount for the recent charge added to your account.</p><p class="govuk-body">Your payment reference is: $referenceNumber.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>"""
+        s"""<p class="govuk-body">You need to pay $paymentAmount for the recent charge added to your account.</p><p class="govuk-body">Your payment reference is: $referenceNumber.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you've already paid you can ignore this message.</p>"""
       case _                             => throw new Exception("An Unknown Exception has occurred, v7m0:reminder():MessageDetails")
     }
 
@@ -146,7 +155,7 @@ object MessageDetails {
 
   def reminderRenewal(endDate: String): String =
     s"""
-       |<p class="govuk-body">You or your business are currently with HMRC for anti-money laundering supervision.</p>
+       |<p class="govuk-body">You or your business are currently registered with HMRC for anti-money laundering supervision.</p>
        |<p class="govuk-body">It's time to confirm your details and pay your annual fee.</p>
        |<p class="govuk-body">If you do not do this by <strong>${formatDate(endDate)}</strong>, HMRC will cancel your registration.</p>
        |<p class="govuk-body">This is a two-stage process. You must complete both stages to stay registered.</p>

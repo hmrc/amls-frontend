@@ -126,5 +126,5 @@ object NotificationDetails {
     pattern.findFirstMatchIn(msg).fold(msg)(m => m.group(1))
   }
 
-  private def splitByDash(s: String): String = s.split("-")(1)
+  def splitByDash(s: String): String = s.split("-")(1)
 }

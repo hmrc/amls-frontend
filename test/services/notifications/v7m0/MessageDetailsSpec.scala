@@ -132,14 +132,14 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
 
           result.get.messageText.get mustBe (
             """<p class="govuk-body">Your application to be supervised by HM Revenue and Customs (HMRC) under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 has failed.</p>""" +
-              """<p class="govuk-body">As you’ve not paid the full fees due, your application has automatically expired.</p>""" +
+              """<p class="govuk-body">As you've not paid the full fees due, your application has automatically expired.</p>""" +
               """<p class="govuk-body">You need to be registered with a <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register">supervisory body</a>""" +
-              """ if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p>""" +
+              """ if Money Laundering Regulations apply to your business. If you're not supervised you may be subject to penalties and criminal charges.</p>""" +
               """<p class="govuk-body">If you still need to be registered with HMRC you should submit a new application immediately. You can apply from your account """ +
               """<a href="""" +
               controllers.routes.StatusController.get() +
               """">status page</a>.</p>"""
-          )
+            )
         }
 
         "contact type is registration variation approval" in new Fixture {
@@ -174,7 +174,7 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
               """<p class="govuk-body">You can find details of your registration on your <a href="""" +
               controllers.routes.StatusController.get() +
               """">status page</a>.</p>"""
-          )
+            )
         }
 
         "contact type is DeRegistrationEffectiveDateChange" in new Fixture {
@@ -209,7 +209,7 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
               """<p class="govuk-body">You can see the new effective date on your <a href="""" +
               controllers.routes.StatusController.get() +
               """">status page</a>.</p>"""
-          )
+            )
         }
 
       }
@@ -237,7 +237,7 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
             service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForVariation, "v7m0", accountTypeId)
           )
 
-          result.get.messageText.get mustBe """<p class="govuk-body">You need to pay £1234.00 for the recent changes made to your details.</p><p class="govuk-body">Your payment reference is: ABC1234.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>"""
+          result.get.messageText.get mustBe """<p class="govuk-body">You need to pay £1234.00 for the recent changes made to your details.</p><p class="govuk-body">Your payment reference is: ABC1234.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you've already paid you can ignore this message.</p>"""
         }
 
         "contact type is ReminderToPayForApplication" in new Fixture {
@@ -261,7 +261,7 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
             service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForApplication, "v7m0", accountTypeId)
           )
 
-          result.get.messageText.get mustBe """<p class="govuk-body">You need to pay £1234.00 for your application to register with HM Revenue and Customs.</p><p class="govuk-body">Your payment reference is: ABC1234.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>"""
+          result.get.messageText.get mustBe """<p class="govuk-body">You need to pay £1234.00 for your application to register with HM Revenue and Customs.</p><p class="govuk-body">Your payment reference is: ABC1234.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you've already paid you can ignore this message.</p>"""
         }
 
         "contact type is ReminderToPayForRenewal" in new Fixture {
@@ -284,7 +284,7 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
           val result =
             await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForRenewal, "v7m0", accountTypeId))
 
-          result.get.messageText.get mustBe MessageDetails.reminderPayRenewal("ABC1234")
+          result.get.messageText.get mustBe MessageDetails.reminderPayRenewal("£1234.00", "ABC1234", "19 December 2016")
         }
 
         "contact type is ReminderToPayForManualCharges" in new Fixture {
@@ -308,7 +308,7 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
             service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForManualCharges, "v7m0", accountTypeId)
           )
 
-          result.get.messageText.get mustBe """<p class="govuk-body">You need to pay £1234.00 for the recent charge added to your account.</p><p class="govuk-body">Your payment reference is: ABC1234.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>"""
+          result.get.messageText.get mustBe """<p class="govuk-body">You need to pay £1234.00 for the recent charge added to your account.</p><p class="govuk-body">Your payment reference is: ABC1234.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you've already paid you can ignore this message.</p>"""
         }
 
         "contact type is ApplicationApproval" in new Fixture {
@@ -331,9 +331,9 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
           val result =
             await(service.getMessageDetails("regNo", "id", ContactType.ApplicationApproval, "v7m0", accountTypeId))
 
-          result.get.messageText.get mustBe s"""<p class="govuk-body">Your application to register has been approved. You’re now registered until 2018-07-31.</p><p class="govuk-body">Your anti-money laundering registration number is: ABC1234.</p><p class="govuk-body">You can find details of your registration on your <a href="${controllers.routes.StatusController
-              .get()
-              .url}">status page</a>.</p>"""
+          result.get.messageText.get mustBe s"""<p class="govuk-body">Your application to register has been approved. You're now registered until 2018-07-31.</p><p class="govuk-body">Your anti-money laundering registration number is: ABC1234.</p><p class="govuk-body">You can find details of your registration on your <a href="${controllers.routes.StatusController
+            .get()
+            .url}">status page</a>.</p>"""
         }
 
         "contact type is RenewalApproval" in new Fixture {
@@ -379,7 +379,7 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
           val result =
             await(service.getMessageDetails("regNo", "id", ContactType.AutoExpiryOfRegistration, "v7m0", accountTypeId))
 
-          result.get.messageText.get mustBe MessageDetails.registrationAutoExpiry
+          result.get.messageText.get mustBe MessageDetails.registrationAutoExpiry("31/07/2018")
         }
 
         "contact type is RenewalReminder" in new Fixture {
@@ -529,7 +529,7 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
           "the wrong contact type is supplied" in {
 
             the[Exception] thrownBy {
-              MessageDetails.reminder(Others, "123", "123456")
+              MessageDetails.reminder(Others, "123", "123456", "23 December 2025")
             } must have message "An Unknown Exception has occurred, v7m0:reminder():MessageDetails"
           }
         }
