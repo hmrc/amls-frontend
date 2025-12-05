@@ -89,6 +89,7 @@ object MessageDetails {
        |<p class="govuk-body">This is because until you submit your annual declaration, you do not have the correct payment reference.</p>
        |<h2 class="govuk-heading-m">If your registration is cancelled</h2>
        |<p class="govuk-body">You will need to submit a new registration application and pay the correct fees, including the application charge.</p>
+       |<p class="govuk-body">If your registration is cancelled, you must not undertake any activity covered by the Money Laundering Regulations. Otherwise, you and/or your business may be subject to civil sanctions, such as a fine, or criminal proceedings.</p>
        |
        |<h2 class="govuk-heading-m">More information</h2>
        |<p class="govuk-body">For details of HMRC's registration policy and how to pay your fee, visit <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees" class="govuk-link">Fees you'll pay for money laundering supervision</a>.</p>
@@ -146,8 +147,7 @@ object MessageDetails {
 
   def reminderRenewal(endDate: String): String =
     s"""
-       |<p class="govuk-body">You or your business are currently registered with HMRC for anti-money laundering supervision.</p>
-       |<p class="govuk-body">It's time to confirm your details and pay your annual fee.</p>
+       |<p class="govuk-body">This is a reminder that you need to confirm your details and pay your annual fee.</p>
        |<p class="govuk-body">If you do not do this by <strong>${formatDate(endDate)}</strong>, HMRC will cancel your registration.</p>
        |<p class="govuk-body">This is a two-stage process. You must complete both stages to stay registered.</p>
        |
@@ -163,6 +163,7 @@ object MessageDetails {
        |
        |<h2 class="govuk-heading-m">If your registration is cancelled</h2>
        |<p class="govuk-body">You will need to submit a new registration application and pay the correct fees, including the application charge.</p>
+       |<p class="govuk-body">If your registration is cancelled, you must not undertake any activity covered by the Money Laundering Regulations. Otherwise, you and/or your business may be subject to civil sanctions, such as a fine, or criminal proceedings.</p>
        |
        |<h2 class="govuk-heading-m">More information</h2>
        |<p class="govuk-body">For details of HMRC's registration policy and how to pay your fee, visit <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees" class="govuk-link">Fees you'll pay for money laundering supervision</a>.</p>

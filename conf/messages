@@ -3027,8 +3027,8 @@ notifications.subject.v7.DeRegistrationEffectiveDateChange = Your de-registratio
 
 notifications.subject.v7.NoSubject = <no subject>
 
-notifications.subject.v7.NewRenewalReminder = Reminder to submit your annual declaration and pay your fee.
-notifications.subject.v7.RenewalReminder = You need to submit your annual declaration and pay your fee.
+notifications.subject.v7.NewRenewalReminder = Reminder to submit your annual declaration and pay your fee
+notifications.subject.v7.RenewalReminder = You need to submit your annual declaration and pay your fee
 
 
 notifications.header = Your messages
