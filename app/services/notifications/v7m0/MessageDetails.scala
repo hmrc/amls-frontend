@@ -146,7 +146,8 @@ object MessageDetails {
 
   def reminderRenewal(endDate: String): String =
     s"""
-       |<p class="govuk-body">This is a reminder that you need to confirm your details and pay your annual fee.</p>
+       |<p class="govuk-body">You or your business are currently with HMRC for anti-money laundering supervision.</p>
+       |<p class="govuk-body">It's time to confirm your details and pay your annual fee.</p>
        |<p class="govuk-body">If you do not do this by <strong>${formatDate(endDate)}</strong>, HMRC will cancel your registration.</p>
        |<p class="govuk-body">This is a two-stage process. You must complete both stages to stay registered.</p>
        |
