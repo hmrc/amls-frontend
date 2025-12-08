@@ -1,4 +1,4 @@
-r5dfswza``#!/bin/bash
+#!/bin/bash
 
 minorflag=false
 if [ "$1" = "minor" ]; then
