@@ -74,23 +74,18 @@ object NotificationDetails {
     input => LocalDate.parse(input, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 
   private val extractEndDate: String => Option[LocalDate] = input => {
-    println(s"[DEBUG] Extracting date from: '$input'")
     val pattern = """(?i)[\w\s]+\s*-\s*(\d{1,2}/\d{1,2}/\d{4})""".r.unanchored
     pattern.findFirstMatchIn(input) match {
       case Some(m) =>
         val dateStr = m.group(1)
-        println(s"[DEBUG] Regex matched! Date string: '$dateStr'")
         try {
           val result = parseDate(dateStr)
-          println(s"[DEBUG] Successfully parsed date: $result")
           result.some
         } catch {
           case e: Exception =>
-            println(s"[DEBUG] Failed to parse date: ${e.getMessage}")
             none[LocalDate]
         }
       case None =>
-        println(s"[DEBUG] Regex did not match!")
         none[LocalDate]
     }
   }
