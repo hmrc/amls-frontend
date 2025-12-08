@@ -40,6 +40,7 @@ class NotificationTemplateGenerator @Inject() (
   v4m0: V4M0,
   v5m0: V5M0,
   v6m0: V6M0,
+  v7m0: V7M0,
   cpd: CommonPlayDependencies
 ) {
 
@@ -53,7 +54,7 @@ class NotificationTemplateGenerator @Inject() (
   implicit val appConfig: ApplicationConfig       = cpd.amlsConfig
 
   @VisibleForTesting val templateMsgVersionsToVersionedViews: Map[String, VersionedView] =
-    Map("v1m0" -> v1m0, "v2m0" -> v2m0, "v3m0" -> v3m0, "v4m0" -> v4m0, "v5m0" -> v5m0, "v6m0" -> v6m0)
+    Map("v1m0" -> v1m0, "v2m0" -> v2m0, "v3m0" -> v3m0, "v4m0" -> v4m0, "v5m0" -> v5m0, "v6m0" -> v6m0, "v7m0" -> v7m0)
 
   def contactTypeToView(
     contactType: ContactType,

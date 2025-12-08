@@ -41,6 +41,7 @@ case class NotificationDetails(
       case "v1m0" | "v2m0" | "v3m0" | "v4m0" => s"notifications.subject.$cType"
       case "v5m0"                            => s"notifications.subject.v5.$cType"
       case "v6m0"                            => s"notifications.subject.v6.$cType"
+      case "v7m0"                            => s"notifications.subject.v7.$cType"
       case _                                 => throw new Exception(s"Unknown template version $templateVersion")
     }
 
@@ -74,7 +75,19 @@ object NotificationDetails {
 
   private val extractEndDate: String => Option[LocalDate] = input => {
     val pattern = """(?i)[\w\s]+\s*-\s*(\d{1,2}/\d{1,2}/\d{4})""".r.unanchored
-    pattern.findFirstMatchIn(input).fold(none[LocalDate])(m => parseDate(m.group(1)).some)
+    pattern.findFirstMatchIn(input) match {
+      case Some(m) =>
+        val dateStr = m.group(1)
+        try {
+          val result = parseDate(dateStr)
+          result.some
+        } catch {
+          case e: Exception =>
+            none[LocalDate]
+        }
+      case None =>
+        none[LocalDate]
+    }
   }
 
   private val extractReference: String => Option[String] = input => {
@@ -91,11 +104,16 @@ object NotificationDetails {
   def convertEndDateMessageText(inputString: String): Option[EndDateDetails] =
     extractEndDate(inputString) map { date => EndDateDetails(date, None) }
 
-  def convertReminderMessageText(inputString: String): Option[ReminderDetails] =
+  def convertReminderMessageText(inputString: String, receivedAt: LocalDateTime): Option[ReminderDetails] =
     inputString.split("\\|").toList match {
       case amount :: ref :: tail =>
-        Some(ReminderDetails(Currency(splitByDash(amount).toDouble), splitByDash(ref)))
-      case _                     => None
+        val dueDate = receivedAt.plusDays(28).format(DateTimeFormatter.ofPattern("d MMMM yyyy"))
+        Some(ReminderDetails(
+          Currency(splitByDash(amount).toDouble),
+          splitByDash(ref),
+          dueDate
+        ))
+      case _ => None
     }
 
   def processGenericMessage(msg: String): String = {
@@ -103,5 +121,5 @@ object NotificationDetails {
     pattern.findFirstMatchIn(msg).fold(msg)(m => m.group(1))
   }
 
-  private def splitByDash(s: String): String = s.split("-")(1)
+  def splitByDash(s: String): String = s.split("-")(1)
 }
