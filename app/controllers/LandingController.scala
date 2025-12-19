@@ -122,7 +122,7 @@ class LandingController @Inject() (
           refreshAndRedirect(mlrNumber, None, credId, accountTypeId)
         } else {
           val cache: Cache = optPrefilledCache.head
-          logger.info("getWithAmendments:AMLSReference:" + amlsRegistrationNumber)
+          logger.debug("getWithAmendments:AMLSReference:" + amlsRegistrationNumber)
           if (dataHasChanged(cache)) {
             logger.info("Entered LandingController.getWithAmendments for case dataHasChanged " + amlsRegistrationNumber)
             cache.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
