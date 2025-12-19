@@ -41,7 +41,9 @@ import models.tradingpremises.TradingPremises
 import play.api.i18n.Messages
 import services.cache.Cache
 import uk.gov.hmrc.http.HeaderCarrier
-
+import models.businessmatching.BusinessMatchingMsbService.ForeignExchange
+import models.moneyservicebusiness.{FXTransactionsInNext12Months, MoneyServiceBusiness => Msb}
+import utils.ControllerHelper
 import scala.concurrent.{ExecutionContext, Future}
 
 class LandingService @Inject() (
@@ -260,11 +262,19 @@ class LandingService @Inject() (
       None
     }
 
-  private def msbSection(viewResponse: ViewResponse): Option[MoneyServiceBusiness] =
-    if (viewResponse.msbSection.throughput.nonEmpty) {
-      Some(viewResponse.msbSection.copy(hasAccepted = true))
-    } else {
-      None
+  private def msbSection(viewResponse: ViewResponse): Option[Msb] =
+    viewResponse.msbSection.map { msb =>
+      val msbServices =
+        ControllerHelper.getMsbServices(Some(viewResponse.businessMatchingSection: BusinessMatching))
+          .getOrElse(Set.empty)
+
+      val fxSelected = msbServices.contains(ForeignExchange)
+
+      val msbWithFxDefault =
+        if (fxSelected && msb.fxTransactionsInNext12Months.isEmpty)
+          msb.copy(fxTransactionsInNext12Months = Some(FXTransactionsInNext12Months("0")))
+        else msb
+      msbWithFxDefault.copy(hasAccepted = true)
     }
 
   private def ampSection(viewResponse: ViewResponse): Option[Amp] =
