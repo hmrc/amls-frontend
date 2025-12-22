@@ -118,11 +118,13 @@ class LandingController @Inject() (
         landingService.initialiseGetWithAmendments(credId)
       prefilledEnrolmentIntoCacheFromDatabase.flatMap { optPrefilledCache =>
         if (optPrefilledCache.isEmpty) {
+          logger.info("Entered LandingController.getWithAmendments for case optPrefilledCache " + amlsRegistrationNumber)
           refreshAndRedirect(mlrNumber, None, credId, accountTypeId)
         } else {
           val cache: Cache = optPrefilledCache.head
           logger.debug("getWithAmendments:AMLSReference:" + amlsRegistrationNumber)
           if (dataHasChanged(cache)) {
+            logger.info("Entered LandingController.getWithAmendments for case dataHasChanged " + amlsRegistrationNumber)
             cache.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
               case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cache), credId, accountTypeId)
             } getOrElse landingService.setAltCorrespondenceAddress(
@@ -134,6 +136,7 @@ class LandingController @Inject() (
               preFlightChecksAndRedirect(amlsRegistrationNumber, accountTypeId, credId)
             }
           } else {
+            logger.info("Entered LandingController.getWithAmendments for default case " + amlsRegistrationNumber)
             refreshAndRedirect(mlrNumber, Some(cache), credId, accountTypeId)
           }
         }
@@ -148,8 +151,10 @@ class LandingController @Inject() (
   )(implicit headerCarrier: HeaderCarrier): Future[Result] =
     maybeCache match {
       case Some(c) if c.getEntry[DataImport](DataImport.key).isDefined =>
+        logger.info("Entered LandingController.refreshAndRedirect for case Some(c) " + amlsRegistrationNumber)
         Future.successful(Redirect(controllers.routes.StatusController.get()))
       case _                                                           =>
+        logger.info("Entered LandingController.refreshAndRedirect for default case " + amlsRegistrationNumber)
         landingService
           .refreshCache(amlsRegistrationNumber, credId, accountTypeId)
           .flatMap(_ => preFlightChecksAndRedirect(Option(amlsRegistrationNumber), accountTypeId, credId))
