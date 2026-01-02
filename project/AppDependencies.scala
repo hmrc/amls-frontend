@@ -29,7 +29,7 @@ private object AppDependencies {
     "uk.gov.hmrc"            %% s"bootstrap-test-$playV"  % bootstrapV % Test,
     "uk.gov.hmrc.mongo"      %% s"hmrc-mongo-test-$playV" % hmrcMongoV % Test,
     "org.scalatestplus"      %% "scalacheck-1-17"         % "3.2.18.0" % Test,
-    "org.scalamock"          %% "scalamock"               % "5.2.0"    % Test
+    "org.scalamock"          %% "scalamock"               % "6.0.0"    % Test
   )
 
   def apply(): Seq[ModuleID] = compile ++ test

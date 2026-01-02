@@ -155,7 +155,7 @@ object RoleWithinBusinessRelease7 extends Enumerable.Implicits {
   implicit val jsonReads: Reads[RoleWithinBusinessRelease7] =
     (__ \ "roleWithinBusiness")
       .read[Set[String]]
-      .flatMap { x: Set[String] =>
+      .flatMap { (x: Set[String]) =>
         x.map {
           case "BeneficialShareholder" => Reads(_ => JsSuccess(BeneficialShareholder)) map identity[RoleType]
           case "Director"              => Reads(_ => JsSuccess(Director)) map identity[RoleType]

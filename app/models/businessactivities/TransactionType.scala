@@ -90,7 +90,7 @@ object TransactionTypes extends Enumerable.Implicits {
   val oldTransactionTypeReader: Reads[Option[TransactionTypes]] =
     (__ \ "isRecorded").read[Boolean] flatMap {
       case true  =>
-        (__ \ "transactions").read[Set[String]].flatMap { x: Set[String] =>
+        (__ \ "transactions").read[Set[String]].flatMap { (x: Set[String]) =>
           x.map {
             case "01" => constant(Paper) map identity[TransactionType]
             case "02" => constant(DigitalSpreadsheet) map identity[TransactionType]

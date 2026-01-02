@@ -24,7 +24,7 @@ case class HowWillYouSellGoods(channels: Set[SalesChannel])
 trait HowWillYouSellGoods0 {
 
   implicit val jsonReads: Reads[HowWillYouSellGoods] =
-    (__ \ "salesChannels").read[Set[String]].flatMap { x: Set[String] =>
+    (__ \ "salesChannels").read[Set[String]].flatMap { (x: Set[String]) =>
       x.map {
         case "Retail"    => Reads(_ => JsSuccess(Retail)) map identity[SalesChannel]
         case "Wholesale" => Reads(_ => JsSuccess(Wholesale)) map identity[SalesChannel]
