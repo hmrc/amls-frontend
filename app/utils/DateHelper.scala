@@ -25,7 +25,7 @@ object DateHelper {
 
   implicit def localDateOrdering: Ordering[LocalDate] = Ordering.fromLessThan(_ isBefore _)
 
-  def isNotFutureDate: LocalDate => Boolean = { date: LocalDate =>
+  def isNotFutureDate: LocalDate => Boolean = {(date: LocalDate) =>
     !date.isAfter(LocalDate.now())
   }
 

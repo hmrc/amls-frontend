@@ -43,6 +43,6 @@ class WhoIsYourAccountantNameFormProvider @Inject() () extends Mappings {
           )
         )
       )
-    )(WhoIsYourAccountantName.apply)(WhoIsYourAccountantName.unapply)
+    )(WhoIsYourAccountantName.apply)(w => Some((w.accountantsName, w.accountantsTradingName)))
   )
 }

@@ -49,6 +49,6 @@ class PersonNameFormProvider @Inject() () extends Mappings {
           regexp(nameRegex, "error.invalid.rp.last_name.validation")
         )
       )
-    )(PersonName.apply)(PersonName.unapply)
+    )(PersonName.apply)(p => Some((p.firstName, p.middleName, p.lastName)))
   )
 }

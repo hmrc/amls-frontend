@@ -51,7 +51,7 @@ object WhoIsYourAccountant {
       Json.toJson(model.isUk).asOpt[JsObject],
       Json.toJson(model.address).asOpt[JsObject]
     ).flatten.fold(Json.obj()) {
-      _ ++ _
+      (acc, obj) => acc ++ obj
     }
   }
 }

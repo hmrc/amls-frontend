@@ -64,7 +64,7 @@ class MongoCacheClient @Inject() (
       indexes = Seq(
         IndexModel(
           Indexes.ascending("lastUpdated"),
-          IndexOptions().name("cacheExpiry").expireAfter(appConfig.cacheExpiryInSeconds, SECONDS)
+          IndexOptions().name("cacheExpiry").expireAfter(appConfig.cacheExpiryInSeconds.toLong, SECONDS)
         )
       )
     )
