@@ -31,7 +31,7 @@
                 @messages("your.registration.withdraw")
                 @anchor(
                     s"${messages("status.withdraw.link-text")}",
-                    controllers.withdrawal.routes.WithdrawApplicationController.get.url,
+                    controllers.withdrawal.routes.WithdrawApplicationController.get().url,
                     "withdraw-application"
                 ).
             </p>
@@ -43,7 +43,7 @@
                 @messages("your.registration.deregister")
                 @anchor(
                     s"${messages("your.registration.deregister.link")}",
-                    controllers.deregister.routes.DeRegisterApplicationController.get.url,
+                    controllers.deregister.routes.DeRegisterApplicationController.get().url,
                     "deregister-link"
                 ).
             </p>

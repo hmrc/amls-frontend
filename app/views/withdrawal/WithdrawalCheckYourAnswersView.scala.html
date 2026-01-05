@@ -39,7 +39,7 @@
     @govukSummaryList(
          CheckYourAnswersHelper.createSummaryList(withdrawalReason)
     )
- @formHelper(controllers.withdrawal.routes.WithdrawalCheckYourAnswersController.post, Symbol("disable-on-submit") -> "true") {
+ @formHelper(controllers.withdrawal.routes.WithdrawalCheckYourAnswersController.post, "disable-on-submit" -> "true") {
      @button("button.acceptandcontinue")
  }
 

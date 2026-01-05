@@ -23,6 +23,7 @@ import config.ApplicationConfig
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
 import play.api.Logging
 import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.ws.JsonBodyWritables._
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.audit.DefaultAuditConnector

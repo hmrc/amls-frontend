@@ -41,7 +41,7 @@ object DeRegisterSubscriptionRequest {
           (__ \ "deregistrationDate").write[LocalDate] and
           __.write[DeregistrationReason] and
           (__ \ "deregReasonOther").writeNullable[String]
-      )(unlift(DeRegisterSubscriptionRequest.unapply)).writes(ep)
+      )(Function.unlift(DeRegisterSubscriptionRequest.unapply)).writes(ep)
     }
   }
 }

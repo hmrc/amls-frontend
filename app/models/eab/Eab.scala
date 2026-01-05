@@ -250,7 +250,7 @@ object Eab {
       (__ \ "data").write[JsObject] and
         (__ \ "hasChanged").write[Boolean] and
         (__ \ "hasAccepted").write[Boolean]
-    )(unlift(Eab.unapply))
+    )(Function.unlift(Eab.unapply))
   }
 
   implicit val formatOption: Reads[Option[Eab]] = Reads.optionWithNull[Eab]

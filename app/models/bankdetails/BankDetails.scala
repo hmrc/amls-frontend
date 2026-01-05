@@ -111,7 +111,7 @@ object BankDetails {
       case bds @ model if model.forall(_.isComplete) && anyChanged(model) =>
         TaskRow(
           messageKey,
-          controllers.bankdetails.routes.YourBankAccountsController.get.url,
+          controllers.bankdetails.routes.YourBankAccountsController.get().url,
           true,
           Updated,
           TaskRow.updatedTag

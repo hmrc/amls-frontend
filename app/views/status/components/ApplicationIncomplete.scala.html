@@ -25,7 +25,7 @@
 @button(
     "status.incomplete.buttontext",
     "return-to-saved-application",
-    Some(controllers.routes.RegistrationProgressController.get.url)
+    Some(controllers.routes.RegistrationProgressController.get().url)
 )
 
 @if(businessName.isDefined) {

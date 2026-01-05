@@ -79,7 +79,7 @@
                 <h2 class="govuk-heading-m override-heading-medium">@messages("progress.submit.updates")</h2>
                 <p class="govuk-body">@messages("progress.updates.made")</p>
 
-                @formHelper(action = controllers.routes.RegistrationProgressController.post) {
+                @formHelper(action = controllers.routes.RegistrationProgressController.post()) {
                     @button("button.continue", "progress-continue")
                 }
             } else {

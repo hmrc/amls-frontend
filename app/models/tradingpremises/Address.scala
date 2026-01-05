@@ -78,6 +78,6 @@ object Address {
         (__ \ "addressLine4").writeNullable[String] and
         (__ \ "postcode").write[String] and
         (__ \ "addressDateOfChange").writeNullable[DateOfChange]
-    )(unlift(Address.unapply))
+    )(Function.unlift(Address.unapply))
   }
 }

@@ -74,7 +74,7 @@ object CorrespondenceAddress {
             (__ \ "correspondenceAddressLine3").writeNullable[String] and
             (__ \ "correspondenceAddressLine4").writeNullable[String] and
             (__ \ "correspondencePostCode").write[String]
-        )(unlift(CorrespondenceAddressUk.unapply)).writes(a)
+        )(Function.unlift(CorrespondenceAddressUk.unapply)).writes(a)
       case CorrespondenceAddress(None, Some(a)) =>
         (
           (__ \ "yourName").write[String] and
@@ -84,7 +84,7 @@ object CorrespondenceAddress {
             (__ \ "correspondenceAddressLine3").writeNullable[String] and
             (__ \ "correspondenceAddressLine4").writeNullable[String] and
             (__ \ "correspondenceCountry").write[Country]
-        )(unlift(CorrespondenceAddressNonUk.unapply)).writes(a)
+        )(Function.unlift(CorrespondenceAddressNonUk.unapply)).writes(a)
       case _                                    => throw new Exception("An UnknownException has occurred while parsing CorrespondenceAddress")
     }
   }

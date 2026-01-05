@@ -65,7 +65,7 @@ object AddPerson {
         (__ \ "middleName").write[Option[String]] and
         (__ \ "lastName").write[String] and
         __.write[RoleWithinBusinessRelease7]
-    )(unlift(AddPerson.unapply))
+    )(Function.unlift(AddPerson.unapply))
   }
 
 }

@@ -54,7 +54,7 @@
         <a href="@appConfig.companiesHouseUrl" target="_blank" class="govuk-link"> @messages("businessmatching.registrationnumber.line_2")</a>.
     </p>
 
-    @formHelper(action = controllers.businessmatching.routes.CompanyRegistrationNumberController.post(edit), 'autoComplete -> "off") {
+    @formHelper(action = controllers.businessmatching.routes.CompanyRegistrationNumberController.post(edit), Symbol("autoComplete") -> "off") {
 
         @input(
             input = Input(

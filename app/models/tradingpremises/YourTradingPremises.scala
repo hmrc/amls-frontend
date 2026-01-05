@@ -48,7 +48,7 @@ object YourTradingPremises {
         (__ \ "isResidential").writeNullable[Boolean] and
         (__ \ "startDate").writeNullable[LocalDate] and
         (__ \ "tradingNameChangeDate").writeNullable[DateOfChange]
-    )(unlift(YourTradingPremises.unapply))
+    )(Function.unlift(YourTradingPremises.unapply))
 
   implicit def convert(data: YourTradingPremises): Option[TradingPremises] =
     Some(TradingPremises(yourTradingPremises = Some(data)))

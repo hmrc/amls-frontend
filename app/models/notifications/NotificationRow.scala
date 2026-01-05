@@ -145,7 +145,7 @@ object NotificationRow {
         (JsPath \ "amlsRegistrationNumber").write[String] and
         (JsPath \ "templatePackageVersion").write[String] and
         (JsPath \ "_id").write[IDType]
-    )(unlift(NotificationRow.unapply))
+    )(Function.unlift(NotificationRow.unapply))
 
   implicit val format: OFormat[NotificationRow] = OFormat(reads, writes)
 }

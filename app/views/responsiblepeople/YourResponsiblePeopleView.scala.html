@@ -116,11 +116,11 @@
     }
 
     @if(responsiblePeopleIncomplete.isEmpty && responsiblePeopleComplete.nonEmpty) {
-        @formHelper(controllers.routes.RegistrationProgressController.get) {
+        @formHelper(controllers.routes.RegistrationProgressController.get()) {
             @button("button.summary.acceptandcomplete", "rp-accept-and-complete")
         }
     } else {
-        @formHelper(controllers.routes.RegistrationProgressController.get) {
+        @formHelper(controllers.routes.RegistrationProgressController.get()) {
             @button("link.return.registration.progress", "rp-return-to-application")
         }
     }

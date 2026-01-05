@@ -39,7 +39,7 @@
     @govukSummaryList(
         CheckYourAnswersHelper.createSummaryList(deregistrationReason)
     )
-    @formHelper(controllers.deregister.routes.DeregistrationCheckYourAnswersController.post, Symbol("disable-on-submit") -> "true") {
+    @formHelper(controllers.deregister.routes.DeregistrationCheckYourAnswersController.post(), Symbol("disable-on-submit") -> "true") {
         @button("button.acceptandcontinue")
     }
 

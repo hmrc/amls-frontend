@@ -42,7 +42,7 @@ object WithdrawSubscriptionRequest {
           (__ \ "withdrawalDate").write[LocalDate] and
           __.write[WithdrawalReason] and
           (__ \ "withdrawalReasonOthers").writeNullable[String]
-      )(unlift(WithdrawSubscriptionRequest.unapply)).writes(ep)
+      )(Function.unlift(WithdrawSubscriptionRequest.unapply)).writes(ep)
     }
   }
 }

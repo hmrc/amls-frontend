@@ -44,7 +44,7 @@ object PersonResidenceType {
       __.write[Residency] and
         (__ \ "countryOfBirth").write[Option[Country]] and
         (__ \ "nationality").write[Option[Country]]
-    )(unlift(PersonResidenceType.unapply))
+    )(Function.unlift(PersonResidenceType.unapply))
   }
 
   implicit def convert(s: PersonResidenceType): Option[ResponsiblePerson] =

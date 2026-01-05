@@ -137,7 +137,7 @@
     }
 
 
-    @formHelper(action = controllers.routes.RegistrationProgressController.get) {
+    @formHelper(action = controllers.routes.RegistrationProgressController.get()) {
         @(inCompleteModel.isEmpty, completedModel.isEmpty) match {
             case (true, false) => {
                 @button("button.bankdetails.yourbankaccount.acceptandcomplete", "accept-and-complete")

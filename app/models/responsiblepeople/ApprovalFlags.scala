@@ -47,7 +47,7 @@ object ApprovalFlags {
     (
       (__ \ "hasAlreadyPassedFitAndProper").writeNullable[Boolean] and
         (__ \ "hasAlreadyPaidApprovalCheck").writeNullable[Boolean]
-    )(unlift(ApprovalFlags.unapply))
+    )(Function.unlift(ApprovalFlags.unapply))
   }
 
   implicit val format: OFormat[ApprovalFlags] = Json.format[ApprovalFlags]

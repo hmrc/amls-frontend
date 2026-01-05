@@ -25,7 +25,7 @@
     classes: String = ""
 )(implicit messages: Messages)
 
-@govukButton(Button(
+@govukButton(new Button(
     href = hrefOpt,
     content = Text(messages(msg)),
     isStartButton = startButton,
