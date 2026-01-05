@@ -28,12 +28,13 @@ object MessageDetails {
 
   def formatDate(date: String): String = {
     val outputFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
-    val parsedDate = try {
-      val inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-      LocalDate.parse(date, inputFormatter)
-    } catch {
-      case _: Exception => LocalDate.parse(date)
-    }
+    val parsedDate      =
+      try {
+        val inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        LocalDate.parse(date, inputFormatter)
+      } catch {
+        case _: Exception => LocalDate.parse(date)
+      }
 
     parsedDate.format(outputFormatter)
   }
@@ -61,11 +62,11 @@ object MessageDetails {
       case _                        => throw new Exception("An Unknown Exception has occurred, v7m0:endDate():MessageDetails")
     }
 
-  def reminder(contactType: ContactType, paymentAmount: String, referenceNumber: String,dueDate:String): String =
+  def reminder(contactType: ContactType, paymentAmount: String, referenceNumber: String, dueDate: String): String =
     contactType match {
       case ReminderToPayForVariation     =>
         s"""<p class="govuk-body">You need to pay $paymentAmount for the recent changes made to your details.</p><p class="govuk-body">Your payment reference is: $referenceNumber.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you've already paid you can ignore this message.</p>"""
-      case ReminderToPayForRenewal       => reminderPayRenewal(paymentAmount,referenceNumber,dueDate)
+      case ReminderToPayForRenewal       => reminderPayRenewal(paymentAmount, referenceNumber, dueDate)
       case ReminderToPayForApplication   =>
         s"""<p class="govuk-body">You need to pay $paymentAmount for your application to register with HM Revenue and Customs.</p><p class="govuk-body">Your payment reference is: $referenceNumber.</p><p class="govuk-body">Find details of how to pay on your status page.</p><p class="govuk-body">It can take time for some payments to clear, so if you've already paid you can ignore this message.</p>"""
       case ReminderToPayForManualCharges =>
@@ -79,7 +80,9 @@ object MessageDetails {
   def newRenewalReminderMsg(endDate: String): String =
     s"""
        |<p class="govuk-body">This is a reminder that you need to confirm your details and pay your annual fee.</p>
-       |<p class="govuk-body">If you do not do this by <strong>${formatDate(endDate)}</strong>, HMRC will cancel your registration.</p>
+       |<p class="govuk-body">If you do not do this by <strong>${formatDate(
+        endDate
+      )}</strong>, HMRC will cancel your registration.</p>
        |<p class="govuk-body">This is a two-stage process. You must complete both stages to stay registered.</p>
        |
        |<h2 class="govuk-heading-m">Stage 1: Confirm your details</h2>
@@ -105,7 +108,7 @@ object MessageDetails {
        |<p class="govuk-body">If you've already completed both stages, you can ignore this message.</p>
        |""".stripMargin
 
-  def reminderPayRenewal(paymentAmount: String, referenceNumber: String,dueDate:String): String =
+  def reminderPayRenewal(paymentAmount: String, referenceNumber: String, dueDate: String): String =
     s"""
        |<p class="govuk-body">You have submitted your annual declaration, but have not paid your annual supervision fee.</p>
        |<p class="govuk-body">You must pay this fee to continue your registration with HMRC.</p>
@@ -140,8 +143,12 @@ object MessageDetails {
        |<p class="govuk-body">This cancellation decision is made under regulation 60(3)(a) by virtue of regulation 59(1)(c)(ii).</p>
        |
        |<h2 class="govuk-heading-m">What happens next</h2>
-       |<p class="govuk-body">The cancellation will come into effect on <strong>${formatDate(endDate)}</strong>. You may conclude any relevant business during this time.</p>
-       |<p class="govuk-body">After <strong>${formatDate(endDate)}</strong>, you must not undertake any activity covered by the Money Laundering Regulations. Otherwise, you and/or your business may be subject to civil sanctions, such as a fine, or criminal proceedings.</p>
+       |<p class="govuk-body">The cancellation will come into effect on <strong>${formatDate(
+        endDate
+      )}</strong>. You may conclude any relevant business during this time.</p>
+       |<p class="govuk-body">After <strong>${formatDate(
+        endDate
+      )}</strong>, you must not undertake any activity covered by the Money Laundering Regulations. Otherwise, you and/or your business may be subject to civil sanctions, such as a fine, or criminal proceedings.</p>
        |
        |<h2 class="govuk-heading-m">If you want to remain registered</h2>
        |<p class="govuk-body">You must submit a new application and pay all fees, including the application charge.</p>
@@ -157,7 +164,9 @@ object MessageDetails {
     s"""
        |<p class="govuk-body">You or your business are currently registered with HMRC for anti-money laundering supervision.</p>
        |<p class="govuk-body">It's time to confirm your details and pay your annual fee.</p>
-       |<p class="govuk-body">If you do not do this by <strong>${formatDate(endDate)}</strong>, HMRC will cancel your registration.</p>
+       |<p class="govuk-body">If you do not do this by <strong>${formatDate(
+        endDate
+      )}</strong>, HMRC will cancel your registration.</p>
        |<p class="govuk-body">This is a two-stage process. You must complete both stages to stay registered.</p>
        |
        |<h2 class="govuk-heading-m">Stage 1: Confirm your details</h2>

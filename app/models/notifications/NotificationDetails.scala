@@ -85,7 +85,7 @@ object NotificationDetails {
           case e: Exception =>
             none[LocalDate]
         }
-      case None =>
+      case None    =>
         none[LocalDate]
     }
   }
@@ -108,12 +108,14 @@ object NotificationDetails {
     inputString.split("\\|").toList match {
       case amount :: ref :: tail =>
         val dueDate = receivedAt.plusDays(28).format(DateTimeFormatter.ofPattern("d MMMM yyyy"))
-        Some(ReminderDetails(
-          Currency(splitByDash(amount).toDouble),
-          splitByDash(ref),
-          dueDate
-        ))
-      case _ => None
+        Some(
+          ReminderDetails(
+            Currency(splitByDash(amount).toDouble),
+            splitByDash(ref),
+            dueDate
+          )
+        )
+      case _                     => None
     }
 
   def processGenericMessage(msg: String): String = {
