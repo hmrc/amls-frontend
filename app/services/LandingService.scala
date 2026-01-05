@@ -265,7 +265,8 @@ class LandingService @Inject() (
   private def msbSection(viewResponse: ViewResponse): Option[Msb] =
     viewResponse.msbSection.map { msb =>
       val msbServices =
-        ControllerHelper.getMsbServices(Some(viewResponse.businessMatchingSection: BusinessMatching))
+        ControllerHelper
+          .getMsbServices(Some(viewResponse.businessMatchingSection: BusinessMatching))
           .getOrElse(Set.empty)
 
       val fxSelected = msbServices.contains(ForeignExchange)

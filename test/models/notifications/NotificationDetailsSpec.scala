@@ -100,15 +100,17 @@ class NotificationDetailsSpec extends PlaySpec with Matchers {
     "convert the input message text into the model" in {
 
       val inputString = "parameter1-1234|parameter2-ABC1234|Status-04-Approved"
-      val receivedAt = LocalDateTime.of(2025, 11, 25, 10, 0)
+      val receivedAt  = LocalDateTime.of(2025, 11, 25, 10, 0)
 
-      NotificationDetails.convertReminderMessageText(inputString, receivedAt) mustBe Some(ReminderDetails(Currency(1234), "ABC1234", "23 December 2025"))
+      NotificationDetails.convertReminderMessageText(inputString, receivedAt) mustBe Some(
+        ReminderDetails(Currency(1234), "ABC1234", "23 December 2025")
+      )
 
     }
 
     "return none when supplied with an invalid string" in {
       val inputString = "invalidtest"
-      val receivedAt = LocalDateTime.of(2025, 11, 25, 10, 0)
+      val receivedAt  = LocalDateTime.of(2025, 11, 25, 10, 0)
 
       NotificationDetails.convertReminderMessageText(inputString, receivedAt) must be(None)
     }

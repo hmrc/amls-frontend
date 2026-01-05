@@ -139,7 +139,7 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
               """<a href="""" +
               controllers.routes.StatusController.get() +
               """">status page</a>.</p>"""
-            )
+          )
         }
 
         "contact type is registration variation approval" in new Fixture {
@@ -174,7 +174,7 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
               """<p class="govuk-body">You can find details of your registration on your <a href="""" +
               controllers.routes.StatusController.get() +
               """">status page</a>.</p>"""
-            )
+          )
         }
 
         "contact type is DeRegistrationEffectiveDateChange" in new Fixture {
@@ -209,7 +209,7 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
               """<p class="govuk-body">You can see the new effective date on your <a href="""" +
               controllers.routes.StatusController.get() +
               """">status page</a>.</p>"""
-            )
+          )
         }
 
       }
@@ -332,8 +332,8 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
             await(service.getMessageDetails("regNo", "id", ContactType.ApplicationApproval, "v7m0", accountTypeId))
 
           result.get.messageText.get mustBe s"""<p class="govuk-body">Your application to register has been approved. You're now registered until 2018-07-31.</p><p class="govuk-body">Your anti-money laundering registration number is: ABC1234.</p><p class="govuk-body">You can find details of your registration on your <a href="${controllers.routes.StatusController
-            .get()
-            .url}">status page</a>.</p>"""
+              .get()
+              .url}">status page</a>.</p>"""
         }
 
         "contact type is RenewalApproval" in new Fixture {

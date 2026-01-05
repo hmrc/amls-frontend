@@ -21,14 +21,14 @@ import views.html.notifications.v7m0._
 import javax.inject.Inject
 
 class V7M0 @Inject() (
-                       val messageDetailsView: MessageDetailsView,
-                       val mindedToRejectView: MindedToRejectView,
-                       val mindedToRevokeView: MindedToRevokeView,
-                       val noLongerMindedToRejectView: NoLongerMindedToRejectView,
-                       val noLongerMindedToRevokeView: NoLongerMindedToRevokeView,
-                       val rejectionReasonsView: RejectionReasonsView,
-                       val revocationReasonsView: RevocationReasonsView
-                     ) extends VersionedView {
+  val messageDetailsView: MessageDetailsView,
+  val mindedToRejectView: MindedToRejectView,
+  val mindedToRevokeView: MindedToRevokeView,
+  val noLongerMindedToRejectView: NoLongerMindedToRejectView,
+  val noLongerMindedToRevokeView: NoLongerMindedToRevokeView,
+  val rejectionReasonsView: RejectionReasonsView,
+  val revocationReasonsView: RevocationReasonsView
+) extends VersionedView {
 
   override def viewFromTemplateFilename(templateName: String): NotificationViewScalaTemplate5 =
     templateName match {
