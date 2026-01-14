@@ -19,11 +19,11 @@ package models.withdrawal
 import java.time.LocalDate
 
 case class WithdrawSubscriptionRequest(
-  acknowledgementReference: String,
-  withdrawalDate: LocalDate,
-  withdrawalReason: WithdrawalReason,
-  withdrawalReasonOthers: Option[String] = None
-)
+                                        acknowledgementReference: String,
+                                        withdrawalDate: LocalDate,
+                                        withdrawalReason: WithdrawalReason,
+                                        withdrawalReasonOthers: Option[String] = None
+                                      )
 
 object WithdrawSubscriptionRequest {
 
@@ -42,7 +42,7 @@ object WithdrawSubscriptionRequest {
           (__ \ "withdrawalDate").write[LocalDate] and
           __.write[WithdrawalReason] and
           (__ \ "withdrawalReasonOthers").writeNullable[String]
-      )(Function.unlift(WithdrawSubscriptionRequest.unapply)).writes(ep)
+        )((w: WithdrawSubscriptionRequest) => (w.acknowledgementReference, w.withdrawalDate, w.withdrawalReason, w.withdrawalReasonOthers)).writes(ep)
     }
   }
 }

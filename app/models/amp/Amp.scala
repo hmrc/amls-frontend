@@ -136,7 +136,7 @@ object Amp {
       (__ \ "data").write[JsObject] and
         (__ \ "hasChanged").write[Boolean] and
         (__ \ "hasAccepted").write[Boolean]
-    )(Function.unlift(Amp.unapply))
+    )(a => (a.data, a.hasChanged, a.hasAccepted))
   }
 
   implicit val formatOption: Reads[Option[Amp]] = Reads.optionWithNull[Amp]

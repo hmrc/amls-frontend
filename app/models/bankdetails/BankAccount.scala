@@ -70,7 +70,7 @@ object BankAccount {
       Json.toJson(model.hasIban).asOpt[JsObject],
       Json.toJson(model.account).asOpt[JsObject]
     ).flatten.fold(Json.obj()) {
-      (acc, obj) => acc ++ obj
+      (acc: JsObject, obj: JsObject) => acc.deepMerge(obj)
     }
   }
 }

@@ -49,7 +49,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
     "have a task row function that" must {
 
-      implicit val cache = mock[Cache]
+      implicit val cache: Cache = mock[Cache]
 
       "returns a Not Started task row when there is no model in the cache" in {
 

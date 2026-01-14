@@ -66,7 +66,7 @@ object NotificationDetails {
         (JsPath \ "messageText").writeNullable[String] and
         (JsPath \ "variation").write[Boolean] and
         (JsPath \ "receivedAt").write[LocalDateTime](localDateTimeWrites)
-    )(Function.unlift(NotificationDetails.unapply))
+      )((n: NotificationDetails) => (n.contactType, n.status, n.messageText, n.variation, n.receivedAt))
 
   implicit val format: OFormat[NotificationDetails] = OFormat(reads, writes)
 

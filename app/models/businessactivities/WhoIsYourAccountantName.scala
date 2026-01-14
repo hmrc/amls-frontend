@@ -30,7 +30,7 @@ object WhoIsYourAccountantName {
   val key = "who-is-your-accountant"
 
   implicit val jsonWrites: Writes[WhoIsYourAccountantName] = Writes[WhoIsYourAccountantName] {
-    data: WhoIsYourAccountantName =>
+    (data) =>
       Json.obj("accountantsName" -> data.accountantsName, "accountantsTradingName" -> data.accountantsTradingName)
   }
 

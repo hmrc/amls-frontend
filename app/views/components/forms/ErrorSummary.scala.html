@@ -15,6 +15,7 @@
  *@
 
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.{ErrorSummary => GovukErrorSummaryModel}
 
 @this(errorSummary: GovukErrorSummary)
 
@@ -22,8 +23,8 @@
 
 @if(form.errors.nonEmpty) {
     @errorSummary(
-        mapping.fold(ErrorSummary().withFormErrorsAsText(form)){ value =>
-            ErrorSummary().withFormErrorsAsText(form, mapping = value)
+        mapping.fold(GovukErrorSummaryModel().withFormErrorsAsText(form)){ value =>
+            GovukErrorSummaryModel().withFormErrorsAsText(form, mapping = value)
         }
     )
 }

@@ -89,7 +89,7 @@ class ResponsiblePersonAddControllerSpec
         val emptyCache       = Cache.empty
         val reasonableCounts = for (n <- Gen.choose(min, max)) yield n
 
-        forAll(reasonableCounts, minSuccessful(PosInt.from(requiredSuccess).get)) { currentCount: Int =>
+        forAll(reasonableCounts, minSuccessful(PosInt.from(requiredSuccess).get)) { (currentCount: Int) =>
           forAll(guidanceOptions(currentCount)) {
             (guidanceRequested: Boolean, fromDeclaration: Option[String], expectedRedirect: Call) =>
               val testSeq = buildTestSequence(currentCount)

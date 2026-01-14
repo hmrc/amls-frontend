@@ -62,8 +62,6 @@ class PercentageOfCashPaymentOver15000ControllerSpec
     )
   }
 
-  val emptyCache = Cache.empty
-
   "PercentageOfCashPaymentOver15000Controller" when {
 
     "get is called" must {

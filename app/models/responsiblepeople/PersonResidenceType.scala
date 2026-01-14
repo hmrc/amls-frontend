@@ -20,10 +20,10 @@ import models.Country
 import play.api.libs.json.{Reads, Writes}
 
 case class PersonResidenceType(
-  isUKResidence: Residency,
-  countryOfBirth: Option[Country],
-  nationality: Option[Country]
-)
+                                isUKResidence: Residency,
+                                countryOfBirth: Option[Country],
+                                nationality: Option[Country]
+                              )
 
 object PersonResidenceType {
 
@@ -34,7 +34,7 @@ object PersonResidenceType {
       __.read[Residency] and
         (__ \ "countryOfBirth").readNullable[Country] and
         (__ \ "nationality").readNullable[Country]
-    )(PersonResidenceType.apply _)
+      )(PersonResidenceType.apply _)
   }
 
   implicit val jsonWrite: Writes[PersonResidenceType] = {
@@ -42,9 +42,9 @@ object PersonResidenceType {
     import play.api.libs.json._
     (
       __.write[Residency] and
-        (__ \ "countryOfBirth").write[Option[Country]] and
-        (__ \ "nationality").write[Option[Country]]
-    )(Function.unlift(PersonResidenceType.unapply))
+        (__ \ "countryOfBirth").writeNullable[Country] and
+        (__ \ "nationality").writeNullable[Country]
+      )((p: PersonResidenceType) => (p.isUKResidence, p.countryOfBirth, p.nationality))
   }
 
   implicit def convert(s: PersonResidenceType): Option[ResponsiblePerson] =

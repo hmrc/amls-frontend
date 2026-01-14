@@ -30,7 +30,7 @@ object PaymentRedirectRequest {
       (__ \ "reference").write[String] and
         (__ \ "amount").write[String].contramap[Double](_.toString) and
         (__ \ "url").write[String].contramap[ReturnLocation](_.absoluteUrl)
-    )(Function.unlift(PaymentRedirectRequest.unapply))
+      )((p: PaymentRedirectRequest) => (p.reference, p.amount, p.redirectUrl))
   }
 
 }

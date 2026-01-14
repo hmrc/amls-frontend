@@ -61,7 +61,7 @@ class TestOnlyController @Inject() (
                                      cryptoService: CryptoService,
                                      errorView: ErrorView,
                                      testOnlyViews: TestOnlyViews
-                                   )(implicit val ec: scala.concurrent.ExecutionContext) extends AmlsBaseController(ds, cc) {
+                                   )(implicit override val ec: scala.concurrent.ExecutionContext) extends AmlsBaseController(ds, cc) {
 
   def dropMongoCache: Action[AnyContent] = authAction.async { implicit request =>
     removeCacheData(request.credId) map { _ =>

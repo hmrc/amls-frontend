@@ -150,7 +150,7 @@ class HvdSpec extends PlaySpec with MockitoSugar {
     "have a section function that" must {
 
       implicit val messages = Helpers.stubMessages()
-      implicit val cache    = mock[Cache]
+      implicit val cache: Cache = mock[Cache]
 
       "return a Not Started Task Row when model is empty" in new HvdTestFixture {
 

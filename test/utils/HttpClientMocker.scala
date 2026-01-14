@@ -23,6 +23,8 @@ import play.api.libs.json.{Json, Writes}
 import play.api.libs.ws.BodyWritable
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
+import play.api.libs.ws.DefaultBodyWritables.writeableOf_String
 
 import java.net.URL
 import scala.concurrent.{ExecutionContext, Future}
