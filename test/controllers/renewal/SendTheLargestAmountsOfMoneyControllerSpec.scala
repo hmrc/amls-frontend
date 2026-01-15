@@ -82,8 +82,6 @@ class SendTheLargestAmountsOfMoneyControllerSpec
       block(controller.post(edit)(formRequest(valid)))
   }
 
-  val emptyCache = Cache.empty
-
   "SendTheLargestAmountsOfMoneyController" when {
 
     "get is called" must {

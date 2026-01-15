@@ -93,8 +93,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   }
 
-  val mockCacheMap = mock[Cache]
-
   val bmBusinessActivities = Some(
     BMBusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
   )

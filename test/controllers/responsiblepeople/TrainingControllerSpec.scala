@@ -31,9 +31,9 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.cache.Cache
 import utils._
+import scala.concurrent.Future
 import views.html.responsiblepeople.TrainingView
 
-import scala.concurrent.Future
 
 class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
@@ -41,6 +41,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
+
+    val emptyCache = Cache.empty
 
     lazy val mockApplicationConfig = mock[ApplicationConfig]
 
@@ -56,9 +58,6 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
     )
 
   }
-
-  val emptyCache   = Cache.empty
-  val mockCacheMap = mock[Cache]
 
   "TrainingController" when {
 

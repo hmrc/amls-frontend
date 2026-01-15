@@ -29,8 +29,7 @@ import play.api.libs.ws.DefaultBodyWritables.writeableOf_String
 import java.net.URL
 import scala.concurrent.{ExecutionContext, Future}
 
-class HttpClientMocker extends MockFactory {
-
+trait HttpClientMocker extends MockFactory {
   val httpClient: HttpClientV2               = mock[HttpClientV2]("mockHttp")
   private val requestBuilder: RequestBuilder = mock[RequestBuilder]("mockRequestBuilder")
 
