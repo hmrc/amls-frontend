@@ -32,19 +32,19 @@ import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class FeeConnectorSpec
-    extends PlaySpec
+  extends PlaySpec
     with MockitoSugar
     with ScalaFutures
     with IntegrationPatience
-    with AmlsReferenceNumberGenerator {
+    with AmlsReferenceNumberGenerator
+    with HttpClientMocker {
 
   trait Fixture {
 
-    val mocker                               = new HttpClientMocker()
     private val configuration: Configuration = Configuration.load(Environment.simple())
     private val config                       = new ApplicationConfig(configuration, new ServicesConfig(configuration))
 
-    val connector = new FeeConnector(http = mocker.httpClient, appConfig = config)
+    val connector = new FeeConnector(http = httpClient, appConfig = config)
 
     val safeId                          = "SAFEID"
     val accountTypeId: (String, String) = ("org", "id")
@@ -69,7 +69,7 @@ class FeeConnectorSpec
 
     "successfully receive feeResponse" in new Fixture {
 
-      mocker.mockGet(url"http://localhost:8940/amls/payment/org/id/$amlsRegistrationNumber", feeResponse)
+      mockGet(url"http://localhost:8940/amls/payment/org/id/$amlsRegistrationNumber", feeResponse)
 
       whenReady(connector.feeResponse(amlsRegistrationNumber, accountTypeId)) {
         _ mustBe feeResponse

@@ -25,11 +25,13 @@ import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import play.api.libs.ws.DefaultBodyWritables.writeableOf_String
+import org.scalatest.TestSuite
+
 
 import java.net.URL
 import scala.concurrent.{ExecutionContext, Future}
 
-trait HttpClientMocker extends MockFactory {
+trait HttpClientMocker extends TestSuite with MockFactory {
   val httpClient: HttpClientV2               = mock[HttpClientV2]("mockHttp")
   private val requestBuilder: RequestBuilder = mock[RequestBuilder]("mockRequestBuilder")
 

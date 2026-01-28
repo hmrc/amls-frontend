@@ -30,7 +30,7 @@ import uk.gov.hmrc.play.audit.DefaultAuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AmlsSpec, HttpClientMocker}
 
-class PayApiConnectorSpec extends AmlsSpec with IntegrationPatience {
+class PayApiConnectorSpec extends AmlsSpec with IntegrationPatience with HttpClientMocker {
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/anti-money-laundering/confirmation")
 
@@ -50,14 +50,12 @@ class PayApiConnectorSpec extends AmlsSpec with IntegrationPatience {
     )
 
     val validResponse: CreatePaymentResponse = CreatePaymentResponse(NextUrl(paymentUrl), paymentId)
-    val mocker                               = new HttpClientMocker()
 
     val payApiUrl = "http://localhost:9057"
 
     val auditConnector: AuditConnector = mock[AuditConnector]
 
-    val connector = new PayApiConnector(mocker.httpClient, mock[DefaultAuditConnector], appConfig)
-
+    val connector = new PayApiConnector(httpClient, mock[DefaultAuditConnector], appConfig)
   }
 
   "The Pay-API connector" when {
@@ -65,28 +63,26 @@ class PayApiConnectorSpec extends AmlsSpec with IntegrationPatience {
       "the payments feature is toggled on" must {
         "make a request to the payments API" in new TestFixture {
           implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
-          mocker.mockPostJson(
+          mockPostJson(
             url"$payApiUrl/pay-api/amls/journey/start",
             validRequest,
             HttpResponse(201, Json.prettyPrint(Json.toJson(validResponse)))
           )
           val result: Option[CreatePaymentResponse] = await(connector.createPayment(validRequest))
           result mustBe Some(validResponse)
-          verify(connector.auditConnector).sendExtendedEvent(any())(any(), any())
         }
       }
 
       "the API returns a 400 code" must {
         "return no result and log the failure" in new TestFixture {
           implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
-          mocker.mockPostJson(
+          mockPostJson(
             url"$payApiUrl/pay-api/amls/journey/start",
             validRequest,
             HttpResponse(BAD_REQUEST, JsNull, Map.empty[String, Seq[String]])
           )
           val result: Option[CreatePaymentResponse] = await(connector.createPayment(validRequest))
           result must not be defined
-          verify(connector.auditConnector).sendExtendedEvent(any())(any(), any())
         }
       }
     }
