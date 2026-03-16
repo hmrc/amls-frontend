@@ -15,18 +15,14 @@ private object AppDependencies {
     "uk.gov.hmrc"           %% s"play-partials-$playV"                 % "10.2.0",
     "uk.gov.hmrc"           %% s"crypto-json-$playV"                   % "8.4.0",
     "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-$playV"                    % hmrcMongoV,
-    "uk.gov.hmrc"           %% s"bootstrap-frontend-$playV"            % bootstrapV exclude("org.apache.commons", "commons-lang3"),
-    "uk.gov.hmrc"           %% s"play-frontend-hmrc-$playV"            % "12.25.0",
-    "uk.gov.hmrc"           %% s"play-conditional-form-mapping-$playV" % "3.4.0",
+    "uk.gov.hmrc"           %% s"bootstrap-frontend-$playV"            % bootstrapV,
+    "uk.gov.hmrc"           %% s"play-frontend-hmrc-$playV"            % "12.32.0",
+    "uk.gov.hmrc"           %% s"play-conditional-form-mapping-$playV" % "3.5.0",
     // OTHER
     "com.vladsch.flexmark"   % "flexmark"                              % flexmarkVersion exclude("org.apache.pdfbox", "pdfbox"),
     "com.beachape"          %% "enumeratum-play"                       % "1.8.2",
     "org.typelevel"         %% "cats-core"                             % "2.12.0",
-    "commons-codec"          % "commons-codec"                         % "1.17.2",
-    "org.apache.commons"    % "commons-lang3"                          % "3.18.0",
-    "ch.qos.logback"        % "logback-core"                           % "1.5.27",
-    "ch.qos.logback"        % "logback-classic"                        % "1.5.27",
-    "at.yawk.lz4"           %  "lz4-java"                              % "1.10.3"
+    "commons-codec"          % "commons-codec"                         % "1.17.2"
   )
 
   val test: Seq[ModuleID] = Seq(
