@@ -18,17 +18,17 @@ package connectors
 
 import models.ReturnLocation
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse, NextUrl}
-import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito._
-import org.scalatest.concurrent._
+import org.scalatest.concurrent.*
 import play.api.libs.json.{JsNull, Json}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
-import uk.gov.hmrc.play.audit.DefaultAuditConnector
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import uk.gov.hmrc.play.audit.model.{DataEvent, ExtendedDataEvent}
 import utils.{AmlsSpec, HttpClientMocker}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class PayApiConnectorSpec extends AmlsSpec with IntegrationPatience with HttpClientMocker {
 
@@ -53,9 +53,14 @@ class PayApiConnectorSpec extends AmlsSpec with IntegrationPatience with HttpCli
 
     val payApiUrl = "http://localhost:9057"
 
-    val auditConnector: AuditConnector = mock[AuditConnector]
+    val mockAuditConnector: AuditConnector = mock[AuditConnector]
 
-    val connector = new PayApiConnector(httpClient, mock[DefaultAuditConnector], appConfig)
+    (mockAuditConnector.sendExtendedEvent(_: ExtendedDataEvent)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *)
+      .returning(Future.successful(AuditResult.Success))
+      .anyNumberOfTimes()
+
+    val connector = new PayApiConnector(httpClient, mockAuditConnector, appConfig)
   }
 
   "The Pay-API connector" when {

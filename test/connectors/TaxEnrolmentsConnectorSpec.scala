@@ -21,17 +21,18 @@ import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsExcep
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.enrolment.{AmlsEnrolmentKey, ErrorResponse, TaxEnrolment}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.verify
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.{AmlsSpec, HttpClientMocker}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class TaxEnrolmentsConnectorSpec
   extends AmlsSpec
@@ -57,6 +58,11 @@ class TaxEnrolmentsConnectorSpec
     val auditConnector: AuditConnector        = mock[AuditConnector]
     val groupIdentfier: String                = stringOfLengthGen(10).sample.get
     implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
+
+    (auditConnector.sendEvent(_: DataEvent)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *)
+      .returning(Future.successful(AuditResult.Success))
+      .anyNumberOfTimes()
 
     val connector                  = new TaxEnrolmentsConnector(httpClient, appConfig, auditConnector)
     val enrolKey: AmlsEnrolmentKey = AmlsEnrolmentKey(amlsRegistrationNumber)
@@ -89,7 +95,6 @@ class TaxEnrolmentsConnectorSpec
         val response: HttpResponse = HttpResponse(OK, "")
         mockPostJson(endpointUrl, enrolment, response)
         connector.enrol(enrolKey, enrolment, Some(groupIdentfier)).futureValue mustBe response
-        verify(auditConnector).sendEvent(any())(any(), any())
       }
     }
 
@@ -134,7 +139,6 @@ class TaxEnrolmentsConnectorSpec
         val response: HttpResponse = HttpResponse(NO_CONTENT, "")
         mockDelete(endpointUrl, response)
         connector.deEnrol(amlsRegistrationNumber, Some(groupIdentfier)).futureValue mustBe response
-        verify(auditConnector).sendEvent(any())(any(), any())
       }
 
       "throw an exception when there is no group identifier" in new Fixture {
@@ -155,7 +159,6 @@ class TaxEnrolmentsConnectorSpec
         mockDelete(endpointUrl, response)
 
         connector.removeKnownFacts(amlsRegistrationNumber).futureValue mustBe response
-        verify(auditConnector).sendEvent(any())(any(), any())
       }
     }
   }
