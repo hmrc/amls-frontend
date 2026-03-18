@@ -22,7 +22,7 @@ import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, Telephone
 import models.businessmatching.BusinessMatchingMsbService.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, TransmittingMoney}
 import models.businessmatching.BusinessType.SoleProprietor
 import models.businessmatching._
-import play.api.libs.json.{JsNull, JsSuccess, Json}
+import play.api.libs.json.{JsNull, JsObject, JsSuccess, Json}
 import utils.AmlsSpec
 
 import java.time.LocalDate
@@ -180,5 +180,10 @@ class UpdateMongoCacheResponseSpec extends AmlsSpec {
     "read response with legacy fields" in {
       UpdateMongoCacheResponse.reads.reads(oldJson) must be(JsSuccess(response))
     }
+  }
+
+  "serialise to JSON using writes" in {
+    val json = Json.toJson(response)
+    json.isInstanceOf[JsObject] mustBe true
   }
 }

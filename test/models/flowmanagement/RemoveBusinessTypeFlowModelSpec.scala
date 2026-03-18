@@ -14,34 +14,30 @@
  * limitations under the License.
  */
 
-package models.deregister
+package models.flowmanagement
 
-import org.scalatest.matchers.must.Matchers
+import models.DateOfChange
+import models.businessmatching.BusinessActivity.AccountancyServices
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
-class DeRegisterSubscriptionRequestSpec extends PlaySpec with Matchers {
+class RemoveBusinessTypeFlowModelSpec extends PlaySpec {
 
-  "The model" must {
+  "RemoveBusinessTypeFlowModel" must {
 
-    "serialise with deregReasonOther" in {
-      val reference = "A" * 32
-      val model = DeRegisterSubscriptionRequest(
-        reference,
-        LocalDate.of(2020, 1, 1),
-        DeregistrationReason.HVDPolicyOfNotAcceptingHighValueCashPayments,
-        Some("other reason")
+    "serialise and deserialise correctly with all fields" in {
+      val model = RemoveBusinessTypeFlowModel(
+        activitiesToRemove = Some(Set(AccountancyServices)),
+        dateOfChange       = Some(DateOfChange(LocalDate.of(2020, 1, 1)))
       )
-      val json = Json.toJson(model)
-      (json \ "deregReasonOther").as[String] mustBe "other reason"
+      Json.toJson(model).as[RemoveBusinessTypeFlowModel] mustEqual model
     }
 
-    "have correct DefaultAckReference" in {
-      DeRegisterSubscriptionRequest.DefaultAckReference mustEqual "A" * 32
+    "serialise and deserialise correctly with no fields" in {
+      val model = RemoveBusinessTypeFlowModel()
+      Json.toJson(model).as[RemoveBusinessTypeFlowModel] mustEqual model
     }
-
   }
 }

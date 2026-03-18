@@ -43,4 +43,40 @@ class WithdrawSubscriptionRequestSpec extends PlaySpec with Matchers {
     }
   }
 
+  "serialise with OutOfScope reason" in {
+    val date = LocalDate.of(2020, 1, 1)
+    val json = Json.toJson(
+      WithdrawSubscriptionRequest("SomeRef", date, WithdrawalReason.OutOfScope)
+    )
+    (json \ "withdrawalReason").as[String] mustBe "Out of scope"
+  }
+
+  "serialise with NotTradingInOwnRight reason" in {
+    val date = LocalDate.of(2020, 1, 1)
+    val json = Json.toJson(
+      WithdrawSubscriptionRequest("SomeRef", date, WithdrawalReason.NotTradingInOwnRight)
+    )
+    (json \ "withdrawalReason").as[String] mustBe "Not trading in own right"
+  }
+
+  "serialise with UnderAnotherSupervisor reason" in {
+    val date = LocalDate.of(2020, 1, 1)
+    val json = Json.toJson(
+      WithdrawSubscriptionRequest("SomeRef", date, WithdrawalReason.UnderAnotherSupervisor)
+    )
+    (json \ "withdrawalReason").as[String] mustBe "Under another supervisor"
+  }
+
+  "serialise with withdrawalReasonOthers field" in {
+    val date = LocalDate.of(2020, 1, 1)
+    val json = Json.toJson(
+      WithdrawSubscriptionRequest("SomeRef", date, WithdrawalReason.OutOfScope, Some("additional info"))
+    )
+    (json \ "withdrawalReasonOthers").as[String] mustBe "additional info"
+  }
+
+  "have correct DefaultAckReference" in {
+    WithdrawSubscriptionRequest.DefaultAckReference mustEqual "A" * 32
+  }
+
 }

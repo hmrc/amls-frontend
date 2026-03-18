@@ -19,13 +19,15 @@ package models
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.status._
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.{JsError, JsString, Json}
 
 import java.time.LocalDateTime
+import java.time.zone.ZoneOffsetTransitionRule.TimeDefinition.UTC
 
 class FeeResponseSpec extends PlaySpec {
 
   "FeeResponse.toPay" must {
-    val difference  = BigDecimal(100)
+    val difference = BigDecimal(100)
     val feeResponse = FeeResponse(
       AmendOrVariationResponseType,
       "XAML00000567890",
@@ -97,7 +99,7 @@ class FeeResponseSpec extends PlaySpec {
     }
 
     "return total" when {
-      val total       = BigDecimal(100)
+      val total = BigDecimal(100)
       val feeResponse = FeeResponse(
         AmendOrVariationResponseType,
         "XAML00000567890",
@@ -216,4 +218,98 @@ class FeeResponseSpec extends PlaySpec {
     }
   }
 
+  "ResponseType" must {
+
+    "serialise SubscriptionResponseType to JSON" in {
+      Json.toJson[ResponseType](SubscriptionResponseType) mustEqual JsString("SubscriptionReponse")
+    }
+
+    "serialise AmendOrVariationResponseType to JSON" in {
+      Json.toJson[ResponseType](AmendOrVariationResponseType) mustEqual JsString("AmendOrVariationResponse")
+    }
+
+    "deserialise SubscriptionReponse from JSON" in {
+      JsString("SubscriptionReponse").as[ResponseType] mustEqual SubscriptionResponseType
+    }
+
+    "deserialise AmendOrVariationResponse from JSON" in {
+      JsString("AmendOrVariationResponse").as[ResponseType] mustEqual AmendOrVariationResponseType
+    }
+
+    "fail to deserialise an invalid ResponseType" in {
+      JsString("invalid").validate[ResponseType] mustBe a[JsError]
+    }
+  }
+
+  "FeeResponse JSON" must {
+
+    val feeResponse = FeeResponse(
+      AmendOrVariationResponseType,
+      "XAML00000567890",
+      BigDecimal(100),
+      Some(BigDecimal(100)),
+      None,
+      BigDecimal(100),
+      BigDecimal(100),
+      None,
+      Some(BigDecimal(50)),
+      LocalDateTime.of(2018, 1, 1, 0, 0)
+    )
+
+    "serialise and deserialise via dateTimeWrite / dateTimeRead ($date long format)" in {
+      val json = Json.toJson(feeResponse)
+      val result = json.as[FeeResponse]
+      result mustEqual feeResponse
+    }
+
+    "deserialise from $date.$numberLong as Long format" in {
+      val timestamp = 1514764800000L
+      val json = Json.obj(
+        "responseType" -> "AmendOrVariationResponse",
+        "amlsReferenceNumber" -> "XAML00000567890",
+        "registrationFee" -> 100,
+        "fpFee" -> 100,
+        "premiseFee" -> 100,
+        "totalFees" -> 100,
+        "difference" -> 50,
+        "createdAt" -> Json.obj("$date" -> Json.obj("$numberLong" -> timestamp))
+      )
+      json.as[FeeResponse].createdAt mustEqual feeResponse.createdAt
+    }
+
+    "deserialise from $date.$numberLong as String format" in {
+      val timestamp = "1514764800000"
+      val json = Json.obj(
+        "responseType" -> "AmendOrVariationResponse",
+        "amlsReferenceNumber" -> "XAML00000567890",
+        "registrationFee" -> 100,
+        "fpFee" -> 100,
+        "premiseFee" -> 100,
+        "totalFees" -> 100,
+        "difference" -> 50,
+        "createdAt" -> Json.obj("$date" -> Json.obj("$numberLong" -> timestamp))
+      )
+      json.as[FeeResponse].createdAt mustEqual feeResponse.createdAt
+    }
+
+    "FeeResponse.toPay" must {
+
+      "return difference when status is RenewalSubmitted and isRenewalAmendment is true" in {
+        val fr = FeeResponse(
+          AmendOrVariationResponseType,
+          "XAML00000567890",
+          BigDecimal(100),
+          Some(BigDecimal(100)),
+          None,
+          BigDecimal(100),
+          BigDecimal(100),
+          None,
+          Some(BigDecimal(50)),
+          LocalDateTime.of(2018, 1, 1, 0, 0)
+        )
+        fr.toPay(RenewalSubmitted(None), Some(SubmissionRequestStatus(true, isRenewalAmendment = Some(true)))) mustEqual BigDecimal(50)
+      }
+    }
+
+  }
 }
