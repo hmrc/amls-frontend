@@ -40,19 +40,19 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class AmlsConnectorSpec
-    extends PlaySpec
+  extends PlaySpec
     with MockitoSugar
     with ScalaFutures
     with IntegrationPatience
     with AmlsReferenceNumberGenerator
-    with PaymentGenerator {
+    with PaymentGenerator
+    with HttpClientMocker {
 
   trait TestSetup {
-    val mocker                               = new HttpClientMocker()
     private val configuration: Configuration = Configuration.load(Environment.simple())
     private val config                       = new ApplicationConfig(configuration, new ServicesConfig(configuration))
     val amlsConnector                        = new AmlsConnector(
-      httpClient = mocker.httpClient,
+      httpClient = httpClient,
       appConfig = config
     )
   }
@@ -158,7 +158,7 @@ class AmlsConnectorSpec
 
     "successfully subscribe" in new TestSetup {
 
-      mocker.mockPostJson(
+      mockPostJson(
         url = url"${amlsConnector.url}/org/id/$safeId",
         requestBody = subscriptionRequest,
         response = subscriptionResponse
@@ -178,7 +178,7 @@ class AmlsConnectorSpec
 
     "return correct status" in new TestSetup {
 
-      mocker.mockGet(
+      mockGet(
         url = url"${amlsConnector.url}/$accountType/$accountId/$amlsRegistrationNumber/status",
         response = readStatusResponse
       )
@@ -193,7 +193,7 @@ class AmlsConnectorSpec
 
     "a view response" in new TestSetup {
 
-      mocker.mockGet(
+      mockGet(
         url = url"${amlsConnector.url}/$accountType/$accountId/$amlsRegistrationNumber",
         response = viewResponse
       )
@@ -207,7 +207,7 @@ class AmlsConnectorSpec
   "update" must {
 
     "successfully submit amendment" in new TestSetup {
-      mocker.mockPostJson(
+      mockPostJson(
         url = url"${amlsConnector.url}/org/id/$amlsRegistrationNumber/update",
         requestBody = subscriptionRequest,
         response = amendmentResponse
@@ -222,7 +222,7 @@ class AmlsConnectorSpec
   "variation" must {
     "successfully submit variation" in new TestSetup {
 
-      mocker.mockPostJson(
+      mockPostJson(
         url = url"${amlsConnector.url}/org/id/$amlsRegistrationNumber/variation",
         requestBody = subscriptionRequest,
         response = amendmentResponse
@@ -236,7 +236,7 @@ class AmlsConnectorSpec
 
   "renewal" must {
     "successfully submit renewal" in new TestSetup {
-      mocker.mockPostJson(
+      mockPostJson(
         url = url"${amlsConnector.url}/org/id/$amlsRegistrationNumber/renewal",
         requestBody = subscriptionRequest,
         response = renewalResponse
@@ -249,7 +249,7 @@ class AmlsConnectorSpec
 
     "successfully submit renewalAmendment" in new TestSetup {
 
-      mocker.mockPostJson(
+      mockPostJson(
         url = url"${amlsConnector.url}/org/id/$amlsRegistrationNumber/renewalAmendment",
         requestBody = subscriptionRequest,
         response = renewalResponse
@@ -267,7 +267,7 @@ class AmlsConnectorSpec
         val request  = WithdrawSubscriptionRequest(amlsRegistrationNumber, LocalDate.now(), WithdrawalReason.OutOfScope)
         val response = WithdrawSubscriptionResponse(LocalDateTime.now().toString)
 
-        mocker.mockPostJson(url = postUrl, requestBody = request, response = response)
+        mockPostJson(url = postUrl, requestBody = request, response = response)
 
         whenReady(amlsConnector.withdraw(amlsRegistrationNumber, request, accountTypeId)) {
           _ mustBe response
@@ -283,7 +283,7 @@ class AmlsConnectorSpec
           DeRegisterSubscriptionRequest(amlsRegistrationNumber, LocalDate.now(), DeregistrationReason.OutOfScope)
         val response = DeRegisterSubscriptionResponse("some date")
 
-        mocker.mockPostJson(url = postUrl, requestBody = request, response = response)
+        mockPostJson(url = postUrl, requestBody = request, response = response)
 
         whenReady(amlsConnector.deregister(amlsRegistrationNumber, request, accountTypeId)) {
           _ mustBe response
@@ -298,7 +298,7 @@ class AmlsConnectorSpec
       val id: String   = "fcguhio"
       val postUrl: URL = url"${amlsConnector.paymentUrl}/$accountType/$accountId/$amlsRegistrationNumber/$safeId"
 
-      mocker.mockPostString(url = postUrl, requestBody = id, response = HttpResponse(status = CREATED, body = ""))
+      mockPostString(url = postUrl, requestBody = id, response = HttpResponse(status = CREATED, body = ""))
 
       whenReady(amlsConnector.savePayment(id, amlsRegistrationNumber, safeId, accountTypeId)) {
         _.status mustBe CREATED
@@ -313,7 +313,7 @@ class AmlsConnectorSpec
       val payment: Payment = paymentGen.sample.get
       val postUrl          = url"${amlsConnector.paymentUrl}/$accountType/$accountId/bacs"
 
-      mocker.mockPostJson(url = postUrl, requestBody = request, response = payment)
+      mockPostJson(url = postUrl, requestBody = request, response = payment)
 
       whenReady(amlsConnector.createBacsPayment(accountTypeId, request)) { result =>
         result mustBe payment
@@ -327,7 +327,7 @@ class AmlsConnectorSpec
       val paymentRef: String = paymentRefGen.sample.get
       val payment: Payment   = paymentGen.sample.get.copy(reference = paymentRef)
 
-      mocker.mockGet[Option[Payment]](
+      mockGet[Option[Payment]](
         url = url"${amlsConnector.paymentUrl}/$accountType/$accountId/payref/$paymentRef",
         response = Some(payment)
       )
@@ -341,7 +341,7 @@ class AmlsConnectorSpec
     "return None when the payment record is not found" in new TestSetup {
       val paymentRef = paymentRefGen.sample.get
 
-      mocker.mockGet[Option[Payment]](
+      mockGet[Option[Payment]](
         url = url"${amlsConnector.paymentUrl}/$accountType/$accountId/payref/$paymentRef",
         response = None
       )
@@ -358,7 +358,7 @@ class AmlsConnectorSpec
       val amlsRef = amlsRefNoGen.sample.get
       val payment = paymentGen.sample.get.copy(amlsRefNo = amlsRef)
 
-      mocker.mockGet[Option[Payment]](
+      mockGet[Option[Payment]](
         url = url"${amlsConnector.paymentUrl}/$accountType/$accountId/amlsref/$amlsRef",
         response = Some(payment)
       )
@@ -372,7 +372,7 @@ class AmlsConnectorSpec
     "return None when the payment record is not found" in new TestSetup {
       val amlsRef = amlsRefNoGen.sample.get
 
-      mocker.mockGet[Option[Payment]](
+      mockGet[Option[Payment]](
         url = url"${amlsConnector.paymentUrl}/$accountType/$accountId/amlsref/$amlsRef",
         response = None
       )
@@ -390,7 +390,7 @@ class AmlsConnectorSpec
       val bacsRequest = UpdateBacsRequest(true)
       val result      = HttpResponse(OK, "")
 
-      mocker.mockPut(
+      mockPut(
         url = url"${amlsConnector.paymentUrl}/${accountTypeId._1}/${accountTypeId._2}/$paymentRef/bacs",
         requestBody = bacsRequest,
         response = result
@@ -405,7 +405,7 @@ class AmlsConnectorSpec
       val result           = paymentStatusResultGen.sample.get
       val paymentReference = result.amlsRef
 
-      mocker.mockPut(
+      mockPut(
         url = url"${amlsConnector.paymentUrl}/$accountType/$accountId/refreshstatus",
         requestBody = RefreshPaymentStatusRequest(paymentReference),
         response = result
@@ -419,7 +419,7 @@ class AmlsConnectorSpec
     "retrieve the registration details given a safe ID" in new TestSetup {
       val safeId = "SAFE_ID"
 
-      mocker.mockGet(
+      mockGet(
         url = url"${amlsConnector.registrationUrl}/${accountTypeId._1}/${accountTypeId._2}/details/$safeId",
         response = RegistrationDetails("Test Company", isIndividual = false)
       )

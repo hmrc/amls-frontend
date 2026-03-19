@@ -64,13 +64,13 @@ object BankAccount {
       __.read(Reads.optionNoError[Account])
   )(BankAccount.apply _)
 
-  implicit val jsonWrites: Writes[BankAccount] = Writes { model: BankAccount =>
+  implicit val jsonWrites: Writes[BankAccount] = Writes {(model: BankAccount) =>
     Seq(
       Json.toJson(model.isUk).asOpt[JsObject],
       Json.toJson(model.hasIban).asOpt[JsObject],
       Json.toJson(model.account).asOpt[JsObject]
     ).flatten.fold(Json.obj()) {
-      _ ++ _
+      (acc: JsObject, obj: JsObject) => acc.deepMerge(obj)
     }
   }
 }

@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.{AmlsSpec, HttpClientMocker}
 
-class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
+class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator with HttpClientMocker {
 
   // scalastyle:off magic.number
   trait TestFixture {
@@ -32,17 +32,16 @@ class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
       GovernmentGatewayEnrolment("HMRC-MLR-ORG", List(EnrolmentIdentifier("MLRRefNumber", "AV23456789")), "")
     )
 
-    val mocker                               = new HttpClientMocker()
     private val configuration: Configuration = Configuration.load(Environment.simple())
     private val config                       = new ApplicationConfig(configuration, new ServicesConfig(configuration))
     val baseUrl                              = "http://localhost:8941"
-    val connector                            = new EnrolmentStubConnector(mocker.httpClient, config)
+    val connector                            = new EnrolmentStubConnector(httpClient, config)
     val groupId: String                      = stringOfLengthGen(10).sample.get
   }
 
   "The Enrolment Stub Connector" must {
     "get the enrolments from the stubs service" in new TestFixture {
-      mocker.mockGet(url"$baseUrl/auth/oid/$groupId/enrolments", enrolments)
+      mockGet(url"$baseUrl/auth/oid/$groupId/enrolments", enrolments)
       connector.enrolments(groupId).futureValue mustBe enrolments
     }
   }

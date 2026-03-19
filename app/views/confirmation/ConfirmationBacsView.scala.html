@@ -52,7 +52,7 @@
     @informationNotice()
 
     <p class="govuk-body">
-        <a href="@controllers.routes.LandingController.get.url" id="goto-reg-link" class="govuk-link">@messages(if(isRenewal) "link.navigate.registration.Returnto" else "link.navigate.registration.Goto")</a>
+        <a href="@controllers.routes.LandingController.get().url" id="goto-reg-link" class="govuk-link">@messages(if(isRenewal) "link.navigate.registration.Returnto" else "link.navigate.registration.Goto")</a>
     </p>
 
     @feedbackSurveyLink()

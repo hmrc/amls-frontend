@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.{AmlsSpec, HttpClientMocker}
 
-class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
+class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures with HttpClientMocker {
 
   val validReviewDetailsJson: String =
     """
@@ -57,10 +57,9 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
     lazy val hc: HeaderCarrier = app.injector.instanceOf[HeaderCarrier]
 
-    val mocker                               = new HttpClientMocker()
     private val configuration: Configuration = Configuration.load(Environment.simple())
     private val config                       = new ApplicationConfig(configuration, new ServicesConfig(configuration))
-    val testBusinessMatchingConnector        = new BusinessMatchingConnector(mocker.httpClient, config)
+    val testBusinessMatchingConnector        = new BusinessMatchingConnector(httpClient, config)
 
     val address: BusinessMatchingAddress =
       BusinessMatchingAddress("1 Test Street", Some("Test Town"), None, None, None, "UK")
@@ -87,7 +86,7 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
     "get the review details" in new Fixture {
 
-      mocker.mockGet[Option[BusinessMatchingReviewDetails]](
+      mockGet[Option[BusinessMatchingReviewDetails]](
         url"http://localhost:9923/business-customer/fetch-review-details/amls",
         Some(validResponseDetail)
       )
@@ -100,7 +99,7 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
     "return None when business matching returns 404" in new Fixture {
 
-      mocker.mockGet[Option[BusinessMatchingReviewDetails]](
+      mockGet[Option[BusinessMatchingReviewDetails]](
         url"http://localhost:9923/business-customer/fetch-review-details/amls",
         None
       )
@@ -113,7 +112,7 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
     "bubble the exception when any other exception is thrown" in new Fixture {
       val ex = new Exception("Some other exception")
 
-      mocker.mockGet(url"http://localhost:9923/business-customer/fetch-review-details/amls", ex)
+      mockGet(url"http://localhost:9923/business-customer/fetch-review-details/amls", ex)
 
       intercept[Exception] {
         await(testBusinessMatchingConnector.getReviewDetails)

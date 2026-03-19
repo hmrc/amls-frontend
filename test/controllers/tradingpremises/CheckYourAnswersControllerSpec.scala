@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.BusinessActivity.{AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, TransmittingMoney}
-import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, BusinessMatching, _}
+import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, BusinessMatching, BusinessMatchingMsbServices}
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.mockito.ArgumentMatchers.{eq => eqTo, _}
@@ -40,7 +40,6 @@ import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
-  implicit val request: FakeRequest.type = FakeRequest
   val userId                             = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector             = mock[DataCacheConnector]
   val mockCacheMap                       = mock[Cache]

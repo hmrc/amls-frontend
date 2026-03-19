@@ -41,27 +41,27 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class TestOnlyController @Inject() (implicit
-  val dataCacheConnector: DataCacheConnector,
-  val mongoCacheConnector: MongoCacheConnector,
-  implicit val testOnlyStubConnector: TestOnlyStubConnector,
-  val stubsService: UpdateMongoCacheService,
-  val amlsConnector: AmlsConnector,
-  val authAction: AuthAction,
-  val ds: CommonPlayDependencies,
-  val customerCache: BusinessCustomerSessionCache,
-  val cc: MessagesControllerComponents,
-  duplicateEnrolment: DuplicateEnrolmentView,
-  duplicateSubmission: DuplicateSubmissionView,
-  wrongCredentialType: WrongCredentialTypeView,
-  paymentFailureView: PaymentFailureView,
-  paymentConfirmationView: PaymentConfirmationView,
-  paymentConfirmationTransitionalRenewalView: PaymentConfirmationTransitionalRenewalView,
-  confirmationBacsView: ConfirmationBacsView,
-  cryptoService: CryptoService,
-  errorView: ErrorView,
-  testOnlyViews: TestOnlyViews
-) extends AmlsBaseController(ds, cc) {
+class TestOnlyController @Inject() (
+                                     val dataCacheConnector: DataCacheConnector,
+                                     val mongoCacheConnector: MongoCacheConnector,
+                                     implicit val testOnlyStubConnector: TestOnlyStubConnector,
+                                     val stubsService: UpdateMongoCacheService,
+                                     val amlsConnector: AmlsConnector,
+                                     val authAction: AuthAction,
+                                     val ds: CommonPlayDependencies,
+                                     val customerCache: BusinessCustomerSessionCache,
+                                     val cc: MessagesControllerComponents,
+                                     duplicateEnrolmentView: DuplicateEnrolmentView,
+                                     duplicateSubmissionView: DuplicateSubmissionView,
+                                     wrongCredentialType: WrongCredentialTypeView,
+                                     paymentFailureView: PaymentFailureView,
+                                     paymentConfirmationView: PaymentConfirmationView,
+                                     paymentConfirmationTransitionalRenewalView: PaymentConfirmationTransitionalRenewalView,
+                                     confirmationBacsView: ConfirmationBacsView,
+                                     cryptoService: CryptoService,
+                                     errorView: ErrorView,
+                                     testOnlyViews: TestOnlyViews
+                                   )(implicit override val ec: scala.concurrent.ExecutionContext) extends AmlsBaseController(ds, cc) {
 
   def dropMongoCache: Action[AnyContent] = authAction.async { implicit request =>
     removeCacheData(request.credId) map { _ =>
@@ -103,11 +103,11 @@ class TestOnlyController @Inject() (implicit
   }
 
   def duplicateEnrolment: Action[AnyContent] = authAction { implicit request =>
-    Ok(duplicateEnrolment(appConfig.contactFrontendReportUrl))
+    Ok(duplicateEnrolmentView(appConfig.contactFrontendReportUrl))
   }
 
   def duplicateSubmission: Action[AnyContent] = authAction { implicit request =>
-    Ok(duplicateSubmission(appConfig.contactFrontendReportUrl))
+    Ok(duplicateSubmissionView(appConfig.contactFrontendReportUrl))
   }
 
   def wrongCredentials: Action[AnyContent] = authAction { implicit request =>

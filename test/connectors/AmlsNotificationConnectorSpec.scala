@@ -30,7 +30,7 @@ import java.time.ZoneOffset.UTC
 import java.time.{Instant, LocalDateTime}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
+class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with HttpClientMocker {
 
   val safeId                          = "SAFEID"
   val accountTypeId: (String, String) = ("org", "id")
@@ -42,10 +42,9 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   private trait Fixture {
-    val mocker                               = new HttpClientMocker()
     private val configuration: Configuration = Configuration.load(Environment.simple())
     private val config                       = new ApplicationConfig(configuration, new ServicesConfig(configuration))
-    val connector                            = new AmlsNotificationConnector(mocker.httpClient, config)
+    val connector                            = new AmlsNotificationConnector(httpClient, config)
     val baseUrl                              = "http://localhost:8942/amls-notification"
   }
 
@@ -67,7 +66,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
           )
         )
 
-        mocker.mockGet[Seq[NotificationRow]](url"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber", response)
+        mockGet[Seq[NotificationRow]](url"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber", response)
         whenReady(connector.fetchAllByAmlsRegNo(amlsRegistrationNumber, accountTypeId)) {
           _ mustBe response
         }
@@ -89,7 +88,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
           )
         )
 
-        mocker.mockGet[Seq[NotificationRow]](url"$baseUrl/$accountType/$accountId/safeId/$safeId", response)
+        mockGet[Seq[NotificationRow]](url"$baseUrl/$accountType/$accountId/safeId/$safeId", response)
 
         whenReady(connector.fetchAllBySafeId(safeId, accountTypeId)) {
           _ mustBe response
@@ -108,7 +107,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
           dateTime
         )
 
-        mocker.mockGet[Option[NotificationDetails]](
+        mockGet[Option[NotificationDetails]](
           url"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/NOTIFICATIONID",
           Some(response)
         )
@@ -128,7 +127,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
     "the call to notification service returns a Bad Request" must {
       "Fail the future with an upstream 5xx exception (using amls reg no)" in new Fixture {
 
-        mocker.mockGet[Option[NotificationDetails]](
+        mockGet[Option[NotificationDetails]](
           url"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/NOTIFICATIONID",
           new BadRequestException("GET of blah returned status 400.")
         )
@@ -144,7 +143,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
     "the call to notification service returns Not Found (when using amls reg no)" must {
       "return a None " in new Fixture {
 
-        mocker.mockGet[Option[NotificationDetails]](
+        mockGet[Option[NotificationDetails]](
           url"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber/NOTIFICATIONID",
           None
         )

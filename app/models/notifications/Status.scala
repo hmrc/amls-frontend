@@ -49,6 +49,6 @@ object Status {
     (
       (__ \ "status_type").writeNullable[StatusType] and
         (__ \ "status_reason").writeNullable[StatusReason]
-    )(unlift(Status.unapply))
+      )((s: Status) => (s.status, s.statusReason))
   }
 }

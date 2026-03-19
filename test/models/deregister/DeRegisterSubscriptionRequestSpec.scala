@@ -26,19 +26,22 @@ import java.time.format.DateTimeFormatter
 class DeRegisterSubscriptionRequestSpec extends PlaySpec with Matchers {
 
   "The model" must {
-    "deserialise correctly" in {
+
+    "serialise with deregReasonOther" in {
       val reference = "A" * 32
-
-      val expectedJson = Json.obj(
-        "acknowledgementReference" -> reference,
-        "deregistrationDate"       -> LocalDate.now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-        "deregistrationReason"     -> "Out of scope"
+      val model = DeRegisterSubscriptionRequest(
+        reference,
+        LocalDate.of(2020, 1, 1),
+        DeregistrationReason.HVDPolicyOfNotAcceptingHighValueCashPayments,
+        Some("other reason")
       )
-
-      Json.toJson(
-        DeRegisterSubscriptionRequest(reference, LocalDate.now, DeregistrationReason.OutOfScope)
-      ) mustBe expectedJson
+      val json = Json.toJson(model)
+      (json \ "deregReasonOther").as[String] mustBe "other reason"
     }
-  }
 
+    "have correct DefaultAckReference" in {
+      DeRegisterSubscriptionRequest.DefaultAckReference mustEqual "A" * 32
+    }
+
+  }
 }

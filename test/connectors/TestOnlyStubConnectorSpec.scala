@@ -24,17 +24,16 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HttpResponse, StringContextOps}
 import utils.{AmlsSpec, HttpClientMocker}
 
-class TestOnlyStubConnectorSpec extends AmlsSpec with Matchers with ScalaFutures with MockitoSugar {
+class TestOnlyStubConnectorSpec extends AmlsSpec with Matchers with ScalaFutures with MockitoSugar with HttpClientMocker {
 
   trait Fixture {
-    val mocker    = new HttpClientMocker
-    val connector = new TestOnlyStubConnector(mocker.httpClient, appConfig, app.injector.instanceOf[Configuration])
+    val connector = new TestOnlyStubConnector(httpClient, appConfig, app.injector.instanceOf[Configuration])
   }
 
   "The TestOnly Stub Connector" must {
     "clear the state from the stubs service" in new Fixture {
       private val response: HttpResponse = HttpResponse(NO_CONTENT, "")
-      mocker.mockDelete(url"http://localhost:8941/test-only/clearstate", response)
+      mockDelete(url"http://localhost:8941/test-only/clearstate", response)
       connector.clearState().futureValue mustBe response
     }
   }

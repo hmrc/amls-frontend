@@ -37,6 +37,6 @@ class BusinessEmailAddressFormProvider @Inject() () extends Mappings {
           regexp(regex, "error.invalid.email")
         )
       )
-    )(ContactingYouEmail.apply)(ContactingYouEmail.unapply)
+    )(ContactingYouEmail.apply)(c => Some(c.email))
   )
 }

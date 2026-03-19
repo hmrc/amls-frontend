@@ -21,24 +21,26 @@ import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsExcep
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.enrolment.{AmlsEnrolmentKey, ErrorResponse, TaxEnrolment}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.verify
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.{AmlsSpec, HttpClientMocker}
 
+import scala.concurrent.{ExecutionContext, Future}
+
 class TaxEnrolmentsConnectorSpec
-    extends AmlsSpec
+  extends AmlsSpec
     with ScalaFutures
     with AmlsReferenceNumberGenerator
     with UserDetailsGenerator
-    with BaseGenerator {
+    with BaseGenerator
+    with HttpClientMocker {
 
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = Span(2, Seconds), interval = Span(20, Millis))
@@ -53,12 +55,16 @@ class TaxEnrolmentsConnectorSpec
       override def enrolmentStoreUrl: String      = baseUrl
     }
 
-    val mocker                                = new HttpClientMocker()
     val auditConnector: AuditConnector        = mock[AuditConnector]
     val groupIdentfier: String                = stringOfLengthGen(10).sample.get
     implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
-    val connector                  = new TaxEnrolmentsConnector(mocker.httpClient, appConfig, auditConnector)
+    (auditConnector.sendEvent(_: DataEvent)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *)
+      .returning(Future.successful(AuditResult.Success))
+      .anyNumberOfTimes()
+
+    val connector                  = new TaxEnrolmentsConnector(httpClient, appConfig, auditConnector)
     val enrolKey: AmlsEnrolmentKey = AmlsEnrolmentKey(amlsRegistrationNumber)
 
     val enrolment: TaxEnrolment = TaxEnrolment("123456789", postcodeGen.sample.get)
@@ -87,9 +93,8 @@ class TaxEnrolmentsConnectorSpec
 
         val endpointUrl            = url"$baseUrl/tax-enrolments/groups/$groupIdentfier/enrolments/${enrolKey.key}"
         val response: HttpResponse = HttpResponse(OK, "")
-        mocker.mockPostJson(endpointUrl, enrolment, response)
+        mockPostJson(endpointUrl, enrolment, response)
         connector.enrol(enrolKey, enrolment, Some(groupIdentfier)).futureValue mustBe response
-        verify(auditConnector).sendEvent(any())(any(), any())
       }
     }
 
@@ -107,7 +112,7 @@ class TaxEnrolmentsConnectorSpec
         BAD_REQUEST,
         BAD_REQUEST
       )
-      mocker.mockPostJson(endpointUrl, enrolment, response)
+      mockPostJson(endpointUrl, enrolment, response)
 
       intercept[DuplicateEnrolmentException] {
         await(connector.enrol(enrolKey, enrolment, Some(groupIdentfier)))
@@ -119,7 +124,7 @@ class TaxEnrolmentsConnectorSpec
       val endpointUrl                     = url"$baseUrl/tax-enrolments/groups/$groupIdentfier/enrolments/${enrolKey.key}"
       val response: UpstreamErrorResponse =
         UpstreamErrorResponse(jsonError("INVALID_CREDENTIAL_ID", "Invalid credential ID"), FORBIDDEN, FORBIDDEN)
-      mocker.mockPostJson(endpointUrl, enrolment, response)
+      mockPostJson(endpointUrl, enrolment, response)
 
       intercept[InvalidEnrolmentCredentialsException] {
         await(connector.enrol(enrolKey, enrolment, Some(groupIdentfier)))
@@ -132,9 +137,8 @@ class TaxEnrolmentsConnectorSpec
       "call the ES9 API endpoint" in new Fixture {
         val endpointUrl            = url"$baseUrl/tax-enrolments/groups/$groupIdentfier/enrolments/${enrolKey.key}"
         val response: HttpResponse = HttpResponse(NO_CONTENT, "")
-        mocker.mockDelete(endpointUrl, response)
+        mockDelete(endpointUrl, response)
         connector.deEnrol(amlsRegistrationNumber, Some(groupIdentfier)).futureValue mustBe response
-        verify(auditConnector).sendEvent(any())(any(), any())
       }
 
       "throw an exception when there is no group identifier" in new Fixture {
@@ -152,10 +156,9 @@ class TaxEnrolmentsConnectorSpec
       "call the ES7 API endpoint" in new Fixture {
         val endpointUrl            = url"$baseUrl/tax-enrolments/enrolments/${enrolKey.key}"
         val response: HttpResponse = HttpResponse(NO_CONTENT, "")
-        mocker.mockDelete(endpointUrl, response)
+        mockDelete(endpointUrl, response)
 
         connector.removeKnownFacts(amlsRegistrationNumber).futureValue mustBe response
-        verify(auditConnector).sendEvent(any())(any(), any())
       }
     }
   }

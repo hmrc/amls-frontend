@@ -115,7 +115,7 @@
         </div>
     }
 
-    @formHelper(action = controllers.routes.RegistrationProgressController.get) {
+    @formHelper(action = controllers.routes.RegistrationProgressController.get()) {
 
         @if(incompleteTp.nonEmpty || (completeTp.isEmpty & incompleteTp.isEmpty)) {
             @button(messages("button.returntoapplicationprogress"))

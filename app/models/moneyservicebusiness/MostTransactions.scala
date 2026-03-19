@@ -32,7 +32,7 @@ private sealed trait MostTransactions0 {
 
   val jsonW: Writes[MostTransactions] = {
     import play.api.libs.functional.syntax.unlift
-    (__ \ "mostTransactionsCountries").write[Seq[Country]] contramap unlift(MostTransactions.unapply)
+    (__ \ "mostTransactionsCountries").write[Seq[Country]] contramap (m => m.countries)
   }
 }
 

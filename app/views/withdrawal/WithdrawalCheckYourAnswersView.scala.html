@@ -17,6 +17,7 @@
 @import models.withdrawal.WithdrawalReason
 @import views.html.components.{Button, Heading, SectionSubtitle}
 @import utils.withdrawal.CheckYourAnswersHelper
+@import views.html.helper.Implicits.toAttributePair
 
 @this(
         layout: Layout,
@@ -39,7 +40,7 @@
     @govukSummaryList(
          CheckYourAnswersHelper.createSummaryList(withdrawalReason)
     )
- @formHelper(controllers.withdrawal.routes.WithdrawalCheckYourAnswersController.post, Symbol("disable-on-submit") -> "true") {
+ @formHelper(controllers.withdrawal.routes.WithdrawalCheckYourAnswersController.post, "disable-on-submit" -> "true") {
      @button("button.acceptandcontinue")
  }
 

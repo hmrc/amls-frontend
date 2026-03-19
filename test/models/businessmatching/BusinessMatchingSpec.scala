@@ -379,7 +379,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       }
 
       "return `Started` task row when there is a task row which isn't completed" in {
-        implicit val cache = mock[Cache]
+        implicit val cache: Cache = mock[Cache]
         when {
           cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
         } thenReturn Some(BusinessMatching())
@@ -393,7 +393,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       }
 
       "return `Completed` task row when there is a task row which is completed" in {
-        implicit val cache = mock[Cache]
+        implicit val cache: Cache = mock[Cache]
 
         when {
           cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
@@ -409,7 +409,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       }
 
       "return `Updated` task row when there is a task row which is completed and has changed" in {
-        implicit val cache = mock[Cache]
+        implicit val cache: Cache = mock[Cache]
 
         when {
           cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())

@@ -46,6 +46,6 @@ class ContactDetailsFormProvider @Inject() () extends Mappings {
             regexp(emailRegex, "error.invalid.rp.contact.email")
           )
         )
-    )(ContactDetails.apply)(ContactDetails.unapply)
+    )(ContactDetails.apply)(c => Some((c.phoneNumber, c.emailAddress)))
   )
 }

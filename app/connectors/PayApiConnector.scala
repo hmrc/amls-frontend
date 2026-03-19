@@ -23,19 +23,20 @@ import config.ApplicationConfig
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
 import play.api.Logging
 import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.ws.JsonBodyWritables._
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, StringContextOps}
-import uk.gov.hmrc.play.audit.DefaultAuditConnector
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.HttpResponseHelper
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class PayApiConnector @Inject() (
-  http: HttpClientV2,
-  val auditConnector: DefaultAuditConnector,
-  val applicationConfig: ApplicationConfig
-) extends HttpResponseHelper
-    with Logging {
+                                  http: HttpClientV2,
+                                  val auditConnector: AuditConnector,
+                                  val applicationConfig: ApplicationConfig
+                                ) extends HttpResponseHelper
+  with Logging {
 
   // $COVERAGE-OFF$
   private val logDebug = (msg: String) => logger.debug(s"[PayApiConnector] $msg")
@@ -43,8 +44,8 @@ class PayApiConnector @Inject() (
   // $COVERAGE-ON$
 
   def createPayment(
-    request: CreatePaymentRequest
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
+                     request: CreatePaymentRequest
+                   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
 
     val bodyParser = JsonParsed[CreatePaymentResponse]
     // $COVERAGE-OFF$

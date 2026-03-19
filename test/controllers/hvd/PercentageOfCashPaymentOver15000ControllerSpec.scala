@@ -46,6 +46,8 @@ class PercentageOfCashPaymentOver15000ControllerSpec
     self =>
     val request = addToken(authRequest)
 
+    val emptyCache = Cache.empty
+
     lazy val view  = inject[PercentageView]
     val controller =
       new PercentageOfCashPaymentOver15000Controller(
@@ -63,7 +65,6 @@ class PercentageOfCashPaymentOver15000ControllerSpec
     mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
-  val emptyCache = Cache.empty
 
   "PercentageOfCashPaymentOver15000Controller" must {
 

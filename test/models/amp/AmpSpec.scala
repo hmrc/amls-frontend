@@ -128,7 +128,7 @@ class AmpSpec extends AmlsSpec with AmpValues {
     }
 
     "have a task row function that" must {
-      implicit val cache         = mock[Cache]
+      implicit val cache: Cache = mock[Cache]
       val ampWhatYouNeedUrl      = "http://localhost:9223/anti-money-laundering/art-market-participant/what-you-need"
       val ampSummaryUrl          = "http://localhost:9223/anti-money-laundering/art-market-participant/check-your-answers"
       val ampSummaryUrlCompleted =

@@ -49,7 +49,7 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
     }
 
     "return the correct TaskRow" when {
-      implicit val cacheMap = mock[Cache]
+      implicit val cacheMap: Cache = mock[Cache]
 
       "model has been updated" should {
         "return an Updated TaskRow" in {

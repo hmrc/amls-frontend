@@ -86,4 +86,98 @@ class SubscriptionResponseSpec extends PlaySpec {
 
     }
   }
+
+  "SubscriptionResponse methods" must {
+
+    val fees = SubscriptionFees(
+      paymentReference    = "XT000000000000",
+      registrationFee     = BigDecimal(100),
+      fpFee               = Some(BigDecimal(50)),
+      fpFeeRate           = Some(BigDecimal(10)),
+      approvalCheckFee    = Some(BigDecimal(25)),
+      approvalCheckFeeRate = Some(BigDecimal(5)),
+      premiseFee          = BigDecimal(200),
+      premiseFeeRate      = Some(BigDecimal(115)),
+      totalFees           = BigDecimal(375)
+    )
+
+    val responseWithFees    = SubscriptionResponse("bundle", "XDML00000000000", Some(fees))
+    val responseWithoutFees = SubscriptionResponse("bundle", "XDML00000000000", None)
+
+    "getRegistrationFee returns fee when subscriptionFees is defined" in {
+      responseWithFees.getRegistrationFee mustBe BigDecimal(100)
+    }
+
+    "getRegistrationFee returns 0 when subscriptionFees is None" in {
+      responseWithoutFees.getRegistrationFee mustBe BigDecimal(0)
+    }
+
+    "getPremiseFee returns fee when subscriptionFees is defined" in {
+      responseWithFees.getPremiseFee mustBe BigDecimal(200)
+    }
+
+    "getPremiseFee returns 0 when subscriptionFees is None" in {
+      responseWithoutFees.getPremiseFee mustBe BigDecimal(0)
+    }
+
+    "getTotalFees returns fee when subscriptionFees is defined" in {
+      responseWithFees.getTotalFees mustBe BigDecimal(375)
+    }
+
+    "getTotalFees returns 0 when subscriptionFees is None" in {
+      responseWithoutFees.getTotalFees mustBe BigDecimal(0)
+    }
+
+    "getPaymentReference returns reference when subscriptionFees is defined" in {
+      responseWithFees.getPaymentReference mustBe "XT000000000000"
+    }
+
+    "getPaymentReference returns empty string when subscriptionFees is None" in {
+      responseWithoutFees.getPaymentReference mustBe ""
+    }
+
+    "getPremiseFeeRate returns rate when subscriptionFees is defined" in {
+      responseWithFees.getPremiseFeeRate mustBe Some(BigDecimal(115))
+    }
+
+    "getPremiseFeeRate returns None when subscriptionFees is None" in {
+      responseWithoutFees.getPremiseFeeRate mustBe None
+    }
+
+    "getFpFeeRate returns rate when subscriptionFees is defined" in {
+      responseWithFees.getFpFeeRate mustBe Some(BigDecimal(10))
+    }
+
+    "getFpFeeRate returns None when subscriptionFees is None" in {
+      responseWithoutFees.getFpFeeRate mustBe None
+    }
+
+    "getFpFee returns fee when subscriptionFees is defined" in {
+      responseWithFees.getFpFee mustBe Some(BigDecimal(50))
+    }
+
+    "getFpFee returns None when subscriptionFees is None" in {
+      responseWithoutFees.getFpFee mustBe None
+    }
+
+    "getApprovalCheckFee returns fee when subscriptionFees is defined" in {
+      responseWithFees.getApprovalCheckFee mustBe Some(BigDecimal(25))
+    }
+
+    "getApprovalCheckFee returns None when subscriptionFees is None" in {
+      responseWithoutFees.getApprovalCheckFee mustBe None
+    }
+
+    "getApprovalCheckFeeRate returns rate when subscriptionFees is defined" in {
+      responseWithFees.getApprovalCheckFeeRate mustBe Some(BigDecimal(5))
+    }
+
+    "getApprovalCheckFeeRate returns None when subscriptionFees is None" in {
+      responseWithoutFees.getApprovalCheckFeeRate mustBe None
+    }
+
+    "serialise to JSON using format" in {
+      Json.toJson(responseWithFees).as[SubscriptionResponse] mustEqual responseWithFees
+    }
+  }
 }

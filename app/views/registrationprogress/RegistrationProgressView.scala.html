@@ -75,7 +75,7 @@
             </p>
 
             @if(declarationAvailable) {
-                <form class="grid-layout__column grid-layout__column--3-3 display-block" method="post" action="@controllers.routes.RegistrationProgressController.post.url">
+                <form class="grid-layout__column grid-layout__column--3-3 display-block" method="post" action="@controllers.routes.RegistrationProgressController.post().url">
                     @CSRF.formField
                     @button("progress.submit", "progress-continue")
                 </form>

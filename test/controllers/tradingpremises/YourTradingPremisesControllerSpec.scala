@@ -42,10 +42,8 @@ class YourTradingPremisesControllerSpec
     with MockitoSugar
     with generators.tradingpremises.TradingPremisesGenerator {
 
-  implicit val request: FakeRequest.type = FakeRequest
   val userId                             = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector             = mock[DataCacheConnector]
-  val mockStatusService                  = mock[StatusService]
   val mockYtp                            = mock[TradingPremises]
 
   trait Fixture extends DependencyMocks {

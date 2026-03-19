@@ -112,7 +112,7 @@ class AspSpec extends AmlsSpec with AspValues {
 
     "have a task row function that" must {
 
-      implicit val cache = mock[Cache]
+      implicit val cache: Cache = mock[Cache]
 
       "return a NotStarted Task Row when model is empty" in {
 

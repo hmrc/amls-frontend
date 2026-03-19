@@ -35,6 +35,6 @@ class BusinessTelephoneFormProvider @Inject() () extends Mappings {
           regexp(regex, "err.invalid.phone.number")
         )
       )
-    )(ContactingYouPhone.apply)(ContactingYouPhone.unapply)
+    )(ContactingYouPhone.apply)(c => Some(c.phoneNumber))
   )
 }

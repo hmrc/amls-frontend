@@ -45,7 +45,7 @@ class DeregistrationConfirmationController @Inject() (
       amlsRefNumber <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
 
       status       <- OptionT.liftF(statusService.getReadStatus(amlsRefNumber, request.accountTypeId))
-      key          <- fetchDeregistrationReason
+      key          <- fetchDeregistrationReason()
       businessName <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
     } yield Ok(
       view(

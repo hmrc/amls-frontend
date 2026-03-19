@@ -36,7 +36,7 @@ object WhoIsYourAccountantIsUk {
 
   }
 
-  implicit val jsonWrites: Writes[WhoIsYourAccountantIsUk] = Writes { isUk: WhoIsYourAccountantIsUk =>
+  implicit val jsonWrites: Writes[WhoIsYourAccountantIsUk] = Writes {(isUk: WhoIsYourAccountantIsUk) =>
     Json.obj("isUK" -> isUk.isUk)
   }
 }

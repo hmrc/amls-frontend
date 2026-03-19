@@ -33,7 +33,7 @@ object CheckYourAnswersHelper {
             Actions(
               items = Seq(
                 ActionItem(
-                  href = controllers.withdrawal.routes.WithdrawalReasonController.get.url,
+                  href = controllers.withdrawal.routes.WithdrawalReasonController.get().url,
                   content = Text(messages("button.change")),
                   attributes = Map("id" -> "cya-change-link")
                 )

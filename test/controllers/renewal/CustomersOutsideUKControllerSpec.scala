@@ -225,7 +225,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
                   .withFormUrlEncodedBody("countries" -> "abc")
               )
             )
-          ) { result: Result =>
+          ) { (result: Result) =>
             result.header.status mustBe BAD_REQUEST
           }
         }

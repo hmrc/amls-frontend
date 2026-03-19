@@ -107,7 +107,7 @@ class DetailedAnswersController @Inject() (
     } yield responsiblePeople.lift(index - 1) match {
       case Some(x) if x.copy(hasAccepted = true).isComplete =>
         showHideAddressMove(amlsRegistrationNo, accountTypeId, credId, x.lineId) flatMap { showHide =>
-          isMsbOrTcsp(credId).map { msbOrTcsp: Option[Boolean] =>
+          isMsbOrTcsp(credId).map { (msbOrTcsp: Option[Boolean]) =>
             val shouldShowApprovalSection =
               !msbOrTcsp.contains(true) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
             val personName                = ControllerHelper.rpTitleName(Some(x))

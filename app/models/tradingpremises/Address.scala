@@ -21,13 +21,13 @@ import play.api.libs.json.{Reads, Writes}
 import models.businesscustomer.{Address => BCAddress}
 
 case class Address(
-  addressLine1: String,
-  addressLine2: Option[String],
-  addressLine3: Option[String],
-  addressLine4: Option[String],
-  postcode: String,
-  dateOfChange: Option[DateOfChange] = None
-) {
+                    addressLine1: String,
+                    addressLine2: Option[String],
+                    addressLine3: Option[String],
+                    addressLine4: Option[String],
+                    postcode: String,
+                    dateOfChange: Option[DateOfChange] = None
+                  ) {
 
   def toLines: Seq[String] = Seq(
     Some(addressLine1),
@@ -44,12 +44,12 @@ case class Address(
 object Address {
 
   def applyWithoutDateOfChange(
-    address1: String,
-    address2: Option[String],
-    address3: Option[String],
-    address4: Option[String],
-    postcode: String
-  ) =
+                                address1: String,
+                                address2: Option[String],
+                                address3: Option[String],
+                                address4: Option[String],
+                                postcode: String
+                              ) =
     Address(address1, address2, address3, address4, postcode)
 
   def unapplyWithoutDateOfChange(x: Address) =
@@ -65,7 +65,7 @@ object Address {
         (__ \ "addressLine4").readNullable[String] and
         (__ \ "postcode").read[String] and
         (__ \ "addressDateOfChange").readNullable[DateOfChange]
-    )(Address.apply _)
+      )(Address.apply _)
   }
 
   implicit val writes: Writes[Address] = {
@@ -78,6 +78,6 @@ object Address {
         (__ \ "addressLine4").writeNullable[String] and
         (__ \ "postcode").write[String] and
         (__ \ "addressDateOfChange").writeNullable[DateOfChange]
-    )(unlift(Address.unapply))
+      )((a: Address) => (a.addressLine1, a.addressLine2, a.addressLine3, a.addressLine4, a.postcode, a.dateOfChange))
   }
 }

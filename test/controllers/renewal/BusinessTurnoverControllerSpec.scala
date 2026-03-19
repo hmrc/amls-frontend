@@ -73,8 +73,6 @@ class BusinessTurnoverControllerSpec
     reset(mockRenewalService, mockDataCacheConnector)
   }
 
-  val emptyCache = Cache.empty
-
   "BusinessTurnoverControllerSpec" must {
 
     "when get is called" must {
