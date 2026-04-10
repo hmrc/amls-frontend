@@ -32,7 +32,7 @@ import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class FeeConnectorSpec
-  extends PlaySpec
+    extends PlaySpec
     with MockitoSugar
     with ScalaFutures
     with IntegrationPatience

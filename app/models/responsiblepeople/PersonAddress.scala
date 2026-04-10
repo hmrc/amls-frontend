@@ -60,20 +60,20 @@ sealed trait PersonAddress {
 }
 
 case class PersonAddressUK(
-                            addressLine1: String,
-                            addressLine2: Option[String],
-                            addressLine3: Option[String],
-                            addressLine4: Option[String],
-                            postCode: String
-                          ) extends PersonAddress
+  addressLine1: String,
+  addressLine2: Option[String],
+  addressLine3: Option[String],
+  addressLine4: Option[String],
+  postCode: String
+) extends PersonAddress
 
 case class PersonAddressNonUK(
-                               addressLineNonUK1: String,
-                               addressLineNonUK2: Option[String],
-                               addressLineNonUK3: Option[String],
-                               addressLineNonUK4: Option[String],
-                               country: Country
-                             ) extends PersonAddress
+  addressLineNonUK1: String,
+  addressLineNonUK2: Option[String],
+  addressLineNonUK3: Option[String],
+  addressLineNonUK4: Option[String],
+  country: Country
+) extends PersonAddress
 
 object PersonAddress {
 
@@ -87,7 +87,7 @@ object PersonAddress {
         (__ \ "personAddressLine3").readNullable[String] and
         (__ \ "personAddressLine4").readNullable[String] and
         (__ \ "personAddressPostCode").read[String])(PersonAddressUK.apply _) map identity[PersonAddress]
-      ) orElse
+    ) orElse
       ((__ \ "personAddressLine1").read[String] and
         (__ \ "personAddressLine2").readNullable[String] and
         (__ \ "personAddressLine3").readNullable[String] and
@@ -107,7 +107,8 @@ object PersonAddress {
             (__ \ "personAddressLine3").writeNullable[String] and
             (__ \ "personAddressLine4").writeNullable[String] and
             (__ \ "personAddressPostCode").write[String]
-          )((p: PersonAddressUK) => (p.addressLine1, p.addressLine2, p.addressLine3, p.addressLine4, p.postCode)).writes(a)
+        )((p: PersonAddressUK) => (p.addressLine1, p.addressLine2, p.addressLine3, p.addressLine4, p.postCode))
+          .writes(a)
       case a: PersonAddressNonUK =>
         (
           (__ \ "personAddressLine1").write[String] and
@@ -115,7 +116,9 @@ object PersonAddress {
             (__ \ "personAddressLine3").writeNullable[String] and
             (__ \ "personAddressLine4").writeNullable[String] and
             (__ \ "personAddressCountry").write[Country]
-          )((p: PersonAddressNonUK) => (p.addressLineNonUK1, p.addressLineNonUK2, p.addressLineNonUK3, p.addressLineNonUK4, p.country)).writes(a)
+        )((p: PersonAddressNonUK) =>
+          (p.addressLineNonUK1, p.addressLineNonUK2, p.addressLineNonUK3, p.addressLineNonUK4, p.country)
+        ).writes(a)
     }
   }
 }

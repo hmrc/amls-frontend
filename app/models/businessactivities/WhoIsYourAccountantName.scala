@@ -29,9 +29,8 @@ object WhoIsYourAccountantName {
 
   val key = "who-is-your-accountant"
 
-  implicit val jsonWrites: Writes[WhoIsYourAccountantName] = Writes[WhoIsYourAccountantName] {
-    (data) =>
-      Json.obj("accountantsName" -> data.accountantsName, "accountantsTradingName" -> data.accountantsTradingName)
+  implicit val jsonWrites: Writes[WhoIsYourAccountantName] = Writes[WhoIsYourAccountantName] { data =>
+    Json.obj("accountantsName" -> data.accountantsName, "accountantsTradingName" -> data.accountantsTradingName)
   }
 
   implicit val jsonReads: Reads[WhoIsYourAccountantName] = {

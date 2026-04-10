@@ -101,7 +101,9 @@ object AccountantsAddress {
             (__ \ "accountantsAddressLine3").writeNullable[String] and
             (__ \ "accountantsAddressLine4").writeNullable[String] and
             (__ \ "accountantsAddressPostCode").write[String]
-        )((uk: UkAccountantsAddress) => (uk.addressLine1, uk.addressLine2, uk.addressLine3, uk.addressLine4, uk.postCode)).writes(a)
+        )((uk: UkAccountantsAddress) =>
+          (uk.addressLine1, uk.addressLine2, uk.addressLine3, uk.addressLine4, uk.postCode)
+        ).writes(a)
       case a: NonUkAccountantsAddress =>
         (
           (__ \ "accountantsAddressLine1").write[String] and
@@ -109,7 +111,9 @@ object AccountantsAddress {
             (__ \ "accountantsAddressLine3").writeNullable[String] and
             (__ \ "accountantsAddressLine4").writeNullable[String] and
             (__ \ "accountantsAddressCountry").write[Country]
-        )((nonUk: NonUkAccountantsAddress) => (nonUk.addressLine1, nonUk.addressLine2, nonUk.addressLine3, nonUk.addressLine4, nonUk.country)).writes(a)
+        )((nonUk: NonUkAccountantsAddress) =>
+          (nonUk.addressLine1, nonUk.addressLine2, nonUk.addressLine3, nonUk.addressLine4, nonUk.country)
+        ).writes(a)
     }
   }
 }

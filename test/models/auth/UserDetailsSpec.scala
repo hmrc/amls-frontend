@@ -25,10 +25,10 @@ class UserDetailsSpec extends PlaySpec {
 
     "serialise and deserialise correctly" in {
       val model = UserDetails(
-        name            = "Test User",
-        email           = Some("test@test.com"),
-        affinityGroup   = "Organisation",
-        credentialRole  = Some("User"),
+        name = "Test User",
+        email = Some("test@test.com"),
+        affinityGroup = "Organisation",
+        credentialRole = Some("User"),
         groupIdentifier = Some("group-123")
       )
       Json.toJson(model).as[UserDetails] mustEqual model
@@ -36,10 +36,10 @@ class UserDetailsSpec extends PlaySpec {
 
     "serialise and deserialise correctly with optional fields absent" in {
       val model = UserDetails(
-        name            = "Test User",
-        email           = None,
-        affinityGroup   = "Individual",
-        credentialRole  = None,
+        name = "Test User",
+        email = None,
+        affinityGroup = "Individual",
+        credentialRole = None,
         groupIdentifier = None
       )
       Json.toJson(model).as[UserDetails] mustEqual model

@@ -27,7 +27,6 @@ import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import play.api.libs.ws.DefaultBodyWritables.writeableOf_String
 import org.scalatest.TestSuite
 
-
 import java.net.URL
 import scala.concurrent.{ExecutionContext, Future}
 

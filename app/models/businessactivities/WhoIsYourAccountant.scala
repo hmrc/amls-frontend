@@ -50,8 +50,8 @@ object WhoIsYourAccountant {
       Json.toJson(model.names).asOpt[JsObject],
       Json.toJson(model.isUk).asOpt[JsObject],
       Json.toJson(model.address).asOpt[JsObject]
-    ).flatten.fold(Json.obj()) {
-      (acc: JsObject, obj: JsObject) => acc.deepMerge(obj)
+    ).flatten.fold(Json.obj()) { (acc: JsObject, obj: JsObject) =>
+      acc.deepMerge(obj)
     }
   }
 }

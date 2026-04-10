@@ -20,9 +20,9 @@ import models.Country
 import play.api.libs.json.{Reads, Writes}
 
 case class CorrespondenceAddress(
-                                  ukAddress: Option[CorrespondenceAddressUk],
-                                  nonUkAddress: Option[CorrespondenceAddressNonUk]
-                                ) {
+  ukAddress: Option[CorrespondenceAddressUk],
+  nonUkAddress: Option[CorrespondenceAddressNonUk]
+) {
 
   def isUk: Option[Boolean] =
     this match {
@@ -49,15 +49,15 @@ object CorrespondenceAddress {
           (__ \ "correspondencePostCode").read[String])(CorrespondenceAddressUk.apply _)
           .map(x => CorrespondenceAddress(Some(x), None))
           orElse
-          ((__ \ "yourName").read[String] and
-            (__ \ "businessName").read[String] and
-            (__ \ "correspondenceAddressLine1").read[String] and
-            (__ \ "correspondenceAddressLine2").readNullable[String] and
-            (__ \ "correspondenceAddressLine3").readNullable[String] and
-            (__ \ "correspondenceAddressLine4").readNullable[String] and
-            (__ \ "correspondenceCountry").read[Country])(CorrespondenceAddressNonUk.apply _)
-            .map(x => CorrespondenceAddress(None, Some(x)))
-        )
+            ((__ \ "yourName").read[String] and
+              (__ \ "businessName").read[String] and
+              (__ \ "correspondenceAddressLine1").read[String] and
+              (__ \ "correspondenceAddressLine2").readNullable[String] and
+              (__ \ "correspondenceAddressLine3").readNullable[String] and
+              (__ \ "correspondenceAddressLine4").readNullable[String] and
+              (__ \ "correspondenceCountry").read[Country])(CorrespondenceAddressNonUk.apply _)
+              .map(x => CorrespondenceAddress(None, Some(x)))
+      )
   }
 
   implicit val jsonWrites: Writes[CorrespondenceAddress] = {
@@ -74,7 +74,9 @@ object CorrespondenceAddress {
             (__ \ "correspondenceAddressLine3").writeNullable[String] and
             (__ \ "correspondenceAddressLine4").writeNullable[String] and
             (__ \ "correspondencePostCode").write[String]
-          )((c: CorrespondenceAddressUk) => (c.yourName, c.businessName, c.addressLine1, c.addressLine2, c.addressLine3, c.addressLine4, c.postCode)).writes(a)
+        )((c: CorrespondenceAddressUk) =>
+          (c.yourName, c.businessName, c.addressLine1, c.addressLine2, c.addressLine3, c.addressLine4, c.postCode)
+        ).writes(a)
       case CorrespondenceAddress(None, Some(a)) =>
         (
           (__ \ "yourName").write[String] and
@@ -84,7 +86,17 @@ object CorrespondenceAddress {
             (__ \ "correspondenceAddressLine3").writeNullable[String] and
             (__ \ "correspondenceAddressLine4").writeNullable[String] and
             (__ \ "correspondenceCountry").write[Country]
-          )((c: CorrespondenceAddressNonUk) => (c.yourName, c.businessName, c.addressLineNonUK1, c.addressLineNonUK2, c.addressLineNonUK3, c.addressLineNonUK4, c.country)).writes(a)
+        )((c: CorrespondenceAddressNonUk) =>
+          (
+            c.yourName,
+            c.businessName,
+            c.addressLineNonUK1,
+            c.addressLineNonUK2,
+            c.addressLineNonUK3,
+            c.addressLineNonUK4,
+            c.country
+          )
+        ).writes(a)
       case _                                    => throw new Exception("An UnknownException has occurred while parsing CorrespondenceAddress")
     }
   }

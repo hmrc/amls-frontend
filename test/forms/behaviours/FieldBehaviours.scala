@@ -27,7 +27,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with BaseGe
     "bind valid data" in {
 
       forAll(validDataGenerator -> "validDataItem") { dataItem =>
-      val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
+        val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
         result.value.value shouldBe dataItem
       }
     }

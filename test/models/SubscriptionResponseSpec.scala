@@ -90,15 +90,15 @@ class SubscriptionResponseSpec extends PlaySpec {
   "SubscriptionResponse methods" must {
 
     val fees = SubscriptionFees(
-      paymentReference    = "XT000000000000",
-      registrationFee     = BigDecimal(100),
-      fpFee               = Some(BigDecimal(50)),
-      fpFeeRate           = Some(BigDecimal(10)),
-      approvalCheckFee    = Some(BigDecimal(25)),
+      paymentReference = "XT000000000000",
+      registrationFee = BigDecimal(100),
+      fpFee = Some(BigDecimal(50)),
+      fpFeeRate = Some(BigDecimal(10)),
+      approvalCheckFee = Some(BigDecimal(25)),
       approvalCheckFeeRate = Some(BigDecimal(5)),
-      premiseFee          = BigDecimal(200),
-      premiseFeeRate      = Some(BigDecimal(115)),
-      totalFees           = BigDecimal(375)
+      premiseFee = BigDecimal(200),
+      premiseFeeRate = Some(BigDecimal(115)),
+      totalFees = BigDecimal(375)
     )
 
     val responseWithFees    = SubscriptionResponse("bundle", "XDML00000000000", Some(fees))

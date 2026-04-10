@@ -89,7 +89,7 @@ class CurrentAddressDateOfChangeController @Inject() (
 
   private def validFormView(credId: String, index: Int, date: DateOfChange, edit: Boolean): Future[Result] =
     doUpdate(credId, index, date).map { (cache: Cache) =>
-    if (cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)) {
+      if (cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)) {
         Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
       } else {
         Redirect(routes.TimeAtCurrentAddressController.get(index, edit))

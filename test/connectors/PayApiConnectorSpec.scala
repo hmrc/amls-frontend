@@ -55,7 +55,8 @@ class PayApiConnectorSpec extends AmlsSpec with IntegrationPatience with HttpCli
 
     val mockAuditConnector: AuditConnector = mock[AuditConnector]
 
-    (mockAuditConnector.sendExtendedEvent(_: ExtendedDataEvent)(_: HeaderCarrier, _: ExecutionContext))
+    (mockAuditConnector
+      .sendExtendedEvent(_: ExtendedDataEvent)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *)
       .returning(Future.successful(AuditResult.Success))
       .anyNumberOfTimes()

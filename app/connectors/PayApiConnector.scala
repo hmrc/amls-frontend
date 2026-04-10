@@ -32,11 +32,11 @@ import utils.HttpResponseHelper
 import scala.concurrent.{ExecutionContext, Future}
 
 class PayApiConnector @Inject() (
-                                  http: HttpClientV2,
-                                  val auditConnector: AuditConnector,
-                                  val applicationConfig: ApplicationConfig
-                                ) extends HttpResponseHelper
-  with Logging {
+  http: HttpClientV2,
+  val auditConnector: AuditConnector,
+  val applicationConfig: ApplicationConfig
+) extends HttpResponseHelper
+    with Logging {
 
   // $COVERAGE-OFF$
   private val logDebug = (msg: String) => logger.debug(s"[PayApiConnector] $msg")
@@ -44,8 +44,8 @@ class PayApiConnector @Inject() (
   // $COVERAGE-ON$
 
   def createPayment(
-                     request: CreatePaymentRequest
-                   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
+    request: CreatePaymentRequest
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
 
     val bodyParser = JsonParsed[CreatePaymentResponse]
     // $COVERAGE-OFF$

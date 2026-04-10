@@ -42,26 +42,27 @@ import scala.concurrent.Future
 
 @Singleton
 class TestOnlyController @Inject() (
-                                     val dataCacheConnector: DataCacheConnector,
-                                     val mongoCacheConnector: MongoCacheConnector,
-                                     implicit val testOnlyStubConnector: TestOnlyStubConnector,
-                                     val stubsService: UpdateMongoCacheService,
-                                     val amlsConnector: AmlsConnector,
-                                     val authAction: AuthAction,
-                                     val ds: CommonPlayDependencies,
-                                     val customerCache: BusinessCustomerSessionCache,
-                                     val cc: MessagesControllerComponents,
-                                     duplicateEnrolmentView: DuplicateEnrolmentView,
-                                     duplicateSubmissionView: DuplicateSubmissionView,
-                                     wrongCredentialType: WrongCredentialTypeView,
-                                     paymentFailureView: PaymentFailureView,
-                                     paymentConfirmationView: PaymentConfirmationView,
-                                     paymentConfirmationTransitionalRenewalView: PaymentConfirmationTransitionalRenewalView,
-                                     confirmationBacsView: ConfirmationBacsView,
-                                     cryptoService: CryptoService,
-                                     errorView: ErrorView,
-                                     testOnlyViews: TestOnlyViews
-                                   )(implicit override val ec: scala.concurrent.ExecutionContext) extends AmlsBaseController(ds, cc) {
+  val dataCacheConnector: DataCacheConnector,
+  val mongoCacheConnector: MongoCacheConnector,
+  implicit val testOnlyStubConnector: TestOnlyStubConnector,
+  val stubsService: UpdateMongoCacheService,
+  val amlsConnector: AmlsConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val customerCache: BusinessCustomerSessionCache,
+  val cc: MessagesControllerComponents,
+  duplicateEnrolmentView: DuplicateEnrolmentView,
+  duplicateSubmissionView: DuplicateSubmissionView,
+  wrongCredentialType: WrongCredentialTypeView,
+  paymentFailureView: PaymentFailureView,
+  paymentConfirmationView: PaymentConfirmationView,
+  paymentConfirmationTransitionalRenewalView: PaymentConfirmationTransitionalRenewalView,
+  confirmationBacsView: ConfirmationBacsView,
+  cryptoService: CryptoService,
+  errorView: ErrorView,
+  testOnlyViews: TestOnlyViews
+)(implicit override val ec: scala.concurrent.ExecutionContext)
+    extends AmlsBaseController(ds, cc) {
 
   def dropMongoCache: Action[AnyContent] = authAction.async { implicit request =>
     removeCacheData(request.credId) map { _ =>

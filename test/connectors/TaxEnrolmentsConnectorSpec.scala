@@ -35,7 +35,7 @@ import utils.{AmlsSpec, HttpClientMocker}
 import scala.concurrent.{ExecutionContext, Future}
 
 class TaxEnrolmentsConnectorSpec
-  extends AmlsSpec
+    extends AmlsSpec
     with ScalaFutures
     with AmlsReferenceNumberGenerator
     with UserDetailsGenerator
@@ -59,7 +59,8 @@ class TaxEnrolmentsConnectorSpec
     val groupIdentfier: String                = stringOfLengthGen(10).sample.get
     implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
-    (auditConnector.sendEvent(_: DataEvent)(_: HeaderCarrier, _: ExecutionContext))
+    (auditConnector
+      .sendEvent(_: DataEvent)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *)
       .returning(Future.successful(AuditResult.Success))
       .anyNumberOfTimes()

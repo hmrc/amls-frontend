@@ -21,11 +21,11 @@ import play.api.libs.json.{Json, Reads, Writes}
 import java.time.LocalDate
 
 case class DeRegisterSubscriptionRequest(
-                                          acknowledgementReference: String,
-                                          deregistrationDate: LocalDate,
-                                          deregistrationReason: DeregistrationReason,
-                                          deregReasonOther: Option[String] = None
-                                        )
+  acknowledgementReference: String,
+  deregistrationDate: LocalDate,
+  deregistrationReason: DeregistrationReason,
+  deregReasonOther: Option[String] = None
+)
 
 object DeRegisterSubscriptionRequest {
   val DefaultAckReference: String = "A" * 32
@@ -41,7 +41,9 @@ object DeRegisterSubscriptionRequest {
           (__ \ "deregistrationDate").write[LocalDate] and
           __.write[DeregistrationReason] and
           (__ \ "deregReasonOther").writeNullable[String]
-        )((d: DeRegisterSubscriptionRequest) => (d.acknowledgementReference, d.deregistrationDate, d.deregistrationReason, d.deregReasonOther)).writes(ep)
+      )((d: DeRegisterSubscriptionRequest) =>
+        (d.acknowledgementReference, d.deregistrationDate, d.deregistrationReason, d.deregReasonOther)
+      ).writes(ep)
     }
   }
 }

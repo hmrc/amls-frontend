@@ -36,7 +36,7 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
   )
   val appConfigNoEncryption                     = new ApplicationConfig(configNoEncryption, app.injector.instanceOf[ServicesConfig])
   val appConfigWithEncryption                   = new ApplicationConfig(configWithEncryption, app.injector.instanceOf[ServicesConfig])
-  override val repository: MongoCacheClient = new MongoCacheClient(
+  override val repository: MongoCacheClient     = new MongoCacheClient(
     appConfigNoEncryption,
     app.injector.instanceOf[ApplicationCrypto],
     mongoComponent,

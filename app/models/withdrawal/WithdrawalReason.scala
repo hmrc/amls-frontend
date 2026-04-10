@@ -80,5 +80,4 @@ object WithdrawalReason extends Enumerable.Implicits {
       )
   }
 
-
 }

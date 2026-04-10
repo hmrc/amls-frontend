@@ -82,9 +82,9 @@ class AddBusinessTypeFlowModelSpec extends PlaySpec {
     "isComplete" must {
       "return true for MoneyServiceBusiness with PSR number, addMoreActivities and hasAccepted" in {
         val model = AddBusinessTypeFlowModel(
-          activity                    = Some(MoneyServiceBusiness),
-          addMoreActivities           = Some(true),
-          hasAccepted                 = true,
+          activity = Some(MoneyServiceBusiness),
+          addMoreActivities = Some(true),
+          hasAccepted = true,
           businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123456"))
         )
         model.isComplete mustBe true
@@ -92,18 +92,18 @@ class AddBusinessTypeFlowModelSpec extends PlaySpec {
 
       "return true for non-MSB activity with addMoreActivities and hasAccepted" in {
         val model = AddBusinessTypeFlowModel(
-          activity          = Some(AccountancyServices),
+          activity = Some(AccountancyServices),
           addMoreActivities = Some(true),
-          hasAccepted       = true
+          hasAccepted = true
         )
         model.isComplete mustBe true
       }
 
       "return false when hasAccepted is false" in {
         val model = AddBusinessTypeFlowModel(
-          activity          = Some(AccountancyServices),
+          activity = Some(AccountancyServices),
           addMoreActivities = Some(true),
-          hasAccepted       = false
+          hasAccepted = false
         )
         model.isComplete mustBe false
       }
@@ -147,10 +147,10 @@ class AddBusinessTypeFlowModelSpec extends PlaySpec {
     "JSON format" must {
       "serialise and deserialise correctly" in {
         val model = AddBusinessTypeFlowModel(
-          activity          = Some(AccountancyServices),
+          activity = Some(AccountancyServices),
           addMoreActivities = Some(true),
-          hasChanged        = true,
-          hasAccepted       = true
+          hasChanged = true,
+          hasAccepted = true
         )
         Json.toJson(model).as[AddBusinessTypeFlowModel] mustEqual model
       }
