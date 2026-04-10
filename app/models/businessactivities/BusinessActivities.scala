@@ -27,23 +27,23 @@ import services.cache.Cache
 import utils.ControllerHelper
 
 case class BusinessActivities(
-                               involvedInOther: Option[InvolvedInOther] = None,
-                               expectedBusinessTurnover: Option[ExpectedBusinessTurnover] = None,
-                               expectedAMLSTurnover: Option[ExpectedAMLSTurnover] = None,
-                               businessFranchise: Option[BusinessFranchise] = None,
-                               transactionRecord: Option[Boolean] = None,
-                               customersOutsideUK: Option[CustomersOutsideUK] = None,
-                               ncaRegistered: Option[NCARegistered] = None,
-                               accountantForAMLSRegulations: Option[AccountantForAMLSRegulations] = None,
-                               identifySuspiciousActivity: Option[IdentifySuspiciousActivity] = None,
-                               riskAssessmentPolicy: Option[RiskAssessmentPolicy] = None,
-                               howManyEmployees: Option[HowManyEmployees] = None,
-                               whoIsYourAccountant: Option[WhoIsYourAccountant] = None,
-                               taxMatters: Option[TaxMatters] = None,
-                               transactionRecordTypes: Option[TransactionTypes] = None,
-                               hasChanged: Boolean = false,
-                               hasAccepted: Boolean = false
-                             ) {
+  involvedInOther: Option[InvolvedInOther] = None,
+  expectedBusinessTurnover: Option[ExpectedBusinessTurnover] = None,
+  expectedAMLSTurnover: Option[ExpectedAMLSTurnover] = None,
+  businessFranchise: Option[BusinessFranchise] = None,
+  transactionRecord: Option[Boolean] = None,
+  customersOutsideUK: Option[CustomersOutsideUK] = None,
+  ncaRegistered: Option[NCARegistered] = None,
+  accountantForAMLSRegulations: Option[AccountantForAMLSRegulations] = None,
+  identifySuspiciousActivity: Option[IdentifySuspiciousActivity] = None,
+  riskAssessmentPolicy: Option[RiskAssessmentPolicy] = None,
+  howManyEmployees: Option[HowManyEmployees] = None,
+  whoIsYourAccountant: Option[WhoIsYourAccountant] = None,
+  taxMatters: Option[TaxMatters] = None,
+  transactionRecordTypes: Option[TransactionTypes] = None,
+  hasChanged: Boolean = false,
+  hasAccepted: Boolean = false
+) {
 
   def businessFranchise(p: BusinessFranchise): BusinessActivities =
     this.copy(
@@ -175,23 +175,23 @@ case class BusinessActivities(
 
     this match {
       case ba @ BusinessActivities(
-        Some(InvolvedInOtherNo),
-        _,
-        Some(_),
-        Some(_),
-        Some(_),
-        _,
-        Some(_),
-        Some(_),
-        Some(_),
-        Some(_),
-        Some(_),
-        _,
-        _,
-        _,
-        _,
-        true
-      ) if !containsASP =>
+            Some(InvolvedInOtherNo),
+            _,
+            Some(_),
+            Some(_),
+            Some(_),
+            _,
+            Some(_),
+            Some(_),
+            Some(_),
+            Some(_),
+            Some(_),
+            _,
+            _,
+            _,
+            _,
+            true
+          ) if !containsASP =>
         (ba.accountantForAMLSRegulations, ba.whoIsYourAccountant, ba.taxMatters) match {
           case (Some(AccountantForAMLSRegulations(true)), Some(accountant), Some(_)) if accountant.isComplete => true
           case (Some(AccountantForAMLSRegulations(false)), _, _)                                              => true
@@ -199,23 +199,23 @@ case class BusinessActivities(
         }
 
       case ba @ BusinessActivities(
-        Some(InvolvedInOtherYes(_)),
-        Some(_),
-        Some(_),
-        Some(_),
-        Some(_),
-        _,
-        Some(_),
-        Some(_),
-        Some(_),
-        Some(_),
-        Some(_),
-        _,
-        _,
-        _,
-        _,
-        true
-      ) if !containsASP =>
+            Some(InvolvedInOtherYes(_)),
+            Some(_),
+            Some(_),
+            Some(_),
+            Some(_),
+            _,
+            Some(_),
+            Some(_),
+            Some(_),
+            Some(_),
+            Some(_),
+            _,
+            _,
+            _,
+            _,
+            true
+          ) if !containsASP =>
         (ba.accountantForAMLSRegulations, ba.whoIsYourAccountant, ba.taxMatters) match {
           case (Some(AccountantForAMLSRegulations(true)), Some(accountant), Some(_)) if accountant.isComplete => true
           case (Some(AccountantForAMLSRegulations(false)), _, _)                                              => true
@@ -223,43 +223,43 @@ case class BusinessActivities(
         }
 
       case BusinessActivities(
-        Some(InvolvedInOtherNo),
-        _,
-        Some(_),
-        Some(_),
-        Some(_),
-        _,
-        Some(_),
-        _,
-        Some(_),
-        Some(_),
-        Some(_),
-        _,
-        _,
-        _,
-        _,
-        true
-      ) if containsASP =>
+            Some(InvolvedInOtherNo),
+            _,
+            Some(_),
+            Some(_),
+            Some(_),
+            _,
+            Some(_),
+            _,
+            Some(_),
+            Some(_),
+            Some(_),
+            _,
+            _,
+            _,
+            _,
+            true
+          ) if containsASP =>
         true
 
       case BusinessActivities(
-        Some(InvolvedInOtherYes(_)),
-        Some(_),
-        Some(_),
-        Some(_),
-        Some(_),
-        _,
-        Some(_),
-        _,
-        Some(_),
-        Some(_),
-        Some(_),
-        _,
-        _,
-        _,
-        _,
-        true
-      ) if containsASP =>
+            Some(InvolvedInOtherYes(_)),
+            Some(_),
+            Some(_),
+            Some(_),
+            Some(_),
+            _,
+            Some(_),
+            _,
+            Some(_),
+            Some(_),
+            Some(_),
+            _,
+            _,
+            _,
+            _,
+            true
+          ) if containsASP =>
         true
 
       case _ => false
@@ -341,26 +341,30 @@ object BusinessActivities extends Logging {
 
   implicit val reads: Reads[BusinessActivities] = (
     __.read(Reads.optionNoError[InvolvedInOther]) and
-      (__ \ "expectedBusinessTurnover").readNullable[String].map(_.flatMap {
-        case "01" => Some(ExpectedBusinessTurnover.First)
-        case "02" => Some(ExpectedBusinessTurnover.Second)
-        case "03" => Some(ExpectedBusinessTurnover.Third)
-        case "04" => Some(ExpectedBusinessTurnover.Fourth)
-        case "05" => Some(ExpectedBusinessTurnover.Fifth)
-        case "06" => Some(ExpectedBusinessTurnover.Sixth)
-        case "07" => Some(ExpectedBusinessTurnover.Seventh)
-        case _    => None
-      }) and
-      (__ \ "expectedAMLSTurnover").readNullable[String].map(_.flatMap {
-        case "01" => Some(ExpectedAMLSTurnover.First)
-        case "02" => Some(ExpectedAMLSTurnover.Second)
-        case "03" => Some(ExpectedAMLSTurnover.Third)
-        case "04" => Some(ExpectedAMLSTurnover.Fourth)
-        case "05" => Some(ExpectedAMLSTurnover.Fifth)
-        case "06" => Some(ExpectedAMLSTurnover.Sixth)
-        case "07" => Some(ExpectedAMLSTurnover.Seventh)
-        case _    => None
-      }) and
+      (__ \ "expectedBusinessTurnover")
+        .readNullable[String]
+        .map(_.flatMap {
+          case "01" => Some(ExpectedBusinessTurnover.First)
+          case "02" => Some(ExpectedBusinessTurnover.Second)
+          case "03" => Some(ExpectedBusinessTurnover.Third)
+          case "04" => Some(ExpectedBusinessTurnover.Fourth)
+          case "05" => Some(ExpectedBusinessTurnover.Fifth)
+          case "06" => Some(ExpectedBusinessTurnover.Sixth)
+          case "07" => Some(ExpectedBusinessTurnover.Seventh)
+          case _    => None
+        }) and
+      (__ \ "expectedAMLSTurnover")
+        .readNullable[String]
+        .map(_.flatMap {
+          case "01" => Some(ExpectedAMLSTurnover.First)
+          case "02" => Some(ExpectedAMLSTurnover.Second)
+          case "03" => Some(ExpectedAMLSTurnover.Third)
+          case "04" => Some(ExpectedAMLSTurnover.Fourth)
+          case "05" => Some(ExpectedAMLSTurnover.Fifth)
+          case "06" => Some(ExpectedAMLSTurnover.Sixth)
+          case "07" => Some(ExpectedAMLSTurnover.Seventh)
+          case _    => None
+        }) and
       __.read(Reads.optionNoError[BusinessFranchise]) and
       (__ \ "isRecorded").readNullable[Boolean] and
       __.read(Reads.optionNoError[CustomersOutsideUK]) and
@@ -374,7 +378,7 @@ object BusinessActivities extends Logging {
       (transactionTypesReader orElse TransactionTypes.oldTransactionTypeReader orElse constant(None)) and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
       (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
-    )(BusinessActivities.apply _)
+  )(BusinessActivities.apply _)
 
   implicit val writes: Writes[BusinessActivities] = Writes[BusinessActivities] { model =>
     if (!model.accountantForAMLSRegulations.isDefined) {

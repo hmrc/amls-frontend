@@ -34,7 +34,6 @@ import utils._
 import scala.concurrent.Future
 import views.html.responsiblepeople.TrainingView
 
-
 class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   val recordId = 1

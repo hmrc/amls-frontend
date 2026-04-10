@@ -24,15 +24,15 @@ import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import views.html.ErrorView
 
 class AmlsErrorHandler @Inject() (
-                                   val messagesApi: MessagesApi,
-                                   val errorView: ErrorView
-                                 )(implicit
-                                   val appConfig: ApplicationConfig,
-                                   protected val ec: ExecutionContext
-                                 ) extends FrontendErrorHandler {
+  val messagesApi: MessagesApi,
+  val errorView: ErrorView
+)(implicit
+  val appConfig: ApplicationConfig,
+  protected val ec: ExecutionContext
+) extends FrontendErrorHandler {
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
-                                                                                          request: RequestHeader
+    request: RequestHeader
   ): Future[play.twirl.api.Html] =
     Future.successful(errorView(pageTitle, heading, message))
 }

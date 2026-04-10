@@ -34,7 +34,7 @@ object AgentCompanyDetails {
     (
       (__ \ "agentCompanyName").read[String] and
         (__ \ "companyRegistrationNumber").readNullable[String]
-      )(AgentCompanyDetails.apply(_, _))
+    )(AgentCompanyDetails.apply(_, _))
   }
 
   implicit val writes: Writes[AgentCompanyDetails] = {
@@ -43,7 +43,7 @@ object AgentCompanyDetails {
     (
       (__ \ "agentCompanyName").write[String] and
         (__ \ "companyRegistrationNumber").writeNullable[String]
-      )((a: AgentCompanyDetails) => (a.agentCompanyName, a.companyRegistrationNumber))
+    )((a: AgentCompanyDetails) => (a.agentCompanyName, a.companyRegistrationNumber))
   }
 
   implicit def conv(name: AgentCompanyName): AgentCompanyDetails =

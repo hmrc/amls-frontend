@@ -42,9 +42,9 @@ class YourTradingPremisesControllerSpec
     with MockitoSugar
     with generators.tradingpremises.TradingPremisesGenerator {
 
-  val userId                             = s"user-${UUID.randomUUID()}"
-  val mockDataCacheConnector             = mock[DataCacheConnector]
-  val mockYtp                            = mock[TradingPremises]
+  val userId                 = s"user-${UUID.randomUUID()}"
+  val mockDataCacheConnector = mock[DataCacheConnector]
+  val mockYtp                = mock[TradingPremises]
 
   trait Fixture extends DependencyMocks {
     self =>

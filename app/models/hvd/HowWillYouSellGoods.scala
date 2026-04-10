@@ -41,7 +41,7 @@ trait HowWillYouSellGoods0 {
     } map HowWillYouSellGoods.apply
 
   val jsonW: Writes[HowWillYouSellGoods] =
-    (__ \ "salesChannels").write[Seq[String]].contramap {(hwysg: HowWillYouSellGoods) =>
+    (__ \ "salesChannels").write[Seq[String]].contramap { (hwysg: HowWillYouSellGoods) =>
       hwysg.channels.toSeq.map {
         case Retail    => "Retail"
         case Wholesale => "Wholesale"

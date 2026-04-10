@@ -28,16 +28,16 @@ import scala.util.{Failure, Success, Try}
 trait CacheOps extends Logging {
 
   /** Retrieves an encrypted value from the cache
-   * @param cache
-   *   The cache to retrieve the value from
-   * @param key
-   *   The cache key
-   * @return
-   *   The decrypted item from the cache as T, or None if the value wasn't present
-   */
+    * @param cache
+    *   The cache to retrieve the value from
+    * @param key
+    *   The cache key
+    * @return
+    *   The decrypted item from the cache as T, or None if the value wasn't present
+    */
   private def decryptValue[T](cache: Cache, key: String)(implicit
-                                                         reads: Reads[T],
-                                                         crypto: Encrypter with Decrypter
+    reads: Reads[T],
+    crypto: Encrypter with Decrypter
   ): Option[T] = {
     val sensitiveDecrypter: Reads[SensitiveT[T]] = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
 
@@ -53,8 +53,8 @@ trait CacheOps extends Logging {
   }
 
   def catchDoubleEncryption[T](cache: Cache, key: String)(implicit
-                                                          reads: Reads[T],
-                                                          c: Encrypter with Decrypter
+    reads: Reads[T],
+    c: Encrypter with Decrypter
   ): Option[T] =
     Try(decryptValue[T](cache, key)(reads, c)) match {
       case Failure(_: JsResultException) =>
@@ -75,13 +75,13 @@ trait CacheOps extends Logging {
     }
 
   /** Gets an unencrypted value from the cache
-   * @param cache
-   *   The cache to retrieve the value from
-   * @param key
-   *   The cache key
-   * @return
-   *   The value from the cache, or None if the value wasn't present
-   */
+    * @param cache
+    *   The cache to retrieve the value from
+    * @param key
+    *   The cache key
+    * @return
+    *   The value from the cache, or None if the value wasn't present
+    */
   def getValue[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] = cache.data.get(key) flatMap {
     (json: JsValue) =>
       if (json.validate[T].isSuccess) {

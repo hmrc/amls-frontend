@@ -255,7 +255,7 @@ class ConversionsSpec extends AnyWordSpec with Matchers {
   }
 
   "throw an exception when no business activities section exists" in new Fixture {
-    val renewal = Renewal(turnover = Some(AMLSTurnover.First))
+    val renewal         = Renewal(turnover = Some(AMLSTurnover.First))
     val requestWithNoBA = subscriptionRequest.copy(businessActivitiesSection = None)
 
     intercept[Exception] {
@@ -275,16 +275,16 @@ class ConversionsSpec extends AnyWordSpec with Matchers {
       "percentageExpectedTurnover"   -> "fortyOneToSixty"
     )
 
-    val renewal = Renewal(ampTurnover = Some(AMPTurnover.Third))
+    val renewal        = Renewal(ampTurnover = Some(AMPTurnover.Third))
     val requestWithAmp = subscriptionRequest.copy(ampSection = Some(Amp(ampData)))
-    val converted = requestWithAmp.withRenewalData(renewal)
+    val converted      = requestWithAmp.withRenewalData(renewal)
     converted.ampSection mustBe defined
   }
 
   "handle None msb and hvd sections gracefully" in new Fixture {
-    val renewal = Renewal(turnover = Some(AMLSTurnover.First))
+    val renewal             = Renewal(turnover = Some(AMLSTurnover.First))
     val requestWithNoMsbHvd = subscriptionRequest.copy(msbSection = None, hvdSection = None)
-    val converted = requestWithNoMsbHvd.withRenewalData(renewal)
+    val converted           = requestWithNoMsbHvd.withRenewalData(renewal)
     converted.msbSection mustBe None
     converted.hvdSection mustBe None
   }

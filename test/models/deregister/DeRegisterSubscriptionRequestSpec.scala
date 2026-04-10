@@ -29,13 +29,13 @@ class DeRegisterSubscriptionRequestSpec extends PlaySpec with Matchers {
 
     "serialise with deregReasonOther" in {
       val reference = "A" * 32
-      val model = DeRegisterSubscriptionRequest(
+      val model     = DeRegisterSubscriptionRequest(
         reference,
         LocalDate.of(2020, 1, 1),
         DeregistrationReason.HVDPolicyOfNotAcceptingHighValueCashPayments,
         Some("other reason")
       )
-      val json = Json.toJson(model)
+      val json      = Json.toJson(model)
       (json \ "deregReasonOther").as[String] mustBe "other reason"
     }
 

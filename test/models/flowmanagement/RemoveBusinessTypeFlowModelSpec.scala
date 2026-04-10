@@ -30,7 +30,7 @@ class RemoveBusinessTypeFlowModelSpec extends PlaySpec {
     "serialise and deserialise correctly with all fields" in {
       val model = RemoveBusinessTypeFlowModel(
         activitiesToRemove = Some(Set(AccountancyServices)),
-        dateOfChange       = Some(DateOfChange(LocalDate.of(2020, 1, 1)))
+        dateOfChange = Some(DateOfChange(LocalDate.of(2020, 1, 1)))
       )
       Json.toJson(model).as[RemoveBusinessTypeFlowModel] mustEqual model
     }

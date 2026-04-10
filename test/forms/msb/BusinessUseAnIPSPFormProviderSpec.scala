@@ -22,7 +22,6 @@ import models.moneyservicebusiness.{BusinessUseAnIPSP, BusinessUseAnIPSPNo, Busi
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
-
 class BusinessUseAnIPSPFormProviderSpec extends BooleanFieldBehaviours[BusinessUseAnIPSP] with Constraints {
 
   val formProvider: BusinessUseAnIPSPFormProvider = new BusinessUseAnIPSPFormProvider()

@@ -25,9 +25,9 @@ class EnrolmentResponseSpec extends PlaySpec {
 
     "serialise and deserialise correctly" in {
       val model = EnrolmentResponse(
-        serviceName           = "HMRC-MLR-ORG",
-        state                 = "Activated",
-        friendlyName          = "AML Service",
+        serviceName = "HMRC-MLR-ORG",
+        state = "Activated",
+        friendlyName = "AML Service",
         identifiersForDisplay = Seq(Identifier("MLRRefNumber", "XAML00000567890"))
       )
       Json.toJson(model).as[EnrolmentResponse] mustEqual model
@@ -35,9 +35,9 @@ class EnrolmentResponseSpec extends PlaySpec {
 
     "serialise and deserialise with empty identifiers" in {
       val model = EnrolmentResponse(
-        serviceName           = "HMRC-MLR-ORG",
-        state                 = "Activated",
-        friendlyName          = "AML Service",
+        serviceName = "HMRC-MLR-ORG",
+        state = "Activated",
+        friendlyName = "AML Service",
         identifiersForDisplay = Seq.empty
       )
       Json.toJson(model).as[EnrolmentResponse] mustEqual model

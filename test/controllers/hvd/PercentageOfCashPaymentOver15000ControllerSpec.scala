@@ -65,7 +65,6 @@ class PercentageOfCashPaymentOver15000ControllerSpec
     mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
-
   "PercentageOfCashPaymentOver15000Controller" must {
 
     "on get display the Percentage Of CashPayment Over 15000 page" in new Fixture {

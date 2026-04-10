@@ -33,18 +33,18 @@ class GovernmentGatewayEnrolmentSpec extends PlaySpec {
 
     "serialise and deserialise correctly with identifiers" in {
       val model = GovernmentGatewayEnrolment(
-        key         = "HMRC-MLR-ORG",
+        key = "HMRC-MLR-ORG",
         identifiers = List(EnrolmentIdentifier("MLRRefNumber", "XAML00000567890")),
-        state       = "Activated"
+        state = "Activated"
       )
       Json.toJson(model).as[GovernmentGatewayEnrolment] mustEqual model
     }
 
     "serialise and deserialise correctly with empty identifiers" in {
       val model = GovernmentGatewayEnrolment(
-        key         = "HMRC-MLR-ORG",
+        key = "HMRC-MLR-ORG",
         identifiers = List.empty,
-        state       = "NotYetActivated"
+        state = "NotYetActivated"
       )
       Json.toJson(model).as[GovernmentGatewayEnrolment] mustEqual model
     }

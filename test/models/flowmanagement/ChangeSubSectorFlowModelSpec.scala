@@ -28,7 +28,7 @@ class ChangeSubSectorFlowModelSpec extends PlaySpec {
     "serialise and deserialise correctly with all fields" in {
       val model = ChangeSubSectorFlowModel(
         subSectors = Some(Set(TransmittingMoney)),
-        psrNumber  = Some(BusinessAppliedForPSRNumberYes("123456"))
+        psrNumber = Some(BusinessAppliedForPSRNumberYes("123456"))
       )
       Json.toJson(model).as[ChangeSubSectorFlowModel] mustEqual model
     }

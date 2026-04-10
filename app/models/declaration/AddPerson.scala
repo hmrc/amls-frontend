@@ -19,11 +19,11 @@ package models.declaration
 import models.declaration.release7.{RoleType, RoleWithinBusinessRelease7}
 
 case class AddPerson(
-                      firstName: String,
-                      middleName: Option[String],
-                      lastName: String,
-                      roleWithinBusiness: RoleWithinBusinessRelease7
-                    )
+  firstName: String,
+  middleName: Option[String],
+  lastName: String,
+  roleWithinBusiness: RoleWithinBusinessRelease7
+)
 
 object AddPerson {
 
@@ -52,7 +52,7 @@ object AddPerson {
         (__ \ "middleName").readNullable[String] and
         (__ \ "lastName").read[String] and
         __.read[RoleWithinBusinessRelease7]
-      )(AddPerson.apply _)
+    )(AddPerson.apply _)
 
   }
 
@@ -65,7 +65,7 @@ object AddPerson {
         (__ \ "middleName").write[Option[String]] and
         (__ \ "lastName").write[String] and
         __.write[RoleWithinBusinessRelease7]
-      )((a: AddPerson) => (a.firstName, a.middleName, a.lastName, a.roleWithinBusiness))
+    )((a: AddPerson) => (a.firstName, a.middleName, a.lastName, a.roleWithinBusiness))
   }
 
 }

@@ -41,10 +41,10 @@ object AddBankAccountEvent {
   object BankAccountAuditDetail {
 
     implicit val accountTypeWrites: Writes[BankAccountType] = Writes[BankAccountType] {
-      case PersonalAccount => JsString("personal")
-      case BelongsToBusiness => JsString("business")
+      case PersonalAccount        => JsString("personal")
+      case BelongsToBusiness      => JsString("business")
       case BelongsToOtherBusiness => JsString("other business")
-      case NoBankAccountUsed => JsString("no bank account")
+      case NoBankAccountUsed      => JsString("no bank account")
     }
 
     implicit val writes: Writes[BankAccountAuditDetail] = {
@@ -57,7 +57,16 @@ object AddBankAccountEvent {
           (__ \ "sortCode").writeNullable[String] and
           (__ \ "accountNumber").writeNullable[String] and
           (__ \ "iban").writeNullable[String]
-        )(detail => (detail.accountName, detail.bankAccountType, detail.isUKBankAccount, detail.sortCode, detail.accountNumber, detail.iban))
+      )(detail =>
+        (
+          detail.accountName,
+          detail.bankAccountType,
+          detail.isUKBankAccount,
+          detail.sortCode,
+          detail.accountNumber,
+          detail.iban
+        )
+      )
     }
   }
 

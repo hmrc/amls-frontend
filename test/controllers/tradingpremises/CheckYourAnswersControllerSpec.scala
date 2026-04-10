@@ -40,10 +40,10 @@ import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
-  val userId                             = s"user-${UUID.randomUUID()}"
-  val mockDataCacheConnector             = mock[DataCacheConnector]
-  val mockCacheMap                       = mock[Cache]
-  val statusService                      = mock[StatusService]
+  val userId                 = s"user-${UUID.randomUUID()}"
+  val mockDataCacheConnector = mock[DataCacheConnector]
+  val mockCacheMap           = mock[Cache]
+  val statusService          = mock[StatusService]
 
   trait Fixture {
     self =>

@@ -27,7 +27,7 @@ import java.time.zone.ZoneOffsetTransitionRule.TimeDefinition.UTC
 class FeeResponseSpec extends PlaySpec {
 
   "FeeResponse.toPay" must {
-    val difference = BigDecimal(100)
+    val difference  = BigDecimal(100)
     val feeResponse = FeeResponse(
       AmendOrVariationResponseType,
       "XAML00000567890",
@@ -99,7 +99,7 @@ class FeeResponseSpec extends PlaySpec {
     }
 
     "return total" when {
-      val total = BigDecimal(100)
+      val total       = BigDecimal(100)
       val feeResponse = FeeResponse(
         AmendOrVariationResponseType,
         "XAML00000567890",
@@ -257,37 +257,37 @@ class FeeResponseSpec extends PlaySpec {
     )
 
     "serialise and deserialise via dateTimeWrite / dateTimeRead ($date long format)" in {
-      val json = Json.toJson(feeResponse)
+      val json   = Json.toJson(feeResponse)
       val result = json.as[FeeResponse]
       result mustEqual feeResponse
     }
 
     "deserialise from $date.$numberLong as Long format" in {
       val timestamp = 1514764800000L
-      val json = Json.obj(
-        "responseType" -> "AmendOrVariationResponse",
+      val json      = Json.obj(
+        "responseType"        -> "AmendOrVariationResponse",
         "amlsReferenceNumber" -> "XAML00000567890",
-        "registrationFee" -> 100,
-        "fpFee" -> 100,
-        "premiseFee" -> 100,
-        "totalFees" -> 100,
-        "difference" -> 50,
-        "createdAt" -> Json.obj("$date" -> Json.obj("$numberLong" -> timestamp))
+        "registrationFee"     -> 100,
+        "fpFee"               -> 100,
+        "premiseFee"          -> 100,
+        "totalFees"           -> 100,
+        "difference"          -> 50,
+        "createdAt"           -> Json.obj("$date" -> Json.obj("$numberLong" -> timestamp))
       )
       json.as[FeeResponse].createdAt mustEqual feeResponse.createdAt
     }
 
     "deserialise from $date.$numberLong as String format" in {
       val timestamp = "1514764800000"
-      val json = Json.obj(
-        "responseType" -> "AmendOrVariationResponse",
+      val json      = Json.obj(
+        "responseType"        -> "AmendOrVariationResponse",
         "amlsReferenceNumber" -> "XAML00000567890",
-        "registrationFee" -> 100,
-        "fpFee" -> 100,
-        "premiseFee" -> 100,
-        "totalFees" -> 100,
-        "difference" -> 50,
-        "createdAt" -> Json.obj("$date" -> Json.obj("$numberLong" -> timestamp))
+        "registrationFee"     -> 100,
+        "fpFee"               -> 100,
+        "premiseFee"          -> 100,
+        "totalFees"           -> 100,
+        "difference"          -> 50,
+        "createdAt"           -> Json.obj("$date" -> Json.obj("$numberLong" -> timestamp))
       )
       json.as[FeeResponse].createdAt mustEqual feeResponse.createdAt
     }
@@ -307,7 +307,10 @@ class FeeResponseSpec extends PlaySpec {
           Some(BigDecimal(50)),
           LocalDateTime.of(2018, 1, 1, 0, 0)
         )
-        fr.toPay(RenewalSubmitted(None), Some(SubmissionRequestStatus(true, isRenewalAmendment = Some(true)))) mustEqual BigDecimal(50)
+        fr.toPay(
+          RenewalSubmitted(None),
+          Some(SubmissionRequestStatus(true, isRenewalAmendment = Some(true)))
+        ) mustEqual BigDecimal(50)
       }
     }
 
