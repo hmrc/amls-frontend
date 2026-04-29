@@ -15,14 +15,13 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
-@import components.{Button, ReturnLink, SectionSubtitle, Heading}
+@import components.{Button, ReturnLink, SectionSubtitle}
 @import components.forms.{InputCheckbox, ErrorSummary}
 @import config.ApplicationConfig
 @import models.businessmatching.{BusinessActivities, BusinessActivity}
 
 @this(
     formHelper: FormWithCSRF,
-    heading: Heading,
     layout: Layout,
     subtitle: SectionSubtitle,
     inputCheckbox: InputCheckbox,
@@ -46,19 +45,6 @@
     </div>
 }
 
-@optionalLegend = @{
-    if(isPreSubmission) {
-        None
-    } else {
-        Some(
-            Legend(
-                content = HtmlContent(supportingContent),
-                classes = if(!isPreSubmission) "govuk-body" else ""
-            )
-        )
-    }
-}
-
 @maybeReturnLink = {
     @if(showReturnLink) {
         @returnLink(true)
@@ -73,11 +59,20 @@
 
         @subtitle("summary.businessmatching")
 
-        @heading(title)
+        @if(!isPreSubmission) {
+            @supportingContent
+        }
 
         @inputCheckbox(
             Checkboxes(
-                fieldset = Some(Fieldset(legend = optionalLegend)),
+                fieldset = Some(Fieldset(
+                    legend = Some(
+                        Legend(
+                            content = HtmlContent(s"""<h1 class="govuk-heading-xl">${messages(title)}</h1>"""),
+                            classes = "govuk-fieldset__legend--xl"
+                        )
+                    )
+                )),
                 hint = Some(
                     Hint(
                         content = Text(messages("lbl.select.all"))

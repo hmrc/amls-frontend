@@ -26,3 +26,5 @@ pc.stdout.log
 .jvmopts
 .DS_Store
 .bsp
+/.metals
+/.vscode
