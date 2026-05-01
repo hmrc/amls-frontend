@@ -19,15 +19,15 @@
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 @import views.html.hvd.CashPaymentText
 @import views.html.components.forms.{ErrorSummary, InputYesNo}
-@import views.html.components.{Button, ReturnLink, SectionSubtitle, Heading}
+@import views.html.components.{Button, ReturnLink, SectionSubtitle}
 
 @this(
     layout: Layout,
     errorSummary: ErrorSummary,
     subtitle: SectionSubtitle,
-    heading: Heading,
     cashPaymentText: CashPaymentText,
     formHelper: FormWithCSRF,
+    govukFieldset: GovukFieldset,
     inputYesNo: InputYesNo,
     button: Button,
     returnLink: ReturnLink
@@ -35,25 +35,33 @@
 
 @(form: Form[_], edit: Boolean)(implicit requestHeader: RequestHeader, messages: Messages, appConfig: ApplicationConfig)
 
+@fieldsetHtml = {
+    @cashPaymentText()
+
+    @inputYesNo(
+        Radios(
+            name = "linkedCashPayments",
+            items = HmrcYesNoRadioItems(),
+            classes = "govuk-radios govuk-radios--inline"
+        ).withFormField(form("linkedCashPayments"))
+    )
+}
+
 @layout(pageTitle = messages("hvd.identify.linked.cash.payment.title") + " - " + messages("summary.hvd")) {
 
     @errorSummary(form)
 
     @subtitle("summary.hvd")
 
-    @heading("hvd.identify.linked.cash.payment.title")
-
-    @cashPaymentText()
-
     @formHelper(action = controllers.hvd.routes.LinkedCashPaymentsController.post(edit)) {
 
-        @inputYesNo(
-            Radios(
-                name = "linkedCashPayments",
-                items = HmrcYesNoRadioItems(),
-                classes = "govuk-radios govuk-radios--inline"
-            ).withFormField(form("linkedCashPayments"))
-        )
+        @govukFieldset(Fieldset(
+            legend = Some(Legend(
+                content = HtmlContent(s"""<h1 class="govuk-heading-xl">${messages("hvd.identify.linked.cash.payment.title")}</h1>"""),
+                classes = "govuk-fieldset__legend--xl"
+            )),
+            html = fieldsetHtml
+        ))
 
         @button()
 
