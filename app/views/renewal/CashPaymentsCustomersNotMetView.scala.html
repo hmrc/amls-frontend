@@ -68,7 +68,7 @@
             Radios(
                 fieldset = Some(Fieldset(
                     legend = Some(Legend(
-                        content = Text(messages("renewal.cash.payments.not.met")),
+                        content = HtmlContent(s"""<h2 class="govuk-heading-m">${messages("renewal.cash.payments.not.met")}</h2>"""),
                         classes = "govuk-fieldset__legend--m"
                     ))
                 )),

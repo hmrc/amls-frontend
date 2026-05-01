@@ -26,14 +26,26 @@
     errorSummary: ErrorSummary,
     subtitle: SectionSubtitle,
     heading: Heading,
-    cashPaymentText: CashPaymentText,
     formHelper: FormWithCSRF,
+    govukFieldset: GovukFieldset,
     inputYesNo: InputYesNo,
     button: Button,
     returnLink: ReturnLink
 )
 
 @(form: Form[_], edit: Boolean)(implicit requestHeader: RequestHeader, messages: Messages, appConfig: ApplicationConfig)
+
+@fieldsetHtml = {
+    <p class="govuk-body">@messages("hvd.cash.payment.convert.currency.summary")</p>
+
+    @inputYesNo(
+        Radios(
+            name = "acceptedAnyPayment",
+            items = HmrcYesNoRadioItems(),
+            classes = "govuk-radios govuk-radios--inline"
+        ).withFormField(form("acceptedAnyPayment"))
+    )
+}
 
 @layout(pageTitle = messages("hvd.cash.payment.title") + " - " + messages("summary.hvd")) {
 
@@ -51,19 +63,15 @@
         <li>@messages("hvd.cash.payment.data.summary.details.03")</li>
     </ul>
 
-    <h2 class = govuk-heading-m>@messages("hvd.cash.accepted.payment")</h2>
-
-    <p class="govuk-body">@messages("hvd.cash.payment.convert.currency.summary")</p>
-
     @formHelper(action = controllers.hvd.routes.CashPaymentController.post(edit)) {
 
-        @inputYesNo(
-            Radios(
-                name = "acceptedAnyPayment",
-                items = HmrcYesNoRadioItems(),
-                classes = "govuk-radios govuk-radios--inline"
-            ).withFormField(form("acceptedAnyPayment"))
-        )
+        @govukFieldset(Fieldset(
+            legend = Some(Legend(
+                content = HtmlContent(s"""<h2 class="govuk-heading-m">${messages("hvd.cash.accepted.payment")}</h2>"""),
+                classes = "govuk-fieldset__legend--m"
+            )),
+            html = fieldsetHtml
+        ))
 
         @button()
 
