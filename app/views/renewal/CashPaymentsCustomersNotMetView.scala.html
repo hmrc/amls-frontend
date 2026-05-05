@@ -62,14 +62,16 @@
         <div/>
     </details>
 
-    <h2 class="govuk-heading-m">@messages("renewal.cash.payments.not.met")</h2>
-
-
-
     @formHelper(controllers.renewal.routes.CashPaymentsCustomersNotMetController.post(edit)) {
 
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = HtmlContent(s"""<h2 class="govuk-heading-m">${messages("renewal.cash.payments.not.met")}</h2>"""),
+                        classes = "govuk-fieldset__legend--m"
+                    ))
+                )),
                 name = "receiveCashPayments",
                 items = HmrcYesNoRadioItems(),
                 classes = "govuk-radios govuk-radios--inline"

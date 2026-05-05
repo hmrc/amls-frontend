@@ -18,14 +18,14 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import models.moneyservicebusiness.BusinessUseAnIPSP
 @import views.html.components.forms.{ErrorSummary, InputYesNo, InputText}
-@import views.html.components.{Button, ReturnLink, SectionSubtitle, Heading}
+@import views.html.components.{Button, ReturnLink, SectionSubtitle}
 
 @this(
     layout: Layout,
     errorSummary: ErrorSummary,
     subtitle: SectionSubtitle,
-    heading: Heading,
     formHelper: FormWithCSRF,
+    govukFieldset: GovukFieldset,
     inputYesNo: InputYesNo,
     inputText: InputText,
     button: Button,
@@ -66,25 +66,33 @@
     )
 }
 
+@fieldsetHtml = {
+    <p class="govuk-body">@messages("msb.throughput.ipsp.hint")</p>
+
+    @inputYesNo(
+        Radios(
+            name = "useAnIPSP",
+            items = BusinessUseAnIPSP.formValues(conditionalNameInput, conditionalReferenceInput),
+            classes = "govuk-radios"
+        ).withFormField(form("useAnIPSP"))
+    )
+}
+
 @layout(pageTitle = messages("msb.ipsp.title") + " - " + messages("summary.msb")) {
 
     @errorSummary(form)
 
     @subtitle("summary.msb")
 
-    @heading("msb.ipsp.title")
-
-    <p class="govuk-body">@messages("msb.throughput.ipsp.hint")</p>
-
     @formHelper(action = controllers.msb.routes.BusinessUseAnIPSPController.post(edit)) {
 
-        @inputYesNo(
-            Radios(
-                name = "useAnIPSP",
-                items = BusinessUseAnIPSP.formValues(conditionalNameInput, conditionalReferenceInput),
-                classes = "govuk-radios"
-            ).withFormField(form("useAnIPSP"))
-        )
+        @govukFieldset(Fieldset(
+            legend = Some(Legend(
+                content = HtmlContent(s"""<h1 class="govuk-heading-xl">${messages("msb.ipsp.title")}</h1>"""),
+                classes = "govuk-fieldset__legend--xl"
+            )),
+            html = fieldsetHtml
+        ))
 
         @button()
 

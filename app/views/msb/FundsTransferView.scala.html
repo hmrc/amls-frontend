@@ -18,13 +18,12 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 @import views.html.components.forms.{ErrorSummary, InputYesNo}
-@import views.html.components.{Button, ReturnLink, SectionSubtitle, Heading}
+@import views.html.components.{Button, ReturnLink, SectionSubtitle}
 
 @this(
     layout: Layout,
     errorSummary: ErrorSummary,
     subtitle: SectionSubtitle,
-    heading: Heading,
     formHelper: FormWithCSRF,
     inputYesNo: InputYesNo,
     button: Button,
@@ -39,12 +38,16 @@
 
     @subtitle("summary.msb")
 
-    @heading("msb.fundstransfer.title")
-
     @formHelper(action = controllers.msb.routes.FundsTransferController.post(edit)) {
 
         @inputYesNo(
             Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = HtmlContent(s"""<h1 class="govuk-heading-xl">${messages("msb.fundstransfer.title")}</h1>"""),
+                        classes = "govuk-fieldset__legend--xl"
+                    ))
+                )),
                 name = "transferWithoutFormalSystems",
                 items = HmrcYesNoRadioItems(),
                 classes = "govuk-radios govuk-radios--inline"
