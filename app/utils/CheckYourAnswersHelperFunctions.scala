@@ -46,8 +46,8 @@ trait CheckYourAnswersHelperFunctions {
     HtmlContent(
       Html(
         "<ul class=\"govuk-list\">" +
-          addressLines.map { line =>
-            s"""<li>$line<li>"""
+          addressLines.filter(_.trim.nonEmpty).map { line =>
+            s"""<li>$line</li>"""
           }.mkString
           + "</ul>"
       )

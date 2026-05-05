@@ -79,8 +79,8 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
     def addressToLines(addressLines: Seq[String]): String =
       "<ul class=\"govuk-list\">" +
-        addressLines.map { line =>
-          s"""<li>$line<li>"""
+        addressLines.filter(_.trim.nonEmpty).map { line =>
+          s"""<li>$line</li>"""
         }.mkString + "</ul>"
   }
 
