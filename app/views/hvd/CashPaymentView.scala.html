@@ -66,6 +66,7 @@
     @formHelper(action = controllers.hvd.routes.CashPaymentController.post(edit)) {
 
         @govukFieldset(Fieldset(
+            describedBy = Some("acceptedAnyPayment-error"),
             legend = Some(Legend(
                 content = HtmlContent(s"""<h2 class="govuk-heading-m">${messages("hvd.cash.accepted.payment")}</h2>"""),
                 classes = "govuk-fieldset__legend--m"

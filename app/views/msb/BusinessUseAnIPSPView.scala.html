@@ -87,6 +87,7 @@
     @formHelper(action = controllers.msb.routes.BusinessUseAnIPSPController.post(edit)) {
 
         @govukFieldset(Fieldset(
+            describedBy = Some("useAnIPSP-error"),
             legend = Some(Legend(
                 content = HtmlContent(s"""<h1 class="govuk-heading-xl">${messages("msb.ipsp.title")}</h1>"""),
                 classes = "govuk-fieldset__legend--xl"
