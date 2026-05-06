@@ -64,7 +64,7 @@ class RegisteredOfficeDateOfChangeController @Inject() (
                     case _                                   => throw new Exception("An exception has occurred")
                   })
                 ) map { _ =>
-                  Redirect(routes.SummaryController.get)
+                  Redirect(routes.BusinessEmailAddressController.get())
                 }
               case Some(date)                                               =>
                 Future.successful(
