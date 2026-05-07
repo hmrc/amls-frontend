@@ -56,6 +56,7 @@
     @formHelper(action = controllers.hvd.routes.ReceiveCashPaymentsController.post(edit)) {
 
         @govukFieldset(Fieldset(
+            describedBy = Some("receivePayments-error"),
             legend = Some(Legend(
                 content = HtmlContent(s"""<h1 class="govuk-heading-xl">${messages("hvd.receiving.title")}</h1>"""),
                 classes = "govuk-fieldset__legend--xl"
