@@ -79,8 +79,8 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
           HtmlContent(
             Html(
               "<ul class=\"govuk-list\">" +
-                review.businessAddress.toLines.map { line =>
-                  s"""<li>$line<li>"""
+                review.businessAddress.toLines.filter(_.trim.nonEmpty).map { line =>
+                  s"""<li>$line</li>"""
                 }.mkString
                 + "</ul>"
             )
