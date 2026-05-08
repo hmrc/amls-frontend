@@ -61,6 +61,12 @@ class ApplicationConfig @Inject() (configuration: Configuration, servicesConfig:
   lazy val timeout          = servicesConfig.getInt("timeout.seconds")
   lazy val timeoutCountdown = servicesConfig.getInt("timeout.countdown")
 
+  val researchBannerEnabled: Boolean =
+    configuration.get[Boolean]("features.researchBannerEnabled")
+
+  val researchBannerUrl: String =
+    configuration.get[String]("urls.researchBanner")
+
   lazy val ampWhatYouNeedUrl =
     s"${servicesConfig.getConfString("amls-art-market-participant-frontend.url", "")}/what-you-need"
   lazy val ampSummaryUrl     =
