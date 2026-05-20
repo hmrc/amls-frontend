@@ -145,12 +145,6 @@ class ApplicationConfig @Inject() (configuration: Configuration, servicesConfig:
 
   val companiesHouseUrl = "https://find-and-update.company-information.service.gov.uk/"
 
-  val researchBannerEnabled: Boolean =
-    configuration.get[Boolean]("features.researchBannerEnabled")
-
-  val researchBannerUrl: String =
-    configuration.get[String]("urls.researchBanner")
-
   val responsibilitiesUpdateLink =
     "https://www.gov.uk/government/collections/anti-money-laundering-supervision-detailed-information"
 }
