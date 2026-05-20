@@ -21,7 +21,6 @@
 @import views.html.helper.CSPNonce
 @import config.ApplicationConfig
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.userresearchbanner.UserResearchBanner
 
 @this(
     appConfig: ApplicationConfig,
@@ -45,8 +44,7 @@
     canSignOut: Boolean = true,
     showBackLink: Boolean = true,
     fullWidthLayout: Boolean = false,
-    showDeskproLink: Boolean = true,
-    showResearchBanner: Boolean = false
+    showDeskproLink: Boolean = true
 )(mainContent: Html)(implicit request: RequestHeader, messages: Messages)
 
 @headScripts = {
@@ -103,13 +101,6 @@
         hmrcStandardHeader(
             serviceName = Some(messages("site.service_name")),
             signOutUrl = if(canSignOut) Some(appConfig.logoutUrlWithFeedback) else None,
-         userResearchBanner =
-        if(showResearchBanner && appConfig.researchBannerEnabled)
-            Some(UserResearchBanner(
-                url = appConfig.researchBannerUrl,
-                hideCloseButton = false
-            ))
-        else None
         )
     ),
     beforeContentBlock = Some(beforeContentBlock),
