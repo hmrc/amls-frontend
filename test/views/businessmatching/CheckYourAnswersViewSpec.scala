@@ -72,7 +72,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
     }
 
     def checkListContainsItems(parent: Element, keysToFind: Set[String]) = {
-      val texts = parent.select("li").asScala.map((el: Element) => el.text())
+      val texts = parent.select("li").asScala.map((el: Element) => el.text()).toSet
       texts must be(keysToFind.map(k => messages(k)))
       true
     }
@@ -129,12 +129,12 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
           ""
         ),
         (
-          "businessmatching.registrationnumber.title",
+          "businessmatching.registrationnumber.lbl",
           checkElementTextIncludes(_, "12345678"),
           controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString
         ),
         (
-          "businessmatching.registerservices.title",
+          "businessmatching.registerservices.cya.lbl",
           checkListContainsItems(
             _,
             Set(
@@ -150,7 +150,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
           defaultActivitiesUrl
         ),
         (
-          "businessmatching.services.title",
+          "businessmatching.services.cya.lbl",
           checkListContainsItems(
             _,
             Set(
@@ -165,6 +165,11 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
         ),
         (
           "businessmatching.psr.number.title",
+          checkElementTextIncludes(_, "Yes"),
+          ""
+        ),
+        (
+          "businessmatching.psr.number.lbl",
           checkElementTextIncludes(_, "123456"),
           controllers.businessmatching.routes.PSRNumberController.get(true).toString
         )
@@ -175,13 +180,14 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
       html must not include messages("button.logout")
       html must include(messages("businessmatching.button.confirm.start"))
 
-      val sections = doc.getElementsByTag("section").asScala.zipWithIndex
+      val sections = doc.select(".govuk-summary-list__row").asScala.zipWithIndex
 
       for ((section, index) <- sections) {
         val (key, check, editLink) = sectionChecks(index)
-        section.select("h2").text()            must be(messages(key))
+
+        section.select("dt").text()            must be(messages(key))
         check(section)                         must be(true)
-        section.select("a[href]").attr("href") must be(editLink)
+        section.select(".govuk-summary-list__actions a").attr("href") must be(editLink)
       }
     }
 
@@ -223,12 +229,12 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
           ""
         ),
         (
-          "businessmatching.typeofbusiness.title",
+          "businessmatching.typeofbusiness.cya.lbl",
           checkElementTextIncludes(_, "test"),
           controllers.businessmatching.routes.TypeOfBusinessController.get(true).toString
         ),
         (
-          "businessmatching.registerservices.title",
+          "businessmatching.registerservices.cya.lbl",
           checkListContainsItems(
             _,
             Set(
@@ -245,13 +251,13 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
 
       html must include(messages("button.logout"))
       html must not include messages("businessmatching.button.confirm.start")
-      val sections = doc.getElementsByTag("section").asScala.zipWithIndex
+      val sections = doc.select(".govuk-summary-list__row").asScala.zipWithIndex
 
       for ((section, index) <- sections) {
         val (key, check, editLink) = sectionChecks(index)
-        section.select("h2").text()            must be(messages(key))
+        section.select("dt").text()            must be(messages(key))
         check(section)                         must be(true)
-        section.select("a[href]").attr("href") must be(editLink)
+        section.select(".govuk-summary-list__actions a").attr("href") must be(editLink)
       }
     }
   }
