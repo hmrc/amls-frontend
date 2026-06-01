@@ -234,7 +234,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
     } yield
       if (isTransmittingMoney) {
         appliedForPSRNumber match {
-          case BusinessAppliedForPSRNumberYes(_) =>
+          case BusinessAppliedForPSRNumberYes(psrNumber) =>
             Some(
               Seq(
                 SummaryListRow(
@@ -243,7 +243,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
                 ),
                 SummaryListRow(
                   Key(Text(messages("businessmatching.psr.number.cya.title"))),
-                  Value(Text(request.session.get("originalPsrNumber").getOrElse(""))),
+                  Value(Text(psrNumber)),
                   actions = Some(
                     Actions(
                       items = Seq(
