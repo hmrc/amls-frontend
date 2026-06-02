@@ -77,7 +77,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
       true
     }
 
-    "include the provided data when MoneyServicesBusiness and TransmittingMoney were selected for a Limited Company" in new ViewFixture {
+    "include the provided data when all registered services are selected for a Limited Company" in new ViewFixture {
 
       val msbServices                      = BusinessMatchingMsbServices(
         Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, ForeignExchange)
@@ -85,6 +85,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
       val BusinessActivitiesModel          = BusinessActivities(
         Set(
           AccountancyServices,
+          ArtMarketParticipant,
           BillPaymentServices,
           EstateAgentBusinessService,
           HighValueDealing,
@@ -139,6 +140,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
             _,
             Set(
               "businessmatching.registerservices.servicename.lbl.01",
+              "businessmatching.registerservices.servicename.lbl.02",
               "businessmatching.registerservices.servicename.lbl.03",
               "businessmatching.registerservices.servicename.lbl.04",
               "businessmatching.registerservices.servicename.lbl.05",
