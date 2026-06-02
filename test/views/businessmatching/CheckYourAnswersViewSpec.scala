@@ -193,6 +193,90 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
       }
     }
 
+    "include the provided data when all registered services are selected with no Money Service Business for a Limited Company" in new ViewFixture {
+
+      val BusinessActivitiesModel = BusinessActivities(
+        Set(
+          AccountancyServices,
+          ArtMarketParticipant,
+          BillPaymentServices,
+          EstateAgentBusinessService,
+          HighValueDealing,
+          TrustAndCompanyServices,
+          TelephonePaymentService
+        )
+      )
+      val businessAddress =
+        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
+      val ReviewDetailsModel =
+        ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany), businessAddress, "XE0000000000000")
+      val TypeOfBusinessModel = TypeOfBusiness("test")
+      val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
+      val BusinessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberYes("123456")
+
+      val testBusinessMatching = BusinessMatching(
+        Some(ReviewDetailsModel),
+        Some(BusinessActivitiesModel),
+        companyRegistrationNumber = Some(CompanyRegistrationNumberModel)
+      )
+
+      val isPreSubmission = true
+
+      val summaryList = cyaHelper.createSummaryList(testBusinessMatching, isPreSubmission, isPending = false)
+      val submitButton = cyaHelper.getSubmitButton(
+        testBusinessMatching.businessAppliedForPSRNumber,
+        isPreSubmission,
+        testBusinessMatching.preAppComplete
+      )
+
+      def view = checkYourAnswersView(summaryList, submitButton, isPreSubmission)
+
+      val sectionChecks = Table[String, Element => Boolean, String](
+        ("title key", "check", "editLink"),
+        (
+          "businessmatching.summary.business.address.lbl",
+          checkElementTextIncludes(_, "line1", "line2", "line3", "line4", "AB1 2CD", "United Kingdom"),
+          ""
+        ),
+        (
+          "businessmatching.registrationnumber.lbl",
+          checkElementTextIncludes(_, "12345678"),
+          controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString
+        ),
+        (
+          "businessmatching.registerservices.cya.lbl",
+          checkListContainsItems(
+            _,
+            Set(
+              "businessmatching.registerservices.servicename.lbl.01",
+              "businessmatching.registerservices.servicename.lbl.02",
+              "businessmatching.registerservices.servicename.lbl.03",
+              "businessmatching.registerservices.servicename.lbl.04",
+              "businessmatching.registerservices.servicename.lbl.05",
+              "businessmatching.registerservices.servicename.lbl.07",
+              "businessmatching.registerservices.servicename.lbl.08"
+            )
+          ),
+          defaultActivitiesUrl
+        )
+      )
+
+      html must not include messages("businessmatching.typeofbusiness.title")
+
+      html must not include messages("button.logout")
+      html must include(messages("businessmatching.summary.noedit.anchortext"))
+
+      val sections = doc.select(".govuk-summary-list__row").asScala.zipWithIndex
+
+      for ((section, index) <- sections) {
+        val (key, check, editLink) = sectionChecks(index)
+
+        section.select("dt").text() must be(messages(key))
+        check(section) must be(true)
+        section.select(".govuk-summary-list__actions a").attr("href") must be(editLink)
+      }
+    }
+
     "include the provided data for an UnincorporatedBody with No MSB Services" in new ViewFixture {
 
       val businessActivitiesWithoutMSB   = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
