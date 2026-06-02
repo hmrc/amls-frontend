@@ -18,29 +18,30 @@ package views.businessmatching
 
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching.BusinessActivity._
-import models.businessmatching.BusinessMatchingMsbService._
-import models.businessmatching._
+import models.businessmatching.BusinessActivity.*
+import models.businessmatching.BusinessMatchingMsbService.*
+import models.businessmatching.*
 import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.prop.TableDrivenPropertyChecks
+import org.scalatest.prop.{TableDrivenPropertyChecks, TableFor3}
 import play.api.mvc.{AnyContentAsEmpty, Request}
+import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.AmlsViewSpec
 import utils.businessmatching.CheckYourAnswersHelper
 import views.Fixture
 import views.html.businessmatching.CheckYourAnswersView
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    lazy val checkYourAnswersView = app.injector.instanceOf[CheckYourAnswersView]
-    lazy val cyaHelper = app.injector.instanceOf[CheckYourAnswersHelper]
+    lazy val checkYourAnswersView: CheckYourAnswersView = app.injector.instanceOf[CheckYourAnswersView]
+    lazy val cyaHelper: CheckYourAnswersHelper = app.injector.instanceOf[CheckYourAnswersHelper]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
-    val defaultActivitiesUrl = controllers.businessmatching.routes.RegisterServicesController.get().url
+    val defaultActivitiesUrl: String = controllers.businessmatching.routes.RegisterServicesController.get().url
 
     val businessAddress = Address(
       "line1",
@@ -61,7 +62,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
     val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
   }
 
-  def checkElementTextIncludes(el: Element, keys: String*) = {
+  def checkElementTextIncludes(el: Element, keys: String*): Boolean = {
     val t = el.text()
     keys.foreach { k =>
       t must include(messages(k))
@@ -69,7 +70,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
     true
   }
 
-  def checkListContainsItems(parent: Element, keysToFind: Set[String]) = {
+  def checkListContainsItems(parent: Element, keysToFind: Set[String]): Boolean = {
     val texts = parent.select("li").asScala.map((el: Element) => el.text()).toSet
     texts must be(keysToFind.map(k => messages(k)))
     true
@@ -78,7 +79,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
   "businessmatching view" must {
     "have correct title when presubmission" in new ViewFixture {
 
-      def view = checkYourAnswersView(SummaryList(Seq.empty), None, true)
+      def view: HtmlFormat.Appendable = checkYourAnswersView(SummaryList(Seq.empty), None)
 
       doc.title       must startWith("Check your answers before starting your application" + " - " + "Pre-application")
       heading.html    must be("Check your answers before starting your application")
@@ -88,7 +89,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
 
     "have correct title when not presubmission" in new ViewFixture {
 
-      def view = checkYourAnswersView(SummaryList(Seq.empty), None, false)
+      def view: HtmlFormat.Appendable = checkYourAnswersView(SummaryList(Seq.empty), None, false)
 
       doc.title       must startWith("Check your answers" + " - " + "Update information")
       heading.html    must be("Check your answers")
@@ -126,16 +127,20 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
 
       val isPreSubmission = true
 
-      val summaryList  = cyaHelper.createSummaryList(testBusinessMatching, isPreSubmission, isPending = false)
-      val submitButton = cyaHelper.getSubmitButton(
+      val summaryList: SummaryList = cyaHelper.createSummaryList(
+        testBusinessMatching,
+        isPreSubmission,
+        isPending = false
+      )
+      val submitButton: Option[Html] = cyaHelper.getSubmitButton(
         testBusinessMatching.businessAppliedForPSRNumber,
         isPreSubmission,
         testBusinessMatching.preAppComplete
       )
 
-      def view = checkYourAnswersView(summaryList, submitButton, isPreSubmission)
+      def view: HtmlFormat.Appendable = checkYourAnswersView(summaryList, submitButton, isPreSubmission)
 
-      val sectionChecks = Table[String, Element => Boolean, String](
+      val sectionChecks: TableFor3[String, Element => Boolean, String] = Table[String, Element => Boolean, String](
         ("title key", "check", "editLink"),
         (
           "businessmatching.summary.business.address.lbl",
@@ -227,14 +232,18 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
 
       val isPreSubmission = true
 
-      val summaryList = cyaHelper.createSummaryList(testBusinessMatching, isPreSubmission, isPending = false)
+      val summaryList: SummaryList = cyaHelper.createSummaryList(
+        testBusinessMatching,
+        isPreSubmission,
+        isPending = false
+      )
       val submitButton = cyaHelper.getSubmitButton(
         testBusinessMatching.businessAppliedForPSRNumber,
         isPreSubmission,
         testBusinessMatching.preAppComplete
       )
 
-      def view = checkYourAnswersView(summaryList, submitButton, isPreSubmission)
+      def view: HtmlFormat.Appendable = checkYourAnswersView(summaryList, submitButton, isPreSubmission)
 
       val sectionChecks = Table[String, Element => Boolean, String](
         ("title key", "check", "editLink"),
@@ -284,7 +293,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
     "include the provided data for an UnincorporatedBody with No MSB Services" in new ViewFixture {
 
       val businessActivitiesWithoutMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-      val reviewDetailsAsUnincorporatedBody = ReviewDetailsModel.copy(
+      val reviewDetailsAsUnincorporatedBody: ReviewDetails = ReviewDetailsModel.copy(
         businessType = Some(BusinessType.UnincorporatedBody)
       )
 
@@ -299,14 +308,18 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
 
       val isPreSubmission = true
 
-      val summaryList  = cyaHelper.createSummaryList(testBusinessMatching, isPreSubmission, isPending = false)
-      val submitButton = cyaHelper.getSubmitButton(
+      val summaryList: SummaryList = cyaHelper.createSummaryList(
+        testBusinessMatching,
+        isPreSubmission,
+        isPending = false
+      )
+      val submitButton: Option[Html] = cyaHelper.getSubmitButton(
         testBusinessMatching.businessAppliedForPSRNumber,
         isPreSubmission,
         testBusinessMatching.preAppComplete
       )
 
-      def view = checkYourAnswersView(summaryList, submitButton, isPreSubmission)
+      def view: HtmlFormat.Appendable = checkYourAnswersView(summaryList, submitButton, isPreSubmission)
 
       val sectionChecks = Table[String, Element => Boolean, String](
         ("title key", "check", "editLink"),
