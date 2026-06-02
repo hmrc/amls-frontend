@@ -36,11 +36,43 @@ import scala.jdk.CollectionConverters._
 class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    lazy val checkYourAnswersView                                  = app.injector.instanceOf[CheckYourAnswersView]
-    lazy val cyaHelper                                             = app.injector.instanceOf[CheckYourAnswersHelper]
+    lazy val checkYourAnswersView = app.injector.instanceOf[CheckYourAnswersView]
+    lazy val cyaHelper = app.injector.instanceOf[CheckYourAnswersHelper]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val defaultActivitiesUrl = controllers.businessmatching.routes.RegisterServicesController.get().url
+
+    val businessAddress = Address(
+      "line1",
+      Some("line2"),
+      Some("line3"),
+      Some("line4"),
+      Some("AB1 2CD"),
+      Country("United Kingdom", "GB")
+    )
+    val ReviewDetailsModel = ReviewDetails(
+      "BusinessName",
+      Some(BusinessType.LimitedCompany),
+      businessAddress,
+      "XE0000000000000"
+    )
+
+    val TypeOfBusinessModel = TypeOfBusiness("test")
+    val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
+  }
+
+  def checkElementTextIncludes(el: Element, keys: String*) = {
+    val t = el.text()
+    keys.foreach { k =>
+      t must include(messages(k))
+    }
+    true
+  }
+
+  def checkListContainsItems(parent: Element, keysToFind: Set[String]) = {
+    val texts = parent.select("li").asScala.map((el: Element) => el.text()).toSet
+    texts must be(keysToFind.map(k => messages(k)))
+    true
   }
 
   "businessmatching view" must {
@@ -63,26 +95,12 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
       subHeading.html must include("Update information")
     }
 
-    def checkElementTextIncludes(el: Element, keys: String*) = {
-      val t = el.text()
-      keys.foreach { k =>
-        t must include(messages(k))
-      }
-      true
-    }
-
-    def checkListContainsItems(parent: Element, keysToFind: Set[String]) = {
-      val texts = parent.select("li").asScala.map((el: Element) => el.text()).toSet
-      texts must be(keysToFind.map(k => messages(k)))
-      true
-    }
-
     "include the provided data when all registered services are selected for a Limited Company" in new ViewFixture {
 
-      val msbServices                      = BusinessMatchingMsbServices(
+      val msbServices = BusinessMatchingMsbServices(
         Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, ForeignExchange)
       )
-      val BusinessActivitiesModel          = BusinessActivities(
+      val allBusinessActivities = BusinessActivities(
         Set(
           AccountancyServices,
           ArtMarketParticipant,
@@ -94,17 +112,12 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
           TelephonePaymentService
         )
       )
-      val businessAddress                  =
-        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
-      val ReviewDetailsModel               =
-        ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany), businessAddress, "XE0000000000000")
-      val TypeOfBusinessModel              = TypeOfBusiness("test")
-      val CompanyRegistrationNumberModel   = CompanyRegistrationNumber("12345678")
+
       val BusinessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberYes("123456")
 
       val testBusinessMatching = BusinessMatching(
         Some(ReviewDetailsModel),
-        Some(BusinessActivitiesModel),
+        Some(allBusinessActivities),
         Some(msbServices),
         Some(TypeOfBusinessModel),
         Some(CompanyRegistrationNumberModel),
@@ -178,7 +191,6 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
       )
 
       html must not include messages("businessmatching.typeofbusiness.title")
-
       html must not include messages("button.logout")
       html must include(messages("businessmatching.button.confirm.start"))
 
@@ -195,7 +207,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
 
     "include the provided data when all registered services are selected with no Money Service Business for a Limited Company" in new ViewFixture {
 
-      val BusinessActivitiesModel = BusinessActivities(
+      val businessActivitiesNoMoneyServiceBusiness = BusinessActivities(
         Set(
           AccountancyServices,
           ArtMarketParticipant,
@@ -206,17 +218,10 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
           TelephonePaymentService
         )
       )
-      val businessAddress =
-        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
-      val ReviewDetailsModel =
-        ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany), businessAddress, "XE0000000000000")
-      val TypeOfBusinessModel = TypeOfBusiness("test")
-      val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
-      val BusinessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberYes("123456")
 
       val testBusinessMatching = BusinessMatching(
         Some(ReviewDetailsModel),
-        Some(BusinessActivitiesModel),
+        Some(businessActivitiesNoMoneyServiceBusiness),
         companyRegistrationNumber = Some(CompanyRegistrationNumberModel)
       )
 
@@ -262,7 +267,6 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
       )
 
       html must not include messages("businessmatching.typeofbusiness.title")
-
       html must not include messages("button.logout")
       html must include(messages("businessmatching.summary.noedit.anchortext"))
 
@@ -279,16 +283,13 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
 
     "include the provided data for an UnincorporatedBody with No MSB Services" in new ViewFixture {
 
-      val businessActivitiesWithoutMSB   = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-      val businessAddress                =
-        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
-      val ReviewDetailsModel             =
-        ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0000000000000")
-      val TypeOfBusinessModel            = TypeOfBusiness("test")
-      val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
+      val businessActivitiesWithoutMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
+      val reviewDetailsAsUnincorporatedBody = ReviewDetailsModel.copy(
+        businessType = Some(BusinessType.UnincorporatedBody)
+      )
 
       val testBusinessMatching = BusinessMatching(
-        Some(ReviewDetailsModel),
+        Some(reviewDetailsAsUnincorporatedBody),
         Some(businessActivitiesWithoutMSB),
         None,
         Some(TypeOfBusinessModel),
@@ -334,9 +335,9 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
 
       html must not include messages("businessmatching.services.title")
       html must not include messages("businessmatching.registrationnumber.title")
-
       html must include(messages("button.logout"))
       html must not include messages("businessmatching.button.confirm.start")
+
       val sections = doc.select(".govuk-summary-list__row").asScala.zipWithIndex
 
       for ((section, index) <- sections) {
