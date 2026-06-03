@@ -158,9 +158,9 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         val result = controller.get()(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
-        val elements = document.getElementsByTag("section").iterator
+        val elements = document.select(".govuk-summary-list__row").iterator
         while (elements.hasNext)
-          elements.next().getElementsByTag("a").hasClass("change-answer") must be(true)
+          elements.next().select(".govuk-summary-list__actions a").hasAttr("href") must be(true)
       }
 
       "in variation mode and also in the new service flow" in new Fixture {
@@ -179,10 +179,10 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        val elements = document.getElementsByTag("section").iterator
+        val elements = document.select(".govuk-summary-list__row").iterator
 
         while (elements.hasNext)
-          elements.next().getElementsByTag("a").hasClass("change-answer") must be(true)
+          elements.next().select(".govuk-summary-list__actions a").hasAttr("href") must be(true)
       }
     }
   }

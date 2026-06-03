@@ -17,6 +17,6 @@ addSbtPlugin("org.scalastyle"     %% "scalastyle-sbt-plugin"  % "1.0.0")
 addSbtPlugin("org.scalameta"      %  "sbt-scalafmt"           % "2.5.2")
 addSbtPlugin("com.github.sbt"     %  "sbt-digest"             % "2.1.0")
 addSbtPlugin("net.virtual-void"   %  "sbt-dependency-graph"   % "0.9.2")
-addSbtPlugin("io.github.irundaia" %  "sbt-sassify"            % "1.5.2")
+addSbtPlugin("uk.gov.hmrc"        %  "sbt-sass-compiler"      % "0.13.0")
 addSbtPlugin("com.timushev.sbt"   %  "sbt-updates"            % "0.6.4")
 addDependencyTreePlugin
