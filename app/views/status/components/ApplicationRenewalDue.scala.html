@@ -27,5 +27,5 @@
 }
 @button("status.renewal.due.start", "start-renewal", Some(controllers.renewal.routes.WhatYouNeedController.get.url))
 @if(businessName.isDefined) {
-    <span class=hidden> for @businessName.get</span>
+    <span class="govuk-visually-hidden"> for @businessName.get</span>
 }
