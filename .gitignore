@@ -28,3 +28,5 @@ pc.stdout.log
 .bsp
 /.metals
 /.vscode
+project/metals.sbt
+project/project/metals.sbt
