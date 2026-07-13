@@ -55,12 +55,12 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
       html must include("what your business will buy or sell")
       html must include("how you’ll sell your goods, for example auction")
-      html must include("the date of the first cash payment of €10,000 or more, if you have made or accepted any")
-      html must include("if you can identify linked cash payments of €10,000 or more")
+      html must include("the date of the first cash payment of £10,000 or more, if you have made or accepted any")
+      html must include("if you can identify linked cash payments of £10,000 or more")
       html must include(
-        "how you’ll receive cash payments of €10,000 or more from customers you have not met in person, if you receive any"
+        "how you’ll receive cash payments of £10,000 or more from customers you have not met in person, if you receive any"
       )
-      html must include("the percentage of your turnover you expect to come from cash payments of €10,000 or more")
+      html must include("the percentage of your turnover you expect to come from cash payments of £10,000 or more")
       html must include("You may need to tell us:")
       html must include("if you’ll be buying or selling duty-suspended excise goods")
 
