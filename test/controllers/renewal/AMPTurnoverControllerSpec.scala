@@ -84,7 +84,7 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         val result = controller.get()(request)
         status(result)          must be(OK)
         contentAsString(result) must include(
-          "How much of your turnover for the last 12 months came from sales of art for €10,000 or more?"
+          "How much of your turnover for the last 12 months came from sales of art for £10,000 or more?"
         )
       }
 

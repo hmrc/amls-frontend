@@ -64,7 +64,7 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
         messages("your total net profit for the last 12 months, if your business was involved in other activities")
       )
       html must include(messages("your total net profit for the last 12 months from the services you have registered"))
-      html must include(messages("the percentage of your turnover that came from sales of art for €10,000 or more"))
+      html must include(messages("the percentage of your turnover that came from sales of art for £10,000 or more"))
     }
 
     "contain the expected content elements for MSB renewal" in new ViewFixture {
@@ -163,10 +163,10 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
           "which countries your customers lived or worked in, if you had customers who lived or worked outside of the UK"
         )
       )
-      html must include(messages("the percentage of your turnover that came from cash payments of €10,000 or more"))
+      html must include(messages("the percentage of your turnover that came from cash payments of £10,000 or more"))
       html must include(
         messages(
-          "how you received cash payments of €10,000 or more from customers you had not met in person, if you received any"
+          "how you received cash payments of £10,000 or more from customers you had not met in person, if you received any"
         )
       )
     }

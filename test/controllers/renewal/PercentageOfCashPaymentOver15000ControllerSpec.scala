@@ -74,7 +74,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec
         val result = controller.get()(request)
         status(result)          must be(OK)
         contentAsString(result) must include(
-          "What percentage of your turnover came from cash payments of €10,000 or more?"
+          "What percentage of your turnover came from cash payments of £10,000 or more?"
         )
       }
 
