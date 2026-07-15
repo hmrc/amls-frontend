@@ -19,7 +19,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
 @import views.html.hvd.CashPaymentText
 @import views.html.components.forms.{ErrorSummary, InputCheckbox, InputText}
-@import views.html.components.{Button, Heading, ReturnLink, SectionSubtitle}
+@import views.html.components.{Button, Heading, NotificationBanner, ReturnLink, SectionSubtitle}
 
 @this(
     layout: Layout,
@@ -31,7 +31,8 @@
     inputCheckbox: InputCheckbox,
     inputText: InputText,
     button: Button,
-    returnLink: ReturnLink
+    returnLink: ReturnLink,
+    notificationBanner: NotificationBanner
 )
 
 @(form: Form[_], edit: Boolean)(implicit messages: Messages, requestHeader: RequestHeader, appConfig: ApplicationConfig)
@@ -52,6 +53,10 @@
 }
 
 @layout(pageTitle = messages("hvd.expect.to.receive.title") + " - " + messages("summary.hvd")) {
+
+    @if(edit) {
+        @notificationBanner("notificationBanner.important.title", "notificationBanner.important.content.thresholdChange")
+    }
 
     @errorSummary(form, Some(Map("paymentMethods" -> "paymentMethods_0")))
 

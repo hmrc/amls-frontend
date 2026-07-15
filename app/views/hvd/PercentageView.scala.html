@@ -19,7 +19,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import views.html.hvd.CashPaymentText
 @import views.html.components.forms.{ErrorSummary, InputYesNo}
-@import views.html.components.{Button, ReturnLink, SectionSubtitle, Heading}
+@import views.html.components.{Button, NotificationBanner, ReturnLink, SectionSubtitle, Heading}
 
 @this(
     layout: Layout,
@@ -30,7 +30,8 @@
     formHelper: FormWithCSRF,
     inputYesNo: InputYesNo,
     button: Button,
-    returnLink: ReturnLink
+    returnLink: ReturnLink,
+    notificationBanner: NotificationBanner
 )
 
 @(form: Form[_], edit: Boolean)(implicit requestHeader: RequestHeader, messages: Messages, appConfig: ApplicationConfig)
@@ -46,6 +47,10 @@
 }
 
 @layout(pageTitle = messages("hvd.percentage.title") + " - " + messages("summary.hvd")) {
+
+    @if(edit) {
+        @notificationBanner("notificationBanner.important.title", "notificationBanner.important.content.thresholdChange")
+    }
 
     @errorSummary(form, Some(Map("percentage" -> PercentageOfCashPaymentOver15000.First.toString)))
 
