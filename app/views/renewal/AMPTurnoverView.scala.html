@@ -17,7 +17,7 @@
 @import models.renewal.AMPTurnover
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import views.html.components.forms.ErrorSummary
-@import views.html.components.{Button, Heading, NotificationBanner, ReturnLink, SectionSubtitle}
+@import views.html.components.{Button, Heading, ImportantBanner, ReturnLink, SectionSubtitle}
 
 @this(
     layout: Layout,
@@ -28,7 +28,7 @@
     inputRadios: GovukRadios,
     button: Button,
     returnLink: ReturnLink,
-    notificationBanner: NotificationBanner
+    importantBanner: ImportantBanner
 )
 
 @(form: Form[_], edit: Boolean)(implicit messages: Messages, requestHeader: RequestHeader)
@@ -47,7 +47,7 @@
 
     @errorSummary(form, Some(Map("percentageExpectedTurnover" -> AMPTurnover.all.head.toString)))
 
-    @notificationBanner("notificationBanner.important.title", "notificationBanner.important.content.thresholdChange")
+    @importantBanner()
 
     @subtitle("summary.renewal")
 
