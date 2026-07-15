@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import models.renewal.CashPaymentsCustomerNotMet
 @import views.html.components.forms.{ErrorSummary, InputYesNo}
-@import views.html.components.{Button, Heading, NotificationBanner, ReturnLink, SectionSubtitle}
+@import views.html.components.{Button, Heading, ImportantBanner, ReturnLink, SectionSubtitle}
 
 @this(
     layout: Layout,
@@ -29,7 +29,7 @@
     inputYesNo: InputYesNo,
     button: Button,
     returnLink: ReturnLink,
-    notificationBanner: NotificationBanner
+    importantBanner: ImportantBanner
 )
 
 
@@ -39,7 +39,7 @@
 
     @errorSummary(form)
 
-    @notificationBanner("notificationBanner.important.title", "notificationBanner.important.content.thresholdChange")
+    @importantBanner()
 
     @subtitle("summary.renewal")
 
