@@ -19,7 +19,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 @import views.html.hvd.CashPaymentText
 @import views.html.components.forms.{ErrorSummary, InputYesNo}
-@import views.html.components.{Button, NotificationBanner, ReturnLink, SectionSubtitle}
+@import views.html.components.{Button, ImportantBanner, ReturnLink, SectionSubtitle}
 
 @this(
     layout: Layout,
@@ -31,7 +31,7 @@
     inputYesNo: InputYesNo,
     button: Button,
     returnLink: ReturnLink,
-    notificationBanner: NotificationBanner
+    importantBanner: ImportantBanner
 )
 
 @(form: Form[_], edit: Boolean)(implicit requestHeader: RequestHeader, messages: Messages, appConfig: ApplicationConfig)
@@ -51,7 +51,7 @@
 @layout(pageTitle = messages("hvd.identify.linked.cash.payment.title") + " - " + messages("summary.hvd")) {
 
     @if(edit) {
-        @notificationBanner("notificationBanner.important.title", "notificationBanner.important.content.thresholdChange")
+        @importantBanner()
     }
 
     @errorSummary(form)
