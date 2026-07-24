@@ -1975,7 +1975,7 @@ businessactivities.whatyouneed.line_6 = how many people work for the business
 businessactivities.whatyouneed.line_7 = how you record customer transactions
 businessactivities.whatyouneed.line_8 = if you have written guidance on how to identify and report suspicious activity
 businessactivities.whatyouneed.line_9 = if your business has registered with the National Crime Agency (NCA)
-businessactivities.whatyouneed.line_10 = how you document your risk assessment policy and procedure, if your business has one
+businessactivities.whatyouneed.line_10 = how you document your risk assessment policy and procedure
 businessactivities.whatyouneed.line_11 = about your professional adviser for Money Laundering Regulations, if you have one
 businessactivities.businessfranchise.title = Franchises
 businessactivities.businessfranchise.heading = Is your business a franchise?
@@ -3225,6 +3225,14 @@ feedback.title = Before you go
 feedback.p1 = Your feedback helps us make our service better.
 feedback.link = Take a short survey
 feedback.p2 = to share your feedback on this service.
+
+cannotContinue.title = You cannot continue with your application
+cannotContinue.text1 = You have told us your business does not have a documented risk assessment policy and procedure.
+cannotContinue.text2 = These are required under regulations 18 and 19 of the money laundering regulations.
+cannotContinue.text3 = You cannot continue with your application until your business has them in place.
+cannotContinue.text4 = You can read the guidance on
+cannotContinue.text4.link = risk assessing your business for money laundering supervision (opens in new tab)
+cannotContinue.text5 = We have saved your answers for 28 days.
 
 ############################### Banners ###############################
 urr.title = Help improve GOV.UK

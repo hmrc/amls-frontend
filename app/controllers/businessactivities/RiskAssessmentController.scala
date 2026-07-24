@@ -70,7 +70,6 @@ class RiskAssessmentController @Inject() (
                                         businessActivities.riskAssessmentHasPolicy(data)
                                       )
               } yield redirectDependingOnAccountancyServices(
-                ControllerHelper.isAccountancyServicesSelected(businessMatching),
                 data
               )
             }
@@ -80,10 +79,9 @@ class RiskAssessmentController @Inject() (
       )
   }
 
-  private def redirectDependingOnAccountancyServices(accountancyServices: Boolean, data: RiskAssessmentHasPolicy) =
-    accountancyServices match {
-      case _ if data == RiskAssessmentHasPolicy(true) => Redirect(routes.DocumentRiskAssessmentController.get())
-      case true                                       => Redirect(routes.SummaryController.get)
-      case false                                      => Redirect(routes.AccountantForAMLSRegulationsController.get())
+  private def redirectDependingOnAccountancyServices(data: RiskAssessmentHasPolicy) =
+    data match {
+      case RiskAssessmentHasPolicy(true) => Redirect(routes.DocumentRiskAssessmentController.get())
+      case RiskAssessmentHasPolicy(false) => Redirect(routes.CannotContinueController.get)
     }
 }

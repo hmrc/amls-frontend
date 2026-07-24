@@ -153,4 +153,6 @@ class ApplicationConfig @Inject() (configuration: Configuration, servicesConfig:
 
   val responsibilitiesUpdateLink =
     "https://www.gov.uk/government/collections/anti-money-laundering-supervision-detailed-information"
+    
+  val riskAssessmentLink = "https://www.gov.uk/guidance/money-laundering-regulations-risk-assessments"
 }
