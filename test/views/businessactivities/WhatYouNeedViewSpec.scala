@@ -69,7 +69,7 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       html must include(messages("how you record customer transactions"))
       html must include(messages("if you have written guidance on how to identify and report suspicious activity"))
       html must include(messages("if your business has registered with the National Crime Agency (NCA)"))
-      html must include(messages("how you document your risk assessment policy and procedure, if your business has on"))
+      html must include(messages("how you document your risk assessment policy and procedure"))
       html must include(messages("about your professional adviser for Money Laundering Regulations, if you have one"))
     }
 
@@ -93,7 +93,7 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       html must include(messages("how you record customer transactions"))
       html must include(messages("if you have written guidance on how to identify and report suspicious activity"))
       html must include(messages("if your business has registered with the National Crime Agency (NCA)"))
-      html must include(messages("how you document your risk assessment policy and procedure, if your business has on"))
+      html must include(messages("how you document your risk assessment policy and procedure"))
     }
 
     behave like pageWithBackLink(need(Some(BusinessActivities(Set(AccountancyServices)))))
