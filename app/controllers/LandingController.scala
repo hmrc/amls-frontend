@@ -150,6 +150,11 @@ class LandingController @Inject() (
       case Some(c) if c.getEntry[DataImport](DataImport.key).isDefined =>
         logger.info("Entered LandingController.refreshAndRedirect for case Some(c) " + amlsRegistrationNumber)
         Future.successful(Redirect(controllers.routes.StatusController.get()))
+
+      case Some(c) =>
+        logger.info("Cache exists. Skipping refreshCache to preserve local changes.")
+        preFlightChecksAndRedirect(Option(amlsRegistrationNumber), accountTypeId, credId)
+
       case _                                                           =>
         landingService
           .refreshCache(amlsRegistrationNumber, credId, accountTypeId)
