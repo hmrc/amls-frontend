@@ -28,13 +28,14 @@ import play.api.Logging
 import scala.concurrent.Future
 
 class CannotContinueController @Inject() (
-                                           val dataCacheConnector: DataCacheConnector,
-                                           val authAction: AuthAction,
-                                           val ds: CommonPlayDependencies,
-                                           val cc: MessagesControllerComponents,
-                                           view: CannotContinueView,
-                                           implicit val error: views.html.ErrorView
-                                         ) extends AmlsBaseController(ds, cc) with Logging {
+  val dataCacheConnector: DataCacheConnector,
+  val authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val cc: MessagesControllerComponents,
+  view: CannotContinueView,
+  implicit val error: views.html.ErrorView
+) extends AmlsBaseController(ds, cc)
+    with Logging {
 
   def get: Action[AnyContent] = authAction.async { implicit request =>
     dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { response =>
@@ -48,5 +49,5 @@ class CannotContinueController @Inject() (
       }
     }
   }
-  
+
 }

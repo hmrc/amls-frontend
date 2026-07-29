@@ -147,18 +147,35 @@ class LandingController @Inject() (
     accountTypeId: (String, String)
   )(implicit headerCarrier: HeaderCarrier): Future[Result] =
     maybeCache match {
-      case Some(c) if c.getEntry[DataImport](DataImport.key).isDefined =>
-        logger.info("Entered LandingController.refreshAndRedirect for case Some(c) " + amlsRegistrationNumber)
+      case Some(cache) if cache.getEntry[DataImport](DataImport.key).isDefined =>
+        logger.info(
+          s"DataImport found in cache for AMLS registration number: $amlsRegistrationNumber. Redirecting to Status page."
+        )
         Future.successful(Redirect(controllers.routes.StatusController.get()))
 
-      case Some(c) =>
-        logger.info("Cache exists. Skipping refreshCache to preserve local changes.")
-        preFlightChecksAndRedirect(Option(amlsRegistrationNumber), accountTypeId, credId)
+      case Some(_) =>
+        logger.info(
+          s"Cache exists for AMLS registration number: $amlsRegistrationNumber. Skipping refreshCache to preserve local changes."
+        )
+        preFlightChecksAndRedirect(
+          Option(amlsRegistrationNumber),
+          accountTypeId,
+          credId
+        )
 
-      case _                                                           =>
+      case None =>
+        logger.info(
+          s"No cache found for AMLS registration number: $amlsRegistrationNumber. Refreshing cache."
+        )
         landingService
           .refreshCache(amlsRegistrationNumber, credId, accountTypeId)
-          .flatMap(_ => preFlightChecksAndRedirect(Option(amlsRegistrationNumber), accountTypeId, credId))
+          .flatMap(_ =>
+            preFlightChecksAndRedirect(
+              Option(amlsRegistrationNumber),
+              accountTypeId,
+              credId
+            )
+          )
     }
 
   private def preFlightChecksAndRedirect(

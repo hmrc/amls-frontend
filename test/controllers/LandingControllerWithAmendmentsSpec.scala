@@ -351,7 +351,7 @@ class LandingControllerWithAmendmentsSpec
                 status(result)           must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
 
-                verify(controller.landingService,never())
+                verify(controller.landingService, never())
                   .refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
               }
             }
@@ -395,7 +395,7 @@ class LandingControllerWithAmendmentsSpec
                 status(result)           must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get.url))
 
-                verify(controller.landingService,never())
+                verify(controller.landingService, never())
                   .refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
               }
             }

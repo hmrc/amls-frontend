@@ -288,9 +288,12 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
     HtmlContent(
       Html(
         "<ul class=\"govuk-list\">" +
-          addressLines.filter(_.trim.nonEmpty).map { line =>
-            s"""<li>$line</li>"""
-          }.mkString
+          addressLines
+            .filter(_.trim.nonEmpty)
+            .map { line =>
+              s"""<li>$line</li>"""
+            }
+            .mkString
           + "</ul>"
       )
     )

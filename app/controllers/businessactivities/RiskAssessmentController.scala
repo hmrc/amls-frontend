@@ -81,7 +81,7 @@ class RiskAssessmentController @Inject() (
 
   private def redirectDependingOnAccountancyServices(data: RiskAssessmentHasPolicy) =
     data match {
-      case RiskAssessmentHasPolicy(true) => Redirect(routes.DocumentRiskAssessmentController.get())
+      case RiskAssessmentHasPolicy(true)  => Redirect(routes.DocumentRiskAssessmentController.get())
       case RiskAssessmentHasPolicy(false) => Redirect(routes.CannotContinueController.get)
     }
 }
