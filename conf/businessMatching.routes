@@ -25,4 +25,4 @@ GET         /check-company-is-not-registered                        @controllers
 GET         /check-your-answers                                     @controllers.businessmatching.SummaryController.get()
 POST        /check-your-answers                                     @controllers.businessmatching.SummaryController.post()
 
-GET         /no-psr-number                                          @controllers.businessmatching.NoPsrController.get
+GET         /no-frn-number                                          @controllers.businessmatching.NoFrnController.get

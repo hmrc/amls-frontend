@@ -23,10 +23,10 @@ import models.flowmanagement.ChangeSubSectorFlowModel
 import utils.AmlsSpec
 import play.api.test.Helpers._
 
-class PSRNumberPageRouterSpec extends AmlsSpec {
+class FrnPageRouterSpec extends AmlsSpec {
 
   trait Fixture {
-    val router = new PSRNumberPageRouter
+    val router = new FrnPageRouter
 
     val createModel: Option[BusinessAppliedForPSRNumber] => ChangeSubSectorFlowModel =
       ChangeSubSectorFlowModel.apply(Some(Set(TransmittingMoney)), _)
@@ -39,7 +39,7 @@ class PSRNumberPageRouterSpec extends AmlsSpec {
       ChangeSubSectorFlowModel.apply(Some(Set(TransmittingMoney)), _)
   }
 
-  "PSRNumberPageRouter" must {
+  "FrnPageRouter" must {
     "redirect to the 'check your answers' page" when {
       "the user has entered a PSR number" in new Fixture {
         val model  = createModel(Some(BusinessAppliedForPSRNumberYes("123456789")))
@@ -54,7 +54,7 @@ class PSRNumberPageRouterSpec extends AmlsSpec {
         val model  = createModel(Some(BusinessAppliedForPSRNumberNo))
         val result = router.getRoute("internalId", model)
 
-        redirectLocation(result) mustBe Some(routes.NoPsrController.get.url)
+        redirectLocation(result) mustBe Some(routes.NoFrnController.get.url)
       }
     }
 
@@ -92,7 +92,7 @@ class PSRNumberPageRouterSpec extends AmlsSpec {
         val model  = createModel(Some(BusinessAppliedForPSRNumberNo))
         val result = router.getRoute("internalId", model)
 
-        redirectLocation(result) mustBe Some(routes.NoPsrController.get.url)
+        redirectLocation(result) mustBe Some(routes.NoFrnController.get.url)
       }
     }
 

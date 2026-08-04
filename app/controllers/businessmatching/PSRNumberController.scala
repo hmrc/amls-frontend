@@ -23,7 +23,7 @@ import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.businessmatching.PSRNumberFormProvider
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
-import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
+import models.flowmanagement.{ChangeSubSectorFlowModel, FrnPageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
@@ -73,7 +73,7 @@ class PSRNumberController @Inject() (
   def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       val route =
-        router.getRoute(request.credId, PsrNumberPageId, _: ChangeSubSectorFlowModel, edit, includeCompanyNotRegistered)
+        router.getRoute(request.credId, FrnPageId, _: ChangeSubSectorFlowModel, edit, includeCompanyNotRegistered)
 
       formProvider()
         .bindFromRequest()

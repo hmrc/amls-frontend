@@ -21,7 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.businessmatching.PSRNumberFormProvider
-import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, FrnPageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.flowmanagement.Router
 import utils.AuthAction
@@ -60,7 +60,7 @@ class BusinessAppliedForPSRNumberController @Inject() (
             case Some(model) => model.businessAppliedForPSRNumber(data)
             case None        => throw new Exception("An UnknownException has occurred: BusinessAppliedForPSRNumberController")
           } flatMap {
-            case Some(model) => router.getRoute(request.credId, PsrNumberPageId, model, edit)
+            case Some(model) => router.getRoute(request.credId, FrnPageId, model, edit)
             case _           =>
               Future
                 .successful(InternalServerError("Post: Cannot retrieve data: BusinessAppliedForPSRNumberController"))

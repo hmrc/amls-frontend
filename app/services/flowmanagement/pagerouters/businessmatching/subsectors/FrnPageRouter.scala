@@ -18,7 +18,7 @@ package services.flowmanagement.pagerouters.businessmatching.subsectors
 
 import controllers.businessmatching.routes
 import models.businessmatching.BusinessAppliedForPSRNumberYes
-import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
+import models.flowmanagement.{ChangeSubSectorFlowModel, FrnPageId}
 import play.api.mvc.Result
 import services.flowmanagement.{PageRouter, PageRouterCompanyNotRegistered}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -26,7 +26,7 @@ import play.api.mvc.Results.Redirect
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PSRNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
+class FrnPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
 
   override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)(implicit
     hc: HeaderCarrier,
@@ -34,10 +34,10 @@ class PSRNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
   ): Future[Result] = {
     val call = model.psrNumber map {
       case BusinessAppliedForPSRNumberYes(_) => routes.SummaryController.get()
-      case _                                 => routes.NoPsrController.get
+      case _                                 => routes.NoFrnController.get
     }
 
-    call.fold(error(PsrNumberPageId))(Redirect)
+    call.fold(error(FrnPageId))(Redirect)
   }
 }
 
@@ -56,9 +56,9 @@ class PSRNumberPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegist
         } else {
           routes.SummaryController.get()
         }
-      case _                                 => routes.NoPsrController.get
+      case _                                 => routes.NoFrnController.get
     }
 
-    call.fold(error(PsrNumberPageId))(Redirect)
+    call.fold(error(FrnPageId))(Redirect)
   }
 }

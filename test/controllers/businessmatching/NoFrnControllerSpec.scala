@@ -25,7 +25,7 @@ import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.{CannotAddServicesView, CannotContinueWithApplicationView}
 
 //noinspection ScalaStyle
-class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
+class NoFrnControllerSpec extends AmlsSpec with ScalaFutures {
 
   implicit val defaultPatience: PatienceConfig =
     PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
@@ -34,7 +34,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
     val request    = addToken(authRequest)
     lazy val view1 = app.injector.instanceOf[CannotAddServicesView]
     lazy val view2 = app.injector.instanceOf[CannotContinueWithApplicationView]
-    val controller = new NoPsrController(
+    val controller = new NoFrnController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockStatusService,

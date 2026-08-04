@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
-import models.flowmanagement.{AddBusinessTypeFlowModel, NoPSRPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, NoFrnPageId}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
@@ -29,7 +29,7 @@ import views.html.businessmatching.updateservice.add.CannotAddServicesView
 
 import scala.concurrent.Future
 
-class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
+class NoFrnControllerSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture extends DependencyMocks {
     self =>
@@ -38,7 +38,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
 
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
     lazy val view               = app.injector.instanceOf[CannotAddServicesView]
-    val controller              = new NoPsrController(
+    val controller              = new NoFrnController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
@@ -75,7 +75,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
       val result = controller.post()(requestWithUrlEncodedBody("" -> ""))
 
       status(result) mustBe SEE_OTHER
-      controller.router.verify("internalId", NoPSRPageId, AddBusinessTypeFlowModel())
+      controller.router.verify("internalId", NoFrnPageId, AddBusinessTypeFlowModel())
     }
   }
 }

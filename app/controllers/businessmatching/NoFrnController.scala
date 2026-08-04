@@ -25,7 +25,7 @@ import views.html.businessmatching.{CannotAddServicesView, CannotContinueWithApp
 
 import javax.inject.Inject
 
-class NoPsrController @Inject() (
+class NoFrnController @Inject()(
   val authAction: AuthAction,
   val ds: CommonPlayDependencies,
   statusService: StatusService,

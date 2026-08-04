@@ -23,7 +23,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.BusinessActivity.{HighValueDealing, MoneyServiceBusiness}
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
-import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, FrnPageId}
 import models.status.SubmissionDecisionApproved
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -161,7 +161,7 @@ class BusinessAppliedForPSRNumberControllerSpec
             val result = controller.post(false)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify("internalId", PsrNumberPageId, flowModel)
+            controller.router.verify("internalId", FrnPageId, flowModel)
 
           }
         }
@@ -184,7 +184,7 @@ class BusinessAppliedForPSRNumberControllerSpec
             status(result) must be(SEE_OTHER)
             controller.router.verify(
               "internalId",
-              PsrNumberPageId,
+              FrnPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789")))
             )
 
@@ -210,7 +210,7 @@ class BusinessAppliedForPSRNumberControllerSpec
             status(result) must be(SEE_OTHER)
             controller.router.verify(
               "internalId",
-              PsrNumberPageId,
+              FrnPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)),
               true
             )
@@ -236,7 +236,7 @@ class BusinessAppliedForPSRNumberControllerSpec
             status(result) must be(SEE_OTHER)
             controller.router.verify(
               "internalId",
-              PsrNumberPageId,
+              FrnPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))),
               true
             )

@@ -25,7 +25,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
+import models.flowmanagement.{ChangeSubSectorFlowModel, FrnPageId}
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.status.NotCompleted
 import org.jsoup.Jsoup
@@ -145,7 +145,7 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
           controller.router.verify(
             "internalId",
-            PsrNumberPageId,
+            FrnPageId,
             ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberYes("123789")))
           )
         }
@@ -167,7 +167,7 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           status(result) mustBe SEE_OTHER
           controller.router.verify(
             "internalId",
-            PsrNumberPageId,
+            FrnPageId,
             ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberNo)),
             edit = true
           )
@@ -219,7 +219,7 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
           controller.router.verify(
             "internalId",
-            PsrNumberPageId,
+            FrnPageId,
             ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberYes("700000")))
           )
         }
