@@ -40,10 +40,10 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
     val router = new AddBusinessTypeRouter(
       businessMatchingService = mockBusinessMatchingService,
       addMoreActivitiesPageRouter = new AddMoreBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
-      businessAppliedForPSRNumberPageRouter =
-        new BusinessAppliedForPsrNumberPageRouter(mockStatusService, mockBusinessMatchingService),
+      businessAppliedForFrnPageRouter =
+        new BusinessAppliedForFrnPageRouter(mockStatusService, mockBusinessMatchingService),
       newServicesInformationPageRouter = new NeedMoreInformationPageRouter(),
-      noPSRPageRouter = new NoPSRPageRouter(mockStatusService, mockBusinessMatchingService),
+      noFrnPageRouter = new NoFrnPageRouter(mockStatusService, mockBusinessMatchingService),
       selectActivitiesPageRouter = new SelectBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
       subServicesPageRouter = new SubSectorsPageRouter(mockStatusService, mockBusinessMatchingService),
       updateServicesSummaryPageRouter =
@@ -65,7 +65,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       }
     }
 
-    "return the 'psr_number' page (BusinessAppliedForPSRNumberController)" when {
+    "return the 'frn_number' page (BusinessAppliedForPSRNumberController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
         "MSB is the Business Activity and subservices contains TransmittingMoney" in new Fixture {
           val model  = AddBusinessTypeFlowModel(
@@ -93,7 +93,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       }
     }
 
-    "return the 'no-psr' page (NoPsrController)" when {
+    "return the 'no-psr' page (NoFrnController)" when {
       "the user is on the 'psr_number' page (BusinessAppliedForPSRNumberPageId)" when {
         "the answer is no and MSB is the Business Activity" in new Fixture {
           val model = AddBusinessTypeFlowModel(
@@ -101,9 +101,9 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)
           )
 
-          val result = await(router.getRoute("internalId", PsrNumberPageId, model))
+          val result = await(router.getRoute("internalId", FrnPageId, model))
 
-          result mustBe Redirect(addRoutes.NoPsrController.get())
+          result mustBe Redirect(addRoutes.NoFrnController.get())
         }
       }
     }
@@ -116,7 +116,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa"))
           )
 
-          val result = await(router.getRoute("internalId", PsrNumberPageId, model))
+          val result = await(router.getRoute("internalId", FrnPageId, model))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
@@ -124,9 +124,9 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
     }
 
     "return the 'About your business' page (RegistrationProgressController)" when {
-      "the user is on the 'no_psr' page (NoPSRPageId)" when {
+      "the user is on the 'no_psr' page (NoFrnPageId)" when {
         "MSB is the Business Activity" in new Fixture {
-          val result = await(router.getRoute("internalId", NoPSRPageId, model))
+          val result = await(router.getRoute("internalId", NoFrnPageId, model))
 
           result mustBe Redirect(rootRoutes.RegistrationProgressController.get())
         }
@@ -288,7 +288,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("bbbbb")),
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal)))
           )
-          val result = await(router.getRoute("internalId", PsrNumberPageId, model, edit = true))
+          val result = await(router.getRoute("internalId", FrnPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
@@ -296,16 +296,16 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
     }
 
     // edit Business Applied For PSR Number false
-    "return the 'no-psr' page (NoPsrController)" when {
+    "return the 'no-psr' page (NoFrnController)" when {
       "the user is on the 'psr_number' page (BusinessAppliedForPSRNumberPageId)" when {
         "the answer is yes" in new Fixture {
           val model  = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)
           )
-          val result = await(router.getRoute("internalId", PsrNumberPageId, model))
+          val result = await(router.getRoute("internalId", FrnPageId, model))
 
-          result mustBe Redirect(addRoutes.NoPsrController.get())
+          result mustBe Redirect(addRoutes.NoFrnController.get())
         }
       }
     }
