@@ -444,9 +444,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
             accountantAddressIndex,
             messages("businessactivities.whoisyouraccountant.address.cya", names.accountantsName),
             "<ul class=\"govuk-list\">" +
-              address.toLines.filter(_.trim.nonEmpty).map { line =>
-                s"""<li>$line</li>"""
-              }.mkString
+              address.toLines
+                .filter(_.trim.nonEmpty)
+                .map { line =>
+                  s"""<li>$line</li>"""
+                }
+                .mkString
               + "</ul>",
             controllers.businessactivities.routes.WhoIsYourAccountantUkAddressController.get(true).url,
             "accountantaddress-edit"
@@ -484,9 +487,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
           result.value.toString must include(
             "<ul class=\"govuk-list\">" +
-              address.toLines.filter(_.trim.nonEmpty).map { line =>
-                s"""<li>$line</li>"""
-              }.mkString
+              address.toLines
+                .filter(_.trim.nonEmpty)
+                .map { line =>
+                  s"""<li>$line</li>"""
+                }
+                .mkString
               + "</ul>"
           )
 

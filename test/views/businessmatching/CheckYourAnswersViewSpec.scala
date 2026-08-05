@@ -37,13 +37,13 @@ import scala.jdk.CollectionConverters.*
 class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    lazy val checkYourAnswersView: CheckYourAnswersView = app.injector.instanceOf[CheckYourAnswersView]
-    lazy val cyaHelper: CheckYourAnswersHelper = app.injector.instanceOf[CheckYourAnswersHelper]
+    lazy val checkYourAnswersView: CheckYourAnswersView            = app.injector.instanceOf[CheckYourAnswersView]
+    lazy val cyaHelper: CheckYourAnswersHelper                     = app.injector.instanceOf[CheckYourAnswersHelper]
     implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
     val defaultActivitiesUrl: String = controllers.businessmatching.routes.RegisterServicesController.get().url
 
-    val businessAddress = Address(
+    val businessAddress    = Address(
       "line1",
       Some("line2"),
       Some("line3"),
@@ -58,7 +58,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
       "XE0000000000000"
     )
 
-    val TypeOfBusinessModel = TypeOfBusiness("test")
+    val TypeOfBusinessModel            = TypeOfBusiness("test")
     val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
   }
 
@@ -98,7 +98,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
 
     "include the provided data when all registered services are selected for a Limited Company" in new ViewFixture {
 
-      val msbServices = BusinessMatchingMsbServices(
+      val msbServices           = BusinessMatchingMsbServices(
         Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, ForeignExchange)
       )
       val allBusinessActivities = BusinessActivities(
@@ -127,7 +127,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
 
       val isPreSubmission = true
 
-      val summaryList: SummaryList = cyaHelper.createSummaryList(
+      val summaryList: SummaryList   = cyaHelper.createSummaryList(
         testBusinessMatching,
         isPreSubmission,
         isPending = false
@@ -204,8 +204,8 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
       for ((section, index) <- sections) {
         val (key, check, editLink) = sectionChecks(index)
 
-        section.select("dt").text()            must be(messages(key))
-        check(section)                         must be(true)
+        section.select("dt").text()                                   must be(messages(key))
+        check(section)                                                must be(true)
         section.select(".govuk-summary-list__actions a").attr("href") must be(editLink)
       }
     }
@@ -237,7 +237,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
         isPreSubmission,
         isPending = false
       )
-      val submitButton = cyaHelper.getSubmitButton(
+      val submitButton             = cyaHelper.getSubmitButton(
         testBusinessMatching.businessAppliedForPSRNumber,
         isPreSubmission,
         testBusinessMatching.preAppComplete
@@ -284,15 +284,15 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
       for ((section, index) <- sections) {
         val (key, check, editLink) = sectionChecks(index)
 
-        section.select("dt").text() must be(messages(key))
-        check(section) must be(true)
+        section.select("dt").text()                                   must be(messages(key))
+        check(section)                                                must be(true)
         section.select(".govuk-summary-list__actions a").attr("href") must be(editLink)
       }
     }
 
     "include the provided data for an UnincorporatedBody with No MSB Services" in new ViewFixture {
 
-      val businessActivitiesWithoutMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
+      val businessActivitiesWithoutMSB                     = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
       val reviewDetailsAsUnincorporatedBody: ReviewDetails = ReviewDetailsModel.copy(
         businessType = Some(BusinessType.UnincorporatedBody)
       )
@@ -308,7 +308,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
 
       val isPreSubmission = true
 
-      val summaryList: SummaryList = cyaHelper.createSummaryList(
+      val summaryList: SummaryList   = cyaHelper.createSummaryList(
         testBusinessMatching,
         isPreSubmission,
         isPending = false
@@ -355,8 +355,8 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
 
       for ((section, index) <- sections) {
         val (key, check, editLink) = sectionChecks(index)
-        section.select("dt").text()            must be(messages(key))
-        check(section)                         must be(true)
+        section.select("dt").text()                                   must be(messages(key))
+        check(section)                                                must be(true)
         section.select(".govuk-summary-list__actions a").attr("href") must be(editLink)
       }
     }

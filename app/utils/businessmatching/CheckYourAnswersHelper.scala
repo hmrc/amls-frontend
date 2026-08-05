@@ -79,9 +79,12 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
           HtmlContent(
             Html(
               "<ul class=\"govuk-list\">" +
-                review.businessAddress.toLines.filter(_.trim.nonEmpty).map { line =>
-                  s"""<li>$line</li>"""
-                }.mkString
+                review.businessAddress.toLines
+                  .filter(_.trim.nonEmpty)
+                  .map { line =>
+                    s"""<li>$line</li>"""
+                  }
+                  .mkString
                 + "</ul>"
             )
           )
@@ -259,7 +262,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
                 )
               )
             )
-          case _                                 => None
+          case _                                         => None
         }
       } else {
         None

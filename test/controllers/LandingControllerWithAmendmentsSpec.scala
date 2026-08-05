@@ -240,7 +240,12 @@ class LandingControllerWithAmendmentsSpec
         "the Save 4 Later data does not contain any sections" when {
           "data has not changed" should {
             "refresh from API5 and redirect to status controller" in new Fixture {
-              setUpMocksForDataExistsInMongoCache(controller, Cache("test", Map.empty))
+
+              when(controller.landingService.cacheMap(any[String]))
+                .thenReturn(Future.successful(None))
+
+              when(controller.landingService.initialiseGetWithAmendments(any[String])(any()))
+                .thenReturn(Future.successful(None))
 
               when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
                 .thenReturn(
@@ -262,7 +267,6 @@ class LandingControllerWithAmendmentsSpec
                 .thenReturn(Future.successful((NotCompleted, None)))
 
               val result = controller.get()(request)
-
               status(result)           must be(SEE_OTHER)
               redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
               verify(controller.landingService, atLeastOnce())
@@ -325,8 +329,11 @@ class LandingControllerWithAmendmentsSpec
               "refresh from API5 and redirect to status controller" in new Fixture {
                 val testCache =
                   createTestCache(hasChanged = true, includesResponse = false, includeSubmissionStatus = true)
+                when(controller.landingService.cacheMap(any[String]))
+                  .thenReturn(Future.successful(None))
 
-                setUpMocksForDataExistsInMongoCache(controller, testCache)
+                when(controller.landingService.initialiseGetWithAmendments(any[String])(any()))
+                  .thenReturn(Future.successful(None))
 
                 when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
                   .thenReturn(
@@ -352,7 +359,7 @@ class LandingControllerWithAmendmentsSpec
                 status(result)           must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
 
-                verify(controller.landingService)
+                verify(controller.landingService, atLeastOnce())
                   .refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
               }
             }
@@ -396,8 +403,12 @@ class LandingControllerWithAmendmentsSpec
                 status(result)           must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get.url))
 
-                verify(controller.landingService)
-                  .refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
+                verify(controller.statusService, atLeastOnce())
+                  .getDetailedStatus(any(), any[(String, String)], any())(
+                    any[HeaderCarrier],
+                    any(),
+                    any()
+                  )
               }
             }
           }
@@ -522,8 +533,12 @@ class LandingControllerWithAmendmentsSpec
 
             status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
-            verify(controller.landingService, atLeastOnce())
-              .refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
+            verify(controller.statusService, atLeastOnce())
+              .getDetailedStatus(any(), any[(String, String)], any())(
+                any[HeaderCarrier],
+                any(),
+                any()
+              )
           }
 
           "refresh from API5 and redirect to status controller with duplicate submission flag set" in new Fixture {
@@ -542,8 +557,12 @@ class LandingControllerWithAmendmentsSpec
 
             status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.routes.StatusController.get(true).url))
-            verify(controller.landingService, atLeastOnce())
-              .refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
+            verify(controller.statusService, atLeastOnce())
+              .getDetailedStatus(any(), any[(String, String)], any())(
+                any[HeaderCarrier],
+                any(),
+                any()
+              )
           }
 
           "refresh from API5 and redirect to status controller when there is no TP or RP data" in new Fixture {
@@ -574,8 +593,12 @@ class LandingControllerWithAmendmentsSpec
 
             status(result)           must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
-            verify(controller.landingService, atLeastOnce())
-              .refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
+            verify(controller.statusService, atLeastOnce())
+              .getDetailedStatus(any(), any[(String, String)], any())(
+                any[HeaderCarrier],
+                any(),
+                any()
+              )
           }
         }
       }
