@@ -238,11 +238,11 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
             Some(
               Seq(
                 SummaryListRow(
-                  Key(Text(messages("businessmatching.psr.number.title"))),
+                  Key(Text(messages("businessmatching.frn.number.title"))),
                   Value(Text(messages("lbl.yes")))
                 ),
                 SummaryListRow(
-                  Key(Text(messages("businessmatching.psr.number.cya.title"))),
+                  Key(Text(messages("businessmatching.frn.number.cya.title"))),
                   Value(Text(psrNumber)),
                   actions = Some(
                     Actions(
@@ -250,7 +250,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
                         ActionItem(
                           href = controllers.businessmatching.routes.PSRNumberController.get(true).url,
                           content = Text(messages("button.edit")),
-                          visuallyHiddenText = Some(messages("businessmatching.checkYourAnswers.change.PSRReg")),
+                          visuallyHiddenText = Some(messages("businessmatching.checkYourAnswers.change.FrnReg")),
                           attributes = Map("id" -> "edit-psr-number")
                         )
                       )
