@@ -475,7 +475,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           checkChangeLink(
             psrNumberRow,
-            controllers.businessmatching.routes.PSRNumberController.get(true).url,
+            controllers.businessmatching.routes.FrnNumberController.get(true).url,
             "edit-psr-number"
           )
         }

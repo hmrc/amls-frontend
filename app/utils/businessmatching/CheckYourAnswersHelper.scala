@@ -248,7 +248,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
                     Actions(
                       items = Seq(
                         ActionItem(
-                          href = controllers.businessmatching.routes.PSRNumberController.get(true).url,
+                          href = controllers.businessmatching.routes.FrnNumberController.get(true).url,
                           content = Text(messages("button.edit")),
                           visuallyHiddenText = Some(messages("businessmatching.checkYourAnswers.change.FrnReg")),
                           attributes = Map("id" -> "edit-psr-number")

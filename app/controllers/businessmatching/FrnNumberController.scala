@@ -33,7 +33,7 @@ import views.html.businessmatching.PsrNumberView
 
 import javax.inject.Inject
 
-class PSRNumberController @Inject() (
+class FrnNumberController @Inject()(
   authAction: AuthAction,
   val ds: CommonPlayDependencies,
   val dataCacheConnector: DataCacheConnector,
