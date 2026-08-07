@@ -89,7 +89,7 @@ class BusinessAppliedForPSRNumberControllerSpec
 
         status(result)                               must be(OK)
         Jsoup.parse(contentAsString(result)).title() must include(
-          messages("businessmatching.updateservice.psr.number.title")
+          messages("businessmatching.updateservice.frn.number.title")
         )
       }
 

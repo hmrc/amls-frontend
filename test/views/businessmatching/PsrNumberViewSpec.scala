@@ -41,9 +41,9 @@ class PsrNumberViewSpec extends AmlsViewSpec {
       def view = psr_number(filledForm, edit = false, isPreSubmission = true)
 
       doc.title       must startWith(
-        Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching")
+        Messages("businessmatching.frn.number.title") + " - " + Messages("summary.businessmatching")
       )
-      heading.html    must include(Messages("businessmatching.psr.number.title"))
+      heading.html    must include(Messages("businessmatching.frn.number.title"))
       subHeading.html must include(Messages("summary.businessmatching"))
 
     }
