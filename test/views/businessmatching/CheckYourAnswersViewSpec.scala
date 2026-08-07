@@ -191,7 +191,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
         (
           "businessmatching.psr.number.lbl",
           checkElementTextIncludes(_, "123456"),
-          controllers.businessmatching.routes.PSRNumberController.get(true).toString
+          controllers.businessmatching.routes.FrnNumberController.get(true).toString
         )
       )
 

@@ -93,7 +93,7 @@
 
 @layout(pageTitle = messages(title) + " - " + messages(section)) {
 
-    @formHelper(action = controllers.businessmatching.routes.PSRNumberController.post(edit)) {
+    @formHelper(action = controllers.businessmatching.routes.FrnNumberController.post(edit)) {
 
         @(edit, isPreSubmission, isPsrDefined) match {
             case (true, false, true) | (false, false, true) => {

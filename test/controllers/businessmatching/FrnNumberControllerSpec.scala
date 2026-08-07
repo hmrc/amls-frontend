@@ -43,13 +43,13 @@ import views.html.businessmatching.PsrNumberView
 
 import scala.concurrent.Future
 
-class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BusinessMatchingGenerator {
+class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BusinessMatchingGenerator {
 
   trait Fixture extends DependencyMocks { self =>
 
     val request    = addToken(authRequest)
     lazy val view  = app.injector.instanceOf[PsrNumberView]
-    val controller = new PSRNumberController(
+    val controller = new FrnNumberController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockCacheConnector,
@@ -128,7 +128,7 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
             controller.helper.updateSubSectors(any(), any())(any())
           } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
-          val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+          val newRequest = FakeRequest(POST, routes.FrnNumberController.post().url)
             .withFormUrlEncodedBody(
               "appliedFor" -> "true",
               "regNumber"  -> "123789"
@@ -159,7 +159,7 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
           mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)
 
-          val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+          val newRequest = FakeRequest(POST, routes.FrnNumberController.post().url)
             .withFormUrlEncodedBody("appliedFor" -> "false")
 
           val result = controller.post(true)(newRequest)
@@ -174,7 +174,7 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
         }
 
         "respond with BAD_REQUEST when given invalid data" in new Fixture {
-          val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+          val newRequest = FakeRequest(POST, routes.FrnNumberController.post().url)
             .withFormUrlEncodedBody(
               "appliedFor" -> "true",
               "regNumber"  -> ""
@@ -207,7 +207,7 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
             ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
           )
 
-          val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+          val newRequest = FakeRequest(POST, routes.FrnNumberController.post().url)
             .withFormUrlEncodedBody(
               "appliedFor" -> "true",
               "regNumber"  -> "1234567"
