@@ -184,7 +184,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
           controllers.businessmatching.routes.MsbSubSectorsController.get(true).toString
         ),
         (
-          "businessmatching.psr.number.title",
+          "businessmatching.frn.number.title",
           checkElementTextIncludes(_, "Yes"),
           ""
         ),

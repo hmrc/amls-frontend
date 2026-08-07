@@ -41,9 +41,9 @@ class BusinessAppliedForPSRNumberViewSpec extends AmlsViewSpec {
       override def view = numberView(filledForm, edit = false)
 
       doc.title       must startWith(
-        messages("businessmatching.updateservice.psr.number.title") + " - " + messages("summary.updateservice")
+        messages("businessmatching.updateservice.frn.number.title") + " - " + messages("summary.updateservice")
       )
-      heading.html    must be(messages("businessmatching.updateservice.psr.number.title"))
+      heading.html    must be(messages("businessmatching.updateservice.frn.number.title"))
       subHeading.html must include(messages("summary.updateservice"))
     }
 

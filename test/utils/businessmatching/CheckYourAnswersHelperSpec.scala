@@ -467,10 +467,10 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
           val hasPsrNumberRow = rows.lift(hasPsrNumberIndex).getOrElse(failIfEmpty)
           val psrNumberRow    = rows.lift(psrNumberIndex).getOrElse(failIfEmpty)
 
-          hasPsrNumberRow.key.toString   must include(messages("businessmatching.psr.number.title"))
+          hasPsrNumberRow.key.toString   must include(messages("businessmatching.frn.number.title"))
           hasPsrNumberRow.value.toString must include(messages("lbl.yes"))
 
-          psrNumberRow.key.toString   must include(messages("businessmatching.psr.number.cya.title"))
+          psrNumberRow.key.toString   must include(messages("businessmatching.frn.number.cya.title"))
           psrNumberRow.value.toString must include("123456")
 
           checkChangeLink(
