@@ -39,7 +39,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.PsrNumberView
+import views.html.businessmatching.FrnNumberView
 
 import scala.concurrent.Future
 
@@ -48,7 +48,7 @@ class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
   trait Fixture extends DependencyMocks { self =>
 
     val request    = addToken(authRequest)
-    lazy val view  = app.injector.instanceOf[PsrNumberView]
+    lazy val view  = app.injector.instanceOf[FrnNumberView]
     val controller = new FrnNumberController(
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -59,7 +59,7 @@ class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
       mock[ChangeSubSectorHelper],
       cc = mockMcc,
       formProvider = app.injector.instanceOf[PSRNumberFormProvider],
-      psr_number = view
+      view = view
     )
 
     when {
