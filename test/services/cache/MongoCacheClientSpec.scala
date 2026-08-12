@@ -16,12 +16,11 @@
 
 package services.cache
 
-import com.typesafe.config.{ConfigFactory, ConfigValueFactory}
+import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
 import config.ApplicationConfig
 import play.api.Configuration
 import play.api.libs.json.{JsString, Reads}
 import services.encryption.CryptoService
-import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.AmlsSpec
@@ -38,14 +37,14 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
   val appConfigWithEncryption                   = new ApplicationConfig(configWithEncryption, app.injector.instanceOf[ServicesConfig])
   override val repository: MongoCacheClient     = new MongoCacheClient(
     appConfigNoEncryption,
-    app.injector.instanceOf[ApplicationCrypto],
+    mock[Config],
     mongoComponent,
     app.injector.instanceOf[CryptoService]
   )
   val encryptedRepository                       =
     new MongoCacheClient(
       appConfigWithEncryption,
-      app.injector.instanceOf[ApplicationCrypto],
+      mock[Config],
       mongoComponent,
       app.injector.instanceOf[CryptoService]
     )

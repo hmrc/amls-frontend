@@ -16,12 +16,13 @@
 
 package services.encryption
 
+import com.typesafe.config.Config
 import config.ApplicationConfig
 import org.apache.commons.codec.binary.Base64
 import play.api.Logger
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsString, JsValue}
 import uk.gov.hmrc.crypto.json.JsonEncryption
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter, PlainText}
+import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, PlainText, SymmetricCryptoFactory}
 
 import java.nio.charset.StandardCharsets.UTF_8
 import javax.crypto.Cipher
@@ -31,16 +32,18 @@ import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Success, Try}
 
 @Singleton
-class CryptoService @Inject() (applicationConfig: ApplicationConfig, applicationCrypto: ApplicationCrypto) {
+class CryptoService @Inject() (applicationConfig: ApplicationConfig, typesafeConfig: Config) {
 
   private val logger                = Logger(getClass)
   private val encryptionKey         = applicationConfig.encryptionKey
-  private val keyBytes: Array[Byte] = Base64.decodeBase64(encryptionKey.getBytes(UTF_8))
-  private val secretKeySpec         = new SecretKeySpec(keyBytes, "AES")
+  private val keyBytes: Array[Byte] = Base64.decodeBase64(encryptionKey.getBytes(UTF_8)) // TODO REMOVE AFTER PRODUCTION DEPLOYMENT OF NEW CRYPTO HANDLING
+  private val secretKeySpec         = new SecretKeySpec(keyBytes, "AES") // TODO REMOVE AFTER PRODUCTION DEPLOYMENT OF NEW CRYPTO HANDLING
 
-  private implicit val encrypterDecrypter: Encrypter with Decrypter = applicationCrypto.JsonCrypto
+  private val compositeSymmetricCrypto: Encrypter & Decrypter =
+    SymmetricCryptoFactory.aesGcmCryptoFromConfig("json.encryption", typesafeConfig)
 
-  /** Take an encrypted string & return the decrypted value string
+  /** TODO REMOVE AFTER PRODUCTION DEPLOYMENT OF NEW CRYPTO HANDLING
+    * Take an encrypted string & return the decrypted value string
     *
     * @param encryptedValue
     *   the value to decrypt
@@ -66,18 +69,27 @@ class CryptoService @Inject() (applicationConfig: ApplicationConfig, application
       case true  => PlainText(value)
       case false =>
         logger.warn(s"performing double decryption")
-        PlainText(decrypt(value))
+        val doublyDecrypted: String = decrypt(value)
+        doublyDecrypted.startsWith("{") | value.startsWith("[") match {
+          case true => PlainText(doublyDecrypted)
+          case false => ??? // need to use the new encryption scheme
+        }
     }
   }
+
+  def decryptJsonString(encryptedValue: String): PlainText =
+    compositeSymmetricCrypto.decrypt(Crypted(encryptedValue))
 
   /** Encrypt a JSON string using the implicit Encrypter
     * @param jsonString
     * @return
     */
-  def encryptJsonString(jsonString: String): JsValue =
-    JsonEncryption.stringEncrypter.writes(jsonString)
+  def encryptJsonString(jsonString: String): JsValue = {
+    JsString(compositeSymmetricCrypto.encrypt(PlainText(jsonString)).value)
+  }
 
-  /** Take an encrypted string & return the decrypted raw array of bytes
+  /** TODO REMOVE AFTER PRODUCTION DEPLOYMENT OF NEW CRYPTO HANDLING
+    * Take an encrypted string & return the decrypted raw array of bytes
     *
     * @param encryptedValue
     *   the value to decrypt
@@ -93,4 +105,7 @@ class CryptoService @Inject() (applicationConfig: ApplicationConfig, application
       case Success(value)     => Success(value)
       case Failure(exception) => Failure(new SecurityException(exception))
     }
+
+  private def isJson(value: String): Boolean =
+    value.startsWith("{") || value.startsWith("[")
 }

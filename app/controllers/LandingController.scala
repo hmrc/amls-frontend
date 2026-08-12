@@ -17,10 +17,11 @@
 package controllers
 
 import audit.ServiceEntrantEvent
+import com.typesafe.config.Config
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import forms.mappings.Constraints
-import models._
+import models.*
 import models.amp.Amp
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -33,17 +34,17 @@ import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePerson
-import models.status._
+import models.status.*
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc._
+import play.api.mvc.*
 import services.cache.Cache
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter, SymmetricCryptoFactory}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
@@ -66,7 +67,7 @@ class LandingController @Inject() (
   val mcc: MessagesControllerComponents,
   implicit override val messagesApi: MessagesApi,
   val config: ApplicationConfig,
-  val applicationCrypto: ApplicationCrypto,
+  val typesafeConfig: Config,
   parser: BodyParsers.Default,
   start: Start,
   headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter
@@ -81,7 +82,8 @@ class LandingController @Inject() (
     "utf-8"
   )
 
-  implicit val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
+  implicit val compositeSymmetricCrypto: Encrypter & Decrypter =
+    SymmetricCryptoFactory.aesGcmCryptoFromConfig("json.encryption", typesafeConfig)
 
   def signoutUrl = s"${appConfig.logoutUrl}?continue=$unauthorisedUrl"
 

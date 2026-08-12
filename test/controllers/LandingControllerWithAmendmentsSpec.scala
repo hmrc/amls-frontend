@@ -16,27 +16,28 @@
 
 package controllers
 
+import com.typesafe.config.Config
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.{SuccessfulAuthAction, SuccessfulAuthActionNoAmlsRefNo}
 import generators.StatusGenerator
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.BusinessDetails
-import models.businessmatching._
+import models.businessmatching.*
 import models.eab.Eab
-import models.responsiblepeople._
-import models.status._
+import models.responsiblepeople.*
+import models.status.*
 import models.tradingpremises.TradingPremises
-import models.{status => _, _}
-import org.mockito.ArgumentMatchers.{eq => meq, _}
+import models.{status as _, *}
+import org.mockito.ArgumentMatchers.{eq as meq, *}
 import org.mockito.Mockito
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import play.api.mvc.BodyParsers
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.cache.Cache
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -79,7 +80,7 @@ class LandingControllerWithAmendmentsSpec
       parser = mock[BodyParsers.Default],
       start = view,
       headerCarrierForPartialsConverter = headerCarrierForPartialsConverter,
-      applicationCrypto = applicationCrypto
+      typesafeConfig = mock[Config]
     )
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any(), any()))
@@ -120,7 +121,7 @@ class LandingControllerWithAmendmentsSpec
       parser = mock[BodyParsers.Default],
       start = view,
       headerCarrierForPartialsConverter = headerCarrierForPartialsConverter,
-      applicationCrypto = applicationCrypto
+      typesafeConfig = mock[Config]
     )
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any(), any()))

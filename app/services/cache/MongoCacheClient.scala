@@ -16,14 +16,15 @@
 
 package services.cache
 
+import com.typesafe.config.Config
 import config.ApplicationConfig
 import connectors.cache.Conversions
 import org.mongodb.scala.bson.BsonDocument
-import org.mongodb.scala.model._
+import org.mongodb.scala.model.*
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
-import play.api.libs.json._
+import play.api.libs.json.*
 import services.encryption.CryptoService
-import uk.gov.hmrc.crypto._
+import uk.gov.hmrc.crypto.*
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
@@ -36,12 +37,12 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 class MongoCacheClientFactory @Inject() (
   config: ApplicationConfig,
-  applicationCrypto: ApplicationCrypto,
+  typesafeConfig: Config,
   mongo: MongoComponent,
   cryptoService: CryptoService
 )(implicit val ec: ExecutionContext) {
   def createClient: MongoCacheClient =
-    new MongoCacheClient(config, applicationCrypto, mongo: MongoComponent, cryptoService)
+    new MongoCacheClient(config, typesafeConfig, mongo: MongoComponent, cryptoService)
 }
 
 /** Implements a client which utilises the GOV UK cache repository to store cached data in Mongo.
@@ -53,7 +54,7 @@ class MongoCacheClientFactory @Inject() (
 @Singleton
 class MongoCacheClient @Inject() (
   appConfig: ApplicationConfig,
-  applicationCrypto: ApplicationCrypto,
+  typesafeConfig: Config,
   mongo: MongoComponent,
   cryptoService: CryptoService
 )(implicit val ec: ExecutionContext)
@@ -71,7 +72,8 @@ class MongoCacheClient @Inject() (
     with Conversions
     with CacheOps {
 
-  val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
+  val compositeSymmetricCrypto: Encrypter & Decrypter =
+    SymmetricCryptoFactory.aesGcmCryptoFromConfig("json.encryption", typesafeConfig)
 
   /** Inserts data into the cache with the specified key. If the data does not exist, it will be created.
     */

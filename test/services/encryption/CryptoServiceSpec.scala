@@ -24,7 +24,7 @@ import java.nio.charset.StandardCharsets.UTF_8
 
 class CryptoServiceSpec extends AmlsSpec with TryValues {
 
-  val cryptoService = new CryptoService(appConfig, applicationCrypto)
+  val cryptoService = new CryptoService(appConfig, typesafeConfig)
 
   ".decrypt" must {
     "decrypt an encrypted value" in {

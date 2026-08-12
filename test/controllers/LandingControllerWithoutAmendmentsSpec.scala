@@ -16,6 +16,8 @@
 
 package controllers
 
+import com.typesafe.config.Config
+
 import java.net.URLEncoder
 import config.ApplicationConfig
 import connectors.DataCacheConnector
@@ -23,16 +25,16 @@ import controllers.actions.{SuccessfulAuthActionNoAmlsRefNo, SuccessfulAuthActio
 import generators.StatusGenerator
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.BusinessDetails
-import models.businessmatching._
+import models.businessmatching.*
 import models.eab.Eab
 import models.responsiblepeople.TimeAtAddress.OneToThreeYears
-import models.responsiblepeople._
-import models.status._
-import models.{status => _, _}
-import org.mockito.ArgumentMatchers.{eq => meq, _}
-import org.mockito.Mockito._
+import models.responsiblepeople.*
+import models.status.*
+import models.{status as _, *}
+import org.mockito.ArgumentMatchers.{eq as meq, *}
+import org.mockito.Mockito.*
 import play.api.mvc.{BodyParsers, Result}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import services.cache.Cache
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -70,7 +72,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       parser = mock[BodyParsers.Default],
       start = view,
       headerCarrierForPartialsConverter = headerCarrierForPartialsConverter,
-      applicationCrypto = applicationCrypto
+      typesafeConfig = mock[Config]
     )
 
     val controllerNoUserRole = new LandingController(
@@ -87,7 +89,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       parser = mock[BodyParsers.Default],
       start = view,
       headerCarrierForPartialsConverter = mock[HeaderCarrierForPartialsConverter],
-      applicationCrypto = applicationCrypto
+      typesafeConfig = mock[Config]
     )
 
     when {
