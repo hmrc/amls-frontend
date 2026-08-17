@@ -22,7 +22,7 @@ import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.businessmatching.PSRNumberFormProvider
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberYes}
 import models.flowmanagement.{ChangeSubSectorFlowModel, FrnPageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
@@ -96,7 +96,7 @@ class FrnNumberController @Inject()(
               val transformedData = transformFrnNumber(data)
 
               dataCacheConnector.update[ChangeSubSectorFlowModel](request.credId, ChangeSubSectorFlowModel.key) { _ =>
-                flowModel.copy(psrNumber = Some(transformedData))
+                flowModel.copy(Frn = Some(transformedData))
               } flatMap {
                 case Some(m @ ChangeSubSectorFlowModel(_, Some(BusinessAppliedForPSRNumberYes(_)))) =>
                   helper.updateSubSectors(request.credId, m) flatMap { _ =>
@@ -110,7 +110,7 @@ class FrnNumberController @Inject()(
         )
   }
 
-  private def transformFrnNumber(data: BusinessAppliedForPSRNumber): BusinessAppliedForPSRNumber =
+  private def transformFrnNumber(data: BusinessAppliedForFrn): BusinessAppliedForFrn =
     data match {
       case BusinessAppliedForPSRNumberYes(regNumber) if regNumber.length == 7 =>
         BusinessAppliedForPSRNumberYes("700000")

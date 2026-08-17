@@ -16,12 +16,12 @@
 
 package models.flowmanagement
 
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessMatchingMsbService}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessMatchingMsbService}
 import play.api.libs.json.{Json, OFormat}
 
 case class ChangeSubSectorFlowModel(
-  subSectors: Option[Set[BusinessMatchingMsbService]] = None,
-  psrNumber: Option[BusinessAppliedForPSRNumber] = None
+                                     subSectors: Option[Set[BusinessMatchingMsbService]] = None,
+                                     Frn: Option[BusinessAppliedForFrn] = None
 )
 
 object ChangeSubSectorFlowModel {

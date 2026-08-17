@@ -17,7 +17,7 @@
 package forms.businessmatching
 
 import forms.mappings.Mappings
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
@@ -29,8 +29,8 @@ class PSRNumberFormProvider @Inject() () extends Mappings {
   val min = 6
   val max = 7
 
-  def apply(): Form[BusinessAppliedForPSRNumber] =
-    Form[BusinessAppliedForPSRNumber](
+  def apply(): Form[BusinessAppliedForFrn] =
+    Form[BusinessAppliedForFrn](
       mapping(
         "appliedFor" -> boolean("error.required.msb.psr.options", "error.required.msb.psr.options"),
         "regNumber"  -> mandatoryIfTrue(
@@ -47,13 +47,13 @@ class PSRNumberFormProvider @Inject() () extends Mappings {
       )(apply)(unapply)
     )
 
-  private def apply(b: Boolean, s: Option[String]): BusinessAppliedForPSRNumber = (b, s) match {
+  private def apply(b: Boolean, s: Option[String]): BusinessAppliedForFrn = (b, s) match {
     case (false, _)        => BusinessAppliedForPSRNumberNo
     case (true, Some(str)) => BusinessAppliedForPSRNumberYes(str)
     case _                 => throw new IllegalArgumentException("No PSR Number available to bind from form")
   }
 
-  private def unapply(obj: BusinessAppliedForPSRNumber): Option[(Boolean, Option[String])] = obj match {
+  private def unapply(obj: BusinessAppliedForFrn): Option[(Boolean, Option[String])] = obj match {
     case BusinessAppliedForPSRNumberNo             => Some((false, None))
     case BusinessAppliedForPSRNumberYes(regNumber) => Some((true, Some(regNumber)))
     case _                                         => None

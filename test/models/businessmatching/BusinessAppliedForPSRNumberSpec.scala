@@ -27,18 +27,18 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec with MessagesImplicits {
 
   implicit val messages: Messages = stubMessagesApi().preferred(FakeRequest())
 
-  "BusinessAppliedForPSRNumber" should {
+  "BusinessAppliedForFrn" should {
 
     "Successfully read and write data:option yes" in {
-      BusinessAppliedForPSRNumber.jsonReads.reads(
-        BusinessAppliedForPSRNumber.jsonWrites.writes(BusinessAppliedForPSRNumberYes("123456"))
+      BusinessAppliedForFrn.jsonReads.reads(
+        BusinessAppliedForFrn.jsonWrites.writes(BusinessAppliedForPSRNumberYes("123456"))
       ) must
         be(JsSuccess(BusinessAppliedForPSRNumberYes("123456"), JsPath \ "regNumber"))
     }
 
     "Successfully read and write data:option No" in {
-      BusinessAppliedForPSRNumber.jsonReads.reads(
-        BusinessAppliedForPSRNumber.jsonWrites.writes(BusinessAppliedForPSRNumberNo)
+      BusinessAppliedForFrn.jsonReads.reads(
+        BusinessAppliedForFrn.jsonWrites.writes(BusinessAppliedForPSRNumberNo)
       ) must
         be(JsSuccess(BusinessAppliedForPSRNumberNo, JsPath))
     }
@@ -47,7 +47,7 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec with MessagesImplicits {
 
       val htmlText = "foo"
 
-      val radioButtons = BusinessAppliedForPSRNumber.formValues(Html(s"<p>$htmlText</p>"))
+      val radioButtons = BusinessAppliedForFrn.formValues(Html(s"<p>$htmlText</p>"))
 
       radioButtons.head.id mustBe Some("appliedFor-true")
       radioButtons.head.value mustBe Some("true")

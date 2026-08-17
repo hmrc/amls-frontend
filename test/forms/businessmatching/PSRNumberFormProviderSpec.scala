@@ -19,17 +19,17 @@ package forms.businessmatching
 import forms.behaviours.BooleanFieldBehaviours
 import forms.mappings.Constraints
 import generators.BaseGenerator
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
 class PSRNumberFormProviderSpec
-    extends BooleanFieldBehaviours[BusinessAppliedForPSRNumber]
+    extends BooleanFieldBehaviours[BusinessAppliedForFrn]
     with BaseGenerator
     with Constraints {
 
   val formProvider: PSRNumberFormProvider              = new PSRNumberFormProvider()
-  override val form: Form[BusinessAppliedForPSRNumber] = formProvider()
+  override val form: Form[BusinessAppliedForFrn] = formProvider()
 
   override val fieldName: String    = "appliedFor"
   override val errorMessage: String = "error.required.msb.psr.options"

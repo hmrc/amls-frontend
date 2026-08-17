@@ -32,7 +32,7 @@ class FrnPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Result] = {
-    val call = model.psrNumber map {
+    val call = model.Frn map {
       case BusinessAppliedForPSRNumberYes(_) => routes.SummaryController.get()
       case _                                 => routes.NoFrnController.get
     }
@@ -49,7 +49,7 @@ class PSRNumberPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegist
     edit: Boolean,
     includeCompanyNotRegistered: Boolean
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-    val call = model.psrNumber map {
+    val call = model.Frn map {
       case BusinessAppliedForPSRNumberYes(_) =>
         if (includeCompanyNotRegistered) {
           routes.CheckCompanyController.get()

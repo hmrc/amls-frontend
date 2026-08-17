@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import config.ApplicationConfig
-@import models.businessmatching.BusinessAppliedForPSRNumber
+@import models.businessmatching.BusinessAppliedForFrn
 @import components.{Button, ReturnLink, SectionSubtitle, Heading}
 @import components.forms.{InputText, InputYesNo, ErrorSummary}
 
@@ -33,14 +33,14 @@
         returnLink: ReturnLink
 )
 
-@(form: Form[_], edit: Boolean, showReturnLink: Boolean = true, isPreSubmission: Boolean = true, isPsrDefined: Boolean = false)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
+@(form: Form[_], edit: Boolean, showReturnLink: Boolean = true, isPreSubmission: Boolean = true, isFrnDefined: Boolean = false)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @section = @{
     if(isPreSubmission) "summary.businessmatching" else "summary.updateinformation"
 }
 
 @title = @{
-    if(isPreSubmission || !isPsrDefined) "businessmatching.frn.number.title" else "businessmatching.psr.number.title.post.submission"
+    if(isPreSubmission || !isFrnDefined) "businessmatching.frn.number.title" else "businessmatching.psr.number.title.post.submission"
 }
 
 @hasPsrNumberError = @{
@@ -95,7 +95,7 @@
 
     @formHelper(action = controllers.businessmatching.routes.FrnNumberController.post(edit)) {
 
-        @(edit, isPreSubmission, isPsrDefined) match {
+        @(edit, isPreSubmission, isFrnDefined) match {
             case (true, false, true) | (false, false, true) => {
 
                 @errorSummary(form)
@@ -153,7 +153,7 @@
                                 content = HtmlContent(supportingContent))
                         ),
                         name = "appliedFor",
-                        items = BusinessAppliedForPSRNumber.formValues(conditionalInput)
+                        items = BusinessAppliedForFrn.formValues(conditionalInput)
                     )
                     .withFormField(form("appliedFor"))
 

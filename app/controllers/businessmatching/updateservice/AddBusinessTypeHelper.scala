@@ -112,12 +112,12 @@ class AddBusinessTypeHelper @Inject() (implicit
           case Some(bm) if newActivity equals MoneyServiceBusiness =>
             val currentMsbServices =
               currentBusinessMatching.msbServices.getOrElse(BusinessMatchingMsbServices(Set.empty))
-            val newPsrNumber       = model.businessAppliedForPSRNumber
+            val newFrn       = model.businessAppliedForPSRNumber
             bm.activities(
               currentActivities.copy(businessActivities = currentActivities.businessActivities + newActivity)
             ).msbServices(
               Some(currentMsbServices.copy(msbServices = currentMsbServices.msbServices ++ newMsbServices.msbServices))
-            ).businessAppliedForPSRNumber(newPsrNumber)
+            ).businessAppliedForPSRNumber(newFrn)
               .copy(hasAccepted = true)
           case Some(bm)                                            =>
             bm.activities(

@@ -25,15 +25,15 @@ import play.api.i18n.Messages
 import services.cache.Cache
 
 case class BusinessMatching(
-  reviewDetails: Option[ReviewDetails] = None,
-  activities: Option[BusinessActivities] = None,
-  msbServices: Option[BusinessMatchingMsbServices] = None,
-  typeOfBusiness: Option[TypeOfBusiness] = None,
-  companyRegistrationNumber: Option[CompanyRegistrationNumber] = None,
-  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
-  hasChanged: Boolean = false,
-  hasAccepted: Boolean = false,
-  preAppComplete: Boolean = false
+                             reviewDetails: Option[ReviewDetails] = None,
+                             activities: Option[BusinessActivities] = None,
+                             msbServices: Option[BusinessMatchingMsbServices] = None,
+                             typeOfBusiness: Option[TypeOfBusiness] = None,
+                             companyRegistrationNumber: Option[CompanyRegistrationNumber] = None,
+                             businessAppliedForPSRNumber: Option[BusinessAppliedForFrn] = None,
+                             hasChanged: Boolean = false,
+                             hasAccepted: Boolean = false,
+                             preAppComplete: Boolean = false
 ) {
 
   def msbOrTcsp: Boolean =
@@ -84,7 +84,7 @@ case class BusinessMatching(
       hasAccepted = hasAccepted && this.companyRegistrationNumber.contains(p)
     )
 
-  def businessAppliedForPSRNumber(p: Option[BusinessAppliedForPSRNumber]): BusinessMatching =
+  def businessAppliedForPSRNumber(p: Option[BusinessAppliedForFrn]): BusinessMatching =
     this.copy(
       businessAppliedForPSRNumber = p,
       hasChanged = hasChanged || !this.businessAppliedForPSRNumber.equals(p),
@@ -241,7 +241,7 @@ object BusinessMatching {
       __.read(Reads.optionNoError[BusinessMatchingMsbServices]) and
       __.read(Reads.optionNoError[TypeOfBusiness]) and
       __.read(Reads.optionNoError[CompanyRegistrationNumber]) and
-      __.read(Reads.optionNoError[BusinessAppliedForPSRNumber]) and
+      __.read(Reads.optionNoError[BusinessAppliedForFrn]) and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
       (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false)) and
       (__ \ "preAppComplete").readNullable[Boolean].map(_.getOrElse(false))

@@ -43,12 +43,12 @@ class AddBusinessTypeFlowModelSpec extends PlaySpec {
       "set hasAccepted to true when value matches existing" in {
         val psr   = BusinessAppliedForPSRNumberYes("123456")
         val model = AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(psr), hasAccepted = true)
-        model.businessAppliedForPSRNumber(psr).hasAccepted mustBe true
+        model.withBusinessAppliedForFrn(psr).hasAccepted mustBe true
       }
 
       "set hasAccepted to false when value does not match" in {
         val model = AddBusinessTypeFlowModel(hasAccepted = true)
-        model.businessAppliedForPSRNumber(BusinessAppliedForPSRNumberNo).hasAccepted mustBe false
+        model.withBusinessAppliedForFrn(BusinessAppliedForPSRNumberNo).hasAccepted mustBe false
       }
     }
 
