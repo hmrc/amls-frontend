@@ -17,7 +17,7 @@
 package views.businessmatching
 
 import forms.businessmatching.PSRNumberFormProvider
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberYes}
 import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContentAsEmpty, Request}
@@ -52,7 +52,7 @@ class FrnNumberViewSpec extends AmlsViewSpec {
 
       val filledForm = formProvider().fill(BusinessAppliedForPSRNumberYes("1234"))
 
-      def view = frnView(filledForm, edit = true, isPreSubmission = false, isPsrDefined = true)
+      def view = frnView(filledForm, edit = true, isPreSubmission = false, isFrnDefined = true)
 
       doc.title       must startWith(
         Messages("businessmatching.psr.number.title.post.submission") + " - " + Messages("summary.updateinformation")
@@ -66,7 +66,7 @@ class FrnNumberViewSpec extends AmlsViewSpec {
 
       val messageKey = "foo"
 
-      val filledForm: Form[BusinessAppliedForPSRNumber] = formProvider().withError(FormError("appliedFor", messageKey))
+      val filledForm: Form[BusinessAppliedForFrn] = formProvider().withError(FormError("appliedFor", messageKey))
 
       def view = frnView(filledForm, edit = false)
 
@@ -80,7 +80,7 @@ class FrnNumberViewSpec extends AmlsViewSpec {
 
       val messageKey = "error.required.msb.services"
 
-      val filledForm: Form[BusinessAppliedForPSRNumber] = formProvider().withError(FormError("regNumber", messageKey))
+      val filledForm: Form[BusinessAppliedForFrn] = formProvider().withError(FormError("regNumber", messageKey))
 
       def view = frnView(filledForm, edit = false)
 
@@ -99,7 +99,7 @@ class FrnNumberViewSpec extends AmlsViewSpec {
     "hide the Yes/No selection when editing an inputted PSR number and not in-presubmission mode" in new ViewFixture {
       val filledForm = formProvider().fill(BusinessAppliedForPSRNumberYes("1234"))
 
-      override def view = frnView(filledForm, edit = true, isPreSubmission = false, isPsrDefined = true)
+      override def view = frnView(filledForm, edit = true, isPreSubmission = false, isFrnDefined = true)
 
       doc.body().text() must not include "Yes"
       doc.body().text() must not include "No"
@@ -108,7 +108,7 @@ class FrnNumberViewSpec extends AmlsViewSpec {
     "hide the Yes/No selection when editing an inputted PSR number and not in-presubmission mode and not in edit mode" in new ViewFixture {
       val filledForm = formProvider().fill(BusinessAppliedForPSRNumberYes("1234"))
 
-      override def view = frnView(filledForm, edit = false, isPreSubmission = false, isPsrDefined = true)
+      override def view = frnView(filledForm, edit = false, isPreSubmission = false, isFrnDefined = true)
 
       doc.body().text() must not include "Yes"
       doc.body().text() must not include "No"

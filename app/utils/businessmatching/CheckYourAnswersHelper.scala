@@ -46,12 +46,12 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
     )
 
   def getSubmitButton(
-    appliedForPSRNumberOpt: Option[BusinessAppliedForPSRNumber],
-    isPreSubmission: Boolean,
-    preAppCompleted: Boolean
+                       appliedForFrnOpt: Option[BusinessAppliedForFrn],
+                       isPreSubmission: Boolean,
+                       preAppCompleted: Boolean
   )(implicit messages: Messages): Option[Html] =
     if (isPreSubmission) {
-      appliedForPSRNumberOpt map {
+      appliedForFrnOpt map {
         case BusinessAppliedForPSRNumberYes(psrNumber) =>
           if (preAppCompleted) {
             button("businessmatching.summary.noedit.anchortext")

@@ -47,7 +47,7 @@ class BusinessAppliedForPSRNumberController @Inject() (
         val form = model.businessAppliedForPSRNumber.fold(formProvider())(formProvider().fill)
         Ok(view(form, edit))
       case _                             => Redirect(controllers.routes.RegistrationProgressController.get())
-    } getOrElse InternalServerError("Get: Unable to show Business Applied For PSR Number page")
+    } getOrElse InternalServerError("Get: Unable to show Business Applied For Frn page")
   }
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
@@ -57,7 +57,7 @@ class BusinessAppliedForPSRNumberController @Inject() (
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
-            case Some(model) => model.businessAppliedForPSRNumber(data)
+            case Some(model) => model.withBusinessAppliedForFrn(data)
             case None        => throw new Exception("An UnknownException has occurred: BusinessAppliedForPSRNumberController")
           } flatMap {
             case Some(model) => router.getRoute(request.credId, FrnPageId, model, edit)

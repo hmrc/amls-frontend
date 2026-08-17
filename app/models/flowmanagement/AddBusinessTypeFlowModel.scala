@@ -23,12 +23,12 @@ import play.api.i18n.Messages
 import play.api.libs.json.{Json, OFormat}
 
 case class AddBusinessTypeFlowModel(
-  activity: Option[BusinessActivity] = None,
-  addMoreActivities: Option[Boolean] = None,
-  hasChanged: Boolean = false,
-  hasAccepted: Boolean = false,
-  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
-  subSectors: Option[BusinessMatchingMsbServices] = None
+                                     activity: Option[BusinessActivity] = None,
+                                     addMoreActivities: Option[Boolean] = None,
+                                     hasChanged: Boolean = false,
+                                     hasAccepted: Boolean = false,
+                                     businessAppliedForPSRNumber: Option[BusinessAppliedForFrn] = None,
+                                     subSectors: Option[BusinessMatchingMsbServices] = None
 ) {
 
   def activity(p: BusinessActivity): AddBusinessTypeFlowModel =
@@ -38,7 +38,7 @@ case class AddBusinessTypeFlowModel(
       hasAccepted = hasAccepted && this.activity.contains(p)
     )
 
-  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): AddBusinessTypeFlowModel =
+  def withBusinessAppliedForFrn(p: BusinessAppliedForFrn): AddBusinessTypeFlowModel =
     this.copy(
       businessAppliedForPSRNumber = Some(p),
       hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p),
@@ -46,7 +46,7 @@ case class AddBusinessTypeFlowModel(
     )
 
   def msbServices(p: BusinessMatchingMsbServices): AddBusinessTypeFlowModel = {
-    val businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] =
+    val businessAppliedForFrn: Option[BusinessAppliedForFrn] =
       if (p.msbServices.contains(TransmittingMoney)) {
         this.businessAppliedForPSRNumber
       } else {
@@ -55,7 +55,7 @@ case class AddBusinessTypeFlowModel(
 
     this.copy(
       subSectors = Some(p),
-      businessAppliedForPSRNumber = businessAppliedForPSRNumber,
+      businessAppliedForPSRNumber = businessAppliedForFrn,
       hasChanged = hasChanged || !this.subSectors.contains(p),
       hasAccepted = hasAccepted && this.subSectors.contains(p)
     )

@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ChangeSubSectorHelper @Inject() (implicit val dataCacheConnector: DataCacheConnector) {
 
   def requiresPSRNumber(model: ChangeSubSectorFlowModel): Boolean =
-    model.psrNumber match {
+    model.Frn match {
       case None => model.subSectors.getOrElse(Set.empty).contains(TransmittingMoney)
       case _    => false
     }
@@ -41,7 +41,7 @@ class ChangeSubSectorHelper @Inject() (implicit val dataCacheConnector: DataCach
       case Some(x) =>
         ChangeSubSectorFlowModel(
           subSectors = x.msbServices.map(_.msbServices),
-          psrNumber = x.businessAppliedForPSRNumber
+          Frn = x.businessAppliedForPSRNumber
         )
       case None    => ChangeSubSectorFlowModel()
     }
@@ -144,7 +144,7 @@ class ChangeSubSectorHelper @Inject() (implicit val dataCacheConnector: DataCach
           businessAppliedForPSRNumber = None
         )
       } else {
-        updatedBm.businessAppliedForPSRNumber(model.psrNumber)
+        updatedBm.businessAppliedForPSRNumber(model.Frn)
       }
     }
 

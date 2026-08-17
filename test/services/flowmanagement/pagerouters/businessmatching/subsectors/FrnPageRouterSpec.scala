@@ -18,7 +18,7 @@ package services.flowmanagement.pagerouters.businessmatching.subsectors
 
 import controllers.businessmatching.routes
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
 import models.flowmanagement.ChangeSubSectorFlowModel
 import utils.AmlsSpec
 import play.api.test.Helpers._
@@ -28,20 +28,20 @@ class FrnPageRouterSpec extends AmlsSpec {
   trait Fixture {
     val router = new FrnPageRouter
 
-    val createModel: Option[BusinessAppliedForPSRNumber] => ChangeSubSectorFlowModel =
+    val createModel: Option[BusinessAppliedForFrn] => ChangeSubSectorFlowModel =
       ChangeSubSectorFlowModel.apply(Some(Set(TransmittingMoney)), _)
   }
 
   trait NotRegisteredFixture {
     val router = new PSRNumberPageRouterCompanyNotRegistered
 
-    val createModel: Option[BusinessAppliedForPSRNumber] => ChangeSubSectorFlowModel =
+    val createModel: Option[BusinessAppliedForFrn] => ChangeSubSectorFlowModel =
       ChangeSubSectorFlowModel.apply(Some(Set(TransmittingMoney)), _)
   }
 
   "FrnPageRouter" must {
     "redirect to the 'check your answers' page" when {
-      "the user has entered a PSR number" in new Fixture {
+      "the user has entered a FRN" in new Fixture {
         val model  = createModel(Some(BusinessAppliedForPSRNumberYes("123456789")))
         val result = router.getRoute("internalId", model)
 
@@ -50,7 +50,7 @@ class FrnPageRouterSpec extends AmlsSpec {
     }
 
     "route to the 'you can't continue with your change' page" when {
-      "there is no PSR number" in new Fixture {
+      "there is no FRN" in new Fixture {
         val model  = createModel(Some(BusinessAppliedForPSRNumberNo))
         val result = router.getRoute("internalId", model)
 
@@ -59,7 +59,7 @@ class FrnPageRouterSpec extends AmlsSpec {
     }
 
     "return an Internal Server Error" when {
-      "there is no PSR number data" in new Fixture {
+      "there is no FRN data" in new Fixture {
         val model  = createModel(None)
         val result = router.getRoute("internalId", model)
 
@@ -70,7 +70,7 @@ class FrnPageRouterSpec extends AmlsSpec {
 
   "PSRNumberPageRouterCompanyNotRegistered" must {
     "redirect to the 'check your answers' page" when {
-      "the user has entered a PSR number and includeCompanyNotRegistered is false" in new NotRegisteredFixture {
+      "the user has entered a FRN and includeCompanyNotRegistered is false" in new NotRegisteredFixture {
         val model  = createModel(Some(BusinessAppliedForPSRNumberYes("123456789")))
         val result = router.getRoute("internalId", model)
 
@@ -79,7 +79,7 @@ class FrnPageRouterSpec extends AmlsSpec {
     }
 
     "redirect to the 'check company' page" when {
-      "the user has entered a PSR number and includeCompanyNotRegistered is true" in new NotRegisteredFixture {
+      "the user has entered a FRN and includeCompanyNotRegistered is true" in new NotRegisteredFixture {
         val model  = createModel(Some(BusinessAppliedForPSRNumberYes("123456789")))
         val result = router.getRoute("internalId", model, includeCompanyNotRegistered = true)
 
@@ -88,7 +88,7 @@ class FrnPageRouterSpec extends AmlsSpec {
     }
 
     "route to the 'you can't continue with your change' page" when {
-      "there is no PSR number" in new NotRegisteredFixture {
+      "there is no FRN" in new NotRegisteredFixture {
         val model  = createModel(Some(BusinessAppliedForPSRNumberNo))
         val result = router.getRoute("internalId", model)
 
@@ -97,7 +97,7 @@ class FrnPageRouterSpec extends AmlsSpec {
     }
 
     "return an Internal Server Error" when {
-      "there is no PSR number data" in new NotRegisteredFixture {
+      "there is no FRN" in new NotRegisteredFixture {
         val model  = createModel(None)
         val result = router.getRoute("internalId", model)
 
