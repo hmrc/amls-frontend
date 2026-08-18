@@ -25,7 +25,7 @@ import models.flowmanagement.{AddBusinessTypeFlowModel, FrnPageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.flowmanagement.Router
 import utils.AuthAction
-import views.html.businessmatching.updateservice.add.BusinessAppliedForPSRNumberView
+import views.html.businessmatching.updateservice.add.BusinessAppliedForFrnView
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
@@ -38,7 +38,7 @@ class BusinessAppliedForPSRNumberController @Inject() (
                                                         val router: Router[AddBusinessTypeFlowModel],
                                                         val cc: MessagesControllerComponents,
                                                         formProvider: FrnFormProvider,
-                                                        view: BusinessAppliedForPSRNumberView
+                                                        view: BusinessAppliedForFrnView
 ) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
