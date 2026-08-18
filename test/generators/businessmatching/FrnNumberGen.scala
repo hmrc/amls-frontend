@@ -20,7 +20,7 @@ import generators.BaseGenerator
 import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberYes}
 import org.scalacheck.Gen
 
-trait PsrNumberGen extends BaseGenerator {
+trait FrnNumberGen extends BaseGenerator {
 
   val psrNumberGen: Gen[BusinessAppliedForFrn] = for {
     num <- numSequence(6)
