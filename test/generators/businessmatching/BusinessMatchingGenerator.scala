@@ -27,7 +27,7 @@ trait BusinessMatchingGenerator
     extends BaseGenerator
     with ReviewDetailsGenerator
     with BusinessActivitiesGenerator
-    with PsrNumberGen {
+    with FrnNumberGen {
 
   val businessMatchingGen: Gen[BusinessMatching] = for {
     reviewDetails <- reviewDetailsGen
