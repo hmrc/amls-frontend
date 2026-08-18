@@ -34,7 +34,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.updateservice.add.BusinessAppliedForPSRNumberView
+import views.html.businessmatching.updateservice.add.BusinessAppliedForFrnView
 
 class BusinessAppliedForPSRNumberControllerSpec
     extends AmlsSpec
@@ -53,7 +53,7 @@ class BusinessAppliedForPSRNumberControllerSpec
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper     = mock[AddBusinessTypeHelper]
 
-    lazy val view  = inject[BusinessAppliedForPSRNumberView]
+    lazy val view  = inject[BusinessAppliedForFrnView]
     val controller = new BusinessAppliedForPSRNumberController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
