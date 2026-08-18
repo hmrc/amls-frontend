@@ -16,7 +16,7 @@
 
 package views.businessmatching
 
-import forms.businessmatching.PSRNumberFormProvider
+import forms.businessmatching.FrnFormProvider
 import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberYes}
 import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
@@ -28,7 +28,7 @@ import views.html.businessmatching.FrnNumberView
 class FrnNumberViewSpec extends AmlsViewSpec {
 
   lazy val frnView                                               = app.injector.instanceOf[FrnNumberView]
-  lazy val formProvider                                          = app.injector.instanceOf[PSRNumberFormProvider]
+  lazy val formProvider                                          = app.injector.instanceOf[FrnFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   trait ViewFixture extends Fixture

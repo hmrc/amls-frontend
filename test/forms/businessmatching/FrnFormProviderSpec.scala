@@ -23,12 +23,12 @@ import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumb
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
-class PSRNumberFormProviderSpec
+class FrnFormProviderSpec
     extends BooleanFieldBehaviours[BusinessAppliedForFrn]
     with BaseGenerator
     with Constraints {
 
-  val formProvider: PSRNumberFormProvider              = new PSRNumberFormProvider()
+  val formProvider: FrnFormProvider              = new FrnFormProvider()
   override val form: Form[BusinessAppliedForFrn] = formProvider()
 
   override val fieldName: String    = "appliedFor"

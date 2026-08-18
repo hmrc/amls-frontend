@@ -18,7 +18,7 @@ package controllers.businessmatching.updateservice.add
 
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
-import forms.businessmatching.PSRNumberFormProvider
+import forms.businessmatching.FrnFormProvider
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.BusinessActivity.{HighValueDealing, MoneyServiceBusiness}
@@ -60,7 +60,7 @@ class BusinessAppliedForPSRNumberControllerSpec
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel],
       cc = mockMcc,
-      formProvider = inject[PSRNumberFormProvider],
+      formProvider = inject[FrnFormProvider],
       view = view
     )
 
