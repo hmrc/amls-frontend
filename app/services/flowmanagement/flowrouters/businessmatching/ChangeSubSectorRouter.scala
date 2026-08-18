@@ -46,9 +46,9 @@ class ChangeSubSectorRouter @Inject() (
 }
 
 class ChangeSubSectorRouter2 @Inject() (
-  subSectorRouter: MsbSubSectorsPageRouterCompanyNotRegistered,
-  frnPageRouter: PSRNumberPageRouterCompanyNotRegistered,
-  noPsrRouter: NoPsrNumberPageRouterCompanyNotRegistered
+                                         subSectorRouter: MsbSubSectorsPageRouterCompanyNotRegistered,
+                                         frnPageRouter: FrnPageRouterCompanyNotRegistered,
+                                         noPsrRouter: NoPsrNumberPageRouterCompanyNotRegistered
 ) extends Router2[ChangeSubSectorFlowModel] {
 
   override def getRoute(
