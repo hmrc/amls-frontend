@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
-import forms.businessmatching.PSRNumberFormProvider
+import forms.businessmatching.FrnFormProvider
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.BusinessMatchingMsbService._
@@ -58,7 +58,7 @@ class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
       createRouter2[ChangeSubSectorFlowModel],
       mock[ChangeSubSectorHelper],
       cc = mockMcc,
-      formProvider = app.injector.instanceOf[PSRNumberFormProvider],
+      formProvider = app.injector.instanceOf[FrnFormProvider],
       view = view
     )
 

@@ -24,7 +24,7 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 
-class PSRNumberFormProvider @Inject() () extends Mappings {
+class FrnFormProvider @Inject()() extends Mappings {
 
   val min = 6
   val max = 7

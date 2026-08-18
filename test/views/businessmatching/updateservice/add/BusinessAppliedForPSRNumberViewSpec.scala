@@ -16,7 +16,7 @@
 
 package views.businessmatching.updateservice.add
 
-import forms.businessmatching.PSRNumberFormProvider
+import forms.businessmatching.FrnFormProvider
 import models.businessmatching.BusinessAppliedForPSRNumberYes
 import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
@@ -27,7 +27,7 @@ class BusinessAppliedForPSRNumberViewSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture
   lazy val numberView                                            = inject[BusinessAppliedForPSRNumberView]
-  lazy val formProvider                                          = inject[PSRNumberFormProvider]
+  lazy val formProvider                                          = inject[FrnFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   def view = numberView(formProvider(), edit = false)

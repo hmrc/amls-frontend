@@ -21,7 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.businessmatching.PSRNumberFormProvider
+import forms.businessmatching.FrnFormProvider
 import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberYes}
 import models.flowmanagement.{ChangeSubSectorFlowModel, FrnPageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -34,16 +34,16 @@ import views.html.businessmatching.FrnNumberView
 import javax.inject.Inject
 
 class FrnNumberController @Inject()(
-  authAction: AuthAction,
-  val ds: CommonPlayDependencies,
-  val dataCacheConnector: DataCacheConnector,
-  val statusService: StatusService,
-  val businessMatchingService: BusinessMatchingService,
-  val router: Router2[ChangeSubSectorFlowModel],
-  val helper: ChangeSubSectorHelper,
-  val cc: MessagesControllerComponents,
-  formProvider: PSRNumberFormProvider,
-  view: FrnNumberView
+                                     authAction: AuthAction,
+                                     val ds: CommonPlayDependencies,
+                                     val dataCacheConnector: DataCacheConnector,
+                                     val statusService: StatusService,
+                                     val businessMatchingService: BusinessMatchingService,
+                                     val router: Router2[ChangeSubSectorFlowModel],
+                                     val helper: ChangeSubSectorHelper,
+                                     val cc: MessagesControllerComponents,
+                                     formProvider: FrnFormProvider,
+                                     view: FrnNumberView
 ) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
