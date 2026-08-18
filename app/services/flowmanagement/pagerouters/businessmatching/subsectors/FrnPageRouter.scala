@@ -41,7 +41,7 @@ class FrnPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
   }
 }
 
-class PSRNumberPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[ChangeSubSectorFlowModel] {
+class FrnPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[ChangeSubSectorFlowModel] {
 
   override def getRoute(
     credId: String,

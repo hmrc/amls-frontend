@@ -33,7 +33,7 @@ class FrnPageRouterSpec extends AmlsSpec {
   }
 
   trait NotRegisteredFixture {
-    val router = new PSRNumberPageRouterCompanyNotRegistered
+    val router = new FrnPageRouterCompanyNotRegistered
 
     val createModel: Option[BusinessAppliedForFrn] => ChangeSubSectorFlowModel =
       ChangeSubSectorFlowModel.apply(Some(Set(TransmittingMoney)), _)
@@ -68,7 +68,7 @@ class FrnPageRouterSpec extends AmlsSpec {
     }
   }
 
-  "PSRNumberPageRouterCompanyNotRegistered" must {
+  "FrnPageRouterCompanyNotRegistered" must {
     "redirect to the 'check your answers' page" when {
       "the user has entered a FRN and includeCompanyNotRegistered is false" in new NotRegisteredFixture {
         val model  = createModel(Some(BusinessAppliedForPSRNumberYes("123456789")))
