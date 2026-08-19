@@ -23,7 +23,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesApi
 import play.twirl.api.Html
 
-class BusinessAppliedForPSRNumberSpec extends PlaySpec with MessagesImplicits {
+class BusinessAppliedForFrnSpec extends PlaySpec with MessagesImplicits {
 
   implicit val messages: Messages = stubMessagesApi().preferred(FakeRequest())
 
