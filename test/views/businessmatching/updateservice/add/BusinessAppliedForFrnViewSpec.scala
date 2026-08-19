@@ -23,7 +23,7 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add.BusinessAppliedForFrnView
 
-class BusinessAppliedForPSRNumberViewSpec extends AmlsViewSpec {
+class BusinessAppliedForFrnViewSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture
   lazy val numberView                                            = inject[BusinessAppliedForFrnView]
@@ -32,7 +32,7 @@ class BusinessAppliedForPSRNumberViewSpec extends AmlsViewSpec {
 
   def view = numberView(formProvider(), edit = false)
 
-  "BusinessAppliedForPSRNumberView" must {
+  "BusinessAppliedForFrnView" must {
 
     "have correct title" in new ViewFixture {
 
