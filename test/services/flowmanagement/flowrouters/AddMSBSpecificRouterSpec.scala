@@ -65,7 +65,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       }
     }
 
-    "return the 'frn_number' page (BusinessAppliedForPSRNumberController)" when {
+    "return the 'frn_number' page (BusinessAppliedForFrnController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
         "MSB is the Business Activity and subservices contains TransmittingMoney" in new Fixture {
           val model  = AddBusinessTypeFlowModel(
@@ -74,7 +74,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
           )
           val result = await(router.getRoute("internalId", SubSectorsPageId, model))
 
-          result mustBe Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(false))
+          result mustBe Redirect(addRoutes.BusinessAppliedForFrnController.get(false))
         }
       }
     }
@@ -163,7 +163,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       }
     }
 
-    "return the 'PSR Number' page (BusinessAppliedForPSRNumberController)" when {
+    "return the 'PSR Number' page (BusinessAppliedForFrnController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
         "MSB is the Business Activity and subservices contains TransmittingMoney and PSR is not defined" in new Fixture {
           val model  = AddBusinessTypeFlowModel(
@@ -172,7 +172,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
           )
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(true))
+          result mustBe Redirect(addRoutes.BusinessAppliedForFrnController.get(true))
         }
       }
     }
@@ -259,7 +259,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
           )
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(true))
+          result mustBe Redirect(addRoutes.BusinessAppliedForFrnController.get(true))
         }
       }
     }
@@ -274,7 +274,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
           )
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(true))
+          result mustBe Redirect(addRoutes.BusinessAppliedForFrnController.get(true))
         }
       }
     }

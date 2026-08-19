@@ -31,7 +31,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class BusinessAppliedForPSRNumberController @Inject() (
+class BusinessAppliedForFrnController @Inject() (
                                                         authAction: AuthAction,
                                                         val ds: CommonPlayDependencies,
                                                         implicit val dataCacheConnector: DataCacheConnector,
@@ -58,12 +58,12 @@ class BusinessAppliedForPSRNumberController @Inject() (
         data =>
           dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
             case Some(model) => model.withBusinessAppliedForFrn(data)
-            case None        => throw new Exception("An UnknownException has occurred: BusinessAppliedForPSRNumberController")
+            case None        => throw new Exception("An UnknownException has occurred: BusinessAppliedForFrnController")
           } flatMap {
             case Some(model) => router.getRoute(request.credId, FrnPageId, model, edit)
             case _           =>
               Future
-                .successful(InternalServerError("Post: Cannot retrieve data: BusinessAppliedForPSRNumberController"))
+                .successful(InternalServerError("Post: Cannot retrieve data: BusinessAppliedForFrnController"))
           }
       )
   }

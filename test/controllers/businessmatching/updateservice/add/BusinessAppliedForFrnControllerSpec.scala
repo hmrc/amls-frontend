@@ -36,7 +36,7 @@ import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.add.BusinessAppliedForFrnView
 
-class BusinessAppliedForPSRNumberControllerSpec
+class BusinessAppliedForFrnControllerSpec
     extends AmlsSpec
     with MockitoSugar
     with ScalaFutures
@@ -54,7 +54,7 @@ class BusinessAppliedForPSRNumberControllerSpec
     val mockUpdateServiceHelper     = mock[AddBusinessTypeHelper]
 
     lazy val view  = inject[BusinessAppliedForFrnView]
-    val controller = new BusinessAppliedForPSRNumberController(
+    val controller = new BusinessAppliedForFrnController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
@@ -72,7 +72,7 @@ class BusinessAppliedForPSRNumberControllerSpec
     mockCacheSave[BusinessMatching]
   }
 
-  "BusinessAppliedForPSRNumberController" when {
+  "BusinessAppliedForFrnController" when {
 
     "get is called" must {
       "return OK with the psr_number view if there is MSB and TM defined" in new Fixture {
@@ -153,7 +153,7 @@ class BusinessAppliedForPSRNumberControllerSpec
 
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), flowModel)
 
-            val newRequest = FakeRequest(POST, routes.BusinessAppliedForPSRNumberController.post().url)
+            val newRequest = FakeRequest(POST, routes.BusinessAppliedForFrnController.post().url)
               .withFormUrlEncodedBody(
                 "appliedFor" -> "false"
               )
@@ -173,7 +173,7 @@ class BusinessAppliedForPSRNumberControllerSpec
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789")))
             )
 
-            val newRequest = FakeRequest(POST, routes.BusinessAppliedForPSRNumberController.post().url)
+            val newRequest = FakeRequest(POST, routes.BusinessAppliedForFrnController.post().url)
               .withFormUrlEncodedBody(
                 "appliedFor" -> "true",
                 "regNumber"  -> "123789"
@@ -200,7 +200,7 @@ class BusinessAppliedForPSRNumberControllerSpec
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo))
             )
 
-            val newRequest = FakeRequest(POST, routes.BusinessAppliedForPSRNumberController.post(true).url)
+            val newRequest = FakeRequest(POST, routes.BusinessAppliedForFrnController.post(true).url)
               .withFormUrlEncodedBody(
                 "appliedFor" -> "false"
               )
@@ -225,7 +225,7 @@ class BusinessAppliedForPSRNumberControllerSpec
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789")))
             )
 
-            val newRequest = FakeRequest(POST, routes.BusinessAppliedForPSRNumberController.post(true).url)
+            val newRequest = FakeRequest(POST, routes.BusinessAppliedForFrnController.post(true).url)
               .withFormUrlEncodedBody(
                 "appliedFor" -> "true",
                 "regNumber"  -> "123789"
@@ -248,7 +248,7 @@ class BusinessAppliedForPSRNumberControllerSpec
       "with an invalid request (missing PSR)" must {
         "return an error" in new Fixture {
           mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
-          val newRequest = FakeRequest(POST, routes.BusinessAppliedForPSRNumberController.post().url)
+          val newRequest = FakeRequest(POST, routes.BusinessAppliedForFrnController.post().url)
             .withFormUrlEncodedBody(
               "appliedFor" -> "true",
               "regNumber"  -> ""
