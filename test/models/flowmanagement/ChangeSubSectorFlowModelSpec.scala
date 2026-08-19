@@ -16,7 +16,7 @@
 
 package models.flowmanagement
 
-import models.businessmatching.BusinessAppliedForPSRNumberYes
+import models.businessmatching.BusinessAppliedForFrnYes
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
@@ -28,7 +28,7 @@ class ChangeSubSectorFlowModelSpec extends PlaySpec {
     "serialise and deserialise correctly with all fields" in {
       val model = ChangeSubSectorFlowModel(
         subSectors = Some(Set(TransmittingMoney)),
-        Frn = Some(BusinessAppliedForPSRNumberYes("123456"))
+        Frn = Some(BusinessAppliedForFrnYes("123456"))
       )
       Json.toJson(model).as[ChangeSubSectorFlowModel] mustEqual model
     }

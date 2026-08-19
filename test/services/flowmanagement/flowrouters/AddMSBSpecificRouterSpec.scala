@@ -113,7 +113,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
         "the answer is yes and MSB is the Business Activity" in new Fixture {
           val model = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa"))
+            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("aaaaa"))
           )
 
           val result = await(router.getRoute("internalId", FrnPageId, model))
@@ -154,7 +154,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
           val model  = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa"))
+            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("aaaaa"))
           )
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
@@ -196,7 +196,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
         "MSB is the Business Activity and subservices does contains TransmittingMoney, PSR is defined" in new Fixture {
           val model  = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("bbbbb")),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("bbbbb")),
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal)))
           )
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
@@ -211,7 +211,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
         "MSB is the Business Activity and subservices does contains TransmittingMoney, PSR is defined" in new Fixture {
           val model  = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("bbbbb")),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("bbbbb")),
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal)))
           )
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
@@ -227,7 +227,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
           val model  = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa"))
+            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("aaaaa"))
           )
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
@@ -285,7 +285,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
         "the answer is yes" in new Fixture {
           val model  = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("bbbbb")),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("bbbbb")),
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal)))
           )
           val result = await(router.getRoute("internalId", FrnPageId, model, edit = true))

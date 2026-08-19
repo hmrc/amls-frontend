@@ -65,7 +65,7 @@ class UpdateMongoCacheResponseSpec extends AmlsSpec {
         ),
         Some(TypeOfBusiness("test")),
         Some(CompanyRegistrationNumber("12345678")),
-        Some(BusinessAppliedForPSRNumberYes("123456")),
+        Some(BusinessAppliedForFrnYes("123456")),
         false,
         true,
         true

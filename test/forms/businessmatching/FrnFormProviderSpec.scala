@@ -19,7 +19,7 @@ package forms.businessmatching
 import forms.behaviours.BooleanFieldBehaviours
 import forms.mappings.Constraints
 import generators.BaseGenerator
-import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberNo, BusinessAppliedForFrnYes}
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
@@ -53,7 +53,7 @@ class FrnFormProviderSpec
         forAll(numSequence(formProvider.min)) { psrNum =>
           val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> psrNum))
 
-          boundForm.value  shouldBe Some(BusinessAppliedForPSRNumberYes(psrNum))
+          boundForm.value  shouldBe Some(BusinessAppliedForFrnYes(psrNum))
           boundForm.errors shouldBe Nil
         }
       }
@@ -117,7 +117,7 @@ class FrnFormProviderSpec
             )
           )
 
-          result.value  shouldBe Some(BusinessAppliedForPSRNumberYes(passStringTransformed))
+          result.value  shouldBe Some(BusinessAppliedForFrnYes(passStringTransformed))
           result.errors shouldBe empty
         }
 

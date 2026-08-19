@@ -88,7 +88,7 @@ class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
     "get is called" must {
       "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?'" in new Fixture {
         val model = BusinessMatching(
-          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("1"))
+          businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("1"))
         )
 
         when {
@@ -101,7 +101,7 @@ class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
       "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?' with pre populated data" in new Fixture {
         override val businessMatching = BusinessMatching(
-          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("700000"))
+          businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("700000"))
         )
 
         when {
@@ -146,7 +146,7 @@ class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           controller.router.verify(
             "internalId",
             FrnPageId,
-            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberYes("123789")))
+            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnYes("123789")))
           )
         }
 
@@ -220,7 +220,7 @@ class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           controller.router.verify(
             "internalId",
             FrnPageId,
-            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberYes("700000")))
+            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnYes("700000")))
           )
         }
       }

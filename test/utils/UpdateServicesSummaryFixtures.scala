@@ -126,7 +126,7 @@ trait UpdateServicesSummaryFixtures extends AmlsViewSpec {
             )
           )
         ),
-        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))
+        businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("111111"))
       )
     )
   }
@@ -141,7 +141,7 @@ trait UpdateServicesSummaryFixtures extends AmlsViewSpec {
       AddBusinessTypeFlowModel(
         activity = Some(MoneyServiceBusiness),
         subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))
+        businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("111111"))
       )
     )
   }
@@ -171,7 +171,7 @@ trait UpdateServicesSummaryFixtures extends AmlsViewSpec {
       AddBusinessTypeFlowModel(
         activity = Some(MoneyServiceBusiness),
         subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))
+        businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("111111"))
       )
     )
   }

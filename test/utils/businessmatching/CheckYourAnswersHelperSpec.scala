@@ -20,7 +20,7 @@ import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService._
-import models.businessmatching.{BusinessActivities, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes, BusinessMatching, BusinessMatchingMsbServices, BusinessType, CompanyRegistrationNumber, TypeOfBusiness}
+import models.businessmatching.{BusinessActivities, BusinessAppliedForPSRNumberNo, BusinessAppliedForFrnYes, BusinessMatching, BusinessMatchingMsbServices, BusinessType, CompanyRegistrationNumber, TypeOfBusiness}
 import play.api.test.FakeRequest
 import play.test.Helpers.fakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -34,12 +34,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
   val registrationTypeIndex   = 1
   val registeredServicesIndex = 2
   val msbActivitiesIndex      = 3
-  val hasPsrNumberIndex       = 4
-  val psrNumberIndex          = 5
+  val hasFrnIndex       = 4
+  val frnIndex          = 5
 
   def failIfEmpty = fail("HTML was not present")
 
-  val businessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberYes("123456")
+  val businessAppliedForFrnModel = BusinessAppliedForFrnYes("123456")
 
   ".createSummaryList" must {
 
@@ -453,7 +453,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             companyRegistrationNumber = Some(companyRegistrationNumberModel),
             activities = Some(businessActivitiesModel),
             msbServices = Some(msbServices),
-            businessAppliedForPSRNumber = Some(businessAppliedForPSRNumberModel)
+            businessAppliedForPSRNumber = Some(businessAppliedForFrnModel)
           )
 
           val rows = cyaHelper
@@ -464,8 +464,8 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             )(messages, request)
             .rows
 
-          val hasPsrNumberRow = rows.lift(hasPsrNumberIndex).getOrElse(failIfEmpty)
-          val psrNumberRow    = rows.lift(psrNumberIndex).getOrElse(failIfEmpty)
+          val hasPsrNumberRow = rows.lift(hasFrnIndex).getOrElse(failIfEmpty)
+          val psrNumberRow    = rows.lift(frnIndex).getOrElse(failIfEmpty)
 
           hasPsrNumberRow.key.toString   must include(messages("businessmatching.frn.number.title"))
           hasPsrNumberRow.value.toString must include(messages("lbl.yes"))
@@ -589,8 +589,8 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             )
             .rows
 
-          result.lift(hasPsrNumberIndex) mustBe None
-          result.lift(psrNumberIndex) mustBe None
+          result.lift(hasFrnIndex) mustBe None
+          result.lift(frnIndex) mustBe None
         }
 
         "is caused by the user answering 'No'" in {
@@ -609,8 +609,8 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             )
             .rows
 
-          result.lift(hasPsrNumberIndex) mustBe None
-          result.lift(psrNumberIndex) mustBe None
+          result.lift(hasFrnIndex) mustBe None
+          result.lift(frnIndex) mustBe None
         }
       }
     }
@@ -644,7 +644,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           val result = cyaHelper
             .getSubmitButton(
-              Some(businessAppliedForPSRNumberModel),
+              Some(businessAppliedForFrnModel),
               isPreSubmission = true,
               preAppCompleted = true
             )
@@ -671,7 +671,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           val result = cyaHelper
             .getSubmitButton(
-              Some(businessAppliedForPSRNumberModel),
+              Some(businessAppliedForFrnModel),
               isPreSubmission = true,
               preAppCompleted = false
             )

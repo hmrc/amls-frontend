@@ -18,7 +18,7 @@ package services.flowmanagement.pagerouters.businessmatching.subsectors
 
 import controllers.businessmatching.routes
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
-import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberNo, BusinessAppliedForFrnYes}
 import models.flowmanagement.ChangeSubSectorFlowModel
 import utils.AmlsSpec
 import play.api.test.Helpers._
@@ -42,7 +42,7 @@ class FrnPageRouterSpec extends AmlsSpec {
   "FrnPageRouter" must {
     "redirect to the 'check your answers' page" when {
       "the user has entered a FRN" in new Fixture {
-        val model  = createModel(Some(BusinessAppliedForPSRNumberYes("123456789")))
+        val model  = createModel(Some(BusinessAppliedForFrnYes("123456789")))
         val result = router.getRoute("internalId", model)
 
         redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
@@ -71,7 +71,7 @@ class FrnPageRouterSpec extends AmlsSpec {
   "FrnPageRouterCompanyNotRegistered" must {
     "redirect to the 'check your answers' page" when {
       "the user has entered a FRN and includeCompanyNotRegistered is false" in new NotRegisteredFixture {
-        val model  = createModel(Some(BusinessAppliedForPSRNumberYes("123456789")))
+        val model  = createModel(Some(BusinessAppliedForFrnYes("123456789")))
         val result = router.getRoute("internalId", model)
 
         redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
@@ -80,7 +80,7 @@ class FrnPageRouterSpec extends AmlsSpec {
 
     "redirect to the 'check company' page" when {
       "the user has entered a FRN and includeCompanyNotRegistered is true" in new NotRegisteredFixture {
-        val model  = createModel(Some(BusinessAppliedForPSRNumberYes("123456789")))
+        val model  = createModel(Some(BusinessAppliedForFrnYes("123456789")))
         val result = router.getRoute("internalId", model, includeCompanyNotRegistered = true)
 
         redirectLocation(result) mustBe Some(routes.CheckCompanyController.get().url)

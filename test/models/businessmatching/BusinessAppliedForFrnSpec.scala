@@ -31,9 +31,9 @@ class BusinessAppliedForFrnSpec extends PlaySpec with MessagesImplicits {
 
     "Successfully read and write data:option yes" in {
       BusinessAppliedForFrn.jsonReads.reads(
-        BusinessAppliedForFrn.jsonWrites.writes(BusinessAppliedForPSRNumberYes("123456"))
+        BusinessAppliedForFrn.jsonWrites.writes(BusinessAppliedForFrnYes("123456"))
       ) must
-        be(JsSuccess(BusinessAppliedForPSRNumberYes("123456"), JsPath \ "regNumber"))
+        be(JsSuccess(BusinessAppliedForFrnYes("123456"), JsPath \ "regNumber"))
     }
 
     "Successfully read and write data:option No" in {

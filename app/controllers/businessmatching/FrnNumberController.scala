@@ -22,7 +22,7 @@ import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.businessmatching.FrnFormProvider
-import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberYes}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForFrnYes}
 import models.flowmanagement.{ChangeSubSectorFlowModel, FrnPageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
@@ -53,7 +53,7 @@ class FrnNumberController @Inject()(
     } yield {
       val form = bm.businessAppliedForPSRNumber.fold(formProvider()) { frn =>
         request.session.get("originalPsrNumber") match {
-          case Some(original) => formProvider().fill(BusinessAppliedForPSRNumberYes(original))
+          case Some(original) => formProvider().fill(BusinessAppliedForFrnYes(original))
           case None           => formProvider().fill(frn)
         }
       }
@@ -89,7 +89,7 @@ class FrnNumberController @Inject()(
           data =>
             helper.getOrCreateFlowModel(request.credId) flatMap { flowModel =>
               val originalFrnNumber = data match {
-                case BusinessAppliedForPSRNumberYes(regNumber) => regNumber
+                case BusinessAppliedForFrnYes(regNumber) => regNumber
                 case _                                         => ""
               }
 
@@ -98,7 +98,7 @@ class FrnNumberController @Inject()(
               dataCacheConnector.update[ChangeSubSectorFlowModel](request.credId, ChangeSubSectorFlowModel.key) { _ =>
                 flowModel.copy(Frn = Some(transformedData))
               } flatMap {
-                case Some(m @ ChangeSubSectorFlowModel(_, Some(BusinessAppliedForPSRNumberYes(_)))) =>
+                case Some(m @ ChangeSubSectorFlowModel(_, Some(BusinessAppliedForFrnYes(_)))) =>
                   helper.updateSubSectors(request.credId, m) flatMap { _ =>
                     route(m).map(_.addingToSession("originalFrnNumber" -> originalFrnNumber))
                   }
@@ -112,8 +112,8 @@ class FrnNumberController @Inject()(
 
   private def transformFrnNumber(data: BusinessAppliedForFrn): BusinessAppliedForFrn =
     data match {
-      case BusinessAppliedForPSRNumberYes(regNumber) if regNumber.length == 7 =>
-        BusinessAppliedForPSRNumberYes("700000")
+      case BusinessAppliedForFrnYes(regNumber) if regNumber.length == 7 =>
+        BusinessAppliedForFrnYes("700000")
       case other                                                              =>
         other
     }
