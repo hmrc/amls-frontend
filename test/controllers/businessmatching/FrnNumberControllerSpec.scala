@@ -83,7 +83,7 @@ class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
     val emptyCache = Cache.empty
   }
 
-  "BusinessAppliedForPSRNumberController" when {
+  "BusinessAppliedForFrnController" when {
 
     "get is called" must {
       "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?'" in new Fixture {

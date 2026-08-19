@@ -59,7 +59,7 @@
         )),
         actions = Some(Actions(
             items = Seq(ActionItem(
-                routes.BusinessAppliedForPSRNumberController.get(true).url,
+                routes.BusinessAppliedForFrnController.get(true).url,
                 Text(messages("button.edit")),
                 attributes = Map("id" -> "psr-edit")
             ))
@@ -116,7 +116,7 @@
                                         Value(Text(psr)),
                                         actions = Some(Actions(
                                             items = Seq(ActionItem(
-                                                routes.BusinessAppliedForPSRNumberController.get(true).url,
+                                                routes.BusinessAppliedForFrnController.get(true).url,
                                                 Text(messages("button.edit")),
                                                 attributes = Map("id" -> "psr-answer-edit")
                                             ))
