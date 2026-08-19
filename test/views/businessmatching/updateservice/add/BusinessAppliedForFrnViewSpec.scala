@@ -17,7 +17,7 @@
 package views.businessmatching.updateservice.add
 
 import forms.businessmatching.FrnFormProvider
-import models.businessmatching.BusinessAppliedForPSRNumberYes
+import models.businessmatching.BusinessAppliedForFrnYes
 import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
@@ -36,7 +36,7 @@ class BusinessAppliedForFrnViewSpec extends AmlsViewSpec {
 
     "have correct title" in new ViewFixture {
 
-      val filledForm = formProvider().fill(BusinessAppliedForPSRNumberYes("1234"))
+      val filledForm = formProvider().fill(BusinessAppliedForFrnYes("1234"))
 
       override def view = numberView(filledForm, edit = false)
 
@@ -48,7 +48,7 @@ class BusinessAppliedForFrnViewSpec extends AmlsViewSpec {
     }
 
     "hide the return to progress link" in new ViewFixture {
-      val filledForm = formProvider().fill(BusinessAppliedForPSRNumberYes("1234"))
+      val filledForm = formProvider().fill(BusinessAppliedForFrnYes("1234"))
 
       override def view = numberView(filledForm, edit = true)
 

@@ -17,7 +17,7 @@
 package services.flowmanagement.pagerouters.businessmatching.subsectors
 
 import controllers.businessmatching.routes
-import models.businessmatching.BusinessAppliedForPSRNumberYes
+import models.businessmatching.BusinessAppliedForFrnYes
 import models.flowmanagement.{ChangeSubSectorFlowModel, FrnPageId}
 import play.api.mvc.Result
 import services.flowmanagement.{PageRouter, PageRouterCompanyNotRegistered}
@@ -33,7 +33,7 @@ class FrnPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
     ec: ExecutionContext
   ): Future[Result] = {
     val call = model.Frn map {
-      case BusinessAppliedForPSRNumberYes(_) => routes.SummaryController.get()
+      case BusinessAppliedForFrnYes(_) => routes.SummaryController.get()
       case _                                 => routes.NoFrnController.get
     }
 
@@ -50,7 +50,7 @@ class FrnPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[C
     includeCompanyNotRegistered: Boolean
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     val call = model.Frn map {
-      case BusinessAppliedForPSRNumberYes(_) =>
+      case BusinessAppliedForFrnYes(_) =>
         if (includeCompanyNotRegistered) {
           routes.CheckCompanyController.get()
         } else {

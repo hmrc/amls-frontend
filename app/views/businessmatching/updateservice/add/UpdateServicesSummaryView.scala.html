@@ -19,7 +19,7 @@
 @import models.businessmatching.BusinessActivity
 @import models.businessmatching.BusinessActivity.MoneyServiceBusiness
 @import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
-@import models.businessmatching.{BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
+@import models.businessmatching.{BusinessAppliedForPSRNumberNo, BusinessAppliedForFrnYes}
 @import views.html.components.{SectionSubtitle, Heading, Button}
 
 @this(
@@ -109,7 +109,7 @@
 
                         val psr = if(services.msbServices.contains(TransmittingMoney)) {
                             model.businessAppliedForPSRNumber match {
-                                case Some(BusinessAppliedForPSRNumberYes(psr)) => Seq(
+                                case Some(BusinessAppliedForFrnYes(psr)) => Seq(
                                     psrRow(true),
                                     SummaryListRow(
                                         Key(Text(messages("businessmatching.psr.number.lbl"))),

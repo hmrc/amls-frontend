@@ -114,7 +114,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
         )
       )
 
-      val BusinessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberYes("123456")
+      val BusinessAppliedForPSRNumberModel = BusinessAppliedForFrnYes("123456")
 
       val testBusinessMatching = BusinessMatching(
         Some(ReviewDetailsModel),

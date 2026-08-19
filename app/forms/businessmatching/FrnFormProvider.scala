@@ -17,7 +17,7 @@
 package forms.businessmatching
 
 import forms.mappings.Mappings
-import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberNo, BusinessAppliedForFrnYes}
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
@@ -49,13 +49,13 @@ class FrnFormProvider @Inject()() extends Mappings {
 
   private def apply(b: Boolean, s: Option[String]): BusinessAppliedForFrn = (b, s) match {
     case (false, _)        => BusinessAppliedForPSRNumberNo
-    case (true, Some(str)) => BusinessAppliedForPSRNumberYes(str)
+    case (true, Some(str)) => BusinessAppliedForFrnYes(str)
     case _                 => throw new IllegalArgumentException("No PSR Number available to bind from form")
   }
 
   private def unapply(obj: BusinessAppliedForFrn): Option[(Boolean, Option[String])] = obj match {
     case BusinessAppliedForPSRNumberNo             => Some((false, None))
-    case BusinessAppliedForPSRNumberYes(regNumber) => Some((true, Some(regNumber)))
+    case BusinessAppliedForFrnYes(regNumber) => Some((true, Some(regNumber)))
     case _                                         => None
   }
 }
