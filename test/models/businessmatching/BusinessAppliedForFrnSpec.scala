@@ -38,9 +38,9 @@ class BusinessAppliedForFrnSpec extends PlaySpec with MessagesImplicits {
 
     "Successfully read and write data:option No" in {
       BusinessAppliedForFrn.jsonReads.reads(
-        BusinessAppliedForFrn.jsonWrites.writes(BusinessAppliedForPSRNumberNo)
+        BusinessAppliedForFrn.jsonWrites.writes(BusinessAppliedForFrnNo)
       ) must
-        be(JsSuccess(BusinessAppliedForPSRNumberNo, JsPath))
+        be(JsSuccess(BusinessAppliedForFrnNo, JsPath))
     }
 
     "return the correct radio button items" in {

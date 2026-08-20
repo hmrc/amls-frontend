@@ -18,7 +18,7 @@ package services.flowmanagement.pagerouters.businessmatching.subsectors
 
 import controllers.businessmatching.routes
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
-import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberNo, BusinessAppliedForFrnYes}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForFrnNo, BusinessAppliedForFrnYes}
 import models.flowmanagement.ChangeSubSectorFlowModel
 import utils.AmlsSpec
 import play.api.test.Helpers._
@@ -51,7 +51,7 @@ class FrnPageRouterSpec extends AmlsSpec {
 
     "route to the 'you can't continue with your change' page" when {
       "there is no FRN" in new Fixture {
-        val model  = createModel(Some(BusinessAppliedForPSRNumberNo))
+        val model  = createModel(Some(BusinessAppliedForFrnNo))
         val result = router.getRoute("internalId", model)
 
         redirectLocation(result) mustBe Some(routes.NoFrnController.get.url)
@@ -89,7 +89,7 @@ class FrnPageRouterSpec extends AmlsSpec {
 
     "route to the 'you can't continue with your change' page" when {
       "there is no FRN" in new NotRegisteredFixture {
-        val model  = createModel(Some(BusinessAppliedForPSRNumberNo))
+        val model  = createModel(Some(BusinessAppliedForFrnNo))
         val result = router.getRoute("internalId", model)
 
         redirectLocation(result) mustBe Some(routes.NoFrnController.get.url)

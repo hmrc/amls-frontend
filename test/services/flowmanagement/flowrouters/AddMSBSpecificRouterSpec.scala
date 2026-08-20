@@ -98,7 +98,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
         "the answer is no and MSB is the Business Activity" in new Fixture {
           val model = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)
+            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnNo)
           )
 
           val result = await(router.getRoute("internalId", FrnPageId, model))
@@ -301,7 +301,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
         "the answer is yes" in new Fixture {
           val model  = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)
+            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnNo)
           )
           val result = await(router.getRoute("internalId", FrnPageId, model))
 

@@ -20,7 +20,7 @@ import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService._
-import models.businessmatching.{BusinessActivities, BusinessAppliedForPSRNumberNo, BusinessAppliedForFrnYes, BusinessMatching, BusinessMatchingMsbServices, BusinessType, CompanyRegistrationNumber, TypeOfBusiness}
+import models.businessmatching.{BusinessActivities, BusinessAppliedForFrnNo, BusinessAppliedForFrnYes, BusinessMatching, BusinessMatchingMsbServices, BusinessType, CompanyRegistrationNumber, TypeOfBusiness}
 import play.api.test.FakeRequest
 import play.test.Helpers.fakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -602,7 +602,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
                 companyRegistrationNumber = Some(companyRegistrationNumberModel),
                 activities = Some(businessActivitiesModel),
                 msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-                businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)
+                businessAppliedForPSRNumber = Some(BusinessAppliedForFrnNo)
               ),
               isPreSubmission = true,
               isPending = false
@@ -624,7 +624,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
         val result = cyaHelper
           .getSubmitButton(
-            Some(BusinessAppliedForPSRNumberNo),
+            Some(BusinessAppliedForFrnNo),
             isPreSubmission = true,
             preAppCompleted = false
           )
