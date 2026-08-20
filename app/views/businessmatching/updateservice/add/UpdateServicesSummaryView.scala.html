@@ -19,7 +19,7 @@
 @import models.businessmatching.BusinessActivity
 @import models.businessmatching.BusinessActivity.MoneyServiceBusiness
 @import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
-@import models.businessmatching.{BusinessAppliedForPSRNumberNo, BusinessAppliedForFrnYes}
+@import models.businessmatching.{BusinessAppliedForFrnNo, BusinessAppliedForFrnYes}
 @import views.html.components.{SectionSubtitle, Heading, Button}
 
 @this(
@@ -123,7 +123,7 @@
                                         ))
                                     )
                                 )
-                                case Some(BusinessAppliedForPSRNumberNo) => Seq(psrRow(false))
+                                case Some(BusinessAppliedForFrnNo) => Seq(psrRow(false))
                                 case _ => Seq.empty
                             }
                         } else Seq.empty

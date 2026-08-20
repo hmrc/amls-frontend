@@ -211,7 +211,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         val startResultMatching = BusinessMatching(
           activities = Some(BMBusinessActivities(Set(HighValueDealing, BillPaymentServices))),
-          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
+          businessAppliedForPSRNumber = Some(BusinessAppliedForFrnNo),
           hasAccepted = true,
           hasChanged = true
         )
@@ -251,7 +251,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         val startResultMatching = BusinessMatching(
           activities = Some(BMBusinessActivities(Set(HighValueDealing, BillPaymentServices))),
-          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
+          businessAppliedForPSRNumber = Some(BusinessAppliedForFrnNo),
           hasAccepted = true,
           hasChanged = true
         )

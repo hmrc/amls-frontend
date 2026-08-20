@@ -156,7 +156,7 @@ trait UpdateServicesSummaryFixtures extends AmlsViewSpec {
       AddBusinessTypeFlowModel(
         activity = Some(MoneyServiceBusiness),
         subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)
+        businessAppliedForPSRNumber = Some(BusinessAppliedForFrnNo)
       )
     )
   }

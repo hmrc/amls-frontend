@@ -18,7 +18,7 @@ package services.flowmanagement.pagerouters.addflow
 
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{BusinessAppliedForPSRNumberNo, BusinessAppliedForFrnYes}
+import models.businessmatching.{BusinessAppliedForFrnNo, BusinessAppliedForFrnYes}
 import models.flowmanagement.{AddBusinessTypeFlowModel, FrnPageId}
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
@@ -42,7 +42,7 @@ class BusinessAppliedForFrnPageRouter @Inject()(
     (edit, model.businessAppliedForPSRNumber) match {
       case (_, Some(BusinessAppliedForFrnYes(_))) =>
         Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
-      case (_, Some(BusinessAppliedForPSRNumberNo))     => Future.successful(Redirect(addRoutes.NoFrnController.get()))
+      case (_, Some(BusinessAppliedForFrnNo))     => Future.successful(Redirect(addRoutes.NoFrnController.get()))
       case (_, None)                                    => Future.successful(error(FrnPageId))
     }
 }

@@ -48,7 +48,7 @@ class AddBusinessTypeFlowModelSpec extends PlaySpec {
 
       "set hasAccepted to false when value does not match" in {
         val model = AddBusinessTypeFlowModel(hasAccepted = true)
-        model.withBusinessAppliedForFrn(BusinessAppliedForPSRNumberNo).hasAccepted mustBe false
+        model.withBusinessAppliedForFrn(BusinessAppliedForFrnNo).hasAccepted mustBe false
       }
     }
 

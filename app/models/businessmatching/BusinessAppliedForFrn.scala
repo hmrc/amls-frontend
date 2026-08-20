@@ -24,7 +24,7 @@ import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 
 sealed trait BusinessAppliedForFrn
 case class BusinessAppliedForFrnYes(regNumber: String) extends BusinessAppliedForFrn
-case object BusinessAppliedForPSRNumberNo extends BusinessAppliedForFrn
+case object BusinessAppliedForFrnNo extends BusinessAppliedForFrn
 
 object BusinessAppliedForFrn {
 
@@ -44,7 +44,7 @@ object BusinessAppliedForFrn {
   implicit val jsonReads: Reads[BusinessAppliedForFrn] =
     (__ \ "appliedFor").read[Boolean] flatMap {
       case true  => (__ \ "regNumber").read[String] map BusinessAppliedForFrnYes.apply
-      case false => Reads(_ => JsSuccess(BusinessAppliedForPSRNumberNo))
+      case false => Reads(_ => JsSuccess(BusinessAppliedForFrnNo))
     }
 
   implicit val jsonWrites: Writes[BusinessAppliedForFrn] = Writes[BusinessAppliedForFrn] {
@@ -53,7 +53,7 @@ object BusinessAppliedForFrn {
         "appliedFor" -> true,
         "regNumber"  -> value
       )
-    case BusinessAppliedForPSRNumberNo         => Json.obj("appliedFor" -> false)
+    case BusinessAppliedForFrnNo         => Json.obj("appliedFor" -> false)
   }
 
 }

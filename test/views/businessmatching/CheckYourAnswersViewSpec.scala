@@ -303,7 +303,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
         None,
         Some(TypeOfBusinessModel),
         Some(CompanyRegistrationNumberModel),
-        Some(BusinessAppliedForPSRNumberNo)
+        Some(BusinessAppliedForFrnNo)
       )
 
       val isPreSubmission = true

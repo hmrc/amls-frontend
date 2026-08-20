@@ -58,7 +58,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
           } else {
             button("businessmatching.button.confirm.start")
           }
-        case BusinessAppliedForPSRNumberNo             =>
+        case BusinessAppliedForFrnNo             =>
           button(
             "button.logout",
             "logout",

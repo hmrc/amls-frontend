@@ -353,7 +353,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
           (_.reviewDetails(reviewDetailsGen.sample.get), "reviewDetails"),
           (_.typeOfBusiness(TypeOfBusiness("type of business")), "typeOfBusiness"),
           (_.companyRegistrationNumber(CompanyRegistrationNumber("987654321")), "companyRegistrationNumber"),
-          (_.businessAppliedForPSRNumber(Some(BusinessAppliedForPSRNumberNo)), "businessAppliedForPSRNumber")
+          (_.businessAppliedForPSRNumber(Some(BusinessAppliedForFrnNo)), "businessAppliedForPSRNumber")
         )
 
         tests.foreach { test =>

@@ -19,7 +19,7 @@ package forms.businessmatching
 import forms.behaviours.BooleanFieldBehaviours
 import forms.mappings.Constraints
 import generators.BaseGenerator
-import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForPSRNumberNo, BusinessAppliedForFrnYes}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForFrnNo, BusinessAppliedForFrnYes}
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
@@ -44,7 +44,7 @@ class FrnFormProviderSpec
 
         val boundForm = form.bind(Map(fieldName -> "false"))
 
-        boundForm.value  shouldBe Some(BusinessAppliedForPSRNumberNo)
+        boundForm.value  shouldBe Some(BusinessAppliedForFrnNo)
         boundForm.errors shouldBe Nil
       }
 

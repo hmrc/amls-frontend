@@ -168,7 +168,7 @@ class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           controller.router.verify(
             "internalId",
             FrnPageId,
-            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberNo)),
+            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnNo)),
             edit = true
           )
         }
