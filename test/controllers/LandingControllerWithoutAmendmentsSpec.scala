@@ -23,17 +23,17 @@ import controllers.actions.{SuccessfulAuthActionNoAmlsRefNo, SuccessfulAuthActio
 import generators.StatusGenerator
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.BusinessDetails
-import models.businessmatching._
+import models.businessmatching.*
 import models.eab.Eab
 import models.responsiblepeople.TimeAtAddress.OneToThreeYears
-import models.responsiblepeople._
-import models.status._
-import models.{status => _, _}
-import org.mockito.ArgumentMatchers.{eq => meq, _}
-import org.mockito.Mockito._
+import models.responsiblepeople.*
+import models.status.*
+import models.{status as _, *}
+import org.mockito.ArgumentMatchers.{eq as meq, *}
+import org.mockito.Mockito.*
 import play.api.mvc.{BodyParsers, Result}
-import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, LandingService, StatusService}
+import play.api.test.Helpers.*
+import services.{AuthEnrolmentsService, DataChangeChecker, LandingService, StatusService}
 import services.cache.Cache
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -50,10 +50,9 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
   trait Fixture {
     self =>
 
-    val mockApplicationConfig = mock[ApplicationConfig]
-
     val request                                = addToken(authRequest)
     val config                                 = mock[ApplicationConfig]
+    val mockDataChangeChecker: DataChangeChecker = mock[DataChangeChecker]
     lazy val view                              = app.injector.instanceOf[Start]
     lazy val headerCarrierForPartialsConverter = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
     val controllerNoAmlsNumber                 = new LandingController(
@@ -70,7 +69,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       parser = mock[BodyParsers.Default],
       start = view,
       headerCarrierForPartialsConverter = headerCarrierForPartialsConverter,
-      applicationCrypto = applicationCrypto
+      applicationCrypto = applicationCrypto,
+      dataChangeChecker = mockDataChangeChecker
     )
 
     val controllerNoUserRole = new LandingController(
@@ -87,7 +87,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       parser = mock[BodyParsers.Default],
       start = view,
       headerCarrierForPartialsConverter = mock[HeaderCarrierForPartialsConverter],
-      applicationCrypto = applicationCrypto
+      applicationCrypto = applicationCrypto,
+      dataChangeChecker = mockDataChangeChecker
     )
 
     when {

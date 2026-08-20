@@ -17,11 +17,15 @@
 package services.encryption
 
 import config.ApplicationConfig
+import models.crypto.Crypto.SensitiveT
 import org.apache.commons.codec.binary.Base64
 import play.api.Logger
-import play.api.libs.json.JsValue
+import play.api.libs.json.Reads.StringReads
+import play.api.libs.json.Reads._
+import play.api.libs.json._
+import services.cache.Cache
 import uk.gov.hmrc.crypto.json.JsonEncryption
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter, PlainText}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Crypted, Decrypter, Encrypter, PlainText}
 
 import java.nio.charset.StandardCharsets.UTF_8
 import javax.crypto.Cipher
@@ -40,26 +44,26 @@ class CryptoService @Inject() (applicationConfig: ApplicationConfig, application
 
   private implicit val encrypterDecrypter: Encrypter with Decrypter = applicationCrypto.JsonCrypto
 
-  /** Take an encrypted string & return the decrypted value string
-    *
-    * @param encryptedValue
-    *   the value to decrypt
-    * @return
-    *   the decrypted string
-    */
   def decrypt(encryptedValue: String): String =
     decryptAsBytes(encryptedValue) match {
       case Success(decryptedBytes) => new String(decryptedBytes)
       case Failure(_)              => encryptedValue
     }
 
-  /** Perform decryption twice to a JSON string that has been encrypted twice
-    *
-    * @param doublyEncryptedValue
-    *   The JSON string that has been encrypted twice
-    * @return
-    *   The decrypted value
-    */
+  def decryptReEncrypt(cache: Cache): Cache = {
+    val rebuiltCache: Map[String, JsValue] = cache.data.foldLeft(Map.empty[String, JsValue]) { (newCache, keyValue) =>
+      val plainText: PlainText = doubleDecryptJsonString(keyValue._2.toString())
+
+      if (applicationConfig.mongoEncryptionEnabled) {
+        newCache + (keyValue._1 -> JsString(encrypterDecrypter.encrypt(plainText).value))
+      } else {
+        newCache + (keyValue._1 -> Json.parse(plainText.value))
+      }
+    }
+
+    Cache(cache.id, rebuiltCache)
+  }
+
   def doubleDecryptJsonString(doublyEncryptedValue: String): PlainText = {
     val value = decrypt(doublyEncryptedValue)
     value.startsWith("{") | value.startsWith("[") match {
@@ -70,20 +74,9 @@ class CryptoService @Inject() (applicationConfig: ApplicationConfig, application
     }
   }
 
-  /** Encrypt a JSON string using the implicit Encrypter
-    * @param jsonString
-    * @return
-    */
   def encryptJsonString(jsonString: String): JsValue =
     JsonEncryption.stringEncrypter.writes(jsonString)
 
-  /** Take an encrypted string & return the decrypted raw array of bytes
-    *
-    * @param encryptedValue
-    *   the value to decrypt
-    * @return
-    *   the decrypted raw array of bytes
-    */
   def decryptAsBytes(encryptedValue: String): Try[Array[Byte]] =
     Try {
       val cipher: Cipher = Cipher.getInstance(secretKeySpec.getAlgorithm)
@@ -93,4 +86,69 @@ class CryptoService @Inject() (applicationConfig: ApplicationConfig, application
       case Success(value)     => Success(value)
       case Failure(exception) => Failure(new SecurityException(exception))
     }
+
+  def sanitiseDoubleDecrypt[T](key: String, cache: Cache)(implicit reads: Reads[T]): Option[T] = {
+    val entry = Try(cache.getEntry(key)(reads))
+
+    entry match {
+      case Success(value)        => value
+      case Failure(_: Exception) =>
+        val sensitiveDecrypter: Reads[SensitiveT[T]]            =
+          JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
+        val sensitiveStringDecrypter: Reads[SensitiveT[String]] =
+          JsonEncryption.sensitiveDecrypter[String, SensitiveT[String]](SensitiveT.apply)
+
+        cache.data
+          .get(key)
+          .map {
+            case jsStr @ JsString(str) if str.startsWith("{") | str.startsWith("[") =>
+              reads.reads(jsStr).asOpt.getOrElse(throw new Exception("error reading"))
+            case JsString(doubleEncStr)                                             =>
+              val sanitisedDoubleEncryptedStr = doubleEncStr.stripPrefix("'").stripSuffix("'")
+              Try(sensitiveDecrypter.reads(JsString(sanitisedDoubleEncryptedStr))) match {
+                case Success(jsResult)             => jsResult.get.decryptedValue
+                case Failure(ex)                   => throw ex
+                case Failure(_: JsResultException) =>
+                  sensitiveStringDecrypter
+                    .reads(JsString(sanitisedDoubleEncryptedStr))
+                    .flatMap(decryptedStr => sensitiveDecrypter.reads(JsString(decryptedStr.decryptedValue)))
+                    .map(_.decryptedValue)
+                    .getOrElse(throw new Exception("unable to double decrypt value"))
+              }
+          }
+    }
+  }
+  
+  def catchDoubleEncryption[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] =
+    Try(decryptValue[T](cache, key)(reads)) match {
+      case Failure(_: JsResultException) =>
+        logger.warn(s"performing double decryption")
+        decryptValue[String](cache, key)(StringReads)
+          .map(hashedStr =>
+            JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply).reads(JsString(hashedStr))
+          )
+          .map(result => result.map(protectedObj => protectedObj.decryptedValue))
+          .map {
+            case JsSuccess(value, _) => Option(value)
+            case JsError(errors) =>
+              throw new Exception(s"Error trying to double decrypt: $errors")
+          }
+          .getOrElse(throw new Exception(s"Result of decryption returned nothing $key"))
+      case Failure(exception) => throw exception
+      case Success(value) => value
+    }
+  
+  private def decryptValue[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] = {
+    val sensitiveDecrypter: Reads[SensitiveT[T]] = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
+
+    cache.data.get(key) flatMap { (encryptedJson: JsValue) =>
+      val decryptionResult: JsResult[SensitiveT[T]] = sensitiveDecrypter.reads(encryptedJson)
+
+      if (decryptionResult.isSuccess) {
+        Some(decryptionResult.get.decryptedValue)
+      } else {
+        None
+      }
+    }
+  }
 }

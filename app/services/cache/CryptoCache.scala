@@ -16,6 +16,8 @@
 
 package services.cache
 
+import services.encryption.CryptoService
+
 import play.api.libs.json.Reads
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
@@ -26,7 +28,7 @@ import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
   * @param crypto
   *   The cryptography instance to use to decrypt values
   */
-class CryptoCache(cache: Cache, crypto: Encrypter with Decrypter) extends Cache(cache.id, cache.data) with CacheOps {
+class CryptoCache(cache: Cache, cryptoService: CryptoService) extends Cache(cache.id, cache.data) {
   override def getEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] =
-    catchDoubleEncryption(cache, key)(fmt, crypto)
+    cryptoService.catchDoubleEncryption[T](cache, key)(fmt)
 }
