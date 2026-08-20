@@ -34,11 +34,6 @@ class DataCacheConnector @Inject() (val cacheConnector: MongoCacheConnector) {
   def upsertNewAuth[T](targetCache: Cache, cacheId: String, data: T)(implicit format: Format[T]): Cache =
     cacheConnector.upsertNewAuth(targetCache, cacheId, data)
 
-  /**
-    * TODO Look into this ...
-    * @param credId
-    * @return
-    */
   def fetchAll(credId: String): Future[Option[Cache]] =
     cacheConnector.fetchAll(credId)
 

@@ -34,12 +34,7 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
     ConfigFactory.load().withValue("appCache.mongo.encryptionEnabled", ConfigValueFactory.fromAnyRef(false))
   )
 
-//  val configWithEncryption: Configuration       = Configuration(
-//    ConfigFactory.load().withValue("appCache.mongo.encryptionEnabled", ConfigValueFactory.fromAnyRef(true))
-//  )
-
   val appConfigNoEncryption                     = new ApplicationConfig(configNoEncryption, app.injector.instanceOf[ServicesConfig])
-//  val appConfigWithEncryption                   = new ApplicationConfig(configWithEncryption, app.injector.instanceOf[ServicesConfig])
 
   override val repository: MongoCacheClient     = new MongoCacheClient(
     appConfigNoEncryption,
