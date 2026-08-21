@@ -38,7 +38,7 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class DataChangeChecker @Inject() (cryptoService: CryptoService) {
 
-  def dataHasChanged(cache: Cache): Boolean = {
+  def dataHasChanged(cache: Cache): Boolean =
     Seq(
       cryptoService.sanitiseDoubleDecrypt[Asp](Asp.key, cache).fold(false)(_.hasChanged),
       cryptoService.sanitiseDoubleDecrypt[Amp](Amp.key, cache).fold(false)(_.hasChanged),
@@ -47,13 +47,18 @@ class DataChangeChecker @Inject() (cryptoService: CryptoService) {
       cryptoService.sanitiseDoubleDecrypt[BusinessActivities](BusinessActivities.key, cache).fold(false)(_.hasChanged),
       cryptoService.sanitiseDoubleDecrypt[BusinessMatching](BusinessMatching.key, cache).fold(false)(_.hasChanged),
       cryptoService.sanitiseDoubleDecrypt[Eab](Eab.key, cache).fold(false)(_.hasChanged),
-      cryptoService.sanitiseDoubleDecrypt[MoneyServiceBusiness](MoneyServiceBusiness.key, cache).fold(false)(_.hasChanged),
-      cryptoService.sanitiseDoubleDecrypt[Seq[ResponsiblePerson]](ResponsiblePerson.key, cache).fold(false)(_.exists(_.hasChanged)),
+      cryptoService
+        .sanitiseDoubleDecrypt[MoneyServiceBusiness](MoneyServiceBusiness.key, cache)
+        .fold(false)(_.hasChanged),
+      cryptoService
+        .sanitiseDoubleDecrypt[Seq[ResponsiblePerson]](ResponsiblePerson.key, cache)
+        .fold(false)(_.exists(_.hasChanged)),
       cryptoService.sanitiseDoubleDecrypt[Supervision](Supervision.key, cache).fold(false)(_.hasChanged),
       cryptoService.sanitiseDoubleDecrypt[Tcsp](Tcsp.key, cache).fold(false)(_.hasChanged),
-      cryptoService.sanitiseDoubleDecrypt[Seq[TradingPremises]](TradingPremises.key, cache).fold(false)(_.exists(_.hasChanged)),
+      cryptoService
+        .sanitiseDoubleDecrypt[Seq[TradingPremises]](TradingPremises.key, cache)
+        .fold(false)(_.exists(_.hasChanged)),
       cryptoService.sanitiseDoubleDecrypt[Hvd](Hvd.key, cache).fold(false)(_.hasChanged),
       cryptoService.sanitiseDoubleDecrypt[Renewal](Renewal.key, cache).fold(false)(_.hasChanged)
     ).exists(identity)
-  }
 }

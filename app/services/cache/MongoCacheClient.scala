@@ -187,9 +187,9 @@ class MongoCacheClient @Inject() (
   /** Saves everything from the in-memory cache into the database - all user data
     *
     * @param cache
-    * the in-memory cache to copy into the database
+    *   the in-memory cache to copy into the database
     * @return
-    * whether the operation was successful or not
+    *   whether the operation was successful or not
     */
   def saveAll(cache: Cache, credId: String): Future[Boolean] = {
     val rebuiltCache = cryptoService.decryptReEncrypt(cache)
@@ -207,14 +207,14 @@ class MongoCacheClient @Inject() (
       .map(_ => true)
   }
 
-  private def getValue[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] = cache.data.get(key) flatMap {
-    (json: JsValue) =>
+  private def getValue[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] =
+    cache.data.get(key) flatMap { (json: JsValue) =>
       if (json.validate[T].isSuccess) {
         Some(json.as[T])
       } else {
         None
       }
-  }
+    }
 
   /** Generates a BSON document query for an id
     */

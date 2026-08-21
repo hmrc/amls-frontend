@@ -77,7 +77,6 @@ class LandingControllerWithAmendmentsSpec
 
   lazy val headerCarrierForPartialsConverter = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
 
-
   def testCache(hasChanged: Boolean): Cache = createTestCache(
     hasChanged = hasChanged,
     includesResponse = false,
@@ -87,10 +86,10 @@ class LandingControllerWithAmendmentsSpec
 
   trait Fixture { self =>
 
-    val request   = addToken(authRequest)
-    val config    = mock[ApplicationConfig]
+    val request                                  = addToken(authRequest)
+    val config                                   = mock[ApplicationConfig]
     val mockDataChangeChecker: DataChangeChecker = mock[DataChangeChecker]
-    lazy val view = app.injector.instanceOf[Start]
+    lazy val view                                = app.injector.instanceOf[Start]
 
     val controller = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -130,10 +129,10 @@ class LandingControllerWithAmendmentsSpec
   trait FixtureNoAmlsNumber extends AuthorisedFixture {
     self =>
 
-    val request   = addToken(authRequest)
-    val config    = mock[ApplicationConfig]
+    val request                                  = addToken(authRequest)
+    val config                                   = mock[ApplicationConfig]
     val mockDataChangeChecker: DataChangeChecker = mock[DataChangeChecker]
-    lazy val view = app.injector.instanceOf[Start]
+    lazy val view                                = app.injector.instanceOf[Start]
 
     val controller = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],

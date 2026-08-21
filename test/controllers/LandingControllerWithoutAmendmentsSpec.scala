@@ -50,12 +50,12 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
   trait Fixture {
     self =>
 
-    val request                                = addToken(authRequest)
-    val config                                 = mock[ApplicationConfig]
+    val request                                  = addToken(authRequest)
+    val config                                   = mock[ApplicationConfig]
     val mockDataChangeChecker: DataChangeChecker = mock[DataChangeChecker]
-    lazy val view                              = app.injector.instanceOf[Start]
-    lazy val headerCarrierForPartialsConverter = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
-    val controllerNoAmlsNumber                 = new LandingController(
+    lazy val view                                = app.injector.instanceOf[Start]
+    lazy val headerCarrierForPartialsConverter   = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
+    val controllerNoAmlsNumber                   = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
       landingService = mock[LandingService],
       authAction = SuccessfulAuthActionNoAmlsRefNo,

@@ -30,13 +30,13 @@ import utils.AmlsSpec
 
 class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySupport[Cache] {
 
-  val configNoEncryption: Configuration         = Configuration(
+  val configNoEncryption: Configuration = Configuration(
     ConfigFactory.load().withValue("appCache.mongo.encryptionEnabled", ConfigValueFactory.fromAnyRef(false))
   )
 
-  val appConfigNoEncryption                     = new ApplicationConfig(configNoEncryption, app.injector.instanceOf[ServicesConfig])
+  val appConfigNoEncryption = new ApplicationConfig(configNoEncryption, app.injector.instanceOf[ServicesConfig])
 
-  override val repository: MongoCacheClient     = new MongoCacheClient(
+  override val repository: MongoCacheClient = new MongoCacheClient(
     appConfigNoEncryption,
     app.injector.instanceOf[ApplicationCrypto],
     mongoComponent,
@@ -46,14 +46,14 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
   private lazy val encryptedApp: Application =
     new GuiceApplicationBuilder()
       .configure(
-        "play.filters.disabled" -> List(
+        "play.filters.disabled"            -> List(
           "uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter"
         ),
         "appCache.mongo.encryptionEnabled" -> true
       )
       .build()
 
-  val encryptedRepository                       =
+  val encryptedRepository =
     new MongoCacheClient(
       encryptedApp.injector.instanceOf[ApplicationConfig],
       encryptedApp.injector.instanceOf[ApplicationCrypto],

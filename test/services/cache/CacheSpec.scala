@@ -83,8 +83,7 @@ class CacheSpec extends AmlsSpec {
       }
     }
 
-    /**
-      * Encryption needs to be enabled ...
+    /** Encryption needs to be enabled ...
       */
     "decrypt encrypted values and encrypt them" ignore {
       "apply encryption is set" ignore {
@@ -120,7 +119,8 @@ class CacheSpec extends AmlsSpec {
       val cache = Cache("test-cache-map-1", Map(BusinessMatching.key -> JsString(encryptedBusinessMatching)))
 
       // When
-      val unencryptedBusinessMatching = cryptoService.sanitiseDoubleDecrypt(BusinessMatching.key, cache)(BusinessMatching.reads)
+      val unencryptedBusinessMatching =
+        cryptoService.sanitiseDoubleDecrypt(BusinessMatching.key, cache)(BusinessMatching.reads)
 
       // Then
       unencryptedBusinessMatching.value mustEqual BusinessMatching(

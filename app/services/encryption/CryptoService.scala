@@ -118,7 +118,7 @@ class CryptoService @Inject() (applicationConfig: ApplicationConfig, application
           }
     }
   }
-  
+
   def catchDoubleEncryption[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] =
     Try(decryptValue[T](cache, key)(reads)) match {
       case Failure(_: JsResultException) =>
@@ -130,14 +130,14 @@ class CryptoService @Inject() (applicationConfig: ApplicationConfig, application
           .map(result => result.map(protectedObj => protectedObj.decryptedValue))
           .map {
             case JsSuccess(value, _) => Option(value)
-            case JsError(errors) =>
+            case JsError(errors)     =>
               throw new Exception(s"Error trying to double decrypt: $errors")
           }
           .getOrElse(throw new Exception(s"Result of decryption returned nothing $key"))
-      case Failure(exception) => throw exception
-      case Success(value) => value
+      case Failure(exception)            => throw exception
+      case Success(value)                => value
     }
-  
+
   private def decryptValue[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] = {
     val sensitiveDecrypter: Reads[SensitiveT[T]] = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
 
