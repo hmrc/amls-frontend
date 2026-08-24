@@ -42,7 +42,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
         registeredServices(businessMatching, isPreSubmission, isPending),
         moneyServiceBusinessActivities(businessMatching, isPending)
       ).flatten ++
-        psrRegistrationNumber(businessMatching).getOrElse(Seq.empty[SummaryListRow])
+        withFrn(businessMatching).getOrElse(Seq.empty[SummaryListRow])
     )
 
   def getSubmitButton(
@@ -224,7 +224,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
 
   }.flatten
 
-  private def psrRegistrationNumber(
+  private def withFrn(
     businessMatching: BusinessMatching
   )(implicit messages: Messages, request: Request[_]): Option[Seq[SummaryListRow]] = {
     for {
