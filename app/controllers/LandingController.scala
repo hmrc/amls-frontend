@@ -20,7 +20,7 @@ import audit.ServiceEntrantEvent
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import forms.mappings.Constraints
-import models._
+import models.*
 import models.amp.Amp
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -33,15 +33,16 @@ import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePerson
-import models.status._
+import models.status.*
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc._
+import play.api.mvc.*
 import services.cache.Cache
-import services.{AuthEnrolmentsService, LandingService, StatusService}
+import services.encryption.CryptoService
+import services.{AuthEnrolmentsService, DataChangeChecker, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -67,6 +68,7 @@ class LandingController @Inject() (
   implicit override val messagesApi: MessagesApi,
   val config: ApplicationConfig,
   val applicationCrypto: ApplicationCrypto,
+  val dataChangeChecker: DataChangeChecker,
   parser: BodyParsers.Default,
   start: Start,
   headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter
@@ -122,7 +124,7 @@ class LandingController @Inject() (
         } else {
           val cache: Cache = optPrefilledCache.head
           logger.debug("getWithAmendments:AMLSReference:" + amlsRegistrationNumber)
-          if (dataHasChanged(cache)) {
+          if (dataChangeChecker.dataHasChanged(cache)) {
             cache.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
               case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cache), credId, accountTypeId)
             } getOrElse landingService.setAltCorrespondenceAddress(
@@ -325,22 +327,4 @@ class LandingController @Inject() (
           .cacheMap(cacheId)
           .map(cache => cache.map(_.getEntry[Eab](Eab.key)).exists(_.exists(_.isInvalidRedressScheme)))
     }
-
-  private def dataHasChanged(cache: Cache): Boolean =
-    Seq(
-      cache.sanitiseDoubleDecrypt[Asp](Asp.key).fold(false)(_.hasChanged),
-      cache.sanitiseDoubleDecrypt[Amp](Amp.key).fold(false)(_.hasChanged),
-      cache.sanitiseDoubleDecrypt[BusinessDetails](BusinessDetails.key).fold(false)(_.hasChanged),
-      cache.sanitiseDoubleDecrypt[Seq[BankDetails]](BankDetails.key).fold(false)(_.exists(_.hasChanged)),
-      cache.sanitiseDoubleDecrypt[BusinessActivities](BusinessActivities.key).fold(false)(_.hasChanged),
-      cache.sanitiseDoubleDecrypt[BusinessMatching](BusinessMatching.key).fold(false)(_.hasChanged),
-      cache.sanitiseDoubleDecrypt[Eab](Eab.key).fold(false)(_.hasChanged),
-      cache.sanitiseDoubleDecrypt[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false)(_.hasChanged),
-      cache.sanitiseDoubleDecrypt[Seq[ResponsiblePerson]](ResponsiblePerson.key).fold(false)(_.exists(_.hasChanged)),
-      cache.sanitiseDoubleDecrypt[Supervision](Supervision.key).fold(false)(_.hasChanged),
-      cache.sanitiseDoubleDecrypt[Tcsp](Tcsp.key).fold(false)(_.hasChanged),
-      cache.sanitiseDoubleDecrypt[Seq[TradingPremises]](TradingPremises.key).fold(false)(_.exists(_.hasChanged)),
-      cache.sanitiseDoubleDecrypt[Hvd](Hvd.key).fold(false)(_.hasChanged),
-      cache.sanitiseDoubleDecrypt[Renewal](Renewal.key).fold(false)(_.hasChanged)
-    ).exists(identity)
 }

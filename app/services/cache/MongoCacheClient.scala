@@ -68,10 +68,7 @@ class MongoCacheClient @Inject() (
         )
       )
     )
-    with Conversions
-    with CacheOps {
-
-  val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
+    with Conversions {
 
   /** Inserts data into the cache with the specified key. If the data does not exist, it will be created.
     */
@@ -141,7 +138,7 @@ class MongoCacheClient @Inject() (
     fetchAll(credId) map {
       case Some(cache) =>
         if (appConfig.mongoEncryptionEnabled) {
-          catchDoubleEncryption[T](cache, key)(reads, compositeSymmetricCrypto)
+          cryptoService.catchDoubleEncryption[T](cache, key)(reads)
         } else {
           getValue[T](cache, key)
         }
@@ -157,7 +154,7 @@ class MongoCacheClient @Inject() (
     */
   def fetchAll(credId: String): Future[Option[Cache]] =
     collection.find(bsonIdQuery(credId)).headOption().map {
-      case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
+      case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, cryptoService))
       case c                                           => c
     }
 
@@ -167,7 +164,7 @@ class MongoCacheClient @Inject() (
     credId match {
       case Some(x) =>
         collection.find(key(x)).headOption().map {
-          case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
+          case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, cryptoService))
           case c                                           => c
         }
       case _       => Future.successful(None)
@@ -194,41 +191,8 @@ class MongoCacheClient @Inject() (
     * @return
     *   whether the operation was successful or not
     */
-  def saveAll(cache: Cache): Future[Boolean] = {
-    val rebuiltCache = cache.decryptReEncrypt(
-      appConfig.mongoEncryptionEnabled,
-      cryptoService.doubleDecryptJsonString,
-      compositeSymmetricCrypto.encrypt
-    )
-    collection
-      .findOneAndUpdate(
-        filter = bsonIdQuery(cache.id),
-        update = Updates.combine(
-          Updates.set("id", rebuiltCache.id),
-          Updates.set("data", Codecs.toBson(rebuiltCache.data)),
-          Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))
-        ),
-        options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
-      )
-      .toFuture()
-      .map(_ => true)
-  }
-
-  /** Save all data about a particular user from the in-memory cache into the database
-    *
-    * @param cache
-    *   the cache to take the data from
-    * @param credId
-    *   the user of which to copy the data of
-    * @return
-    *   whether the operation was successful or not
-    */
   def saveAll(cache: Cache, credId: String): Future[Boolean] = {
-    val rebuiltCache = cache.decryptReEncrypt(
-      appConfig.mongoEncryptionEnabled,
-      cryptoService.doubleDecryptJsonString,
-      compositeSymmetricCrypto.encrypt
-    )
+    val rebuiltCache = cryptoService.decryptReEncrypt(cache)
     collection
       .findOneAndUpdate(
         filter = bsonIdQuery(rebuiltCache.id),
@@ -242,6 +206,15 @@ class MongoCacheClient @Inject() (
       .toFuture()
       .map(_ => true)
   }
+
+  private def getValue[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] =
+    cache.data.get(key) flatMap { (json: JsValue) =>
+      if (json.validate[T].isSuccess) {
+        Some(json.as[T])
+      } else {
+        None
+      }
+    }
 
   /** Generates a BSON document query for an id
     */

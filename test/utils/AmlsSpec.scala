@@ -50,7 +50,8 @@ trait AmlsSpec
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .configure(
-        "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+        "play.filters.disabled"            -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter"),
+        "appCache.mongo.encryptionEnabled" -> false
       )
       .build()
 

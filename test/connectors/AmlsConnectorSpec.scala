@@ -169,7 +169,6 @@ class AmlsConnectorSpec
 
       val result = eventualResponse.futureValue
 
-      println(result)
       result mustBe subscriptionResponse
     }
   }

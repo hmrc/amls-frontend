@@ -20,32 +20,50 @@ import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.{SuccessfulAuthAction, SuccessfulAuthActionNoAmlsRefNo}
 import generators.StatusGenerator
+import models.bankdetails.BankDetails
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.BusinessDetails
-import models.businessmatching._
+import models.businessmatching.*
 import models.eab.Eab
-import models.responsiblepeople._
-import models.status._
+import models.responsiblepeople.*
+import models.status.*
 import models.tradingpremises.TradingPremises
-import models.{status => _, _}
-import org.mockito.ArgumentMatchers.{eq => meq, _}
+import models.{status as _, *}
+import org.mockito.ArgumentMatchers.{eq as meq, *}
 import org.mockito.Mockito
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import play.api.mvc.BodyParsers
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.cache.Cache
-import services.{AuthEnrolmentsService, LandingService, StatusService}
+import services.{AuthEnrolmentsService, DataChangeChecker, LandingService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.Start
+import org.mockito.ArgumentMatchers
 
 import scala.concurrent.{ExecutionContext, Future}
+
+import play.api.libs.json._
+import models.asp.Asp
+import models.amp.Amp
+import models.businessdetails.BusinessDetails
+import models.bankdetails.BankDetails
+import models.businessactivities.BusinessActivities
+import models.businessmatching.BusinessMatching
+import models.eab.Eab
+import models.moneyservicebusiness.MoneyServiceBusiness
+import models.responsiblepeople.ResponsiblePerson
+import models.supervision.Supervision
+import models.tcsp.Tcsp
+import models.tradingpremises.TradingPremises
+import models.hvd.Hvd
+import models.renewal.Renewal
 
 class LandingControllerWithAmendmentsSpec
     extends AmlsSpec
@@ -59,11 +77,19 @@ class LandingControllerWithAmendmentsSpec
 
   lazy val headerCarrierForPartialsConverter = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
 
+  def testCache(hasChanged: Boolean): Cache = createTestCache(
+    hasChanged = hasChanged,
+    includesResponse = false,
+    includeSubmissionStatus = true,
+    includeDataImport = true
+  )
+
   trait Fixture { self =>
 
-    val request   = addToken(authRequest)
-    val config    = mock[ApplicationConfig]
-    lazy val view = app.injector.instanceOf[Start]
+    val request                                  = addToken(authRequest)
+    val config                                   = mock[ApplicationConfig]
+    val mockDataChangeChecker: DataChangeChecker = mock[DataChangeChecker]
+    lazy val view                                = app.injector.instanceOf[Start]
 
     val controller = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -79,7 +105,8 @@ class LandingControllerWithAmendmentsSpec
       parser = mock[BodyParsers.Default],
       start = view,
       headerCarrierForPartialsConverter = headerCarrierForPartialsConverter,
-      applicationCrypto = applicationCrypto
+      applicationCrypto = applicationCrypto,
+      dataChangeChecker = mockDataChangeChecker
     )
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any(), any()))
@@ -102,9 +129,10 @@ class LandingControllerWithAmendmentsSpec
   trait FixtureNoAmlsNumber extends AuthorisedFixture {
     self =>
 
-    val request   = addToken(authRequest)
-    val config    = mock[ApplicationConfig]
-    lazy val view = app.injector.instanceOf[Start]
+    val request                                  = addToken(authRequest)
+    val config                                   = mock[ApplicationConfig]
+    val mockDataChangeChecker: DataChangeChecker = mock[DataChangeChecker]
+    lazy val view                                = app.injector.instanceOf[Start]
 
     val controller = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -120,7 +148,8 @@ class LandingControllerWithAmendmentsSpec
       parser = mock[BodyParsers.Default],
       start = view,
       headerCarrierForPartialsConverter = headerCarrierForPartialsConverter,
-      applicationCrypto = applicationCrypto
+      applicationCrypto = applicationCrypto,
+      dataChangeChecker = mockDataChangeChecker
     )
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any(), any()))
@@ -277,15 +306,10 @@ class LandingControllerWithAmendmentsSpec
 
         "data has just been imported" should {
 
-          def runImportTest(hasChanged: Boolean): Unit = new Fixture {
-            val testCache = createTestCache(
-              hasChanged = hasChanged,
-              includesResponse = false,
-              includeSubmissionStatus = true,
-              includeDataImport = true
-            )
+          def runImportTest(hasChanged: Boolean, cache: Cache): Unit = new Fixture {
+            setUpMocksForDataExistsInMongoCache(controller, cache)
 
-            setUpMocksForDataExistsInMongoCache(controller, testCache)
+            when(mockDataChangeChecker.dataHasChanged(any())).thenReturn(hasChanged)
 
             when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
               .thenReturn(
@@ -314,11 +338,12 @@ class LandingControllerWithAmendmentsSpec
 
           "redirect to the status page without refreshing the cache" when {
             "hasChanged is false" in {
-              runImportTest(hasChanged = false)
+              val cache = testCache(false)
+              runImportTest(hasChanged = false, cache)
             }
 
             "hasChanged is true" in new Fixture {
-              runImportTest(hasChanged = true)
+              runImportTest(hasChanged = true, testCache(true))
             }
           }
         }

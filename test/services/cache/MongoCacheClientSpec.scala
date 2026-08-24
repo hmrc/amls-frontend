@@ -18,7 +18,9 @@ package services.cache
 
 import com.typesafe.config.{ConfigFactory, ConfigValueFactory}
 import config.ApplicationConfig
+import play.api.Application
 import play.api.Configuration
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsString, Reads}
 import services.encryption.CryptoService
 import uk.gov.hmrc.crypto.ApplicationCrypto
@@ -28,44 +30,63 @@ import utils.AmlsSpec
 
 class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySupport[Cache] {
 
-  val configNoEncryption: Configuration         = Configuration(
+  val configNoEncryption: Configuration = Configuration(
     ConfigFactory.load().withValue("appCache.mongo.encryptionEnabled", ConfigValueFactory.fromAnyRef(false))
   )
-  val configWithEncryption: Configuration       = Configuration(
-    ConfigFactory.load().withValue("appCache.mongo.encryptionEnabled", ConfigValueFactory.fromAnyRef(true))
-  )
-  val appConfigNoEncryption                     = new ApplicationConfig(configNoEncryption, app.injector.instanceOf[ServicesConfig])
-  val appConfigWithEncryption                   = new ApplicationConfig(configWithEncryption, app.injector.instanceOf[ServicesConfig])
-  override val repository: MongoCacheClient     = new MongoCacheClient(
+
+  val appConfigNoEncryption = new ApplicationConfig(configNoEncryption, app.injector.instanceOf[ServicesConfig])
+
+  override val repository: MongoCacheClient = new MongoCacheClient(
     appConfigNoEncryption,
     app.injector.instanceOf[ApplicationCrypto],
     mongoComponent,
     app.injector.instanceOf[CryptoService]
   )
-  val encryptedRepository                       =
+
+  private lazy val encryptedApp: Application =
+    new GuiceApplicationBuilder()
+      .configure(
+        "play.filters.disabled"            -> List(
+          "uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter"
+        ),
+        "appCache.mongo.encryptionEnabled" -> true
+      )
+      .build()
+
+  val encryptedRepository =
     new MongoCacheClient(
-      appConfigWithEncryption,
-      app.injector.instanceOf[ApplicationCrypto],
+      encryptedApp.injector.instanceOf[ApplicationConfig],
+      encryptedApp.injector.instanceOf[ApplicationCrypto],
       mongoComponent,
-      app.injector.instanceOf[CryptoService]
+      encryptedApp.injector.instanceOf[CryptoService]
     )
+
   val testCache: Cache                          = Cache("123", Map("fieldName" -> JsString("valueName")))
   val encryptedCacheData: Map[String, JsString] = Map("fieldName" -> JsString("Q2NYiC4W49rMPxfI+soQ2g=="))
 
+  override def afterAll(): Unit = {
+    encryptedApp.stop()
+    super.afterAll()
+  }
+
   ".saveAll" must {
 
-    "save a cache" in {
-      repository.saveAll(testCache).futureValue
+    "save a cache without encryption" in {
+      repository.saveAll(testCache, "123").futureValue
       repository.collection.countDocuments().head().futureValue mustBe 1
+    }
 
-      encryptedRepository.saveAll(testCache).futureValue
+    "save a cache with encryption" in {
+      encryptedRepository.saveAll(testCache, "123").futureValue
       encryptedRepository.collection.countDocuments().head().futureValue mustBe 1
     }
 
-    "save a cache when a credId is provided" in {
+    "save a cache without encryption when a credId is provided" in {
       repository.saveAll(testCache, "123").futureValue
       repository.collection.countDocuments().head().futureValue mustBe 1
+    }
 
+    "save a cache with encryption when a credId is provided" in {
       encryptedRepository.saveAll(testCache, "123").futureValue
       encryptedRepository.collection.countDocuments().head().futureValue mustBe 1
     }
@@ -73,17 +94,21 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
 
   ".fetchAll" must {
 
-    "retrieve a cache that exists" in {
-      repository.saveAll(testCache).futureValue
+    "retrieve an unencrypted cache that exists" in {
+      repository.saveAll(testCache, "123").futureValue
       repository.fetchAll("123").futureValue.map(_.data) mustBe Some(testCache.data)
+    }
 
-      encryptedRepository.saveAll(testCache).futureValue
+    "retrieve an encrypted cache that exists" in {
+      encryptedRepository.saveAll(testCache, "123").futureValue
       encryptedRepository.fetchAll("123").futureValue.map(_.data) mustBe Some(encryptedCacheData)
     }
 
     "return None when no cache exists" in {
       repository.fetchAll("123").futureValue.map(_.data) mustBe None
+    }
 
+    "return None when no encrypted cache exists" in {
       encryptedRepository.fetchAll("123").futureValue.map(_.data) mustBe None
     }
   }
@@ -92,7 +117,9 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
 
     "return a fallback empty cache when no cache exists" in {
       repository.fetchAllWithDefault("123").futureValue.data mustBe Map.empty
+    }
 
+    "return a fallback empty cache when no encrypted cache exists" in {
       encryptedRepository.fetchAllWithDefault("123").futureValue.data mustBe Map.empty
     }
   }
@@ -101,7 +128,9 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
 
     "create and return a cache when one does not exist" in {
       repository.createOrUpdate("123", JsString("valueName"), "fieldName").futureValue.data mustBe testCache.data
+    }
 
+    "create and return an encrypted cache when one does not exist" in {
       encryptedRepository
         .createOrUpdate("123", JsString("valueName"), "fieldName")
         .futureValue
@@ -112,9 +141,13 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
       repository.saveAll(testCache, "123").futureValue
       val newData = Map("fieldName" -> JsString("newValueName"))
       repository.createOrUpdate("123", JsString("newValueName"), "fieldName").futureValue.data mustBe newData
+    }
 
+    "update and return an encrypted cache when one already exists" in {
       encryptedRepository.saveAll(testCache, "123").futureValue
+
       val newEncryptedData = Map("fieldName" -> JsString("lb6PR82vFARAM8u3kHMtKA=="))
+
       encryptedRepository
         .createOrUpdate("123", JsString("newValueName"), "fieldName")
         .futureValue
@@ -128,7 +161,9 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
       repository.saveAll(testCache, "123").futureValue
       repository.removeById("123").futureValue
       repository.collection.countDocuments().head().futureValue mustBe 0
+    }
 
+    "remove an encrypted cache when one exists" in {
       encryptedRepository.saveAll(testCache, "123").futureValue
       encryptedRepository.removeById("123").futureValue
       encryptedRepository.collection.countDocuments().head().futureValue mustBe 0
@@ -138,7 +173,9 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
       repository.saveAll(testCache, "123").futureValue
       repository.removeById("456").futureValue
       repository.collection.countDocuments().head().futureValue mustBe 1
+    }
 
+    "remove nothing when there is no matching encrypted cache" in {
       encryptedRepository.saveAll(testCache, "123").futureValue
       encryptedRepository.removeById("456").futureValue
       encryptedRepository.collection.countDocuments().head().futureValue mustBe 1
@@ -150,7 +187,9 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
     "remove a field from a cache item when one exists" in {
       repository.saveAll(testCache, "123").futureValue
       repository.removeByKey("123", "fieldName").futureValue.data mustBe Map.empty
+    }
 
+    "remove a field from an encrypted cache item when one exists" in {
       encryptedRepository.saveAll(testCache, "123").futureValue
       encryptedRepository.removeByKey("123", "fieldName").futureValue.data mustBe Map.empty
     }
@@ -158,7 +197,9 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
     "return the cache with no updates when the key does not exist" in {
       repository.saveAll(testCache, "123").futureValue
       repository.removeByKey("123", "unrecognisedFieldName").futureValue.data mustBe testCache.data
+    }
 
+    "return the encrypted cache with no updates when the key does not exist" in {
       encryptedRepository.saveAll(testCache, "123").futureValue
       encryptedRepository.removeByKey("123", "unrecognisedFieldName").futureValue.data mustBe encryptedCacheData
     }
@@ -174,7 +215,9 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
           "fieldName"
         )
         .data mustBe testCache.data
+    }
 
+    "create and return an encrypted cache when one does not exist=" in {
       encryptedRepository
         .upsert(
           Cache("123", testCache.data),
@@ -194,7 +237,9 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
           "fieldName"
         )
         .data mustBe newData
+    }
 
+    "update and return an ecnrypted cache when one already exists" in {
       encryptedRepository.saveAll(testCache, "123").futureValue
       val newEncryptedData = Map("fieldName" -> JsString("lb6PR82vFARAM8u3kHMtKA=="))
       encryptedRepository
@@ -212,7 +257,9 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
     "return a matching value for the key when one is found" in {
       repository.saveAll(testCache, "123").futureValue
       repository.find("123", "fieldName")(implicitly[Reads[String]]).futureValue mustBe Some("valueName")
+    }
 
+    "return a matching encrypted value for the key when one is found" in {
       encryptedRepository.saveAll(testCache, "123").futureValue
       encryptedRepository.find("123", "fieldName")(implicitly[Reads[String]]).futureValue mustBe Some("valueName")
     }
@@ -220,14 +267,18 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
     "return None when a matching value is not found" in {
       repository.saveAll(testCache, "123").futureValue
       repository.find("123", "unrecognisedFieldName")(implicitly[Reads[String]]).futureValue mustBe None
+    }
 
+    "return None when a matching encrypted value is not found" in {
       encryptedRepository.saveAll(testCache, "123").futureValue
       encryptedRepository.find("123", "unrecognisedFieldName")(implicitly[Reads[String]]).futureValue mustBe None
     }
 
     "return None when a cache is not found" in {
       repository.find("123", "fieldName")(implicitly[Reads[String]]).futureValue mustBe None
+    }
 
+    "return NOne when an encrypted cache is not found" in {
       encryptedRepository.find("123", "fieldName")(implicitly[Reads[String]]).futureValue mustBe None
     }
   }
