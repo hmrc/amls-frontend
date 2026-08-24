@@ -50,6 +50,26 @@ class CryptoService @Inject() (applicationConfig: ApplicationConfig, application
       case Failure(_)              => encryptedValue
     }
 
+  def doubleDecryptJsonString(doublyEncryptedValue: String): PlainText = {
+    val value = decrypt(doublyEncryptedValue)
+    value.startsWith("{") | value.startsWith("[") match {
+      case true  => PlainText(value)
+      case false =>
+        logger.warn(s"performing double decryption")
+        PlainText(decrypt(value))
+    }
+  }
+
+  def decryptAsBytes(encryptedValue: String): Try[Array[Byte]] =
+    Try {
+      val cipher: Cipher = Cipher.getInstance(secretKeySpec.getAlgorithm)
+      cipher.init(DECRYPT_MODE, secretKeySpec, cipher.getParameters)
+      cipher.doFinal(Base64.decodeBase64(encryptedValue.getBytes(UTF_8)))
+    } match {
+      case Success(value)     => Success(value)
+      case Failure(exception) => Failure(new SecurityException(exception))
+    }
+
   def decryptReEncrypt(cache: Cache): Cache = {
     val rebuiltCache: Map[String, JsValue] = cache.data.foldLeft(Map.empty[String, JsValue]) { (newCache, keyValue) =>
       val plainText: PlainText = doubleDecryptJsonString(keyValue._2.toString())
@@ -64,28 +84,8 @@ class CryptoService @Inject() (applicationConfig: ApplicationConfig, application
     Cache(cache.id, rebuiltCache)
   }
 
-  def doubleDecryptJsonString(doublyEncryptedValue: String): PlainText = {
-    val value = decrypt(doublyEncryptedValue)
-    value.startsWith("{") | value.startsWith("[") match {
-      case true  => PlainText(value)
-      case false =>
-        logger.warn(s"performing double decryption")
-        PlainText(decrypt(value))
-    }
-  }
-
   def encryptJsonString(jsonString: String): JsValue =
     JsonEncryption.stringEncrypter.writes(jsonString)
-
-  def decryptAsBytes(encryptedValue: String): Try[Array[Byte]] =
-    Try {
-      val cipher: Cipher = Cipher.getInstance(secretKeySpec.getAlgorithm)
-      cipher.init(DECRYPT_MODE, secretKeySpec, cipher.getParameters)
-      cipher.doFinal(Base64.decodeBase64(encryptedValue.getBytes(UTF_8)))
-    } match {
-      case Success(value)     => Success(value)
-      case Failure(exception) => Failure(new SecurityException(exception))
-    }
 
   def sanitiseDoubleDecrypt[T](key: String, cache: Cache)(implicit reads: Reads[T]): Option[T] = {
     val entry = Try(cache.getEntry(key)(reads))
