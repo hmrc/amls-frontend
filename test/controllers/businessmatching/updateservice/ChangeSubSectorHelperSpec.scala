@@ -37,25 +37,25 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
     val helper = new ChangeSubSectorHelper()(mockCacheConnector)
   }
 
-  "requires a PSR Number" when {
-    "Transmitting money is selected and there is no PSR number" in new Fixture {
+  "requires a FRN" when {
+    "Transmitting money is selected and there is no FRN" in new Fixture {
       val model = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney, ChequeCashingNotScrapMetal)), None)
-      helper.requiresPSRNumber(model) mustBe true
+      helper.requiresFrn(model) mustBe true
     }
   }
 
-  "does not require a PSR Number" when {
-    "Transmitting money is selected and there is a PSR number" in new Fixture {
+  "does not require a FRN" when {
+    "Transmitting money is selected and there is a FRN" in new Fixture {
       val model = ChangeSubSectorFlowModel(
         Some(Set(TransmittingMoney, ChequeCashingNotScrapMetal)),
         Some(BusinessAppliedForFrnYes("XXXX"))
       )
-      helper.requiresPSRNumber(model) mustBe false
+      helper.requiresFrn(model) mustBe false
     }
 
     "Transmitting money is not selected" in new Fixture {
       val model = ChangeSubSectorFlowModel(Some(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)), None)
-      helper.requiresPSRNumber(model) mustBe false
+      helper.requiresFrn(model) mustBe false
     }
   }
 
@@ -229,7 +229,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
       verify(mockCacheConnector, never).save(any(), eqTo(MSB.key), any[MSB])(any())
     }
 
-    "wipe the psr number when transmitting money isn't set" in new Fixture {
+    "wipe the FRN when transmitting money isn't set" in new Fixture {
 
       val model = ChangeSubSectorFlowModel(Some(Set(ChequeCashingNotScrapMetal)), None)
 
@@ -252,7 +252,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
       updatedBm.hasAccepted mustBe true
     }
 
-    "apply the PSR number when one is given, and transmitting money is given" in new Fixture {
+    "apply the FRN when one is given, and transmitting money is given" in new Fixture {
       val model =
         ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnYes("12345678")))
 

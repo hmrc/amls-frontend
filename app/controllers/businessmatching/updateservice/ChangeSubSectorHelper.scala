@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ChangeSubSectorHelper @Inject() (implicit val dataCacheConnector: DataCacheConnector) {
 
-  def requiresPSRNumber(model: ChangeSubSectorFlowModel): Boolean =
+  def requiresFrn(model: ChangeSubSectorFlowModel): Boolean =
     model.Frn match {
       case None => model.subSectors.getOrElse(Set.empty).contains(TransmittingMoney)
       case _    => false
@@ -136,7 +136,7 @@ class ChangeSubSectorHelper @Inject() (implicit val dataCacheConnector: DataCach
     ec: ExecutionContext
   ): Future[BusinessMatching] = {
 
-    val updatePsr = (bm: BusinessMatching, newSectors: Set[BusinessMatchingMsbService]) => {
+    val updateFrn = (bm: BusinessMatching, newSectors: Set[BusinessMatchingMsbService]) => {
       val updatedBm = bm.copy(msbServices = Some(BusinessMatchingMsbServices(model.subSectors.getOrElse(Set.empty))))
 
       if (!newSectors.contains(TransmittingMoney)) {
@@ -152,7 +152,7 @@ class ChangeSubSectorHelper @Inject() (implicit val dataCacheConnector: DataCach
       val sectorDiff  = model.subSectors.getOrElse(Set.empty)
       val bm          = maybeBm.getOrElse(BusinessMatching())
       val hasAccepted = bm.hasAccepted
-      val updatedBm   = updatePsr(maybeBm.getOrElse(bm), sectorDiff)
+      val updatedBm   = updateFrn(maybeBm.getOrElse(bm), sectorDiff)
 
       if (sectorDiff.isEmpty) {
         Future.successful(bm)
