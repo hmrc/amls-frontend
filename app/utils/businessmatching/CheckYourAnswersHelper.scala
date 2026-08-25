@@ -52,7 +52,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
   )(implicit messages: Messages): Option[Html] =
     if (isPreSubmission) {
       appliedForFrnOpt map {
-        case BusinessAppliedForFrnYes(psrNumber) =>
+        case BusinessAppliedForFrnYes(frn) =>
           if (preAppCompleted) {
             button("businessmatching.summary.noedit.anchortext")
           } else {
@@ -237,7 +237,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
     } yield
       if (isTransmittingMoney) {
         appliedForFrn match {
-          case BusinessAppliedForFrnYes(psrNumber) =>
+          case BusinessAppliedForFrnYes(frn) =>
             Some(
               Seq(
                 SummaryListRow(
@@ -246,7 +246,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
                 ),
                 SummaryListRow(
                   Key(Text(messages("businessmatching.frn.number.cya.title"))),
-                  Value(Text(psrNumber)),
+                  Value(Text(frn)),
                   actions = Some(
                     Actions(
                       items = Seq(
