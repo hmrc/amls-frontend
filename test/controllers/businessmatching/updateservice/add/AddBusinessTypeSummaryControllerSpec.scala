@@ -77,7 +77,7 @@ class AddBusinessTypeSummaryControllerSpec
       addMoreActivities = None,
       hasChanged = true,
       hasAccepted = false,
-      businessAppliedForPSRNumber = None,
+      businessAppliedForFrn = None,
       subSectors = None
     )
 

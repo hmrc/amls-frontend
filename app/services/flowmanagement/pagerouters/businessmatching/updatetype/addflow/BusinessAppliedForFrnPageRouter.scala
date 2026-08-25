@@ -39,7 +39,7 @@ class BusinessAppliedForFrnPageRouter @Inject()(
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Result] =
-    (edit, model.businessAppliedForPSRNumber) match {
+    (edit, model.businessAppliedForFrn) match {
       case (_, Some(BusinessAppliedForFrnYes(_))) =>
         Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
       case (_, Some(BusinessAppliedForFrnNo))     => Future.successful(Redirect(addRoutes.NoFrnController.get()))

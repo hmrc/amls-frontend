@@ -47,7 +47,7 @@
     )
 }
 
-@psrRow(bool: Boolean) = @{
+@frnRow(bool: Boolean) = @{
     SummaryListRow(
         Key(Text(messages("businessmatching.psr.number.title"))),
         Value(Text(
@@ -107,13 +107,13 @@
                             )
                         )
 
-                        val psr = if(services.msbServices.contains(TransmittingMoney)) {
-                            model.businessAppliedForPSRNumber match {
-                                case Some(BusinessAppliedForFrnYes(psr)) => Seq(
-                                    psrRow(true),
+                        val frn = if(services.msbServices.contains(TransmittingMoney)) {
+                            model.businessAppliedForFrn match {
+                                case Some(BusinessAppliedForFrnYes(frn)) => Seq(
+                                    frnRow(true),
                                     SummaryListRow(
                                         Key(Text(messages("businessmatching.psr.number.lbl"))),
-                                        Value(Text(psr)),
+                                        Value(Text(frn)),
                                         actions = Some(Actions(
                                             items = Seq(ActionItem(
                                                 routes.BusinessAppliedForFrnController.get(true).url,
@@ -123,12 +123,12 @@
                                         ))
                                     )
                                 )
-                                case Some(BusinessAppliedForFrnNo) => Seq(psrRow(false))
+                                case Some(BusinessAppliedForFrnNo) => Seq(frnRow(false))
                                 case _ => Seq.empty
                             }
                         } else Seq.empty
 
-                      msb ++ psr
+                      msb ++ frn
                     } getOrElse Seq.empty
                 case Some(activity) => Seq(activityRow(activity))
                 case _ => Seq.empty

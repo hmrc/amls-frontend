@@ -39,10 +39,10 @@ class AddBusinessTypeFlowModelSpec extends PlaySpec {
       }
     }
 
-    "businessAppliedForPSRNumber setter" must {
+    "businessAppliedForFrn setter" must {
       "set hasAccepted to true when value matches existing" in {
         val frn   = BusinessAppliedForFrnYes("123456")
-        val model = AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(frn), hasAccepted = true)
+        val model = AddBusinessTypeFlowModel(businessAppliedForFrn = Some(frn), hasAccepted = true)
         model.withBusinessAppliedForFrn(frn).hasAccepted mustBe true
       }
 
@@ -64,18 +64,18 @@ class AddBusinessTypeFlowModelSpec extends PlaySpec {
         model.msbServices(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))).hasAccepted mustBe false
       }
 
-      "retain businessAppliedForPSRNumber when TransmittingMoney is in new subSectors" in {
+      "retain businessAppliedForFrn when TransmittingMoney is in new subSectors" in {
         val frn      = BusinessAppliedForFrnYes("123456")
         val services = BusinessMatchingMsbServices(Set(TransmittingMoney))
-        val model    = AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(frn))
-        model.msbServices(services).businessAppliedForPSRNumber mustBe Some(frn)
+        val model    = AddBusinessTypeFlowModel(businessAppliedForFrn = Some(frn))
+        model.msbServices(services).businessAppliedForFrn mustBe Some(frn)
       }
 
-      "clear businessAppliedForPSRNumber when TransmittingMoney is not in new subSectors" in {
+      "clear businessAppliedForFrn when TransmittingMoney is not in new subSectors" in {
         val frn      = BusinessAppliedForFrnYes("123456")
         val services = BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))
-        val model    = AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(frn))
-        model.msbServices(services).businessAppliedForPSRNumber mustBe None
+        val model    = AddBusinessTypeFlowModel(businessAppliedForFrn = Some(frn))
+        model.msbServices(services).businessAppliedForFrn mustBe None
       }
     }
 
@@ -85,7 +85,7 @@ class AddBusinessTypeFlowModelSpec extends PlaySpec {
           activity = Some(MoneyServiceBusiness),
           addMoreActivities = Some(true),
           hasAccepted = true,
-          businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("123456"))
+          businessAppliedForFrn = Some(BusinessAppliedForFrnYes("123456"))
         )
         model.isComplete mustBe true
       }

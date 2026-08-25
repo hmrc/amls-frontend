@@ -27,7 +27,7 @@ case class AddBusinessTypeFlowModel(
                                      addMoreActivities: Option[Boolean] = None,
                                      hasChanged: Boolean = false,
                                      hasAccepted: Boolean = false,
-                                     businessAppliedForPSRNumber: Option[BusinessAppliedForFrn] = None,
+                                     businessAppliedForFrn: Option[BusinessAppliedForFrn] = None,
                                      subSectors: Option[BusinessMatchingMsbServices] = None
 ) {
 
@@ -40,22 +40,22 @@ case class AddBusinessTypeFlowModel(
 
   def withBusinessAppliedForFrn(p: BusinessAppliedForFrn): AddBusinessTypeFlowModel =
     this.copy(
-      businessAppliedForPSRNumber = Some(p),
-      hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p),
-      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.contains(p)
+      businessAppliedForFrn = Some(p),
+      hasChanged = hasChanged || !this.businessAppliedForFrn.contains(p),
+      hasAccepted = hasAccepted && this.businessAppliedForFrn.contains(p)
     )
 
   def msbServices(p: BusinessMatchingMsbServices): AddBusinessTypeFlowModel = {
     val businessAppliedForFrn: Option[BusinessAppliedForFrn] =
       if (p.msbServices.contains(TransmittingMoney)) {
-        this.businessAppliedForPSRNumber
+        this.businessAppliedForFrn
       } else {
         None
       }
 
     this.copy(
       subSectors = Some(p),
-      businessAppliedForPSRNumber = businessAppliedForFrn,
+      businessAppliedForFrn = businessAppliedForFrn,
       hasChanged = hasChanged || !this.subSectors.contains(p),
       hasAccepted = hasAccepted && this.subSectors.contains(p)
     )

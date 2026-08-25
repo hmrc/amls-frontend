@@ -44,7 +44,7 @@ class SubSectorsPageRouter @Inject() (
 
     def isTransmittingMoneyDefined =
       model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.contains(TransmittingMoney)
-    def isFrnDefined               = model.businessAppliedForPSRNumber.isDefined
+    def isFrnDefined               = model.businessAppliedForFrn.isDefined
 
     (isTransmittingMoneyDefined, edit, isFrnDefined) match {
       case (true, true, true)  => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))

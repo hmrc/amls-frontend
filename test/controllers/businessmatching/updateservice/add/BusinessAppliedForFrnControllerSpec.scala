@@ -100,7 +100,7 @@ class BusinessAppliedForFrnControllerSpec
           Some(
             AddBusinessTypeFlowModel(
               activity = Some(MoneyServiceBusiness),
-              businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("123456")),
+              businessAppliedForFrn = Some(BusinessAppliedForFrnYes("123456")),
               subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
             )
           )
@@ -147,7 +147,7 @@ class BusinessAppliedForFrnControllerSpec
             val flowModel = AddBusinessTypeFlowModel(
               activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-              businessAppliedForPSRNumber = Some(BusinessAppliedForFrnNo),
+              businessAppliedForFrn = Some(BusinessAppliedForFrnNo),
               hasChanged = true
             )
 
@@ -170,7 +170,7 @@ class BusinessAppliedForFrnControllerSpec
           "yes is selected and a FRN is supplied" in new Fixture {
             mockCacheUpdate[AddBusinessTypeFlowModel](
               Some(AddBusinessTypeFlowModel.key),
-              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("123789")))
+              AddBusinessTypeFlowModel(businessAppliedForFrn = Some(BusinessAppliedForFrnYes("123789")))
             )
 
             val newRequest = FakeRequest(POST, routes.BusinessAppliedForFrnController.post().url)
@@ -185,7 +185,7 @@ class BusinessAppliedForFrnControllerSpec
             controller.router.verify(
               "internalId",
               FrnPageId,
-              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("123789")))
+              AddBusinessTypeFlowModel(businessAppliedForFrn = Some(BusinessAppliedForFrnYes("123789")))
             )
 
           }
@@ -197,7 +197,7 @@ class BusinessAppliedForFrnControllerSpec
           "no is selected" in new Fixture {
             mockCacheUpdate[AddBusinessTypeFlowModel](
               Some(AddBusinessTypeFlowModel.key),
-              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForFrnNo))
+              AddBusinessTypeFlowModel(businessAppliedForFrn = Some(BusinessAppliedForFrnNo))
             )
 
             val newRequest = FakeRequest(POST, routes.BusinessAppliedForFrnController.post(true).url)
@@ -211,7 +211,7 @@ class BusinessAppliedForFrnControllerSpec
             controller.router.verify(
               "internalId",
               FrnPageId,
-              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForFrnNo)),
+              AddBusinessTypeFlowModel(businessAppliedForFrn = Some(BusinessAppliedForFrnNo)),
               true
             )
 
@@ -222,7 +222,7 @@ class BusinessAppliedForFrnControllerSpec
           "yes is selected and a FRN is supplied" in new Fixture {
             mockCacheUpdate[AddBusinessTypeFlowModel](
               Some(AddBusinessTypeFlowModel.key),
-              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("123789")))
+              AddBusinessTypeFlowModel(businessAppliedForFrn = Some(BusinessAppliedForFrnYes("123789")))
             )
 
             val newRequest = FakeRequest(POST, routes.BusinessAppliedForFrnController.post(true).url)
@@ -237,7 +237,7 @@ class BusinessAppliedForFrnControllerSpec
             controller.router.verify(
               "internalId",
               FrnPageId,
-              AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("123789"))),
+              AddBusinessTypeFlowModel(businessAppliedForFrn = Some(BusinessAppliedForFrnYes("123789"))),
               true
             )
 
