@@ -22,7 +22,7 @@ import org.scalacheck.Gen
 
 trait FrnNumberGen extends BaseGenerator {
 
-  val psrNumberGen: Gen[BusinessAppliedForFrn] = for {
+  val frnGen: Gen[BusinessAppliedForFrn] = for {
     num <- numSequence(6)
   } yield BusinessAppliedForFrnYes(num)
 

@@ -75,7 +75,7 @@ class BusinessAppliedForFrnControllerSpec
   "BusinessAppliedForFrnController" when {
 
     "get is called" must {
-      "return OK with the psr_number view if there is MSB and TM defined" in new Fixture {
+      "return OK with the FRN view if there is MSB and TM defined" in new Fixture {
         mockCacheFetch(
           Some(
             AddBusinessTypeFlowModel(
@@ -93,8 +93,8 @@ class BusinessAppliedForFrnControllerSpec
         )
       }
 
-      "return OK and display psr_number view with pre populated data if there is MSB and TM defined" in new Fixture {
-        override val businessMatching = businessMatchingWithPsrGen.sample.get
+      "return OK and display FRN view with pre populated data if there is MSB and TM defined" in new Fixture {
+        override val businessMatching = businessMatchingWithFrnGen.sample.get
 
         mockCacheFetch(
           Some(
@@ -142,7 +142,7 @@ class BusinessAppliedForFrnControllerSpec
 
     "post is called" must {
       "with a valid request and not in edit mode" must {
-        "progress to the 'no psr' page" when {
+        "progress to the 'no frn' page" when {
           "no is selected" in new Fixture {
             val flowModel = AddBusinessTypeFlowModel(
               activity = Some(MoneyServiceBusiness),
@@ -167,7 +167,7 @@ class BusinessAppliedForFrnControllerSpec
         }
 
         "progress to the 'fit and proper' page" when {
-          "yes is selected and a PSR is supplied" in new Fixture {
+          "yes is selected and a FRN is supplied" in new Fixture {
             mockCacheUpdate[AddBusinessTypeFlowModel](
               Some(AddBusinessTypeFlowModel.key),
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("123789")))
@@ -193,7 +193,7 @@ class BusinessAppliedForFrnControllerSpec
       }
 
       "with a valid request and in edit mode" must {
-        "progress to the 'no psr' page" when {
+        "progress to the 'no frn' page" when {
           "no is selected" in new Fixture {
             mockCacheUpdate[AddBusinessTypeFlowModel](
               Some(AddBusinessTypeFlowModel.key),
@@ -219,7 +219,7 @@ class BusinessAppliedForFrnControllerSpec
         }
 
         "progress to the 'update services summary' page" when {
-          "yes is selected and a PSR is supplied" in new Fixture {
+          "yes is selected and a FRN is supplied" in new Fixture {
             mockCacheUpdate[AddBusinessTypeFlowModel](
               Some(AddBusinessTypeFlowModel.key),
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("123789")))
@@ -245,7 +245,7 @@ class BusinessAppliedForFrnControllerSpec
         }
       }
 
-      "with an invalid request (missing PSR)" must {
+      "with an invalid request (missing FRN)" must {
         "return an error" in new Fixture {
           mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
           val newRequest = FakeRequest(POST, routes.BusinessAppliedForFrnController.post().url)

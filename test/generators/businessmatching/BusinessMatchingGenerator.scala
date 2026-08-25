@@ -34,10 +34,10 @@ trait BusinessMatchingGenerator
     activities    <- businessActivitiesGen
   } yield BusinessMatching(Some(reviewDetails), Some(activities))
 
-  val businessMatchingWithPsrGen: Gen[BusinessMatching] = for {
+  val businessMatchingWithFrnGen: Gen[BusinessMatching] = for {
     bm  <- businessMatchingGen
-    psr <- psrNumberGen
-  } yield bm.copy(businessAppliedForFrn = Some(psr))
+    frn <- frnGen
+  } yield bm.copy(businessAppliedForFrn = Some(frn))
 
   def businessMatchingWithTypesGen(bType: Option[BusinessType]) = for {
     bm <- businessMatchingGen
