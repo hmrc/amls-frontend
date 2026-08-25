@@ -453,7 +453,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             companyRegistrationNumber = Some(companyRegistrationNumberModel),
             activities = Some(businessActivitiesModel),
             msbServices = Some(msbServices),
-            businessAppliedForPSRNumber = Some(businessAppliedForFrnModel)
+            businessAppliedForFrn = Some(businessAppliedForFrnModel)
           )
 
           val rows = cyaHelper
@@ -602,7 +602,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
                 companyRegistrationNumber = Some(companyRegistrationNumberModel),
                 activities = Some(businessActivitiesModel),
                 msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-                businessAppliedForPSRNumber = Some(BusinessAppliedForFrnNo)
+                businessAppliedForFrn = Some(BusinessAppliedForFrnNo)
               ),
               isPreSubmission = true,
               isPending = false

@@ -117,7 +117,7 @@ class AddBusinessTypeHelper @Inject() (implicit
               currentActivities.copy(businessActivities = currentActivities.businessActivities + newActivity)
             ).msbServices(
               Some(currentMsbServices.copy(msbServices = currentMsbServices.msbServices ++ newMsbServices.msbServices))
-            ).businessAppliedForPSRNumber(newFrn)
+            ).businessAppliedForFrn(newFrn)
               .copy(hasAccepted = true)
           case Some(bm)                                            =>
             bm.activities(

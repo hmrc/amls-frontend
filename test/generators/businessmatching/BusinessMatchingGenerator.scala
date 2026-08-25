@@ -37,7 +37,7 @@ trait BusinessMatchingGenerator
   val businessMatchingWithPsrGen: Gen[BusinessMatching] = for {
     bm  <- businessMatchingGen
     psr <- psrNumberGen
-  } yield bm.copy(businessAppliedForPSRNumber = Some(psr))
+  } yield bm.copy(businessAppliedForFrn = Some(psr))
 
   def businessMatchingWithTypesGen(bType: Option[BusinessType]) = for {
     bm <- businessMatchingGen

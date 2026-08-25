@@ -233,10 +233,10 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
     for {
       businessMatchingMsbServices <- businessMatching.msbServices
       isTransmittingMoney          = businessMatchingMsbServices.msbServices.contains(TransmittingMoney)
-      appliedForPSRNumber         <- businessMatching.businessAppliedForPSRNumber
+      appliedForFrn         <- businessMatching.businessAppliedForFrn
     } yield
       if (isTransmittingMoney) {
-        appliedForPSRNumber match {
+        appliedForFrn match {
           case BusinessAppliedForFrnYes(psrNumber) =>
             Some(
               Seq(

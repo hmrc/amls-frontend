@@ -70,7 +70,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
         Some(
           BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("XXXX"))
+            businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
           )
         ),
         Some(BusinessMatching.key)
@@ -95,7 +95,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
         Some(
           BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("XXXX"))
+            businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
           )
         ),
         Some(BusinessMatching.key)
@@ -151,7 +151,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
         Some(
           BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("XXXX"))
+            businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
           )
         ),
         Some(BusinessMatching.key)
@@ -189,7 +189,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
         Some(
           BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("XXXX"))
+            businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
           )
         ),
         Some(BusinessMatching.key)
@@ -237,7 +237,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
         Some(
           BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("XXXX")),
+            businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX")),
             hasAccepted = true
           )
         ),
@@ -248,7 +248,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
 
       val updatedBm = await(helper.updateBusinessMatching("internalId", model))
 
-      updatedBm.businessAppliedForPSRNumber mustBe None
+      updatedBm.businessAppliedForFrn mustBe None
       updatedBm.hasAccepted mustBe true
     }
 
@@ -265,7 +265,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
 
       val updatedBm = await(helper.updateBusinessMatching("internalId", model))
 
-      updatedBm.businessAppliedForPSRNumber mustBe Some(BusinessAppliedForFrnYes("12345678"))
+      updatedBm.businessAppliedForFrn mustBe Some(BusinessAppliedForFrnYes("12345678"))
       updatedBm.hasChanged mustBe true
     }
 
@@ -276,7 +276,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
         Some(
           BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("XXXX")),
+            businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX")),
             hasAccepted = true
           )
         ),
@@ -295,7 +295,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
 
       val bm = BusinessMatching(
         msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-        businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("XXXX")),
+        businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX")),
         hasAccepted = true
       )
 
@@ -313,7 +313,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
         Some(
           BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("XXXX")),
+            businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX")),
             hasAccepted = true
           )
         ),
@@ -476,7 +476,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
           Some(
             BusinessMatching(
               msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-              businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("XXXX"))
+              businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
             )
           ),
           Some(BusinessMatching.key)
@@ -497,7 +497,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
           Some(
             BusinessMatching(
               msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-              businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("XXXX"))
+              businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
             )
           ),
           Some(BusinessMatching.key)
@@ -517,7 +517,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
           Some(
             BusinessMatching(
               msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-              businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("XXXX"))
+              businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
             )
           ),
           Some(BusinessMatching.key)
@@ -538,7 +538,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
           Some(
             BusinessMatching(
               msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))),
-              businessAppliedForPSRNumber = Some(BusinessAppliedForFrnYes("XXXX"))
+              businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
             )
           ),
           Some(BusinessMatching.key)

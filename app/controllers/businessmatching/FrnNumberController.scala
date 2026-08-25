@@ -51,7 +51,7 @@ class FrnNumberController @Inject()(
       bm     <- businessMatchingService.getModel(request.credId)
       status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
     } yield {
-      val form = bm.businessAppliedForPSRNumber.fold(formProvider()) { frn =>
+      val form = bm.businessAppliedForFrn.fold(formProvider()) { frn =>
         request.session.get("originalPsrNumber") match {
           case Some(original) => formProvider().fill(BusinessAppliedForFrnYes(original))
           case None           => formProvider().fill(frn)
@@ -64,7 +64,7 @@ class FrnNumberController @Inject()(
           edit,
           bm.preAppComplete,
           statusService.isPreSubmission(status),
-          bm.businessAppliedForPSRNumber.isDefined
+          bm.businessAppliedForFrn.isDefined
         )
       )
     }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())

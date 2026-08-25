@@ -41,7 +41,7 @@ class ChangeSubSectorHelper @Inject() (implicit val dataCacheConnector: DataCach
       case Some(x) =>
         ChangeSubSectorFlowModel(
           subSectors = x.msbServices.map(_.msbServices),
-          Frn = x.businessAppliedForPSRNumber
+          Frn = x.businessAppliedForFrn
         )
       case None    => ChangeSubSectorFlowModel()
     }
@@ -141,10 +141,10 @@ class ChangeSubSectorHelper @Inject() (implicit val dataCacheConnector: DataCach
 
       if (!newSectors.contains(TransmittingMoney)) {
         updatedBm.copy(
-          businessAppliedForPSRNumber = None
+          businessAppliedForFrn = None
         )
       } else {
-        updatedBm.businessAppliedForPSRNumber(model.Frn)
+        updatedBm.businessAppliedForFrn(model.Frn)
       }
     }
 

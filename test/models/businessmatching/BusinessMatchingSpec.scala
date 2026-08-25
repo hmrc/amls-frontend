@@ -142,7 +142,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
 
     "Merged with BusinessAppliedForPSRNumberModel" must {
       "return BusinessMatching with correct BusinessAppliedForPSRNumberModel" in {
-        val result = initial.businessAppliedForPSRNumber(Some(businessAppliedForFrnModel))
+        val result = initial.businessAppliedForFrn(Some(businessAppliedForFrnModel))
         result must be(
           BusinessMatching(None, None, None, None, None, Some(businessAppliedForFrnModel), hasChanged = true)
         )
@@ -353,7 +353,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
           (_.reviewDetails(reviewDetailsGen.sample.get), "reviewDetails"),
           (_.typeOfBusiness(TypeOfBusiness("type of business")), "typeOfBusiness"),
           (_.companyRegistrationNumber(CompanyRegistrationNumber("987654321")), "companyRegistrationNumber"),
-          (_.businessAppliedForPSRNumber(Some(BusinessAppliedForFrnNo)), "businessAppliedForPSRNumber")
+          (_.businessAppliedForFrn(Some(BusinessAppliedForFrnNo)), "businessAppliedForFrn")
         )
 
         tests.foreach { test =>
