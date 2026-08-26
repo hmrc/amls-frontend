@@ -48,7 +48,7 @@ class ChangeSubSectorRouter @Inject() (
 class ChangeSubSectorRouter2 @Inject() (
                                          subSectorRouter: MsbSubSectorsPageRouterCompanyNotRegistered,
                                          frnPageRouter: FrnPageRouterCompanyNotRegistered,
-                                         noPsrRouter: NoFrnPageRouterCompanyNotRegistered
+                                         noFrnRouter: NoFrnPageRouterCompanyNotRegistered
 ) extends Router2[ChangeSubSectorFlowModel] {
 
   override def getRoute(
@@ -60,7 +60,7 @@ class ChangeSubSectorRouter2 @Inject() (
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = pageId match {
     case SubSectorsPageId => subSectorRouter.getRoute(credId, model, edit, includeCompanyNotRegistered)
     case FrnPageId  => frnPageRouter.getRoute(credId, model, edit, includeCompanyNotRegistered)
-    case NoFrnPageId      => noPsrRouter.getRoute(credId, model, edit, includeCompanyNotRegistered)
+    case NoFrnPageId      => noFrnRouter.getRoute(credId, model, edit, includeCompanyNotRegistered)
     case _                => throw new Exception("An Unknown Exception has occurred : ChangeSubSectorRouter")
   }
 }
