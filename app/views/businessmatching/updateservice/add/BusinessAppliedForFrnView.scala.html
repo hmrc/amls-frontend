@@ -63,7 +63,7 @@
 }
 
 @layout(
-    pageTitle = messages("businessmatching.frn.number.title") + " - " + messages("summary.updateservice")
+    pageTitle = messages("businessmatching.frn.title") + " - " + messages("summary.updateservice")
 )  {
 
     @formHelper(action = controllers.businessmatching.updateservice.add.routes.BusinessAppliedForFrnController.post(edit)) {
@@ -72,7 +72,7 @@
 
         @subtitle("summary.updateservice")
 
-        @heading("businessmatching.frn.number.title")
+        @heading("businessmatching.frn.title")
 
         @warningText(
             WarningText(

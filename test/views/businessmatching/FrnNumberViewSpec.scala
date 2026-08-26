@@ -41,9 +41,9 @@ class FrnNumberViewSpec extends AmlsViewSpec {
       def view = frnView(filledForm, edit = false, isPreSubmission = true)
 
       doc.title       must startWith(
-        Messages("businessmatching.frn.number.title") + " - " + Messages("summary.businessmatching")
+        Messages("businessmatching.frn.title") + " - " + Messages("summary.businessmatching")
       )
-      heading.html    must include(Messages("businessmatching.frn.number.title"))
+      heading.html    must include(Messages("businessmatching.frn.title"))
       subHeading.html must include(Messages("summary.businessmatching"))
 
     }

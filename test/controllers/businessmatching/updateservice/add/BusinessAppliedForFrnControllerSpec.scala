@@ -89,7 +89,7 @@ class BusinessAppliedForFrnControllerSpec
 
         status(result)                               must be(OK)
         Jsoup.parse(contentAsString(result)).title() must include(
-          messages("businessmatching.updateservice.frn.number.title")
+          messages("businessmatching.updateservice.frn.title")
         )
       }
 

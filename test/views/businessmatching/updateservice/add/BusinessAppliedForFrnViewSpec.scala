@@ -41,9 +41,9 @@ class BusinessAppliedForFrnViewSpec extends AmlsViewSpec {
       override def view = numberView(filledForm, edit = false)
 
       doc.title       must startWith(
-        messages("businessmatching.updateservice.frn.number.title") + " - " + messages("summary.updateservice")
+        messages("businessmatching.updateservice.frn.title") + " - " + messages("summary.updateservice")
       )
-      heading.html    must be(messages("businessmatching.updateservice.frn.number.title"))
+      heading.html    must be(messages("businessmatching.updateservice.frn.title"))
       subHeading.html must include(messages("summary.updateservice"))
     }
 

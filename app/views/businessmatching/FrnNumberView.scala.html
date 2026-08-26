@@ -40,10 +40,10 @@
 }
 
 @title = @{
-    if(isPreSubmission || !isFrnDefined) "businessmatching.frn.number.title" else "businessmatching.psr.number.title.post.submission"
+    if(isPreSubmission || !isFrnDefined) "businessmatching.frn.title" else "businessmatching.psr.number.title.post.submission"
 }
 
-@hasPsrNumberError = @{
+@hasFrnError = @{
     form.errors match {
         case Nil => false
         case x if x.head.key == "regNumber" => true
@@ -52,7 +52,7 @@
 }
 
 @preparedErrorSummary = @{
-    if(hasPsrNumberError) {
+    if(hasFrnError) {
         errorSummary(form, Some(Map("regNumber" -> "regNumber")))
     } else {
         errorSummary(form, Some(Map("appliedFor" -> "appliedFor-true")))
@@ -70,7 +70,7 @@
         input = Input(
             label = Label(
                 isPageHeading = false,
-                content = Text(messages("businessmatching.updateservice.psr.number.lbl")),
+                content = Text(messages("businessmatching.updateservice.frn.number.lbl")),
                 classes = "govuk-label"
             ),
             hint = None,
@@ -85,9 +85,9 @@
 
 @supportingContent = {
     <div>
-        <p class="govuk-hint">@messages("businessmatching.psr.number.hint")</p>
-        <p class="govuk-hint">@messages("businessmatching.psr.number.hint2")</p>
-        <p class="govuk-hint">@messages("businessmatching.psr.number.hint3")</p>
+        <p class="govuk-hint">@messages("businessmatching.frn.hint")</p>
+        <p class="govuk-hint">@messages("businessmatching.frn.hint2")</p>
+        <p class="govuk-hint">@messages("businessmatching.frn.hint3")</p>
     </div>
 }
 
@@ -106,21 +106,21 @@
 
                 @warningText(
                     WarningText(
-                        content = Text(messages("businessmatching.psr.warning"))
+                        content = Text(messages("businessmatching.frn.warning"))
                     )
                 )
 
                 <input type="hidden" name="appliedFor" value=true />
 
-                <p class="govuk-body">@messages("businessmatching.psr.number.hint")</p>
-                <p class="govuk-body">@messages("businessmatching.psr.number.hint2")</p>
-                <p class="govuk-body">@messages("businessmatching.psr.number.hint3")</p>
+                <p class="govuk-body">@messages("businessmatching.frn.hint")</p>
+                <p class="govuk-body">@messages("businessmatching.frn.hint2")</p>
+                <p class="govuk-body">@messages("businessmatching.frn.hint3")</p>
 
                 @inputText(
                     input = Input(
                         label = Label(
                             isPageHeading = false,
-                            content = Text(messages("businessmatching.updateservice.psr.number.lbl2")),
+                            content = Text(messages("businessmatching.updateservice.frn.lbl2")),
                             classes = "govuk-label govuk-label--m"
                         ),
                         name = "regNumber",
@@ -138,11 +138,11 @@
 
                 @subtitle(section)
 
-                @heading("businessmatching.frn.number.title")
+                @heading("businessmatching.frn.title")
 
                 @warningText(
                     WarningText(
-                        content = Text(messages("businessmatching.psr.warning"))
+                        content = Text(messages("businessmatching.frn.warning"))
                     )
                 )
 
