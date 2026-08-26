@@ -91,7 +91,7 @@ case class BusinessMatching(
       hasAccepted = hasAccepted && this.businessAppliedForFrn.equals(p)
     )
 
-  def clearPSRNumber: BusinessMatching =
+  def clearFrn: BusinessMatching =
     this.copy(
       businessAppliedForFrn = None,
       hasChanged = hasChanged || this.businessAppliedForFrn.isDefined,
