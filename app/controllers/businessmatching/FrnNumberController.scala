@@ -52,7 +52,7 @@ class FrnNumberController @Inject()(
       status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
     } yield {
       val form = bm.businessAppliedForFrn.fold(formProvider()) { frn =>
-        request.session.get("originalPsrNumber") match {
+        request.session.get("originalFrn") match {
           case Some(original) => formProvider().fill(BusinessAppliedForFrnYes(original))
           case None           => formProvider().fill(frn)
         }

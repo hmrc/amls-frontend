@@ -108,7 +108,7 @@ class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           controller.businessMatchingService.getModel(any())
         } thenReturn OptionT.liftF(Future.successful(businessMatching))
 
-        val result = controller.get()(FakeRequest().withSession("originalPsrNumber" -> "1234567"))
+        val result = controller.get()(FakeRequest().withSession("originalFrn" -> "1234567"))
         status(result) mustBe OK
 
         val document = Jsoup.parse(contentAsString(result))
