@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class NoPsrNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
+class NoFrnPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
 
   override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)(implicit
     hc: HeaderCarrier,
@@ -33,7 +33,7 @@ class NoPsrNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
     routes.SummaryController.get()
 
 }
-class NoPsrNumberPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[ChangeSubSectorFlowModel] {
+class NoFrnPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[ChangeSubSectorFlowModel] {
 
   override def getRoute(
     credId: String,

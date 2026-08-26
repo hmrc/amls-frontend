@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ChangeSubSectorRouter @Inject() (
                                         subSectorRouter: MsbSubSectorsPageRouter,
                                         frnPageRouter: FrnPageRouter,
-                                        noPsrRouter: NoPsrNumberPageRouter
+                                        noFrnRouter: NoFrnPageRouter
 ) extends Router[ChangeSubSectorFlowModel] {
 
   override def getRoute(credId: String, pageId: PageId, model: ChangeSubSectorFlowModel, edit: Boolean)(implicit
@@ -40,7 +40,7 @@ class ChangeSubSectorRouter @Inject() (
   ): Future[Result] = pageId match {
     case SubSectorsPageId => subSectorRouter.getRoute(credId, model, edit)
     case FrnPageId  => frnPageRouter.getRoute(credId, model, edit)
-    case NoFrnPageId      => noPsrRouter.getRoute(credId, model, edit)
+    case NoFrnPageId      => noFrnRouter.getRoute(credId, model, edit)
     case _                => throw new Exception("An Unknown Exception has occurred : ChangeSubSectorRouter")
   }
 }
@@ -48,7 +48,7 @@ class ChangeSubSectorRouter @Inject() (
 class ChangeSubSectorRouter2 @Inject() (
                                          subSectorRouter: MsbSubSectorsPageRouterCompanyNotRegistered,
                                          frnPageRouter: FrnPageRouterCompanyNotRegistered,
-                                         noPsrRouter: NoPsrNumberPageRouterCompanyNotRegistered
+                                         noPsrRouter: NoFrnPageRouterCompanyNotRegistered
 ) extends Router2[ChangeSubSectorFlowModel] {
 
   override def getRoute(

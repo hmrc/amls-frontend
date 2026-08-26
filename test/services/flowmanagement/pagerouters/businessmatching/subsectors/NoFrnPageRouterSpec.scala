@@ -21,17 +21,17 @@ import models.flowmanagement.ChangeSubSectorFlowModel
 import utils.AmlsSpec
 import play.api.test.Helpers._
 
-class NoPsrNumberPageRouterSpec extends AmlsSpec {
+class NoFrnPageRouterSpec extends AmlsSpec {
 
   trait Fixture {
-    val router = new NoPsrNumberPageRouter
+    val router = new NoFrnPageRouter
   }
 
   trait NotRegisteredFixture {
-    val router = new NoPsrNumberPageRouterCompanyNotRegistered
+    val router = new NoFrnPageRouterCompanyNotRegistered
   }
 
-  "NoPsrNumberPageRouter" must {
+  "NoFrnPageRouter" must {
     "route to the 'Check your answers' page" in new Fixture {
       val model  = ChangeSubSectorFlowModel()
       val result = router.getRoute("internalId", model)
@@ -40,7 +40,7 @@ class NoPsrNumberPageRouterSpec extends AmlsSpec {
     }
   }
 
-  "NoPsrNumberPageRouter" must {
+  "NoFrnPageRouter" must {
     "route to the 'Check your answers' page if company not registered is false" in new NotRegisteredFixture {
       val model  = ChangeSubSectorFlowModel()
       val result = router.getRoute("internalId", model)
