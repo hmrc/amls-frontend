@@ -16,8 +16,13 @@
 
 package services.cache
 
+import models.Country
 import models.amp.Amp
-import models.businessmatching.BusinessMatching
+import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching.BusinessActivity.MoneyServiceBusiness
+import models.businessmatching.BusinessMatchingMsbService.CurrencyExchange
+import models.businessmatching.{BusinessActivities, BusinessMatching, BusinessMatchingMsbServices}
+import models.businessmatching.BusinessType.SoleProprietor
 import services.encryption.CryptoService
 import play.api.libs.json.{JsArray, JsBoolean, JsString, JsValue, Json}
 import uk.gov.hmrc.crypto.{Crypted, PlainText}
@@ -83,9 +88,9 @@ class CacheSpec extends AmlsSpec {
       }
     }
 
-    /** Encryption needs to be enabled ...
-      */
-    "decrypt encrypted values and encrypt them" ignore {
+//    /** Encryption needs to be enabled ...
+//      */
+    "decrypt encrypted values and encrypt them" when {
       "apply encryption is set" ignore {
         val cache        = Cache(
           "test-cache-1",
@@ -116,32 +121,54 @@ class CacheSpec extends AmlsSpec {
 
     "decrypt once successfully" in {
       // Given
-      val cache = Cache("test-cache-map-1", Map(BusinessMatching.key -> JsString(encryptedBusinessMatching)))
+      val encrBusinessMatching =
+        "K9bHWULp9RdCrsHiP/9CUYOx43QiR3ava9vf2Cts6mapa+nn9V5oyPFksOmy7U3Boi+R04C6gGeG1+Cg3QDu48J2tyX8GCdHAi08aqSrYToSKDGb85ro3Jnlrjj6PBd/5w58NL+rk5Zb7s1+4iXLtvUhUFmfOt9ci1ABAlWWOerhYNo6x26vLZyc1zsXdYZaNbxZHtfs+fHtmUbgkyOkiGVInlLaPEzVyZstf0GNlgBSqucBYkrJ5XjDssi+8XJSatJMCqFsP4eBRWJcH2qdL6I+1SQ+6ES7NkSt72RpSZffbbJIP4h0DbEnQ+HUH2BXyh+ZgSCM94x+lauFRM1qQ2S8tUErhD6KxI87Fr3xuqP8V+pWplwwxcq+IEQTb+q7r4XSoxF9UkQZMxEEiUZ5jiWprKnob8yhg9fsaay4SK6v0kHAYr4BxWWaAs98yEPnB7XTxAmyOCB4qddPTrSYV9uRs60upNC+6/c7jrgCjW4="
+      val cache                = new CryptoCache(
+        Cache("test-cache-map-1", Map(BusinessMatching.key -> JsString(encrBusinessMatching))),
+        cryptoService
+      )
 
       // When
-      val unencryptedBusinessMatching =
-        cryptoService.sanitiseDoubleDecrypt(BusinessMatching.key, cache)(BusinessMatching.reads)
+      val unencryptedBusinessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)(BusinessMatching.reads)
 
       // Then
       unencryptedBusinessMatching.value mustEqual BusinessMatching(
+        Some(
+          ReviewDetails(
+            "Jon Snow",
+            Some(SoleProprietor),
+            Address(
+              "23 High Street",
+              Some("Park View"),
+              Some("Gloucester"),
+              Some("Gloucestershire"),
+              Some("NE98 1ZZ"),
+              Country.unitedKingdom
+            ),
+            "XE0001234567890",
+            Some("1111111111")
+          )
+        ),
+        Some(BusinessActivities(Set(MoneyServiceBusiness), None, None, None)),
+        Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
         None,
         None,
         None,
-        None,
-        None,
-        None,
-        false,
-        false,
-        false
+        true,
+        true,
+        true
       )
     }
 
     "remove random single quotes from the beginning and end & decrypt twice successfully" in {
       // Given
-      val cache = Cache("test-cache-map-1", Map(Amp.key -> JsString(doubleEncryptedUnsanitaryAmp)))
+      val cache = new CryptoCache(
+        Cache("test-cache-map-1", Map(Amp.key -> JsString(doubleEncryptedUnsanitaryAmp))),
+        cryptoService
+      )
 
       // When
-      val unencryptedAmp: Option[Amp] = cryptoService.sanitiseDoubleDecrypt(Amp.key, cache)(Amp.reads)
+      val unencryptedAmp: Option[Amp] = cache.getEntry[Amp](Amp.key)(Amp.reads)
 
       // Then
       unencryptedAmp.value mustEqual expectedAmp
@@ -150,10 +177,11 @@ class CacheSpec extends AmlsSpec {
     "decrypt sanitary encrypted strings" in {
       // Given
       val sanitaryDoubleEncryptedAmp = doubleEncryptedUnsanitaryAmp.stripPrefix("'").stripSuffix("'")
-      val cache                      = Cache("test-cache-map-1", Map("amp" -> JsString(sanitaryDoubleEncryptedAmp)))
+      val cache                      =
+        new CryptoCache(Cache("test-cache-map-1", Map("amp" -> JsString(sanitaryDoubleEncryptedAmp))), cryptoService)
 
       // When
-      val unencryptedAmp: Option[Amp] = cryptoService.sanitiseDoubleDecrypt(Amp.key, cache)(Amp.reads)
+      val unencryptedAmp: Option[Amp] = cache.getEntry[Amp](Amp.key)(Amp.reads)
 
       // Then
       unencryptedAmp.value mustEqual expectedAmp
@@ -161,10 +189,10 @@ class CacheSpec extends AmlsSpec {
 
     "double decrypt nothing" in {
       // Given
-      val emptyCacheMap = Cache("test-cache-map-1", Map.empty[String, JsValue])
+      val emptyCacheMap = new CryptoCache(Cache("test-cache-map-1", Map.empty[String, JsValue]), cryptoService)
 
       // When
-      val unencryptedAmp = cryptoService.sanitiseDoubleDecrypt(Amp.key, emptyCacheMap)(Amp.reads)
+      val unencryptedAmp = cache.getEntry[Amp](Amp.key)(Amp.reads)
 
       // Then
       unencryptedAmp mustBe None

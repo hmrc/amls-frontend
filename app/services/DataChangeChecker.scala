@@ -36,29 +36,23 @@ import services.encryption.CryptoService
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class DataChangeChecker @Inject() (cryptoService: CryptoService) {
+class DataChangeChecker {
 
   def dataHasChanged(cache: Cache): Boolean =
     Seq(
-      cryptoService.sanitiseDoubleDecrypt[Asp](Asp.key, cache).fold(false)(_.hasChanged),
-      cryptoService.sanitiseDoubleDecrypt[Amp](Amp.key, cache).fold(false)(_.hasChanged),
-      cryptoService.sanitiseDoubleDecrypt[BusinessDetails](BusinessDetails.key, cache).fold(false)(_.hasChanged),
-      cryptoService.sanitiseDoubleDecrypt[Seq[BankDetails]](BankDetails.key, cache).fold(false)(_.exists(_.hasChanged)),
-      cryptoService.sanitiseDoubleDecrypt[BusinessActivities](BusinessActivities.key, cache).fold(false)(_.hasChanged),
-      cryptoService.sanitiseDoubleDecrypt[BusinessMatching](BusinessMatching.key, cache).fold(false)(_.hasChanged),
-      cryptoService.sanitiseDoubleDecrypt[Eab](Eab.key, cache).fold(false)(_.hasChanged),
-      cryptoService
-        .sanitiseDoubleDecrypt[MoneyServiceBusiness](MoneyServiceBusiness.key, cache)
-        .fold(false)(_.hasChanged),
-      cryptoService
-        .sanitiseDoubleDecrypt[Seq[ResponsiblePerson]](ResponsiblePerson.key, cache)
-        .fold(false)(_.exists(_.hasChanged)),
-      cryptoService.sanitiseDoubleDecrypt[Supervision](Supervision.key, cache).fold(false)(_.hasChanged),
-      cryptoService.sanitiseDoubleDecrypt[Tcsp](Tcsp.key, cache).fold(false)(_.hasChanged),
-      cryptoService
-        .sanitiseDoubleDecrypt[Seq[TradingPremises]](TradingPremises.key, cache)
-        .fold(false)(_.exists(_.hasChanged)),
-      cryptoService.sanitiseDoubleDecrypt[Hvd](Hvd.key, cache).fold(false)(_.hasChanged),
-      cryptoService.sanitiseDoubleDecrypt[Renewal](Renewal.key, cache).fold(false)(_.hasChanged)
+      cache.getEntry[Asp](Asp.key).fold(false)(_.hasChanged),
+      cache.getEntry[Amp](Amp.key).fold(false)(_.hasChanged),
+      cache.getEntry[BusinessDetails](BusinessDetails.key).fold(false)(_.hasChanged),
+      cache.getEntry[Seq[BankDetails]](BankDetails.key).fold(false)(_.exists(_.hasChanged)),
+      cache.getEntry[BusinessActivities](BusinessActivities.key).fold(false)(_.hasChanged),
+      cache.getEntry[BusinessMatching](BusinessMatching.key).fold(false)(_.hasChanged),
+      cache.getEntry[Eab](Eab.key).fold(false)(_.hasChanged),
+      cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false)(_.hasChanged),
+      cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).fold(false)(_.exists(_.hasChanged)),
+      cache.getEntry[Supervision](Supervision.key).fold(false)(_.hasChanged),
+      cache.getEntry[Tcsp](Tcsp.key).fold(false)(_.hasChanged),
+      cache.getEntry[Seq[TradingPremises]](TradingPremises.key).fold(false)(_.exists(_.hasChanged)),
+      cache.getEntry[Hvd](Hvd.key).fold(false)(_.hasChanged),
+      cache.getEntry[Renewal](Renewal.key).fold(false)(_.hasChanged)
     ).exists(identity)
 }

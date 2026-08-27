@@ -16,11 +16,8 @@
 
 package services.cache
 
-import models.crypto.Crypto.SensitiveT
 import play.api.libs.json.{Format, JsResultException, JsString, JsValue, Json, OFormat, Reads}
 import play.custom.JsPathSupport.{localDateTimeReads, localDateTimeWrites}
-import uk.gov.hmrc.crypto.json.JsonEncryption
-import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, PlainText}
 
 import java.time.{LocalDateTime, ZoneOffset}
 import scala.util.{Failure, Success, Try}

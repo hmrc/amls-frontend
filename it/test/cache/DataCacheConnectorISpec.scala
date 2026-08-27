@@ -38,8 +38,7 @@ class DataCacheConnectorISpec extends IntegrationBaseSpec with DefaultPlayMongoR
 
     "retrieve an item from the cache given a model type" in {
       val businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(BillPaymentServices))))
-      val testCache: Cache = Cache("123", Map(BusinessMatching.key -> Json.toJson(businessMatching)))
-      repository.saveAll(testCache, "123")
+      val cache = dataCacheConnector.save("123", BusinessMatching.key, businessMatching).futureValue
       dataCacheConnector.fetch[BusinessMatching]("123", BusinessMatching.key).futureValue mustBe Some(businessMatching)
     }
   }
