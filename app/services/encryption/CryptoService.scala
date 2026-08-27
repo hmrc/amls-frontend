@@ -72,24 +72,28 @@ class CryptoService @Inject() (applicationConfig: ApplicationConfig, application
       )
   }
 
-  def decryptReEncrypt(cache: Cache): Cache =
-    val rebuiltCache =
-      cache.data.map { case (key, value) =>
-        val rebuiltValue =
-          if applicationConfig.mongoEncryptionEnabled then
-            val plainText = decryptJsonString(value.as[String])
-            JsString(encrypterDecrypter.encrypt(plainText).value)
-          else Json.parse(value.toString)
-
-        key -> rebuiltValue
+  def decryptReEncrypt(cache: Cache): Cache = {
+    val rebuiltCache = cache.data.map { case (key, value) =>
+      val rebuiltValue = {
+        if (applicationConfig.mongoEncryptionEnabled) {
+          val plainText = decryptJsonString(value.as[String])
+          JsString(encrypterDecrypter.encrypt(plainText).value)
+        } else {
+          Json.parse(value.toString)
+        }
       }
 
+      key -> rebuiltValue
+    }
+
     Cache(cache.id, rebuiltCache)
+  }
+
 
   def encryptJsonString(jsonString: String): JsValue =
     JsonEncryption.stringEncrypter.writes(jsonString)
 
-  def decryptValue[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] =
+  def decryptValue[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] = {
     cache.data.get(key).map { jsValue =>
       val encrypted = jsValue
         .as[String]
@@ -102,4 +106,5 @@ class CryptoService @Inject() (applicationConfig: ApplicationConfig, application
 
       Json.parse(plainText.value).as[T]
     }
+  }
 }
