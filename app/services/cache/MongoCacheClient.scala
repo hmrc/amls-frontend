@@ -138,7 +138,7 @@ class MongoCacheClient @Inject() (
     fetchAll(credId) map {
       case Some(cache) =>
         if (appConfig.mongoEncryptionEnabled) {
-          cryptoService.catchDoubleEncryption[T](cache, key)(reads)
+          cryptoService.decryptValue[T](cache, key)(reads)
         } else {
           getValue[T](cache, key)
         }

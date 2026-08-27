@@ -28,7 +28,7 @@ lazy val scoverageSettings = {
   )
 }
 
-ThisBuild / scalaVersion := "3.3.6"
+ThisBuild / scalaVersion := "3.3.8"
 ThisBuild / majorVersion := 5
 
 lazy val microservice = Project(appName, file("."))
