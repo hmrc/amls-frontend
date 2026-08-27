@@ -69,7 +69,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       parser = mock[BodyParsers.Default],
       start = view,
       headerCarrierForPartialsConverter = headerCarrierForPartialsConverter,
-      applicationCrypto = applicationCrypto,
       dataChangeChecker = mockDataChangeChecker
     )
 
@@ -87,7 +86,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       parser = mock[BodyParsers.Default],
       start = view,
       headerCarrierForPartialsConverter = mock[HeaderCarrierForPartialsConverter],
-      applicationCrypto = applicationCrypto,
       dataChangeChecker = mockDataChangeChecker
     )
 

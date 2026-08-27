@@ -76,7 +76,7 @@ class TestOnlyController @Inject() (
         // needs decrypting first
         val decryptedCache = cache.data.keys.map { key =>
           val string          = cache.data(key).asInstanceOf[JsString].value
-          val decryptedString = cryptoService.doubleDecryptJsonString(string).value
+          val decryptedString = cryptoService.decryptJsonString(string).value
           val json            = Json.parse(decryptedString)
           key -> json
         }.toMap

@@ -33,7 +33,7 @@ class CacheOpsSpec extends AmlsSpec with OptionValues {
   val doubleEncryptedAmp =
     "eNMq8gbH7h1r/oKEz3Fl1GCzr3zgqgqYSCtaFIVD0evtBDfbtyE5+V7G+22KKpjtGM3CL/tUGZgWF+Xm6bw9QInlcuq9bxEAXHq7Ao/0ymYDUHB9ao2nlwxlRYfLjRTXYKxP2Xe+faMXnEpCXAg/d9vnXncQf//fzaXxSS+xcI6Fi2FWDZ2+XuiTWQPtKFIWA30CDJer9aFJcGa3YaoOEsTZ+TI6Gu5H2381OKujumZdXAC33AYNHlMTzDgoQKW8hs/iXI6TxYq82L1xRj8Zpb+jnf2lY9n+6Um6us2mNEUAEzerjg6FYa0VbOhsdcno1XCbX9C9ffGeTvOuK+NC5CjVBWWP+ldW6vizplPTdXmMb9phzWHlQ9F/QaRUi2f2SBiEdJkfq75RtuPXss5rFFsteok+H79FQbEKsc3MZ0VWqAd8pC5pcJHUks6e+GqlC0Dz5U4Lu/H3nF3Tt4RFsbQBZkoalXJuBK1X+G9v5gniQIOqcq325Ky+cyoguAu5rYrtBLng//yUMcar6vgr6G61nESuL6vzoZquaMPDgUuRCjoHa4BSvBU1uwt4NEIkdwzj5VuvAwqqQ84TcdxTuTInrXHND6d6tDIAP6is7gI="
 
-  ".catchDoubleEncryption" must {
+  ".decryptValue" must {
     "decrypt double encrypted value" in {
       // Given
       val cache       = Cache("test-cache", Map("amp" -> JsString(doubleEncryptedAmp)))
@@ -63,7 +63,7 @@ class CacheOpsSpec extends AmlsSpec with OptionValues {
       )
 
       // When
-      val optAmp = cryptoService.catchDoubleEncryption(cache, "amp")(Amp.reads)
+      val optAmp = cryptoService.decryptValue(cache, "amp")(Amp.reads)
 
       // Then
       optAmp.value mustEqual expectedAmp
@@ -74,7 +74,7 @@ class CacheOpsSpec extends AmlsSpec with OptionValues {
       val cache = Cache("test-cache", Map("trading-premises" -> JsString(encryptedTradingPremises)))
 
       // When
-      val optTradingPremises = cryptoService.catchDoubleEncryption(cache, "trading-premises")(TradingPremises.reads)
+      val optTradingPremises = cryptoService.decryptValue(cache, "trading-premises")(TradingPremises.reads)
 
       // Then
       optTradingPremises.value mustEqual TradingPremises()
@@ -86,7 +86,7 @@ class CacheOpsSpec extends AmlsSpec with OptionValues {
 
       // when
       val expectedEx = intercept[SecurityException] {
-        cryptoService.catchDoubleEncryption(cache, "trading-premises")(TradingPremises.reads)
+        cryptoService.decryptValue(cache, "trading-premises")(TradingPremises.reads)
       }
 
       // Then

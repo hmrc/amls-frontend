@@ -30,5 +30,5 @@ import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
   */
 class CryptoCache(cache: Cache, cryptoService: CryptoService) extends Cache(cache.id, cache.data) {
   override def getEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] =
-    cryptoService.catchDoubleEncryption[T](cache, key)(fmt)
+    cryptoService.decryptValue[T](cache, key)(fmt)
 }

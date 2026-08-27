@@ -105,7 +105,6 @@ class LandingControllerWithAmendmentsSpec
       parser = mock[BodyParsers.Default],
       start = view,
       headerCarrierForPartialsConverter = headerCarrierForPartialsConverter,
-      applicationCrypto = applicationCrypto,
       dataChangeChecker = mockDataChangeChecker
     )
 
@@ -148,7 +147,6 @@ class LandingControllerWithAmendmentsSpec
       parser = mock[BodyParsers.Default],
       start = view,
       headerCarrierForPartialsConverter = headerCarrierForPartialsConverter,
-      applicationCrypto = applicationCrypto,
       dataChangeChecker = mockDataChangeChecker
     )
 
