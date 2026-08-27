@@ -16,10 +16,8 @@
 
 package services.cache
 
-import services.encryption.CryptoService
-
 import play.api.libs.json.Reads
-import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
+import services.encryption.CryptoService
 
 /** Implements getEncryptedEntry[T], which will decrypt the entry on retrieval This type itself is a type of Cache.
   *

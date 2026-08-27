@@ -44,7 +44,6 @@ import services.cache.Cache
 import services.encryption.CryptoService
 import services.{AuthEnrolmentsService, DataChangeChecker, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
