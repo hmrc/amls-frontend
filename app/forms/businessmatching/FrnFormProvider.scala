@@ -32,15 +32,15 @@ class FrnFormProvider @Inject()() extends Mappings {
   def apply(): Form[BusinessAppliedForFrn] =
     Form[BusinessAppliedForFrn](
       mapping(
-        "appliedFor" -> boolean("error.required.msb.psr.options", "error.required.msb.psr.options"),
+        "appliedFor" -> boolean("error.required.msb.frn.options", "error.required.msb.frn.options"),
         "regNumber"  -> mandatoryIfTrue(
           "appliedFor",
-          textAllowWhitespace("error.invalid.msb.psr.number")
+          textAllowWhitespace("error.invalid.msb.frn")
             .verifying(
               firstError(
-                minLength(min, "error.required.msb.psr.length"),
-                maxLength(max, "error.required.msb.psr.length"),
-                regexp("^[0-9]*$", "error.max.msb.psr.number.format")
+                minLength(min, "error.required.msb.frn.length"),
+                maxLength(max, "error.required.msb.frn.length"),
+                regexp("^[0-9]*$", "error.max.msb.frn.format")
               )
             )
         )
@@ -50,7 +50,7 @@ class FrnFormProvider @Inject()() extends Mappings {
   private def apply(b: Boolean, s: Option[String]): BusinessAppliedForFrn = (b, s) match {
     case (false, _)        => BusinessAppliedForFrnNo
     case (true, Some(str)) => BusinessAppliedForFrnYes(str)
-    case _                 => throw new IllegalArgumentException("No PSR Number available to bind from form")
+    case _                 => throw new IllegalArgumentException("No FRN available to bind from form")
   }
 
   private def unapply(obj: BusinessAppliedForFrn): Option[(Boolean, Option[String])] = obj match {

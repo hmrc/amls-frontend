@@ -86,7 +86,7 @@ class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
   "BusinessAppliedForFrnController" when {
 
     "get is called" must {
-      "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?'" in new Fixture {
+      "on get display the page 'business applied for a Firm Reference Number (FRN)'" in new Fixture {
         val model = BusinessMatching(
           businessAppliedForFrn = Some(BusinessAppliedForFrnYes("1"))
         )
@@ -99,7 +99,7 @@ class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
         status(result) mustBe OK
       }
 
-      "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?' with pre populated data" in new Fixture {
+      "on get display the page 'business applied for a Firm Reference Number (FRN)' with pre populated data" in new Fixture {
         override val businessMatching = BusinessMatching(
           businessAppliedForFrn = Some(BusinessAppliedForFrnYes("700000"))
         )
@@ -188,10 +188,10 @@ class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           status(result) mustBe BAD_REQUEST
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.text() must include(messages("error.invalid.msb.psr.number"))
+          document.text() must include(messages("error.invalid.msb.frn"))
         }
 
-        "transform a 7-digit PSR number to 700000 when submitting the form" in new Fixture {
+        "transform a 7-digit FRN to 700000 when submitting the form" in new Fixture {
           val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
           when {

@@ -258,7 +258,7 @@ class BusinessAppliedForFrnControllerSpec
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.text() must include(messages("error.invalid.msb.psr.number"))
+          document.text() must include(messages("error.invalid.msb.frn"))
         }
       }
     }
