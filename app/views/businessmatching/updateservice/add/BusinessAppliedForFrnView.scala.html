@@ -42,7 +42,7 @@
         input = Input(
             label = Label(
                 isPageHeading = false,
-                content = Text(messages("businessmatching.updateservice.psr.number.lbl")),
+                content = Text(messages("businessmatching.updateservice.frn.number.lbl")),
                 classes = "govuk-label"
             ),
             hint = None,
@@ -57,8 +57,8 @@
 
 @supportingContent = {
 <div>
-    <p class="govuk-hint">@messages("businessmatching.psr.number.hint")</p>
-    <p class="govuk-hint">@messages("businessmatching.psr.number.hint2")</p>
+    <p class="govuk-hint">@messages("businessmatching.frn.hint")</p>
+    <p class="govuk-hint">@messages("businessmatching.frn.hint2")</p>
 </div>
 }
 
@@ -76,7 +76,7 @@
 
         @warningText(
             WarningText(
-                content = Text(messages("businessmatching.psr.warning"))
+                content = Text(messages("businessmatching.frn.warning"))
             )
         )
 
@@ -92,7 +92,7 @@
             .withFormField(form("appliedFor"))
         )
 
-        @button("button.continue", "appliedspsr-submit")
+        @button("button.continue", "appliedsFrn-submit")
     }
 
 }

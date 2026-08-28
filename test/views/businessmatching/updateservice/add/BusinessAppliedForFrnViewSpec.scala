@@ -56,15 +56,15 @@ class BusinessAppliedForFrnViewSpec extends AmlsViewSpec {
     }
 
     behave like pageWithErrors(
-      numberView(formProvider().withError("appliedFor", "error.required.msb.psr.options"), edit = false),
+      numberView(formProvider().withError("appliedFor", "error.required.msb.frn.options"), edit = false),
       "appliedFor",
-      "error.required.msb.psr.options"
+      "error.required.msb.frn.options"
     )
 
     behave like pageWithErrors(
-      numberView(formProvider().withError("regNumber", "error.max.msb.psr.number.format"), edit = false),
+      numberView(formProvider().withError("regNumber", "error.max.msb.frn.format"), edit = false),
       "regNumber",
-      "error.max.msb.psr.number.format"
+      "error.max.msb.frn.format"
     )
 
     behave like pageWithBackLink(view)
