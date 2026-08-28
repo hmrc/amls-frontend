@@ -34,14 +34,14 @@ class CannotAddServicesViewSpec extends AmlsViewSpec {
 
     "have the correct title" in new ViewFixture {
       doc.title must startWith(
-        messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title") + " - " + messages(
+        messages("businessmatching.updateservice.noFrn.cannotcontinuewiththeapplication.title") + " - " + messages(
           "summary.updateservice"
         )
       )
     }
 
     "have correct heading" in new ViewFixture {
-      heading.html must be(messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading"))
+      heading.html must be(messages("businessmatching.updateservice.noFrn.cannotcontinuewiththeapplication.heading"))
     }
 
     "have correct subHeading" in new ViewFixture {
@@ -52,7 +52,7 @@ class CannotAddServicesViewSpec extends AmlsViewSpec {
 
     "show the correct content" in new ViewFixture {
       doc.body().text() must include(
-        messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2")
+        messages("businessmatching.updateservice.noFrn.cannotcontinuewiththeapplication.requiredinfo.2")
       )
     }
   }

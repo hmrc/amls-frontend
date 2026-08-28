@@ -1815,11 +1815,11 @@ businessmatching.updateservice.frn.number.lbl = Firm Reference Number
 businessmatching.updateservice.frn.lbl2 = What is your business’s Firm Reference Number?
 businessmatching.updateservice.psr.number.hint = It’s 6 numbers, like 123456. You received it when you registered with the Financial Conduct Authority (FCA).
 
-businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading = You’ll need a Payment Services Regulations (PSR) number to continue with your update
-businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title = You’ll need a Payment Services Regulations (PSR) number to continue with your update
+businessmatching.updateservice.noFrn.cannotcontinuewiththeapplication.heading = You’ll need a Firm Reference Number (FRN) to continue with your update
+businessmatching.updateservice.noFrn.cannotcontinuewiththeapplication.title = You’ll need a Firm Reference Number (FRN) to continue with your update
 businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.1 = Your business must have a Payment Services Regulations (PSR) reference number to include a money service business as part of your anti-money laundering supervision.
-businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2 = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
-businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.text = Return to about your business
+businessmatching.updateservice.noFrn.cannotcontinuewiththeapplication.requiredinfo.2 = You can apply for an FRN from the Financial Conduct Authority (FCA).
+businessmatching.updateservice.noFrn.cannotcontinuewiththeapplication.button.text = Return to about your business
 
 businessmatching.updateservice.selectactivities.title = Which service do you need to register?
 businessmatching.updateservice.selectactivities.cya = Service you need to register

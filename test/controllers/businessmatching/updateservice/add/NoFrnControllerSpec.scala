@@ -58,7 +58,7 @@ class NoFrnControllerSpec extends AmlsSpec with ScalaFutures {
 
           status(result) mustBe OK
           contentAsString(result) must include(
-            messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title")
+            messages("businessmatching.updateservice.noFrn.cannotcontinuewiththeapplication.title")
           )
         }
       }
