@@ -206,28 +206,28 @@ class UpdateServicesSummaryViewSpec extends UpdateServicesSummaryFixtures {
       }
     }
 
-    "if adding TransmittingMoney as an MSB subsector, for does your business have a PSR number" must {
+    "if adding TransmittingMoney as an MSB subsector, for does your business have an FRN" must {
       "have a question title" in new MSBAllViewFixture {
-        doc.body().text must include(messages("businessmatching.psr.number.title"))
+        doc.body().text must include(messages("businessmatching.frn.title"))
       }
 
       "show edit link" in new MSBAllViewFixture {
-        Option(doc.getElementById("psr-edit")).isDefined mustBe true
+        Option(doc.getElementById("frn-edit")).isDefined mustBe true
       }
 
-      "have Yes answer to PSR number question" in new MSBAllViewFixture {
+      "have Yes answer to FRN question" in new MSBAllViewFixture {
         doc.getElementsByClass("govuk-summary-list__value").get(2).text mustBe messages("lbl.yes")
       }
 
-      "have a PSR number" in new MSBAllViewFixture {
+      "have an FRN" in new MSBAllViewFixture {
         doc.getElementsByClass("govuk-summary-list__value").get(3).text mustBe "111111"
       }
 
-      "have answered no to do I have a PSR number" in new MSBNoPSRViewFixture {
+      "have answered no to do I have an FRN" in new MSBNoPSRViewFixture {
         doc.getElementsByClass("govuk-summary-list__value").get(2).text mustBe messages("lbl.no")
       }
 
-      "not have transmitting money and not have a PSR section" in new MSBViewFixture {
+      "not have transmitting money and not have a FRN section" in new MSBViewFixture {
         doc.getElementsByClass("govuk-summary-list__value").size() mustBe 2
       }
     }
