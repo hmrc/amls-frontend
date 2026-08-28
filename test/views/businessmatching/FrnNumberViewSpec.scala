@@ -55,9 +55,9 @@ class FrnNumberViewSpec extends AmlsViewSpec {
       def view = frnView(filledForm, edit = true, isPreSubmission = false, isFrnDefined = true)
 
       doc.title       must startWith(
-        Messages("businessmatching.psr.number.title.post.submission") + " - " + Messages("summary.updateinformation")
+        Messages("businessmatching.frn.title.post.submission") + " - " + Messages("summary.updateinformation")
       )
-      heading.html    must include(Messages("businessmatching.psr.number.title.post.submission"))
+      heading.html    must include(Messages("businessmatching.frn.title.post.submission"))
       subHeading.html must include(Messages("summary.updateinformation"))
 
     }
@@ -96,7 +96,7 @@ class FrnNumberViewSpec extends AmlsViewSpec {
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
 
-    "hide the Yes/No selection when editing an inputted PSR number and not in-presubmission mode" in new ViewFixture {
+    "hide the Yes/No selection when editing an inputted FRN and not in-presubmission mode" in new ViewFixture {
       val filledForm = formProvider().fill(BusinessAppliedForFrnYes("1234"))
 
       override def view = frnView(filledForm, edit = true, isPreSubmission = false, isFrnDefined = true)
@@ -105,7 +105,7 @@ class FrnNumberViewSpec extends AmlsViewSpec {
       doc.body().text() must not include "No"
     }
 
-    "hide the Yes/No selection when editing an inputted PSR number and not in-presubmission mode and not in edit mode" in new ViewFixture {
+    "hide the Yes/No selection when editing an inputted FRN and not in-presubmission mode and not in edit mode" in new ViewFixture {
       val filledForm = formProvider().fill(BusinessAppliedForFrnYes("1234"))
 
       override def view = frnView(filledForm, edit = false, isPreSubmission = false, isFrnDefined = true)
@@ -114,7 +114,7 @@ class FrnNumberViewSpec extends AmlsViewSpec {
       doc.body().text() must not include "No"
     }
 
-    "show the Yes/No selection when editing an inputted PSR number and in pre-submission mode" in new ViewFixture {
+    "show the Yes/No selection when editing an inputted FRN and in pre-submission mode" in new ViewFixture {
       override def view = frnView(formProvider(), edit = true, isPreSubmission = true)
 
       doc.body().text() must include("Yes")
