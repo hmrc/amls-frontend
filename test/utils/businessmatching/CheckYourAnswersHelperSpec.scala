@@ -444,9 +444,9 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         }
       }
 
-      "contains PSR number" when {
-        "the user has answered yes and supplied a PSR number" in {
-          val request = addTokenWithSessionParam(FakeRequest())("originalPsrNumber" -> "123456")
+      "contains FRN" when {
+        "the user has answered yes and supplied an FRN" in {
+          val request = addTokenWithSessionParam(FakeRequest())("originalFrn" -> "123456")
 
           val bm = BusinessMatching(
             reviewDetails = Some(reviewDetailsModel),
@@ -464,19 +464,19 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             )(messages, request)
             .rows
 
-          val hasPsrNumberRow = rows.lift(hasFrnIndex).getOrElse(failIfEmpty)
-          val psrNumberRow    = rows.lift(frnIndex).getOrElse(failIfEmpty)
+          val hasFrnRow = rows.lift(hasFrnIndex).getOrElse(failIfEmpty)
+          val frnRow    = rows.lift(frnIndex).getOrElse(failIfEmpty)
 
-          hasPsrNumberRow.key.toString   must include(messages("businessmatching.frn.number.title"))
-          hasPsrNumberRow.value.toString must include(messages("lbl.yes"))
+          hasFrnRow.key.toString   must include(messages("businessmatching.frn.number.title"))
+          hasFrnRow.value.toString must include(messages("lbl.yes"))
 
-          psrNumberRow.key.toString   must include(messages("businessmatching.frn.number.cya.title"))
-          psrNumberRow.value.toString must include("123456")
+          frnRow.key.toString   must include(messages("businessmatching.frn.number.cya.title"))
+          frnRow.value.toString must include("123456")
 
           checkChangeLink(
-            psrNumberRow,
+            frnRow,
             controllers.businessmatching.routes.FrnNumberController.get(true).url,
-            "edit-psr-number"
+            "edit-frn"
           )
         }
       }
@@ -572,7 +572,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         }
       }
 
-      "attempting to render PSR number" which {
+      "attempting to render FRN" which {
 
         "is caused by NOT selecting 'Transmitting Money' in MSB services" in {
 
@@ -620,7 +620,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
     "return the logout link" when {
 
-      "application is in pre-submission and 'No' for PSR number is answered" in {
+      "application is in pre-submission and 'No' for FRN is answered" in {
 
         val result = cyaHelper
           .getSubmitButton(

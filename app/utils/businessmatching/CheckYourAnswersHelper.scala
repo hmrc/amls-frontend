@@ -254,7 +254,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
                           href = controllers.businessmatching.routes.FrnNumberController.get(true).url,
                           content = Text(messages("button.edit")),
                           visuallyHiddenText = Some(messages("businessmatching.checkYourAnswers.change.FrnReg")),
-                          attributes = Map("id" -> "edit-psr-number")
+                          attributes = Map("id" -> "edit-frn")
                         )
                       )
                     )
@@ -287,3 +287,5 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
       case _                            => None
     }
 }
+
+// TODO: fix CYA Helper spec and UpdateServicesSummaryFixtures.scala
