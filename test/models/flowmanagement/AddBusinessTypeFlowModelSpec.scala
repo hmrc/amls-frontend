@@ -80,7 +80,7 @@ class AddBusinessTypeFlowModelSpec extends PlaySpec {
     }
 
     "isComplete" must {
-      "return true for MoneyServiceBusiness with PSR number, addMoreActivities and hasAccepted" in {
+      "return true for MoneyServiceBusiness with FRN, addMoreActivities and hasAccepted" in {
         val model = AddBusinessTypeFlowModel(
           activity = Some(MoneyServiceBusiness),
           addMoreActivities = Some(true),

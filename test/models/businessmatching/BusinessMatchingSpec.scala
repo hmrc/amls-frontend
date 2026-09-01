@@ -140,8 +140,8 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       }
     }
 
-    "Merged with BusinessAppliedForPSRNumberModel" must {
-      "return BusinessMatching with correct BusinessAppliedForPSRNumberModel" in {
+    "Merged with BusinessAppliedForFrnModel" must {
+      "return BusinessMatching with correct BusinessAppliedForFrnModel" in {
         val result = initial.businessAppliedForFrn(Some(businessAppliedForFrnModel))
         result must be(
           BusinessMatching(None, None, None, None, None, Some(businessAppliedForFrnModel), hasChanged = true)
@@ -327,7 +327,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
           businessMatching.isComplete must be(false)
         }
 
-        "business activity selected as MSB and msb services model is defined and psr is not defined" in {
+        "business activity selected as MSB and msb services model is defined and frn is not defined" in {
 
           val businessMatching = BusinessMatching(
             Some(reviewDetailsModel),
