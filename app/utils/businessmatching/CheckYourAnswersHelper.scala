@@ -287,5 +287,3 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
       case _                            => None
     }
 }
-
-// TODO: fix CYA Helper spec and UpdateServicesSummaryFixtures.scala

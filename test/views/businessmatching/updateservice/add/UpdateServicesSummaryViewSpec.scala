@@ -223,7 +223,7 @@ class UpdateServicesSummaryViewSpec extends UpdateServicesSummaryFixtures {
         doc.getElementsByClass("govuk-summary-list__value").get(3).text mustBe "111111"
       }
 
-      "have answered no to do I have an FRN" in new MSBNoPSRViewFixture {
+      "have answered no to do I have an FRN" in new MSBNoFrnViewFixture {
         doc.getElementsByClass("govuk-summary-list__value").get(2).text mustBe messages("lbl.no")
       }
 
