@@ -45,7 +45,7 @@ class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
       }
     }
 
-    "route to the 'PSR number' page" when {
+    "route to the 'FRN' page" when {
       "TransmittingMoney has been chosen" in new Fixture {
         val model  = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
         val result = router.getRoute("internalId", model)
@@ -86,7 +86,7 @@ class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
       }
     }
 
-    "route to the 'PSR number' page" when {
+    "route to the 'FRN' page" when {
       "TransmittingMoney has been chosen" in new NotRegisteredFixture {
         val model  = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
         val result = router.getRoute("internalId", model)

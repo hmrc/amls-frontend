@@ -169,7 +169,7 @@ class MsbSubSectorsControllerSpec
       document.select("input[type=checkbox][checked]").size mustBe 0
     }
 
-    "redirect to the 'PSR Number' page on valid submission when adding 'Transmitting Money' and you don't have a PSR Number" in new Fixture {
+    "redirect to the 'FRN' page on valid submission when adding 'Transmitting Money' and you don't have an FRN" in new Fixture {
 
       mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel())
 
