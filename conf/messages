@@ -1746,8 +1746,8 @@ businessmatching.cannotcontinuewiththeapplication.requiredinfo.second = You can 
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.third = The information you have given so far in this application has been saved. You have 28 days to return and complete your application.
 
 businessmatching.cannotchangeservices.title = You cannot continue with your change
-businessmatching.cannotchangeservices.requiredinfo.line1 = Your business must have a Payment Services Regulations (PSR) reference number in order to register for Money Service Business as part of your anti-money laundering supervision from HM Revenue and Customs.
-businessmatching.cannotchangeservices.requiredinfo.line2 = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
+businessmatching.cannotchangeservices.requiredinfo.line1 = Your business must have a Firm Reference Number (FRN) in order to register for Money Service Business as part of your anti-money laundering supervision from HM Revenue and Customs.
+businessmatching.cannotchangeservices.requiredinfo.line2 = You can apply for an FRN from the Financial Conduct Authority (FCA).
 businessmatching.cannotchangeservices.button.text = Return to about your business
 
 businessmatching.checkbusiness.title = Make sure this company is not already registered
@@ -1813,7 +1813,7 @@ businessmatching.updateservice.msb.services.list.lbl.01 = Transmitting money
 businessmatching.updateservice.frn.title = Does your business have a Firm Reference Number (FRN)?
 businessmatching.updateservice.frn.number.lbl = Firm Reference Number
 businessmatching.updateservice.frn.lbl2 = What is your business’s Firm Reference Number?
-businessmatching.updateservice.psr.number.hint = It’s 6 numbers, like 123456. You received it when you registered with the Financial Conduct Authority (FCA).
+businessmatching.updateservice.frn.hint = It’s 6 numbers, like 123456. You received it when you registered with the Financial Conduct Authority (FCA).
 
 businessmatching.updateservice.noFrn.cannotcontinuewiththeapplication.heading = You’ll need a Firm Reference Number (FRN) to continue with your update
 businessmatching.updateservice.noFrn.cannotcontinuewiththeapplication.title = You’ll need a Firm Reference Number (FRN) to continue with your update
