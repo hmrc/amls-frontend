@@ -44,7 +44,6 @@ import services.cache.Cache
 import services.encryption.CryptoService
 import services.{AuthEnrolmentsService, DataChangeChecker, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
@@ -67,7 +66,6 @@ class LandingController @Inject() (
   val mcc: MessagesControllerComponents,
   implicit override val messagesApi: MessagesApi,
   val config: ApplicationConfig,
-  val applicationCrypto: ApplicationCrypto,
   val dataChangeChecker: DataChangeChecker,
   parser: BodyParsers.Default,
   start: Start,
@@ -82,8 +80,6 @@ class LandingController @Inject() (
     ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(appConfig).absoluteUrl,
     "utf-8"
   )
-
-  implicit val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
 
   def signoutUrl = s"${appConfig.logoutUrl}?continue=$unauthorisedUrl"
 
