@@ -241,7 +241,7 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
             Some(
               Seq(
                 SummaryListRow(
-                  Key(Text(messages("businessmatching.frn.number.title"))),
+                  Key(Text(messages("businessmatching.frn.title"))),
                   Value(Text(messages("lbl.yes")))
                 ),
                 SummaryListRow(

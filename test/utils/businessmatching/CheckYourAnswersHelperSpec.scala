@@ -467,7 +467,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
           val hasFrnRow = rows.lift(hasFrnIndex).getOrElse(failIfEmpty)
           val frnRow    = rows.lift(frnIndex).getOrElse(failIfEmpty)
 
-          hasFrnRow.key.toString   must include(messages("businessmatching.frn.number.title"))
+          hasFrnRow.key.toString   must include(messages("businessmatching.frn.title"))
           hasFrnRow.value.toString must include(messages("lbl.yes"))
 
           frnRow.key.toString   must include(messages("businessmatching.frn.number.cya.title"))
