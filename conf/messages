@@ -1726,6 +1726,15 @@ businessmatching.button.confirm.start = Confirm and start application
 businessmatching.confirm.postcode.title = What is your business’s postcode?
 businessmatching.confirm.postcode.error.empty = Enter your business’s postcode
 
+businessmatching.frnNeedMoreInfo.title = We need more information about your registration
+businessmatching.frnNeedMoreInfo.heading = We need more information about your registration
+businessmatching.frnNeedMoreInfo.lbl.01 = You entered a Firm Reference Number (FRN) with 7 digits.
+businessmatching.frnNeedMoreInfo.lbl.02 = HMRC cannot process 7-digit FRNs online.
+businessmatching.frnNeedMoreInfo.heading.02 = What happens next
+businessmatching.frnNeedMoreInfo.lbl.03 = You can save this FRN and continue with your online application.
+businessmatching.frnNeedMoreInfo.lbl.04 = HMRC will contact you later in the application process to request full details of your application for full registration with the Financial Conduct Authority.
+businessmatching.frnNeedMoreInfo.lbl.05 = If you've entered a 7-digit FRN by mistake, you can
+
 businessmatching.checkYourAnswers.change.CompanyReg = your company registration number
 businessmatching.checkYourAnswers.change.ServicesRegstd = the services you need to register
 businessmatching.checkYourAnswers.change.MSBActivities = the money service business activities your business carries out

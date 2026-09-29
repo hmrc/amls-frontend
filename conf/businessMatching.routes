@@ -26,3 +26,5 @@ GET         /check-your-answers                                     @controllers
 POST        /check-your-answers                                     @controllers.businessmatching.SummaryController.post()
 
 GET         /no-frn-number                                          @controllers.businessmatching.NoFrnController.get
+
+GET         /frn-need-more-information                              @controllers.businessmatching.FrnNeedMoreInfoController.get
