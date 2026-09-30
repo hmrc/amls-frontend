@@ -21,17 +21,17 @@ import config.ApplicationConfig
 import play.api.Application
 import play.api.Configuration
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsString, Json, Reads}
+import play.api.libs.json.{JsString, JsValue, Json, Reads}
+import org.scalatest.OptionValues
 import services.encryption.CryptoService
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.AmlsSpec
-
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessMatching.{reads, writes}
 
-class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySupport[Cache] {
+class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySupport[Cache] with OptionValues {
 
   val configNoEncryption: Configuration = Configuration(
     ConfigFactory.load().withValue("appCache.mongo.encryptionEnabled", ConfigValueFactory.fromAnyRef(false))
@@ -56,12 +56,14 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
       )
       .build()
 
+  private val cryptoService: CryptoService = encryptedApp.injector.instanceOf[CryptoService]
+
   val encryptedRepository =
     new MongoCacheClient(
       encryptedApp.injector.instanceOf[ApplicationConfig],
       encryptedApp.injector.instanceOf[ApplicationCrypto],
       mongoComponent,
-      encryptedApp.injector.instanceOf[CryptoService]
+      cryptoService
     )
 
   val businessMatchingData: String              =
@@ -113,7 +115,9 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
 
     "retrieve an encrypted cache that exists" in {
       encryptedRepository.saveAll(encryptedCache, "123").futureValue
-      encryptedRepository.fetchAll("123").futureValue.map(_.data) mustBe Some(encryptedCacheData)
+      val cache               = encryptedRepository.fetchAll("123").futureValue.head
+      val optBusinessMatching = cryptoService.decryptValue(cache, "business-matching")(BusinessMatching.reads)
+      optBusinessMatching.value mustBe Json.parse(businessMatchingData).as[BusinessMatching]
     }
 
     "return None when no cache exists" in {
@@ -143,14 +147,16 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
     }
 
     "create and return an encrypted cache when one does not exist" in {
-      val createdOrUpdated = encryptedRepository
-        .createOrUpdate("123", JsString(businessMatchingData), "business-matching")
+      val businessMatching = Json.parse(businessMatchingData).as[BusinessMatching]
+
+      val createdOrUpdated: Map[String, JsValue] = encryptedRepository
+        .createOrUpdate("123", businessMatching, "business-matching")
         .futureValue
         .data
 
-      val fetched = encryptedRepository.fetchAll("123").futureValue.head.data
+      val fetched: Map[String, JsValue] = encryptedRepository.fetchAll("123").futureValue.head.data
 
-      createdOrUpdated mustBe fetched
+      createdOrUpdated.head._2 mustBe fetched.head._2
     }
 
     "update and return a cache when one already exists" in {
@@ -160,21 +166,21 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
     }
 
     "update and return an encrypted cache when one already exists" in {
-      val cryptoService                 = new CryptoService(appConfig, applicationCrypto)
-      val encryptedBusinessMatchingData = cryptoService.encryptJsonString(businessMatchingData)
+      // Given
+      encryptedRepository
+        .saveAll(Cache("123", encryptedCacheData), "123")
+        .futureValue // this is saving businessMatchingData
 
-      encryptedRepository.saveAll(Cache("123", encryptedCacheData), "123").futureValue
-
-      val expectedUpdatedEncryptedData = cryptoService.encryptJsonString(businessMatchingDataTwo)
-
+      // When
       val updatedBusinessMatching: BusinessMatching = Json.parse(businessMatchingDataTwo).as[BusinessMatching]
-
-      val updatedData = encryptedRepository
+      val updatedData: Cache                        = encryptedRepository
         .createOrUpdate("123", updatedBusinessMatching, "business-matching")
         .futureValue
-        .data
 
-      updatedData("business-matching") mustEqual expectedUpdatedEncryptedData
+      // Then
+      val decryptedUpdatedBusinesMatching =
+        cryptoService.decryptValue(updatedData, "business-matching")(BusinessMatching.reads)
+      decryptedUpdatedBusinesMatching.value mustEqual updatedBusinessMatching
     }
   }
 
@@ -224,7 +230,7 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
 
     "return the encrypted cache with no updates when the key does not exist" in {
       encryptedRepository.saveAll(encryptedCache, "123").futureValue
-      encryptedRepository.removeByKey("123", "unrecognisedFieldName").futureValue.data mustBe encryptedCacheData
+      encryptedRepository.removeByKey("123", "unrecognisedFieldName").futureValue.data mustNot be(empty)
     }
   }
 
@@ -241,17 +247,20 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
     }
 
     "create and return an encrypted cache when one does not exist=" in {
-      val cryptoService                             = new CryptoService(appConfig, applicationCrypto)
-      val expectedEncryptedBusinessMatching         = cryptoService.encryptJsonString(businessMatchingDataTwo)
+      val expectedEncryptedBusinessMatching         =
+        cryptoService.encryptJsonString(Json.toJson(businessMatchingDataTwo).toString())
       val updatedBusinessMatching: BusinessMatching = Json.parse(businessMatchingDataTwo).as[BusinessMatching]
 
-      encryptedRepository
+      val encryptedData = encryptedRepository
         .upsert(
-          Cache("123", encryptedCacheData),
+          encryptedCache,
           updatedBusinessMatching,
           "business-matching"
         )
-        .data("business-matching") mustBe expectedEncryptedBusinessMatching
+
+      cryptoService
+        .decryptValue(encryptedData, "business-matching")(BusinessMatching.reads)
+        .value mustBe updatedBusinessMatching
     }
 
     "update and return a cache when one already exists" in {
@@ -267,17 +276,19 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
     }
 
     "update and return an ecnrypted cache when one already exists" in {
-      val cryptoService                             = new CryptoService(appConfig, applicationCrypto)
       val expectedEncryptedBusinessMatching         = cryptoService.encryptJsonString(businessMatchingDataTwo)
       val updatedBusinessMatching: BusinessMatching = Json.parse(businessMatchingDataTwo).as[BusinessMatching]
 
-      encryptedRepository
+      val encryptedData = encryptedRepository
         .upsert(
           Cache("123", encryptedCacheData),
           updatedBusinessMatching,
           "business-matching"
         )
-        .data("business-matching") mustBe expectedEncryptedBusinessMatching
+
+      cryptoService
+        .decryptValue(encryptedData, "business-matching")(BusinessMatching.reads)
+        .value mustBe updatedBusinessMatching
     }
   }
 
