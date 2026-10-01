@@ -178,9 +178,9 @@ class MongoCacheClientSpec extends AmlsSpec with DefaultPlayMongoRepositorySuppo
         .futureValue
 
       // Then
-      val decryptedUpdatedBusinesMatching =
+      val decryptedUpdatedBusinessMatching =
         cryptoService.decryptValue(updatedData, "business-matching")(BusinessMatching.reads)
-      decryptedUpdatedBusinesMatching.value mustEqual updatedBusinessMatching
+      decryptedUpdatedBusinessMatching.value mustEqual updatedBusinessMatching
     }
   }
 

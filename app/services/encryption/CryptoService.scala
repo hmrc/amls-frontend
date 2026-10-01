@@ -78,9 +78,9 @@ class CryptoService @Inject() (
         )
     }
 
-    Try(decrypt(value, stringDecrypter)) match {
+    Try(decrypt(value, newStringDecrypter)) match {
       case Success(data) => data
-      case Failure(_)    => decrypt(value, newStringDecrypter)
+      case Failure(_)    => decrypt(value, stringDecrypter)
     }
   }
 
