@@ -32,7 +32,7 @@ class CacheSpec extends AmlsSpec {
 
   val cache: Cache = Cache("123", Map("fieldName" -> JsString("valueName")))
 
-  val cryptoService = new CryptoService(appConfig, applicationCrypto)
+  val cryptoService = new CryptoService(appConfig, applicationCrypto, typeSafeConfig)
 
   val doubleEncryptedUnsanitaryAmp =
     "'" + "avIcAP8AvFcC96lrOKiAAcSQu9oB2IuZtI4dWP/ucDEkPPLTUVxhYmH4INDPogXoIHRuqBmY+FR9zkPRZsiXBdR6dJRY3FEoUV6+y8zfUytTuMXc2RZ0mJx4MuqmZfNmO97UsFsnDpp+YcsJUGIei7Ci6WatX5MMgOMwPbFUOhRemp8mvaXto7guCYeRWyfkfH5nI+r8LF2UvNPZIsxeIZhyV5XNJyiQjzf9Wmw8G2Wx82nqVCMyZeH5j/O9fifBuIbcbpJrPV2Ua+FQlcYi3fymLcdCvi1AX5vbzLJjJBbLXMtRYvI7W7/O/FjoyaOGDb7q63+iVz5GGZnG40syuqVyMDbCUS8zmtvDVeiRfC7kEMY5zQ//hBFTrXNiIWH+RvZmI4nEty4KsrEOX7vZBK/SQcBivgHFZZoCz3zIQ+fKc5P2y6Vk4Nsv4fn+OapA" + "'"

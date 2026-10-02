@@ -16,6 +16,7 @@
 
 package services.encryption
 
+import com.typesafe.config.Config
 import config.ApplicationConfig
 import models.crypto.Crypto.SensitiveT
 import org.apache.commons.codec.binary.Base64
@@ -24,7 +25,7 @@ import play.api.libs.json.*
 import play.api.libs.json.Reads.*
 import services.cache.Cache
 import uk.gov.hmrc.crypto.json.JsonEncryption
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Crypted, Decrypter, Encrypter, PlainText}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Crypted, Decrypter, Encrypter, PlainText, SymmetricCryptoFactory}
 
 import java.nio.charset.StandardCharsets.UTF_8
 import javax.crypto.Cipher
@@ -33,38 +34,54 @@ import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Success, Try}
 
 @Singleton
-class CryptoService @Inject() (applicationConfig: ApplicationConfig, applicationCrypto: ApplicationCrypto) {
+class CryptoService @Inject() (
+  applicationConfig: ApplicationConfig,
+  applicationCrypto: ApplicationCrypto,
+  config: Config
+) {
 
-  private val logger                                                = Logger(getClass)
-  private val encryptionKey                                         = applicationConfig.encryptionKey
+  private val logger        = Logger(getClass)
+  private val encryptionKey = applicationConfig.encryptionKey
+
   private implicit val encrypterDecrypter: Encrypter with Decrypter = applicationCrypto.JsonCrypto
-  private val stringDecrypter                                       = JsonEncryption.stringDecrypter(encrypterDecrypter)
+  private val stringDecrypter: Reads[String]                        = JsonEncryption.stringDecrypter(encrypterDecrypter)
+
+  private val crypto: Encrypter & Decrypter     = SymmetricCryptoFactory.aesGcmCryptoFromConfig("json.encryption", config)
+  private val newStringDecrypter: Reads[String] = JsonEncryption.stringDecrypter(crypto)
+  private val newStringEncrypter                = JsonEncryption.stringEncrypter(crypto)
 
   def decryptJsonString(value: String): PlainText = {
-    val firstDecrypted =
-      stringDecrypter
-        .reads(JsString(value))
-        .fold(
-          errors => throw new SecurityException(s"Unable to decrypt value: $errors"),
-          identity
-        )
+    def decrypt(value: String, reader: Reads[String]) = {
+      val firstDecrypted =
+        reader
+          .reads(JsString(value))
+          .fold(
+            errors => throw new SecurityException(s"Unable to decrypt value: $errors"),
+            identity
+          )
 
-    Json
-      .parse(firstDecrypted)
-      .validate[String]
-      .fold(
-        _ => PlainText(firstDecrypted),
-        innerEncrypted =>
-          stringDecrypter
-            .reads(JsString(innerEncrypted))
-            .fold(
-              errors =>
-                throw new SecurityException(
-                  s"Unable to decrypt inner value: $errors"
-                ),
-              PlainText.apply
-            )
-      )
+      Json
+        .parse(firstDecrypted)
+        .validate[String]
+        .fold(
+          _ => PlainText(firstDecrypted),
+          innerEncrypted =>
+            reader
+              .reads(JsString(innerEncrypted))
+              .fold(
+                errors =>
+                  throw new SecurityException(
+                    s"Unable to decrypt inner value: $errors"
+                  ),
+                PlainText.apply
+              )
+        )
+    }
+
+    Try(decrypt(value, newStringDecrypter)) match {
+      case Success(data) => data
+      case Failure(_)    => decrypt(value, stringDecrypter)
+    }
   }
 
   def decryptReEncrypt(cache: Cache): Cache = {
@@ -72,7 +89,7 @@ class CryptoService @Inject() (applicationConfig: ApplicationConfig, application
       val rebuiltValue =
         if (applicationConfig.mongoEncryptionEnabled) {
           val plainText = decryptJsonString(value.as[String])
-          JsString(encrypterDecrypter.encrypt(plainText).value)
+          JsString(crypto.encrypt(plainText).value)
         } else {
           Json.parse(value.toString)
         }
@@ -84,7 +101,7 @@ class CryptoService @Inject() (applicationConfig: ApplicationConfig, application
   }
 
   def encryptJsonString(jsonString: String): JsValue =
-    JsonEncryption.stringEncrypter.writes(jsonString)
+    newStringEncrypter.writes(jsonString)
 
   def decryptValue[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] =
     cache.data.get(key).map { jsValue =>

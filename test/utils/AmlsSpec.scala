@@ -16,6 +16,7 @@
 
 package utils
 
+import com.typesafe.config.Config
 import config.ApplicationConfig
 import controllers.CommonPlayDependencies
 import org.apache.pekko.stream.Materializer
@@ -26,7 +27,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
-import play.api.i18n._
+import play.api.i18n.*
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContentAsEmpty, MessagesControllerComponents, Request}
 import play.api.test.FakeRequest
@@ -72,6 +73,7 @@ trait AmlsSpec
   // ================================== Encryption/Decryption ==================================
   val applicationCrypto: ApplicationCrypto                        = app.injector.instanceOf[ApplicationCrypto]
   implicit val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
+  val typeSafeConfig: Config                                      = app.injector.instanceOf[Config]
   // ===========================================================================================
 
   implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
