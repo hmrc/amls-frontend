@@ -15,22 +15,21 @@
  *@
 
 @import config.ApplicationConfig
-@import views.html.components.Heading
+@import views.html.components.{Heading, Button}
 
 @this(
     layout: Layout,
-    heading: Heading
+    heading: Heading,
+    button: Button
 )
 
 @()(implicit requestHeader: RequestHeader, appConfig: ApplicationConfig, messages: Messages)
 
-@layout(messages("unauthorised.role.title"), showBackLink = false) {
+@layout(messages("unauthorised.authprovider.title"), showBackLink = false) {
 
-    @heading("unauthorised.role.title")
+    @heading("unauthorised.authprovider.title")
 
-    <p class="govuk-body">@messages("unauthorised.role.content.line1")</p>
-    <p class="govuk-body">@messages("unauthorised.role.content.line2")</p>
-    <p class="govuk-body">@messages("unauthorised.role.content.line3")
-        <a id="manage-team-members-link" class="govuk-link" href='@messages("unauthorised.role.link.href")'>@messages("unauthorised.role.link.text")</a>.
-    </p>
+    <p class="govuk-body">@messages("unauthorised.authprovider.content")</p>
+
+    @button("unauthorised.authprovider.button", hrefOpt = Some(s"${appConfig.logoutUrl}?continue=${appConfig.loginContinue}"))
 }

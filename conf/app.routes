@@ -36,6 +36,8 @@ GET         /subscribe/bad-request                                              
 
 GET         /unauthorised                                                             @controllers.AmlsController.unauthorised
 GET         /unauthorised-role                                                        @controllers.AmlsController.unauthorised_role
+GET         /unauthorised-agent                                                       @controllers.AmlsController.unauthorised_agent
+GET         /unauthorised-auth-provider                                               @controllers.AmlsController.unauthorised_auth_provider
 GET         /keep-alive                                                               @controllers.AmlsController.keep_alive
 
 GET         /registration-progress                                                    @controllers.RegistrationProgressController.get()
