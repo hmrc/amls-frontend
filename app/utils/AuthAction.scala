@@ -59,13 +59,15 @@ class DefaultAuthAction @Inject() (
   private val saKey         = "IR-SA"
   private val ctKey         = "IR-CT"
 
-  private lazy val unauthorisedUrl = URLEncoder.encode(
-    ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(applicationConfig).absoluteUrl,
-    "utf-8"
-  )
+  private def logoutAndContinueTo(call: Call): String = {
+    val continueUrl = URLEncoder.encode(ReturnLocation(call)(applicationConfig).absoluteUrl, "utf-8")
+    s"${applicationConfig.logoutUrl}?continue=$continueUrl"
+  }
 
-  def unauthorised = s"${applicationConfig.logoutUrl}?continue=$unauthorisedUrl"
-  def signout      = s"${applicationConfig.logoutUrl}"
+  def unauthorised             = logoutAndContinueTo(controllers.routes.AmlsController.unauthorised_role)
+  def unauthorisedAgent        = logoutAndContinueTo(controllers.routes.AmlsController.unauthorised_agent)
+  def unauthorisedAuthProvider = logoutAndContinueTo(controllers.routes.AmlsController.unauthorised_auth_provider)
+  def signout                  = s"${applicationConfig.logoutUrl}"
 
   override final protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
 
@@ -79,7 +81,11 @@ class DefaultAuthAction @Inject() (
           Retrievals.groupIdentifier and
           Retrievals.credentialRole
       ) {
-        case enrolments ~ Some(credentials) ~ Some(affinityGroup) ~ groupIdentifier ~ credentialRole =>
+        case enrolments ~ Some(_) ~ Some(affinityGroup) ~ _ ~ _ if !isPermitted(affinityGroup, enrolments) =>
+          logger.debug("DefaultAuthAction:Refine - Not permitted affinity group: " + affinityGroup)
+          val target = if (affinityGroup == AffinityGroup.Agent) unauthorisedAgent else unauthorised
+          Future.successful(Left(Redirect(Call("GET", target))))
+        case enrolments ~ Some(credentials) ~ Some(affinityGroup) ~ groupIdentifier ~ credentialRole       =>
           // $COVERAGE-OFF$
           logger.debug("DefaultAuthAction:Refine - Enrolments:" + enrolments)
           // $COVERAGE-ON$
@@ -98,7 +104,7 @@ class DefaultAuthAction @Inject() (
               )
             )
           )
-        case _                                                                                       =>
+        case _                                                                                             =>
           // $COVERAGE-OFF$
           logger.debug("DefaultAuthAction:Refine - Non match (enrolments ~ Some(credentials) ~ Some(affinityGroup))")
           // $COVERAGE-ON$
@@ -116,10 +122,10 @@ class DefaultAuthAction @Inject() (
           Left(Redirect(Call("GET", unauthorised)))
         case uap: UnsupportedAuthProvider     =>
           logger.debug("DefaultAuthAction:Refine - UnsupportedAuthProvider:" + uap)
-          Left(Redirect(Call("GET", unauthorised)))
+          Left(Redirect(Call("GET", unauthorisedAuthProvider)))
         case uag: UnsupportedAffinityGroup    =>
           logger.debug("DefaultAuthAction:Refine - UnsupportedAffinityGroup:" + uag)
-          Left(Redirect(Call("GET", unauthorised)))
+          Left(Redirect(Call("GET", unauthorisedAgent)))
         case ucr: UnsupportedCredentialRole   =>
           logger.debug("DefaultAuthAction:Refine - UnsupportedCredentialRole:" + ucr)
           Left(Redirect(Call("GET", unauthorised)))
@@ -133,7 +139,12 @@ class DefaultAuthAction @Inject() (
   }
 
   private def authPredicate =
-    User and (AffinityGroup.Organisation or (Enrolment(saKey) or Enrolment(ctKey)))
+    AuthProviders(AuthProvider.GovernmentGateway) and User
+
+  private def isPermitted(affinityGroup: AffinityGroup, enrolments: Enrolments): Boolean =
+    affinityGroup == AffinityGroup.Organisation ||
+      getActiveEnrolment(enrolments, saKey).isDefined ||
+      getActiveEnrolment(enrolments, ctKey).isDefined
 
   private def amlsRefNo(enrolments: Enrolments): Option[String] = {
     val amlsRefNumber = for {

@@ -22,7 +22,7 @@ import play.api.mvc.{AnyContentAsEmpty, BodyParsers}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.AmlsSpec
-import views.html.{UnauthorisedRoleView, UnauthorisedView}
+import views.html.{UnauthorisedAgentView, UnauthorisedAuthProviderView, UnauthorisedRoleView, UnauthorisedView}
 
 class AmlsControllerSpec extends AmlsSpec {
 
@@ -33,6 +33,8 @@ class AmlsControllerSpec extends AmlsSpec {
     val request                                                              = addToken(unauthenticatedRequest)
     lazy val view1                                                           = app.injector.instanceOf[UnauthorisedView]
     lazy val view2                                                           = app.injector.instanceOf[UnauthorisedRoleView]
+    lazy val view3                                                           = app.injector.instanceOf[UnauthorisedAgentView]
+    lazy val view4                                                           = app.injector.instanceOf[UnauthorisedAuthProviderView]
     val controller                                                           = new AmlsController(
       SuccessfulAuthAction,
       commonDependencies,
@@ -40,7 +42,9 @@ class AmlsControllerSpec extends AmlsSpec {
       messagesApi,
       mock[BodyParsers.Default],
       unauthorisedView = view1,
-      unauthorisedRole = view2
+      unauthorisedRole = view2,
+      unauthorisedAgent = view3,
+      unauthorisedAuthProvider = view4
     )
   }
 
@@ -51,10 +55,25 @@ class AmlsControllerSpec extends AmlsSpec {
       contentAsString(result) must include(messages("unauthorised.title"))
     }
 
-    "load the unauthorised role with an unauthenticated request" in new UnauthenticatedFixture {
+    "load the unauthorised role page with an unauthenticated request" in new UnauthenticatedFixture {
       val result = controller.unauthorised_role(request)
       status(result) mustBe UNAUTHORIZED
-      contentAsString(result) must include(messages("unauthorised.title"))
+      contentAsString(result) must include(messages("unauthorised.role.title"))
+      contentAsString(result) must include(messages("unauthorised.role.content.line1"))
+    }
+
+    "load the unauthorised agent page with an unauthenticated request" in new UnauthenticatedFixture {
+      val result = controller.unauthorised_agent(request)
+      status(result) mustBe UNAUTHORIZED
+      contentAsString(result) must include(messages("unauthorised.agent.title"))
+      contentAsString(result) must include(messages("unauthorised.agent.button"))
+    }
+
+    "load the unauthorised auth provider page with an unauthenticated request" in new UnauthenticatedFixture {
+      val result = controller.unauthorised_auth_provider(request)
+      status(result) mustBe UNAUTHORIZED
+      contentAsString(result) must include(messages("unauthorised.authprovider.title"))
+      contentAsString(result) must include(messages("unauthorised.authprovider.content"))
     }
   }
 }

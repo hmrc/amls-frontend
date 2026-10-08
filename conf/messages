@@ -822,8 +822,18 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.text1 = To use this service you should sign in with an ’organisation’ account, but it looks like you’ve tried to use either an ’individual’ or ’agent’ account.
 unauthorised.text2 = If you don’t have an organisation account you can
 unauthorised.register.link.text = register for a new one.
-unauthorised.role.content.line1 = Your account does not have enough access rights to register.
-unauthorised.role.content.line2 = Contact your account administrator to change your access rights, or create a new organisation account.
+unauthorised.role.title = Your login attempt was not successful
+unauthorised.role.content.line1 = You must be an administrator of your organisation to log in to the Anti-Money Laundering Supervision.
+unauthorised.role.content.line2 = If you believe this is a mistake and you should be an administrator, speak to an existing administrator for your organisation.
+unauthorised.role.content.line3 = They can
+unauthorised.role.link.text = manage team members using an HMRC business tax account
+unauthorised.role.link.href = https://www.gov.uk/guidance/manage-team-members-using-your-hmrc-business-tax-account
+unauthorised.agent.title = Your login attempt was not successful
+unauthorised.agent.content = You’ve attempted to log in with an agent account. To access the Anti-Money Laundering Supervision service, you must log in with an organisation account.
+unauthorised.agent.button = Login using an organisation account
+unauthorised.authprovider.title = Your login attempt was not successful
+unauthorised.authprovider.content = You can only access the Anti-Money Laundering Supervision service through your organisational HMRC online login details.
+unauthorised.authprovider.button = Log in using HMRC online login details
 
 ############################### Start Page ###############################
 start.title = Manage your anti-money laundering supervision

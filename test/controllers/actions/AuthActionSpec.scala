@@ -58,12 +58,16 @@ class AuthActionSpec
   val mockApplicationConfig: ApplicationConfig = mock[ApplicationConfig]
   val mockParser: BodyParsers.Default          = mock[BodyParsers.Default]
 
-  private lazy val unauthorisedUrl = URLEncoder.encode(
+  private lazy val unauthorisedUrl                                 = URLEncoder.encode(
     ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(mockApplicationConfig).absoluteUrl,
     "utf-8"
   )
-  def unauthorised                 = s"${mockApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
-  def signout                      = s"${mockApplicationConfig.logoutUrl}"
+  def unauthorised                                                 = s"${mockApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
+  def signout                                                      = s"${mockApplicationConfig.logoutUrl}"
+  private def logoutAndContinueTo(call: play.api.mvc.Call): String =
+    s"${mockApplicationConfig.logoutUrl}?continue=${URLEncoder.encode(ReturnLocation(call)(mockApplicationConfig).absoluteUrl, "utf-8")}"
+  def unauthorisedAgent                                            = logoutAndContinueTo(controllers.routes.AmlsController.unauthorised_agent)
+  def unauthorisedAuthProvider                                     = logoutAndContinueTo(controllers.routes.AmlsController.unauthorised_auth_provider)
 
   def fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
 
@@ -107,7 +111,7 @@ class AuthActionSpec
       }
 
       "the user has inactive credentials for sa" must {
-        "redirect the user to amls frontend" in {
+        "redirect the user to the unauthorised agent page" in {
           val authAction = new DefaultAuthAction(
             fakeAuthConnector(agentSaAuthRetrievalsInactive),
             mockApplicationConfig,
@@ -118,7 +122,7 @@ class AuthActionSpec
 
           val result = controller.onPageLoad()(fakeRequest)
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(unauthorised)
+          redirectLocation(result) mustBe Some(unauthorisedAgent)
         }
       }
 
@@ -137,7 +141,7 @@ class AuthActionSpec
         }
       }
       "the user has inactive credentials for ct" must {
-        "redirect the user to amls frontend" in {
+        "redirect the user to the unauthorised agent page" in {
           val authAction = new DefaultAuthAction(
             fakeAuthConnector(agentCtAuthRetrievalsInactive),
             mockApplicationConfig,
@@ -148,8 +152,55 @@ class AuthActionSpec
 
           val result = controller.onPageLoad()(fakeRequest)
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(unauthorised)
+          redirectLocation(result) mustBe Some(unauthorisedAgent)
         }
+      }
+    }
+
+    "AffinityGroup is Agent without SA or CT enrolment" must {
+      "redirect the user to the unauthorised agent page" in {
+        val authAction = new DefaultAuthAction(
+          fakeAuthConnector(retrievalsFor(enrolments, AffinityGroup.Agent)),
+          mockApplicationConfig,
+          mockParser,
+          headerCarrierForPartialsConverter
+        )
+        val controller = new Harness(authAction)
+
+        val result = controller.onPageLoad()(fakeRequest)
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(unauthorisedAgent)
+      }
+    }
+
+    "AffinityGroup is Individual without SA or CT enrolment" must {
+      "redirect the user to the unauthorised" in {
+        val authAction = new DefaultAuthAction(
+          fakeAuthConnector(retrievalsFor(enrolments, AffinityGroup.Individual)),
+          mockApplicationConfig,
+          mockParser,
+          headerCarrierForPartialsConverter
+        )
+        val controller = new Harness(authAction)
+
+        val result = controller.onPageLoad()(fakeRequest)
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(unauthorised)
+      }
+    }
+
+    "AffinityGroup is Individual with an active SA enrolment" must {
+      "allow the user through" in {
+        val authAction = new DefaultAuthAction(
+          fakeAuthConnector(retrievalsFor(enrolmentsSa, AffinityGroup.Individual)),
+          mockApplicationConfig,
+          mockParser,
+          headerCarrierForPartialsConverter
+        )
+        val controller = new Harness(authAction)
+
+        val result = controller.onPageLoad()(fakeRequest)
+        status(result) mustBe OK
       }
     }
 
@@ -234,7 +285,7 @@ class AuthActionSpec
     }
 
     "the user used an unaccepted auth provider" must {
-      "redirect the user to the unauthorised" in {
+      "redirect the user to the unauthorised auth provider page" in {
         val authAction = new DefaultAuthAction(
           fakeAuthConnector(Future.failed(new UnsupportedAuthProvider)),
           mockApplicationConfig,
@@ -245,12 +296,12 @@ class AuthActionSpec
 
         val result = controller.onPageLoad()(fakeRequest)
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(unauthorised)
+        redirectLocation(result) mustBe Some(unauthorisedAuthProvider)
       }
     }
 
     "the user has an unsupported affinity group" must {
-      "redirect the user to the unauthorised" in {
+      "redirect the user to the unauthorised agent page" in {
         val authAction = new DefaultAuthAction(
           fakeAuthConnector(Future.failed(new UnsupportedAffinityGroup)),
           mockApplicationConfig,
@@ -261,7 +312,7 @@ class AuthActionSpec
 
         val result = controller.onPageLoad()(fakeRequest)
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(unauthorised)
+        redirectLocation(result) mustBe Some(unauthorisedAgent)
       }
     }
 
@@ -384,6 +435,16 @@ object AuthActionSpec extends AmlsReferenceNumberGenerator {
   private def erroneousRetrievals = Future.successful(
     new ~(
       new ~(new ~(new ~(Enrolments(Set()), None), Some(AffinityGroup.Organisation)), Some("groupIdentifier")),
+      Some(User)
+    )
+  )
+
+  private def retrievalsFor(enrols: Enrolments, affinityGroup: AffinityGroup) = Future.successful(
+    new ~(
+      new ~(
+        new ~(new ~(enrols, Some(Credentials("gg", "cred-1234"))), Some(affinityGroup)),
+        Some("groupIdentifier")
+      ),
       Some(User)
     )
   )

@@ -32,21 +32,26 @@ class UnauthorisedRoleViewSpec extends AmlsViewSpec with Matchers {
 
   "UnauthorisedRoleView" must {
     "display the correct headings and titles" in new ViewFixture {
-      validateTitle("unauthorised.title")
-      doc.getElementsByTag("h1").text mustBe messages("unauthorised.title")
+      validateTitle("unauthorised.role.title")
+      doc.getElementsByTag("h1").text mustBe messages("unauthorised.role.title")
     }
 
     "display the correct body content" in new ViewFixture {
       val paragraphs = doc.getElementsByClass("govuk-body").text()
       paragraphs must include(messages("unauthorised.role.content.line1"))
       paragraphs must include(messages("unauthorised.role.content.line2"))
+      paragraphs must include(messages("unauthorised.role.content.line3"))
     }
 
-    "display the correct button with link" in new ViewFixture {
-      val button = doc.getElementById("button")
+    "display the manage team members link" in new ViewFixture {
+      val link = doc.getElementById("manage-team-members-link")
 
-      button.text() mustBe messages("button.backtosignin")
-      button.attr("href") mustBe appConfig.logoutUrl
+      link.text() mustBe messages("unauthorised.role.link.text")
+      link.attr("href") mustBe messages("unauthorised.role.link.href")
+    }
+
+    "not display a button" in new ViewFixture {
+      Option(doc.getElementById("button")) mustBe None
     }
   }
 }
