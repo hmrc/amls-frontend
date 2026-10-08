@@ -14,8 +14,12 @@
  * limitations under the License.
  *@
 
+@import config.ApplicationConfig
+
 @this()
-@()(implicit messages: Messages)
+@(
+        formHelper: FormWithCSRF,
+)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
 <div class="govuk-panel govuk-panel--interruption">
   <h1 class="govuk-panel__title">
@@ -34,10 +38,12 @@
       <p class="govuk-body">@Html(messages("businessmatching.frnNeedMoreInfo.lbl.05")) <a class="govuk-link govuk-link--inverse" href="@controllers.businessmatching.routes.FrnNumberController.get(edit=true)">change it</a></p>
     </div>
   <div class="govuk-panel__actions">
-    <div class="govuk-button-group">
-      <a href="" role="button" draggable="false" class="govuk-button govuk-button--inverse" data-module="govuk-button">
-        Save & Continue
-      </a>
-    </div>
+    @formHelper(action = controllers.businessmatching.routes.FrnNeedMoreInfoController.post()) {
+        <div class="govuk-button-group">
+            <button type="submit" class="govuk-button govuk-button--inverse" data-module="govuk-button">
+                Save & Continue
+            </button>
+        </div>
+    }
   </div>
 </div>
