@@ -17,7 +17,7 @@
 package controllers.businessmatching
 
 import cats.data.OptionT
-import cats.implicits._
+import cats.implicits.*
 import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import controllers.{AmlsBaseController, CommonPlayDependencies}
@@ -33,17 +33,17 @@ import views.html.businessmatching.FrnNumberView
 
 import javax.inject.Inject
 
-class FrnNumberController @Inject()(
-                                     authAction: AuthAction,
-                                     val ds: CommonPlayDependencies,
-                                     val dataCacheConnector: DataCacheConnector,
-                                     val statusService: StatusService,
-                                     val businessMatchingService: BusinessMatchingService,
-                                     val router: Router2[ChangeSubSectorFlowModel],
-                                     val helper: ChangeSubSectorHelper,
-                                     val cc: MessagesControllerComponents,
-                                     formProvider: FrnFormProvider,
-                                     view: FrnNumberView
+class FrnNumberController @Inject() (
+  authAction: AuthAction,
+  val ds: CommonPlayDependencies,
+  val dataCacheConnector: DataCacheConnector,
+  val statusService: StatusService,
+  val businessMatchingService: BusinessMatchingService,
+  val router: Router2[ChangeSubSectorFlowModel],
+  val helper: ChangeSubSectorHelper,
+  val cc: MessagesControllerComponents,
+  formProvider: FrnFormProvider,
+  view: FrnNumberView
 ) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
@@ -90,31 +90,24 @@ class FrnNumberController @Inject()(
             helper.getOrCreateFlowModel(request.credId) flatMap { flowModel =>
               val originalFrnNumber = data match {
                 case BusinessAppliedForFrnYes(regNumber) => regNumber
-                case _                                         => ""
+                case _                                   => ""
               }
-
-              val transformedData = transformFrnNumber(data)
-
               dataCacheConnector.update[ChangeSubSectorFlowModel](request.credId, ChangeSubSectorFlowModel.key) { _ =>
-                flowModel.copy(Frn = Some(transformedData))
+                flowModel.copy(Frn = Some(data))
               } flatMap {
                 case Some(m @ ChangeSubSectorFlowModel(_, Some(BusinessAppliedForFrnYes(_)))) =>
                   helper.updateSubSectors(request.credId, m) flatMap { _ =>
                     route(m).map(_.addingToSession("originalFrnNumber" -> originalFrnNumber))
                   }
-                case Some(m) =>
+                case Some(m)                                                                  =>
                   route(m)
-                case _ => throw new Exception("An Exception has occurred")
+                case _                                                                        =>
+                  throw new Exception(
+                    "An Exception has occurred"
+                  )
               }
             }
         )
   }
 
-  private def transformFrnNumber(data: BusinessAppliedForFrn): BusinessAppliedForFrn =
-    data match {
-      case BusinessAppliedForFrnYes(regNumber) if regNumber.length == 7 =>
-        BusinessAppliedForFrnYes("700000")
-      case other                                                              =>
-        other
-    }
 }
