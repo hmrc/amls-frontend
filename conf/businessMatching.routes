@@ -27,4 +27,5 @@ POST        /check-your-answers                                     @controllers
 
 GET         /no-frn-number                                          @controllers.businessmatching.NoFrnController.get
 
-GET         /frn-need-more-information                              @controllers.businessmatching.FrnNeedMoreInfoController.get
+GET         /frn-need-more-information                              @controllers.businessmatching.FrnNeedMoreInfoController.get()
+POST        /frn-need-more-information                              @controllers.businessmatching.FrnNeedMoreInfoController.post(edit: Boolean ?= false , includeCompanyNotRegistered: Boolean ?= false)

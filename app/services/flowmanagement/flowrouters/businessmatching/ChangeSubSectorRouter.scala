@@ -31,7 +31,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class ChangeSubSectorRouter @Inject() (
                                         subSectorRouter: MsbSubSectorsPageRouter,
                                         frnPageRouter: FrnPageRouter,
-                                        noFrnRouter: NoFrnPageRouter
+                                        noFrnRouter: NoFrnPageRouter,
+                                        frnNeedMoreInfoPageRouter: FrnNeedMoreInfoPageRouter
+  
 ) extends Router[ChangeSubSectorFlowModel] {
 
   override def getRoute(credId: String, pageId: PageId, model: ChangeSubSectorFlowModel, edit: Boolean)(implicit
@@ -41,6 +43,7 @@ class ChangeSubSectorRouter @Inject() (
     case SubSectorsPageId => subSectorRouter.getRoute(credId, model, edit)
     case FrnPageId  => frnPageRouter.getRoute(credId, model, edit)
     case NoFrnPageId      => noFrnRouter.getRoute(credId, model, edit)
+    case FrnNeedMoreInfoPageId      => frnNeedMoreInfoPageRouter.getRoute(credId, model, edit)
     case _                => throw new Exception("An Unknown Exception has occurred : ChangeSubSectorRouter")
   }
 }
@@ -48,7 +51,8 @@ class ChangeSubSectorRouter @Inject() (
 class ChangeSubSectorRouter2 @Inject() (
                                          subSectorRouter: MsbSubSectorsPageRouterCompanyNotRegistered,
                                          frnPageRouter: FrnPageRouterCompanyNotRegistered,
-                                         noFrnRouter: NoFrnPageRouterCompanyNotRegistered
+                                         noFrnRouter: NoFrnPageRouterCompanyNotRegistered,
+                                         frnNeedMoreInfoPageRouter: FrnNeedMoreInfoPageRouter
 ) extends Router2[ChangeSubSectorFlowModel] {
 
   override def getRoute(
@@ -61,6 +65,7 @@ class ChangeSubSectorRouter2 @Inject() (
     case SubSectorsPageId => subSectorRouter.getRoute(credId, model, edit, includeCompanyNotRegistered)
     case FrnPageId  => frnPageRouter.getRoute(credId, model, edit, includeCompanyNotRegistered)
     case NoFrnPageId      => noFrnRouter.getRoute(credId, model, edit, includeCompanyNotRegistered)
+    case FrnNeedMoreInfoPageId      => frnNeedMoreInfoPageRouter.getRoute(credId, model, edit)
     case _                => throw new Exception("An Unknown Exception has occurred : ChangeSubSectorRouter")
   }
 }

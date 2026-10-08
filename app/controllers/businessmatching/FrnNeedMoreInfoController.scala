@@ -16,19 +16,45 @@
 
 package controllers.businessmatching
 
+import connectors.DataCacheConnector
+import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import models.businessmatching.BusinessAppliedForFrn
+import models.flowmanagement.{ChangeSubSectorFlowModel, FrnNeedMoreInfoPageId, FrnPageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.flowmanagement.Router2
+import utils.AuthAction
 import views.html.businessmatching.FrnNeedMoreInfoView
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class FrnNeedMoreInfoController @Inject() (
+  authAction: AuthAction,
   val ds: CommonPlayDependencies,
   val cc: MessagesControllerComponents,
+  val router: Router2[ChangeSubSectorFlowModel],
+  val dataCacheConnector: DataCacheConnector,
+  val helper: ChangeSubSectorHelper,
   view: FrnNeedMoreInfoView
 ) extends AmlsBaseController(ds, cc) {
 
-  def get: Action[AnyContent] = Action { implicit request =>
+  def get(): Action[AnyContent] = authAction { implicit request =>
     Ok(view())
+  }
+
+  def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = true): Action[AnyContent] = authAction.async {
+    implicit request =>
+      val route = router.getRoute(
+        request.credId,
+        FrnNeedMoreInfoPageId,
+        _: ChangeSubSectorFlowModel,
+        edit,
+        includeCompanyNotRegistered
+      )
+
+      dataCacheConnector.fetch[ChangeSubSectorFlowModel](request.credId, ChangeSubSectorFlowModel.key) flatMap {
+        case Some(flowModel) => route(flowModel)
+        case None            => throw new Exception("Flow model not found")
+      }
   }
 }

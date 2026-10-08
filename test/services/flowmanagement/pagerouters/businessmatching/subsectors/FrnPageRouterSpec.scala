@@ -42,7 +42,7 @@ class FrnPageRouterSpec extends AmlsSpec {
   "FrnPageRouter" must {
     "redirect to the 'check your answers' page" when {
       "the user has entered a FRN" in new Fixture {
-        val model  = createModel(Some(BusinessAppliedForFrnYes("123456789")))
+        val model = createModel(Some(BusinessAppliedForFrnYes("123456789")))
         val result = router.getRoute("internalId", model)
 
         redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
@@ -51,7 +51,7 @@ class FrnPageRouterSpec extends AmlsSpec {
 
     "route to the 'you can't continue with your change' page" when {
       "there is no FRN" in new Fixture {
-        val model  = createModel(Some(BusinessAppliedForFrnNo))
+        val model = createModel(Some(BusinessAppliedForFrnNo))
         val result = router.getRoute("internalId", model)
 
         redirectLocation(result) mustBe Some(routes.NoFrnController.get.url)
@@ -60,7 +60,7 @@ class FrnPageRouterSpec extends AmlsSpec {
 
     "return an Internal Server Error" when {
       "there is no FRN data" in new Fixture {
-        val model  = createModel(None)
+        val model = createModel(None)
         val result = router.getRoute("internalId", model)
 
         status(result) mustBe INTERNAL_SERVER_ERROR
@@ -70,26 +70,35 @@ class FrnPageRouterSpec extends AmlsSpec {
 
   "FrnPageRouterCompanyNotRegistered" must {
     "redirect to the 'check your answers' page" when {
-      "the user has entered a FRN and includeCompanyNotRegistered is false" in new NotRegisteredFixture {
-        val model  = createModel(Some(BusinessAppliedForFrnYes("123456789")))
-        val result = router.getRoute("internalId", model)
+      "the user has entered a 6 digit FRN and includeCompanyNotRegistered is false" in new NotRegisteredFixture {
+        val model = createModel(Some(BusinessAppliedForFrnYes("123456")))
+        val result = router.getRoute("internalId", model, includeCompanyNotRegistered = false)
 
         redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
       }
     }
 
     "redirect to the 'check company' page" when {
-      "the user has entered a FRN and includeCompanyNotRegistered is true" in new NotRegisteredFixture {
-        val model  = createModel(Some(BusinessAppliedForFrnYes("123456789")))
+      "the user has entered a 6 digit FRN and includeCompanyNotRegistered is true" in new NotRegisteredFixture {
+        val model = createModel(Some(BusinessAppliedForFrnYes("123456")))
         val result = router.getRoute("internalId", model, includeCompanyNotRegistered = true)
 
         redirectLocation(result) mustBe Some(routes.CheckCompanyController.get().url)
       }
     }
 
+    "redirect to the 'FRN need more info' page" when {
+      "the user has entered a 7 digit FRN" in new NotRegisteredFixture {
+        val model = createModel(Some(BusinessAppliedForFrnYes("1234567")))
+        val result = router.getRoute("internalId", model)
+
+        redirectLocation(result) mustBe Some(routes.FrnNeedMoreInfoController.get().url)
+      }
+    }
+
     "route to the 'you can't continue with your change' page" when {
       "there is no FRN" in new NotRegisteredFixture {
-        val model  = createModel(Some(BusinessAppliedForFrnNo))
+        val model = createModel(Some(BusinessAppliedForFrnNo))
         val result = router.getRoute("internalId", model)
 
         redirectLocation(result) mustBe Some(routes.NoFrnController.get.url)
@@ -98,7 +107,7 @@ class FrnPageRouterSpec extends AmlsSpec {
 
     "return an Internal Server Error" when {
       "there is no FRN" in new NotRegisteredFixture {
-        val model  = createModel(None)
+        val model = createModel(None)
         val result = router.getRoute("internalId", model)
 
         status(result) mustBe INTERNAL_SERVER_ERROR
@@ -106,4 +115,4 @@ class FrnPageRouterSpec extends AmlsSpec {
     }
   }
 
-}
+  }

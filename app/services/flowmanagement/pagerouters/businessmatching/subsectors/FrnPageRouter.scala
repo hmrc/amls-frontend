@@ -20,9 +20,9 @@ import controllers.businessmatching.routes
 import models.businessmatching.BusinessAppliedForFrnYes
 import models.flowmanagement.{ChangeSubSectorFlowModel, FrnPageId}
 import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import services.flowmanagement.{PageRouter, PageRouterCompanyNotRegistered}
 import uk.gov.hmrc.http.HeaderCarrier
-import play.api.mvc.Results.Redirect
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,13 +34,12 @@ class FrnPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
   ): Future[Result] = {
     val call = model.Frn map {
       case BusinessAppliedForFrnYes(_) => routes.SummaryController.get()
-      case _                                 => routes.NoFrnController.get
+      case _                           => routes.NoFrnController.get
     }
 
     call.fold(error(FrnPageId))(Redirect)
   }
 }
-
 class FrnPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[ChangeSubSectorFlowModel] {
 
   override def getRoute(
@@ -50,13 +49,15 @@ class FrnPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[C
     includeCompanyNotRegistered: Boolean
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     val call = model.Frn map {
-      case BusinessAppliedForFrnYes(_) =>
-        if (includeCompanyNotRegistered) {
+      case BusinessAppliedForFrnYes(regNumber) =>
+        if (regNumber.length == 7) {
+          routes.FrnNeedMoreInfoController.get()
+        } else if (regNumber.length == 6 && includeCompanyNotRegistered) {
           routes.CheckCompanyController.get()
         } else {
           routes.SummaryController.get()
         }
-      case _                                 => routes.NoFrnController.get
+      case _                                   => routes.NoFrnController.get
     }
 
     call.fold(error(FrnPageId))(Redirect)

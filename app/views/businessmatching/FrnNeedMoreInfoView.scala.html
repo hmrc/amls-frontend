@@ -22,7 +22,8 @@
     subtitle: SectionSubtitle,
     heading: Heading,
     button: Button,
-    interruptionPanelFrn: InterruptionPanelFrn
+    interruptionPanelFrn: InterruptionPanelFrn,
+    formHelper: FormWithCSRF,
 )
 
 @()(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
@@ -31,5 +32,5 @@
     pageTitle = messages("businessmatching.frnNeedMoreInfo.title")
 ) {
 
-  @interruptionPanelFrn()
+  @interruptionPanelFrn(formHelper)
 }
