@@ -58,7 +58,7 @@ class TaxEnrolmentsConnector @Inject() (http: HttpClientV2, val appConfig: Appli
   ): Future[HttpResponse] = {
 
     // $COVERAGE-OFF$
-    logger.debug("TaxEnrolmentsConnector:enrol:enrolKey:" + enrolKey)
+    logger.debug(s"[TaxEnrolmentsConnector][enrol] - enrolKey: ${enrolKey.key}")
     // $COVERAGE-ON$
     groupId match {
       case Some(groupId) =>
@@ -72,7 +72,9 @@ class TaxEnrolmentsConnector @Inject() (http: HttpClientV2, val appConfig: Appli
             val error = Json.parse(e.message).as[ErrorResponse]
             audit.sendEvent(ESEnrolFailureEvent(enrolment, e, enrolKey))
             // $COVERAGE-OFF$
-            warn(error.toString)
+            logger.warn(
+              s"[TaxEnrolmentsConnector][enrol] - Tax enrolments rejected enrolment - status: ${e.statusCode}, error: $error"
+            )
             // $COVERAGE-ON$
 
             (e.statusCode, error.code) match {
@@ -80,18 +82,28 @@ class TaxEnrolmentsConnector @Inject() (http: HttpClientV2, val appConfig: Appli
                 throw DuplicateEnrolmentException(error.toString, e)
               case (FORBIDDEN, ResponseCodes.invalidCredentialRole) =>
                 throw InvalidEnrolmentCredentialsException(error.toString, e)
-              case _                                                => throw new Exception("An Unknown exception has occurred :")
+              case _                                                =>
+                throw new Exception(
+                  s"[TaxEnrolmentsConnector][enrol] - Unhandled tax enrolments error - status: ${e.statusCode}, code: ${error.code}",
+                  e
+                )
             }
 
           case e: Throwable =>
             audit.sendEvent(ESEnrolFailureEvent(enrolment, e, enrolKey))
             // $COVERAGE-OFF$
-            warn(e.getMessage)
+            logger.warn(
+              s"[TaxEnrolmentsConnector][enrol] - Exception calling tax enrolments - enrolKey: ${enrolKey.key}",
+              e
+            )
             // $COVERAGE-ON$
             throw e
         }
 
-      case _ => throw new Exception("Group identifier is unavailable")
+      case _ =>
+        throw new Exception(
+          s"[TaxEnrolmentsConnector][enrol] - Group identifier is unavailable - enrolKey: ${enrolKey.key}"
+        )
     }
   }
 
@@ -102,18 +114,28 @@ class TaxEnrolmentsConnector @Inject() (http: HttpClientV2, val appConfig: Appli
 
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
     // $COVERAGE-OFF$
-    logger.debug("TaxEnrolmentsConnector:deEnrol:enrolKey:" + enrolKey)
+    logger.debug(s"[TaxEnrolmentsConnector][deEnrol] - enrolKey: $enrolKey")
     // $COVERAGE-ON$
     groupId match {
       case Some(groupId) =>
         val url = url"$baseUrl/groups/$groupId/enrolments/$enrolKey"
 
-        http.delete(url).execute[HttpResponse].map { response =>
-          audit.sendEvent(ESDeEnrolEvent(response, enrolKey))
-          response
-        }
+        http
+          .delete(url)
+          .execute[HttpResponse]
+          .map { response =>
+            audit.sendEvent(ESDeEnrolEvent(response, enrolKey))
+            response
+          }
+          .recoverWith { case e =>
+            logger.warn(s"[TaxEnrolmentsConnector][deEnrol] - Failed to de-enrol - enrolKey: $enrolKey", e)
+            Future.failed(e)
+          }
 
-      case _ => throw new Exception("Group identifier is unavailable")
+      case _ =>
+        throw new Exception(
+          s"[TaxEnrolmentsConnector][deEnrol] - Group identifier is unavailable - enrolKey: $enrolKey"
+        )
     }
   }
 

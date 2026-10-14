@@ -101,7 +101,11 @@ class LandingController @Inject() (
   def get(): Action[AnyContent] = authAction.async { implicit request =>
     request.credentialRole match {
       case Some(User) => getWithAmendments(request.amlsRefNumber, request.credId, request.accountTypeId)
-      case _          => Future.successful(Redirect(signoutUrl))
+      case _          =>
+        logger.warn(
+          s"[LandingController][get] - Credential role is not User, signing out - credentialRole: ${request.credentialRole}"
+        )
+        Future.successful(Redirect(signoutUrl))
     }
   }
 
@@ -119,7 +123,7 @@ class LandingController @Inject() (
           refreshAndRedirect(mlrNumber, None, credId, accountTypeId)
         } else {
           val cache: Cache = optPrefilledCache.head
-          logger.debug("getWithAmendments:AMLSReference:" + amlsRegistrationNumber)
+          logger.debug(s"[LandingController][getWithAmendments] - amlsRegNo: $amlsRegistrationNumber")
           if (dataChangeChecker.dataHasChanged(cache)) {
             cache.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
               case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cache), credId, accountTypeId)
@@ -147,13 +151,13 @@ class LandingController @Inject() (
     maybeCache match {
       case Some(cache) if cache.getEntry[DataImport](DataImport.key).isDefined =>
         logger.info(
-          s"DataImport found in cache for AMLS registration number: $amlsRegistrationNumber. Redirecting to Status page."
+          s"[LandingController][refreshAndRedirect] - DataImport found in cache for AMLS registration number: $amlsRegistrationNumber. Redirecting to Status page."
         )
         Future.successful(Redirect(controllers.routes.StatusController.get()))
 
       case Some(_) =>
         logger.info(
-          s"Cache exists for AMLS registration number: $amlsRegistrationNumber. Skipping refreshCache to preserve local changes."
+          s"[LandingController][refreshAndRedirect] - Cache exists for AMLS registration number: $amlsRegistrationNumber. Skipping refreshCache to preserve local changes."
         )
         preFlightChecksAndRedirect(
           Option(amlsRegistrationNumber),
@@ -163,7 +167,7 @@ class LandingController @Inject() (
 
       case None =>
         logger.info(
-          s"No cache found for AMLS registration number: $amlsRegistrationNumber. Refreshing cache."
+          s"[LandingController][refreshAndRedirect] - No cache found for AMLS registration number: $amlsRegistrationNumber. Refreshing cache."
         )
         landingService
           .refreshCache(amlsRegistrationNumber, credId, accountTypeId)
@@ -184,7 +188,13 @@ class LandingController @Inject() (
 
     val loginEvent = for {
       dupe                <-
-        cacheConnector.fetch[SubscriptionResponse](cacheId, SubscriptionResponse.key).recover { case _ => None } map {
+        cacheConnector.fetch[SubscriptionResponse](cacheId, SubscriptionResponse.key).recover { case e =>
+          logger.warn(
+            "[LandingController][preFlightChecksAndRedirect] - Failed to fetch SubscriptionResponse from cache, treating as not previously submitted",
+            e
+          )
+          None
+        } map {
           case Some(x) => x.previouslySubmitted.contains(true)
           case _       => false
         }
@@ -218,7 +228,7 @@ class LandingController @Inject() (
           .map { reviewDetails =>
             (reviewDetails, amlsRegistrationNumber) match {
               case (Some(rd), None)   =>
-                logger.debug("LandingController:getWithoutAmendments: " + rd)
+                logger.debug("[LandingController][getWithoutAmendments] - Review details found in cache")
                 landingService.updateReviewDetails(rd, credId).map { _ =>
                   auditConnector
                     .sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse(""), rd.safeId))
@@ -226,7 +236,7 @@ class LandingController @Inject() (
                 }
               case (None, None)       => Future.successful(Redirect(Call("GET", appConfig.businessCustomerUrl)))
               case (_, Some(amlsRef)) =>
-                logger.debug("LandingController:getWithoutAmendments: " + amlsRef)
+                logger.debug(s"[LandingController][getWithoutAmendments] - amlsRef: $amlsRef")
                 Future.successful(Redirect(controllers.routes.StatusController.get()))
             }
           }
@@ -260,14 +270,14 @@ class LandingController @Inject() (
 
     cache.getEntry[BusinessMatching](BusinessMatching.key) map { bm =>
       // $COVERAGE-OFF$
-      logger.debug(s"[AMLSLandingController][preApplicationComplete]: found BusinessMatching key")
+      logger.debug(s"[LandingController][preApplicationComplete]: found BusinessMatching key")
       // $COVERAGE-ON$
       (bm.isCompleteLanding, cache.getEntry[BusinessDetails](BusinessDetails.key)) match {
         case (true, Some(abt)) =>
           landingService.setAltCorrespondenceAddress(abt, cacheId) flatMap { _ =>
             // $COVERAGE-OFF$
             logger.debug(
-              s"[AMLSLandingController][preApplicationComplete]: landingService.setAltCorrespondenceAddress returned"
+              s"[LandingController][preApplicationComplete]: landingService.setAltCorrespondenceAddress returned"
             )
             // $COVERAGE-ON$
             // below to be called logic to decide if the Login Events Page should be displayed or not (second place below)
@@ -276,13 +286,13 @@ class LandingController @Inject() (
             redirectToEventPage.map {
               case true =>
                 // $COVERAGE-OFF$
-                logger.debug(s"[AMLSLandingController][preApplicationComplete]: redirecting to LoginEvent")
+                logger.debug(s"[LandingController][preApplicationComplete]: redirecting to LoginEvent")
                 // $COVERAGE-ON$
                 Redirect(controllers.routes.LoginEventController.get)
               case _    =>
                 // $COVERAGE-OFF$
                 logger.debug(
-                  s"[AMLSLandingController][preApplicationComplete]: has complete RPs - redirecting to status"
+                  s"[LandingController][preApplicationComplete]: has complete RPs - redirecting to status"
                 )
                 // $COVERAGE-ON$
                 Redirect(controllers.routes.StatusController.get())
@@ -292,14 +302,14 @@ class LandingController @Inject() (
         case (true, _) =>
           // $COVERAGE-OFF$
           logger.debug(
-            s"[AMLSLandingController][preApplicationComplete]: bm.isComplete is true but no cache Entry for BusinessDetails - redirecting to status"
+            s"[LandingController][preApplicationComplete]: bm.isComplete is true but no cache Entry for BusinessDetails - redirecting to status"
           )
           // $COVERAGE-ON$
           Future.successful(Redirect(controllers.routes.StatusController.get()))
 
         case (false, _) =>
           // $COVERAGE-OFF$
-          logger.debug(s"[AMLSLandingController][preApplicationComplete]: bm.isComplete is false")
+          logger.debug(s"[LandingController][preApplicationComplete]: bm.isComplete is false")
           // $COVERAGE-ON$
           deleteAndRedirect()
       }

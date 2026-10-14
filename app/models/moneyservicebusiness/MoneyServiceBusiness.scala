@@ -194,8 +194,8 @@ object MoneyServiceBusiness extends Logging {
         msbService.contains(ForeignExchange)
       )
       if (isComplete && model.hasChanged || !isComplete) {
-        logger.info(
-          s"[MSB DEBUG] " +
+        logger.debug(
+          s"[MoneyServiceBusiness][taskRow] - " +
             s"isComplete=$isComplete hasChanged=${Option(model.hasChanged)
                 .getOrElse(false)} hasAccepted=${Option(model.hasAccepted).getOrElse(false)} " +
             s"mt=${msbService != null && msbService.contains(TransmittingMoney)} " +

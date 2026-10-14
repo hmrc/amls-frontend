@@ -69,11 +69,13 @@ class InvolvedInOtherController @Inject() (
       case None =>
         Future.successful(Ok(view(formProvider(), edit, None, formProvider.length)))
     } recoverWith { case _: NoSuchElementException =>
-      logger.warn("[InvolvedInOtherController][get] - Business activities list was empty, attempting to recover")
+      logger.warn(
+        "[businessactivities][InvolvedInOtherController][get] - Business activities list was empty, attempting to recover"
+      )
       recoverActivitiesService.recover(request).flatMap {
         case true  => Future.successful(Redirect(routes.InvolvedInOtherController.get()))
         case false =>
-          logger.warn("[InvolvedInOtherController][get] - Unable to determine business types")
+          logger.warn("[businessactivities][InvolvedInOtherController][get] - Unable to determine business types")
           error.internalServerErrorTemplate.map(template => InternalServerError(template))
       }
     }
