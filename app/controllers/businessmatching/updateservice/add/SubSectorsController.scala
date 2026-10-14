@@ -69,7 +69,7 @@ class SubSectorsController @Inject() (
           dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
             case Some(model) =>
               model.msbServices(BusinessMatchingMsbServices(data.toSet))
-            case _           => throw new Exception("An Unknown Exception has occurred")
+            case _           => throw new Exception("[SubSectorsController][post] - Unexpected state, unable to continue")
           } flatMap {
             case Some(model) => router.getRoute(request.credId, SubSectorsPageId, model, edit)
             case _           => Future.successful(InternalServerError("Post: Cannot retrieve data: SubServicesController"))

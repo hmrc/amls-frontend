@@ -16,6 +16,8 @@
 
 package controllers.withdrawal
 
+import play.api.Logging
+
 import cats.implicits.catsSyntaxOptionId
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
@@ -37,7 +39,8 @@ class WithdrawalReasonController @Inject() (
   val cc: MessagesControllerComponents,
   formProvider: WithdrawalReasonFormProvider,
   view: WithdrawalReasonView
-) extends AmlsBaseController(ds, cc) {
+) extends AmlsBaseController(ds, cc)
+    with Logging {
 
   def get: Action[AnyContent] = authAction { implicit request =>
     Ok(view(formProvider()))
@@ -60,6 +63,7 @@ class WithdrawalReasonController @Inject() (
               Redirect(controllers.withdrawal.routes.WithdrawalCheckYourAnswersController.get)
             }
             .recover { case ex: Exception =>
+              logger.warn("[WithdrawalReasonController][post] - Failed to save withdrawal reason", ex)
               InternalServerError("Error occurred while processing withdrawal reason")
             }
         }

@@ -90,7 +90,9 @@ class WhoIsTheBusinessNominatedOfficerController @Inject() (
       result           <- sectionsComplete match {
                             case true  => whenSectionsComplete
                             case false =>
-                              logger.warn("Sections aren't complete, redirecting")
+                              logger.info(
+                                "[WhoIsTheBusinessNominatedOfficerController][get] - Sections not complete, redirecting"
+                              )
                               Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
                           }
     } yield result

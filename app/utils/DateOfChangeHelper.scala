@@ -46,7 +46,9 @@ trait DateOfChangeHelper extends Logging {
         case `exciseGoods`         => DateOfChangeRedirect(routes.ExciseGoodsController.get())
         case `exciseGoodsEdit`     => DateOfChangeRedirect(routes.ExciseGoodsController.get(true))
         case _                     =>
-          logger.warn(s"Could not retrieve Date of Change redirect for '$key', redirecting to Check Your Answers")
+          logger.warn(
+            s"[DateOfChangeHelper][apply] - Could not retrieve Date of Change redirect for '$key', redirecting to Check Your Answers"
+          )
           DateOfChangeRedirect(routes.SummaryController.get)
       }
   }

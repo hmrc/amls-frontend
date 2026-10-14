@@ -16,6 +16,8 @@
 
 package controllers.bankdetails
 
+import play.api.Logging
+
 import connectors.DataCacheConnector
 import controllers.CommonPlayDependencies
 
@@ -36,7 +38,8 @@ class SummaryController @Inject() (
   val mcc: MessagesControllerComponents,
   cyaHelper: CheckYourAnswersHelper,
   view: CheckYourAnswersView
-) extends BankDetailsController(ds, mcc) {
+) extends BankDetailsController(ds, mcc)
+    with Logging {
 
   def get(index: Int): Action[AnyContent] = authAction.async { implicit request =>
     for {
@@ -53,7 +56,11 @@ class SummaryController @Inject() (
     (for {
       _ <- updateDataStrict[BankDetails](request.credId, index)(bd => bd.copy(hasAccepted = true))
     } yield Redirect(controllers.bankdetails.routes.YourBankAccountsController.get()))
-      .map(_.removingFromSession("itemIndex")) recoverWith { case _: Throwable =>
+      .map(_.removingFromSession("itemIndex")) recoverWith { case e: Throwable =>
+      logger.warn(
+        s"[bankdetails][SummaryController][post] - Failed to save bank details or redirect - index: $index",
+        e
+      )
       Future.successful(InternalServerError("Unable to save data and get redirect link"))
     }
   }

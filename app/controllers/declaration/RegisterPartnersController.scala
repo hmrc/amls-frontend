@@ -74,7 +74,7 @@ class RegisterPartnersController @Inject() (
       result           <- sectionsComplete match {
                             case true  => whenSectionsComplete
                             case false =>
-                              logger.warn("Sections aren't complete, redirecting")
+                              logger.info("[RegisterPartnersController][get] - Sections not complete, redirecting")
                               Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
                           }
     } yield result
@@ -155,8 +155,14 @@ class RegisterPartnersController @Inject() (
       url               <- progressService.getSubmitRedirect(amlsRegistrationNo, accountTypeId, cacheId)
     } yield url match {
       case Some(x) => Redirect(x)
-      case _       => InternalServerError("Unable to get redirect url")
-    }) recoverWith { case _: Throwable =>
+      case _       =>
+        logger.warn("[RegisterPartnersController][saveAndRedirect] - No submit redirect url returned")
+        InternalServerError("Unable to get redirect url")
+    }) recoverWith { case e: Throwable =>
+      logger.warn(
+        "[RegisterPartnersController][saveAndRedirect] - Failed to save business partners or get submit redirect",
+        e
+      )
       Future.successful(InternalServerError("Unable to save data and get redirect link"))
     }
 

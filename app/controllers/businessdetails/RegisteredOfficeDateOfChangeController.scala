@@ -61,7 +61,10 @@ class RegisteredOfficeDateOfChangeController @Inject() (
                   details.registeredOffice(details.registeredOffice match {
                     case Some(office: RegisteredOfficeUK)    => office.copy(dateOfChange = Some(doc))
                     case Some(office: RegisteredOfficeNonUK) => office.copy(dateOfChange = Some(doc))
-                    case _                                   => throw new Exception("An exception has occurred")
+                    case _                                   =>
+                      throw new Exception(
+                        "[RegisteredOfficeDateOfChangeController][post] - Unexpected state, unable to continue"
+                      )
                   })
                 ) map { _ =>
                   Redirect(routes.BusinessEmailAddressController.get())

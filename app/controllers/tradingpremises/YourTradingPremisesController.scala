@@ -16,6 +16,8 @@
 
 package controllers.tradingpremises
 
+import play.api.Logging
+
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
@@ -42,7 +44,8 @@ class YourTradingPremisesController @Inject() (
   view: YourTradingPremisesView,
   implicit val error: views.html.ErrorView
 ) extends AmlsBaseController(ds, cc)
-    with RepeatingSection {
+    with RepeatingSection
+    with Logging {
 
   private def updateTradingPremises(
     tradingPremises: Option[Seq[TradingPremises]]
@@ -81,7 +84,8 @@ class YourTradingPremisesController @Inject() (
       tpNew <- updateTradingPremises(tp)
       _     <-
         dataCacheConnector.save[Seq[TradingPremises]](request.credId, TradingPremises.key, tpNew.getOrElse(Seq.empty))
-    } yield Redirect(controllers.routes.RegistrationProgressController.get())) recoverWith { case _: Throwable =>
+    } yield Redirect(controllers.routes.RegistrationProgressController.get())) recoverWith { case e: Throwable =>
+      logger.warn("[YourTradingPremisesController][post] - Failed to save trading premises", e)
       Future.successful(InternalServerError("Unable to save data and get redirect link"))
     }
   }

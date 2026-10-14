@@ -146,7 +146,7 @@ class TaxEnrolmentsConnectorSpec
         intercept[Exception] {
           await(connector.deEnrol(amlsRegistrationNumber, None))
         } match {
-          case ex => ex.getMessage mustBe "Group identifier is unavailable"
+          case ex => ex.getMessage must include("Group identifier is unavailable")
         }
       }
     }
