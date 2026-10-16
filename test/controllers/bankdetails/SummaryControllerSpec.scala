@@ -29,10 +29,13 @@ import play.api.test.Injecting
 import utils.bankdetails.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.bankdetails.CheckYourAnswersView
+import ch.qos.logback.classic.Level
+import play.api.Logger
+import uk.gov.hmrc.play.bootstrap.tools.LogCapturing
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting with LogCapturing {
 
   trait Fixture extends DependencyMocks {
     self =>
@@ -163,6 +166,29 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
       status(result) must be(SEE_OTHER)
       session(result).get("itemIndex") mustBe None
+    }
+  }
+
+  "bank details SummaryController logging" must {
+    "return 500 and log a warning with the index and exception when saving the bank details fails" in new Fixture {
+      val model1: BankDetails = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount))
+      val model2: BankDetails = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
+
+      mockCacheFetch[Seq[BankDetails]](Some(Seq(model1, model2)))
+      when(mockCacheConnector.save[Seq[BankDetails]](any(), any(), any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("cache unavailable")))
+
+      withCaptureOfLoggingFrom(Logger(classOf[SummaryController])) { logs =>
+        status(controller.post(2)(request)) mustBe INTERNAL_SERVER_ERROR
+
+        val event = logs.find(
+          _.getFormattedMessage.contains(
+            "[bankdetails][SummaryController][post] - Failed to save bank details or redirect - index: 2"
+          )
+        )
+        event.map(_.getLevel) mustBe Some(Level.WARN)
+        Option(event.get.getThrowableProxy).map(_.getMessage) mustBe Some("cache unavailable")
+      }
     }
   }
 }

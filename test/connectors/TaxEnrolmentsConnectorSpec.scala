@@ -31,6 +31,9 @@ import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.{AmlsSpec, HttpClientMocker}
+import ch.qos.logback.classic.Level
+import play.api.Logger
+import uk.gov.hmrc.play.bootstrap.tools.LogCapturing
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,7 +43,8 @@ class TaxEnrolmentsConnectorSpec
     with AmlsReferenceNumberGenerator
     with UserDetailsGenerator
     with BaseGenerator
-    with HttpClientMocker {
+    with HttpClientMocker
+    with LogCapturing {
 
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = Span(2, Seconds), interval = Span(20, Millis))
@@ -160,6 +164,64 @@ class TaxEnrolmentsConnectorSpec
         mockDelete(endpointUrl, response)
 
         connector.removeKnownFacts(amlsRegistrationNumber).futureValue mustBe response
+      }
+    }
+  }
+
+  private val connectorLogger: Logger = Logger(classOf[TaxEnrolmentsConnector])
+
+  "TaxEnrolmentsConnector logging" must {
+
+    "log a warning and throw an exception with the status, code and original cause for an unhandled enrolment error" in new Fixture {
+      val endpointUrl                     = url"$baseUrl/tax-enrolments/groups/$groupIdentfier/enrolments/${enrolKey.key}"
+      val response: UpstreamErrorResponse =
+        UpstreamErrorResponse(jsonError("SOME_OTHER_ERROR", "Something else went wrong"), BAD_REQUEST, BAD_REQUEST)
+      mockPostJson(endpointUrl, enrolment, response)
+
+      withCaptureOfLoggingFrom(connectorLogger) { logs =>
+        val ex = intercept[Exception](await(connector.enrol(enrolKey, enrolment, Some(groupIdentfier))))
+
+        ex.getMessage must include(
+          "[TaxEnrolmentsConnector][enrol] - Unhandled tax enrolments error - status: 400, code: SOME_OTHER_ERROR"
+        )
+        ex.getCause mustBe response
+        logs.exists(e =>
+          e.getLevel == Level.WARN &&
+            e.getFormattedMessage.contains(
+              "[TaxEnrolmentsConnector][enrol] - Tax enrolments rejected enrolment - status: 400"
+            )
+        ) mustBe true
+      }
+    }
+
+    "log a warning with the exception attached and rethrow when the enrolment call throws" in new Fixture {
+      val endpointUrl = url"$baseUrl/tax-enrolments/groups/$groupIdentfier/enrolments/${enrolKey.key}"
+      val boom        = new RuntimeException("connection refused")
+      mockPostJson[TaxEnrolment, HttpResponse](endpointUrl, enrolment, boom)
+
+      withCaptureOfLoggingFrom(connectorLogger) { logs =>
+        intercept[RuntimeException](await(connector.enrol(enrolKey, enrolment, Some(groupIdentfier)))) mustBe boom
+
+        val event = logs.find(
+          _.getFormattedMessage.contains("[TaxEnrolmentsConnector][enrol] - Exception calling tax enrolments")
+        )
+        event.map(_.getLevel) mustBe Some(Level.WARN)
+        Option(event.get.getThrowableProxy).map(_.getMessage) mustBe Some("connection refused")
+      }
+    }
+
+    "log a warning with the exception attached and rethrow when de-enrolment fails" in new Fixture {
+      val endpointUrl = url"$baseUrl/tax-enrolments/groups/$groupIdentfier/enrolments/${enrolKey.key}"
+      val boom        = new RuntimeException("connection refused")
+      mockDelete[HttpResponse](endpointUrl, boom)
+
+      withCaptureOfLoggingFrom(connectorLogger) { logs =>
+        intercept[RuntimeException](await(connector.deEnrol(amlsRegistrationNumber, Some(groupIdentfier)))) mustBe boom
+
+        val event = logs.find(_.getFormattedMessage.contains("[TaxEnrolmentsConnector][deEnrol] - Failed to de-enrol"))
+        event.map(_.getLevel) mustBe Some(Level.WARN)
+        event.get.getFormattedMessage must include(enrolKey.key)
+        Option(event.get.getThrowableProxy).map(_.getMessage) mustBe Some("connection refused")
       }
     }
   }
