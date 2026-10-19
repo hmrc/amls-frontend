@@ -42,7 +42,7 @@ class FrnNeedMoreInfoController @Inject() (
     Ok(view())
   }
 
-  def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = true): Action[AnyContent] = authAction.async {
+  def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       val route = router.getRoute(
         request.credId,
