@@ -52,7 +52,7 @@ class SubmissionController @Inject() (
 
   def post(): Action[AnyContent] = authAction.async { implicit request =>
     lazy val whenSectionsComplete = {
-      logger.info("[SubmissionController][post]:true")
+      logger.info("[SubmissionController][post] - Sections complete, submitting based on current status")
       statusService
         .getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
         .flatMap[SubmissionResponse](status =>
@@ -66,12 +66,10 @@ class SubmissionController @Inject() (
         )
     }.flatMap {
       case SubscriptionResponse(_, _, _, Some(true)) =>
-        logger.info("[SubmissionController][post]:SubscriptionResponse(previouslySubmitted=true)")
+        logger.info("[SubmissionController][post] - Already submitted previously, redirecting to landing page")
         Future.successful(Redirect(controllers.routes.LandingController.get()))
       case _                                         =>
-        logger.info(
-          "[SubmissionController][post]:SubmissionResponse or SubscriptionResponse(previouslySubmitted=false)"
-        )
+        logger.info("[SubmissionController][post] - Submission complete, redirecting to confirmation")
         Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
     } recoverWith {
       case _: DuplicateEnrolmentException          =>
@@ -87,7 +85,7 @@ class SubmissionController @Inject() (
         logger.warn("[SubmissionController][post] handling BadRequestException")
         Future.successful(Redirect(routes.SubmissionErrorController.badRequest()))
       case e: Exception                            =>
-        logger.warn("[SubmissionController][post] handling Exception")
+        logger.warn(s"[SubmissionController][post] - Submission failed with ${e.getClass.getSimpleName}, rethrowing")
         throw e
     }
 
@@ -97,7 +95,7 @@ class SubmissionController @Inject() (
       result           <- sectionsComplete match {
                             case true  => whenSectionsComplete
                             case false =>
-                              logger.info("sections aren't complete, redirecting")
+                              logger.info("[SubmissionController][post] - Sections not complete, redirecting")
                               Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
                           }
     } yield result

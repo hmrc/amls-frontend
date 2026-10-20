@@ -16,6 +16,8 @@
 
 package services.cache
 
+import play.api.Logging
+
 import config.ApplicationConfig
 import connectors.cache.Conversions
 import org.mongodb.scala.bson.BsonDocument
@@ -68,7 +70,8 @@ class MongoCacheClient @Inject() (
         )
       )
     )
-    with Conversions {
+    with Conversions
+    with Logging {
 
   /** Inserts data into the cache with the specified key. If the data does not exist, it will be created.
     */
@@ -182,7 +185,10 @@ class MongoCacheClient @Inject() (
     * @return
     */
   def removeById(credId: String): Future[Boolean] =
-    collection.findOneAndDelete(key(credId)).toFuture().map(_ => true).recover { case _ => false }
+    collection.findOneAndDelete(key(credId)).toFuture().map(_ => true).recover { case e =>
+      logger.warn("[MongoCacheClient][removeById] - Failed to delete user cache", e)
+      false
+    }
 
   /** Saves everything from the in-memory cache into the database - all user data
     *

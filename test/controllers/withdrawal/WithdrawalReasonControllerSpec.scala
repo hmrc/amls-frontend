@@ -30,10 +30,13 @@ import services.AuthEnrolmentsService
 import services.cache.Cache
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.withdrawal.WithdrawalReasonView
+import ch.qos.logback.classic.Level
+import play.api.Logger
+import uk.gov.hmrc.play.bootstrap.tools.LogCapturing
 
 import scala.concurrent.Future
 
-class WithdrawalReasonControllerSpec extends AmlsSpec with Injecting {
+class WithdrawalReasonControllerSpec extends AmlsSpec with Injecting with LogCapturing {
 
   trait TestFixture extends AuthorisedFixture {
     self =>
@@ -126,5 +129,25 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with Injecting {
 
     val redirectLoc = redirectLocation(result)
     redirectLoc must be(Some(controllers.withdrawal.routes.WithdrawalCheckYourAnswersController.get.url))
+  }
+
+  "WithdrawalReasonController logging" must {
+    "return 500 and log an error with the exception attached when saving the withdrawal reason fails" in new TestFixture {
+      when(dataCacheConnector.save[WithdrawalReason](any(), eqTo(WithdrawalReason.key), any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("cache unavailable")))
+
+      val postRequest = FakeRequest(POST, routes.WithdrawalReasonController.post().url)
+        .withFormUrlEncodedBody("withdrawalReason" -> WithdrawalReason.OutOfScope.toString)
+
+      withCaptureOfLoggingFrom(Logger(classOf[WithdrawalReasonController])) { logs =>
+        status(controller.post()(postRequest)) mustBe INTERNAL_SERVER_ERROR
+
+        val event = logs.find(
+          _.getFormattedMessage.contains("[WithdrawalReasonController][post] - Failed to save withdrawal reason")
+        )
+        event.map(_.getLevel) mustBe Some(Level.ERROR)
+        Option(event.get.getThrowableProxy).map(_.getMessage) mustBe Some("cache unavailable")
+      }
+    }
   }
 }

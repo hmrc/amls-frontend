@@ -81,7 +81,7 @@ class PaymentsService @Inject() (
       case _              =>
         // $COVERAGE-OFF$
         logger.warn(
-          "[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default"
+          "[PaymentsService][paymentsUrlOrDefault] - Did not get a redirect url from the payments service; using configured default"
         )
         // $COVERAGE-ON$
         Future.successful(NextUrl(applicationConfig.paymentsUrl))
@@ -115,7 +115,10 @@ class PaymentsService @Inject() (
     amlsConnector
       .savePayment(response.journeyId, amlsRefNo, safeId, accountTypeId)
       .recover { case e =>
-        throw new Exception(s"Payment details failed to save. [paymentId:${response.journeyId}]", e)
+        throw new Exception(
+          s"[PaymentsService][savePaymentBeforeResponse] - Payment details failed to save - paymentId: ${response.journeyId}",
+          e
+        )
       }
       .map(_ => ())
 }

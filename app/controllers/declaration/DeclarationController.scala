@@ -77,7 +77,7 @@ class DeclarationController @Inject() (
       result           <- sectionsComplete match {
                             case true  => whenSectionsComplete
                             case false =>
-                              logger.info("sections not complete, redirecting")
+                              logger.info("[DeclarationController][get] - Sections not complete, redirecting")
                               Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
                           }
     } yield result
@@ -94,7 +94,7 @@ class DeclarationController @Inject() (
           val name = s"${addPerson.firstName} ${addPerson.middleName getOrElse ""} ${addPerson.lastName}"
           Future.successful(Ok(view(title, subtitle, name, isAmendment)))
         case _               =>
-          logger.warn("No 'addPerson' found, redirecting to redirectToAddPersonPage")
+          logger.warn("[DeclarationController][declarationView] - No addPerson found, redirecting to add person page")
           redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
       }
       for {

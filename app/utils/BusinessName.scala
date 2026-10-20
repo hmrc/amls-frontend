@@ -52,7 +52,7 @@ object BusinessName extends Logging {
     OptionT(amlsConnector.registrationDetails(accountTypeId, safeId) map { r =>
       Option(r.companyName)
     } recover { case ex =>
-      warn(s"Call to registrationDetails failed: ${ex.getMessage}. Falling back to cache..")
+      logger.warn("[BusinessName][getNameFromAmls] - Call to registrationDetails failed, falling back to cache", ex)
       None
     })
 
