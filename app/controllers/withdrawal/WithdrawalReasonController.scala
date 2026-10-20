@@ -63,7 +63,7 @@ class WithdrawalReasonController @Inject() (
               Redirect(controllers.withdrawal.routes.WithdrawalCheckYourAnswersController.get)
             }
             .recover { case ex: Exception =>
-              logger.warn("[WithdrawalReasonController][post] - Failed to save withdrawal reason", ex)
+              logger.error("[WithdrawalReasonController][post] - Failed to save withdrawal reason", ex)
               InternalServerError("Error occurred while processing withdrawal reason")
             }
         }

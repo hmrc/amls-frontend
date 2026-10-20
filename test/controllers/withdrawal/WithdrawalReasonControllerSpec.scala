@@ -132,7 +132,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with Injecting with LogCap
   }
 
   "WithdrawalReasonController logging" must {
-    "return 500 and log a warning with the exception attached when saving the withdrawal reason fails" in new TestFixture {
+    "return 500 and log an error with the exception attached when saving the withdrawal reason fails" in new TestFixture {
       when(dataCacheConnector.save[WithdrawalReason](any(), eqTo(WithdrawalReason.key), any())(any()))
         .thenReturn(Future.failed(new RuntimeException("cache unavailable")))
 
@@ -145,7 +145,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with Injecting with LogCap
         val event = logs.find(
           _.getFormattedMessage.contains("[WithdrawalReasonController][post] - Failed to save withdrawal reason")
         )
-        event.map(_.getLevel) mustBe Some(Level.WARN)
+        event.map(_.getLevel) mustBe Some(Level.ERROR)
         Option(event.get.getThrowableProxy).map(_.getMessage) mustBe Some("cache unavailable")
       }
     }

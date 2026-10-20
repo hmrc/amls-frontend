@@ -170,7 +170,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting wi
   }
 
   "bank details SummaryController logging" must {
-    "return 500 and log a warning with the index and exception when saving the bank details fails" in new Fixture {
+    "return 500 and log an error with the index and exception when saving the bank details fails" in new Fixture {
       val model1: BankDetails = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount))
       val model2: BankDetails = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
 
@@ -186,7 +186,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting wi
             "[bankdetails][SummaryController][post] - Failed to save bank details or redirect - index: 2"
           )
         )
-        event.map(_.getLevel) mustBe Some(Level.WARN)
+        event.map(_.getLevel) mustBe Some(Level.ERROR)
         Option(event.get.getThrowableProxy).map(_.getMessage) mustBe Some("cache unavailable")
       }
     }
