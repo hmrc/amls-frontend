@@ -57,7 +57,7 @@ class SummaryController @Inject() (
       _ <- updateDataStrict[BankDetails](request.credId, index)(bd => bd.copy(hasAccepted = true))
     } yield Redirect(controllers.bankdetails.routes.YourBankAccountsController.get()))
       .map(_.removingFromSession("itemIndex")) recoverWith { case e: Throwable =>
-      logger.warn(
+      logger.error(
         s"[bankdetails][SummaryController][post] - Failed to save bank details or redirect - index: $index",
         e
       )

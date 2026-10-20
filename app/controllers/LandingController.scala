@@ -123,7 +123,7 @@ class LandingController @Inject() (
           refreshAndRedirect(mlrNumber, None, credId, accountTypeId)
         } else {
           val cache: Cache = optPrefilledCache.head
-          logger.debug(s"[LandingController][getWithAmendments] - amlsRegNo: $amlsRegistrationNumber")
+          logger.info(s"[LandingController][getWithAmendments] - amlsRegNo: $amlsRegistrationNumber")
           if (dataChangeChecker.dataHasChanged(cache)) {
             cache.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
               case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cache), credId, accountTypeId)
@@ -214,8 +214,8 @@ class LandingController @Inject() (
   ): Future[Result] = {
 
     // $COVERAGE-OFF$
-    logger.debug(
-      "getWithoutAmendments:AMLSReference:" + amlsRegistrationNumber.getOrElse("Amls registration number not available")
+    logger.info(
+      s"[LandingController][getWithoutAmendments] - amlsRegNo: ${amlsRegistrationNumber.getOrElse("not available")}"
     )
     // $COVERAGE-ON$
 
@@ -228,7 +228,7 @@ class LandingController @Inject() (
           .map { reviewDetails =>
             (reviewDetails, amlsRegistrationNumber) match {
               case (Some(rd), None)   =>
-                logger.debug("[LandingController][getWithoutAmendments] - Review details found in cache")
+                logger.info("[LandingController][getWithoutAmendments] - Review details found in cache")
                 landingService.updateReviewDetails(rd, credId).map { _ =>
                   auditConnector
                     .sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse(""), rd.safeId))
@@ -236,7 +236,7 @@ class LandingController @Inject() (
                 }
               case (None, None)       => Future.successful(Redirect(Call("GET", appConfig.businessCustomerUrl)))
               case (_, Some(amlsRef)) =>
-                logger.debug(s"[LandingController][getWithoutAmendments] - amlsRef: $amlsRef")
+                logger.info(s"[LandingController][getWithoutAmendments] - amlsRef: $amlsRef")
                 Future.successful(Redirect(controllers.routes.StatusController.get()))
             }
           }
@@ -270,13 +270,13 @@ class LandingController @Inject() (
 
     cache.getEntry[BusinessMatching](BusinessMatching.key) map { bm =>
       // $COVERAGE-OFF$
-      logger.debug(s"[LandingController][preApplicationComplete]: found BusinessMatching key")
+      logger.info(s"[LandingController][preApplicationComplete]: found BusinessMatching key")
       // $COVERAGE-ON$
       (bm.isCompleteLanding, cache.getEntry[BusinessDetails](BusinessDetails.key)) match {
         case (true, Some(abt)) =>
           landingService.setAltCorrespondenceAddress(abt, cacheId) flatMap { _ =>
             // $COVERAGE-OFF$
-            logger.debug(
+            logger.info(
               s"[LandingController][preApplicationComplete]: landingService.setAltCorrespondenceAddress returned"
             )
             // $COVERAGE-ON$
@@ -286,12 +286,12 @@ class LandingController @Inject() (
             redirectToEventPage.map {
               case true =>
                 // $COVERAGE-OFF$
-                logger.debug(s"[LandingController][preApplicationComplete]: redirecting to LoginEvent")
+                logger.info(s"[LandingController][preApplicationComplete]: redirecting to LoginEvent")
                 // $COVERAGE-ON$
                 Redirect(controllers.routes.LoginEventController.get)
               case _    =>
                 // $COVERAGE-OFF$
-                logger.debug(
+                logger.info(
                   s"[LandingController][preApplicationComplete]: has complete RPs - redirecting to status"
                 )
                 // $COVERAGE-ON$
@@ -301,7 +301,7 @@ class LandingController @Inject() (
 
         case (true, _) =>
           // $COVERAGE-OFF$
-          logger.debug(
+          logger.info(
             s"[LandingController][preApplicationComplete]: bm.isComplete is true but no cache Entry for BusinessDetails - redirecting to status"
           )
           // $COVERAGE-ON$
@@ -309,7 +309,7 @@ class LandingController @Inject() (
 
         case (false, _) =>
           // $COVERAGE-OFF$
-          logger.debug(s"[LandingController][preApplicationComplete]: bm.isComplete is false")
+          logger.info(s"[LandingController][preApplicationComplete]: bm.isComplete is false")
           // $COVERAGE-ON$
           deleteAndRedirect()
       }

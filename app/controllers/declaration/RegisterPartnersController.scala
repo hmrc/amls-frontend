@@ -156,10 +156,10 @@ class RegisterPartnersController @Inject() (
     } yield url match {
       case Some(x) => Redirect(x)
       case _       =>
-        logger.warn("[RegisterPartnersController][saveAndRedirect] - No submit redirect url returned")
+        logger.error("[RegisterPartnersController][saveAndRedirect] - No submit redirect url returned")
         InternalServerError("Unable to get redirect url")
     }) recoverWith { case e: Throwable =>
-      logger.warn(
+      logger.error(
         "[RegisterPartnersController][saveAndRedirect] - Failed to save business partners or get submit redirect",
         e
       )

@@ -51,7 +51,7 @@ class PreviouslyRegisteredService @Inject() (val dataCacheConnector: DataCacheCo
         BusinessDetails.key,
         detailsOpt
       ) map { cache =>
-        logger.debug(s"$logPrefix - Business details updated successfully")
+        logger.info(s"$logPrefix - Business details updated successfully")
         Some(cache)
       }
     } recover { case e: Exception =>

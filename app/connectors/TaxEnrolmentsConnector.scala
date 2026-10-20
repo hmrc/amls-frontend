@@ -58,7 +58,7 @@ class TaxEnrolmentsConnector @Inject() (http: HttpClientV2, val appConfig: Appli
   ): Future[HttpResponse] = {
 
     // $COVERAGE-OFF$
-    logger.debug(s"[TaxEnrolmentsConnector][enrol] - enrolKey: ${enrolKey.key}")
+    logger.info(s"[TaxEnrolmentsConnector][enrol] - enrolKey: ${enrolKey.key}")
     // $COVERAGE-ON$
     groupId match {
       case Some(groupId) =>
@@ -114,7 +114,7 @@ class TaxEnrolmentsConnector @Inject() (http: HttpClientV2, val appConfig: Appli
 
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
     // $COVERAGE-OFF$
-    logger.debug(s"[TaxEnrolmentsConnector][deEnrol] - enrolKey: $enrolKey")
+    logger.info(s"[TaxEnrolmentsConnector][deEnrol] - enrolKey: $enrolKey")
     // $COVERAGE-ON$
     groupId match {
       case Some(groupId) =>

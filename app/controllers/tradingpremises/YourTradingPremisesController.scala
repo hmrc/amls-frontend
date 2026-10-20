@@ -85,7 +85,7 @@ class YourTradingPremisesController @Inject() (
       _     <-
         dataCacheConnector.save[Seq[TradingPremises]](request.credId, TradingPremises.key, tpNew.getOrElse(Seq.empty))
     } yield Redirect(controllers.routes.RegistrationProgressController.get())) recoverWith { case e: Throwable =>
-      logger.warn("[YourTradingPremisesController][post] - Failed to save trading premises", e)
+      logger.error("[YourTradingPremisesController][post] - Failed to save trading premises", e)
       Future.successful(InternalServerError("Unable to save data and get redirect link"))
     }
   }
