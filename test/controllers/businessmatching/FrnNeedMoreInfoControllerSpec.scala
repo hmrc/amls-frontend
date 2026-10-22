@@ -50,6 +50,7 @@ class FrnNeedMoreInfoControllerSpec extends AmlsSpec with MockitoSugar with Scal
     self =>
 
     val request = addToken(authRequest)
+    val mockHelper = mock[ChangeSubSectorHelper]
     lazy val view = app.injector.instanceOf[FrnNeedMoreInfoView]
     val controller = new FrnNeedMoreInfoController(
       SuccessfulAuthAction,
@@ -57,7 +58,7 @@ class FrnNeedMoreInfoControllerSpec extends AmlsSpec with MockitoSugar with Scal
       cc = mockMcc,
       createRouter2[ChangeSubSectorFlowModel],
       mockCacheConnector,
-      mock[ChangeSubSectorHelper],
+      mockHelper,
       view = view
     )
 
@@ -96,12 +97,17 @@ class FrnNeedMoreInfoControllerSpec extends AmlsSpec with MockitoSugar with Scal
     "post is called" must {
 
       "the flow model exists" must {
-        "respond with SEE_OTHER and redirect to correct page route when includeCompanyNotRegistered is false" in new Fixture {
-          val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
+
+        "respond with SEE_OTHER and redirect to correct page router when includeCompanyNotRegistered is false" in new Fixture {
+
+          val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnYes("1234567")))
           val pageId = FrnNeedMoreInfoPageId
 
-          when(mockCacheConnector.fetch[ChangeSubSectorFlowModel](any(), any())(any()))
+          when(mockCacheConnector.update[ChangeSubSectorFlowModel](any(), any())(any()) (any()))
             .thenReturn(Future.successful(Some(flowModel)))
+
+          when(mockHelper.updateSubSectors(any(), any())(any()))
+            .thenReturn(Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty)))
 
           val result = controller.post(includeCompanyNotRegistered = false)(request)
 
@@ -109,18 +115,22 @@ class FrnNeedMoreInfoControllerSpec extends AmlsSpec with MockitoSugar with Scal
           controller.router.verify(
             "internalId",
             pageId,
-            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))),
+            flowModel,
             edit = false,
             includeCompanyNotRegistered = false
           )
         }
 
-        "respond with SEE_OTHER and redirect to correct page route when includeCompanyNotRegistered is true" in new Fixture {
-          val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
+        "respond with SEE_OTHER and redirect to the correct page router when includeCompanyNotRegistered is true" in new Fixture {
+
+          val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnYes("1234567")))
           val pageId = FrnNeedMoreInfoPageId
 
-          when(mockCacheConnector.fetch[ChangeSubSectorFlowModel](any(), any())(any()))
+          when(mockCacheConnector.update[ChangeSubSectorFlowModel](any(), any())(any()) (any()))
             .thenReturn(Future.successful(Some(flowModel)))
+
+          when(mockHelper.updateSubSectors(any(), any())(any()))
+            .thenReturn(Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty)))
 
           val result = controller.post(includeCompanyNotRegistered = true)(request)
 
@@ -128,18 +138,75 @@ class FrnNeedMoreInfoControllerSpec extends AmlsSpec with MockitoSugar with Scal
           controller.router.verify(
             "internalId",
             pageId,
-            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))),
+            flowModel,
             edit = false,
             includeCompanyNotRegistered = true
+          )
+        }
+
+        "respond with SEE_OTHER, redirect to correct page router and frn is transformed when 7 digits" in new Fixture {
+          val transformedFrn: String = "700000"
+          val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnYes("1234567")))
+          val pageId = FrnNeedMoreInfoPageId
+
+
+          when(mockCacheConnector.update[ChangeSubSectorFlowModel](any(), any())(any())(any()))
+            .thenAnswer { cacheUpdateCall =>
+               val updateFunction = cacheUpdateCall.getArgument[Option[ChangeSubSectorFlowModel] => ChangeSubSectorFlowModel](2)
+               Future.successful(Some(updateFunction(Some(flowModel))))
+             }
+
+          when(mockHelper.updateSubSectors(any(), any())(any()))
+            .thenReturn(Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty)))
+
+          val result = controller.post(includeCompanyNotRegistered = false)(request)
+
+          status(result) mustBe SEE_OTHER
+          controller.router.verify(
+            "internalId",
+            pageId,
+            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnYes(transformedFrn))),
+            edit = false,
+            includeCompanyNotRegistered = false
+          )
+        }
+
+        "respond with SEE_OTHER and redirect to correct page route and frn is not 7 digits" in new Fixture {
+          val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnYes("123456")))
+          val pageId = FrnNeedMoreInfoPageId
+
+
+          when(mockCacheConnector.update[ChangeSubSectorFlowModel](any(), any())(any())(any()))
+            .thenAnswer { cacheUpdateCall =>
+              val updateFunction = cacheUpdateCall.getArgument[Option[ChangeSubSectorFlowModel] => ChangeSubSectorFlowModel](2)
+              Future.successful(Some(updateFunction(Some(flowModel))))
+            }
+
+          when(mockHelper.updateSubSectors(any(), any())(any()))
+            .thenReturn(Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty)))
+
+          val result = controller.post(includeCompanyNotRegistered = false)(request)
+
+          status(result) mustBe SEE_OTHER
+          controller.router.verify(
+            "internalId",
+            pageId,
+            flowModel,
+            edit = false,
+            includeCompanyNotRegistered = false
           )
         }
       }
 
       "the flow model is not found" must {
+
         "throw an exception" in new Fixture {
 
-          when(mockCacheConnector.fetch[ChangeSubSectorFlowModel](any(), any())(any()))
-            .thenReturn(Future.successful(None))
+          when(mockCacheConnector.update[ChangeSubSectorFlowModel](any(), any())(any())(any()))
+            .thenAnswer { cacheUpdateCall =>
+               val updateFunction = cacheUpdateCall.getArgument[Option[ChangeSubSectorFlowModel] => ChangeSubSectorFlowModel](2)
+               Future.successful(Some(updateFunction(None)))
+             }
 
           val result = controller.post(includeCompanyNotRegistered = false)(request)
 
@@ -153,6 +220,31 @@ class FrnNeedMoreInfoControllerSpec extends AmlsSpec with MockitoSugar with Scal
             .getRoute(any(), any(), any(), any(), any())(any(), any())
         }
         }
+
+      "the flow model does not update" must {
+
+        "throw an exception" in new Fixture {
+          val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnYes("1234567")))
+
+
+          when(mockCacheConnector.update[ChangeSubSectorFlowModel](any(), any())(any())(any()))
+            .thenReturn(Future.successful(None))
+
+          when(mockHelper.updateSubSectors(any(), any())(any()))
+            .thenReturn(Future.successful(None))
+
+          val result = controller.post(includeCompanyNotRegistered = false)(request)
+
+          val exception = intercept[Exception] {
+            await(result)
+          }
+
+          exception.getMessage mustBe "Flow model not updated"
+
+          verify(controller.router, never())
+            .getRoute(any(), any(), any(), any(), any())(any(), any())
+        }
+      }
       }
     }
   }

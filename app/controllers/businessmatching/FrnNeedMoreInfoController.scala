@@ -19,8 +19,9 @@ package controllers.businessmatching
 import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import models.businessmatching.BusinessAppliedForFrn
-import models.flowmanagement.{ChangeSubSectorFlowModel, FrnNeedMoreInfoPageId, FrnPageId}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForFrnYes}
+import models.flowmanagement.{ChangeSubSectorFlowModel, FrnNeedMoreInfoPageId}
+import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.flowmanagement.Router2
 import utils.AuthAction
@@ -52,9 +53,25 @@ class FrnNeedMoreInfoController @Inject() (
         includeCompanyNotRegistered
       )
 
-      dataCacheConnector.fetch[ChangeSubSectorFlowModel](request.credId, ChangeSubSectorFlowModel.key) flatMap {
-        case Some(flowModel) => route(flowModel)
-        case None            => throw new Exception("Flow model not found")
+      dataCacheConnector.update[ChangeSubSectorFlowModel](request.credId, ChangeSubSectorFlowModel.key) {
+        case Some(flowModel) =>
+          flowModel.copy(Frn = flowModel.Frn.map(transformFrn))
+        case None =>
+          throw new Exception("Flow model not found")
+      } flatMap {
+        case Some(updatedFlowModel @ ChangeSubSectorFlowModel(_, Some(BusinessAppliedForFrnYes(_)))) =>
+          helper.updateSubSectors(request.credId, updatedFlowModel) flatMap { _ =>
+            route(updatedFlowModel)
+          }
+        case None => throw new Exception("Flow model not updated")
       }
   }
+
+  private def transformFrn(data: BusinessAppliedForFrn): BusinessAppliedForFrn =
+    data match {
+      case BusinessAppliedForFrnYes(regNumber) if regNumber.length == 7 =>
+        BusinessAppliedForFrnYes("700000")
+      case other =>
+        other
+    }
 }
