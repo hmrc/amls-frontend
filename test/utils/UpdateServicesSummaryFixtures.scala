@@ -105,7 +105,7 @@ trait UpdateServicesSummaryFixtures extends AmlsViewSpec {
 
   /** MSBAllViewFixture.
     *
-    * View to include MoneyServiceBusiness. Has all sub services. Has PSR No.
+    * View to include MoneyServiceBusiness. Has all sub services. Has FRN No.
     */
   trait MSBAllViewFixture extends ViewFixture {
     lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
@@ -126,14 +126,14 @@ trait UpdateServicesSummaryFixtures extends AmlsViewSpec {
             )
           )
         ),
-        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))
+        businessAppliedForFrn = Some(BusinessAppliedForFrnYes("111111"))
       )
     )
   }
 
   /** MSBSingleViewFixture.
     *
-    * View to include MoneyServiceBusiness. Has a single sub services. Has PSR No.
+    * View to include MoneyServiceBusiness. Has a single sub services. Has FRN No.
     */
   trait MSBSingleViewFixture extends ViewFixture {
     lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
@@ -141,37 +141,37 @@ trait UpdateServicesSummaryFixtures extends AmlsViewSpec {
       AddBusinessTypeFlowModel(
         activity = Some(MoneyServiceBusiness),
         subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))
+        businessAppliedForFrn = Some(BusinessAppliedForFrnYes("111111"))
       )
     )
   }
 
-  /** MSBNoPSRViewFixture.
+  /** MSBNoFrnViewFixture.
     *
-    * View to include MoneyServiceBusiness. Has single CurrencyExchange sub service. Has no PSR No.
+    * View to include MoneyServiceBusiness. Has single CurrencyExchange sub service. Has no FRN No.
     */
-  trait MSBNoPSRViewFixture extends ViewFixture {
+  trait MSBNoFrnViewFixture extends ViewFixture {
     lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
     override def view                = update_services_summary(
       AddBusinessTypeFlowModel(
         activity = Some(MoneyServiceBusiness),
         subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)
+        businessAppliedForFrn = Some(BusinessAppliedForFrnNo)
       )
     )
   }
 
   /** MSBViewFixture.
     *
-    * View to include MoneyServiceBusiness. Has single CurrencyExchange sub service. Has a PSR No.
+    * View to include MoneyServiceBusiness. Has single CurrencyExchange sub service. Has a FRN No.
     */
-  trait SingleSubSectorPSRMSBViewFixture extends ViewFixture {
+  trait SingleSubSectorFrnMSBViewFixture extends ViewFixture {
     lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
     override def view                = update_services_summary(
       AddBusinessTypeFlowModel(
         activity = Some(MoneyServiceBusiness),
         subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))
+        businessAppliedForFrn = Some(BusinessAppliedForFrnYes("111111"))
       )
     )
   }

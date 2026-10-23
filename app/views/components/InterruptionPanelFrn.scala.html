@@ -1,0 +1,49 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+
+@this()
+@(
+        formHelper: FormWithCSRF,
+)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+<div class="govuk-panel govuk-panel--interruption">
+  <h1 class="govuk-panel__title">
+      @messages("businessmatching.frnNeedMoreInfo.heading")
+  </h1>
+  <div class="govuk-panel__body">
+    <p class="govuk-body">@messages("businessmatching.frnNeedMoreInfo.lbl.01")</p>
+    <p class="govuk-body">@messages("businessmatching.frnNeedMoreInfo.lbl.02")</p>
+  </div>
+    <h2 class="govuk-heading-m">
+      @messages("businessmatching.frnNeedMoreInfo.heading.02")
+    </h2>
+    <div class="govuk-panel__body">
+      <p class="govuk-body">@messages("businessmatching.frnNeedMoreInfo.lbl.03")</p>
+      <p class="govuk-body">@messages("businessmatching.frnNeedMoreInfo.lbl.04")</p>
+      <p class="govuk-body">@Html(messages("businessmatching.frnNeedMoreInfo.lbl.05")) <a class="govuk-link govuk-link--inverse" href="@controllers.businessmatching.routes.FrnNumberController.get(edit=true)">change it</a></p>
+    </div>
+  <div class="govuk-panel__actions">
+    @formHelper(action = controllers.businessmatching.routes.FrnNeedMoreInfoController.post()) {
+        <div class="govuk-button-group">
+            <button type="submit" class="govuk-button govuk-button--inverse" data-module="govuk-button">
+                Save & Continue
+            </button>
+        </div>
+    }
+  </div>
+</div>

@@ -34,7 +34,7 @@ class MsbSubSectorsPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
   ): Future[Result] = {
     val result = model.subSectors map {
       case sectors if sectors.contains(TransmittingMoney) =>
-        routes.PSRNumberController.get(edit)
+        routes.FrnNumberController.get(edit)
       case _                                              => routes.SummaryController.get()
     }
 
@@ -52,7 +52,7 @@ class MsbSubSectorsPageRouterCompanyNotRegistered extends PageRouterCompanyNotRe
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     val result = model.subSectors map {
       case sectors if sectors.contains(TransmittingMoney) =>
-        routes.PSRNumberController.get(edit)
+        routes.FrnNumberController.get(edit)
       case _                                              =>
         if (includeCompanyNotRegistered) {
           routes.CheckCompanyController.get()

@@ -17,23 +17,23 @@
 package controllers.businessmatching
 
 import cats.data.OptionT
-import cats.implicits._
+import cats.implicits.*
 import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.businessmatching.PSRNumberFormProvider
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
-import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
+import forms.businessmatching.FrnFormProvider
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForFrnYes}
+import models.flowmanagement.{ChangeSubSectorFlowModel, FrnPageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router2
 import utils.AuthAction
-import views.html.businessmatching.PsrNumberView
+import views.html.businessmatching.FrnNumberView
 
 import javax.inject.Inject
 
-class PSRNumberController @Inject() (
+class FrnNumberController @Inject() (
   authAction: AuthAction,
   val ds: CommonPlayDependencies,
   val dataCacheConnector: DataCacheConnector,
@@ -42,8 +42,8 @@ class PSRNumberController @Inject() (
   val router: Router2[ChangeSubSectorFlowModel],
   val helper: ChangeSubSectorHelper,
   val cc: MessagesControllerComponents,
-  formProvider: PSRNumberFormProvider,
-  psr_number: PsrNumberView
+  formProvider: FrnFormProvider,
+  view: FrnNumberView
 ) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
@@ -51,20 +51,20 @@ class PSRNumberController @Inject() (
       bm     <- businessMatchingService.getModel(request.credId)
       status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
     } yield {
-      val form = bm.businessAppliedForPSRNumber.fold(formProvider()) { psr =>
-        request.session.get("originalPsrNumber") match {
-          case Some(original) => formProvider().fill(BusinessAppliedForPSRNumberYes(original))
-          case None           => formProvider().fill(psr)
+      val form = bm.businessAppliedForFrn.fold(formProvider()) { frn =>
+        request.session.get("originalFrn") match {
+          case Some(original) => formProvider().fill(BusinessAppliedForFrnYes(original))
+          case None           => formProvider().fill(frn)
         }
       }
 
       Ok(
-        psr_number(
+        view(
           form,
           edit,
           bm.preAppComplete,
           statusService.isPreSubmission(status),
-          bm.businessAppliedForPSRNumber.isDefined
+          bm.businessAppliedForFrn.isDefined
         )
       )
     }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
@@ -73,7 +73,7 @@ class PSRNumberController @Inject() (
   def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       val route =
-        router.getRoute(request.credId, PsrNumberPageId, _: ChangeSubSectorFlowModel, edit, includeCompanyNotRegistered)
+        router.getRoute(request.credId, FrnPageId, _: ChangeSubSectorFlowModel, edit, includeCompanyNotRegistered)
 
       formProvider()
         .bindFromRequest()
@@ -84,37 +84,30 @@ class PSRNumberController @Inject() (
               status <-
                 OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
             } yield BadRequest(
-              psr_number(formWithErrors, edit, bm.preAppComplete, statusService.isPreSubmission(status))
-            )) getOrElse BadRequest(psr_number(formWithErrors, edit)),
+              view(formWithErrors, edit, bm.preAppComplete, statusService.isPreSubmission(status))
+            )) getOrElse BadRequest(view(formWithErrors, edit)),
           data =>
             helper.getOrCreateFlowModel(request.credId) flatMap { flowModel =>
-              val originalPsrNumber = data match {
-                case BusinessAppliedForPSRNumberYes(regNumber) => regNumber
-                case _                                         => ""
+              val originalFrnNumber = data match {
+                case BusinessAppliedForFrnYes(regNumber) => regNumber
+                case _                                   => ""
               }
-
-              val transformedData = transformPSRNumber(data)
-
               dataCacheConnector.update[ChangeSubSectorFlowModel](request.credId, ChangeSubSectorFlowModel.key) { _ =>
-                flowModel.copy(psrNumber = Some(transformedData))
+                flowModel.copy(Frn = Some(data))
               } flatMap {
-                case Some(m @ ChangeSubSectorFlowModel(_, Some(BusinessAppliedForPSRNumberYes(_)))) =>
+                case Some(m @ ChangeSubSectorFlowModel(_, Some(BusinessAppliedForFrnYes(_)))) =>
                   helper.updateSubSectors(request.credId, m) flatMap { _ =>
-                    route(m).map(_.addingToSession("originalPsrNumber" -> originalPsrNumber))
+                    route(m).map(_.addingToSession("originalFrnNumber" -> originalFrnNumber))
                   }
-                case Some(m)                                                                        =>
+                case Some(m)                                                                  =>
                   route(m)
-                case _                                                                              => throw new Exception("An Exception has occurred")
+                case _                                                                        =>
+                  throw new Exception(
+                    "An Exception has occurred"
+                  )
               }
             }
         )
   }
 
-  private def transformPSRNumber(data: BusinessAppliedForPSRNumber): BusinessAppliedForPSRNumber =
-    data match {
-      case BusinessAppliedForPSRNumberYes(regNumber) if regNumber.length == 7 =>
-        BusinessAppliedForPSRNumberYes("700000")
-      case other                                                              =>
-        other
-    }
 }

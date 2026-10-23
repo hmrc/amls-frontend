@@ -114,7 +114,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
         )
       )
 
-      val BusinessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberYes("123456")
+      val appliedForFrnModel = BusinessAppliedForFrnYes("123456")
 
       val testBusinessMatching = BusinessMatching(
         Some(ReviewDetailsModel),
@@ -122,7 +122,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
         Some(msbServices),
         Some(TypeOfBusinessModel),
         Some(CompanyRegistrationNumberModel),
-        Some(BusinessAppliedForPSRNumberModel)
+        Some(appliedForFrnModel)
       )
 
       val isPreSubmission = true
@@ -133,7 +133,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
         isPending = false
       )
       val submitButton: Option[Html] = cyaHelper.getSubmitButton(
-        testBusinessMatching.businessAppliedForPSRNumber,
+        testBusinessMatching.businessAppliedForFrn,
         isPreSubmission,
         testBusinessMatching.preAppComplete
       )
@@ -184,14 +184,14 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
           controllers.businessmatching.routes.MsbSubSectorsController.get(true).toString
         ),
         (
-          "businessmatching.psr.number.title",
+          "businessmatching.frn.title",
           checkElementTextIncludes(_, "Yes"),
           ""
         ),
         (
-          "businessmatching.psr.number.lbl",
+          "businessmatching.frn.lbl",
           checkElementTextIncludes(_, "123456"),
-          controllers.businessmatching.routes.PSRNumberController.get(true).toString
+          controllers.businessmatching.routes.FrnNumberController.get(true).toString
         )
       )
 
@@ -237,8 +237,8 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
         isPreSubmission,
         isPending = false
       )
-      val submitButton             = cyaHelper.getSubmitButton(
-        testBusinessMatching.businessAppliedForPSRNumber,
+      val submitButton = cyaHelper.getSubmitButton(
+        testBusinessMatching.businessAppliedForFrn,
         isPreSubmission,
         testBusinessMatching.preAppComplete
       )
@@ -303,7 +303,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
         None,
         Some(TypeOfBusinessModel),
         Some(CompanyRegistrationNumberModel),
-        Some(BusinessAppliedForPSRNumberNo)
+        Some(BusinessAppliedForFrnNo)
       )
 
       val isPreSubmission = true
@@ -314,7 +314,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDriv
         isPending = false
       )
       val submitButton: Option[Html] = cyaHelper.getSubmitButton(
-        testBusinessMatching.businessAppliedForPSRNumber,
+        testBusinessMatching.businessAppliedForFrn,
         isPreSubmission,
         testBusinessMatching.preAppComplete
       )

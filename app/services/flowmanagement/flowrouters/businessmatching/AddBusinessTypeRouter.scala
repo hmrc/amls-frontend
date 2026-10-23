@@ -27,14 +27,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AddBusinessTypeRouter @Inject() (
-  val businessMatchingService: BusinessMatchingService,
-  val addMoreActivitiesPageRouter: AddMoreBusinessTypesPageRouter,
-  val businessAppliedForPSRNumberPageRouter: BusinessAppliedForPsrNumberPageRouter,
-  val newServicesInformationPageRouter: NeedMoreInformationPageRouter,
-  val noPSRPageRouter: NoPSRPageRouter,
-  val selectActivitiesPageRouter: SelectBusinessTypesPageRouter,
-  val subServicesPageRouter: SubSectorsPageRouter,
-  val updateServicesSummaryPageRouter: AddBusinessTypeSummaryPageRouter
+                                        val businessMatchingService: BusinessMatchingService,
+                                        val addMoreActivitiesPageRouter: AddMoreBusinessTypesPageRouter,
+                                        val businessAppliedForFrnPageRouter: BusinessAppliedForFrnPageRouter,
+                                        val newServicesInformationPageRouter: NeedMoreInformationPageRouter,
+                                        val noFrnPageRouter: NoFrnPageRouter,
+                                        val selectActivitiesPageRouter: SelectBusinessTypesPageRouter,
+                                        val subServicesPageRouter: SubSectorsPageRouter,
+                                        val updateServicesSummaryPageRouter: AddBusinessTypeSummaryPageRouter
 ) extends Router[AddBusinessTypeFlowModel] {
 
   override def getRoute(credId: String, pageId: PageId, model: AddBusinessTypeFlowModel, edit: Boolean = false)(implicit
@@ -43,9 +43,9 @@ class AddBusinessTypeRouter @Inject() (
   ): Future[Result] =
     pageId match {
       case AddMoreBusinessTypesPageId   => addMoreActivitiesPageRouter.getRoute(credId, model, edit)
-      case PsrNumberPageId              => businessAppliedForPSRNumberPageRouter.getRoute(credId, model, edit)
+      case FrnPageId              => businessAppliedForFrnPageRouter.getRoute(credId, model, edit)
       case NeedMoreInformationPageId    => newServicesInformationPageRouter.getRoute(credId, model, edit)
-      case NoPSRPageId                  => noPSRPageRouter.getRoute(credId, model, edit)
+      case NoFrnPageId                  => noFrnPageRouter.getRoute(credId, model, edit)
       case SelectBusinessTypesPageId    => selectActivitiesPageRouter.getRoute(credId, model, edit)
       case SubSectorsPageId             => subServicesPageRouter.getRoute(credId, model, edit)
       case AddBusinessTypeSummaryPageId => updateServicesSummaryPageRouter.getRoute(credId, model, edit)

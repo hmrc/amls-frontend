@@ -19,9 +19,10 @@ package models.flowmanagement
 sealed trait PageId
 
 case object AddMoreBusinessTypesPageId extends PageId
-case object PsrNumberPageId extends PageId
+case object FrnPageId extends PageId
 case object NeedMoreInformationPageId extends PageId
-case object NoPSRPageId extends PageId
+case object NoFrnPageId extends PageId
+case object FrnNeedMoreInfoPageId extends PageId
 case object SelectBusinessTypesPageId extends PageId
 case object SubSectorsPageId extends PageId
 case object AddBusinessTypeSummaryPageId extends PageId

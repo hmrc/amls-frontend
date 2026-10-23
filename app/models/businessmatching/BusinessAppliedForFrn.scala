@@ -22,11 +22,11 @@ import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 
-sealed trait BusinessAppliedForPSRNumber
-case class BusinessAppliedForPSRNumberYes(regNumber: String) extends BusinessAppliedForPSRNumber
-case object BusinessAppliedForPSRNumberNo extends BusinessAppliedForPSRNumber
+sealed trait BusinessAppliedForFrn
+case class BusinessAppliedForFrnYes(regNumber: String) extends BusinessAppliedForFrn
+case object BusinessAppliedForFrnNo extends BusinessAppliedForFrn
 
-object BusinessAppliedForPSRNumber {
+object BusinessAppliedForFrn {
 
   def formValues(html: Html)(implicit messages: Messages): Seq[RadioItem] = HmrcYesNoRadioItems().map { radioItem =>
     if (radioItem.value.contains("true")) {
@@ -41,19 +41,19 @@ object BusinessAppliedForPSRNumber {
     }
   }
 
-  implicit val jsonReads: Reads[BusinessAppliedForPSRNumber] =
+  implicit val jsonReads: Reads[BusinessAppliedForFrn] =
     (__ \ "appliedFor").read[Boolean] flatMap {
-      case true  => (__ \ "regNumber").read[String] map BusinessAppliedForPSRNumberYes.apply
-      case false => Reads(_ => JsSuccess(BusinessAppliedForPSRNumberNo))
+      case true  => (__ \ "regNumber").read[String] map BusinessAppliedForFrnYes.apply
+      case false => Reads(_ => JsSuccess(BusinessAppliedForFrnNo))
     }
 
-  implicit val jsonWrites: Writes[BusinessAppliedForPSRNumber] = Writes[BusinessAppliedForPSRNumber] {
-    case BusinessAppliedForPSRNumberYes(value) =>
+  implicit val jsonWrites: Writes[BusinessAppliedForFrn] = Writes[BusinessAppliedForFrn] {
+    case BusinessAppliedForFrnYes(value) =>
       Json.obj(
         "appliedFor" -> true,
         "regNumber"  -> value
       )
-    case BusinessAppliedForPSRNumberNo         => Json.obj("appliedFor" -> false)
+    case BusinessAppliedForFrnNo         => Json.obj("appliedFor" -> false)
   }
 
 }

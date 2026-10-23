@@ -16,10 +16,9 @@
 
 package services.flowmanagement.pagerouters.addflow
 
-import controllers.businessmatching.updateservice.add.{routes => addRoutes}
+import controllers.routes
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
-import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId}
+import models.flowmanagement.AddBusinessTypeFlowModel
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.StatusService
@@ -30,19 +29,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BusinessAppliedForPsrNumberPageRouter @Inject() (
-  val statusService: StatusService,
-  val businessMatchingService: BusinessMatchingService
-) extends PageRouter[AddBusinessTypeFlowModel] {
+class NoFrnPageRouter @Inject()(val statusService: StatusService, val businessMatchingService: BusinessMatchingService)
+    extends PageRouter[AddBusinessTypeFlowModel] {
 
   override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)(implicit
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Result] =
-    (edit, model.businessAppliedForPSRNumber) match {
-      case (_, Some(BusinessAppliedForPSRNumberYes(_))) =>
-        Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
-      case (_, Some(BusinessAppliedForPSRNumberNo))     => Future.successful(Redirect(addRoutes.NoPsrController.get()))
-      case (_, None)                                    => Future.successful(error(PsrNumberPageId))
-    }
+    Future.successful(Redirect(routes.RegistrationProgressController.get()))
 }

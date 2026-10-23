@@ -20,34 +20,34 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.businessmatching.PSRNumberFormProvider
-import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId}
+import forms.businessmatching.FrnFormProvider
+import models.flowmanagement.{AddBusinessTypeFlowModel, FrnPageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.flowmanagement.Router
 import utils.AuthAction
-import views.html.businessmatching.updateservice.add.BusinessAppliedForPSRNumberView
+import views.html.businessmatching.updateservice.add.BusinessAppliedForFrnView
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class BusinessAppliedForPSRNumberController @Inject() (
-  authAction: AuthAction,
-  val ds: CommonPlayDependencies,
-  implicit val dataCacheConnector: DataCacheConnector,
-  val router: Router[AddBusinessTypeFlowModel],
-  val cc: MessagesControllerComponents,
-  formProvider: PSRNumberFormProvider,
-  view: BusinessAppliedForPSRNumberView
+class BusinessAppliedForFrnController @Inject() (
+                                                        authAction: AuthAction,
+                                                        val ds: CommonPlayDependencies,
+                                                        implicit val dataCacheConnector: DataCacheConnector,
+                                                        val router: Router[AddBusinessTypeFlowModel],
+                                                        val cc: MessagesControllerComponents,
+                                                        formProvider: FrnFormProvider,
+                                                        view: BusinessAppliedForFrnView
 ) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
     OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)) map {
       case model if model.isMsbTmDefined =>
-        val form = model.businessAppliedForPSRNumber.fold(formProvider())(formProvider().fill)
+        val form = model.businessAppliedForFrn.fold(formProvider())(formProvider().fill)
         Ok(view(form, edit))
       case _                             => Redirect(controllers.routes.RegistrationProgressController.get())
-    } getOrElse InternalServerError("Get: Unable to show Business Applied For PSR Number page")
+    } getOrElse InternalServerError("Get: Unable to show Business Applied For Frn page")
   }
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
@@ -57,13 +57,13 @@ class BusinessAppliedForPSRNumberController @Inject() (
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
-            case Some(model) => model.businessAppliedForPSRNumber(data)
-            case None        => throw new Exception("An UnknownException has occurred: BusinessAppliedForPSRNumberController")
+            case Some(model) => model.withBusinessAppliedForFrn(data)
+            case None        => throw new Exception("An UnknownException has occurred: BusinessAppliedForFrnController")
           } flatMap {
-            case Some(model) => router.getRoute(request.credId, PsrNumberPageId, model, edit)
+            case Some(model) => router.getRoute(request.credId, FrnPageId, model, edit)
             case _           =>
               Future
-                .successful(InternalServerError("Post: Cannot retrieve data: BusinessAppliedForPSRNumberController"))
+                .successful(InternalServerError("Post: Cannot retrieve data: BusinessAppliedForFrnController"))
           }
       )
   }

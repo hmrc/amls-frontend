@@ -50,7 +50,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor), businessAddress, "XE0000000000000")
     val typeOfBusinessModel              = TypeOfBusiness("test")
     val companyRegistrationNumberModel   = CompanyRegistrationNumber("12345678")
-    val businessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberYes("123456")
+    val businessAppliedForFrnModel = BusinessAppliedForFrnYes("123456")
 
     val jsonBusinessMatching = Json.obj(
       "businessActivities"        -> Seq("05", "06", "07"),
@@ -81,7 +81,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       Some(msbServices),
       Some(typeOfBusinessModel),
       Some(companyRegistrationNumberModel),
-      Some(businessAppliedForPSRNumberModel),
+      Some(businessAppliedForFrnModel),
       hasAccepted = true,
       preAppComplete = true
     )
@@ -140,11 +140,11 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       }
     }
 
-    "Merged with BusinessAppliedForPSRNumberModel" must {
-      "return BusinessMatching with correct BusinessAppliedForPSRNumberModel" in {
-        val result = initial.businessAppliedForPSRNumber(Some(businessAppliedForPSRNumberModel))
+    "Merged with BusinessAppliedForFrnModel" must {
+      "return BusinessMatching with correct BusinessAppliedForFrnModel" in {
+        val result = initial.businessAppliedForFrn(Some(businessAppliedForFrnModel))
         result must be(
-          BusinessMatching(None, None, None, None, None, Some(businessAppliedForPSRNumberModel), hasChanged = true)
+          BusinessMatching(None, None, None, None, None, Some(businessAppliedForFrnModel), hasChanged = true)
         )
       }
     }
@@ -160,7 +160,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
             Some(msbServices),
             None,
             None,
-            Some(businessAppliedForPSRNumberModel),
+            Some(businessAppliedForFrnModel),
             hasChanged = false,
             hasAccepted = true,
             preAppComplete = true
@@ -177,7 +177,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
             Some(msbServices),
             Some(typeOfBusinessModel),
             None,
-            Some(businessAppliedForPSRNumberModel),
+            Some(businessAppliedForFrnModel),
             hasChanged = false,
             hasAccepted = true,
             preAppComplete = true
@@ -196,7 +196,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
             Some(msbServices),
             None,
             Some(companyRegistrationNumberModel),
-            Some(businessAppliedForPSRNumberModel),
+            Some(businessAppliedForFrnModel),
             hasChanged = false,
             hasAccepted = true,
             preAppComplete = true
@@ -215,7 +215,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
             Some(msbServices),
             None,
             Some(companyRegistrationNumberModel),
-            Some(businessAppliedForPSRNumberModel),
+            Some(businessAppliedForFrnModel),
             hasChanged = false,
             hasAccepted = true,
             preAppComplete = true
@@ -232,7 +232,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
             Some(msbServices),
             Some(typeOfBusinessModel),
             Some(companyRegistrationNumberModel),
-            Some(businessAppliedForPSRNumberModel),
+            Some(businessAppliedForFrnModel),
             hasChanged = false,
             hasAccepted = true,
             preAppComplete = true
@@ -283,7 +283,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
             Some(msbServices),
             None,
             None,
-            Some(businessAppliedForPSRNumberModel),
+            Some(businessAppliedForFrnModel),
             hasChanged = false,
             hasAccepted = false
           )
@@ -320,14 +320,14 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
             None,
             Some(typeOfBusinessModel),
             Some(companyRegistrationNumberModel),
-            Some(businessAppliedForPSRNumberModel),
+            Some(businessAppliedForFrnModel),
             hasChanged = false
           )
 
           businessMatching.isComplete must be(false)
         }
 
-        "business activity selected as MSB and msb services model is defined and psr is not defined" in {
+        "business activity selected as MSB and msb services model is defined and frn is not defined" in {
 
           val businessMatching = BusinessMatching(
             Some(reviewDetailsModel),
@@ -353,7 +353,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
           (_.reviewDetails(reviewDetailsGen.sample.get), "reviewDetails"),
           (_.typeOfBusiness(TypeOfBusiness("type of business")), "typeOfBusiness"),
           (_.companyRegistrationNumber(CompanyRegistrationNumber("987654321")), "companyRegistrationNumber"),
-          (_.businessAppliedForPSRNumber(Some(BusinessAppliedForPSRNumberNo)), "businessAppliedForPSRNumber")
+          (_.businessAppliedForFrn(Some(BusinessAppliedForFrnNo)), "businessAppliedForFrn")
         )
 
         tests.foreach { test =>

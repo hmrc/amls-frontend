@@ -26,17 +26,17 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title") + " - " + messages("summary.updateservice")) {
+@layout(messages("businessmatching.updateservice.noFrn.cannotcontinuewiththeapplication.title") + " - " + messages("summary.updateservice")) {
 
     @subtitle("summary.updateservice")
 
-    @heading("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading")
+    @heading("businessmatching.updateservice.noFrn.cannotcontinuewiththeapplication.heading")
 
-    <p class="govuk-body">@messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2")</p>
+    <p class="govuk-body">@messages("businessmatching.updateservice.noFrn.cannotcontinuewiththeapplication.requiredinfo.2")</p>
 
-    @formHelper(controllers.businessmatching.updateservice.add.routes.NoPsrController.post()) {
+    @formHelper(controllers.businessmatching.updateservice.add.routes.NoFrnController.post()) {
         @button(
-            "businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.text",
+            "businessmatching.updateservice.noFrn.cannotcontinuewiththeapplication.button.text",
             "cannot-continue-with-application"
         )
     }

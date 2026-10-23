@@ -20,7 +20,7 @@ import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService._
-import models.businessmatching.{BusinessActivities, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes, BusinessMatching, BusinessMatchingMsbServices, BusinessType, CompanyRegistrationNumber, TypeOfBusiness}
+import models.businessmatching.{BusinessActivities, BusinessAppliedForFrnNo, BusinessAppliedForFrnYes, BusinessMatching, BusinessMatchingMsbServices, BusinessType, CompanyRegistrationNumber, TypeOfBusiness}
 import play.api.test.FakeRequest
 import play.test.Helpers.fakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -34,12 +34,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
   val registrationTypeIndex   = 1
   val registeredServicesIndex = 2
   val msbActivitiesIndex      = 3
-  val hasPsrNumberIndex       = 4
-  val psrNumberIndex          = 5
+  val hasFrnIndex       = 4
+  val frnIndex          = 5
 
   def failIfEmpty = fail("HTML was not present")
 
-  val businessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberYes("123456")
+  val businessAppliedForFrnModel = BusinessAppliedForFrnYes("123456")
 
   ".createSummaryList" must {
 
@@ -444,16 +444,16 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         }
       }
 
-      "contains PSR number" when {
-        "the user has answered yes and supplied a PSR number" in {
-          val request = addTokenWithSessionParam(FakeRequest())("originalPsrNumber" -> "123456")
+      "contains FRN" when {
+        "the user has answered yes and supplied an FRN" in {
+          val request = addTokenWithSessionParam(FakeRequest())("originalFrn" -> "123456")
 
           val bm = BusinessMatching(
             reviewDetails = Some(reviewDetailsModel),
             companyRegistrationNumber = Some(companyRegistrationNumberModel),
             activities = Some(businessActivitiesModel),
             msbServices = Some(msbServices),
-            businessAppliedForPSRNumber = Some(businessAppliedForPSRNumberModel)
+            businessAppliedForFrn = Some(businessAppliedForFrnModel)
           )
 
           val rows = cyaHelper
@@ -464,19 +464,19 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             )(messages, request)
             .rows
 
-          val hasPsrNumberRow = rows.lift(hasPsrNumberIndex).getOrElse(failIfEmpty)
-          val psrNumberRow    = rows.lift(psrNumberIndex).getOrElse(failIfEmpty)
+          val hasFrnRow = rows.lift(hasFrnIndex).getOrElse(failIfEmpty)
+          val frnRow    = rows.lift(frnIndex).getOrElse(failIfEmpty)
 
-          hasPsrNumberRow.key.toString   must include(messages("businessmatching.psr.number.title"))
-          hasPsrNumberRow.value.toString must include(messages("lbl.yes"))
+          hasFrnRow.key.toString   must include(messages("businessmatching.frn.title"))
+          hasFrnRow.value.toString must include(messages("lbl.yes"))
 
-          psrNumberRow.key.toString   must include(messages("businessmatching.psr.number.cya.title"))
-          psrNumberRow.value.toString must include("123456")
+          frnRow.key.toString   must include(messages("businessmatching.frn.number.cya.title"))
+          frnRow.value.toString must include("123456")
 
           checkChangeLink(
-            psrNumberRow,
-            controllers.businessmatching.routes.PSRNumberController.get(true).url,
-            "edit-psr-number"
+            frnRow,
+            controllers.businessmatching.routes.FrnNumberController.get(true).url,
+            "edit-frn"
           )
         }
       }
@@ -572,7 +572,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         }
       }
 
-      "attempting to render PSR number" which {
+      "attempting to render FRN" which {
 
         "is caused by NOT selecting 'Transmitting Money' in MSB services" in {
 
@@ -589,8 +589,8 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
             )
             .rows
 
-          result.lift(hasPsrNumberIndex) mustBe None
-          result.lift(psrNumberIndex) mustBe None
+          result.lift(hasFrnIndex) mustBe None
+          result.lift(frnIndex) mustBe None
         }
 
         "is caused by the user answering 'No'" in {
@@ -602,15 +602,15 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
                 companyRegistrationNumber = Some(companyRegistrationNumberModel),
                 activities = Some(businessActivitiesModel),
                 msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-                businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)
+                businessAppliedForFrn = Some(BusinessAppliedForFrnNo)
               ),
               isPreSubmission = true,
               isPending = false
             )
             .rows
 
-          result.lift(hasPsrNumberIndex) mustBe None
-          result.lift(psrNumberIndex) mustBe None
+          result.lift(hasFrnIndex) mustBe None
+          result.lift(frnIndex) mustBe None
         }
       }
     }
@@ -620,11 +620,11 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
     "return the logout link" when {
 
-      "application is in pre-submission and 'No' for PSR number is answered" in {
+      "application is in pre-submission and 'No' for FRN is answered" in {
 
         val result = cyaHelper
           .getSubmitButton(
-            Some(BusinessAppliedForPSRNumberNo),
+            Some(BusinessAppliedForFrnNo),
             isPreSubmission = true,
             preAppCompleted = false
           )
@@ -644,7 +644,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           val result = cyaHelper
             .getSubmitButton(
-              Some(businessAppliedForPSRNumberModel),
+              Some(businessAppliedForFrnModel),
               isPreSubmission = true,
               preAppCompleted = true
             )
@@ -671,7 +671,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
 
           val result = cyaHelper
             .getSubmitButton(
-              Some(businessAppliedForPSRNumberModel),
+              Some(businessAppliedForFrnModel),
               isPreSubmission = true,
               preAppCompleted = false
             )

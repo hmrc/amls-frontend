@@ -16,9 +16,10 @@
 
 package services.flowmanagement.pagerouters.addflow
 
-import controllers.routes
+import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.AddBusinessTypeFlowModel
+import models.businessmatching.{BusinessAppliedForFrnNo, BusinessAppliedForFrnYes}
+import models.flowmanagement.{AddBusinessTypeFlowModel, FrnPageId}
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.StatusService
@@ -29,12 +30,19 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NoPSRPageRouter @Inject() (val statusService: StatusService, val businessMatchingService: BusinessMatchingService)
-    extends PageRouter[AddBusinessTypeFlowModel] {
+class BusinessAppliedForFrnPageRouter @Inject()(
+  val statusService: StatusService,
+  val businessMatchingService: BusinessMatchingService
+) extends PageRouter[AddBusinessTypeFlowModel] {
 
   override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)(implicit
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Result] =
-    Future.successful(Redirect(routes.RegistrationProgressController.get()))
+    (edit, model.businessAppliedForFrn) match {
+      case (_, Some(BusinessAppliedForFrnYes(_))) =>
+        Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
+      case (_, Some(BusinessAppliedForFrnNo))     => Future.successful(Redirect(addRoutes.NoFrnController.get()))
+      case (_, None)                                    => Future.successful(error(FrnPageId))
+    }
 }
