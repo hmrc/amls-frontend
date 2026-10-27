@@ -40,40 +40,17 @@
     @formHelper(action = controllers.tradingpremises.routes.AgentCompanyDetailsController.post(index, edit)) {
 
         @heading("tradingpremises.youragent.company.details.title")
-
         @inputText(
             Input(
                 id = "agentCompanyName",
-                name = "agentCompanyName",
-                label = Label(
-                    content = Text(messages("tradingpremises.youragent.company.name"))
-                ),
-                hint = Some(Hint(
+                name = "agentCompanyName",hint = Some(Hint(
                     content = Text(messages("tradingpremises.agentcompanyname.lbl.hint"))
                 )),
                 classes = "govuk-!-width-full"
             ),
             form("agentCompanyName")
         )
-
-        @inputText(
-            Input(
-                id = "companyRegistrationNumber",
-                name = "companyRegistrationNumber",
-                inputmode = Some("numeric"),
-                label = Label(
-                    content = Text(messages("tradingpremises.youragent.crn"))
-                ),
-                hint = Some(Hint(
-                    content = Text(messages("tradingpremises.youragent.crn.hint"))
-                )),
-                classes = "govuk-!-width-one-quarter"
-            ),
-            form("companyRegistrationNumber")
-        )
-
         @button()
-
         @returnLink(true)
     }
 }

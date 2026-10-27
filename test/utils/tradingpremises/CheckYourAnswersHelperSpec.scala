@@ -264,7 +264,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
           assertRowMatches(
             2,
-            "tradingpremises.youragent.company.name",
+            "tradingpremises.youragent.cya.company",
             agentCompanyName,
             controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).url,
             "tradingpremisesagentcompanyname-edit"
@@ -280,9 +280,9 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
         assertRowMatches(
           3,
-          "tradingpremises.youragent.crn",
+          "tradingpremises.youragent.cya.company.registration",
           agentCompanyRegNumber,
-          controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).url,
+          controllers.tradingpremises.routes.AgentCRNController.get(index, true).url,
           "tradingpremisesyouragentcrn-edit"
         )
       }

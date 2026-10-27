@@ -39,7 +39,7 @@ class AgentCompanyDetailsViewSpec extends AmlsViewSpec with Matchers {
   "AgentCompanyDetailsView" must {
     "have correct title" in new ViewFixture {
 
-      def view = agent_company_details(fp().fill(AgentCompanyDetails("A Name", Some("QWER1234"))), 0, false)
+      def view = agent_company_details(fp().fill(String("A Name")), 0, false)
 
       doc.title() must startWith(
         messages("tradingpremises.youragent.company.details.title") + " - " + messages("summary.tradingpremises")
@@ -63,16 +63,6 @@ class AgentCompanyDetailsViewSpec extends AmlsViewSpec with Matchers {
       ),
       "agentCompanyName",
       "error.invalid.char.tp.agent.company.details"
-    )
-
-    behave like pageWithErrors(
-      agent_company_details(
-        fp().withError("companyRegistrationNumber", "error.char.to.agent.company.reg.number"),
-        0,
-        false
-      ),
-      "companyRegistrationNumber",
-      "error.char.to.agent.company.reg.number"
     )
 
     behave like pageWithBackLink(agent_company_details(fp(), 1, true))
