@@ -189,41 +189,6 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
         }
       }
 
-      /*"set the hasChanged flag to true" in new Fixture {
-
-        val newRequest = FakeRequest(POST, routes.AgentCompanyDetailsController.post(1).url)
-          .withFormUrlEncodedBody("agentCompanyName" -> "text")
-
-        when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-          .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
-
-        when(controller.dataCacheConnector.fetchAll(any()))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-
-        when(controller.dataCacheConnector.save(any(), any(), any())(any()))
-          .thenReturn(Future.successful(mockCacheMap))
-
-        val result = controller.post(1)(newRequest)
-
-        status(result)           must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.AgentCRNController.get(1, false).url))
-
-        verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
-          any(),
-          any(),
-          meq(
-            Seq(
-              tradingPremisesWithHasChangedFalse.copy(
-                hasChanged = true,
-                agentName = None,
-                agentCompanyDetails = None,
-                agentPartnership = None
-              ),
-              TradingPremises()
-            )
-          )
-        )(any())
-      }*/
     }
   }
 
