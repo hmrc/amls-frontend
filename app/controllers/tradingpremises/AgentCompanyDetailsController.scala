@@ -43,50 +43,69 @@ class AgentCompanyDetailsController @Inject() (
 
   def get(index: Int, edit: Boolean = false): Action[AnyContent] =
     authAction.async { implicit request =>
-      getData[TradingPremises](request.credId, index) map {
+      getData[TradingPremises](request.credId, index).map {
         case Some(tp) =>
           val form = tp.agentCompanyDetails match {
-            case Some(data) => formProvider().fill(data)
-            case None       => formProvider()
+            case Some(details) =>
+              formProvider().fill(details.agentCompanyName)
+
+            case None =>
+              formProvider()
           }
+
           Ok(view(form, index, edit))
-        case None     => NotFound(notFoundView)
+
+        case None =>
+          NotFound(notFoundView)
       }
     }
 
-  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
-    formProvider()
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, index, edit))),
-        data =>
-          {
-            for {
-              result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_, tp) =>
-                          TradingPremises(
-                            tp.registeringAgentPremises,
-                            tp.yourTradingPremises,
-                            tp.businessStructure,
-                            None,
-                            Some(data),
-                            None,
-                            tp.whatDoesYourBusinessDoAtThisAddress,
-                            tp.msbServices,
-                            true,
-                            tp.lineId,
-                            tp.status,
-                            tp.endDate
-                          )
-                        }
-            } yield
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] =
+    authAction.async { implicit request =>
+      formProvider()
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              BadRequest(view(formWithErrors, index, edit))
+            ),
+          companyName =>
+            fetchAllAndUpdateStrict[TradingPremises](
+              request.credId,
+              index
+            ) { (_, tp) =>
+
+              val updatedAgentCompanyDetails =
+                tp.agentCompanyDetails match {
+                  case Some(existingDetails) =>
+                    existingDetails.copy(
+                      agentCompanyName = companyName
+                    )
+
+                  case None =>
+                    AgentCompanyDetails(
+                      agentCompanyName = companyName,
+                      companyRegistrationNumber = None
+                    )
+                }
+
+              tp.copy(
+                agentCompanyDetails = Some(updatedAgentCompanyDetails)
+              )
+            }.map { result =>
               if (edit) {
-                Redirect(routes.CheckYourAnswersController.get(index))
+                Redirect(
+                  routes.CheckYourAnswersController.get(index)
+                )
               } else {
-                TPControllerHelper.redirectToNextPage(result, index, edit)
+                Redirect(
+                  routes.AgentCRNController
+                    .get(index, edit = false)
+                )
               }
-          }.recoverWith { case _: IndexOutOfBoundsException =>
-            Future.successful(NotFound(notFoundView))
-          }
-      )
-  }
+            }.recover { case _: IndexOutOfBoundsException =>
+              NotFound(notFoundView)
+            }
+        )
+    }
 }

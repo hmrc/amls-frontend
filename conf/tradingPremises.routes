@@ -20,6 +20,9 @@ POST        /premises/date-of-change/:index                          @controller
 GET         /agent-company-details/:index                            @controllers.tradingpremises.AgentCompanyDetailsController.get(index: Int, edit: Boolean ?= false)
 POST        /agent-company-details/:index                            @controllers.tradingpremises.AgentCompanyDetailsController.post(index: Int, edit: Boolean ?= false)
 
+GET         /agent-crn/:index                                        @controllers.tradingpremises.AgentCRNController.get(index: Int, edit: Boolean ?= false)
+POST        /agent-crn/:index                                        @controllers.tradingpremises.AgentCRNController.post(index: Int, edit: Boolean ?= false)
+
 GET         /agent-details/:index                                    @controllers.tradingpremises.AgentNameController.get(index: Int, edit: Boolean ?= false)
 POST        /agent-details/:index                                    @controllers.tradingpremises.AgentNameController.post(index: Int, edit: Boolean ?= false)
 GET         /agent-details/date-of-change/:index                     @controllers.tradingpremises.AgentNameController.dateOfChange(index: Int)

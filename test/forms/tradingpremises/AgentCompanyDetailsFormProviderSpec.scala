@@ -24,7 +24,7 @@ import play.api.data.{Form, FormError}
 class AgentCompanyDetailsFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   val formProvider: AgentCompanyDetailsFormProvider = new AgentCompanyDetailsFormProvider()
-  val form: Form[AgentCompanyDetails]               = formProvider()
+  val form: Form[String]                            = formProvider()
 
   val companyNameFieldName   = "agentCompanyName"
   val companyNumberFieldName = "companyRegistrationNumber"
@@ -68,7 +68,7 @@ class AgentCompanyDetailsFormProviderSpec extends StringFieldBehaviours with Con
       }
     }
 
-    s"$companyNumberFieldName is validated" must {
+    /*s"$companyNumberFieldName is validated" must {
 
       behave like fieldThatBindsValidData(
         form,
@@ -117,6 +117,6 @@ class AgentCompanyDetailsFormProviderSpec extends StringFieldBehaviours with Con
           )
         }
       }
-    }
+    }*/
   }
 }

@@ -81,10 +81,20 @@ case class NotificationRow(
   }
 
   def asTableRows(id: String, index: Int)(implicit messages: Messages): Seq[TableRow] = {
+    val rowClass        = if (!isRead) {
+      "govuk-!-font-weight-bold govuk-!-width-one-third"
+    } else {
+      "govuk-!-width-one-third"
+    }
+    val unreadIndicator =
+      if (!isRead)
+        HtmlContent("""<span class="notification-unread-dot"></span>""")
+      else
+        HtmlContent("")
 
     val link =
       s"""
-         |<a id="hyper-link-$id-$index" class="govuk-link"
+         |<a id="hyper-link-$id-$index" class="govuk-link $rowClass"
          |href="${controllers.routes.NotificationController.messageDetails(
           _id.id,
           utils.ContactTypeHelper.getContactType(
@@ -100,9 +110,10 @@ case class NotificationRow(
          |</a>
          |""".stripMargin
 
-    val rowClass = "govuk-!-width-one-third"
-
     Seq(
+      TableRow(
+        unreadIndicator
+      ),
       TableRow(
         HtmlContent(link)
       ),

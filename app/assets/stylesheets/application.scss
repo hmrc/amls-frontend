@@ -51,3 +51,13 @@ div.currencies-autocomplete-wrapper > div.govuk-form-group > div > div.autocompl
         border-right: 20px solid white;
     }
 }
+
+.notification-unread-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background-color: #d4351c;
+  vertical-align: middle;
+}

@@ -95,7 +95,7 @@ class CheckYourAnswersHelper @Inject() () {
   ): Option[SummaryListRow] =
     tradingPremises.agentCompanyDetails.map { details =>
       row(
-        "tradingpremises.youragent.company.name",
+        "tradingpremises.youragent.cya.company",
         details.agentCompanyName,
         editAction(
           controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).url,
@@ -154,10 +154,10 @@ class CheckYourAnswersHelper @Inject() () {
       details   <- tradingPremises.agentCompanyDetails
       regNumber <- details.companyRegistrationNumber
     } yield row(
-      "tradingpremises.youragent.crn",
+      "tradingpremises.youragent.cya.company.registration",
       regNumber,
       editAction(
-        controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).url,
+        controllers.tradingpremises.routes.AgentCRNController.get(index, true).url,
         "tradingpremises.checkYourAnswers.change.agentCompDtls",
         "tradingpremisesyouragentcrn-edit"
       )

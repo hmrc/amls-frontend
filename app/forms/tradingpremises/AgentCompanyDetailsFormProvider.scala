@@ -19,7 +19,7 @@ package forms.tradingpremises
 import forms.mappings.Mappings
 import models.tradingpremises.AgentCompanyDetails
 import play.api.data.Form
-import play.api.data.Forms.mapping
+import play.api.data.Forms.{mapping, single}
 
 import javax.inject.Inject
 
@@ -28,22 +28,24 @@ class AgentCompanyDetailsFormProvider @Inject() () extends Mappings {
   val companyNameLength   = 140
   val companyNumberLength = 8
 
-  val crnNumberRegex                     = "^[A-Z0-9]{8}$"
-  def apply(): Form[AgentCompanyDetails] = Form[AgentCompanyDetails](
-    mapping(
-      "agentCompanyName"          -> text("error.required.tp.agent.company.details").verifying(
-        firstError(
-          maxLength(companyNameLength, "error.invalid.tp.agent.company.details"),
-          regexp(basicPunctuationRegex, "error.invalid.char.tp.agent.company.details")
-        )
-      ),
-      "companyRegistrationNumber" -> text("error.required.to.agent.company.reg.number").verifying(
-        firstError(
-          minLength(companyNumberLength, "error.size.to.agent.company.reg.number"),
-          maxLength(companyNumberLength, "error.size.to.agent.company.reg.number"),
-          regexp(crnNumberRegex, "error.char.to.agent.company.reg.number")
-        )
+  val crnNumberRegex        = "^[A-Z0-9]{8}$"
+  def apply(): Form[String] =
+    Form(
+      single(
+        "agentCompanyName" ->
+          text("error.required.tp.agent.company.details")
+            .verifying(
+              firstError(
+                maxLength(
+                  companyNameLength,
+                  "error.invalid.tp.agent.company.details"
+                ),
+                regexp(
+                  basicPunctuationRegex,
+                  "error.invalid.char.tp.agent.company.details"
+                )
+              )
+            )
       )
-    )(AgentCompanyDetails.apply)(x => x.companyRegistrationNumber.map(y => (x.agentCompanyName, y)))
-  )
+    )
 }

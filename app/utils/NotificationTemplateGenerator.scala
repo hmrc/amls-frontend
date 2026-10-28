@@ -26,9 +26,9 @@ import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl, MessagesProvide
 import play.api.mvc.Request
 import play.twirl.api.{Html, Template5}
 import uk.gov.hmrc.govukfrontend.views.Aliases.Table
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.HeadCell
-import views.notifications._
+import views.notifications.*
 
 import javax.inject.{Inject, Singleton}
 
@@ -132,6 +132,7 @@ class NotificationTemplateGenerator @Inject() (
 
   def toTable(rowsWithIndex: Seq[(NotificationRow, Int)], id: String, isPrevRegistration: Boolean): Table = {
     val tableHeader = Seq(
+      HeadCell(HtmlContent("")),
       headCell("subject", isPrevRegistration),
       headCell("category", isPrevRegistration),
       headCell("date", isPrevRegistration)
