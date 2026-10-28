@@ -110,8 +110,6 @@ case class NotificationRow(
          |</a>
          |""".stripMargin
 
-    // val rowClass = "govuk-!-width-one-third"
-
     Seq(
       TableRow(
         unreadIndicator
