@@ -43,7 +43,12 @@
         @inputText(
             Input(
                 id = "agentCompanyName",
-                name = "agentCompanyName",hint = Some(Hint(
+                name = "agentCompanyName",
+                label = Label(
+                content = Text(messages("tradingpremises.youragent.company.name")),
+                classes = "govuk-visually-hidden"
+                 ),
+                hint = Some(Hint(
                     content = Text(messages("tradingpremises.agentcompanyname.lbl.hint"))
                 )),
                 classes = "govuk-!-width-full"
