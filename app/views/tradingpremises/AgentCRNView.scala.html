@@ -58,6 +58,10 @@
                 id = "companyRegistrationNumber",
                 name = "companyRegistrationNumber",
                 inputmode = Some("numeric"),
+                label = Label(
+                 content = Text(messages("tradingpremises.youragent.crn")),
+                 classes = "govuk-visually-hidden"
+                ),
                 hint = Some(Hint(
                     content = Text(messages("tradingpremises.youragent.crn.hint"))
                 )),
