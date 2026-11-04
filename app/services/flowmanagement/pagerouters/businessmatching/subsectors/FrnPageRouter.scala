@@ -17,33 +17,49 @@
 package services.flowmanagement.pagerouters.businessmatching.subsectors
 
 import controllers.businessmatching.routes
-import models.flowmanagement.ChangeSubSectorFlowModel
+import models.businessmatching.BusinessAppliedForFrnYes
+import models.flowmanagement.{ChangeSubSectorFlowModel, FrnPageId}
 import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import services.flowmanagement.{PageRouter, PageRouterCompanyNotRegistered}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class NoPsrNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
+class FrnPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
 
   override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)(implicit
     hc: HeaderCarrier,
     ec: ExecutionContext
-  ): Future[Result] =
-    routes.SummaryController.get()
+  ): Future[Result] = {
+    val call = model.Frn map {
+      case BusinessAppliedForFrnYes(_) => routes.SummaryController.get()
+      case _                           => routes.NoFrnController.get
+    }
 
+    call.fold(error(FrnPageId))(Redirect)
+  }
 }
-class NoPsrNumberPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[ChangeSubSectorFlowModel] {
+class FrnPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[ChangeSubSectorFlowModel] {
 
   override def getRoute(
     credId: String,
     model: ChangeSubSectorFlowModel,
     edit: Boolean,
     includeCompanyNotRegistered: Boolean
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
-    if (includeCompanyNotRegistered) {
-      routes.CheckCompanyController.get()
-    } else {
-      routes.SummaryController.get()
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+    val call = model.Frn map {
+      case BusinessAppliedForFrnYes(regNumber) =>
+        if (regNumber.length == 7) {
+          routes.FrnNeedMoreInfoController.get()
+        } else if (regNumber.length == 6 && includeCompanyNotRegistered) {
+          routes.CheckCompanyController.get()
+        } else {
+          routes.SummaryController.get()
+        }
+      case _                                   => routes.NoFrnController.get
     }
+
+    call.fold(error(FrnPageId))(Redirect)
+  }
 }

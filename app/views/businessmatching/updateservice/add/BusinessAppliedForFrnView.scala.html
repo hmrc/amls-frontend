@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
 @import config.ApplicationConfig
-@import models.businessmatching.BusinessAppliedForPSRNumber
+@import models.businessmatching.BusinessAppliedForFrn
 @import components.{SectionSubtitle, Button, Heading}
 @import components.forms.{InputText, InputYesNo, ErrorSummary}
 @import views.ViewUtils._
@@ -42,7 +42,7 @@
         input = Input(
             label = Label(
                 isPageHeading = false,
-                content = Text(messages("businessmatching.updateservice.psr.number.lbl")),
+                content = Text(messages("businessmatching.updateservice.frn.number.lbl")),
                 classes = "govuk-label"
             ),
             hint = None,
@@ -57,26 +57,26 @@
 
 @supportingContent = {
 <div>
-    <p class="govuk-hint">@messages("businessmatching.psr.number.hint")</p>
-    <p class="govuk-hint">@messages("businessmatching.psr.number.hint2")</p>
+    <p class="govuk-hint">@messages("businessmatching.frn.hint")</p>
+    <p class="govuk-hint">@messages("businessmatching.frn.hint2")</p>
 </div>
 }
 
 @layout(
-    pageTitle = messages("businessmatching.psr.number.title") + " - " + messages("summary.updateservice")
+    pageTitle = messages("businessmatching.frn.title") + " - " + messages("summary.updateservice")
 )  {
 
-    @formHelper(action = controllers.businessmatching.updateservice.add.routes.BusinessAppliedForPSRNumberController.post(edit)) {
+    @formHelper(action = controllers.businessmatching.updateservice.add.routes.BusinessAppliedForFrnController.post(edit)) {
 
         @errorSummary(form)
 
         @subtitle("summary.updateservice")
 
-        @heading("businessmatching.psr.number.title")
+        @heading("businessmatching.frn.title")
 
         @warningText(
             WarningText(
-                content = Text(messages("businessmatching.psr.warning"))
+                content = Text(messages("businessmatching.frn.warning"))
             )
         )
 
@@ -87,12 +87,12 @@
                         content = HtmlContent(supportingContent))
                     ),
                 name = "appliedFor",
-                items = BusinessAppliedForPSRNumber.formValues(conditionalInput)
+                items = BusinessAppliedForFrn.formValues(conditionalInput)
                 )
             .withFormField(form("appliedFor"))
         )
 
-        @button("button.continue", "appliedspsr-submit")
+        @button("button.continue", "appliedsFrn-submit")
     }
 
 }

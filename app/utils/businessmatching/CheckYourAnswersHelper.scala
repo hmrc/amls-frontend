@@ -42,23 +42,23 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
         registeredServices(businessMatching, isPreSubmission, isPending),
         moneyServiceBusinessActivities(businessMatching, isPending)
       ).flatten ++
-        psrRegistrationNumber(businessMatching).getOrElse(Seq.empty[SummaryListRow])
+        withFrn(businessMatching).getOrElse(Seq.empty[SummaryListRow])
     )
 
   def getSubmitButton(
-    appliedForPSRNumberOpt: Option[BusinessAppliedForPSRNumber],
-    isPreSubmission: Boolean,
-    preAppCompleted: Boolean
+                       appliedForFrnOpt: Option[BusinessAppliedForFrn],
+                       isPreSubmission: Boolean,
+                       preAppCompleted: Boolean
   )(implicit messages: Messages): Option[Html] =
     if (isPreSubmission) {
-      appliedForPSRNumberOpt map {
-        case BusinessAppliedForPSRNumberYes(psrNumber) =>
+      appliedForFrnOpt map {
+        case BusinessAppliedForFrnYes(frn) =>
           if (preAppCompleted) {
             button("businessmatching.summary.noedit.anchortext")
           } else {
             button("businessmatching.button.confirm.start")
           }
-        case BusinessAppliedForPSRNumberNo             =>
+        case BusinessAppliedForFrnNo             =>
           button(
             "button.logout",
             "logout",
@@ -227,34 +227,34 @@ class CheckYourAnswersHelper @Inject() (button: SubmissionButton, appConfig: App
 
   }.flatten
 
-  private def psrRegistrationNumber(
+  private def withFrn(
     businessMatching: BusinessMatching
   )(implicit messages: Messages, request: Request[_]): Option[Seq[SummaryListRow]] = {
     for {
       businessMatchingMsbServices <- businessMatching.msbServices
       isTransmittingMoney          = businessMatchingMsbServices.msbServices.contains(TransmittingMoney)
-      appliedForPSRNumber         <- businessMatching.businessAppliedForPSRNumber
+      appliedForFrn         <- businessMatching.businessAppliedForFrn
     } yield
       if (isTransmittingMoney) {
-        appliedForPSRNumber match {
-          case BusinessAppliedForPSRNumberYes(psrNumber) =>
+        appliedForFrn match {
+          case BusinessAppliedForFrnYes(frn) =>
             Some(
               Seq(
                 SummaryListRow(
-                  Key(Text(messages("businessmatching.psr.number.title"))),
+                  Key(Text(messages("businessmatching.frn.title"))),
                   Value(Text(messages("lbl.yes")))
                 ),
                 SummaryListRow(
-                  Key(Text(messages("businessmatching.psr.number.cya.title"))),
-                  Value(Text(psrNumber)),
+                  Key(Text(messages("businessmatching.frn.number.cya.title"))),
+                  Value(Text(frn)),
                   actions = Some(
                     Actions(
                       items = Seq(
                         ActionItem(
-                          href = controllers.businessmatching.routes.PSRNumberController.get(true).url,
+                          href = controllers.businessmatching.routes.FrnNumberController.get(true).url,
                           content = Text(messages("button.edit")),
-                          visuallyHiddenText = Some(messages("businessmatching.checkYourAnswers.change.PSRReg")),
-                          attributes = Map("id" -> "edit-psr-number")
+                          visuallyHiddenText = Some(messages("businessmatching.checkYourAnswers.change.FrnReg")),
+                          attributes = Map("id" -> "edit-frn")
                         )
                       )
                     )

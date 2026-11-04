@@ -39,16 +39,16 @@ class AddBusinessTypeFlowModelSpec extends PlaySpec {
       }
     }
 
-    "businessAppliedForPSRNumber setter" must {
+    "businessAppliedForFrn setter" must {
       "set hasAccepted to true when value matches existing" in {
-        val psr   = BusinessAppliedForPSRNumberYes("123456")
-        val model = AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(psr), hasAccepted = true)
-        model.businessAppliedForPSRNumber(psr).hasAccepted mustBe true
+        val frn   = BusinessAppliedForFrnYes("123456")
+        val model = AddBusinessTypeFlowModel(businessAppliedForFrn = Some(frn), hasAccepted = true)
+        model.withBusinessAppliedForFrn(frn).hasAccepted mustBe true
       }
 
       "set hasAccepted to false when value does not match" in {
         val model = AddBusinessTypeFlowModel(hasAccepted = true)
-        model.businessAppliedForPSRNumber(BusinessAppliedForPSRNumberNo).hasAccepted mustBe false
+        model.withBusinessAppliedForFrn(BusinessAppliedForFrnNo).hasAccepted mustBe false
       }
     }
 
@@ -64,28 +64,28 @@ class AddBusinessTypeFlowModelSpec extends PlaySpec {
         model.msbServices(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))).hasAccepted mustBe false
       }
 
-      "retain businessAppliedForPSRNumber when TransmittingMoney is in new subSectors" in {
-        val psr      = BusinessAppliedForPSRNumberYes("123456")
+      "retain businessAppliedForFrn when TransmittingMoney is in new subSectors" in {
+        val frn      = BusinessAppliedForFrnYes("123456")
         val services = BusinessMatchingMsbServices(Set(TransmittingMoney))
-        val model    = AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(psr))
-        model.msbServices(services).businessAppliedForPSRNumber mustBe Some(psr)
+        val model    = AddBusinessTypeFlowModel(businessAppliedForFrn = Some(frn))
+        model.msbServices(services).businessAppliedForFrn mustBe Some(frn)
       }
 
-      "clear businessAppliedForPSRNumber when TransmittingMoney is not in new subSectors" in {
-        val psr      = BusinessAppliedForPSRNumberYes("123456")
+      "clear businessAppliedForFrn when TransmittingMoney is not in new subSectors" in {
+        val frn      = BusinessAppliedForFrnYes("123456")
         val services = BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))
-        val model    = AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(psr))
-        model.msbServices(services).businessAppliedForPSRNumber mustBe None
+        val model    = AddBusinessTypeFlowModel(businessAppliedForFrn = Some(frn))
+        model.msbServices(services).businessAppliedForFrn mustBe None
       }
     }
 
     "isComplete" must {
-      "return true for MoneyServiceBusiness with PSR number, addMoreActivities and hasAccepted" in {
+      "return true for MoneyServiceBusiness with FRN, addMoreActivities and hasAccepted" in {
         val model = AddBusinessTypeFlowModel(
           activity = Some(MoneyServiceBusiness),
           addMoreActivities = Some(true),
           hasAccepted = true,
-          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123456"))
+          businessAppliedForFrn = Some(BusinessAppliedForFrnYes("123456"))
         )
         model.isComplete mustBe true
       }

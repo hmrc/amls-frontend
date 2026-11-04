@@ -20,12 +20,12 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
-import forms.businessmatching.PSRNumberFormProvider
+import forms.businessmatching.FrnFormProvider
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
+import models.flowmanagement.{ChangeSubSectorFlowModel, FrnPageId}
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.status.NotCompleted
 import org.jsoup.Jsoup
@@ -39,17 +39,17 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.cache.Cache
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.PsrNumberView
+import views.html.businessmatching.FrnNumberView
 
 import scala.concurrent.Future
 
-class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BusinessMatchingGenerator {
+class FrnNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BusinessMatchingGenerator {
 
   trait Fixture extends DependencyMocks { self =>
 
     val request    = addToken(authRequest)
-    lazy val view  = app.injector.instanceOf[PsrNumberView]
-    val controller = new PSRNumberController(
+    lazy val view  = app.injector.instanceOf[FrnNumberView]
+    val controller = new FrnNumberController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockCacheConnector,
@@ -58,8 +58,8 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
       createRouter2[ChangeSubSectorFlowModel],
       mock[ChangeSubSectorHelper],
       cc = mockMcc,
-      formProvider = app.injector.instanceOf[PSRNumberFormProvider],
-      psr_number = view
+      formProvider = app.injector.instanceOf[FrnFormProvider],
+      view = view
     )
 
     when {
@@ -83,12 +83,12 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
     val emptyCache = Cache.empty
   }
 
-  "BusinessAppliedForPSRNumberController" when {
+  "BusinessAppliedForFrnController" when {
 
     "get is called" must {
-      "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?'" in new Fixture {
+      "on get display the page 'business applied for a Firm Reference Number (FRN)'" in new Fixture {
         val model = BusinessMatching(
-          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("1"))
+          businessAppliedForFrn = Some(BusinessAppliedForFrnYes("1"))
         )
 
         when {
@@ -99,16 +99,16 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
         status(result) mustBe OK
       }
 
-      "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?' with pre populated data" in new Fixture {
+      "on get display the page 'business applied for a Firm Reference Number (FRN)' with pre populated data" in new Fixture {
         override val businessMatching = BusinessMatching(
-          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("700000"))
+          businessAppliedForFrn = Some(BusinessAppliedForFrnYes("700000"))
         )
 
         when {
           controller.businessMatchingService.getModel(any())
         } thenReturn OptionT.liftF(Future.successful(businessMatching))
 
-        val result = controller.get()(FakeRequest().withSession("originalPsrNumber" -> "1234567"))
+        val result = controller.get()(FakeRequest().withSession("originalFrn" -> "1234567"))
         status(result) mustBe OK
 
         val document = Jsoup.parse(contentAsString(result))
@@ -128,7 +128,7 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
             controller.helper.updateSubSectors(any(), any())(any())
           } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
-          val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+          val newRequest = FakeRequest(POST, routes.FrnNumberController.post().url)
             .withFormUrlEncodedBody(
               "appliedFor" -> "true",
               "regNumber"  -> "123789"
@@ -145,8 +145,8 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
           controller.router.verify(
             "internalId",
-            PsrNumberPageId,
-            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberYes("123789")))
+            FrnPageId,
+            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnYes("123789")))
           )
         }
 
@@ -159,7 +159,7 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
           mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)
 
-          val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+          val newRequest = FakeRequest(POST, routes.FrnNumberController.post().url)
             .withFormUrlEncodedBody("appliedFor" -> "false")
 
           val result = controller.post(true)(newRequest)
@@ -167,14 +167,14 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           status(result) mustBe SEE_OTHER
           controller.router.verify(
             "internalId",
-            PsrNumberPageId,
-            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberNo)),
+            FrnPageId,
+            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnNo)),
             edit = true
           )
         }
 
         "respond with BAD_REQUEST when given invalid data" in new Fixture {
-          val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+          val newRequest = FakeRequest(POST, routes.FrnNumberController.post().url)
             .withFormUrlEncodedBody(
               "appliedFor" -> "true",
               "regNumber"  -> ""
@@ -188,40 +188,7 @@ class PSRNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           status(result) mustBe BAD_REQUEST
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.text() must include(messages("error.invalid.msb.psr.number"))
-        }
-
-        "transform a 7-digit PSR number to 700000 when submitting the form" in new Fixture {
-          val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
-
-          when {
-            controller.helper.getOrCreateFlowModel(any())(any())
-          } thenReturn Future.successful(flowModel)
-
-          when {
-            controller.helper.updateSubSectors(any(), any())(any())
-          } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
-
-          mockCacheUpdate[ChangeSubSectorFlowModel](
-            Some(ChangeSubSectorFlowModel.key),
-            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
-          )
-
-          val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
-            .withFormUrlEncodedBody(
-              "appliedFor" -> "true",
-              "regNumber"  -> "1234567"
-            )
-
-          val result = controller.post()(newRequest)
-
-          status(result) mustBe SEE_OTHER
-
-          controller.router.verify(
-            "internalId",
-            PsrNumberPageId,
-            ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberYes("700000")))
-          )
+          document.text() must include(messages("error.invalid.msb.frn"))
         }
       }
     }

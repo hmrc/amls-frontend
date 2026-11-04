@@ -23,12 +23,12 @@ import play.api.i18n.Messages
 import play.api.libs.json.{Json, OFormat}
 
 case class AddBusinessTypeFlowModel(
-  activity: Option[BusinessActivity] = None,
-  addMoreActivities: Option[Boolean] = None,
-  hasChanged: Boolean = false,
-  hasAccepted: Boolean = false,
-  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
-  subSectors: Option[BusinessMatchingMsbServices] = None
+                                     activity: Option[BusinessActivity] = None,
+                                     addMoreActivities: Option[Boolean] = None,
+                                     hasChanged: Boolean = false,
+                                     hasAccepted: Boolean = false,
+                                     businessAppliedForFrn: Option[BusinessAppliedForFrn] = None,
+                                     subSectors: Option[BusinessMatchingMsbServices] = None
 ) {
 
   def activity(p: BusinessActivity): AddBusinessTypeFlowModel =
@@ -38,24 +38,24 @@ case class AddBusinessTypeFlowModel(
       hasAccepted = hasAccepted && this.activity.contains(p)
     )
 
-  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): AddBusinessTypeFlowModel =
+  def withBusinessAppliedForFrn(p: BusinessAppliedForFrn): AddBusinessTypeFlowModel =
     this.copy(
-      businessAppliedForPSRNumber = Some(p),
-      hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p),
-      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.contains(p)
+      businessAppliedForFrn = Some(p),
+      hasChanged = hasChanged || !this.businessAppliedForFrn.contains(p),
+      hasAccepted = hasAccepted && this.businessAppliedForFrn.contains(p)
     )
 
   def msbServices(p: BusinessMatchingMsbServices): AddBusinessTypeFlowModel = {
-    val businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] =
+    val businessAppliedForFrn: Option[BusinessAppliedForFrn] =
       if (p.msbServices.contains(TransmittingMoney)) {
-        this.businessAppliedForPSRNumber
+        this.businessAppliedForFrn
       } else {
         None
       }
 
     this.copy(
       subSectors = Some(p),
-      businessAppliedForPSRNumber = businessAppliedForPSRNumber,
+      businessAppliedForFrn = businessAppliedForFrn,
       hasChanged = hasChanged || !this.subSectors.contains(p),
       hasAccepted = hasAccepted && this.subSectors.contains(p)
     )

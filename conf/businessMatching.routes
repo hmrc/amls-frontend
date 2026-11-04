@@ -16,8 +16,8 @@ POST        /registration-number                                    @controllers
 GET         /money-service-business-activities                      @controllers.businessmatching.MsbSubSectorsController.get(edit: Boolean ?= false)
 POST        /money-service-business-activities                      @controllers.businessmatching.MsbSubSectorsController.post(edit: Boolean ?= false , includeCompanyNotRegistered: Boolean ?= false)
 
-GET         /psr-registration-number                                @controllers.businessmatching.PSRNumberController.get(edit: Boolean ?= false)
-POST        /psr-registration-number                                @controllers.businessmatching.PSRNumberController.post(edit: Boolean ?= false , includeCompanyNotRegistered: Boolean ?= false)
+GET         /frn-registration-number                                @controllers.businessmatching.FrnNumberController.get(edit: Boolean ?= false)
+POST        /frn-registration-number                                @controllers.businessmatching.FrnNumberController.post(edit: Boolean ?= false , includeCompanyNotRegistered: Boolean ?= false)
 
 GET         /check-company-is-not-registered                        @controllers.businessmatching.CheckCompanyController.get()
 GET         /check-company-is-not-registered                        @controllers.businessmatching.CheckCompanyController.post()
@@ -25,4 +25,7 @@ GET         /check-company-is-not-registered                        @controllers
 GET         /check-your-answers                                     @controllers.businessmatching.SummaryController.get()
 POST        /check-your-answers                                     @controllers.businessmatching.SummaryController.post()
 
-GET         /no-psr-number                                          @controllers.businessmatching.NoPsrController.get
+GET         /no-frn-number                                          @controllers.businessmatching.NoFrnController.get
+
+GET         /frn-need-more-information                              @controllers.businessmatching.FrnNeedMoreInfoController.get()
+POST        /frn-need-more-information                              @controllers.businessmatching.FrnNeedMoreInfoController.post(edit: Boolean ?= false , includeCompanyNotRegistered: Boolean ?= false)

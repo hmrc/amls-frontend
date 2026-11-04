@@ -17,31 +17,16 @@
 package services.flowmanagement.pagerouters.businessmatching.subsectors
 
 import controllers.businessmatching.routes
-import models.businessmatching.BusinessAppliedForPSRNumberYes
-import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
+import models.businessmatching.BusinessAppliedForFrnYes
+import models.flowmanagement.{ChangeSubSectorFlowModel, FrnNeedMoreInfoPageId}
 import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import services.flowmanagement.{PageRouter, PageRouterCompanyNotRegistered}
 import uk.gov.hmrc.http.HeaderCarrier
-import play.api.mvc.Results.Redirect
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PSRNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
-
-  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[Result] = {
-    val call = model.psrNumber map {
-      case BusinessAppliedForPSRNumberYes(_) => routes.SummaryController.get()
-      case _                                 => routes.NoPsrController.get
-    }
-
-    call.fold(error(PsrNumberPageId))(Redirect)
-  }
-}
-
-class PSRNumberPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[ChangeSubSectorFlowModel] {
+class FrnNeedMoreInfoPageRouter extends PageRouterCompanyNotRegistered[ChangeSubSectorFlowModel] {
 
   override def getRoute(
     credId: String,
@@ -49,16 +34,16 @@ class PSRNumberPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegist
     edit: Boolean,
     includeCompanyNotRegistered: Boolean
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-    val call = model.psrNumber map {
-      case BusinessAppliedForPSRNumberYes(_) =>
+    val call = model.Frn map {
+      case BusinessAppliedForFrnYes(_) =>
         if (includeCompanyNotRegistered) {
           routes.CheckCompanyController.get()
         } else {
           routes.SummaryController.get()
         }
-      case _                                 => routes.NoPsrController.get
+      case _                           => routes.SummaryController.get()
     }
 
-    call.fold(error(PsrNumberPageId))(Redirect)
+    call.fold(error(FrnNeedMoreInfoPageId))(Redirect)
   }
 }

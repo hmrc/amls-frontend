@@ -21,7 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import models.flowmanagement.{AddBusinessTypeFlowModel, NoPSRPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, NoFrnPageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.flowmanagement.Router
 import utils.AuthAction
@@ -30,7 +30,7 @@ import views.html.businessmatching.updateservice.add.CannotAddServicesView
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class NoPsrController @Inject() (
+class NoFrnController @Inject()(
   authAction: AuthAction,
   val ds: CommonPlayDependencies,
   implicit val dataCacheConnector: DataCacheConnector,
@@ -47,7 +47,7 @@ class NoPsrController @Inject() (
   def post(): Action[AnyContent] = authAction.async { implicit request =>
     (for {
       _     <- helper.clearFlowModel(request.credId)
-      route <- OptionT.liftF(router.getRoute(request.credId, NoPSRPageId, AddBusinessTypeFlowModel()))
-    } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NoPsrController")
+      route <- OptionT.liftF(router.getRoute(request.credId, NoFrnPageId, AddBusinessTypeFlowModel()))
+    } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NoFrnController")
   }
 }

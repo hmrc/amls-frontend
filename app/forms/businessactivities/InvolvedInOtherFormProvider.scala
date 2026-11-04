@@ -49,7 +49,7 @@ class InvolvedInOtherFormProvider @Inject() () extends Mappings {
   private def apply(b: Boolean, s: Option[String]): InvolvedInOther = (b, s) match {
     case (false, _)        => InvolvedInOtherNo
     case (true, Some(str)) => InvolvedInOtherYes(str)
-    case _                 => throw new IllegalArgumentException("No PSR Number available to bind from form")
+    case _                 => throw new IllegalArgumentException("No FRN available to bind from form")
   }
 
   private def unapply(obj: InvolvedInOther): Option[(Boolean, Option[String])] = obj match {

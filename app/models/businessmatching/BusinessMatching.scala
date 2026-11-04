@@ -25,15 +25,15 @@ import play.api.i18n.Messages
 import services.cache.Cache
 
 case class BusinessMatching(
-  reviewDetails: Option[ReviewDetails] = None,
-  activities: Option[BusinessActivities] = None,
-  msbServices: Option[BusinessMatchingMsbServices] = None,
-  typeOfBusiness: Option[TypeOfBusiness] = None,
-  companyRegistrationNumber: Option[CompanyRegistrationNumber] = None,
-  businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
-  hasChanged: Boolean = false,
-  hasAccepted: Boolean = false,
-  preAppComplete: Boolean = false
+                             reviewDetails: Option[ReviewDetails] = None,
+                             activities: Option[BusinessActivities] = None,
+                             msbServices: Option[BusinessMatchingMsbServices] = None,
+                             typeOfBusiness: Option[TypeOfBusiness] = None,
+                             companyRegistrationNumber: Option[CompanyRegistrationNumber] = None,
+                             businessAppliedForFrn: Option[BusinessAppliedForFrn] = None,
+                             hasChanged: Boolean = false,
+                             hasAccepted: Boolean = false,
+                             preAppComplete: Boolean = false
 ) {
 
   def msbOrTcsp: Boolean =
@@ -84,24 +84,24 @@ case class BusinessMatching(
       hasAccepted = hasAccepted && this.companyRegistrationNumber.contains(p)
     )
 
-  def businessAppliedForPSRNumber(p: Option[BusinessAppliedForPSRNumber]): BusinessMatching =
+  def businessAppliedForFrn(p: Option[BusinessAppliedForFrn]): BusinessMatching =
     this.copy(
-      businessAppliedForPSRNumber = p,
-      hasChanged = hasChanged || !this.businessAppliedForPSRNumber.equals(p),
-      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.equals(p)
+      businessAppliedForFrn = p,
+      hasChanged = hasChanged || !this.businessAppliedForFrn.equals(p),
+      hasAccepted = hasAccepted && this.businessAppliedForFrn.equals(p)
     )
 
-  def clearPSRNumber: BusinessMatching =
+  def clearFrn: BusinessMatching =
     this.copy(
-      businessAppliedForPSRNumber = None,
-      hasChanged = hasChanged || this.businessAppliedForPSRNumber.isDefined,
-      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.isDefined
+      businessAppliedForFrn = None,
+      hasChanged = hasChanged || this.businessAppliedForFrn.isDefined,
+      hasAccepted = hasAccepted && this.businessAppliedForFrn.isDefined
     )
 
   def msbComplete(activities: BusinessActivities): Boolean =
     if (activities.businessActivities.contains(MoneyServiceBusiness)) {
       this.msbServices.isDefined && this.msbServices.fold(false)(_.msbServices.contains(TransmittingMoney) match {
-        case true  => this.businessAppliedForPSRNumber.isDefined
+        case true  => this.businessAppliedForFrn.isDefined
         case false => true
       })
     } else {
@@ -241,7 +241,7 @@ object BusinessMatching {
       __.read(Reads.optionNoError[BusinessMatchingMsbServices]) and
       __.read(Reads.optionNoError[TypeOfBusiness]) and
       __.read(Reads.optionNoError[CompanyRegistrationNumber]) and
-      __.read(Reads.optionNoError[BusinessAppliedForPSRNumber]) and
+      __.read(Reads.optionNoError[BusinessAppliedForFrn]) and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
       (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false)) and
       (__ \ "preAppComplete").readNullable[Boolean].map(_.getOrElse(false))
@@ -255,7 +255,7 @@ object BusinessMatching {
         Json.toJson(model.msbServices).asOpt[JsObject],
         Json.toJson(model.typeOfBusiness).asOpt[JsObject],
         Json.toJson(model.companyRegistrationNumber).asOpt[JsObject],
-        Json.toJson(model.businessAppliedForPSRNumber).asOpt[JsObject]
+        Json.toJson(model.businessAppliedForFrn).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
       } + ("hasChanged"      -> JsBoolean(model.hasChanged)) + ("hasAccepted" -> JsBoolean(

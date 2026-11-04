@@ -19,20 +19,20 @@ package forms.businessmatching
 import forms.behaviours.BooleanFieldBehaviours
 import forms.mappings.Constraints
 import generators.BaseGenerator
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForFrnNo, BusinessAppliedForFrnYes}
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
-class PSRNumberFormProviderSpec
-    extends BooleanFieldBehaviours[BusinessAppliedForPSRNumber]
+class FrnFormProviderSpec
+    extends BooleanFieldBehaviours[BusinessAppliedForFrn]
     with BaseGenerator
     with Constraints {
 
-  val formProvider: PSRNumberFormProvider              = new PSRNumberFormProvider()
-  override val form: Form[BusinessAppliedForPSRNumber] = formProvider()
+  val formProvider: FrnFormProvider              = new FrnFormProvider()
+  override val form: Form[BusinessAppliedForFrn] = formProvider()
 
   override val fieldName: String    = "appliedFor"
-  override val errorMessage: String = "error.required.msb.psr.options"
+  override val errorMessage: String = "error.required.msb.frn.options"
 
   val inputFieldName: String = "regNumber"
 
@@ -44,16 +44,16 @@ class PSRNumberFormProviderSpec
 
         val boundForm = form.bind(Map(fieldName -> "false"))
 
-        boundForm.value  shouldBe Some(BusinessAppliedForPSRNumberNo)
+        boundForm.value  shouldBe Some(BusinessAppliedForFrnNo)
         boundForm.errors shouldBe Nil
       }
 
-      "'Yes' is submitted and a PSR number is given" in {
+      "'Yes' is submitted and an FRN is given" in {
 
-        forAll(numSequence(formProvider.min)) { psrNum =>
-          val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> psrNum))
+        forAll(numSequence(formProvider.min)) { frn =>
+          val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> frn))
 
-          boundForm.value  shouldBe Some(BusinessAppliedForPSRNumberYes(psrNum))
+          boundForm.value  shouldBe Some(BusinessAppliedForFrnYes(frn))
           boundForm.errors shouldBe Nil
         }
       }
@@ -77,30 +77,30 @@ class PSRNumberFormProviderSpec
         }
       }
 
-      "'Yes' is submitted without a PSR number" in {
+      "'Yes' is submitted without an FRN" in {
 
         val boundForm = form.bind(Map(fieldName -> "true"))
 
-        boundForm.errors.headOption shouldBe Some(FormError(inputFieldName, "error.invalid.msb.psr.number"))
+        boundForm.errors.headOption shouldBe Some(FormError(inputFieldName, "error.invalid.msb.frn"))
       }
 
-      "'Yes' is submitted with a PSR number" which {
+      "'Yes' is submitted with an FRN" which {
         "is too long" in {
 
-          forAll(numsLongerThan(formProvider.max)) { longPsrNum =>
-            val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> longPsrNum.toString))
+          forAll(numsLongerThan(formProvider.max)) { longFrn =>
+            val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> longFrn.toString))
             boundForm.errors.headOption shouldBe Some(
-              FormError(inputFieldName, "error.required.msb.psr.length", Seq(formProvider.max))
+              FormError(inputFieldName, "error.required.msb.frn.length", Seq(formProvider.max))
             )
           }
         }
 
         "is too short" in {
 
-          forAll(numsShorterThan(formProvider.min - 1)) { shortPsrNum =>
-            val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> shortPsrNum.toString))
+          forAll(numsShorterThan(formProvider.min - 1)) { shortFrn =>
+            val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> shortFrn.toString))
             boundForm.errors.headOption shouldBe Some(
-              FormError(inputFieldName, "error.required.msb.psr.length", Seq(formProvider.min))
+              FormError(inputFieldName, "error.required.msb.frn.length", Seq(formProvider.min))
             )
           }
         }
@@ -117,17 +117,17 @@ class PSRNumberFormProviderSpec
             )
           )
 
-          result.value  shouldBe Some(BusinessAppliedForPSRNumberYes(passStringTransformed))
+          result.value  shouldBe Some(BusinessAppliedForFrnYes(passStringTransformed))
           result.errors shouldBe empty
         }
 
         "is invalid" in {
 
           forAll(numSequence(formProvider.max).suchThat(_.length == formProvider.max), Gen.alphaChar) {
-            (psrNum, char) =>
-              val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> s"${psrNum.dropRight(1)}$char"))
+            (frn, char) =>
+              val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> s"${frn.dropRight(1)}$char"))
               boundForm.errors.headOption shouldBe Some(
-                FormError(inputFieldName, "error.max.msb.psr.number.format", Seq(numbersOnlyRegex))
+                FormError(inputFieldName, "error.max.msb.frn.format", Seq(numbersOnlyRegex))
               )
           }
         }

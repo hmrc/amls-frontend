@@ -64,7 +64,7 @@ class SummaryController @Inject() (
       )
 
       val submissionButton = cyaHelper.getSubmitButton(
-        bmWithAdditionalActivities.businessAppliedForPSRNumber,
+        bmWithAdditionalActivities.businessAppliedForFrn,
         isPreSubmission,
         bmWithAdditionalActivities.preAppComplete
       )

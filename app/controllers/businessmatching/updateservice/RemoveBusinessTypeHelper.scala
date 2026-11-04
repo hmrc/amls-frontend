@@ -99,7 +99,7 @@ class RemoveBusinessTypeHelper @Inject() (implicit val dataCacheConnector: DataC
 
             setAccepted {
               if (activitiesToRemove.contains(MoneyServiceBusiness)) {
-                newBm.msbServices(None).businessAppliedForPSRNumber(None)
+                newBm.msbServices(None).businessAppliedForFrn(None)
               } else {
                 newBm
               }

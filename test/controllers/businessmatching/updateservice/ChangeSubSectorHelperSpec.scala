@@ -37,25 +37,25 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
     val helper = new ChangeSubSectorHelper()(mockCacheConnector)
   }
 
-  "requires a PSR Number" when {
-    "Transmitting money is selected and there is no PSR number" in new Fixture {
+  "requires a FRN" when {
+    "Transmitting money is selected and there is no FRN" in new Fixture {
       val model = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney, ChequeCashingNotScrapMetal)), None)
-      helper.requiresPSRNumber(model) mustBe true
+      helper.requiresFrn(model) mustBe true
     }
   }
 
-  "does not require a PSR Number" when {
-    "Transmitting money is selected and there is a PSR number" in new Fixture {
+  "does not require a FRN" when {
+    "Transmitting money is selected and there is a FRN" in new Fixture {
       val model = ChangeSubSectorFlowModel(
         Some(Set(TransmittingMoney, ChequeCashingNotScrapMetal)),
-        Some(BusinessAppliedForPSRNumberYes("XXXX"))
+        Some(BusinessAppliedForFrnYes("XXXX"))
       )
-      helper.requiresPSRNumber(model) mustBe false
+      helper.requiresFrn(model) mustBe false
     }
 
     "Transmitting money is not selected" in new Fixture {
       val model = ChangeSubSectorFlowModel(Some(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)), None)
-      helper.requiresPSRNumber(model) mustBe false
+      helper.requiresFrn(model) mustBe false
     }
   }
 
@@ -63,14 +63,14 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
     "populate the sub sectors from the data cache" in new Fixture {
       val expectedModel = ChangeSubSectorFlowModel(
         Some(Set(TransmittingMoney, ChequeCashingNotScrapMetal)),
-        Some(BusinessAppliedForPSRNumberYes("XXXX"))
+        Some(BusinessAppliedForFrnYes("XXXX"))
       )
 
       mockCacheFetch[BusinessMatching](
         Some(
           BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX"))
+            businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
           )
         ),
         Some(BusinessMatching.key)
@@ -86,7 +86,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
     "create and populate a new one when it doesn't exist" in new Fixture {
       val expectedModel = ChangeSubSectorFlowModel(
         Some(Set(TransmittingMoney, ChequeCashingNotScrapMetal)),
-        Some(BusinessAppliedForPSRNumberYes("XXXX"))
+        Some(BusinessAppliedForFrnYes("XXXX"))
       )
 
       mockCacheFetch[ChangeSubSectorFlowModel](None, Some(ChangeSubSectorFlowModel.key))
@@ -95,7 +95,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
         Some(
           BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX"))
+            businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
           )
         ),
         Some(BusinessMatching.key)
@@ -109,7 +109,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
     "return an existing one whe it does exist" in new Fixture {
       val expectedModel = ChangeSubSectorFlowModel(
         Some(Set(TransmittingMoney, ChequeCashingNotScrapMetal)),
-        Some(BusinessAppliedForPSRNumberYes("XXXX"))
+        Some(BusinessAppliedForFrnYes("XXXX"))
       )
 
       mockCacheFetch[ChangeSubSectorFlowModel](Some(expectedModel), Some(ChangeSubSectorFlowModel.key))
@@ -123,7 +123,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
   "updating the sub sectors" must {
 
     "return an empty entity where no msb exists in cache" in new Fixture {
-      val model = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberYes("XXXX")))
+      val model = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnYes("XXXX")))
 
       mockCacheFetch[MSB](None, Some(MSB.key))
 
@@ -134,7 +134,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
 
     "wipe the currency exchange questions when it isn't set" in new Fixture {
 
-      val model = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberYes("XXXX")))
+      val model = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnYes("XXXX")))
 
       mockCacheFetch[MSB](
         Some(
@@ -151,7 +151,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
         Some(
           BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX"))
+            businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
           )
         ),
         Some(BusinessMatching.key)
@@ -189,7 +189,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
         Some(
           BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX"))
+            businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
           )
         ),
         Some(BusinessMatching.key)
@@ -229,7 +229,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
       verify(mockCacheConnector, never).save(any(), eqTo(MSB.key), any[MSB])(any())
     }
 
-    "wipe the psr number when transmitting money isn't set" in new Fixture {
+    "wipe the FRN when transmitting money isn't set" in new Fixture {
 
       val model = ChangeSubSectorFlowModel(Some(Set(ChequeCashingNotScrapMetal)), None)
 
@@ -237,7 +237,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
         Some(
           BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")),
+            businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX")),
             hasAccepted = true
           )
         ),
@@ -248,13 +248,13 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
 
       val updatedBm = await(helper.updateBusinessMatching("internalId", model))
 
-      updatedBm.businessAppliedForPSRNumber mustBe None
+      updatedBm.businessAppliedForFrn mustBe None
       updatedBm.hasAccepted mustBe true
     }
 
-    "apply the PSR number when one is given, and transmitting money is given" in new Fixture {
+    "apply the FRN when one is given, and transmitting money is given" in new Fixture {
       val model =
-        ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberYes("12345678")))
+        ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForFrnYes("12345678")))
 
       mockCacheFetch[BusinessMatching](
         Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))),
@@ -265,7 +265,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
 
       val updatedBm = await(helper.updateBusinessMatching("internalId", model))
 
-      updatedBm.businessAppliedForPSRNumber mustBe Some(BusinessAppliedForPSRNumberYes("12345678"))
+      updatedBm.businessAppliedForFrn mustBe Some(BusinessAppliedForFrnYes("12345678"))
       updatedBm.hasChanged mustBe true
     }
 
@@ -276,7 +276,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
         Some(
           BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")),
+            businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX")),
             hasAccepted = true
           )
         ),
@@ -295,7 +295,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
 
       val bm = BusinessMatching(
         msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")),
+        businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX")),
         hasAccepted = true
       )
 
@@ -313,7 +313,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
         Some(
           BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")),
+            businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX")),
             hasAccepted = true
           )
         ),
@@ -476,7 +476,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
           Some(
             BusinessMatching(
               msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-              businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX"))
+              businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
             )
           ),
           Some(BusinessMatching.key)
@@ -497,7 +497,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
           Some(
             BusinessMatching(
               msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-              businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX"))
+              businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
             )
           ),
           Some(BusinessMatching.key)
@@ -517,7 +517,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
           Some(
             BusinessMatching(
               msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-              businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX"))
+              businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
             )
           ),
           Some(BusinessMatching.key)
@@ -538,7 +538,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
           Some(
             BusinessMatching(
               msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))),
-              businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX"))
+              businessAppliedForFrn = Some(BusinessAppliedForFrnYes("XXXX"))
             )
           ),
           Some(BusinessMatching.key)

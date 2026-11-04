@@ -27,17 +27,17 @@ trait BusinessMatchingGenerator
     extends BaseGenerator
     with ReviewDetailsGenerator
     with BusinessActivitiesGenerator
-    with PsrNumberGen {
+    with FrnNumberGen {
 
   val businessMatchingGen: Gen[BusinessMatching] = for {
     reviewDetails <- reviewDetailsGen
     activities    <- businessActivitiesGen
   } yield BusinessMatching(Some(reviewDetails), Some(activities))
 
-  val businessMatchingWithPsrGen: Gen[BusinessMatching] = for {
+  val businessMatchingWithFrnGen: Gen[BusinessMatching] = for {
     bm  <- businessMatchingGen
-    psr <- psrNumberGen
-  } yield bm.copy(businessAppliedForPSRNumber = Some(psr))
+    frn <- frnGen
+  } yield bm.copy(businessAppliedForFrn = Some(frn))
 
   def businessMatchingWithTypesGen(bType: Option[BusinessType]) = for {
     bm <- businessMatchingGen

@@ -23,31 +23,31 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesApi
 import play.twirl.api.Html
 
-class BusinessAppliedForPSRNumberSpec extends PlaySpec with MessagesImplicits {
+class BusinessAppliedForFrnSpec extends PlaySpec with MessagesImplicits {
 
   implicit val messages: Messages = stubMessagesApi().preferred(FakeRequest())
 
-  "BusinessAppliedForPSRNumber" should {
+  "BusinessAppliedForFrn" should {
 
     "Successfully read and write data:option yes" in {
-      BusinessAppliedForPSRNumber.jsonReads.reads(
-        BusinessAppliedForPSRNumber.jsonWrites.writes(BusinessAppliedForPSRNumberYes("123456"))
+      BusinessAppliedForFrn.jsonReads.reads(
+        BusinessAppliedForFrn.jsonWrites.writes(BusinessAppliedForFrnYes("123456"))
       ) must
-        be(JsSuccess(BusinessAppliedForPSRNumberYes("123456"), JsPath \ "regNumber"))
+        be(JsSuccess(BusinessAppliedForFrnYes("123456"), JsPath \ "regNumber"))
     }
 
     "Successfully read and write data:option No" in {
-      BusinessAppliedForPSRNumber.jsonReads.reads(
-        BusinessAppliedForPSRNumber.jsonWrites.writes(BusinessAppliedForPSRNumberNo)
+      BusinessAppliedForFrn.jsonReads.reads(
+        BusinessAppliedForFrn.jsonWrites.writes(BusinessAppliedForFrnNo)
       ) must
-        be(JsSuccess(BusinessAppliedForPSRNumberNo, JsPath))
+        be(JsSuccess(BusinessAppliedForFrnNo, JsPath))
     }
 
     "return the correct radio button items" in {
 
       val htmlText = "foo"
 
-      val radioButtons = BusinessAppliedForPSRNumber.formValues(Html(s"<p>$htmlText</p>"))
+      val radioButtons = BusinessAppliedForFrn.formValues(Html(s"<p>$htmlText</p>"))
 
       radioButtons.head.id mustBe Some("appliedFor-true")
       radioButtons.head.value mustBe Some("true")

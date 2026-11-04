@@ -38,10 +38,10 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
     val router = new AddBusinessTypeRouter(
       businessMatchingService = mockBusinessMatchingService,
       addMoreActivitiesPageRouter = new AddMoreBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
-      businessAppliedForPSRNumberPageRouter =
-        new BusinessAppliedForPsrNumberPageRouter(mockStatusService, mockBusinessMatchingService),
+      businessAppliedForFrnPageRouter =
+        new BusinessAppliedForFrnPageRouter(mockStatusService, mockBusinessMatchingService),
       newServicesInformationPageRouter = new NeedMoreInformationPageRouter(),
-      noPSRPageRouter = new NoPSRPageRouter(mockStatusService, mockBusinessMatchingService),
+      noFrnPageRouter = new NoFrnPageRouter(mockStatusService, mockBusinessMatchingService),
       selectActivitiesPageRouter = new SelectBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
       subServicesPageRouter = new SubSectorsPageRouter(mockStatusService, mockBusinessMatchingService),
       updateServicesSummaryPageRouter =

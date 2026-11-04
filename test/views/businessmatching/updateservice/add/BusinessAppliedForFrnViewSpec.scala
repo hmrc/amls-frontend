@@ -16,39 +16,39 @@
 
 package views.businessmatching.updateservice.add
 
-import forms.businessmatching.PSRNumberFormProvider
-import models.businessmatching.BusinessAppliedForPSRNumberYes
+import forms.businessmatching.FrnFormProvider
+import models.businessmatching.BusinessAppliedForFrnYes
 import play.api.mvc.{AnyContentAsEmpty, Request}
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.businessmatching.updateservice.add.BusinessAppliedForPSRNumberView
+import views.html.businessmatching.updateservice.add.BusinessAppliedForFrnView
 
-class BusinessAppliedForPSRNumberViewSpec extends AmlsViewSpec {
+class BusinessAppliedForFrnViewSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture
-  lazy val numberView                                            = inject[BusinessAppliedForPSRNumberView]
-  lazy val formProvider                                          = inject[PSRNumberFormProvider]
+  lazy val numberView                                            = inject[BusinessAppliedForFrnView]
+  lazy val formProvider                                          = inject[FrnFormProvider]
   implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
   def view = numberView(formProvider(), edit = false)
 
-  "BusinessAppliedForPSRNumberView" must {
+  "BusinessAppliedForFrnView" must {
 
     "have correct title" in new ViewFixture {
 
-      val filledForm = formProvider().fill(BusinessAppliedForPSRNumberYes("1234"))
+      val filledForm = formProvider().fill(BusinessAppliedForFrnYes("1234"))
 
       override def view = numberView(filledForm, edit = false)
 
       doc.title       must startWith(
-        messages("businessmatching.updateservice.psr.number.title") + " - " + messages("summary.updateservice")
+        messages("businessmatching.updateservice.frn.title") + " - " + messages("summary.updateservice")
       )
-      heading.html    must be(messages("businessmatching.updateservice.psr.number.title"))
+      heading.html    must be(messages("businessmatching.updateservice.frn.title"))
       subHeading.html must include(messages("summary.updateservice"))
     }
 
     "hide the return to progress link" in new ViewFixture {
-      val filledForm = formProvider().fill(BusinessAppliedForPSRNumberYes("1234"))
+      val filledForm = formProvider().fill(BusinessAppliedForFrnYes("1234"))
 
       override def view = numberView(filledForm, edit = true)
 
@@ -56,15 +56,15 @@ class BusinessAppliedForPSRNumberViewSpec extends AmlsViewSpec {
     }
 
     behave like pageWithErrors(
-      numberView(formProvider().withError("appliedFor", "error.required.msb.psr.options"), edit = false),
+      numberView(formProvider().withError("appliedFor", "error.required.msb.frn.options"), edit = false),
       "appliedFor",
-      "error.required.msb.psr.options"
+      "error.required.msb.frn.options"
     )
 
     behave like pageWithErrors(
-      numberView(formProvider().withError("regNumber", "error.max.msb.psr.number.format"), edit = false),
+      numberView(formProvider().withError("regNumber", "error.max.msb.frn.format"), edit = false),
       "regNumber",
-      "error.max.msb.psr.number.format"
+      "error.max.msb.frn.format"
     )
 
     behave like pageWithBackLink(view)

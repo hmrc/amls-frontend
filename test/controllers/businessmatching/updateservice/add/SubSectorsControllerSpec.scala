@@ -185,7 +185,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
         status(result) mustBe BAD_REQUEST
       }
 
-      "return the 'Does Your Business ... PSR ...' page in the flow" when {
+      "return the 'Does Your Business ... FRN ...' page in the flow" when {
         "money transfer has been posted" in new Fixture {
           mockCacheUpdate(
             Some(AddBusinessTypeFlowModel.key),

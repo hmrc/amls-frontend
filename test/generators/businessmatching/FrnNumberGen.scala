@@ -17,13 +17,13 @@
 package generators.businessmatching
 
 import generators.BaseGenerator
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
+import models.businessmatching.{BusinessAppliedForFrn, BusinessAppliedForFrnYes}
 import org.scalacheck.Gen
 
-trait PsrNumberGen extends BaseGenerator {
+trait FrnNumberGen extends BaseGenerator {
 
-  val psrNumberGen: Gen[BusinessAppliedForPSRNumber] = for {
+  val frnGen: Gen[BusinessAppliedForFrn] = for {
     num <- numSequence(6)
-  } yield BusinessAppliedForPSRNumberYes(num)
+  } yield BusinessAppliedForFrnYes(num)
 
 }
