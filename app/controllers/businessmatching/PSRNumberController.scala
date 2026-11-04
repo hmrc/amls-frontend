@@ -104,7 +104,7 @@ class PSRNumberController @Inject() (
                   }
                 case Some(m)                                                                        =>
                   route(m)
-                case _                                                                              => throw new Exception("An Exception has occurred")
+                case _                                                                              => throw new Exception("[PSRNumberController][post] - Unexpected state, unable to continue")
               }
             }
         )
