@@ -51,9 +51,9 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
       html must include(
-        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+        messages("your total turnover for the last 12 months, if your business was involved in other activities")
       )
-      html must include(messages("your total net profit for the last 12 months from the services you have registered"))
+      html must include(messages("your total turnover for the last 12 months from the services you have registered"))
     }
 
     "contain the expected content elements for AMP renewal" in new ViewFixture {
@@ -61,9 +61,9 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
       html must include(
-        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+        messages("your total turnover for the last 12 months, if your business was involved in other activities")
       )
-      html must include(messages("your total net profit for the last 12 months from the services you have registered"))
+      html must include(messages("your total turnover for the last 12 months from the services you have registered"))
       html must include(messages("the percentage of your turnover that came from sales of art for £10,000 or more"))
     }
 
@@ -72,9 +72,9 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
       html must include(
-        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+        messages("your total turnover for the last 12 months, if your business was involved in other activities")
       )
-      html must include(messages("your total net profit for the last 12 months from the services you have registered"))
+      html must include(messages("your total turnover for the last 12 months from the services you have registered"))
       html must include(messages("your total value of transactions in the last 12 months"))
     }
 
@@ -86,9 +86,9 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
       html must include(
-        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+        messages("your total turnover for the last 12 months, if your business was involved in other activities")
       )
-      html must include(messages("your total net profit for the last 12 months from the services you have registered"))
+      html must include(messages("your total turnover for the last 12 months from the services you have registered"))
       html must include(messages("your total value of transactions in the last 12 months"))
       html must include(messages("the number of money transfers you made in the last 12 months"))
       html must include(
@@ -111,9 +111,9 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
       html must include(
-        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+        messages("your total turnover for the last 12 months, if your business was involved in other activities")
       )
-      html must include(messages("your total net profit for the last 12 months from the services you have registered"))
+      html must include(messages("your total turnover for the last 12 months from the services you have registered"))
       html must include(messages("your total value of transactions in the last 12 months"))
       html must include(messages("the number of currency exchange transactions you made in the last 12 months"))
       html must include(messages("which currencies you supplied the most to your customers"))
@@ -128,9 +128,9 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
       html must include(
-        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+        messages("your total turnover for the last 12 months, if your business was involved in other activities")
       )
-      html must include(messages("your total net profit for the last 12 months from the services you have registered"))
+      html must include(messages("your total turnover for the last 12 months from the services you have registered"))
       html must include(messages("your total value of transactions in the last 12 months"))
       html must include(messages("the number of foreign exchange transactions you made in the last 12 months"))
     }
@@ -140,9 +140,9 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
       html must include(
-        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+        messages("your total turnover for the last 12 months, if your business was involved in other activities")
       )
-      html must include(messages("your total net profit for the last 12 months from the services you have registered"))
+      html must include(messages("your total turnover for the last 12 months from the services you have registered"))
       html must include(
         messages(
           "which countries your customers lived or worked in, if you had customers who lived or worked outside of the UK"
@@ -155,9 +155,9 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
       html must include(messages("about any other activities your business was involved in over the last 12 months"))
       html must include(
-        messages("your total net profit for the last 12 months, if your business was involved in other activities")
+        messages("your total turnover for the last 12 months, if your business was involved in other activities")
       )
-      html must include(messages("your total net profit for the last 12 months from the services you have registered"))
+      html must include(messages("your total turnover for the last 12 months from the services you have registered"))
       html must include(
         messages(
           "which countries your customers lived or worked in, if you had customers who lived or worked outside of the UK"

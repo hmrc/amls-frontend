@@ -9,11 +9,11 @@ POST        /other-activities                                     @controllers.b
 GET         /written-guidance-suspicious-activity                 @controllers.businessactivities.IdentifySuspiciousActivityController.get(edit: Boolean ?= false)
 POST        /written-guidance-suspicious-activity                 @controllers.businessactivities.IdentifySuspiciousActivityController.post(edit: Boolean ?= false)
 
-GET         /net-profit-services-next-12-months                   @controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
-POST        /net-profit-services-next-12-months                   @controllers.businessactivities.ExpectedAMLSTurnoverController.post(edit: Boolean ?= false)
+GET         /turnover-services-next-12-months                   @controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /turnover-services-next-12-months                   @controllers.businessactivities.ExpectedAMLSTurnoverController.post(edit: Boolean ?= false)
 
-GET         /net-profit-next-12-months                            @controllers.businessactivities.ExpectedBusinessTurnoverController.get(edit: Boolean ?= false)
-POST        /net-profit-next-12-months                            @controllers.businessactivities.ExpectedBusinessTurnoverController.post(edit: Boolean ?= false)
+GET         /turnover-next-12-months                            @controllers.businessactivities.ExpectedBusinessTurnoverController.get(edit: Boolean ?= false)
+POST        /turnover-next-12-months                            @controllers.businessactivities.ExpectedBusinessTurnoverController.post(edit: Boolean ?= false)
 
 GET         /records                                              @controllers.businessactivities.TransactionRecordController.get(edit: Boolean ?= false)
 POST        /records                                              @controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)

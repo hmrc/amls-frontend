@@ -11,11 +11,11 @@ POST        /other-activities                                                 @c
 GET         /other-activities-details                                         @controllers.renewal.InvolvedInOtherDetailsController.get(edit: Boolean ?= false)
 POST        /other-activities-details                                         @controllers.renewal.InvolvedInOtherDetailsController.post(edit: Boolean ?= false)
 
-GET         /net-profit-last-12-months                                        @controllers.renewal.BusinessTurnoverController.get(edit: Boolean ?= false)
-POST        /net-profit-last-12-months                                        @controllers.renewal.BusinessTurnoverController.post(edit: Boolean ?= false)
+GET         /turnover-last-12-months                                        @controllers.renewal.BusinessTurnoverController.get(edit: Boolean ?= false)
+POST        /turnover-last-12-months                                        @controllers.renewal.BusinessTurnoverController.post(edit: Boolean ?= false)
 
-GET         /net-profit-registered-services                                   @controllers.renewal.AMLSTurnoverController.get(edit: Boolean ?= false)
-POST        /net-profit-registered-services                                   @controllers.renewal.AMLSTurnoverController.post(edit: Boolean ?= false)
+GET         /turnover-registered-services                                   @controllers.renewal.AMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /turnover-registered-services                                   @controllers.renewal.AMLSTurnoverController.post(edit: Boolean ?= false)
 
 GET         /turnover-from-art-sales                                          @controllers.renewal.AMPTurnoverController.get(edit: Boolean ?= false)
 POST        /turnover-from-art-sales                                          @controllers.renewal.AMPTurnoverController.post(edit: Boolean ?= false)

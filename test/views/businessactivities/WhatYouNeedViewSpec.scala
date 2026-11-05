@@ -57,11 +57,11 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       )
       html must include(
         messages(
-          "the net profit you expect in the next 12 months, if you also carry out activities not covered by the regulations"
+          "the turnover you expect in the next 12 months, if you also carry out activities not covered by the regulations"
         )
       )
       html must include(
-        messages("the net profit you expect in the next 12 months from the services you’re registering")
+        messages("the turnover you expect in the next 12 months from the services you’re registering")
       )
       html must include(messages("the franchisor’s name, if your business is a franchise"))
       html must include(messages("how many people work on activities covered by the Money Laundering Regulations"))
@@ -81,11 +81,11 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
       )
       html must include(
         messages(
-          "the net profit you expect in the next 12 months, if you also carry out activities not covered by the regulations"
+          "the turnover you expect in the next 12 months, if you also carry out activities not covered by the regulations"
         )
       )
       html must include(
-        messages("the net profit you expect in the next 12 months from the services you’re registering")
+        messages("the turnover you expect in the next 12 months from the services you’re registering")
       )
       html must include(messages("the franchisor’s name, if your business is a franchise"))
       html must include(messages("how many people work on activities covered by the Money Laundering Regulations"))
