@@ -21,6 +21,7 @@
 @import views.html.helper.CSPNonce
 @import config.ApplicationConfig
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
+@import uk.gov.hmrc.hmrcfrontend.views.Aliases.{Cy, En, UserResearchBanner}
 
 @this(
     appConfig: ApplicationConfig,
@@ -59,6 +60,16 @@
     }
 
     @stylesheets()
+}
+
+@userResearchBanner = @{
+Option.when(showResearchBanner && appConfig.researchBannerEnabled)(
+UserResearchBanner(
+language = if(messages.lang.code == "cy") Cy else En,
+url = appConfig.researchBannerUrl,
+hideCloseButton = true
+)
+)
 }
 
 @beforeContentBlock = {
@@ -102,14 +113,8 @@
         hmrcStandardHeader(
             serviceName = Some(messages("site.service_name")),
             signOutUrl = if(canSignOut) Some(appConfig.logoutUrlWithFeedback) else None,
-         userResearchBanner =
-            if(showResearchBanner && appConfig.researchBannerEnabled)
-                Some(UserResearchBanner(
-                    url = appConfig.researchBannerUrl,
-                    hideCloseButton = false
-                ))
-            else None
-        )
+            userResearchBanner = userResearchBanner,
+            isWelshTranslationAvailable = false)
     ),
     beforeContentBlock = Some(beforeContentBlock),
     scriptsBlock = Some(scripts),
