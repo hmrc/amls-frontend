@@ -31,7 +31,8 @@ class SelfAssessmentRegisteredFormProviderSpec extends StringFieldBehaviours wit
   val booleanFieldName: String = "saRegistered"
   val stringFieldName: String  = "utrNumber"
 
-  val utrLength = 10
+  val utrLength     = 10
+  val utrLongLength = 13
 
   "SelfAssessmentRegisteredFormProvider" must {
 
@@ -56,6 +57,37 @@ class SelfAssessmentRegisteredFormProviderSpec extends StringFieldBehaviours wit
 
         val utrString            = " 1 2 34 5 6 78 90 "
         val utrStringTransformed = "1234567890"
+
+        val result = form.bind(
+          Map(
+            booleanFieldName -> "true",
+            stringFieldName  -> utrString
+          )
+        )
+
+        result.value shouldBe Some(SaRegisteredYes(utrStringTransformed))
+        assert(result.errors.isEmpty)
+      }
+
+      "true is submitted with a 13 digit UTR number, keeping the last 10 digits" in {
+
+        forAll(numStringOfLength(utrLongLength).suchThat(_.nonEmpty)) { utr =>
+          val result = form.bind(
+            Map(
+              booleanFieldName -> "true",
+              stringFieldName  -> utr
+            )
+          )
+
+          result.value shouldBe Some(SaRegisteredYes(utr.takeRight(utrLength)))
+          assert(result.errors.isEmpty)
+        }
+      }
+
+      "true is submitted with a 13 digit UTR number which contains spaces" in {
+
+        val utrString            = " 123 4567 890 123 "
+        val utrStringTransformed = "4567890123"
 
         val result = form.bind(
           Map(
@@ -137,9 +169,24 @@ class SelfAssessmentRegisteredFormProviderSpec extends StringFieldBehaviours wit
         }
       }
 
-      s"$stringFieldName is longer than $utrLength when $booleanFieldName is true" in {
+      s"$stringFieldName is between $utrLength and $utrLongLength digits when $booleanFieldName is true" in {
 
-        forAll(numStringOfLength(utrLength + 1).suchThat(_.nonEmpty)) { utr =>
+        forAll(Gen.choose(utrLength + 1, utrLongLength - 1).flatMap(numStringOfLength).suchThat(_.nonEmpty)) { utr =>
+          val result = form.bind(
+            Map(
+              booleanFieldName -> "true",
+              stringFieldName  -> utr
+            )
+          )
+
+          result.value  shouldBe None
+          result.errors shouldBe Seq(FormError(stringFieldName, "error.invalid.length.utr.number", Seq(utrRegex)))
+        }
+      }
+
+      s"$stringFieldName is longer than $utrLongLength when $booleanFieldName is true" in {
+
+        forAll(numStringOfLength(utrLongLength + 1).suchThat(_.nonEmpty)) { utr =>
           val result = form.bind(
             Map(
               booleanFieldName -> "true",

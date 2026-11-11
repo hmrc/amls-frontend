@@ -40,6 +40,7 @@ class SelfAssessmentRegisteredFormProvider @Inject() () extends Mappings {
           .verifying(
             regexp(utrRegex, "error.invalid.length.utr.number")
           )
+          .transform[String](_.takeRight(10), x => x)
       )
     )(apply)(unapply)
   )
