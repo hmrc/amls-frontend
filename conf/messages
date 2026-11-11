@@ -95,7 +95,7 @@ error.required.nino = Enter this person’s National Insurance number
 error.invalid.nino = Enter a National Insurance number in the correct format
 
 error.required.utr.number = Enter this person’s Unique Taxpayer Reference
-error.invalid.length.utr.number = Unique Taxpayer Reference must be 10 numbers
+error.invalid.length.utr.number = Self Assessment Unique Taxpayer Reference must be 10 or 13 numbers
 error.required.sa.registration = Select yes if this person is registered for Self Assessment
 
 error.required.rp.nominated_officer = Select yes if this person is the nominated officer for the business
@@ -2255,7 +2255,7 @@ responsiblepeople.knownby.answer = Other names {0} is known by
 responsiblepeople.registeredforselfassessment.heading = Is {0} registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.title = Is this person registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.lbl.utrnumber = Self Assessment Unique Taxpayer Reference (UTR) number
-responsiblepeople.registeredforselfassessment.lbl.utrnumber.hint = This is a 10-digit or 13-digit number. If it is 13 numbers only enter the last 10. You can find it on tax returns and other documents from HMRC. It might be called ‘tax reference’.
+responsiblepeople.registeredforselfassessment.lbl.utrnumber.hint = This is a 10 or 13 digit number. You can find it on their statement of accounts, any Self Assessment calculations, or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
 responsiblepeople.contact_details.heading = What are {0}’s contact details?
 responsiblepeople.contact_details.cya = {0}’s contact details
 responsiblepeople.contact_details.title = What are the contact details for this person?
