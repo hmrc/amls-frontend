@@ -34,6 +34,9 @@ import uk.gov.hmrc.auth.core.retrieve.{Credentials, Retrieval, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AuthAction, DefaultAuthAction}
+import ch.qos.logback.classic.Level
+import play.api.Logger
+import uk.gov.hmrc.play.bootstrap.tools.LogCapturing
 
 import java.net.URLEncoder
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -44,7 +47,8 @@ class AuthActionSpec
     with MockitoSugar
     with ScalaFutures
     with GuiceOneAppPerSuite
-    with AmlsReferenceNumberGenerator {
+    with AmlsReferenceNumberGenerator
+    with LogCapturing {
 
   import AuthActionSpec._
 
@@ -333,6 +337,82 @@ class AuthActionSpec
     }
   }
 
+  private val authLogger: Logger = Logger(classOf[DefaultAuthAction])
+
+  private def authActionWith(connector: AuthConnector) =
+    new DefaultAuthAction(connector, mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
+
+  "Auth Action logging" must {
+
+    "log at debug only, with no warning, when the user is not signed in" in {
+      val controller = new Harness(authActionWith(fakeAuthConnector(Future.failed(new MissingBearerToken))))
+
+      withCaptureOfLoggingFrom(authLogger) { logs =>
+        status(controller.onPageLoad()(fakeRequest)) mustBe SEE_OTHER
+
+        logs.exists(e =>
+          e.getLevel == Level.DEBUG && e.getFormattedMessage.contains("[DefaultAuthAction][refine] - No active session")
+        ) mustBe true
+        logs.exists(_.getLevel == Level.WARN) mustBe false
+      }
+    }
+
+    "log a warning with the reason when the user has insufficient enrolments" in {
+      val controller = new Harness(authActionWith(fakeAuthConnector(Future.failed(new InsufficientEnrolments))))
+
+      withCaptureOfLoggingFrom(authLogger) { logs =>
+        status(controller.onPageLoad()(fakeRequest)) mustBe SEE_OTHER
+
+        logs.exists(e =>
+          e.getLevel == Level.WARN &&
+            e.getFormattedMessage.contains(
+              "[DefaultAuthAction][refine] - Insufficient enrolments, redirecting to unauthorised - reason:"
+            )
+        ) mustBe true
+      }
+    }
+
+    "log a distinct warning when the user has an unsupported credential role" in {
+      val controller = new Harness(authActionWith(fakeAuthConnector(Future.failed(new UnsupportedCredentialRole))))
+
+      withCaptureOfLoggingFrom(authLogger) { logs =>
+        status(controller.onPageLoad()(fakeRequest)) mustBe SEE_OTHER
+
+        logs.exists(e =>
+          e.getLevel == Level.WARN &&
+            e.getFormattedMessage.contains(
+              "[DefaultAuthAction][refine] - Unsupported credential role, redirecting to unauthorised"
+            )
+        ) mustBe true
+      }
+    }
+
+    "log a warning when the auth retrieval is missing credentials or affinity group" in {
+      val controller = new Harness(authActionWith(fakeAuthConnector(erroneousRetrievals)))
+
+      withCaptureOfLoggingFrom(authLogger) { logs =>
+        status(controller.onPageLoad()(fakeRequest)) mustBe SEE_OTHER
+
+        logs.exists(e =>
+          e.getLevel == Level.WARN &&
+            e.getFormattedMessage.contains(
+              "[DefaultAuthAction][refine] - Auth retrieval missing credentials or affinity group"
+            )
+        ) mustBe true
+      }
+    }
+
+    "not log a warning, and never log the enrolments object, when the user is authorised" in {
+      val controller = new Harness(authActionWith(fakeAuthConnector(orgAuthRetrievals)))
+
+      withCaptureOfLoggingFrom(authLogger) { logs =>
+        status(controller.onPageLoad()(fakeRequest)) mustBe OK
+
+        logs.exists(_.getLevel == Level.WARN) mustBe false
+        logs.exists(_.getFormattedMessage.contains("Enrolment(")) mustBe false
+      }
+    }
+  }
 }
 
 object AuthActionSpec extends AmlsReferenceNumberGenerator {

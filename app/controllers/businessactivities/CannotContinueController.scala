@@ -43,7 +43,8 @@ class CannotContinueController @Inject() (
         businessActivities   <- response
         riskAssessmentPolicy <- businessActivities.riskAssessmentPolicy
       } yield Ok(view())).getOrElse {
-        val errorMessage = "Unable to retrieve business activities in [businessactivities][CannotContinueController]"
+        val errorMessage =
+          "[businessactivities][CannotContinueController][get] - Unable to retrieve business activities"
         logger.warn(errorMessage)
         throw new Exception(errorMessage)
       }

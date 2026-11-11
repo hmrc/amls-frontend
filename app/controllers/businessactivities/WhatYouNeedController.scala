@@ -43,7 +43,7 @@ class WhatYouNeedController @Inject() (
         bm <- businessMatching
         ba <- bm.activities
       } yield Ok(view(Some(ba)))).getOrElse {
-        val errorMessage = "Unable to retrieve business activities in [businessactivities][WhatYouNeedController]"
+        val errorMessage = "[businessactivities][WhatYouNeedController][get] - Unable to retrieve business activities"
         logger.warn(errorMessage)
         throw new Exception(errorMessage)
       }

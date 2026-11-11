@@ -303,7 +303,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
         )
 
       whenReady(service.getStatus(amlsRegNo, accountTypeId, credId).failed) {
-        _.getMessage mustBe "ETMP returned status is inconsistent [status:adasdasd]"
+        _.getMessage mustBe "[StatusService][getETMPStatus] - ETMP returned an unrecognised status - status: adasdasd"
       }
 
     }

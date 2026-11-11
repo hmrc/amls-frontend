@@ -16,6 +16,8 @@
 
 package services
 
+import play.api.Logging
+
 import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
@@ -51,7 +53,7 @@ class LandingService @Inject() (
   val amlsConnector: AmlsConnector,
   val statusService: StatusService,
   val businessMatchingConnector: BusinessMatchingConnector
-) {
+) extends Logging {
 
   def cacheMap(credId: String): Future[Option[Cache]] = cacheConnector.fetchAll(credId)
 
@@ -91,7 +93,9 @@ class LandingService @Inject() (
       businessDetails <- cachedModel orElse etmpModel
       cacheMap        <-
         OptionT.liftF(cacheConnector.save[BusinessDetails](credId, BusinessDetails.key, fixAddress(businessDetails)))
-    } yield cacheMap) getOrElse (throw new Exception("Unable to update alt correspondence address"))
+    } yield cacheMap) getOrElse (throw new Exception(
+      "[LandingService][setAltCorrespondenceAddress] - Unable to update alt correspondence address - no business details in cache or ETMP"
+    ))
   }
 
   def setAltCorrespondenceAddress(businessDetails: BusinessDetails, credId: String): Future[Cache] =
@@ -105,10 +109,21 @@ class LandingService @Inject() (
     for {
       viewResponse           <- amlsConnector.view(amlsRefNumber, accountTypeId)
       subscriptionResponse   <-
-        cacheConnector.fetch[SubscriptionResponse](credId, SubscriptionResponse.key).recover { case _ => None }
+        cacheConnector.fetch[SubscriptionResponse](credId, SubscriptionResponse.key).recover { case e =>
+          logger.warn(
+            "[LandingService][refreshCache] - Failed to fetch SubscriptionResponse from cache, continuing without it",
+            e
+          )
+          None
+        }
       amendVariationResponse <-
         cacheConnector.fetch[AmendVariationRenewalResponse](credId, AmendVariationRenewalResponse.key) recover {
-          case _ => None
+          case e =>
+            logger.warn(
+              "[LandingService][refreshCache] - Failed to fetch AmendVariationRenewalResponse from cache, continuing without it",
+              e
+            )
+            None
         }
       _                      <- cacheConnector.remove(credId) // MUST clear cash first to remove stale data and reload from API5
       appCache               <- cacheConnector.fetchAllWithDefault(credId)

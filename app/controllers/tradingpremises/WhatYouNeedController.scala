@@ -56,8 +56,8 @@ class WhatYouNeedController @Inject() (
 
         Ok(view(call, index, Some(ba), bm.msbServices))
       }).getOrElse {
-        logger.warn("Unable to retrieve business activities in [tradingpremises][WhatYouNeedController]")
-        throw new Exception("Unable to retrieve business activities in [tradingpremises][WhatYouNeedController]")
+        logger.warn("[tradingpremises][WhatYouNeedController][get] - Unable to retrieve business activities")
+        throw new Exception("[tradingpremises][WhatYouNeedController][get] - Unable to retrieve business activities")
       }
     }
   }

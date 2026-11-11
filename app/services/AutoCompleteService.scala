@@ -29,7 +29,7 @@ class AutoCompleteService @Inject() (data: CountryDataProvider) {
     case Some(value) =>
       Seq(SelectItem()) ++
         value.map(pair => SelectItem(value = Some(pair.value), text = pair.name))
-    case None        => throw new RuntimeException()
+    case None        => throw new RuntimeException("[AutoCompleteService][formOptions] - Country data could not be loaded")
   }
 
   lazy val formOptionsExcludeUK: Seq[SelectItem] = getCountries match {
@@ -38,6 +38,7 @@ class AutoCompleteService @Inject() (data: CountryDataProvider) {
         value
           .filterNot(_.value == "GB")
           .map(pair => SelectItem(value = Some(pair.value), text = pair.name))
-    case None        => throw new RuntimeException()
+    case None        =>
+      throw new RuntimeException("[AutoCompleteService][formOptionsExcludeUK] - Country data could not be loaded")
   }
 }
