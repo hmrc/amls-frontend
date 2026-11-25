@@ -5,7 +5,7 @@ private object AppDependencies {
 
   private val playV = "play-30"
   private val flexmarkVersion = "0.64.8"
-  private val bootstrapV = "10.8.0"
+  private val bootstrapV = "10.9.0"
   private val hmrcMongoV = "2.14.0"
 
   val compile: Seq[ModuleID] = Seq(
