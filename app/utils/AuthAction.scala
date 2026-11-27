@@ -72,6 +72,7 @@ class DefaultAuthAction @Inject() (
   override final protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
 
     implicit val hc = headerCarrierForPartialsConverter.fromRequestWithEncryptedCookie(request)
+    val prefix      = "[DefaultAuthAction][refine]"
 
     authorised(authPredicate)
       .retrieve(
@@ -82,12 +83,16 @@ class DefaultAuthAction @Inject() (
           Retrievals.credentialRole
       ) {
         case enrolments ~ Some(_) ~ Some(affinityGroup) ~ _ ~ _ if !isPermitted(affinityGroup, enrolments) =>
-          logger.debug("DefaultAuthAction:Refine - Not permitted affinity group: " + affinityGroup)
+          logger.warn(
+            s"$prefix - Affinity group not permitted, redirecting to unauthorised - affinityGroup: $affinityGroup"
+          )
           val target = if (affinityGroup == AffinityGroup.Agent) unauthorisedAgent else unauthorised
           Future.successful(Left(Redirect(Call("GET", target))))
         case enrolments ~ Some(credentials) ~ Some(affinityGroup) ~ groupIdentifier ~ credentialRole       =>
           // $COVERAGE-OFF$
-          logger.debug("DefaultAuthAction:Refine - Enrolments:" + enrolments)
+          logger.debug(
+            s"$prefix - Authorised - affinityGroup: $affinityGroup, enrolments: ${enrolments.enrolments.size}"
+          )
           // $COVERAGE-ON$
 
           Future.successful(
@@ -105,35 +110,39 @@ class DefaultAuthAction @Inject() (
             )
           )
         case _                                                                                             =>
-          // $COVERAGE-OFF$
-          logger.debug("DefaultAuthAction:Refine - Non match (enrolments ~ Some(credentials) ~ Some(affinityGroup))")
-          // $COVERAGE-ON$
+          logger.warn(s"$prefix - Auth retrieval missing credentials or affinity group, redirecting to unauthorised")
           Future.successful(Left(Redirect(Call("GET", unauthorised))))
       }
       .recover[Either[Result, AuthorisedRequest[A]]] {
         case nas: NoActiveSession             =>
-          logger.debug("DefaultAuthAction:Refine - NoActiveSession:" + nas)
+          logger.debug(s"$prefix - No active session, redirecting to sign out - type: ${nas.getClass.getSimpleName}")
           Left(Redirect(Call("GET", signout)))
         case ie: InsufficientEnrolments       =>
-          logger.debug("DefaultAuthAction:Refine - InsufficientEnrolments:" + ie)
+          logger.warn(s"$prefix - Insufficient enrolments, redirecting to unauthorised - reason: ${ie.reason}")
           Left(Redirect(Call("GET", unauthorised)))
         case icl: InsufficientConfidenceLevel =>
-          logger.debug("DefaultAuthAction:Refine - InsufficientConfidenceLevel:" + icl)
+          logger.warn(s"$prefix - Insufficient confidence level, redirecting to unauthorised - reason: ${icl.reason}")
           Left(Redirect(Call("GET", unauthorised)))
         case uap: UnsupportedAuthProvider     =>
-          logger.debug("DefaultAuthAction:Refine - UnsupportedAuthProvider:" + uap)
+          logger.warn(s"$prefix - Unsupported auth provider, redirecting to unauthorised - reason: ${uap.reason}")
           Left(Redirect(Call("GET", unauthorisedAuthProvider)))
         case uag: UnsupportedAffinityGroup    =>
-          logger.debug("DefaultAuthAction:Refine - UnsupportedAffinityGroup:" + uag)
+          logger.warn(
+            s"$prefix - Unsupported affinity group, redirecting to unauthorised agent - reason: ${uag.reason}"
+          )
           Left(Redirect(Call("GET", unauthorisedAgent)))
         case ucr: UnsupportedCredentialRole   =>
-          logger.debug("DefaultAuthAction:Refine - UnsupportedCredentialRole:" + ucr)
+          logger.warn(s"$prefix - Unsupported credential role, redirecting to unauthorised - reason: ${ucr.reason}")
           Left(Redirect(Call("GET", unauthorised)))
         case enf: enrolmentNotFound           =>
-          logger.debug("DefaultAuthAction:Refine - enrolmentNotFound:" + enf)
+          logger.warn(
+            s"$prefix - No SA or CT enrolment found, redirecting to unauthorised - type: ${enf.getClass.getSimpleName}"
+          )
           Left(Redirect(Call("GET", unauthorised)))
         case e: AuthorisationException        =>
-          logger.debug("DefaultAuthAction:Refine - AuthorisationException:" + e)
+          logger.warn(
+            s"$prefix - Authorisation failed, redirecting to unauthorised - reason: ${e.reason}, type: ${e.getClass.getSimpleName}"
+          )
           Left(Redirect(Call("GET", unauthorised)))
       }
   }

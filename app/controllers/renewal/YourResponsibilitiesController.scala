@@ -49,8 +49,8 @@ class YourResponsibilitiesController @Inject() (
       ba      <- OptionT.fromOption[Future](bm.activities)
       section <- OptionT.liftF(getSection(renewalService, request.credId, Some(ba), bm.msbServices))
     } yield section).getOrElse {
-      logger.warn("Unable to retrieve business activities in [renewal][YourResponsibilitiesController]")
-      throw new Exception("Unable to retrieve business activities in [renewal][YourResponsibilitiesController]")
+      logger.warn("[renewal][YourResponsibilitiesController][get] - Unable to retrieve business activities")
+      throw new Exception("[renewal][YourResponsibilitiesController][get] - Unable to retrieve business activities")
     }
   }
 

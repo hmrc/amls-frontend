@@ -55,6 +55,14 @@ trait HttpClientMocker extends TestSuite with MockFactory {
     mockExecute(Future.successful(response))
   }
 
+  def mockDelete[Res: HttpReads](
+    url: URL,
+    response: Exception
+  ): CallHandler2[HttpReads[Res], ExecutionContext, Future[Res]] = {
+    (httpClient.delete(_: URL)(_: HeaderCarrier)).expects(url, *).returning(requestBuilder)
+    mockExecute(Future.failed(response))
+  }
+
   def mockPostJson[B: Writes, Res: HttpReads](
     url: URL,
     requestBody: B,

@@ -74,7 +74,9 @@ class InvolvedInOtherDetailsController @Inject() (
     optBusinessAndOtherActivities match {
       case Some(_) => Future.successful(Redirect(routes.BusinessTurnoverController.get(edit)))
       case None    =>
-        logger.error(s"Unable to fetch business activities or other activities for $credId")
+        logger.warn(
+          "[renewal][InvolvedInOtherDetailsController][redirect] - Unable to fetch business activities or other activities"
+        )
         internalServerError
     }
 

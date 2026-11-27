@@ -206,12 +206,18 @@ class SubmissionService @Inject() (
         if (a.trim.isEmpty) {
           businessMatchingConnector.getReviewDetails map {
             case Some(details) => details.safeId
-            case _             => throw new Exception("No safe id from business customer service")
+            case _             =>
+              throw new Exception(
+                "[SubmissionService][safeId] - Business customer service returned no review details, so no safeId"
+              )
           }
         } else {
           Future.successful(a)
         }
-      case _       => Future.failed(new Exception("No SafeID value available"))
+      case _       =>
+        Future.failed(
+          new Exception("[SubmissionService][safeId] - No safeId in business matching review details in cache")
+        )
     }
 
   def bankDetailsExceptDeleted(bankDetails: Option[Seq[BankDetails]]): Option[Seq[BankDetails]] =

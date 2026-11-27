@@ -42,8 +42,10 @@ class WhatYouNeedController @Inject() (
           ba <- bm.activities
         } yield Ok(view(controllers.responsiblepeople.routes.PersonNameController.get(index, false, flow), Some(ba))))
           .getOrElse {
-            logger.warn("Unable to retrieve business activities in [responsiblepeople][WhatYouNeedController]")
-            throw new Exception("Unable to retrieve business activities in [responsiblepeople][WhatYouNeedController]")
+            logger.warn("[responsiblepeople][WhatYouNeedController][get] - Unable to retrieve business activities")
+            throw new Exception(
+              "[responsiblepeople][WhatYouNeedController][get] - Unable to retrieve business activities"
+            )
           }
       }
     }

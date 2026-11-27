@@ -16,6 +16,8 @@
 
 package controllers.renewal
 
+import play.api.Logging
+
 import com.google.inject.Singleton
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
@@ -39,7 +41,8 @@ class CashPaymentsCustomersNotMetController @Inject() (
   val cc: MessagesControllerComponents,
   formProvider: CashPaymentsCustomersNotMetFormProvider,
   view: CashPaymentsCustomersNotMetView
-) extends AmlsBaseController(ds, cc) {
+) extends AmlsBaseController(ds, cc)
+    with Logging {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async { implicit request =>
     renewalService.getRenewal(request.credId).map { response =>
@@ -48,7 +51,11 @@ class CashPaymentsCustomersNotMetController @Inject() (
         payments <- renewal.receiveCashPayments map { c => c.cashPaymentsCustomerNotMet }
       } yield formProvider().fill(payments)).getOrElse(formProvider())
       Ok(view(form, edit))
-    } recoverWith { case _ =>
+    } recoverWith { case e =>
+      logger.warn(
+        "[renewal][CashPaymentsCustomersNotMetController][get] - Failed to fetch renewal, showing empty form",
+        e
+      )
       Future.successful(Ok(view(formProvider(), edit)))
     }
   }
